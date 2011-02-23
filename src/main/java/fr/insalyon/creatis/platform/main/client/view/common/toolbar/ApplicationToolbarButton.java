@@ -47,7 +47,6 @@ import fr.insalyon.creatis.platform.main.client.view.application.manage.ManageCe
 import fr.insalyon.creatis.platform.main.client.view.application.monitor.MonitorLeftPanel;
 import fr.insalyon.creatis.platform.main.client.view.application.monitor.WorkflowsPanel;
 import fr.insalyon.creatis.platform.main.client.view.common.Context;
-import fr.insalyon.creatis.platform.main.client.view.system.application.ManageClassesCenterPanel;
 
 /**
  *
@@ -55,7 +54,7 @@ import fr.insalyon.creatis.platform.main.client.view.system.application.ManageCl
  */
 public class ApplicationToolbarButton extends ToolbarButton {
 
-    public ApplicationToolbarButton(final String applicationClass, boolean isAdmin) {
+    public ApplicationToolbarButton(final String applicationClass, final boolean isAdmin) {
 
         super(applicationClass);
 
@@ -89,7 +88,12 @@ public class ApplicationToolbarButton extends ToolbarButton {
                     WorkflowsPanel panel = WorkflowsPanel.getInstance();
                     layout.setCenterPanel(panel);
                     panel.setApplicationClass(applicationClass);
-                    panel.loadWorkflowData();
+                    if (isAdmin) {
+                        panel.loadWorkflowData();
+                    } else {
+                        String user = Context.getInstance().getAuthentication().getUserName().split(" / ")[0];
+                        panel.loadWorkflowData(user, null, null, null, null);
+                    }
                 }
                 Ext.get("app-workflows-grid").mask("Loading data...");
                 MonitorLeftPanel monitorLeftPanel = MonitorLeftPanel.getInstance();

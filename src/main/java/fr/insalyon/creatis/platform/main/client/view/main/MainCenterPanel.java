@@ -32,7 +32,6 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-
 package fr.insalyon.creatis.platform.main.client.view.main;
 
 import com.gwtext.client.widgets.Panel;
@@ -59,20 +58,24 @@ public class MainCenterPanel extends Panel {
         this.setPaddings(5, 5, 5, 5);
         this.setLayout(new FitLayout());
 
-        this.setHtml("<html>" +
-                "<body>" +
-                "<p>&nbsp;</p>" +
-                "<h2>Disclaimer</h2><p>This portal is exclusively dedicated to academic use. "
-                +"It shows some functionalities of the VIP platform but it is not in a stable release yet. "
-                + "Please acknowledge the Virtual Imaging Platform (VIP) ANR project ANR-09-COSI-03 wherever appropriate.</p><br/>"
+        this.setHtml("<html>"
+                + "<body>"
+                + "<p>&nbsp;</p>"
+                + "<img src=\"http://www.agence-nationale-recherche.fr/fileadmin/tpl/img/logo.gif\"/>"
+                + "<h2>Disclaimer</h2><p>This portal is exclusively dedicated to academic use. "
+                + "It shows some functionalities of the VIP platform but it is not in a stable release yet. "
+                + "Please acknowledge the <b>Virtual Imaging Platform (VIP) ANR project ANR-09-COSI-03</b> wherever appropriate.</p><br/>"
                 + "<p style=\"padding-left: 10 px\">The Virtual Imaging Platform (VIP) project targets multi-modality, "
                 + "multi-organ and dynamic (4D) medical image simulation. Integrating proven simulation software "
-                +"of the four main imaging modalities (MRI, US, PET and CT), the platform will cope with "
-                +"interoperability challenges among simulators, will address compatibility issues between organ"+
-                "models and will provide transparent access to computing and storage resources.</p><p>"
-                + "<img src=\"http://www.agence-nationale-recherche.fr/fileadmin/tpl/img/logo.gif\"/><p/>" +
-                "</body>" +
-                "</html>");
+                + "of the four main imaging modalities (MRI, US, PET and CT), the platform will cope with "
+                + "interoperability challenges among simulators, will address compatibility issues between organ"
+                + "models and will provide transparent access to computing and storage resources.</p><p><br/>"
+                + "The simulators integrated in the platform must be acknowledged separately and explicitly as follows:</p>"
+                + "<br/><b>Field II</b> is citationware. If you are publishing any work, where this program has been used, please remember that it was obtained free of charge. You must reference the two papers shown below and the name of the program Field II must be mentioned in the publication."
+                + "<ul><li>[1] J.A. Jensen: Field: A Program for Simulating Ultrasound Systems, Paper presented at the 10th Nordic-Baltic Conference on Biomedical Imaging Published in Medical & Biological Engineering & Computing, pp. 351-353, Volume 34, Supplement 1, Part 1, 1996."
+                + "<li>[2] J.A. Jensen and N. B. Svendsen: Calculation of pressure fields from arbitrarily shaped, apodized, and excited ultrasound transducers, IEEE Trans. Ultrason., Ferroelec., Freq. Contr., 39, pp. 262-267, 1992."
+                + "</ul>"
+                + "</body>"
+                + "</html>");
     }
-
 }
