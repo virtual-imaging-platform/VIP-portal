@@ -57,7 +57,7 @@ import fr.insalyon.creatis.vip.portal.client.bean.WorkflowDescriptor;
 import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.portal.client.view.common.panel.CheckboxPanel;
-import fr.insalyon.creatis.vip.portal.client.view.common.FieldUtil;
+import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 import fr.insalyon.creatis.vip.portal.client.view.common.panel.AbstractPanel;
 import fr.insalyon.creatis.vip.portal.client.view.common.window.lfn.SelectLFNBrowserWindow;
 import java.util.ArrayList;

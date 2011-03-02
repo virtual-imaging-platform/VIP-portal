@@ -37,7 +37,7 @@ package fr.insalyon.creatis.vip.portal.client.view.main;
 import com.google.gwt.user.client.ui.Frame;
 import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.layout.FitLayout;
-import fr.insalyon.creatis.vip.portal.client.view.common.Context;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 
 /**
  *

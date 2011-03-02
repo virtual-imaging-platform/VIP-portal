@@ -54,7 +54,7 @@ import com.gwtext.client.widgets.form.event.ComboBoxListenerAdapter;
 import com.gwtext.client.widgets.layout.VerticalLayout;
 import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationServiceAsync;
-import fr.insalyon.creatis.vip.portal.client.view.common.FieldUtil;
+import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 import fr.insalyon.creatis.vip.portal.client.view.common.panel.AbstractPanel;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
 import java.util.List;

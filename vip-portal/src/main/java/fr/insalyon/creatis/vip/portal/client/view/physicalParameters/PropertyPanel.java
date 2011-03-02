@@ -25,8 +25,8 @@ import fr.insalyon.creatis.vip.portal.client.bean.PhysicalProperty;
 import fr.insalyon.creatis.vip.portal.client.bean.Tissue;
 import fr.insalyon.creatis.vip.portal.client.rpc.TissueService;
 import fr.insalyon.creatis.vip.portal.client.rpc.TissueServiceAsync;
-import fr.insalyon.creatis.vip.portal.client.view.common.Context;
-import fr.insalyon.creatis.vip.portal.client.view.common.FieldUtil;
+import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
 import java.util.ArrayList;
 import java.util.Date;
@@ -118,7 +118,7 @@ class PropertyPanel extends Panel {
 
 
         authorField = FieldUtil.getTextField("author", 300, "Author", false);
-        authorField.setEmptyText(fr.insalyon.creatis.vip.portal.client.view.common.Context.getInstance().getAuthentication().getUserName());
+        authorField.setEmptyText(fr.insalyon.creatis.vip.common.client.view.Context.getInstance().getAuthentication().getUserName());
         authorField.setDisabled(true);
 
         dateField = new DateField("Date","d-M-Y");

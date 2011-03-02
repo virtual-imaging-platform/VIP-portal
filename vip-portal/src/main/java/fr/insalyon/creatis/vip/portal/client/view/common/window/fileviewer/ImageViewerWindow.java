@@ -38,7 +38,7 @@ import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.Ext;
 import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.event.ButtonListenerAdapter;
-import fr.insalyon.creatis.vip.portal.client.view.common.Context;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 import java.util.Date;
 
 /**

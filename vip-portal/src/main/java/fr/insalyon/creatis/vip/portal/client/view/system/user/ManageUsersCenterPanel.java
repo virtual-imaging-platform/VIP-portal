@@ -57,7 +57,7 @@ import fr.insalyon.creatis.vip.portal.client.bean.User;
 import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.portal.client.view.common.panel.CheckboxPanel;
-import fr.insalyon.creatis.vip.portal.client.view.common.FieldUtil;
+import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 import fr.insalyon.creatis.vip.portal.client.view.common.panel.AbstractPanel;
 import java.util.HashMap;
 import java.util.List;

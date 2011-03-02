@@ -41,7 +41,7 @@ import com.gwtext.client.widgets.MessageBox;
 import fr.insalyon.creatis.vip.portal.client.bean.Configuration;
 import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationServiceAsync;
-import fr.insalyon.creatis.vip.portal.client.view.common.Context;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
 
 /**

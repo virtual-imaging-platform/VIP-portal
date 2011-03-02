@@ -47,7 +47,7 @@ import com.gwtext.client.core.Ext;
 import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.Window;
 import fr.insalyon.creatis.vip.portal.client.view.application.launch.LaunchLeftPanel;
-import fr.insalyon.creatis.vip.portal.client.view.common.Context;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.portal.client.view.gatelab.GatelabLeftPanel;
 import fr.insalyon.creatis.vip.portal.client.view.gatelab.WorkflowsPanel;

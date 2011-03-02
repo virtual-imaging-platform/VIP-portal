@@ -50,7 +50,7 @@ import com.gwtext.client.widgets.layout.AnchorLayoutData;
 import com.gwtext.client.widgets.layout.FormLayout;
 import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationServiceAsync;
-import fr.insalyon.creatis.vip.portal.client.view.common.FieldUtil;
+import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 import fr.insalyon.creatis.vip.portal.client.view.layout.AbstractLeftPanel;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
 import java.util.List;

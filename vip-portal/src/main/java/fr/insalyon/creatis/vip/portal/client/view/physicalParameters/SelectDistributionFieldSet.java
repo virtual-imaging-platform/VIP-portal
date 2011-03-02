@@ -21,7 +21,7 @@ import fr.insalyon.creatis.vip.portal.client.bean.DistributionParameter;
 import fr.insalyon.creatis.vip.portal.client.bean.DistributionParameterValue;
 import fr.insalyon.creatis.vip.portal.client.rpc.TissueService;
 import fr.insalyon.creatis.vip.portal.client.rpc.TissueServiceAsync;
-import fr.insalyon.creatis.vip.portal.client.view.common.FieldUtil;
+import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

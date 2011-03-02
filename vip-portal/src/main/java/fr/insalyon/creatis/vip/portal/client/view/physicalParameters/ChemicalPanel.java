@@ -14,7 +14,7 @@ import com.gwtext.client.widgets.form.FieldSet;
 import com.gwtext.client.widgets.form.MultiFieldPanel;
 import com.gwtext.client.widgets.form.TextField;
 import fr.insalyon.creatis.vip.portal.client.bean.PhysicalProperty;
-import fr.insalyon.creatis.vip.portal.client.view.common.FieldUtil;
+import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 
 
 /**

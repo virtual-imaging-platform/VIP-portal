@@ -37,7 +37,7 @@ package fr.insalyon.creatis.vip.portal.client.view.layout;
 import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.Toolbar;
 import com.gwtext.client.widgets.ToolbarTextItem;
-import fr.insalyon.creatis.vip.portal.client.view.common.Context;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 
 /**
  *

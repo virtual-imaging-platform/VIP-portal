@@ -18,7 +18,7 @@ import com.gwtext.client.widgets.layout.VerticalLayout;
 import fr.insalyon.creatis.vip.portal.client.bean.Tissue;
 import fr.insalyon.creatis.vip.portal.client.rpc.TissueService;
 import fr.insalyon.creatis.vip.portal.client.rpc.TissueServiceAsync;
-import fr.insalyon.creatis.vip.portal.client.view.common.FieldUtil;
+import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 
 /**
  *

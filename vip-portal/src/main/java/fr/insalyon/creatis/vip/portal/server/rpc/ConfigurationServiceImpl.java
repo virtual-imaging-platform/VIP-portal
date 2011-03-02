@@ -35,7 +35,7 @@
 package fr.insalyon.creatis.vip.portal.server.rpc;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import fr.insalyon.creatis.vip.portal.client.bean.Authentication;
+import fr.insalyon.creatis.vip.common.client.bean.Authentication;
 import fr.insalyon.creatis.vip.portal.client.bean.Configuration;
 import fr.insalyon.creatis.vip.portal.client.bean.User;
 import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationService;

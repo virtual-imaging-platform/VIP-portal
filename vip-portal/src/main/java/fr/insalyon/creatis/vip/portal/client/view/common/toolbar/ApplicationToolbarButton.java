@@ -46,7 +46,7 @@ import fr.insalyon.creatis.vip.portal.client.view.application.launch.LaunchLeftP
 import fr.insalyon.creatis.vip.portal.client.view.application.manage.ManageCenterPanel;
 import fr.insalyon.creatis.vip.portal.client.view.application.monitor.MonitorLeftPanel;
 import fr.insalyon.creatis.vip.portal.client.view.application.monitor.WorkflowsPanel;
-import fr.insalyon.creatis.vip.portal.client.view.common.Context;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 
 /**
  *

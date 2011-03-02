@@ -57,6 +57,17 @@
         <servlet-name>TissueService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/tissueservice</url-pattern>
     </servlet-mapping>
+
+    <!-- Modules -->
+    <servlet>
+        <servlet-name>FileCatalogService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.datamanagement.server.rpc.FileCatalogServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FileCatalogService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/filecatalogservice</url-pattern>
+    </servlet-mapping>
+
     <session-config>
         <session-timeout>
             30

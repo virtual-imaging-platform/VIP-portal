@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.portal.client.bean;
 
+import fr.insalyon.creatis.vip.common.client.bean.Authentication;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
