@@ -34,17 +34,27 @@
  */
 package fr.insalyon.creatis.vip.datamanagement.client.view;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.gwtext.client.core.EventObject;
+import com.gwtext.client.core.Ext;
+import com.gwtext.client.core.SortDir;
+import com.gwtext.client.data.ArrayReader;
+import com.gwtext.client.data.FieldDef;
+import com.gwtext.client.data.MemoryProxy;
 import com.gwtext.client.data.Record;
-import com.gwtext.client.data.SimpleStore;
+import com.gwtext.client.data.RecordDef;
+import com.gwtext.client.data.SortState;
 import com.gwtext.client.data.Store;
+import com.gwtext.client.data.StringFieldDef;
 import com.gwtext.client.widgets.Button;
+import com.gwtext.client.widgets.MessageBox;
 import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.Toolbar;
 import com.gwtext.client.widgets.ToolbarButton;
-import com.gwtext.client.widgets.ToolbarTextItem;
 import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 import com.gwtext.client.widgets.form.ComboBox;
+import com.gwtext.client.widgets.form.Field;
+import com.gwtext.client.widgets.form.event.ComboBoxListenerAdapter;
 import com.gwtext.client.widgets.grid.BaseColumnConfig;
 import com.gwtext.client.widgets.grid.CellMetadata;
 import com.gwtext.client.widgets.grid.CheckboxColumnConfig;
@@ -57,6 +67,12 @@ import com.gwtext.client.widgets.grid.event.GridRowListenerAdapter;
 import com.gwtext.client.widgets.layout.FitLayout;
 import com.gwtext.client.widgets.menu.Item;
 import com.gwtext.client.widgets.menu.Menu;
+import com.gwtextux.client.data.PagingMemoryProxy;
+import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
+import fr.insalyon.creatis.vip.datamanagement.client.bean.Data;
+import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogService;
+import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogServiceAsync;
+import java.util.List;
 
 /**
  *
@@ -64,9 +80,13 @@ import com.gwtext.client.widgets.menu.Menu;
  */
 public class BrowserPanel extends Panel {
 
-    private ToolbarTextItem pathItem;
+    private GridPanel remoteGrid;
+    private Store store;
+    private Store simulationsStore;
+    private ComboBox pathCB;
 
     public BrowserPanel() {
+        this.setId("dm-browser-panel");
         this.setLayout(new FitLayout());
         this.setMargins(0, 0, 0, 0);
         this.setBorder(false);
@@ -77,23 +97,37 @@ public class BrowserPanel extends Panel {
 
     private GridPanel getRemoteGrid() {
 
-        GridPanel remoteGrid = new GridPanel();
+        remoteGrid = new GridPanel();
         remoteGrid.setFrame(true);
         remoteGrid.setStripeRows(true);
         remoteGrid.setMargins(0, 0, 0, 0);
 
         CheckboxSelectionModel cbSelectionModel = new CheckboxSelectionModel();
 
-        Store remoteStore = new SimpleStore(
-                new String[]{"typeico", "fileName"}, getRemoteData());
-        remoteStore.load();
-        remoteGrid.setStore(remoteStore);
+        RecordDef recordDef = new RecordDef(
+                new FieldDef[]{
+                    new StringFieldDef("typeico"),
+                    new StringFieldDef("fileName")
+                });
+
+        ArrayReader reader = new ArrayReader(recordDef);
+        PagingMemoryProxy proxy = new PagingMemoryProxy(new Object[][]{new Object[]{}});
+
+        store = new Store(proxy, reader);
+        store.setSortInfo(new SortState("fileName", SortDir.ASC));
+        remoteGrid.setStore(store);
 
         remoteGrid.addGridRowListener(new GridRowListenerAdapter() {
 
             @Override
             public void onRowDblClick(GridPanel grid, int rowIndex, EventObject e) {
-                super.onRowDblClick(grid, rowIndex, e);
+                Record record = grid.getStore().getRecordAt(rowIndex);
+                if (record.getAsString("typeico").equals("Folder")) {
+                    String clickedFolderName = record.getAsString("fileName");
+                    String parentDir = pathCB.getValue();
+
+                    loadData(parentDir + "/" + clickedFolderName, true);
+                }
             }
         });
 
@@ -108,12 +142,72 @@ public class BrowserPanel extends Panel {
         return remoteGrid;
     }
 
-    private Object[][] getRemoteData() {
-        return new Object[][]{
-                    new Object[]{"Folder", "abc"},
-                    new Object[]{"File", "qwwe.txt"},
-                    new Object[]{"File", "file231.doc"}
-                };
+    /**
+     * 
+     * @param baseDir
+     */
+    public void loadData(String baseDir, boolean newPath) {
+        Ext.get("dm-browser-panel").mask("Loading...");
+
+        Record[] records = pathCB.getStore().getRecords();
+        Object[][] data;
+        if (newPath) {
+            if (records.length > 0) {
+                data = new Object[records.length + 1][1];
+                for (int i = 0; i < records.length; i++) {
+                    data[i][0] = records[i].getAsString("dm-path-name");
+                }
+                data[records.length][0] = baseDir;
+
+            } else {
+                data = new Object[1][1];
+                data[0][0] = baseDir;
+            }
+        } else {
+            data = new Object[records.length][1];
+            for (int i = 0; i < records.length; i++) {
+                data[i][0] = records[i].getAsString("dm-path-name");
+            }
+        }
+
+        MemoryProxy usersProxy = new MemoryProxy(data);
+        simulationsStore.setDataProxy(usersProxy);
+        simulationsStore.load();
+        simulationsStore.commitChanges();
+        pathCB.setValue(baseDir);
+
+        FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
+        AsyncCallback<List<Data>> callback = new AsyncCallback<List<Data>>() {
+
+            public void onFailure(Throwable caught) {
+                MessageBox.alert("Error", "Error executing get files list: " + caught.getMessage());
+                Ext.get("dm-browser-panel").unmask();
+            }
+
+            public void onSuccess(List<Data> result) {
+                if (result != null) {
+                    Object[][] data = new Object[result.size()][2];
+                    int i = 0;
+                    for (Data d : result) {
+                        data[i][0] = d.getType();
+                        data[i][1] = d.getName();
+                        i++;
+                    }
+                    PagingMemoryProxy proxy = new PagingMemoryProxy(data);
+                    store.setDataProxy(proxy);
+                    store.load();
+                    store.commitChanges();
+                } else {
+                    MessageBox.alert("Error", "Unable to get list of files.");
+                }
+                Ext.get("dm-browser-panel").unmask();
+            }
+        };
+//        Context context = Context.getInstance();
+//        context.setLastGridFolderBrowsed(baseDir);
+//        Authentication auth = context.getAuthentication();
+//        service.listDir(auth.getProxyFileName(), baseDir, callback);
+        service.listDir("/tmp/x509up_u501", baseDir, callback);
     }
 
     private ColumnConfig getIcoTypeColumnConfig() {
@@ -137,8 +231,22 @@ public class BrowserPanel extends Panel {
 
         Toolbar topToolbar = new Toolbar();
 
-        ComboBox pathComboBox = new ComboBox();
-        pathComboBox.setWidth(300);
+        simulationsStore = FieldUtil.getComboBoxStore("dm-path-name");
+        simulationsStore.load();
+
+        pathCB = FieldUtil.getComboBox("dm-path-cb", "", 300,
+                "", simulationsStore, "dm-path-name");
+        pathCB.addListener(new ComboBoxListenerAdapter() {
+
+            @Override
+            public void onChange(Field field, Object newVal, Object oldVal) {
+                String path = pathCB.getValue();
+
+                if (path != null && !path.isEmpty()) {
+                    loadData(pathCB.getValue(), false);
+                }
+            }
+        });
 
         // Folder up Button
         ToolbarButton folderupButton = new ToolbarButton("", new ButtonListenerAdapter() {
@@ -156,7 +264,7 @@ public class BrowserPanel extends Panel {
 
             @Override
             public void onClick(Button button, EventObject e) {
-                // TODO
+                loadData(pathCB.getValue(), false);
             }
         });
         refreshButton.setIcon("images/icon-refresh.gif");
@@ -176,7 +284,7 @@ public class BrowserPanel extends Panel {
         menu.addItem(deleteSelectedItem);
         actionsButton.setMenu(menu);
 
-        topToolbar.addField(pathComboBox);
+        topToolbar.addField(pathCB);
         topToolbar.addButton(folderupButton);
         topToolbar.addButton(refreshButton);
         topToolbar.addButton(actionsButton);

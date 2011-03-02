@@ -66,10 +66,12 @@ public class DataManagementWindow extends Window {
         eastData.setMargins(0, 0, 0, 0);
 
         panel.add(new EastPanel(), eastData);
-        panel.add(new BrowserPanel(), new BorderLayoutData(RegionPosition.CENTER));
+        BrowserPanel browserPanel = new BrowserPanel();
+        panel.add(browserPanel, new BorderLayoutData(RegionPosition.CENTER));
 
         this.add(panel);
         this.show();
+        browserPanel.loadData("/grid/biomed/creatis", true);
     }
 
     

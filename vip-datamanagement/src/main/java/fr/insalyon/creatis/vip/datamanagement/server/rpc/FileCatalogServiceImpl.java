@@ -56,15 +56,12 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
                     ServerConfiguration.getInstance().getVletagentPort(),
                     proxyFileName);
 
-            List<String> dirs = client.getDirectoriesList(baseDir);
-            List<String> files = client.getFilesList(baseDir);
+            List<String> list = client.getFilesAndFoldersList(baseDir);
 
             List<Data> dataList = new ArrayList<Data>();
-            for (String d : dirs) {
-                dataList.add(new Data(d, "Folder"));
-            }
-            for (String f : files) {
-                dataList.add(new Data(f, "File"));
+            for (String d : list) {
+                String[] data = d.split("--");
+                dataList.add(new Data(data[0], data[1]));
             }
             return dataList;
 
