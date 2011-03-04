@@ -65,8 +65,10 @@ import com.gwtext.client.widgets.grid.GridPanel;
 import com.gwtext.client.widgets.grid.Renderer;
 import com.gwtext.client.widgets.grid.event.GridRowListenerAdapter;
 import com.gwtext.client.widgets.layout.FitLayout;
+import com.gwtext.client.widgets.menu.BaseItem;
 import com.gwtext.client.widgets.menu.Item;
 import com.gwtext.client.widgets.menu.Menu;
+import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
 import com.gwtextux.client.data.PagingMemoryProxy;
 import fr.insalyon.creatis.vip.common.client.bean.Authentication;
 import fr.insalyon.creatis.vip.common.client.view.Context;
@@ -205,11 +207,11 @@ public class BrowserPanel extends Panel {
                 Ext.get("dm-browser-panel").unmask();
             }
         };
-        Context context = Context.getInstance();
-        context.setLastGridFolderBrowsed(baseDir);
-        Authentication auth = context.getAuthentication();
-        service.listDir(auth.getProxyFileName(), baseDir, callback);
-//        service.listDir("/tmp/x509up_u501", baseDir, callback);
+//        Context context = Context.getInstance();
+//        context.setLastGridFolderBrowsed(baseDir);
+//        Authentication auth = context.getAuthentication();
+//        service.listDir(auth.getProxyFileName(), baseDir, callback);
+        service.listDir("/tmp/x509up_u501", baseDir, callback);
     }
 
     private ColumnConfig getIcoTypeColumnConfig() {
@@ -278,7 +280,13 @@ public class BrowserPanel extends Panel {
         ToolbarButton actionsButton = new ToolbarButton("Actions");
         Menu menu = new Menu();
 
-        Item uploadItem = new Item("Upload a File");
+        Item uploadItem = new Item("Upload a File", new BaseItemListenerAdapter() {
+
+            @Override
+            public void onClick(BaseItem item, EventObject e) {
+                new FileUploadWindow(pathCB.getValue());
+            }
+        });
         Item downloadSelectedItem = new Item("Download Selected Files");
         Item deleteSelectedItem = new Item("Delete Selected Files");
 
