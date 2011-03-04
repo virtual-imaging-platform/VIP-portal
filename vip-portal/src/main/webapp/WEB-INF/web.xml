@@ -67,6 +67,14 @@
         <servlet-name>FileCatalogService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/filecatalogservice</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>FileUploadService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.datamanagement.server.rpc.FileUploadServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FileUploadService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/fileuploadservice</url-pattern>
+    </servlet-mapping>
 
     <session-config>
         <session-timeout>
