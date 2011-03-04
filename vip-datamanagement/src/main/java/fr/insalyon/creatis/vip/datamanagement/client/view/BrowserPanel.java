@@ -68,6 +68,8 @@ import com.gwtext.client.widgets.layout.FitLayout;
 import com.gwtext.client.widgets.menu.Item;
 import com.gwtext.client.widgets.menu.Menu;
 import com.gwtextux.client.data.PagingMemoryProxy;
+import fr.insalyon.creatis.vip.common.client.bean.Authentication;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 import fr.insalyon.creatis.vip.datamanagement.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogService;
@@ -114,7 +116,7 @@ public class BrowserPanel extends Panel {
         PagingMemoryProxy proxy = new PagingMemoryProxy(new Object[][]{new Object[]{}});
 
         store = new Store(proxy, reader);
-        store.setSortInfo(new SortState("fileName", SortDir.ASC));
+        store.setSortInfo(new SortState("typeico", SortDir.DESC));
         remoteGrid.setStore(store);
 
         remoteGrid.addGridRowListener(new GridRowListenerAdapter() {
@@ -203,11 +205,11 @@ public class BrowserPanel extends Panel {
                 Ext.get("dm-browser-panel").unmask();
             }
         };
-//        Context context = Context.getInstance();
-//        context.setLastGridFolderBrowsed(baseDir);
-//        Authentication auth = context.getAuthentication();
-//        service.listDir(auth.getProxyFileName(), baseDir, callback);
-        service.listDir("/tmp/x509up_u501", baseDir, callback);
+        Context context = Context.getInstance();
+        context.setLastGridFolderBrowsed(baseDir);
+        Authentication auth = context.getAuthentication();
+        service.listDir(auth.getProxyFileName(), baseDir, callback);
+//        service.listDir("/tmp/x509up_u501", baseDir, callback);
     }
 
     private ColumnConfig getIcoTypeColumnConfig() {
@@ -253,7 +255,9 @@ public class BrowserPanel extends Panel {
 
             @Override
             public void onClick(Button button, EventObject e) {
-                // TODO
+                String selectedPath = pathCB.getValue();
+                String newPath = selectedPath.substring(0, selectedPath.lastIndexOf("/"));
+                loadData(newPath, false);
             }
         });
         folderupButton.setIcon("images/icon-folderup.gif");

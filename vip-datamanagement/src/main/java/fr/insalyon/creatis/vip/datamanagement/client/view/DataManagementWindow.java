@@ -48,6 +48,7 @@ import com.gwtext.client.widgets.layout.FitLayout;
 public class DataManagementWindow extends Window {
 
     public DataManagementWindow() {
+
         this.setTitle("VIP Data Management");
         this.setWidth(850);
         this.setHeight(500);
@@ -73,6 +74,4 @@ public class DataManagementWindow extends Window {
         this.show();
         browserPanel.loadData("/grid/biomed/creatis", true);
     }
-
-    
 }
