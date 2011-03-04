@@ -71,6 +71,8 @@ public class ServerConfiguration {
     private String keystorePass = "";
     private String truststoreFile = "/usr/local/apache-tomcat-6.0.29/conf/truststore.jks";
     private String truststorePass = "";
+    // Data Management
+    private String dataManagementPath = "/tmp";
 
     public static ServerConfiguration getInstance() {
         if (instance == null) {
@@ -117,6 +119,7 @@ public class ServerConfiguration {
             apacheHost = prop.getProperty("apache.host", apacheHost);
             apacheSSLPort = new Integer(prop.getProperty("apache.ssl.port", apacheSSLPort + ""));
             quickStartURL = prop.getProperty("quickstart.url", quickStartURL);
+            dataManagementPath = prop.getProperty("datamanagement.path", dataManagementPath);
 
         } catch (IOException e) {
 
@@ -136,8 +139,9 @@ public class ServerConfiguration {
                 prop.setProperty("apache.host", apacheHost);
                 prop.setProperty("apache.ssl.port", apacheSSLPort + "");
                 prop.setProperty("quickstart.url", quickStartURL);
+                prop.setProperty("datamanagement.path", dataManagementPath);
 
-                prop.store(new FileOutputStream(confFilePath), "");
+                prop.store(new FileOutputStream(confFilePath), "VIP Configuration File");
 
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -211,5 +215,9 @@ public class ServerConfiguration {
 
     public String getQuickStartURL() {
         return quickStartURL;
+    }
+
+    public String getDataManagementPath() {
+        return dataManagementPath;
     }
 }
