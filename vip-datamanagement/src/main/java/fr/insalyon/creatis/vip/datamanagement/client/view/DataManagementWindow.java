@@ -47,7 +47,18 @@ import com.gwtext.client.widgets.layout.FitLayout;
  */
 public class DataManagementWindow extends Window {
 
-    public DataManagementWindow() {
+    private static DataManagementWindow instance;
+    private EastPanel eastPanel;
+    private BrowserPanel browserPanel;
+
+    public static DataManagementWindow getInstance() {
+        if (instance == null) {
+            instance = new DataManagementWindow();
+        }
+        return instance;
+    }
+
+    private DataManagementWindow() {
 
         this.setTitle("VIP Data Management");
         this.setWidth(850);
@@ -66,12 +77,24 @@ public class DataManagementWindow extends Window {
         eastData.setMaxSize(450);
         eastData.setMargins(0, 0, 0, 0);
 
-        panel.add(new EastPanel(), eastData);
-        BrowserPanel browserPanel = new BrowserPanel();
+        eastPanel = EastPanel.getInstance();
+        panel.add(eastPanel, eastData);
+        browserPanel = new BrowserPanel();
         panel.add(browserPanel, new BorderLayoutData(RegionPosition.CENTER));
 
         this.add(panel);
+    }
+
+    public void display() {
         this.show();
-        browserPanel.loadData("/grid/biomed/creatis", true);
+//        browserPanel.loadData("/grid/biomed/creatis", true);
+        browserPanel.loadData("/grid/biomed/creatis/rafael", true);
+        eastPanel.loadData();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        instance = null;
     }
 }

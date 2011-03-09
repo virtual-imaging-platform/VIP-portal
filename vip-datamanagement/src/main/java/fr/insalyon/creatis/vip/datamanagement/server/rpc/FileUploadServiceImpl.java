@@ -102,7 +102,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                                         ServerConfiguration.getInstance().getVletagentHost(),
                                         ServerConfiguration.getInstance().getVletagentPort(),
                                         proxy);
-                                client.uploadFile(uploadedFile.getAbsolutePath(), path, userdn);
+                                String opId = client.uploadFile(uploadedFile.getAbsolutePath(), path, userdn);
 
                             } catch (Exception ex) {
                                 ex.printStackTrace();

@@ -35,11 +35,12 @@
 package fr.insalyon.creatis.vip.datamanagement.server.rpc;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
+import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
+import fr.insalyon.creatis.agent.vlet.common.bean.Operation;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
-import fr.insalyon.creatis.vip.datamanagement.client.bean.Data;
-import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogService;
+import fr.insalyon.creatis.vip.datamanagement.client.bean.PoolOperation;
+import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolService;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,23 +48,26 @@ import java.util.List;
  *
  * @author Rafael Silva
  */
-public class FileCatalogServiceImpl extends RemoteServiceServlet implements FileCatalogService {
+public class TransferPoolServiceImpl extends RemoteServiceServlet implements TransferPoolService {
 
-    public List<Data> listDir(String proxyFileName, String baseDir) {
+    public List<PoolOperation> getOperations(String user, String proxy) {
+
         try {
-            VletAgentClient client = new VletAgentClient(
+            VletAgentPoolClient client = new VletAgentPoolClient(
                     ServerConfiguration.getInstance().getVletagentHost(),
                     ServerConfiguration.getInstance().getVletagentPort(),
-                    proxyFileName);
+                    proxy);
+            
+            List<Operation> operationsList = client.getOperationsListByUser(user);
+            List<PoolOperation> poolOperations = new ArrayList<PoolOperation>();
 
-            List<String> list = client.getFilesAndFoldersList(baseDir);
-
-            List<Data> dataList = new ArrayList<Data>();
-            for (String d : list) {
-                String[] data = d.split("--");
-                dataList.add(new Data(data[0], data[1]));
+            for (Operation op : operationsList) {
+                poolOperations.add(new PoolOperation(
+                        op.getId(), op.getRegistration(), op.getSource(),
+                        op.getDest(), op.getType().name(), op.getStatus().name(), op.getUser()));
             }
-            return dataList;
+
+            return poolOperations;
 
         } catch (VletAgentClientException ex) {
             ex.printStackTrace();
@@ -71,17 +75,21 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
         return null;
     }
 
-    public void delete(String proxyFileName, String path) {
+    public PoolOperation getOperationById(String id, String proxy) {
         try {
-            VletAgentClient client = new VletAgentClient(
+            VletAgentPoolClient client = new VletAgentPoolClient(
                     ServerConfiguration.getInstance().getVletagentHost(),
                     ServerConfiguration.getInstance().getVletagentPort(),
-                    proxyFileName);
+                    proxy);
+            Operation op = client.getOperationById(id);
 
-            client.delete(path);
-            
+            return new PoolOperation(
+                        op.getId(), op.getRegistration(), op.getSource(),
+                        op.getDest(), op.getType().name(), op.getStatus().name(), op.getUser());
+
         } catch (VletAgentClientException ex) {
             ex.printStackTrace();
         }
+        return null;
     }
 }

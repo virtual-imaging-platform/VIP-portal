@@ -60,4 +60,6 @@ public interface FileCatalogService extends RemoteService {
     }
 
     public List<Data> listDir(String proxyFileName, String baseDir);
+
+    public void delete(String proxyFileName, String path);
 }

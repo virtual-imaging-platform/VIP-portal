@@ -32,55 +32,75 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanagement.client.view;
+package fr.insalyon.creatis.vip.datamanagement.client.bean;
 
-import com.gwtext.client.core.EventObject;
-import com.gwtext.client.widgets.Button;
-import com.gwtext.client.widgets.Toolbar;
-import com.gwtext.client.widgets.ToolbarButton;
-import com.gwtext.client.widgets.event.ButtonListenerAdapter;
+import com.google.gwt.user.client.rpc.IsSerializable;
+import java.util.Date;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DownloadPanel extends AbstractOperationPanel {
+public class PoolOperation implements IsSerializable {
 
-    private static DownloadPanel instance;
+    private String id;
+    private Date registration;
+    private String source;
+    private String dest;
+    private String type;
+    private String status;
+    private String user;
 
-    public static DownloadPanel getInstance() {
-        if (instance == null) {
-            instance = new DownloadPanel();
-        }
-        return instance;
-    }
-
-    private DownloadPanel() {
-        super("dm-download-panel", "Downloads");
-        this.setTopToolbar(getToolbar());
+    public PoolOperation() {
     }
 
     /**
-     *
-     * @return
+     * 
+     * @param id
+     * @param registration
+     * @param source
+     * @param dest
+     * @param type
+     * @param status
+     * @param user
      */
-    private Toolbar getToolbar() {
+    public PoolOperation(String id, Date registration, String source,
+            String dest, String type, String status, String user) {
+        
+        this.id = id;
+        this.registration = registration;
+        this.source = source;
+        this.dest = dest;
+        this.type = type;
+        this.status = status;
+        this.user = user;
+    }
 
-        Toolbar topToolbar = new Toolbar();
+    public String getDest() {
+        return dest;
+    }
 
-        // Refresh Button
-        ToolbarButton refreshButton = new ToolbarButton("", new ButtonListenerAdapter() {
+    public String getId() {
+        return id;
+    }
 
-            @Override
-            public void onClick(Button button, EventObject e) {
-                EastPanel.getInstance().loadData();
-            }
-        });
-        refreshButton.setIcon("images/icon-refresh.gif");
-        refreshButton.setCls("x-btn-icon");
+    public Date getRegistration() {
+        return registration;
+    }
 
-        topToolbar.addButton(refreshButton);
+    public String getSource() {
+        return source;
+    }
 
-        return topToolbar;
+    public String getStatus() {
+        return status;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getUser() {
+        return user;
     }
 }

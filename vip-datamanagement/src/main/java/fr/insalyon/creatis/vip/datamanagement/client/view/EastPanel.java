@@ -34,7 +34,17 @@
  */
 package fr.insalyon.creatis.vip.datamanagement.client.view;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.gwtext.client.core.Ext;
+import com.gwtext.client.widgets.MessageBox;
 import com.gwtext.client.widgets.TabPanel;
+import fr.insalyon.creatis.vip.common.client.bean.Authentication;
+import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.datamanagement.client.bean.PoolOperation;
+import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolService;
+import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolServiceAsync;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -42,14 +52,65 @@ import com.gwtext.client.widgets.TabPanel;
  */
 public class EastPanel extends TabPanel {
 
-    public EastPanel() {
+    private static EastPanel instance;
+    private UploadPanel uploadPanel;
+    private DownloadPanel downloadPanel;
+
+    public static EastPanel getInstance() {
+        if (instance == null) {
+            instance = new EastPanel();
+        }
+        return instance;
+    }
+
+    private EastPanel() {
+        this.setId("dm-east-panel");
         this.setWidth(300);
         this.setEnableTabScroll(true);
         this.setResizeTabs(true);
         this.setMinTabWidth(80);
         this.setCollapsible(false);
 
-        this.add(new UploadPanel());
-        this.add(new DownloadPanel());
+        uploadPanel = UploadPanel.getInstance();
+        downloadPanel = DownloadPanel.getInstance();
+
+        this.add(uploadPanel);
+        this.add(downloadPanel);
+    }
+
+    public void loadData() {
+        TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+        AsyncCallback<List<PoolOperation>> callback = new AsyncCallback<List<PoolOperation>>() {
+
+            public void onFailure(Throwable caught) {
+                MessageBox.alert("Error", "Error executing get files list: " + caught.getMessage());
+                Ext.get("dm-east-panel").unmask();
+            }
+
+            public void onSuccess(List<PoolOperation> result) {
+
+                if (result != null) {
+
+                    List<PoolOperation> uploads = new ArrayList<PoolOperation>();
+                    List<PoolOperation> downloads = new ArrayList<PoolOperation>();
+
+                    for (PoolOperation op : result) {
+                        if (op.getType().equals("Upload")) {
+                            uploads.add(op);
+                        } else {
+                            downloads.add(op);
+                        }
+                    }
+                    uploadPanel.loadData(uploads);
+                    downloadPanel.loadData(downloads);
+                } else {
+                    MessageBox.alert("Error", "Unable to get list of operations.");
+                }
+                Ext.get("dm-east-panel").unmask();
+            }
+        };
+        Authentication auth = Context.getInstance().getAuthentication();
+        service.getOperations(auth.getUserDN(), auth.getProxyFileName(), callback);
+        Ext.get("dm-east-panel").mask("Loading...");
     }
 }

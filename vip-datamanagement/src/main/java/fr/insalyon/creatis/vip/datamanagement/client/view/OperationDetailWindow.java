@@ -34,53 +34,38 @@
  */
 package fr.insalyon.creatis.vip.datamanagement.client.view;
 
-import com.gwtext.client.core.EventObject;
-import com.gwtext.client.widgets.Button;
-import com.gwtext.client.widgets.Toolbar;
-import com.gwtext.client.widgets.ToolbarButton;
-import com.gwtext.client.widgets.event.ButtonListenerAdapter;
+import com.gwtext.client.widgets.Window;
+import com.gwtext.client.widgets.layout.FitLayout;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DownloadPanel extends AbstractOperationPanel {
+public class OperationDetailWindow extends Window {
 
-    private static DownloadPanel instance;
+    private static OperationDetailWindow instance;
+    private OperationDetailPanel panel;
 
-    public static DownloadPanel getInstance() {
+    public static OperationDetailWindow getInstance() {
         if (instance == null) {
-            instance = new DownloadPanel();
+            instance = new OperationDetailWindow();
         }
         return instance;
     }
 
-    private DownloadPanel() {
-        super("dm-download-panel", "Downloads");
-        this.setTopToolbar(getToolbar());
+    private OperationDetailWindow() {
+
+        this.setTitle("Operation Details");
+        this.setLayout(new FitLayout());
+        this.setWidth(470);
+        this.setHeight(240);
+        this.setResizable(false);
+        panel = new OperationDetailPanel();
+        this.add(panel);
     }
 
-    /**
-     *
-     * @return
-     */
-    private Toolbar getToolbar() {
-
-        Toolbar topToolbar = new Toolbar();
-
-        // Refresh Button
-        ToolbarButton refreshButton = new ToolbarButton("", new ButtonListenerAdapter() {
-
-            @Override
-            public void onClick(Button button, EventObject e) {
-                EastPanel.getInstance().loadData();
-            }
-        });
-        refreshButton.setIcon("images/icon-refresh.gif");
-        refreshButton.setCls("x-btn-icon");
-
-        topToolbar.addButton(refreshButton);
-
-        return topToolbar;
+    public void display(String operationId) {
+        this.show();
+        panel.loadData(operationId);
     }
 }

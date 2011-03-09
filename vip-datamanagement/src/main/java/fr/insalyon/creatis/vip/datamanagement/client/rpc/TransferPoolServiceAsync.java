@@ -32,55 +32,19 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanagement.client.view;
+package fr.insalyon.creatis.vip.datamanagement.client.rpc;
 
-import com.gwtext.client.core.EventObject;
-import com.gwtext.client.widgets.Button;
-import com.gwtext.client.widgets.Toolbar;
-import com.gwtext.client.widgets.ToolbarButton;
-import com.gwtext.client.widgets.event.ButtonListenerAdapter;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import fr.insalyon.creatis.vip.datamanagement.client.bean.PoolOperation;
+import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DownloadPanel extends AbstractOperationPanel {
+public interface TransferPoolServiceAsync {
 
-    private static DownloadPanel instance;
+    public void getOperations(String user, String proxy, AsyncCallback<List<PoolOperation>> asyncCallback);
 
-    public static DownloadPanel getInstance() {
-        if (instance == null) {
-            instance = new DownloadPanel();
-        }
-        return instance;
-    }
-
-    private DownloadPanel() {
-        super("dm-download-panel", "Downloads");
-        this.setTopToolbar(getToolbar());
-    }
-
-    /**
-     *
-     * @return
-     */
-    private Toolbar getToolbar() {
-
-        Toolbar topToolbar = new Toolbar();
-
-        // Refresh Button
-        ToolbarButton refreshButton = new ToolbarButton("", new ButtonListenerAdapter() {
-
-            @Override
-            public void onClick(Button button, EventObject e) {
-                EastPanel.getInstance().loadData();
-            }
-        });
-        refreshButton.setIcon("images/icon-refresh.gif");
-        refreshButton.setCls("x-btn-icon");
-
-        topToolbar.addButton(refreshButton);
-
-        return topToolbar;
-    }
+    public void getOperationById(String id, String proxy, AsyncCallback<PoolOperation> asyncCallback);
 }

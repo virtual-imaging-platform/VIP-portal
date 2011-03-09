@@ -34,16 +34,53 @@
  */
 package fr.insalyon.creatis.vip.datamanagement.client.view;
 
-import com.gwtext.client.widgets.Panel;
+import com.gwtext.client.core.EventObject;
+import com.gwtext.client.widgets.Button;
+import com.gwtext.client.widgets.Toolbar;
+import com.gwtext.client.widgets.ToolbarButton;
+import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 
 /**
  *
  * @author Rafael Silva
  */
-public class UploadPanel extends Panel {
+public class UploadPanel extends AbstractOperationPanel {
 
-    public UploadPanel() {
-        this.setTitle("Uploads");
-        this.setWidth(300);
+    private static UploadPanel instance;
+
+    public static UploadPanel getInstance() {
+        if (instance == null) {
+            instance = new UploadPanel();
+        }
+        return instance;
+    }
+
+    private UploadPanel() {
+        super("dm-upload-panel", "Uploads");
+        this.setTopToolbar(getToolbar());
+    }
+
+    /**
+     * 
+     * @return
+     */
+    private Toolbar getToolbar() {
+
+        Toolbar topToolbar = new Toolbar();
+
+        // Refresh Button
+        ToolbarButton refreshButton = new ToolbarButton("", new ButtonListenerAdapter() {
+
+            @Override
+            public void onClick(Button button, EventObject e) {
+                EastPanel.getInstance().loadData();
+            }
+        });
+        refreshButton.setIcon("images/icon-refresh.gif");
+        refreshButton.setCls("x-btn-icon");
+
+        topToolbar.addButton(refreshButton);
+
+        return topToolbar;
     }
 }

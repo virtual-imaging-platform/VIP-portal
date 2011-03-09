@@ -23,4 +23,5 @@
 
     <!-- Servlets -->
     <servlet class="fr.insalyon.creatis.vip.datamanagement.server.rpc.FileCatalogServiceImpl" path="/filecatalogservice"/>
+    <servlet class="fr.insalyon.creatis.vip.datamanagement.server.rpc.TransferPoolServiceImpl" path="/transferpoolservice"/>
 </module>

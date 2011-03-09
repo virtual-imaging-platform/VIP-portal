@@ -79,6 +79,7 @@ public class FileUploadWindow extends Window {
         formPanel.setFileUpload(true);
         formPanel.setFrame(true);
         formPanel.setWidth(350);
+        formPanel.setHeight(60);
         formPanel.setLabelWidth(75);
 
         // Setup error reader to process from submit response from server
@@ -114,6 +115,7 @@ public class FileUploadWindow extends Window {
                         null, Connection.POST,
                         "Adding data to pool of transfers...",
                         false);
+                EastPanel.getInstance().loadData();
             }
         }));
 
