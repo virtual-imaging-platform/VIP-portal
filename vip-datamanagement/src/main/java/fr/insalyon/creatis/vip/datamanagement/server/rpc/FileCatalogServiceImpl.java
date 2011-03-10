@@ -84,4 +84,18 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
             ex.printStackTrace();
         }
     }
+
+    public void createDir(String proxyFileName, String baseDir, String name) {
+        try {
+            VletAgentClient client = new VletAgentClient(
+                    ServerConfiguration.getInstance().getVletagentHost(),
+                    ServerConfiguration.getInstance().getVletagentPort(),
+                    proxyFileName);
+
+            client.createDirectory(baseDir, name);
+
+        } catch (VletAgentClientException ex) {
+            ex.printStackTrace();
+        }
+    }
 }

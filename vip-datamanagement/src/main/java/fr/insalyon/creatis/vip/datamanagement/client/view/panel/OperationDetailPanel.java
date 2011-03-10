@@ -32,7 +32,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanagement.client.view;
+package fr.insalyon.creatis.vip.datamanagement.client.view.panel;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.gwtext.client.core.Ext;

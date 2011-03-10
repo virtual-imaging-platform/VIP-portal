@@ -32,7 +32,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanagement.client.view;
+package fr.insalyon.creatis.vip.datamanagement.client.view.panel;
 
 import com.google.gwt.user.client.DOM;
 import com.gwtext.client.core.EventObject;
@@ -55,10 +55,7 @@ import com.gwtext.client.widgets.grid.GridPanel;
 import com.gwtext.client.widgets.grid.Renderer;
 import com.gwtext.client.widgets.grid.event.GridRowListenerAdapter;
 import com.gwtext.client.widgets.layout.FitLayout;
-import com.gwtext.client.widgets.menu.BaseItem;
-import com.gwtext.client.widgets.menu.Item;
 import com.gwtext.client.widgets.menu.Menu;
-import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
 import com.gwtextux.client.data.PagingMemoryProxy;
 import fr.insalyon.creatis.vip.datamanagement.client.bean.PoolOperation;
 import java.util.List;
@@ -69,9 +66,9 @@ import java.util.List;
  */
 public abstract class AbstractOperationPanel extends Panel {
 
-    private Menu menu;
     private String operationId;
     protected Store store;
+    protected Menu menu;
 
     public AbstractOperationPanel(String id, String title) {
 
@@ -184,22 +181,9 @@ public abstract class AbstractOperationPanel extends Panel {
         return icoColumn;
     }
 
-    private void showMenu(EventObject e) {
-        if (menu == null) {
-            menu = new Menu();
-            menu.setId("dm-operation-menu");
+    protected abstract void showMenu(EventObject e);
 
-            Item detailsItem = new Item("View Details", new BaseItemListenerAdapter() {
-
-                @Override
-                public void onClick(BaseItem item, EventObject e) {
-                    OperationDetailWindow detailWindow = OperationDetailWindow.getInstance();
-                    detailWindow.display(operationId);
-                }
-            });
-            detailsItem.setId("dm-details-operation-menu");
-            menu.addItem(detailsItem);
-        }
-        menu.showAt(e.getXY());
+    public String getOperationId() {
+        return operationId;
     }
 }

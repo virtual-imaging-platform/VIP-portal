@@ -32,8 +32,10 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanagement.client.view;
+package fr.insalyon.creatis.vip.datamanagement.client.view.window;
 
+import fr.insalyon.creatis.vip.datamanagement.client.view.panel.BrowserPanel;
+import fr.insalyon.creatis.vip.datamanagement.client.view.panel.EastPanel;
 import com.gwtext.client.core.RegionPosition;
 import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.Window;
@@ -79,7 +81,7 @@ public class DataManagementWindow extends Window {
 
         eastPanel = EastPanel.getInstance();
         panel.add(eastPanel, eastData);
-        browserPanel = new BrowserPanel();
+        browserPanel = BrowserPanel.getInstance();
         panel.add(browserPanel, new BorderLayoutData(RegionPosition.CENTER));
 
         this.add(panel);

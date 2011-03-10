@@ -32,40 +32,35 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanagement.client.view;
+package fr.insalyon.creatis.vip.datamanagement.client.view.menu;
 
-import com.gwtext.client.widgets.Window;
-import com.gwtext.client.widgets.layout.FitLayout;
+import com.gwtext.client.core.EventObject;
+import com.gwtext.client.widgets.menu.BaseItem;
+import com.gwtext.client.widgets.menu.Item;
+import com.gwtext.client.widgets.menu.Menu;
+import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
+import fr.insalyon.creatis.vip.datamanagement.client.view.window.OperationDetailWindow;
+import fr.insalyon.creatis.vip.datamanagement.client.view.panel.UploadPanel;
 
 /**
  *
  * @author Rafael Silva
  */
-public class OperationDetailWindow extends Window {
+public class UploadMenu extends Menu {
 
-    private static OperationDetailWindow instance;
-    private OperationDetailPanel panel;
+    public UploadMenu() {
 
-    public static OperationDetailWindow getInstance() {
-        if (instance == null) {
-            instance = new OperationDetailWindow();
-        }
-        return instance;
-    }
+        this.setId("dm-upload-menu");
 
-    private OperationDetailWindow() {
+        Item detailsItem = new Item("View Details", new BaseItemListenerAdapter() {
 
-        this.setTitle("Operation Details");
-        this.setLayout(new FitLayout());
-        this.setWidth(470);
-        this.setHeight(240);
-        this.setResizable(false);
-        panel = new OperationDetailPanel();
-        this.add(panel);
-    }
-
-    public void display(String operationId) {
-        this.show();
-        panel.loadData(operationId);
+            @Override
+            public void onClick(BaseItem item, EventObject e) {
+                OperationDetailWindow detailWindow = OperationDetailWindow.getInstance();
+                detailWindow.display(UploadPanel.getInstance().getOperationId());
+            }
+        });
+        detailsItem.setId("dm-details-upload-menu");
+        this.addItem(detailsItem);
     }
 }

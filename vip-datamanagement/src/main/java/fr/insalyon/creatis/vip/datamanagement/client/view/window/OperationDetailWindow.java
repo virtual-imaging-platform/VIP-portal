@@ -32,55 +32,41 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanagement.client.view;
+package fr.insalyon.creatis.vip.datamanagement.client.view.window;
 
-import com.gwtext.client.core.EventObject;
-import com.gwtext.client.widgets.Button;
-import com.gwtext.client.widgets.Toolbar;
-import com.gwtext.client.widgets.ToolbarButton;
-import com.gwtext.client.widgets.event.ButtonListenerAdapter;
+import fr.insalyon.creatis.vip.datamanagement.client.view.panel.OperationDetailPanel;
+import com.gwtext.client.widgets.Window;
+import com.gwtext.client.widgets.layout.FitLayout;
 
 /**
  *
  * @author Rafael Silva
  */
-public class UploadPanel extends AbstractOperationPanel {
+public class OperationDetailWindow extends Window {
 
-    private static UploadPanel instance;
+    private static OperationDetailWindow instance;
+    private OperationDetailPanel panel;
 
-    public static UploadPanel getInstance() {
+    public static OperationDetailWindow getInstance() {
         if (instance == null) {
-            instance = new UploadPanel();
+            instance = new OperationDetailWindow();
         }
         return instance;
     }
 
-    private UploadPanel() {
-        super("dm-upload-panel", "Uploads");
-        this.setTopToolbar(getToolbar());
+    private OperationDetailWindow() {
+
+        this.setTitle("Operation Details");
+        this.setLayout(new FitLayout());
+        this.setWidth(470);
+        this.setHeight(240);
+        this.setResizable(false);
+        panel = new OperationDetailPanel();
+        this.add(panel);
     }
 
-    /**
-     * 
-     * @return
-     */
-    private Toolbar getToolbar() {
-
-        Toolbar topToolbar = new Toolbar();
-
-        // Refresh Button
-        ToolbarButton refreshButton = new ToolbarButton("", new ButtonListenerAdapter() {
-
-            @Override
-            public void onClick(Button button, EventObject e) {
-                EastPanel.getInstance().loadData();
-            }
-        });
-        refreshButton.setIcon("images/icon-refresh.gif");
-        refreshButton.setCls("x-btn-icon");
-
-        topToolbar.addButton(refreshButton);
-
-        return topToolbar;
+    public void display(String operationId) {
+        this.show();
+        panel.loadData(operationId);
     }
 }

@@ -32,7 +32,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanagement.client.view;
+package fr.insalyon.creatis.vip.datamanagement.client.view.panel;
 
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -75,6 +75,8 @@ import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 import fr.insalyon.creatis.vip.datamanagement.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogServiceAsync;
+import fr.insalyon.creatis.vip.datamanagement.client.view.window.FileUploadWindow;
+import fr.insalyon.creatis.vip.datamanagement.client.view.menu.BrowserMenu;
 import java.util.List;
 
 /**
@@ -83,14 +85,21 @@ import java.util.List;
  */
 public class BrowserPanel extends Panel {
 
+    private static BrowserPanel instance;
     private Store store;
     private Store simulationsStore;
     private ComboBox pathCB;
     private Menu menu;
-    private String type;
     private String name;
 
-    public BrowserPanel() {
+    public static BrowserPanel getInstance() {
+        if (instance == null) {
+            instance = new BrowserPanel();
+        }
+        return instance;
+    }
+
+    private BrowserPanel() {
         this.setId("dm-browser-panel");
         this.setLayout(new FitLayout());
         this.setMargins(0, 0, 0, 0);
@@ -138,7 +147,6 @@ public class BrowserPanel extends Panel {
             public void onRowContextMenu(GridPanel grid, int rowIndex, EventObject e) {
                 DOM.eventPreventDefault(e.getBrowserEvent());
                 Record record = grid.getStore().getRecordAt(rowIndex);
-                type = record.getAsString("typeico");
                 name = record.getAsString("fileName");
                 showMenu(e);
             }
@@ -315,53 +323,18 @@ public class BrowserPanel extends Panel {
         return topToolbar;
     }
 
-    /**
-     * 
-     * @param e
-     */
     private void showMenu(EventObject e) {
         if (menu == null) {
-            menu = new Menu();
-            menu.setId("dm-browser-menu");
-
-            Item uploadItem = new Item("Upload File", new BaseItemListenerAdapter() {
-
-                @Override
-                public void onClick(BaseItem item, EventObject e) {
-                    new FileUploadWindow(pathCB.getValue());
-                }
-            });
-            uploadItem.setId("dm-upload-browser-menu");
-            menu.addItem(uploadItem);
-            Item deleteItem = new Item("Delete File/Folder", new BaseItemListenerAdapter() {
-
-                @Override
-                public void onClick(BaseItem item, EventObject e) {
-                    final String parentDir = pathCB.getValue();
-                    FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
-                    AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-                        public void onFailure(Throwable caught) {
-                            MessageBox.alert("Error", "Error executing delete file/folder: " + caught.getMessage());
-                            Ext.get("dm-browser-panel").unmask();
-                        }
-
-                        public void onSuccess(Void result) {
-                            Ext.get("dm-browser-panel").unmask();
-                            loadData(parentDir, false);
-                        }
-                    };
-//                    Context context = Context.getInstance();
-//                    context.setLastGridFolderBrowsed(baseDir);
-//                    Authentication auth = context.getAuthentication();
-//                    service.deleteFile(auth.getProxyFileName(), parentDir + "/" + name, callback);
-                    service.delete("/tmp/x509up_u501", parentDir + "/" + name, callback);
-                    Ext.get("dm-browser-panel").mask("Deleting File/Folder...");
-                }
-            });
-            deleteItem.setId("dm-delete-browser-menu");
-            menu.addItem(deleteItem);
+            menu = new BrowserMenu();
         }
         menu.showAt(e.getXY());
+    }
+
+    public ComboBox getPathCB() {
+        return pathCB;
+    }
+
+    public String getName() {
+        return name;
     }
 }

@@ -32,23 +32,64 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
+package fr.insalyon.creatis.vip.datamanagement.client.view.panel;
 
-package fr.insalyon.creatis.vip.datamanagement.client.rpc;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.datamanagement.client.bean.Data;
-import java.util.List;
+import com.gwtext.client.core.EventObject;
+import com.gwtext.client.widgets.Button;
+import com.gwtext.client.widgets.Toolbar;
+import com.gwtext.client.widgets.ToolbarButton;
+import com.gwtext.client.widgets.event.ButtonListenerAdapter;
+import fr.insalyon.creatis.vip.datamanagement.client.view.menu.DownloadMenu;
 
 /**
  *
  * @author Rafael Silva
  */
-public interface FileCatalogServiceAsync {
+public class DownloadPanel extends AbstractOperationPanel {
 
-    public void listDir(String proxyFileName, String baseDir, AsyncCallback<List<Data>> asyncCallback);
+    private static DownloadPanel instance;
 
-    public void delete(String proxyFileName, String path, AsyncCallback<Void> asyncCallback);
+    public static DownloadPanel getInstance() {
+        if (instance == null) {
+            instance = new DownloadPanel();
+        }
+        return instance;
+    }
 
-    public void createDir(String proxyFileName, String baseDir, String name, AsyncCallback<Void> asyncCallback);
+    private DownloadPanel() {
+        super("dm-download-panel", "Downloads");
+        this.setTopToolbar(getToolbar());
+    }
 
+    /**
+     *
+     * @return
+     */
+    private Toolbar getToolbar() {
+
+        Toolbar topToolbar = new Toolbar();
+
+        // Refresh Button
+        ToolbarButton refreshButton = new ToolbarButton("", new ButtonListenerAdapter() {
+
+            @Override
+            public void onClick(Button button, EventObject e) {
+                EastPanel.getInstance().loadData();
+            }
+        });
+        refreshButton.setIcon("images/icon-refresh.gif");
+        refreshButton.setCls("x-btn-icon");
+
+        topToolbar.addButton(refreshButton);
+
+        return topToolbar;
+    }
+
+    @Override
+    protected void showMenu(EventObject e) {
+        if (menu == null) {
+            menu = new DownloadMenu();
+        }
+        menu.showAt(e.getXY());
+    }
 }

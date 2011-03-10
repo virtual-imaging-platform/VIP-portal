@@ -32,55 +32,35 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanagement.client.view;
+package fr.insalyon.creatis.vip.datamanagement.client.view.menu;
 
 import com.gwtext.client.core.EventObject;
-import com.gwtext.client.widgets.Button;
-import com.gwtext.client.widgets.Toolbar;
-import com.gwtext.client.widgets.ToolbarButton;
-import com.gwtext.client.widgets.event.ButtonListenerAdapter;
+import com.gwtext.client.widgets.menu.BaseItem;
+import com.gwtext.client.widgets.menu.Item;
+import com.gwtext.client.widgets.menu.Menu;
+import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
+import fr.insalyon.creatis.vip.datamanagement.client.view.panel.DownloadPanel;
+import fr.insalyon.creatis.vip.datamanagement.client.view.window.OperationDetailWindow;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DownloadPanel extends AbstractOperationPanel {
+public class DownloadMenu extends Menu {
 
-    private static DownloadPanel instance;
+    public DownloadMenu() {
 
-    public static DownloadPanel getInstance() {
-        if (instance == null) {
-            instance = new DownloadPanel();
-        }
-        return instance;
-    }
+        this.setId("dm-download-menu");
 
-    private DownloadPanel() {
-        super("dm-download-panel", "Downloads");
-        this.setTopToolbar(getToolbar());
-    }
-
-    /**
-     *
-     * @return
-     */
-    private Toolbar getToolbar() {
-
-        Toolbar topToolbar = new Toolbar();
-
-        // Refresh Button
-        ToolbarButton refreshButton = new ToolbarButton("", new ButtonListenerAdapter() {
+        Item detailsItem = new Item("View Details", new BaseItemListenerAdapter() {
 
             @Override
-            public void onClick(Button button, EventObject e) {
-                EastPanel.getInstance().loadData();
+            public void onClick(BaseItem item, EventObject e) {
+                OperationDetailWindow detailWindow = OperationDetailWindow.getInstance();
+                detailWindow.display(DownloadPanel.getInstance().getOperationId());
             }
         });
-        refreshButton.setIcon("images/icon-refresh.gif");
-        refreshButton.setCls("x-btn-icon");
-
-        topToolbar.addButton(refreshButton);
-
-        return topToolbar;
+        detailsItem.setId("dm-details-download-menu");
+        this.addItem(detailsItem);
     }
 }

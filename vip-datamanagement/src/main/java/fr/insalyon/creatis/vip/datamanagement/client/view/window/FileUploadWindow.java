@@ -32,8 +32,9 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanagement.client.view;
+package fr.insalyon.creatis.vip.datamanagement.client.view.window;
 
+import fr.insalyon.creatis.vip.datamanagement.client.view.panel.EastPanel;
 import com.google.gwt.core.client.GWT;
 import com.gwtext.client.core.Connection;
 import com.gwtext.client.core.EventObject;
@@ -62,8 +63,7 @@ public class FileUploadWindow extends Window {
 
         this.setTitle("VIP File Upload");
         this.setLayout(new FitLayout());
-        this.setWidth(400);
-
+        this.setWidth(450);
         this.add(getFormPanel(baseDir));
         this.show();
     }
@@ -106,7 +106,7 @@ public class FileUploadWindow extends Window {
         textField.setInputType("file");
         formPanel.add(textField);
 
-        this.addButton(new Button("Submit", new ButtonListenerAdapter() {
+        this.addButton(new Button("Upload", new ButtonListenerAdapter() {
 
             @Override
             public void onClick(Button button, EventObject e) {
@@ -115,7 +115,6 @@ public class FileUploadWindow extends Window {
                         null, Connection.POST,
                         "Adding data to pool of transfers...",
                         false);
-                EastPanel.getInstance().loadData();
             }
         }));
 
@@ -123,7 +122,8 @@ public class FileUploadWindow extends Window {
 
             @Override
             public void onActionComplete(Form form, int httpStatus, java.lang.String responseText) {
-                // TODO
+                EastPanel.getInstance().loadData();
+                close();
             }
 
             @Override
