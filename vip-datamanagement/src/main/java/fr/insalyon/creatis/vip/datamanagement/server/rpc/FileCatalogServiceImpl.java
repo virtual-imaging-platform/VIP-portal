@@ -57,11 +57,13 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
                     proxyFileName);
 
             List<String> list = client.getFilesAndFoldersList(baseDir);
-
+            
             List<Data> dataList = new ArrayList<Data>();
             for (String d : list) {
-                String[] data = d.split("--");
-                dataList.add(new Data(data[0], data[1]));
+                if (!d.isEmpty()) {
+                    String[] data = d.split("--");
+                    dataList.add(new Data(data[0], data[1]));
+                }
             }
             return dataList;
 
@@ -79,7 +81,7 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
                     proxyFileName);
 
             client.delete(path);
-            
+
         } catch (VletAgentClientException ex) {
             ex.printStackTrace();
         }
