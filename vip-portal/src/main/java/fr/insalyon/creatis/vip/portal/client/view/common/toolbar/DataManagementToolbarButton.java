@@ -38,7 +38,7 @@ import com.gwtext.client.core.EventObject;
 import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.ToolbarButton;
 import com.gwtext.client.widgets.event.ButtonListenerAdapter;
-import fr.insalyon.creatis.vip.datamanagement.client.view.DataManagementWindow;
+import fr.insalyon.creatis.vip.datamanagement.client.view.window.DataManagementWindow;
 
 /**
  *
@@ -53,7 +53,7 @@ public class DataManagementToolbarButton extends ToolbarButton {
 
             @Override
             public void onClick(Button button, EventObject e) {
-                new DataManagementWindow();
+                DataManagementWindow.getInstance().display();
             }
         });
     }

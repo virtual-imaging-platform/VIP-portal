@@ -58,7 +58,7 @@
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/tissueservice</url-pattern>
     </servlet-mapping>
 
-    <!-- Modules -->
+    <!-- DataManagement Module -->
     <servlet>
         <servlet-name>FileCatalogService</servlet-name>
         <servlet-class>fr.insalyon.creatis.vip.datamanagement.server.rpc.FileCatalogServiceImpl</servlet-class>
@@ -75,6 +75,15 @@
         <servlet-name>FileUploadService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/fileuploadservice</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>TransferPoolService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.datamanagement.server.rpc.TransferPoolServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>TransferPoolService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/transferpoolservice</url-pattern>
+    </servlet-mapping>
+    <!-- End DataManagement Module -->
 
     <session-config>
         <session-timeout>
