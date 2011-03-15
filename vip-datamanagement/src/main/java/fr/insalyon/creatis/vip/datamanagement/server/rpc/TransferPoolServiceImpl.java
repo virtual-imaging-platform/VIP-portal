@@ -92,4 +92,17 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
         }
         return null;
     }
+
+    public void removeOperationById(String id, String proxy) {
+        try {
+            VletAgentPoolClient client = new VletAgentPoolClient(
+                    ServerConfiguration.getInstance().getVletagentHost(),
+                    ServerConfiguration.getInstance().getVletagentPort(),
+                    proxy);
+            client.removeOperationById(id);
+
+        } catch (VletAgentClientException ex) {
+            ex.printStackTrace();
+        }
+    }
 }

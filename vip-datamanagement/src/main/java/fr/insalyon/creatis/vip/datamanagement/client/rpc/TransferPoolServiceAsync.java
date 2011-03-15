@@ -47,4 +47,6 @@ public interface TransferPoolServiceAsync {
     public void getOperations(String user, String proxy, AsyncCallback<List<PoolOperation>> asyncCallback);
 
     public void getOperationById(String id, String proxy, AsyncCallback<PoolOperation> asyncCallback);
+
+    public void removeOperationById(String id, String proxy, AsyncCallback<Void> asyncCallback);
 }
