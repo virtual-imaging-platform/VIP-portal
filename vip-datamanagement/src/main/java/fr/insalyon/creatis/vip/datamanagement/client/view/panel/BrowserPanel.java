@@ -66,16 +66,13 @@ import com.gwtext.client.widgets.grid.GridPanel;
 import com.gwtext.client.widgets.grid.Renderer;
 import com.gwtext.client.widgets.grid.event.GridRowListenerAdapter;
 import com.gwtext.client.widgets.layout.FitLayout;
-import com.gwtext.client.widgets.menu.BaseItem;
-import com.gwtext.client.widgets.menu.Item;
 import com.gwtext.client.widgets.menu.Menu;
-import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
 import com.gwtextux.client.data.PagingMemoryProxy;
 import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 import fr.insalyon.creatis.vip.datamanagement.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogServiceAsync;
-import fr.insalyon.creatis.vip.datamanagement.client.view.window.FileUploadWindow;
+import fr.insalyon.creatis.vip.datamanagement.client.view.menu.BrowserActionsMenu;
 import fr.insalyon.creatis.vip.datamanagement.client.view.menu.BrowserMenu;
 import java.util.List;
 
@@ -91,6 +88,7 @@ public class BrowserPanel extends Panel {
     private ComboBox pathCB;
     private Menu menu;
     private String name;
+    private CheckboxSelectionModel cbSelectionModel;
 
     public static BrowserPanel getInstance() {
         if (instance == null) {
@@ -116,7 +114,7 @@ public class BrowserPanel extends Panel {
         remoteGrid.setStripeRows(true);
         remoteGrid.setMargins(0, 0, 0, 0);
 
-        CheckboxSelectionModel cbSelectionModel = new CheckboxSelectionModel();
+        cbSelectionModel = new CheckboxSelectionModel();
 
         RecordDef recordDef = new RecordDef(
                 new FieldDef[]{
@@ -295,25 +293,7 @@ public class BrowserPanel extends Panel {
 
         // Actions Menu
         ToolbarButton actionsButton = new ToolbarButton("Actions");
-        Menu menu = new Menu();
-
-        Item uploadItem = new Item("Upload a File", new BaseItemListenerAdapter() {
-
-            @Override
-            public void onClick(BaseItem item, EventObject e) {
-                new FileUploadWindow(pathCB.getValue());
-            }
-        });
-        Item downloadSelectedItem = new Item("Download Selected Files");
-        downloadSelectedItem.setDisabled(true);
-        Item deleteSelectedItem = new Item("Delete Selected Files");
-        deleteSelectedItem.setDisabled(true);
-
-        menu.addItem(uploadItem);
-        menu.addSeparator();
-        menu.addItem(downloadSelectedItem);
-        menu.addItem(deleteSelectedItem);
-        actionsButton.setMenu(menu);
+        actionsButton.setMenu(new BrowserActionsMenu());
 
         topToolbar.addField(pathCB);
         topToolbar.addButton(folderupButton);
@@ -336,5 +316,9 @@ public class BrowserPanel extends Panel {
 
     public String getName() {
         return name;
+    }
+
+    public CheckboxSelectionModel getCbSelectionModel() {
+        return cbSelectionModel;
     }
 }

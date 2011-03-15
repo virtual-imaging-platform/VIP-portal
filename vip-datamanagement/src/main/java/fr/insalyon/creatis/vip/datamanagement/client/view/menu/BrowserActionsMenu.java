@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.datamanagement.client.view.menu;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.Ext;
+import com.gwtext.client.data.Record;
 import com.gwtext.client.widgets.MessageBox;
 import com.gwtext.client.widgets.menu.BaseItem;
 import com.gwtext.client.widgets.menu.Item;
@@ -47,41 +48,50 @@ import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogServiceAsync
 import fr.insalyon.creatis.vip.datamanagement.client.view.panel.BrowserPanel;
 import fr.insalyon.creatis.vip.datamanagement.client.view.window.CreateFolderWindow;
 import fr.insalyon.creatis.vip.datamanagement.client.view.window.FileUploadWindow;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class BrowserMenu extends Menu {
+public class BrowserActionsMenu extends Menu {
 
-    public BrowserMenu() {
-        this.setId("dm-browser-menu");
+    public BrowserActionsMenu() {
+        this.setId("dm-browser-actions-menu");
 
-        Item uploadItem = new Item("Upload File", new BaseItemListenerAdapter() {
+        Item uploadItem = new Item("Upload a File", new BaseItemListenerAdapter() {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
                 new FileUploadWindow(BrowserPanel.getInstance().getPathCB().getValue());
             }
         });
-        uploadItem.setId("dm-upload-browser-menu");
-        this.addItem(uploadItem);
 
-        Item deleteItem = new Item("Delete File/Folder", new BaseItemListenerAdapter() {
+        Item downloadSelectedItem = new Item("Download Selected Files");
+        downloadSelectedItem.setDisabled(true);
+
+        Item deleteSelectedItem = new Item("Delete Selected Files/Folders", new BaseItemListenerAdapter() {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                MessageBox.confirm("Confirm", "Do you really want to delete the file/folder \"" + BrowserPanel.getInstance().getName() + "\"?",
+                Record[] records = BrowserPanel.getInstance().getCbSelectionModel().getSelections();
+                final String parentDir = BrowserPanel.getInstance().getPathCB().getValue();
+                final List<String> paths = new ArrayList<String>();
+                for (Record r : records) {
+                    paths.add(parentDir + "/" + r.getAsString("fileName"));
+                }
+
+                MessageBox.confirm("Confirm", "Do you really want to delete the files/folders \"" + paths + "\"?",
                         new MessageBox.ConfirmCallback() {
 
                             public void execute(String btnID) {
                                 if (btnID.toLowerCase().equals("yes")) {
-                                    final String parentDir = BrowserPanel.getInstance().getPathCB().getValue();
                                     FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
                                     AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                                         public void onFailure(Throwable caught) {
-                                            MessageBox.alert("Error", "Error executing delete file/folder: " + caught.getMessage());
+                                            MessageBox.alert("Error", "Error executing delete files/folders: " + caught.getMessage());
                                             Ext.get("dm-browser-panel").unmask();
                                         }
 
@@ -90,28 +100,31 @@ public class BrowserMenu extends Menu {
                                             BrowserPanel.getInstance().loadData(parentDir, false);
                                         }
                                     };
-//                                        Context context = Context.getInstance();
-//                                        context.setLastGridFolderBrowsed(baseDir);
-//                                        Authentication auth = context.getAuthentication();
-//                                        service.delete(auth.getProxyFileName(), parentDir + "/" + name, callback);
-                                    service.delete("/tmp/x509up_u501", parentDir + "/" + BrowserPanel.getInstance().getName(), callback);
-                                    Ext.get("dm-browser-panel").mask("Deleting File/Folder...");
+//                                    Context context = Context.getInstance();
+//                                    context.setLastGridFolderBrowsed(baseDir);
+//                                    Authentication auth = context.getAuthentication();
+//                                    service.deleteFiles(auth.getProxyFileName(), paths, callback);
+                                    service.deleteFiles("/tmp/x509up_u501", paths, callback);
+                                    Ext.get("dm-browser-panel").mask("Deleting Files/Folders...");
                                 }
                             }
                         });
             }
         });
-        deleteItem.setId("dm-delete-browser-menu");
-        this.addItem(deleteItem);
 
-        Item createFolderItem = new Item("Create Folder", new BaseItemListenerAdapter() {
+        Item createItem = new Item("Create Folder", new BaseItemListenerAdapter() {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
                 new CreateFolderWindow(BrowserPanel.getInstance().getPathCB().getValue());
             }
         });
-        createFolderItem.setId("dm-createfolder-browser-menu");
-        this.addItem(createFolderItem);
+
+        this.addItem(uploadItem);
+        this.addSeparator();
+        this.addItem(downloadSelectedItem);
+        this.addItem(deleteSelectedItem);
+        this.addSeparator();
+        this.addItem(createItem);
     }
 }

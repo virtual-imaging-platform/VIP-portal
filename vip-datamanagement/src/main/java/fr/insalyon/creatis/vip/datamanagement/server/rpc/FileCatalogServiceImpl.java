@@ -57,7 +57,7 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
                     proxyFileName);
 
             List<String> list = client.getFilesAndFoldersList(baseDir);
-            
+
             List<Data> dataList = new ArrayList<Data>();
             for (String d : list) {
                 if (!d.isEmpty()) {
@@ -81,6 +81,20 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
                     proxyFileName);
 
             client.delete(path);
+
+        } catch (VletAgentClientException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void deleteFiles(String proxyFileName, List<String> paths) {
+        try {
+            VletAgentClient client = new VletAgentClient(
+                    ServerConfiguration.getInstance().getVletagentHost(),
+                    ServerConfiguration.getInstance().getVletagentPort(),
+                    proxyFileName);
+
+            client.deleteFiles(paths);
 
         } catch (VletAgentClientException ex) {
             ex.printStackTrace();

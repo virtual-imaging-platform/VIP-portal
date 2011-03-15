@@ -39,26 +39,23 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.Ext;
 import com.gwtext.client.widgets.Button;
-import com.gwtext.client.widgets.DataView.Data;
 import com.gwtext.client.widgets.MessageBox;
 import com.gwtext.client.widgets.Window;
 import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 import com.gwtext.client.widgets.form.FormPanel;
 import com.gwtext.client.widgets.form.TextField;
 import com.gwtext.client.widgets.layout.FitLayout;
-import com.gwtextux.client.data.PagingMemoryProxy;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogServiceAsync;
-import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class CreateDirWindow extends Window {
+public class CreateFolderWindow extends Window {
 
-    public CreateDirWindow(String baseDir) {
-        this.setTitle("VIP Create Directory");
+    public CreateFolderWindow(String baseDir) {
+        this.setTitle("VIP Create Folder");
         this.setLayout(new FitLayout());
         this.setWidth(450);
         this.add(getFormPanel(baseDir));
@@ -72,13 +69,12 @@ public class CreateDirWindow extends Window {
      */
     private FormPanel getFormPanel(final String baseDir) {
         FormPanel formPanel = new FormPanel();
-        formPanel.setTitle("Create Directory in: " + baseDir);
+        formPanel.setTitle("Create Folder in: " + baseDir);
         formPanel.setFrame(true);
         formPanel.setWidth(350);
         formPanel.setHeight(60);
         formPanel.setLabelWidth(75);
 
-        // Name Field
         final TextField textField = new TextField("Name", "name", 335);
         textField.setAllowBlank(false);
         formPanel.add(textField);
@@ -100,13 +96,18 @@ public class CreateDirWindow extends Window {
                         BrowserPanel.getInstance().loadData(baseDir, false);
                     }
                 };
+                String text = textField.getText();
+                if (text == null || text.isEmpty()) {
+                    MessageBox.alert("You should provide a folder name");
+                } else {
 //                Context context = Context.getInstance();
 //                context.setLastGridFolderBrowsed(baseDir);
 //                Authentication auth = context.getAuthentication();
-//                service.createDir(auth.getProxyFileName(), baseDir, textField.getText(), callback);
-                service.createDir("/tmp/x509up_u501", baseDir, textField.getText(), callback);
-                Ext.get("dm-browser-panel").mask("Creating Directory...");
-                close();
+//                service.createDir(auth.getProxyFileName(), baseDir, text, callback);
+                    service.createDir("/tmp/x509up_u501", baseDir, text, callback);
+                    Ext.get("dm-browser-panel").mask("Creating Folder...");
+                    close();
+                }
             }
         }));
 

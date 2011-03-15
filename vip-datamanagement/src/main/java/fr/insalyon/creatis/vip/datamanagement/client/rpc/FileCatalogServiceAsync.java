@@ -51,4 +51,6 @@ public interface FileCatalogServiceAsync {
 
     public void createDir(String proxyFileName, String baseDir, String name, AsyncCallback<Void> asyncCallback);
 
+    public void deleteFiles(String proxyFileName, List paths, AsyncCallback<Void> asyncCallback);
+
 }
