@@ -63,18 +63,16 @@ public class JobServiceImpl extends RemoteServiceServlet implements JobService {
 
     public String getFile(String workflowID, String dir, String fileName, String ext) {
         try {
-            if (fileName.contains(".")) {
-                fileName = fileName.substring(0, fileName.lastIndexOf("."));
-            }
             fileName += ext;
             FileReader fr = new FileReader(ServerConfiguration.getInstance().getWorkflowsPath() + "/" + workflowID + "/" + dir + "/" + fileName);
             BufferedReader br = new BufferedReader(fr);
 
             String strLine;
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
 
             while ((strLine = br.readLine()) != null) {
-                sb.append(strLine + "\n");
+                sb.append(strLine);
+                sb.append("\n");
             }
 
             br.close();

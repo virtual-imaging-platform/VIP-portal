@@ -203,7 +203,7 @@ public class JobsPanel extends Panel {
 
                 @Override
                 public void onClick(BaseItem item, EventObject e) {
-                    loadFileWindow("out", ".sh.out", "application_execution");
+                    loadFileWindow("out", ".sh.app.out", null);
                 }
             });
             appOutputItem.setId(workflowID + "-jobs-app-out");
@@ -213,7 +213,7 @@ public class JobsPanel extends Panel {
 
                 @Override
                 public void onClick(BaseItem item, EventObject e) {
-                    loadFileWindow("err", ".sh.err", "application_execution");
+                    loadFileWindow("err", ".sh.app.err", null);
                 }
             });
             appErrorItem.setId(workflowID + "-jobs-app-err");
