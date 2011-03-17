@@ -62,6 +62,7 @@ public class Main implements EntryPoint {
                 Context.getInstance().setAuthentication(result.getAuthentication());
                 Context.getInstance().setQuickstartURL(result.getQuickstartURL());
                 Context.getInstance().setMoteurServerHost(result.getMoteurServerHost());
+                Context.getInstance().setUserHome(result.getUserHome());
                 buildLayout();
             }
         };

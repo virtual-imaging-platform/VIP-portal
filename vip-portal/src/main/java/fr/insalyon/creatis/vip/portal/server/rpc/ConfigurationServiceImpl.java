@@ -35,6 +35,8 @@
 package fr.insalyon.creatis.vip.portal.server.rpc;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
+import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.vip.common.client.bean.Authentication;
 import fr.insalyon.creatis.vip.portal.client.bean.Configuration;
 import fr.insalyon.creatis.vip.portal.client.bean.User;
@@ -63,6 +65,8 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
         HttpServletRequest request = this.getThreadLocalRequest();
         Object o = request.getAttribute("javax.servlet.request.X509Certificate");
         Authentication authentication = null;
+        ServerConfiguration conf = ServerConfiguration.getInstance();
+        String userHome = null;
 
         if (o != null) {
             X509Certificate certs[] = (X509Certificate[]) o;
@@ -87,29 +91,40 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
                     MyProxyClient myproxy = new MyProxyClient();
                     proxyFileName = myproxy.getProxy(user.getCanonicalName(), userDN);
                     authentication = new Authentication(
-                        user.getCanonicalName() + " / " + user.getOrganizationUnit(),
-                        userDN, user.getGroups(), proxyFileName, true);
+                            user.getCanonicalName() + " / " + user.getOrganizationUnit(),
+                            userDN, user.getGroups(), proxyFileName, true);
 
+                    VletAgentClient client = new VletAgentClient(
+                            ServerConfiguration.getInstance().getVletagentHost(),
+                            ServerConfiguration.getInstance().getVletagentPort(),
+                            proxyFileName);
+
+                    client.createDirectory(conf.getDataManagementHome(), user.getCanonicalName().replace(" ", "-"));
+                    
                 } catch (BusinessException ex) {
                     authentication = new Authentication(
                             user.getCanonicalName() + " / " + user.getOrganizationUnit(),
                             userDN, new HashMap(), "", false);
+
+                } catch (VletAgentClientException ex) {
+                    ex.printStackTrace();
                 }
+                userHome = conf.getDataManagementHome() + "/" + user.getCanonicalName().replace(" ", "-");
             }
         } else {
             authentication = new Authentication("Anonymous", "Anonymous", new HashMap(), "", false);
         }
-
-        ServerConfiguration conf = ServerConfiguration.getInstance();
+        
         URI uri = null;
         try {
             uri = new URI(conf.getMoteurServer());
         } catch (URISyntaxException ex) {
             ex.printStackTrace();
         }
-        return new Configuration(authentication, 
+        return new Configuration(authentication,
                 conf.getQuickStartURL(),
-                uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort());
+                uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort(),
+                userHome);
     }
 
     public String addGroup(String groupName) {

@@ -46,14 +46,17 @@ public class Configuration implements IsSerializable {
     private Authentication authentication;
     private String quickstartURL;
     private String moteurServerHost;
+    private String userHome;
 
     public Configuration() {
     }
 
-    public Configuration(Authentication authentication, String quickstartURL, String moteurServerHost) {
+    public Configuration(Authentication authentication, String quickstartURL,
+            String moteurServerHost, String userHome) {
         this.authentication = authentication;
         this.quickstartURL = quickstartURL;
         this.moteurServerHost = moteurServerHost;
+        this.userHome = userHome;
     }
 
     public Authentication getAuthentication() {
@@ -66,5 +69,9 @@ public class Configuration implements IsSerializable {
 
     public String getQuickstartURL() {
         return quickstartURL;
+    }
+
+    public String getUserHome() {
+        return userHome;
     }
 }
