@@ -73,6 +73,7 @@ public class ServerConfiguration {
     private String truststorePass = "";
     // Data Management
     private String dataManagementPath = "/tmp";
+    private String dataManagementHome = "/grid/biomed/creatis/vip/home";
 
     public static ServerConfiguration getInstance() {
         if (instance == null) {
@@ -120,6 +121,7 @@ public class ServerConfiguration {
             apacheSSLPort = new Integer(prop.getProperty("apache.ssl.port", apacheSSLPort + ""));
             quickStartURL = prop.getProperty("quickstart.url", quickStartURL);
             dataManagementPath = prop.getProperty("datamanagement.path", dataManagementPath);
+            dataManagementHome = prop.getProperty("datamanagement.home", dataManagementHome);
 
         } catch (IOException e) {
 
@@ -140,6 +142,7 @@ public class ServerConfiguration {
                 prop.setProperty("apache.ssl.port", apacheSSLPort + "");
                 prop.setProperty("quickstart.url", quickStartURL);
                 prop.setProperty("datamanagement.path", dataManagementPath);
+                prop.setProperty("datamanagement.home", dataManagementHome);
 
                 prop.store(new FileOutputStream(confFilePath), "VIP Configuration File");
 
@@ -219,5 +222,9 @@ public class ServerConfiguration {
 
     public String getDataManagementPath() {
         return dataManagementPath;
+    }
+
+    public String getDataManagementHome() {
+        return dataManagementHome;
     }
 }
