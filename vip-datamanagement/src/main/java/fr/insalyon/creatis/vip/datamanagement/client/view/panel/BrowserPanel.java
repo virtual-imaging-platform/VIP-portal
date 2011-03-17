@@ -68,6 +68,8 @@ import com.gwtext.client.widgets.grid.event.GridRowListenerAdapter;
 import com.gwtext.client.widgets.layout.FitLayout;
 import com.gwtext.client.widgets.menu.Menu;
 import com.gwtextux.client.data.PagingMemoryProxy;
+import fr.insalyon.creatis.vip.common.client.bean.Authentication;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 import fr.insalyon.creatis.vip.datamanagement.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogService;
@@ -83,9 +85,13 @@ import java.util.List;
 public class BrowserPanel extends Panel {
 
     private static BrowserPanel instance;
+    private Context context;
+    private Authentication auth;
     private Store store;
     private Store simulationsStore;
     private ComboBox pathCB;
+    private String userHomePath;
+    private String userHome;
     private Menu menu;
     private String name;
     private CheckboxSelectionModel cbSelectionModel;
@@ -102,6 +108,12 @@ public class BrowserPanel extends Panel {
         this.setLayout(new FitLayout());
         this.setMargins(0, 0, 0, 0);
         this.setBorder(false);
+
+        this.context = Context.getInstance();
+        this.auth = context.getAuthentication();
+        this.userHomePath = context.getUserHome();
+        this.userHome = "/home/" + auth.getUserName().split(" / ")[0].replace(" ", "-");
+
         this.add(getRemoteGrid());
         this.setTopToolbar(getToolbar());
         this.setWidth(420);
@@ -166,7 +178,12 @@ public class BrowserPanel extends Panel {
      * @param baseDir
      */
     public void loadData(String baseDir, boolean newPath) {
+
         Ext.get("dm-browser-panel").mask("Loading...");
+        if (baseDir == null) {
+            baseDir = userHomePath;
+        }
+        baseDir = baseDir.replace(userHomePath, userHome);
 
         Record[] records = pathCB.getStore().getRecords();
         Object[][] data;
@@ -222,11 +239,8 @@ public class BrowserPanel extends Panel {
                 Ext.get("dm-browser-panel").unmask();
             }
         };
-//        Context context = Context.getInstance();
-//        context.setLastGridFolderBrowsed(baseDir);
-//        Authentication auth = context.getAuthentication();
 //        service.listDir(auth.getProxyFileName(), baseDir, callback);
-        service.listDir("/tmp/x509up_u501", baseDir, callback);
+        service.listDir("/tmp/x509up_u501", baseDir.replace(userHome, userHomePath), callback);
     }
 
     private ColumnConfig getIcoTypeColumnConfig() {
@@ -249,6 +263,7 @@ public class BrowserPanel extends Panel {
     private Toolbar getToolbar() {
 
         Toolbar topToolbar = new Toolbar();
+        topToolbar.setId("dm-browser-tb");
 
         simulationsStore = FieldUtil.getComboBoxStore("dm-path-name");
         simulationsStore.load();
@@ -272,9 +287,11 @@ public class BrowserPanel extends Panel {
 
             @Override
             public void onClick(Button button, EventObject e) {
-                String selectedPath = pathCB.getValue();
-                String newPath = selectedPath.substring(0, selectedPath.lastIndexOf("/"));
-                loadData(newPath, false);
+                String selectedPath = getPathCBValue();
+                if (!selectedPath.equals(userHomePath)) {
+                    String newPath = selectedPath.substring(0, selectedPath.lastIndexOf("/"));
+                    loadData(newPath, false);
+                }
             }
         });
         folderupButton.setIcon("images/icon-folderup.gif");
@@ -310,8 +327,8 @@ public class BrowserPanel extends Panel {
         menu.showAt(e.getXY());
     }
 
-    public ComboBox getPathCB() {
-        return pathCB;
+    public String getPathCBValue() {
+        return pathCB.getValue().replace(userHome, userHomePath);
     }
 
     public String getName() {
@@ -320,5 +337,9 @@ public class BrowserPanel extends Panel {
 
     public CheckboxSelectionModel getCbSelectionModel() {
         return cbSelectionModel;
+    }
+
+    public String getUserHome() {
+        return userHomePath;
     }
 }

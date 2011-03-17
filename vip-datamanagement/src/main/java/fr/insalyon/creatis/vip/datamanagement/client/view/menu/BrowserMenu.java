@@ -61,7 +61,7 @@ public class BrowserMenu extends Menu {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                new FileUploadWindow(BrowserPanel.getInstance().getPathCB().getValue());
+                new FileUploadWindow(BrowserPanel.getInstance().getPathCBValue());
             }
         });
         uploadItem.setId("dm-upload-browser-menu");
@@ -76,7 +76,7 @@ public class BrowserMenu extends Menu {
 
                             public void execute(String btnID) {
                                 if (btnID.toLowerCase().equals("yes")) {
-                                    final String parentDir = BrowserPanel.getInstance().getPathCB().getValue();
+                                    final String parentDir = BrowserPanel.getInstance().getPathCBValue();
                                     FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
                                     AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
@@ -91,7 +91,6 @@ public class BrowserMenu extends Menu {
                                         }
                                     };
 //                                        Context context = Context.getInstance();
-//                                        context.setLastGridFolderBrowsed(baseDir);
 //                                        Authentication auth = context.getAuthentication();
 //                                        service.delete(auth.getProxyFileName(), parentDir + "/" + name, callback);
                                     service.delete("/tmp/x509up_u501", parentDir + "/" + BrowserPanel.getInstance().getName(), callback);
@@ -108,7 +107,7 @@ public class BrowserMenu extends Menu {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                new CreateFolderWindow(BrowserPanel.getInstance().getPathCB().getValue());
+                new CreateFolderWindow(BrowserPanel.getInstance().getPathCBValue());
             }
         });
         createFolderItem.setId("dm-createfolder-browser-menu");

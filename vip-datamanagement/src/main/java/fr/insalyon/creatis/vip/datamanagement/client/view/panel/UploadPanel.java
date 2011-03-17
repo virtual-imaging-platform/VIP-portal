@@ -68,6 +68,7 @@ public class UploadPanel extends AbstractOperationPanel {
     private Toolbar getToolbar() {
 
         Toolbar topToolbar = new Toolbar();
+        topToolbar.setId("dm-upload-tb");
 
         // Refresh Button
         ToolbarButton refreshButton = new ToolbarButton("", new ButtonListenerAdapter() {

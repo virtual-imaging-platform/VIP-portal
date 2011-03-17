@@ -64,7 +64,7 @@ public class BrowserActionsMenu extends Menu {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                new FileUploadWindow(BrowserPanel.getInstance().getPathCB().getValue());
+                new FileUploadWindow(BrowserPanel.getInstance().getPathCBValue());
             }
         });
 
@@ -76,7 +76,7 @@ public class BrowserActionsMenu extends Menu {
             @Override
             public void onClick(BaseItem item, EventObject e) {
                 Record[] records = BrowserPanel.getInstance().getCbSelectionModel().getSelections();
-                final String parentDir = BrowserPanel.getInstance().getPathCB().getValue();
+                final String parentDir = BrowserPanel.getInstance().getPathCBValue();
                 final List<String> paths = new ArrayList<String>();
                 for (Record r : records) {
                     paths.add(parentDir + "/" + r.getAsString("fileName"));
@@ -116,7 +116,7 @@ public class BrowserActionsMenu extends Menu {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                new CreateFolderWindow(BrowserPanel.getInstance().getPathCB().getValue());
+                new CreateFolderWindow(BrowserPanel.getInstance().getPathCBValue());
             }
         });
 

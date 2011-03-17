@@ -68,6 +68,7 @@ public class DownloadPanel extends AbstractOperationPanel {
     private Toolbar getToolbar() {
 
         Toolbar topToolbar = new Toolbar();
+        topToolbar.setId("dm-download-tb");
 
         // Refresh Button
         ToolbarButton refreshButton = new ToolbarButton("", new ButtonListenerAdapter() {

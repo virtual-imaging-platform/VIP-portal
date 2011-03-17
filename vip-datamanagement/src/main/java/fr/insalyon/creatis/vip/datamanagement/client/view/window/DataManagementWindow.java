@@ -89,8 +89,7 @@ public class DataManagementWindow extends Window {
 
     public void display() {
         this.show();
-//        browserPanel.loadData("/grid/biomed/creatis", true);
-        browserPanel.loadData("/grid/biomed/creatis/rafael", true);
+        browserPanel.loadData(null, true);
         eastPanel.loadData();
     }
 
