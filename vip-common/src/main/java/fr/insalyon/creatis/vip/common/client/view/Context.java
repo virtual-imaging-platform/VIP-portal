@@ -47,6 +47,7 @@ public class Context {
     private String quickstartURL;
     private String moteurServerHost;
     private String lastGridFolderBrowsed;
+    private String userHome;
 
     public static Context getInstance() {
         if (instance == null) {
@@ -88,5 +89,13 @@ public class Context {
 
     public void setQuickstartURL(String quickstartURL) {
         this.quickstartURL = quickstartURL;
+    }
+
+    public String getUserHome() {
+        return userHome;
+    }
+
+    public void setUserHome(String userHome) {
+        this.userHome = userHome;
     }
 }
