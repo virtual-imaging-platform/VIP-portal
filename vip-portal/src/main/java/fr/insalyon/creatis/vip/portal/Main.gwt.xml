@@ -19,7 +19,7 @@
 
     <!-- Project sub-modules -->
     <inherits name="fr.insalyon.creatis.vip.common.Common" />
-    <inherits name="fr.insalyon.creatis.vip.datamanagement.DataManagement" />
+    <inherits name="fr.insalyon.creatis.vip.datamanagement.DataManager" />
 
     <!-- Specify the app entry point class.-->
     <entry-point class="fr.insalyon.creatis.vip.portal.client.Main"/>

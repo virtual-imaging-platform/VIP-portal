@@ -108,16 +108,6 @@
             <version>0.4</version>
         </dependency>
         <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-common</artifactId>
-            <version>0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-datamanagement</artifactId>
-            <version>0.1</version>
-        </dependency>
-        <dependency>
             <groupId>fr.cnrs.i3s</groupId>
             <artifactId>moteur2</artifactId>
             <version>0.9.13</version>
@@ -137,6 +127,18 @@
             <artifactId>commons-discovery</artifactId>
             <version>0.4</version>
         </dependency>
+        <!-- VIP MODULES -->
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-common</artifactId>
+            <version>0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-datamanager</artifactId>
+            <version>0.1</version>
+        </dependency>
+        <!-- END VIP MODULES -->
     </dependencies>
     <build>
         <plugins>
