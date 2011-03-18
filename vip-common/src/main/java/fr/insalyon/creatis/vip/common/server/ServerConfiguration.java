@@ -72,8 +72,10 @@ public class ServerConfiguration {
     private String truststoreFile = "/usr/local/apache-tomcat-6.0.29/conf/truststore.jks";
     private String truststorePass = "";
     // Data Management
-    private String dataManagementPath = "/tmp";
-    private String dataManagementHome = "/grid/biomed/creatis/vip/home";
+    private String dataManagerPath = "/tmp";
+    private String dataManagerHome = "/grid/biomed/creatis/vip/home";
+    private String dataManagerLFCHost = "lfc-biomed.in2p3.fr";
+    private int dataManagerLFCPort = 5010;
 
     public static ServerConfiguration getInstance() {
         if (instance == null) {
@@ -120,8 +122,10 @@ public class ServerConfiguration {
             apacheHost = prop.getProperty("apache.host", apacheHost);
             apacheSSLPort = new Integer(prop.getProperty("apache.ssl.port", apacheSSLPort + ""));
             quickStartURL = prop.getProperty("quickstart.url", quickStartURL);
-            dataManagementPath = prop.getProperty("datamanagement.path", dataManagementPath);
-            dataManagementHome = prop.getProperty("datamanagement.home", dataManagementHome);
+            dataManagerPath = prop.getProperty("datamanager.path", dataManagerPath);
+            dataManagerHome = prop.getProperty("datamanager.home", dataManagerHome);
+            dataManagerLFCHost = prop.getProperty("datamanager.lfc.host", dataManagerLFCHost);
+            dataManagerLFCPort = new Integer(prop.getProperty("datamanager.lfc.port", dataManagerLFCPort + ""));
 
         } catch (IOException e) {
 
@@ -141,8 +145,10 @@ public class ServerConfiguration {
                 prop.setProperty("apache.host", apacheHost);
                 prop.setProperty("apache.ssl.port", apacheSSLPort + "");
                 prop.setProperty("quickstart.url", quickStartURL);
-                prop.setProperty("datamanagement.path", dataManagementPath);
-                prop.setProperty("datamanagement.home", dataManagementHome);
+                prop.setProperty("datamanager.path", dataManagerPath);
+                prop.setProperty("datamanager.home", dataManagerHome);
+                prop.setProperty("datamanager.lfc.host", dataManagerLFCHost);
+                prop.setProperty("datamanager.lfc.port", dataManagerLFCPort + "");
 
                 prop.store(new FileOutputStream(confFilePath), "VIP Configuration File");
 
@@ -220,11 +226,20 @@ public class ServerConfiguration {
         return quickStartURL;
     }
 
-    public String getDataManagementPath() {
-        return dataManagementPath;
+    public String getDataManagerPath() {
+        return dataManagerPath;
     }
 
-    public String getDataManagementHome() {
-        return dataManagementHome;
+    public String getDataManagerHome() {
+        return dataManagerHome;
     }
+
+    public String getDataManagerLFCHost() {
+        return dataManagerLFCHost;
+    }
+
+    public int getDataManagerLFCPort() {
+        return dataManagerLFCPort;
+    }
+
 }

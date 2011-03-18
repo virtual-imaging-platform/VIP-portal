@@ -48,6 +48,8 @@ public class Context {
     private String moteurServerHost;
     private String lastGridFolderBrowsed;
     private String userHome;
+    private String lfcHost;
+    private int lfcPort;
 
     public static Context getInstance() {
         if (instance == null) {
@@ -97,5 +99,21 @@ public class Context {
 
     public void setUserHome(String userHome) {
         this.userHome = userHome;
+    }
+
+    public String getLfcHost() {
+        return lfcHost;
+    }
+
+    public void setLfcHost(String lfcHost) {
+        this.lfcHost = lfcHost;
+    }
+
+    public int getLfcPort() {
+        return lfcPort;
+    }
+
+    public void setLfcPort(int lfcPort) {
+        this.lfcPort = lfcPort;
     }
 }
