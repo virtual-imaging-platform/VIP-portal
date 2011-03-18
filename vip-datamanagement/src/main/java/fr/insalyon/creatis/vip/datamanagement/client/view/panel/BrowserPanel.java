@@ -54,7 +54,6 @@ import com.gwtext.client.widgets.Toolbar;
 import com.gwtext.client.widgets.ToolbarButton;
 import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 import com.gwtext.client.widgets.form.ComboBox;
-import com.gwtext.client.widgets.form.Field;
 import com.gwtext.client.widgets.form.event.ComboBoxListenerAdapter;
 import com.gwtext.client.widgets.grid.BaseColumnConfig;
 import com.gwtext.client.widgets.grid.CellMetadata;
@@ -64,6 +63,7 @@ import com.gwtext.client.widgets.grid.ColumnConfig;
 import com.gwtext.client.widgets.grid.ColumnModel;
 import com.gwtext.client.widgets.grid.GridPanel;
 import com.gwtext.client.widgets.grid.Renderer;
+import com.gwtext.client.widgets.grid.RowSelectionModel;
 import com.gwtext.client.widgets.grid.event.GridRowListenerAdapter;
 import com.gwtext.client.widgets.layout.FitLayout;
 import com.gwtext.client.widgets.menu.Menu;
@@ -95,6 +95,7 @@ public class BrowserPanel extends Panel {
     private Menu menu;
     private String name;
     private CheckboxSelectionModel cbSelectionModel;
+    private GridPanel remoteGrid;
 
     public static BrowserPanel getInstance() {
         if (instance == null) {
@@ -121,10 +122,12 @@ public class BrowserPanel extends Panel {
 
     private GridPanel getRemoteGrid() {
 
-        GridPanel remoteGrid = new GridPanel();
+        remoteGrid = new GridPanel();
         remoteGrid.setFrame(true);
         remoteGrid.setStripeRows(true);
         remoteGrid.setMargins(0, 0, 0, 0);
+        remoteGrid.setEnableDragDrop(true);
+        remoteGrid.setDdGroup("dm-browser-dd");
 
         cbSelectionModel = new CheckboxSelectionModel();
 
@@ -273,7 +276,7 @@ public class BrowserPanel extends Panel {
         pathCB.addListener(new ComboBoxListenerAdapter() {
 
             @Override
-            public void onChange(Field field, Object newVal, Object oldVal) {
+            public void onSelect(ComboBox comboBox, Record record, int index) {
                 String path = pathCB.getValue();
 
                 if (path != null && !path.isEmpty()) {
@@ -337,6 +340,10 @@ public class BrowserPanel extends Panel {
 
     public CheckboxSelectionModel getCbSelectionModel() {
         return cbSelectionModel;
+    }
+
+    public RowSelectionModel getSelectionModel() {
+        return remoteGrid.getSelectionModel();
     }
 
     public String getUserHome() {

@@ -123,6 +123,7 @@ public class FileUploadWindow extends Window {
             @Override
             public void onActionComplete(Form form, int httpStatus, java.lang.String responseText) {
                 EastPanel.getInstance().loadData();
+                EastPanel.getInstance().displayUploadPanel();
                 close();
             }
 

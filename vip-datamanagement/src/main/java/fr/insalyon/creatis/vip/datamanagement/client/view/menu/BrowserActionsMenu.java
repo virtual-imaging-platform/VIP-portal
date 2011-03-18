@@ -43,9 +43,13 @@ import com.gwtext.client.widgets.menu.BaseItem;
 import com.gwtext.client.widgets.menu.Item;
 import com.gwtext.client.widgets.menu.Menu;
 import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogServiceAsync;
+import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolService;
+import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolServiceAsync;
 import fr.insalyon.creatis.vip.datamanagement.client.view.panel.BrowserPanel;
+import fr.insalyon.creatis.vip.datamanagement.client.view.panel.EastPanel;
 import fr.insalyon.creatis.vip.datamanagement.client.view.window.CreateFolderWindow;
 import fr.insalyon.creatis.vip.datamanagement.client.view.window.FileUploadWindow;
 import java.util.ArrayList;
@@ -60,6 +64,7 @@ public class BrowserActionsMenu extends Menu {
     public BrowserActionsMenu() {
         this.setId("dm-browser-actions-menu");
 
+        // Upload a File
         Item uploadItem = new Item("Upload a File", new BaseItemListenerAdapter() {
 
             @Override
@@ -68,9 +73,44 @@ public class BrowserActionsMenu extends Menu {
             }
         });
 
-        Item downloadSelectedItem = new Item("Download Selected Files");
-        downloadSelectedItem.setDisabled(true);
+        // Download Selected Files
+        Item downloadSelectedItem = new Item("Download Selected Files", new BaseItemListenerAdapter() {
 
+            @Override
+            public void onClick(BaseItem item, EventObject e) {
+                Record[] records = BrowserPanel.getInstance().getCbSelectionModel().getSelections();
+                final String parentDir = BrowserPanel.getInstance().getPathCBValue();
+                for (Record r : records) {
+                    if (!r.getAsString("typeico").equals("Folder")) {
+                        TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+                        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                            public void onFailure(Throwable caught) {
+                                MessageBox.alert("Error", "Unable to download file: " + caught.getMessage());
+                            }
+
+                            public void onSuccess(Void result) {
+                                EastPanel.getInstance().loadData();
+                                EastPanel.getInstance().displayDownloadPanel();
+                            }
+                        };
+//                        service.downloadFile(
+//                                parentDir + "/" + r.getAsString("fileName"),
+//                                Context.getInstance().getAuthentication().getUserDN(),
+//                                Context.getInstance().getAuthentication().getProxyFileName(),
+//                                callback);
+                        service.downloadFile(
+                                parentDir + "/" + r.getAsString("fileName"),
+                                Context.getInstance().getAuthentication().getUserDN(),
+                                "/tmp/x509up_u501",
+                                callback);
+                    }
+                }
+
+            }
+        });
+
+        // Delete Selected Files/Folders
         Item deleteSelectedItem = new Item("Delete Selected Files/Folders", new BaseItemListenerAdapter() {
 
             @Override
@@ -112,6 +152,7 @@ public class BrowserActionsMenu extends Menu {
             }
         });
 
+        // Create Folder
         Item createItem = new Item("Create Folder", new BaseItemListenerAdapter() {
 
             @Override

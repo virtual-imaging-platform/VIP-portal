@@ -42,9 +42,13 @@ import com.gwtext.client.widgets.menu.BaseItem;
 import com.gwtext.client.widgets.menu.Item;
 import com.gwtext.client.widgets.menu.Menu;
 import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogServiceAsync;
+import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolService;
+import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolServiceAsync;
 import fr.insalyon.creatis.vip.datamanagement.client.view.panel.BrowserPanel;
+import fr.insalyon.creatis.vip.datamanagement.client.view.panel.EastPanel;
 import fr.insalyon.creatis.vip.datamanagement.client.view.window.CreateFolderWindow;
 import fr.insalyon.creatis.vip.datamanagement.client.view.window.FileUploadWindow;
 
@@ -66,6 +70,39 @@ public class BrowserMenu extends Menu {
         });
         uploadItem.setId("dm-upload-browser-menu");
         this.addItem(uploadItem);
+
+        Item downloadItem = new Item("Download File", new BaseItemListenerAdapter() {
+
+            @Override
+            public void onClick(BaseItem item, EventObject e) {
+                TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+                final String parentDir = BrowserPanel.getInstance().getPathCBValue();
+                AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                    public void onFailure(Throwable caught) {
+                        MessageBox.alert("Error", "Unable to download file: " + caught.getMessage());
+                    }
+
+                    public void onSuccess(Void result) {
+                        EastPanel.getInstance().loadData();
+                        EastPanel.getInstance().displayDownloadPanel();
+                    }
+                };
+//                service.downloadFile(
+//                        parentDir + "/" + BrowserPanel.getInstance().getName(),
+//                        Context.getInstance().getAuthentication().getUserDN(),
+//                        Context.getInstance().getAuthentication().getProxyFileName(),
+//                        callback);
+                service.downloadFile(
+                        parentDir + "/" + BrowserPanel.getInstance().getName(),
+                        Context.getInstance().getAuthentication().getUserDN(),
+                        "/tmp/x509up_u501",
+                        callback);
+            }
+        });
+        downloadItem.setId("dm-download-browser-menu");
+        this.addItem(downloadItem);
+        this.addSeparator();
 
         Item deleteItem = new Item("Delete File/Folder", new BaseItemListenerAdapter() {
 

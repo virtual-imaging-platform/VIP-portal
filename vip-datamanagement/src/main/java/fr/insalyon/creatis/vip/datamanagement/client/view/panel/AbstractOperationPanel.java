@@ -69,6 +69,7 @@ public abstract class AbstractOperationPanel extends Panel {
     private String operationId;
     protected Store store;
     protected Menu menu;
+    protected GridPanel grid;
 
     public AbstractOperationPanel(String id, String title) {
 
@@ -83,10 +84,12 @@ public abstract class AbstractOperationPanel extends Panel {
 
     private GridPanel getGrid() {
 
-        GridPanel grid = new GridPanel();
+        grid = new GridPanel();
         grid.setFrame(true);
         grid.setStripeRows(true);
         grid.setMargins(0, 0, 0, 0);
+        grid.setEnableDragDrop(true);
+        grid.setDdGroup("dm-browser-dd");
 
         CheckboxSelectionModel cbSelectionModel = new CheckboxSelectionModel();
 

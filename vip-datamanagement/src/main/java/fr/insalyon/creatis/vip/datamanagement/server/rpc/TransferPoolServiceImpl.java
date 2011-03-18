@@ -41,6 +41,7 @@ import fr.insalyon.creatis.agent.vlet.common.bean.Operation;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.datamanagement.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolService;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,20 +51,23 @@ import java.util.List;
  */
 public class TransferPoolServiceImpl extends RemoteServiceServlet implements TransferPoolService {
 
+    private ServerConfiguration serverConfiguration = ServerConfiguration.getInstance();
+
     public List<PoolOperation> getOperations(String user, String proxy) {
 
         try {
             VletAgentPoolClient client = new VletAgentPoolClient(
-                    ServerConfiguration.getInstance().getVletagentHost(),
-                    ServerConfiguration.getInstance().getVletagentPort(),
+                    serverConfiguration.getVletagentHost(),
+                    serverConfiguration.getVletagentPort(),
                     proxy);
             
             List<Operation> operationsList = client.getOperationsListByUser(user);
             List<PoolOperation> poolOperations = new ArrayList<PoolOperation>();
 
             for (Operation op : operationsList) {
+                String source = new File(op.getSource()).getName();
                 poolOperations.add(new PoolOperation(
-                        op.getId(), op.getRegistration(), op.getSource(),
+                        op.getId(), op.getRegistration(), source,
                         op.getDest(), op.getType().name(), op.getStatus().name(), op.getUser()));
             }
 
@@ -78,8 +82,8 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
     public PoolOperation getOperationById(String id, String proxy) {
         try {
             VletAgentPoolClient client = new VletAgentPoolClient(
-                    ServerConfiguration.getInstance().getVletagentHost(),
-                    ServerConfiguration.getInstance().getVletagentPort(),
+                    serverConfiguration.getVletagentHost(),
+                    serverConfiguration.getVletagentPort(),
                     proxy);
             Operation op = client.getOperationById(id);
 
@@ -96,10 +100,24 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
     public void removeOperationById(String id, String proxy) {
         try {
             VletAgentPoolClient client = new VletAgentPoolClient(
-                    ServerConfiguration.getInstance().getVletagentHost(),
-                    ServerConfiguration.getInstance().getVletagentPort(),
+                    serverConfiguration.getVletagentHost(),
+                    serverConfiguration.getVletagentPort(),
                     proxy);
             client.removeOperationById(id);
+
+        } catch (VletAgentClientException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void downloadFile(String remoteFile, String user, String proxy) {
+        try {
+            VletAgentPoolClient client = new VletAgentPoolClient(
+                    serverConfiguration.getVletagentHost(),
+                    serverConfiguration.getVletagentPort(),
+                    proxy);
+            client.downloadFile(remoteFile,
+                    serverConfiguration.getDataManagementPath() + "/downloads", user);
 
         } catch (VletAgentClientException ex) {
             ex.printStackTrace();

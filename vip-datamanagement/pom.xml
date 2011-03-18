@@ -2,14 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.insalyon.creatis</groupId>
-    <artifactId>vip-datamanagement</artifactId>
+    <artifactId>vip-datamanager</artifactId>
     <packaging>jar</packaging>
     <version>0.1</version>
     <properties>
         <gwt.version>2.0.4</gwt.version>
         <gwt.ext.version>2.0.6</gwt.ext.version>
     </properties>
-    <name>VIP-DataManagement</name>
+    <name>VIP-DataManager</name>
     <dependencies>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -124,7 +124,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>vip-datamanagement</finalName>
+        <finalName>vip-datamanager</finalName>
         <resources>
             <resource>
                 <directory>src/main/java</directory>

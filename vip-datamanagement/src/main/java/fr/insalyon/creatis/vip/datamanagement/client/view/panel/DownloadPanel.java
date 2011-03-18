@@ -34,11 +34,21 @@
  */
 package fr.insalyon.creatis.vip.datamanagement.client.view.panel;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.gwtext.client.core.EventObject;
+import com.gwtext.client.data.Record;
+import com.gwtext.client.dd.DragData;
+import com.gwtext.client.dd.DragSource;
+import com.gwtext.client.dd.DropTarget;
+import com.gwtext.client.dd.DropTargetConfig;
 import com.gwtext.client.widgets.Button;
+import com.gwtext.client.widgets.MessageBox;
 import com.gwtext.client.widgets.Toolbar;
 import com.gwtext.client.widgets.ToolbarButton;
 import com.gwtext.client.widgets.event.ButtonListenerAdapter;
+import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolService;
+import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolServiceAsync;
 import fr.insalyon.creatis.vip.datamanagement.client.view.menu.DownloadMenu;
 
 /**
@@ -59,6 +69,51 @@ public class DownloadPanel extends AbstractOperationPanel {
     private DownloadPanel() {
         super("dm-download-panel", "Downloads");
         this.setTopToolbar(getToolbar());
+
+        DropTargetConfig cfg = new DropTargetConfig();
+        cfg.setdDdGroup("dm-browser-dd");
+
+        DropTarget tg = new DropTarget(grid, cfg) {
+
+            @Override
+            public boolean notifyDrop(DragSource source, EventObject e, DragData data) {
+                Record[] rows = BrowserPanel.getInstance().getSelectionModel().getSelections();
+
+                for (Record r : rows) {
+                    if (!r.getAsString("typeico").equals("Folder")) {
+                        TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+                        final String parentDir = BrowserPanel.getInstance().getPathCBValue();
+                        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                            public void onFailure(Throwable caught) {
+                                MessageBox.alert("Error", "Unable to download file: " + caught.getMessage());
+                            }
+
+                            public void onSuccess(Void result) {
+                                EastPanel.getInstance().loadData();
+                                EastPanel.getInstance().displayDownloadPanel();
+                            }
+                        };
+//                    service.downloadFile(
+//                            parentDir + "/" + r.getAsString("fileName"),
+//                            Context.getInstance().getAuthentication().getUserDN(),
+//                            Context.getInstance().getAuthentication().getProxyFileName(),
+//                            callback);
+                        service.downloadFile(
+                                parentDir + "/" + r.getAsString("fileName"),
+                                Context.getInstance().getAuthentication().getUserDN(),
+                                "/tmp/x509up_u501",
+                                callback);
+                    }
+                }
+                return super.notifyDrop(source, e, data);
+            }
+
+            @Override
+            public String notifyOver(DragSource source, EventObject e, DragData data) {
+                return "x-dd-drop-ok";
+            }
+        };
     }
 
     /**

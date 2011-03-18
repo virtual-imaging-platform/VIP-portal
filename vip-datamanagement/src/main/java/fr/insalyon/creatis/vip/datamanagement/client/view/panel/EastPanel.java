@@ -113,4 +113,12 @@ public class EastPanel extends TabPanel {
         service.getOperations(auth.getUserDN(), auth.getProxyFileName(), callback);
         Ext.get("dm-east-panel").mask("Loading...");
     }
+
+    public void displayDownloadPanel() {
+        this.setActiveTab(downloadPanel.getId());
+    }
+
+    public void displayUploadPanel() {
+        this.setActiveTab(uploadPanel.getId());
+    }
 }

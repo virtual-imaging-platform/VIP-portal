@@ -92,7 +92,6 @@ public class UploadMenu extends Menu {
                                         }
                                     };
 //                                    Context context = Context.getInstance();
-//                                    context.setLastGridFolderBrowsed(baseDir);
 //                                    Authentication auth = context.getAuthentication();
 //                                    service.removeOperationById(UploadPanel.getInstance().getOperationId(),
 //                                            auth.getProxyFileName(), callback);

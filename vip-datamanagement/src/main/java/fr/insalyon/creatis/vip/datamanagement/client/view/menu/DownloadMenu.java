@@ -34,12 +34,18 @@
  */
 package fr.insalyon.creatis.vip.datamanagement.client.view.menu;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.gwtext.client.core.EventObject;
+import com.gwtext.client.core.Ext;
+import com.gwtext.client.widgets.MessageBox;
 import com.gwtext.client.widgets.menu.BaseItem;
 import com.gwtext.client.widgets.menu.Item;
 import com.gwtext.client.widgets.menu.Menu;
 import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
+import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolService;
+import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolServiceAsync;
 import fr.insalyon.creatis.vip.datamanagement.client.view.panel.DownloadPanel;
+import fr.insalyon.creatis.vip.datamanagement.client.view.panel.EastPanel;
 import fr.insalyon.creatis.vip.datamanagement.client.view.window.OperationDetailWindow;
 
 /**
@@ -62,5 +68,42 @@ public class DownloadMenu extends Menu {
         });
         detailsItem.setId("dm-details-download-menu");
         this.addItem(detailsItem);
+
+        Item cleanItem = new Item("Clean Operation", new BaseItemListenerAdapter() {
+
+            @Override
+            public void onClick(BaseItem item, EventObject e) {
+                MessageBox.confirm("Confirm", "Do you really want to clean the operation \"" + DownloadPanel.getInstance().getOperationId() + "\"?",
+                        new MessageBox.ConfirmCallback() {
+
+                            public void execute(String btnID) {
+                                if (btnID.toLowerCase().equals("yes")) {
+                                    TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+                                    AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                                        public void onFailure(Throwable caught) {
+                                            MessageBox.alert("Error", "Error executing clean operation: " + caught.getMessage());
+                                            Ext.get("dm-download-panel").unmask();
+                                        }
+
+                                        public void onSuccess(Void result) {
+                                            Ext.get("dm-download-panel").unmask();
+                                            EastPanel.getInstance().loadData();
+                                        }
+                                    };
+//                                    Context context = Context.getInstance();
+//                                    Authentication auth = context.getAuthentication();
+//                                    service.removeOperationById(DownloadPanel.getInstance().getOperationId(),
+//                                            auth.getProxyFileName(), callback);
+                                    service.removeOperationById(DownloadPanel.getInstance().getOperationId(),
+                                            "/tmp/x509up_u501", callback);
+                                    Ext.get("dm-download-panel").mask("Cleaning Operation...");
+                                }
+                            }
+                        });
+            }
+        });
+        cleanItem.setId("dm-clean-download-menu");
+        this.addItem(cleanItem);
     }
 }
