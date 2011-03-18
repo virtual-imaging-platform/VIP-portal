@@ -99,7 +99,7 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
                             ServerConfiguration.getInstance().getVletagentPort(),
                             proxyFileName);
 
-                    client.createDirectory(conf.getDataManagementHome(), user.getCanonicalName().replace(" ", "-"));
+                    client.createDirectory(conf.getDataManagerHome(), user.getCanonicalName().replace(" ", "-"));
                     
                 } catch (BusinessException ex) {
                     authentication = new Authentication(
@@ -109,7 +109,7 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
                 } catch (VletAgentClientException ex) {
                     ex.printStackTrace();
                 }
-                userHome = conf.getDataManagementHome() + "/" + user.getCanonicalName().replace(" ", "-");
+                userHome = conf.getDataManagerHome() + "/" + user.getCanonicalName().replace(" ", "-");
             }
         } else {
             authentication = new Authentication("Anonymous", "Anonymous", new HashMap(), "", false);
@@ -124,7 +124,7 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
         return new Configuration(authentication,
                 conf.getQuickStartURL(),
                 uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort(),
-                userHome);
+                userHome, conf.getDataManagerLFCHost(), conf.getDataManagerLFCPort());
     }
 
     public String addGroup(String groupName) {

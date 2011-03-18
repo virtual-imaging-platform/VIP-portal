@@ -59,10 +59,14 @@ public class Main implements EntryPoint {
             }
 
             public void onSuccess(Configuration result) {
-                Context.getInstance().setAuthentication(result.getAuthentication());
-                Context.getInstance().setQuickstartURL(result.getQuickstartURL());
-                Context.getInstance().setMoteurServerHost(result.getMoteurServerHost());
-                Context.getInstance().setUserHome(result.getUserHome());
+                Context context = Context.getInstance();
+                context.setAuthentication(result.getAuthentication());
+                context.setQuickstartURL(result.getQuickstartURL());
+                context.setMoteurServerHost(result.getMoteurServerHost());
+                context.setUserHome(result.getUserHome());
+                context.setLfcHost(result.getLfcHost());
+                context.setLfcPort(result.getLfcPort());
+
                 buildLayout();
             }
         };
