@@ -117,7 +117,7 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
                     serverConfiguration.getVletagentPort(),
                     proxy);
             client.downloadFile(remoteFile,
-                    serverConfiguration.getDataManagementPath() + "/downloads", user);
+                    serverConfiguration.getDataManagerPath() + "/downloads", user);
 
         } catch (VletAgentClientException ex) {
             ex.printStackTrace();

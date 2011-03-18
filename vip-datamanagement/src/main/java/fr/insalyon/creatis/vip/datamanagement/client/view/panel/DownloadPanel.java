@@ -77,12 +77,12 @@ public class DownloadPanel extends AbstractOperationPanel {
 
             @Override
             public boolean notifyDrop(DragSource source, EventObject e, DragData data) {
-                Record[] rows = BrowserPanel.getInstance().getSelectionModel().getSelections();
+                Record[] rows = DataManagerBrowserPanel.getInstance().getSelectionModel().getSelections();
 
                 for (Record r : rows) {
                     if (!r.getAsString("typeico").equals("Folder")) {
                         TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
-                        final String parentDir = BrowserPanel.getInstance().getPathCBValue();
+                        final String parentDir = DataManagerBrowserPanel.getInstance().getPathCBValue();
                         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                             public void onFailure(Throwable caught) {
@@ -147,5 +147,11 @@ public class DownloadPanel extends AbstractOperationPanel {
             menu = new DownloadMenu();
         }
         menu.showAt(e.getXY());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        instance = null;
     }
 }

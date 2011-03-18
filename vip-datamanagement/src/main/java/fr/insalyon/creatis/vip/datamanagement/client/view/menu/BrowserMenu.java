@@ -47,7 +47,7 @@ import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogServiceAsync;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolServiceAsync;
-import fr.insalyon.creatis.vip.datamanagement.client.view.panel.BrowserPanel;
+import fr.insalyon.creatis.vip.datamanagement.client.view.panel.DataManagerBrowserPanel;
 import fr.insalyon.creatis.vip.datamanagement.client.view.panel.EastPanel;
 import fr.insalyon.creatis.vip.datamanagement.client.view.window.CreateFolderWindow;
 import fr.insalyon.creatis.vip.datamanagement.client.view.window.FileUploadWindow;
@@ -65,7 +65,7 @@ public class BrowserMenu extends Menu {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                new FileUploadWindow(BrowserPanel.getInstance().getPathCBValue());
+                new FileUploadWindow(DataManagerBrowserPanel.getInstance().getPathCBValue());
             }
         });
         uploadItem.setId("dm-upload-browser-menu");
@@ -76,7 +76,7 @@ public class BrowserMenu extends Menu {
             @Override
             public void onClick(BaseItem item, EventObject e) {
                 TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
-                final String parentDir = BrowserPanel.getInstance().getPathCBValue();
+                final String parentDir = DataManagerBrowserPanel.getInstance().getPathCBValue();
                 AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                     public void onFailure(Throwable caught) {
@@ -94,7 +94,7 @@ public class BrowserMenu extends Menu {
 //                        Context.getInstance().getAuthentication().getProxyFileName(),
 //                        callback);
                 service.downloadFile(
-                        parentDir + "/" + BrowserPanel.getInstance().getName(),
+                        parentDir + "/" + DataManagerBrowserPanel.getInstance().getName(),
                         Context.getInstance().getAuthentication().getUserDN(),
                         "/tmp/x509up_u501",
                         callback);
@@ -108,12 +108,12 @@ public class BrowserMenu extends Menu {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                MessageBox.confirm("Confirm", "Do you really want to delete the file/folder \"" + BrowserPanel.getInstance().getName() + "\"?",
+                MessageBox.confirm("Confirm", "Do you really want to delete the file/folder \"" + DataManagerBrowserPanel.getInstance().getName() + "\"?",
                         new MessageBox.ConfirmCallback() {
 
                             public void execute(String btnID) {
                                 if (btnID.toLowerCase().equals("yes")) {
-                                    final String parentDir = BrowserPanel.getInstance().getPathCBValue();
+                                    final String parentDir = DataManagerBrowserPanel.getInstance().getPathCBValue();
                                     FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
                                     AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
@@ -124,13 +124,13 @@ public class BrowserMenu extends Menu {
 
                                         public void onSuccess(Void result) {
                                             Ext.get("dm-browser-panel").unmask();
-                                            BrowserPanel.getInstance().loadData(parentDir, false);
+                                            DataManagerBrowserPanel.getInstance().loadData(parentDir, false);
                                         }
                                     };
 //                                        Context context = Context.getInstance();
 //                                        Authentication auth = context.getAuthentication();
 //                                        service.delete(auth.getProxyFileName(), parentDir + "/" + name, callback);
-                                    service.delete("/tmp/x509up_u501", parentDir + "/" + BrowserPanel.getInstance().getName(), callback);
+                                    service.delete("/tmp/x509up_u501", parentDir + "/" + DataManagerBrowserPanel.getInstance().getName(), callback);
                                     Ext.get("dm-browser-panel").mask("Deleting File/Folder...");
                                 }
                             }
@@ -144,7 +144,7 @@ public class BrowserMenu extends Menu {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                new CreateFolderWindow(BrowserPanel.getInstance().getPathCBValue());
+                new CreateFolderWindow(DataManagerBrowserPanel.getInstance().getPathCBValue());
             }
         });
         createFolderItem.setId("dm-createfolder-browser-menu");

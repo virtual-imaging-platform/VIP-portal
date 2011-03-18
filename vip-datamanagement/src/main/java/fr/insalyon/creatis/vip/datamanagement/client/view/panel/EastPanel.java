@@ -71,11 +71,11 @@ public class EastPanel extends TabPanel {
         this.setMinTabWidth(80);
         this.setCollapsible(false);
 
-        uploadPanel = UploadPanel.getInstance();
         downloadPanel = DownloadPanel.getInstance();
+        uploadPanel = UploadPanel.getInstance();
 
-        this.add(uploadPanel);
         this.add(downloadPanel);
+        this.add(uploadPanel);
     }
 
     public void loadData() {
@@ -101,8 +101,8 @@ public class EastPanel extends TabPanel {
                             downloads.add(op);
                         }
                     }
-                    uploadPanel.loadData(uploads);
                     downloadPanel.loadData(downloads);
+                    uploadPanel.loadData(uploads);
                 } else {
                     MessageBox.alert("Error", "Unable to get list of operations.");
                 }

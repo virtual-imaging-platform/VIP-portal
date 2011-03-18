@@ -34,36 +34,37 @@
  */
 package fr.insalyon.creatis.vip.datamanagement.client.view.window;
 
-import fr.insalyon.creatis.vip.datamanagement.client.view.panel.BrowserPanel;
-import fr.insalyon.creatis.vip.datamanagement.client.view.panel.EastPanel;
 import com.gwtext.client.core.RegionPosition;
 import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.Window;
+import com.gwtext.client.widgets.form.FieldSet;
 import com.gwtext.client.widgets.layout.BorderLayout;
 import com.gwtext.client.widgets.layout.BorderLayoutData;
 import com.gwtext.client.widgets.layout.FitLayout;
+import fr.insalyon.creatis.vip.datamanagement.client.view.panel.SelectDataBrowserPanel;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DataManagementWindow extends Window {
+public class SelectDataPathWindow extends Window {
 
-    private static DataManagementWindow instance;
-    private EastPanel eastPanel;
-    private BrowserPanel browserPanel;
+    private static SelectDataPathWindow instance;
+    private SelectDataBrowserPanel browserPanel;
+    private String refID;
+    private FieldSet fieldSet;
 
-    public static DataManagementWindow getInstance() {
+    public static SelectDataPathWindow getInstance() {
         if (instance == null) {
-            instance = new DataManagementWindow();
+            instance = new SelectDataPathWindow();
         }
         return instance;
     }
 
-    private DataManagementWindow() {
+    private SelectDataPathWindow() {
 
-        this.setTitle("VIP Data Management");
-        this.setWidth(850);
+        this.setTitle("VIP Select Data Path");
+        this.setWidth(550);
         this.setHeight(500);
         this.setResizable(true);
         this.setMaximizable(true);
@@ -73,29 +74,33 @@ public class DataManagementWindow extends Window {
         Panel panel = new Panel();
         panel.setLayout(new BorderLayout());
 
-        BorderLayoutData eastData = new BorderLayoutData(RegionPosition.EAST);
-        eastData.setSplit(true);
-        eastData.setMinSize(300);
-        eastData.setMaxSize(450);
-        eastData.setMargins(0, 0, 0, 0);
-
-        eastPanel = EastPanel.getInstance();
-        panel.add(eastPanel, eastData);
-        browserPanel = BrowserPanel.getInstance();
+        browserPanel = SelectDataBrowserPanel.getInstance();
         panel.add(browserPanel, new BorderLayoutData(RegionPosition.CENTER));
 
         this.add(panel);
     }
 
-    public void display() {
+    public void configure(String refID, FieldSet fieldSet) {
+        this.refID = refID;
+        this.fieldSet = fieldSet;
+    }
+
+    public void display(String path) {
         this.show();
-        browserPanel.loadData(null, true);
-        eastPanel.loadData();
+        browserPanel.loadData(path, true);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         instance = null;
+    }
+
+    public FieldSet getFieldSet() {
+        return fieldSet;
+    }
+
+    public String getRefID() {
+        return refID;
     }
 }

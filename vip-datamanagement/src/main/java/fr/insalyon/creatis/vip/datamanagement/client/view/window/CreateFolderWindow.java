@@ -34,7 +34,7 @@
  */
 package fr.insalyon.creatis.vip.datamanagement.client.view.window;
 
-import fr.insalyon.creatis.vip.datamanagement.client.view.panel.BrowserPanel;
+import fr.insalyon.creatis.vip.datamanagement.client.view.panel.DataManagerBrowserPanel;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.Ext;
@@ -93,7 +93,7 @@ public class CreateFolderWindow extends Window {
 
                     public void onSuccess(Void result) {
                         Ext.get("dm-browser-panel").unmask();
-                        BrowserPanel.getInstance().loadData(baseDir, false);
+                        DataManagerBrowserPanel.getInstance().loadData(baseDir, false);
                     }
                 };
                 String text = textField.getText();

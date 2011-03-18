@@ -48,7 +48,7 @@ import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogServiceAsync;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolServiceAsync;
-import fr.insalyon.creatis.vip.datamanagement.client.view.panel.BrowserPanel;
+import fr.insalyon.creatis.vip.datamanagement.client.view.panel.DataManagerBrowserPanel;
 import fr.insalyon.creatis.vip.datamanagement.client.view.panel.EastPanel;
 import fr.insalyon.creatis.vip.datamanagement.client.view.window.CreateFolderWindow;
 import fr.insalyon.creatis.vip.datamanagement.client.view.window.FileUploadWindow;
@@ -69,7 +69,7 @@ public class BrowserActionsMenu extends Menu {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                new FileUploadWindow(BrowserPanel.getInstance().getPathCBValue());
+                new FileUploadWindow(DataManagerBrowserPanel.getInstance().getPathCBValue());
             }
         });
 
@@ -78,8 +78,8 @@ public class BrowserActionsMenu extends Menu {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                Record[] records = BrowserPanel.getInstance().getCbSelectionModel().getSelections();
-                final String parentDir = BrowserPanel.getInstance().getPathCBValue();
+                Record[] records = DataManagerBrowserPanel.getInstance().getCbSelectionModel().getSelections();
+                final String parentDir = DataManagerBrowserPanel.getInstance().getPathCBValue();
                 for (Record r : records) {
                     if (!r.getAsString("typeico").equals("Folder")) {
                         TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
@@ -115,8 +115,8 @@ public class BrowserActionsMenu extends Menu {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                Record[] records = BrowserPanel.getInstance().getCbSelectionModel().getSelections();
-                final String parentDir = BrowserPanel.getInstance().getPathCBValue();
+                Record[] records = DataManagerBrowserPanel.getInstance().getCbSelectionModel().getSelections();
+                final String parentDir = DataManagerBrowserPanel.getInstance().getPathCBValue();
                 final List<String> paths = new ArrayList<String>();
                 for (Record r : records) {
                     paths.add(parentDir + "/" + r.getAsString("fileName"));
@@ -137,7 +137,7 @@ public class BrowserActionsMenu extends Menu {
 
                                         public void onSuccess(Void result) {
                                             Ext.get("dm-browser-panel").unmask();
-                                            BrowserPanel.getInstance().loadData(parentDir, false);
+                                            DataManagerBrowserPanel.getInstance().loadData(parentDir, false);
                                         }
                                     };
 //                                    Context context = Context.getInstance();
@@ -157,7 +157,7 @@ public class BrowserActionsMenu extends Menu {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                new CreateFolderWindow(BrowserPanel.getInstance().getPathCBValue());
+                new CreateFolderWindow(DataManagerBrowserPanel.getInstance().getPathCBValue());
             }
         });
 
