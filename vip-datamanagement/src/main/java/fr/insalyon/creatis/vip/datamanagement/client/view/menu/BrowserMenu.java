@@ -42,7 +42,9 @@ import com.gwtext.client.widgets.menu.BaseItem;
 import com.gwtext.client.widgets.menu.Item;
 import com.gwtext.client.widgets.menu.Menu;
 import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
+import fr.insalyon.creatis.vip.common.client.bean.Authentication;
 import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.datamanagement.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogServiceAsync;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolService;
@@ -88,12 +90,14 @@ public class BrowserMenu extends Menu {
                         EastPanel.getInstance().displayDownloadPanel();
                     }
                 };
+                Authentication auth = Context.getInstance().getAuthentication();
+                String user = auth.getUserName().split(" / ")[0];
 //                service.downloadFile(
 //                        parentDir + "/" + BrowserPanel.getInstance().getName(),
 //                        Context.getInstance().getAuthentication().getUserDN(),
 //                        Context.getInstance().getAuthentication().getProxyFileName(),
 //                        callback);
-                service.downloadFile(
+                service.downloadFile(user, 
                         parentDir + "/" + DataManagerBrowserPanel.getInstance().getName(),
                         Context.getInstance().getAuthentication().getUserDN(),
                         "/tmp/x509up_u501",
@@ -108,6 +112,7 @@ public class BrowserMenu extends Menu {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
+                if (!DataManagerBrowserPanel.getInstance().getPathCBValue().equals(DataManagerConstants.ROOT)) {
                 MessageBox.confirm("Confirm", "Do you really want to delete the file/folder \"" + DataManagerBrowserPanel.getInstance().getName() + "\"?",
                         new MessageBox.ConfirmCallback() {
 
@@ -127,14 +132,17 @@ public class BrowserMenu extends Menu {
                                             DataManagerBrowserPanel.getInstance().loadData(parentDir, false);
                                         }
                                     };
-//                                        Context context = Context.getInstance();
-//                                        Authentication auth = context.getAuthentication();
+                                    Authentication auth = Context.getInstance().getAuthentication();
+                                    String user = auth.getUserName().split(" / ")[0];
 //                                        service.delete(auth.getProxyFileName(), parentDir + "/" + name, callback);
-                                    service.delete("/tmp/x509up_u501", parentDir + "/" + DataManagerBrowserPanel.getInstance().getName(), callback);
+                                    service.delete(user, "/tmp/x509up_u501", parentDir + "/" + DataManagerBrowserPanel.getInstance().getName(), callback);
                                     Ext.get("dm-browser-panel").mask("Deleting File/Folder...");
                                 }
                             }
                         });
+                } else {
+                    MessageBox.alert("You can not delete a root folder.");
+                }
             }
         });
         deleteItem.setId("dm-delete-browser-menu");

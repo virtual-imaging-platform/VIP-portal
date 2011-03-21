@@ -46,6 +46,7 @@ import com.gwtext.client.widgets.MessageBox;
 import com.gwtext.client.widgets.Toolbar;
 import com.gwtext.client.widgets.ToolbarButton;
 import com.gwtext.client.widgets.event.ButtonListenerAdapter;
+import fr.insalyon.creatis.vip.common.client.bean.Authentication;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolServiceAsync;
@@ -94,12 +95,14 @@ public class DownloadPanel extends AbstractOperationPanel {
                                 EastPanel.getInstance().displayDownloadPanel();
                             }
                         };
+                        Authentication auth = Context.getInstance().getAuthentication();
+                        String user = auth.getUserName().split(" / ")[0];
 //                    service.downloadFile(
 //                            parentDir + "/" + r.getAsString("fileName"),
 //                            Context.getInstance().getAuthentication().getUserDN(),
 //                            Context.getInstance().getAuthentication().getProxyFileName(),
 //                            callback);
-                        service.downloadFile(
+                        service.downloadFile(user,
                                 parentDir + "/" + r.getAsString("fileName"),
                                 Context.getInstance().getAuthentication().getUserDN(),
                                 "/tmp/x509up_u501",

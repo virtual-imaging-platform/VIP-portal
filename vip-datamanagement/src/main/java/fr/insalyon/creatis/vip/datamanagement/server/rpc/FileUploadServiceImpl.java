@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.datamanagement.server.rpc;
 
 import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
+import fr.insalyon.creatis.vip.datamanagement.server.DataManagerUtil;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -73,6 +74,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                 List items = upload.parseRequest(request);
                 Iterator iter = items.iterator();
                 String userdn = null;
+                String user = null;
                 String proxy = null;
                 String path = null;
 
@@ -82,6 +84,8 @@ public class FileUploadServiceImpl extends HttpServlet {
                     if (item.isFormField()) {
                         if (item.getFieldName().equals("userdn")) {
                             userdn = item.getString();
+                        } else if (item.getFieldName().equals("user")) {
+                            user = item.getString();
                         } else if (item.getFieldName().equals("proxy")) {
                             proxy = item.getString();
                         } else if (item.getFieldName().equals("path")) {
@@ -102,7 +106,10 @@ public class FileUploadServiceImpl extends HttpServlet {
                                         ServerConfiguration.getInstance().getVletagentHost(),
                                         ServerConfiguration.getInstance().getVletagentPort(),
                                         proxy);
-                                String opId = client.uploadFile(uploadedFile.getAbsolutePath(), path, userdn);
+                                client.uploadFile(
+                                        uploadedFile.getAbsolutePath(),
+                                        DataManagerUtil.parseBaseDir(user, path),
+                                        userdn);
 
                             } catch (Exception ex) {
                                 ex.printStackTrace();

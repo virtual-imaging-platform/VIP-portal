@@ -37,16 +37,13 @@ package fr.insalyon.creatis.vip.datamanagement.client.view.panel;
 import com.google.gwt.user.client.DOM;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.data.Record;
-import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.ToolbarButton;
-import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 import com.gwtext.client.widgets.grid.CheckboxSelectionModel;
 import com.gwtext.client.widgets.grid.GridPanel;
 import com.gwtext.client.widgets.grid.RowSelectionModel;
 import com.gwtext.client.widgets.grid.event.GridRowListenerAdapter;
 import com.gwtext.client.widgets.menu.Menu;
-import fr.insalyon.creatis.vip.common.client.bean.Authentication;
-import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.datamanagement.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanagement.client.view.menu.BrowserActionsMenu;
 import fr.insalyon.creatis.vip.datamanagement.client.view.menu.BrowserMenu;
 
@@ -57,10 +54,6 @@ import fr.insalyon.creatis.vip.datamanagement.client.view.menu.BrowserMenu;
 public class DataManagerBrowserPanel extends AbstractBrowserPanel {
 
     private static DataManagerBrowserPanel instance;
-    private Context context;
-    private Authentication auth;
-    private String userHomePath;
-    private String userHome;
     private Menu menu;
     private String name;
 
@@ -74,12 +67,6 @@ public class DataManagerBrowserPanel extends AbstractBrowserPanel {
     private DataManagerBrowserPanel() {
         super("dm-browser");
         this.setWidth(420);
-
-        this.context = Context.getInstance();
-        this.auth = context.getAuthentication();
-        this.userHomePath = context.getUserHome();
-        this.userHome = "/home/" + auth.getUserName().split(" / ")[0].replace(" ", "-");
-
         this.configureGrid();
         this.configureToolbar();
     }
@@ -95,6 +82,9 @@ public class DataManagerBrowserPanel extends AbstractBrowserPanel {
                 if (record.getAsString("typeico").equals("Folder")) {
                     String clickedFolderName = record.getAsString("fileName");
                     String parentDir = pathCB.getValue();
+                    if (parentDir.equals(DataManagerConstants.ROOT)) {
+                        parentDir = "";
+                    }
                     loadData(parentDir + "/" + clickedFolderName, true);
                 }
             }
@@ -110,43 +100,10 @@ public class DataManagerBrowserPanel extends AbstractBrowserPanel {
     }
 
     private void configureToolbar() {
-
-        // Folder up Button
-        ToolbarButton folderupButton = new ToolbarButton("", new ButtonListenerAdapter() {
-
-            @Override
-            public void onClick(Button button, EventObject e) {
-                String selectedPath = getPathCBValue();
-                if (!selectedPath.equals(userHomePath)) {
-                    String newPath = selectedPath.substring(0, selectedPath.lastIndexOf("/"));
-                    loadData(newPath, false);
-                }
-            }
-        });
-        folderupButton.setIcon("images/icon-folderup.gif");
-        folderupButton.setCls("x-btn-icon");
-
         // Actions Menu
         ToolbarButton actionsButton = new ToolbarButton("Actions");
         actionsButton.setMenu(new BrowserActionsMenu());
-
-        topToolbar.addButton(folderupButton);
         topToolbar.addButton(actionsButton);
-    }
-
-    /**
-     * 
-     * @param displayDir
-     * @param newPath
-     */
-    @Override
-    public void loadData(String displayDir, boolean newPath) {
-
-        if (displayDir == null) {
-            displayDir = userHomePath;
-        }
-        displayDir = displayDir.replace(userHomePath, userHome);
-        loadData(displayDir, displayDir.replace(userHome, userHomePath), newPath);
     }
 
     private void showMenu(EventObject e) {
@@ -154,10 +111,6 @@ public class DataManagerBrowserPanel extends AbstractBrowserPanel {
             menu = new BrowserMenu();
         }
         menu.showAt(e.getXY());
-    }
-
-    public String getPathCBValue() {
-        return pathCB.getValue().replace(userHome, userHomePath);
     }
 
     public String getName() {
@@ -170,10 +123,6 @@ public class DataManagerBrowserPanel extends AbstractBrowserPanel {
 
     public RowSelectionModel getSelectionModel() {
         return grid.getSelectionModel();
-    }
-
-    public String getUserHome() {
-        return userHomePath;
     }
 
     @Override

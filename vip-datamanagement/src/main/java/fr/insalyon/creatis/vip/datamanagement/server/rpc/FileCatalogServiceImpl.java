@@ -40,6 +40,7 @@ import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.datamanagement.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogService;
+import fr.insalyon.creatis.vip.datamanagement.server.DataManagerUtil;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,14 +50,15 @@ import java.util.List;
  */
 public class FileCatalogServiceImpl extends RemoteServiceServlet implements FileCatalogService {
 
-    public List<Data> listDir(String proxyFileName, String baseDir) {
+    public List<Data> listDir(String user, String proxyFileName, String baseDir) {
         try {
             VletAgentClient client = new VletAgentClient(
                     ServerConfiguration.getInstance().getVletagentHost(),
                     ServerConfiguration.getInstance().getVletagentPort(),
                     proxyFileName);
 
-            List<String> list = client.getFilesAndFoldersList(baseDir);
+            List<String> list = client.getFilesAndFoldersList(
+                    DataManagerUtil.parseBaseDir(user, baseDir));
 
             List<Data> dataList = new ArrayList<Data>();
             for (String d : list) {
@@ -73,42 +75,47 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
         return null;
     }
 
-    public void delete(String proxyFileName, String path) {
+    public void delete(String user, String proxyFileName, String path) {
         try {
             VletAgentClient client = new VletAgentClient(
                     ServerConfiguration.getInstance().getVletagentHost(),
                     ServerConfiguration.getInstance().getVletagentPort(),
                     proxyFileName);
 
-            client.delete(path);
+            client.delete(DataManagerUtil.parseBaseDir(user, path));
 
         } catch (VletAgentClientException ex) {
             ex.printStackTrace();
         }
     }
 
-    public void deleteFiles(String proxyFileName, List<String> paths) {
+    public void deleteFiles(String user, String proxyFileName, List<String> paths) {
         try {
             VletAgentClient client = new VletAgentClient(
                     ServerConfiguration.getInstance().getVletagentHost(),
                     ServerConfiguration.getInstance().getVletagentPort(),
                     proxyFileName);
 
-            client.deleteFiles(paths);
+            List<String> parsedPaths = new ArrayList<String>();
+            for (String path : paths) {
+                parsedPaths.add(DataManagerUtil.parseBaseDir(user, path));
+            }
+
+            client.deleteFiles(parsedPaths);
 
         } catch (VletAgentClientException ex) {
             ex.printStackTrace();
         }
     }
 
-    public void createDir(String proxyFileName, String baseDir, String name) {
+    public void createDir(String user, String proxyFileName, String baseDir, String name) {
         try {
             VletAgentClient client = new VletAgentClient(
                     ServerConfiguration.getInstance().getVletagentHost(),
                     ServerConfiguration.getInstance().getVletagentPort(),
                     proxyFileName);
 
-            client.createDirectory(baseDir, name);
+            client.createDirectory(DataManagerUtil.parseBaseDir(user, baseDir), name);
 
         } catch (VletAgentClientException ex) {
             ex.printStackTrace();

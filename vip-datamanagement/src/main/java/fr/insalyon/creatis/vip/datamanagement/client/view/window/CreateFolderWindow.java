@@ -45,6 +45,8 @@ import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 import com.gwtext.client.widgets.form.FormPanel;
 import com.gwtext.client.widgets.form.TextField;
 import com.gwtext.client.widgets.layout.FitLayout;
+import fr.insalyon.creatis.vip.common.client.bean.Authentication;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogServiceAsync;
 
@@ -100,11 +102,12 @@ public class CreateFolderWindow extends Window {
                 if (text == null || text.isEmpty()) {
                     MessageBox.alert("You should provide a folder name");
                 } else {
-//                Context context = Context.getInstance();
+                    Context context = Context.getInstance();
 //                context.setLastGridFolderBrowsed(baseDir);
-//                Authentication auth = context.getAuthentication();
-//                service.createDir(auth.getProxyFileName(), baseDir, text, callback);
-                    service.createDir("/tmp/x509up_u501", baseDir, text, callback);
+                    Authentication auth = context.getAuthentication();
+                    String user = auth.getUserName().split(" / ")[0];
+//                service.createDir(user, auth.getProxyFileName(), baseDir, text, callback);
+                    service.createDir(user, "/tmp/x509up_u501", baseDir, text, callback);
                     Ext.get("dm-browser-panel").mask("Creating Folder...");
                     close();
                 }

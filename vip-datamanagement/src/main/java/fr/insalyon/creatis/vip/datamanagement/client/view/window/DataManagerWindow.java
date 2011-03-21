@@ -42,6 +42,7 @@ import com.gwtext.client.widgets.Window;
 import com.gwtext.client.widgets.layout.BorderLayout;
 import com.gwtext.client.widgets.layout.BorderLayoutData;
 import com.gwtext.client.widgets.layout.FitLayout;
+import fr.insalyon.creatis.vip.datamanagement.client.DataManagerConstants;
 
 /**
  *
@@ -89,7 +90,6 @@ public class DataManagerWindow extends Window {
 
     public void display() {
         this.show();
-        browserPanel.loadData(null, true);
         eastPanel.loadData();
     }
 

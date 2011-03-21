@@ -36,13 +36,10 @@ package fr.insalyon.creatis.vip.datamanagement.client.view.panel;
 
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.data.Record;
-import com.gwtext.client.widgets.Button;
-import com.gwtext.client.widgets.ToolbarButton;
-import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 import com.gwtext.client.widgets.form.TextField;
 import com.gwtext.client.widgets.grid.GridPanel;
 import com.gwtext.client.widgets.grid.event.GridRowListenerAdapter;
-import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.datamanagement.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanagement.client.view.window.SelectDataPathWindow;
 
 /**
@@ -64,7 +61,6 @@ public class SelectDataBrowserPanel extends AbstractBrowserPanel {
         super("dm-select");
         this.setWidth(450);
         this.configureGrid();
-        this.ConfigureToolbar();
     }
 
     private void configureGrid() {
@@ -76,43 +72,18 @@ public class SelectDataBrowserPanel extends AbstractBrowserPanel {
                 String parentDir = pathCB.getValue();
                 if (record.getAsString("typeico").equals("Folder")) {
                     String clickedFolderName = record.getAsString("fileName");
+                    if (parentDir.equals(DataManagerConstants.ROOT)) {
+                        parentDir = "";
+                    }
                     loadData(parentDir + "/" + clickedFolderName, true);
                 } else {
                     SelectDataPathWindow window = SelectDataPathWindow.getInstance();
                     TextField tf = (TextField) window.getFieldSet().findByID(window.getRefID());
-                    Context context = Context.getInstance();
-                    tf.setValue("lfn://" + context.getLfcHost() + ":"
-                            + context.getLfcPort() + parentDir
-                            + "/" + record.getAsString("fileName"));
+                    tf.setValue(parentDir + "/" + record.getAsString("fileName"));
                     window.close();
                 }
             }
         });
-    }
-
-    private void ConfigureToolbar() {
-        // Folder up Button
-        ToolbarButton folderupButton = new ToolbarButton("", new ButtonListenerAdapter() {
-
-            @Override
-            public void onClick(Button button, EventObject e) {
-                String selectedPath = pathCB.getValue();
-                String newPath = selectedPath.substring(0, selectedPath.lastIndexOf("/"));
-                loadData(newPath, false);
-            }
-        });
-        folderupButton.setIcon("images/icon-folderup.gif");
-        folderupButton.setCls("x-btn-icon");
-
-        topToolbar.addButton(folderupButton);
-    }
-
-    @Override
-    public void loadData(String displayDir, boolean newPath) {
-        if (displayDir == null) {
-            displayDir = "/grid/biomed";
-        }
-        loadData(displayDir, displayDir, newPath);
     }
 
     @Override

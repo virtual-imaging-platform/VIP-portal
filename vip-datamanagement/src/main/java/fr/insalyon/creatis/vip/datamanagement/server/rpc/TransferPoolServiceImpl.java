@@ -41,6 +41,7 @@ import fr.insalyon.creatis.agent.vlet.common.bean.Operation;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.datamanagement.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolService;
+import fr.insalyon.creatis.vip.datamanagement.server.DataManagerUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,7 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
 
     private ServerConfiguration serverConfiguration = ServerConfiguration.getInstance();
 
-    public List<PoolOperation> getOperations(String user, String proxy) {
+    public List<PoolOperation> getOperations(String userDN, String proxy) {
 
         try {
             VletAgentPoolClient client = new VletAgentPoolClient(
@@ -61,7 +62,7 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
                     serverConfiguration.getVletagentPort(),
                     proxy);
             
-            List<Operation> operationsList = client.getOperationsListByUser(user);
+            List<Operation> operationsList = client.getOperationsListByUser(userDN);
             List<PoolOperation> poolOperations = new ArrayList<PoolOperation>();
 
             for (Operation op : operationsList) {
@@ -110,14 +111,14 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
         }
     }
 
-    public void downloadFile(String remoteFile, String user, String proxy) {
+    public void downloadFile(String user, String remoteFile, String userDN, String proxy) {
         try {
             VletAgentPoolClient client = new VletAgentPoolClient(
                     serverConfiguration.getVletagentHost(),
                     serverConfiguration.getVletagentPort(),
                     proxy);
-            client.downloadFile(remoteFile,
-                    serverConfiguration.getDataManagerPath() + "/downloads", user);
+            client.downloadFile(DataManagerUtil.parseBaseDir(user, remoteFile),
+                    serverConfiguration.getDataManagerPath() + "/downloads", userDN);
 
         } catch (VletAgentClientException ex) {
             ex.printStackTrace();

@@ -44,11 +44,11 @@ import java.util.List;
  */
 public interface FileCatalogServiceAsync {
 
-    public void listDir(String proxyFileName, String baseDir, AsyncCallback<List<Data>> asyncCallback);
+    public void listDir(String user, String proxyFileName, String baseDir, AsyncCallback<List<Data>> asyncCallback);
 
-    public void delete(String proxyFileName, String path, AsyncCallback<Void> asyncCallback);
+    public void delete(String user, String proxyFileName, String path, AsyncCallback<Void> asyncCallback);
 
-    public void createDir(String proxyFileName, String baseDir, String name, AsyncCallback<Void> asyncCallback);
+    public void createDir(String user, String proxyFileName, String baseDir, String name, AsyncCallback<Void> asyncCallback);
 
-    public void deleteFiles(String proxyFileName, List<String> paths, AsyncCallback<Void> asyncCallback);
+    public void deleteFiles(String user, String proxyFileName, List<String> paths, AsyncCallback<Void> asyncCallback);
 }

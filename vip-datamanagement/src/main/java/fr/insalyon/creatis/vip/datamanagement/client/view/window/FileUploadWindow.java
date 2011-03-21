@@ -92,12 +92,14 @@ public class FileUploadWindow extends Window {
         formPanel.setErrorReader(errorReader);
 
         // Hidden Fields
-        Hidden userHidden = new Hidden("userdn", Context.getInstance().getAuthentication().getUserDN());
+        Hidden userHidden = new Hidden("user", Context.getInstance().getAuthentication().getUserName().split(" / ")[0]);
+        Hidden userDNHidden = new Hidden("userdn", Context.getInstance().getAuthentication().getUserDN());
 //        Hidden proxyHidden = new Hidden("proxy", Context.getInstance().getAuthentication().getProxyFileName());
         Hidden proxyHidden = new Hidden("proxy", "/tmp/x509up_u501"); //TODO remove it
         Hidden pathHidden = new Hidden("path", baseDir);
         formPanel.add(proxyHidden);
         formPanel.add(userHidden);
+        formPanel.add(userDNHidden);
         formPanel.add(pathHidden);
 
         // File Field

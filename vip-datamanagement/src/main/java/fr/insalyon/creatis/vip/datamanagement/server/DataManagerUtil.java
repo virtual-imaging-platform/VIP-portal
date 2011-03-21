@@ -1,4 +1,4 @@
-    /* Copyright CNRS-CREATIS
+/* Copyright CNRS-CREATIS
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
@@ -32,38 +32,45 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanagement.client.rpc;
+package fr.insalyon.creatis.vip.datamanagement.server;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import fr.insalyon.creatis.vip.datamanagement.client.bean.PoolOperation;
-import java.util.List;
+import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
+import fr.insalyon.creatis.vip.datamanagement.client.DataManagerConstants;
 
 /**
  *
  * @author Rafael Silva
  */
-public interface TransferPoolService extends RemoteService {
+public class DataManagerUtil {
 
-    public static final String SERVICE_URI = "/transferpoolservice";
+    public static String parseBaseDir(String user, String baseDir) {
+        if (baseDir.contains(DataManagerConstants.USERS_HOME)) {
+            return baseDir.replace(
+                    DataManagerConstants.USERS_HOME,
+                    ServerConfiguration.getInstance().getDataManagerUsersHome()
+                    + "/" + user.replaceAll(" ", "_").toLowerCase());
 
-    public static class Util {
+        } else if (baseDir.contains(DataManagerConstants.PUBLIC_HOME)) {
+            return baseDir.replace(
+                    DataManagerConstants.PUBLIC_HOME,
+                    ServerConfiguration.getInstance().getDataManagerUsersHome()
+                    + "/public");
 
-        public static TransferPoolServiceAsync getInstance() {
+        } else if (baseDir.contains(DataManagerConstants.GROUPS_HOME)) {
+            return baseDir.replace(
+                    DataManagerConstants.GROUPS_HOME,
+                    ServerConfiguration.getInstance().getDataManagerGroupsHome());
 
-            TransferPoolServiceAsync instance = (TransferPoolServiceAsync) GWT.create(TransferPoolService.class);
-            ServiceDefTarget target = (ServiceDefTarget) instance;
-            target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
-            return instance;
+        } else if (baseDir.contains(DataManagerConstants.ACTIVITIES_HOME)) {
+            return baseDir.replace(
+                    DataManagerConstants.ACTIVITIES_HOME,
+                    ServerConfiguration.getInstance().getDataManagerActivitiesHome());
+            
+        } else if (baseDir.contains(DataManagerConstants.WORKFLOWS_HOME)) {
+            return baseDir.replace(
+                    DataManagerConstants.WORKFLOWS_HOME,
+                    ServerConfiguration.getInstance().getDataManagerWorkflowsHome());
         }
+        return baseDir;
     }
-
-    public List<PoolOperation> getOperations(String userDN, String proxy);
-
-    public PoolOperation getOperationById(String id, String proxy);
-
-    public void removeOperationById(String id, String proxy);
-
-    public void downloadFile(String user, String remoteFile, String userDN, String proxy);
 }

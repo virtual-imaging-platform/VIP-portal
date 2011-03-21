@@ -64,7 +64,10 @@ import com.gwtext.client.widgets.grid.GridPanel;
 import com.gwtext.client.widgets.grid.Renderer;
 import com.gwtext.client.widgets.layout.FitLayout;
 import com.gwtextux.client.data.PagingMemoryProxy;
+import fr.insalyon.creatis.vip.common.client.bean.Authentication;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
+import fr.insalyon.creatis.vip.datamanagement.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanagement.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogServiceAsync;
@@ -112,10 +115,10 @@ public abstract class AbstractBrowserPanel extends Panel {
                 });
 
         ArrayReader reader = new ArrayReader(recordDef);
-        PagingMemoryProxy proxy = new PagingMemoryProxy(new Object[][]{new Object[]{}});
-
+        PagingMemoryProxy proxy = new PagingMemoryProxy(getRootData());
         store = new Store(proxy, reader);
         store.setSortInfo(new SortState("typeico", SortDir.DESC));
+        store.load();
         grid.setStore(store);
 
         BaseColumnConfig[] columns = {
@@ -152,9 +155,12 @@ public abstract class AbstractBrowserPanel extends Panel {
 
         // Path ComboBox
         simulationsStore = FieldUtil.getComboBoxStore(pId + "-path-name");
+        Object[][] data = new Object[][]{{"/"}};
+        MemoryProxy usersProxy = new MemoryProxy(data);
+        simulationsStore.setDataProxy(usersProxy);
         simulationsStore.load();
 
-        pathCB = FieldUtil.getComboBox(pId + "-path-cb", "", 300,
+        pathCB = FieldUtil.getComboBox(pId + "-path-cb", "", 350,
                 "", simulationsStore, pId + "-path-name");
         pathCB.addListener(new ComboBoxListenerAdapter() {
 
@@ -167,19 +173,42 @@ public abstract class AbstractBrowserPanel extends Panel {
                 }
             }
         });
+        pathCB.setValue("/");
+
+        // Folder up Button
+        ToolbarButton folderupButton = new ToolbarButton("", new ButtonListenerAdapter() {
+
+            @Override
+            public void onClick(Button button, EventObject e) {
+                String selectedPath = pathCB.getValue();
+                if (!selectedPath.equals(DataManagerConstants.ROOT)) {
+                    String newPath = selectedPath.substring(0, selectedPath.lastIndexOf("/"));
+                    if (newPath.isEmpty()) {
+                        newPath = DataManagerConstants.ROOT;
+                    }
+                    loadData(newPath, false);
+                }
+            }
+        });
+        folderupButton.setIcon("images/icon-folderup.gif");
+        folderupButton.setCls("x-btn-icon");
 
         // Refresh Button
         ToolbarButton refreshButton = new ToolbarButton("", new ButtonListenerAdapter() {
 
             @Override
             public void onClick(Button button, EventObject e) {
-                loadData(pathCB.getValue(), false);
+                String selectedPath = pathCB.getValue();
+                if (!selectedPath.equals(DataManagerConstants.ROOT)) {
+                    loadData(selectedPath, false);
+                }
             }
         });
         refreshButton.setIcon("images/icon-refresh.gif");
         refreshButton.setCls("x-btn-icon");
 
         topToolbar.addField(pathCB);
+        topToolbar.addButton(folderupButton);
         topToolbar.addButton(refreshButton);
 
         return topToolbar;
@@ -187,13 +216,10 @@ public abstract class AbstractBrowserPanel extends Panel {
 
     /**
      * 
-     * @param displayDir
      * @param baseDir
      * @param newPath
      */
-    protected void loadData(String displayDir, String baseDir, boolean newPath) {
-
-        Ext.get(pId + "-panel").mask("Loading...");
+    public void loadData(String baseDir, boolean newPath) {
 
         Record[] records = pathCB.getStore().getRecords();
         Object[][] data;
@@ -202,7 +228,7 @@ public abstract class AbstractBrowserPanel extends Panel {
             for (int i = 0; i < records.length; i++) {
                 data[i][0] = records[i].getAsString(pId + "-path-name");
             }
-            data[records.length][0] = displayDir;
+            data[records.length][0] = baseDir;
 
         } else {
             data = new Object[records.length][1];
@@ -215,38 +241,61 @@ public abstract class AbstractBrowserPanel extends Panel {
         simulationsStore.setDataProxy(usersProxy);
         simulationsStore.load();
         simulationsStore.commitChanges();
-        pathCB.setValue(displayDir);
+        pathCB.setValue(baseDir);
 
-        FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
-        AsyncCallback<List<Data>> callback = new AsyncCallback<List<Data>>() {
+        if (!baseDir.equals(DataManagerConstants.ROOT)) {
+            Ext.get(pId + "-panel").mask("Loading...");
+            FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
+            AsyncCallback<List<Data>> callback = new AsyncCallback<List<Data>>() {
 
-            public void onFailure(Throwable caught) {
-                MessageBox.alert("Error", "Error executing get files list: " + caught.getMessage());
-                Ext.get(pId + "-panel").unmask();
-            }
-
-            public void onSuccess(List<Data> result) {
-                if (result != null) {
-                    Object[][] data = new Object[result.size()][2];
-                    int i = 0;
-                    for (Data d : result) {
-                        data[i][0] = d.getType();
-                        data[i][1] = d.getName();
-                        i++;
-                    }
-                    PagingMemoryProxy proxy = new PagingMemoryProxy(data);
-                    store.setDataProxy(proxy);
-                    store.load();
-                    store.commitChanges();
-                } else {
-                    MessageBox.alert("Error", "Unable to get list of files.");
+                public void onFailure(Throwable caught) {
+                    MessageBox.alert("Error", "Error executing get files list: " + caught.getMessage());
+                    Ext.get(pId + "-panel").unmask();
                 }
-                Ext.get(pId + "-panel").unmask();
-            }
-        };
-//        service.listDir(auth.getProxyFileName(), baseDir, callback);
-        service.listDir("/tmp/x509up_u501", baseDir, callback);
+
+                public void onSuccess(List<Data> result) {
+                    if (result != null) {
+                        Object[][] data = new Object[result.size()][2];
+                        int i = 0;
+                        for (Data d : result) {
+                            data[i][0] = d.getType();
+                            data[i][1] = d.getName();
+                            i++;
+                        }
+                        PagingMemoryProxy proxy = new PagingMemoryProxy(data);
+                        store.setDataProxy(proxy);
+                        store.load();
+                        store.commitChanges();
+                    } else {
+                        MessageBox.alert("Error", "Unable to get list of files.");
+                    }
+                    Ext.get(pId + "-panel").unmask();
+                }
+            };
+            Authentication auth = Context.getInstance().getAuthentication();
+            String user = auth.getUserName().split(" / ")[0];
+//        service.listDir(user, auth.getProxyFileName(), baseDir, callback);
+            service.listDir(user, "/tmp/x509up_u501", baseDir, callback);
+            
+        } else {
+            PagingMemoryProxy proxy = new PagingMemoryProxy(getRootData());
+            store.setDataProxy(proxy);
+            store.load();
+            store.commitChanges();
+        }
     }
 
-    public abstract void loadData(String displayDir, boolean newPath);
+    private Object[][] getRootData() {
+        return new Object[][]{
+                    {"Folder", DataManagerConstants.USERS_HOME},
+                    {"Folder", DataManagerConstants.PUBLIC_HOME},
+                    {"Folder", DataManagerConstants.GROUPS_HOME},
+                    {"Folder", DataManagerConstants.ACTIVITIES_HOME},
+                    {"Folder", DataManagerConstants.WORKFLOWS_HOME}
+                };
+    }
+
+    public String getPathCBValue() {
+        return this.pathCB.getValueAsString();
+    }
 }

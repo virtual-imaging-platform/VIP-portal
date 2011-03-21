@@ -44,11 +44,11 @@ import java.util.List;
  */
 public interface TransferPoolServiceAsync {
 
-    public void getOperations(String user, String proxy, AsyncCallback<List<PoolOperation>> asyncCallback);
+    public void getOperations(String userDN, String proxy, AsyncCallback<List<PoolOperation>> asyncCallback);
 
     public void getOperationById(String id, String proxy, AsyncCallback<PoolOperation> asyncCallback);
 
     public void removeOperationById(String id, String proxy, AsyncCallback<Void> asyncCallback);
 
-    public void downloadFile(String remoteFile, String user, String proxy, AsyncCallback<Void> asyncCallback);
+    public void downloadFile(String user, String remoteFile, String userDN, String proxy, AsyncCallback<Void> asyncCallback);
 }
