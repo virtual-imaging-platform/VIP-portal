@@ -32,7 +32,6 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-
 package fr.insalyon.creatis.vip.datamanagement.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -51,6 +50,5 @@ public interface FileCatalogServiceAsync {
 
     public void createDir(String proxyFileName, String baseDir, String name, AsyncCallback<Void> asyncCallback);
 
-    public void deleteFiles(String proxyFileName, List paths, AsyncCallback<Void> asyncCallback);
-
+    public void deleteFiles(String proxyFileName, List<String> paths, AsyncCallback<Void> asyncCallback);
 }
