@@ -73,9 +73,11 @@ public class ServerConfiguration {
     private String truststorePass = "";
     // Data Management
     private String dataManagerPath = "/tmp";
-    private String dataManagerHome = "/grid/biomed/creatis/vip/home";
     private String dataManagerLFCHost = "lfc-biomed.in2p3.fr";
     private int dataManagerLFCPort = 5010;
+    private String dataManagerUsersHome = "/grid/biomed/creatis/vip/data/users";
+    private String dataManagerActivitiesHome = "/grid/biomed/creatis/vip/tools/activities";
+    private String dataManagerWorkflowsHome = "/grid/biomed/creatis/vip/tools/workflows";
 
     public static ServerConfiguration getInstance() {
         if (instance == null) {
@@ -123,9 +125,11 @@ public class ServerConfiguration {
             apacheSSLPort = new Integer(prop.getProperty("apache.ssl.port", apacheSSLPort + ""));
             quickStartURL = prop.getProperty("quickstart.url", quickStartURL);
             dataManagerPath = prop.getProperty("datamanager.path", dataManagerPath);
-            dataManagerHome = prop.getProperty("datamanager.home", dataManagerHome);
             dataManagerLFCHost = prop.getProperty("datamanager.lfc.host", dataManagerLFCHost);
             dataManagerLFCPort = new Integer(prop.getProperty("datamanager.lfc.port", dataManagerLFCPort + ""));
+            dataManagerUsersHome = prop.getProperty("datamanager.users.home", dataManagerUsersHome);
+            dataManagerActivitiesHome = prop.getProperty("datamanager.activities.home", dataManagerActivitiesHome);
+            dataManagerWorkflowsHome = prop.getProperty("datamanager.workflows.home", dataManagerWorkflowsHome);
 
         } catch (IOException e) {
 
@@ -146,9 +150,11 @@ public class ServerConfiguration {
                 prop.setProperty("apache.ssl.port", apacheSSLPort + "");
                 prop.setProperty("quickstart.url", quickStartURL);
                 prop.setProperty("datamanager.path", dataManagerPath);
-                prop.setProperty("datamanager.home", dataManagerHome);
                 prop.setProperty("datamanager.lfc.host", dataManagerLFCHost);
                 prop.setProperty("datamanager.lfc.port", dataManagerLFCPort + "");
+                prop.setProperty("datamanager.users.home", dataManagerUsersHome);
+                prop.setProperty("datamanager.activities.home", dataManagerActivitiesHome);
+                prop.setProperty("datamanager.workflows.home", dataManagerWorkflowsHome);
 
                 prop.store(new FileOutputStream(confFilePath), "VIP Configuration File");
 
@@ -230,10 +236,6 @@ public class ServerConfiguration {
         return dataManagerPath;
     }
 
-    public String getDataManagerHome() {
-        return dataManagerHome;
-    }
-
     public String getDataManagerLFCHost() {
         return dataManagerLFCHost;
     }
@@ -242,4 +244,15 @@ public class ServerConfiguration {
         return dataManagerLFCPort;
     }
 
+    public String getDataManagerUsersHome() {
+        return dataManagerUsersHome;
+    }
+
+    public String getDataManagerActivitiesHome() {
+        return dataManagerActivitiesHome;
+    }
+
+    public String getDataManagerWorkflowsHome() {
+        return dataManagerWorkflowsHome;
+    }
 }
