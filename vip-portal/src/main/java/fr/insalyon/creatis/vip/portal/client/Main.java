@@ -63,7 +63,6 @@ public class Main implements EntryPoint {
                 context.setAuthentication(result.getAuthentication());
                 context.setQuickstartURL(result.getQuickstartURL());
                 context.setMoteurServerHost(result.getMoteurServerHost());
-                context.setUserHome(result.getUserHome());
                 context.setLfcHost(result.getLfcHost());
                 context.setLfcPort(result.getLfcPort());
 

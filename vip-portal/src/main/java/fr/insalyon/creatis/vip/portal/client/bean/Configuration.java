@@ -46,7 +46,6 @@ public class Configuration implements IsSerializable {
     private Authentication authentication;
     private String quickstartURL;
     private String moteurServerHost;
-    private String userHome;
     private String lfcHost;
     private int lfcPort;
 
@@ -54,11 +53,10 @@ public class Configuration implements IsSerializable {
     }
 
     public Configuration(Authentication authentication, String quickstartURL,
-            String moteurServerHost, String userHome, String lfcHost, int lfcPort) {
+            String moteurServerHost, String lfcHost, int lfcPort) {
         this.authentication = authentication;
         this.quickstartURL = quickstartURL;
         this.moteurServerHost = moteurServerHost;
-        this.userHome = userHome;
         this.lfcHost = lfcHost;
         this.lfcPort = lfcPort;
     }
@@ -73,10 +71,6 @@ public class Configuration implements IsSerializable {
 
     public String getQuickstartURL() {
         return quickstartURL;
-    }
-
-    public String getUserHome() {
-        return userHome;
     }
 
     public String getLfcHost() {

@@ -68,7 +68,7 @@ public class ToolbarPanel extends AbstractPanel {
         toolbar.addSeparator();
 
         // Data Management Menu
-        toolbar.addButton(new DataManagementToolbarButton("Data Management"));
+        toolbar.addButton(new DataManagerToolbarButton("Data Manager"));
         toolbar.addSeparator();
 
         // System Menu

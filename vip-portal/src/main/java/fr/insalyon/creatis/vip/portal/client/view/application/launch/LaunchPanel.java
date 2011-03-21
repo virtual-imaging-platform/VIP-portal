@@ -63,11 +63,11 @@ import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.portal.client.view.common.window.lfn.SelectLFNBrowserWindow;
 import fr.insalyon.creatis.vip.portal.client.view.application.monitor.MonitorLeftPanel;
 import fr.insalyon.creatis.vip.portal.client.view.application.monitor.WorkflowPanel;
 import fr.insalyon.creatis.vip.portal.client.view.application.monitor.WorkflowsPanel;
 import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.datamanagement.client.view.window.SelectDataPathWindow;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -326,7 +326,10 @@ public class LaunchPanel extends Panel {
 
             @Override
             public void onClick(Button button, EventObject e) {
-                new SelectLFNBrowserWindow(rootPath, id, fieldSet);
+                SelectDataPathWindow window = SelectDataPathWindow.getInstance();
+                window.configure(id, fieldSet);
+                window.display();
+//                new SelectLFNBrowserWindow(rootPath, id, fieldSet);
             }
         });
         mfp.addToRow(browseButton, 60);
@@ -412,7 +415,10 @@ public class LaunchPanel extends Panel {
 
             @Override
             public void onClick(Button button, EventObject e) {
-                new SelectLFNBrowserWindow(rootPath, button.getId().substring(button.getId().indexOf("-") + 1), fieldSet);
+                SelectDataPathWindow window = SelectDataPathWindow.getInstance();
+                window.configure(button.getId().substring(button.getId().indexOf("-") + 1), fieldSet);
+                window.display();
+//                new SelectLFNBrowserWindow(rootPath, button.getId().substring(button.getId().indexOf("-") + 1), fieldSet);
             }
         });
         mfp.addToRow(browseButton, 60);

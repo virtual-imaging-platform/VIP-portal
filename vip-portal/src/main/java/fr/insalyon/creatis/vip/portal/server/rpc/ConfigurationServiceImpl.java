@@ -46,13 +46,13 @@ import fr.insalyon.creatis.vip.portal.server.business.proxy.MyProxyClient;
 import fr.insalyon.creatis.vip.portal.server.dao.DAOException;
 import fr.insalyon.creatis.vip.portal.server.dao.DAOFactory;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
+import fr.insalyon.creatis.vip.datamanagement.client.DataManagerConstants;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -63,13 +63,12 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
     public Configuration loadConfiguration() {
 
         HttpServletRequest request = this.getThreadLocalRequest();
-        Object o = request.getAttribute("javax.servlet.request.X509Certificate");
+        Object object = request.getAttribute("javax.servlet.request.X509Certificate");
         Authentication authentication = null;
         ServerConfiguration conf = ServerConfiguration.getInstance();
-        String userHome = null;
 
-        if (o != null) {
-            X509Certificate certs[] = (X509Certificate[]) o;
+        if (object != null) {
+            X509Certificate certs[] = (X509Certificate[]) object;
             X509Certificate cert = certs[0];
 
             String[] subjectDN = cert.getSubjectDN().getName().split(", ");
@@ -81,11 +80,6 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
 
             if (DAOFactory.getDAOFactory().getUserDAO().exists(userDN)) {
                 User user = DAOFactory.getDAOFactory().getUserDAO().getUser(userDN);
-                HttpSession session = request.getSession();
-                if (session.getAttribute("userDN") == null) {
-                    session.setAttribute("userDN", userDN);
-                }
-
                 String proxyFileName = "";
                 try {
                     MyProxyClient myproxy = new MyProxyClient();
@@ -99,7 +93,10 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
                             ServerConfiguration.getInstance().getVletagentPort(),
                             proxyFileName);
 
-                    client.createDirectory(conf.getDataManagerUsersHome(), user.getCanonicalName().replace(" ", "-"));
+                    client.createDirectory(conf.getDataManagerUsersHome(),
+                            user.getCanonicalName().replace(" ", "_").toLowerCase());
+                    client.createDirectory(conf.getDataManagerUsersHome(),
+                            DataManagerConstants.PUBLIC_HOME);
                     
                 } catch (BusinessException ex) {
                     authentication = new Authentication(
@@ -109,7 +106,8 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
                 } catch (VletAgentClientException ex) {
                     ex.printStackTrace();
                 }
-                userHome = conf.getDataManagerUsersHome() + "/" + user.getCanonicalName().replace(" ", "-");
+            } else {
+                authentication = new Authentication("Anonymous", "Anonymous", new HashMap(), "", false);
             }
         } else {
             authentication = new Authentication("Anonymous", "Anonymous", new HashMap(), "", false);
@@ -124,7 +122,7 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
         return new Configuration(authentication,
                 conf.getQuickStartURL(),
                 uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort(),
-                userHome, conf.getDataManagerLFCHost(), conf.getDataManagerLFCPort());
+                conf.getDataManagerLFCHost(), conf.getDataManagerLFCPort());
     }
 
     public String addGroup(String groupName) {

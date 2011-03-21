@@ -44,9 +44,9 @@ import fr.insalyon.creatis.vip.datamanagement.client.view.window.DataManagerWind
  *
  * @author Rafael Silva
  */
-public class DataManagementToolbarButton extends ToolbarButton {
+public class DataManagerToolbarButton extends ToolbarButton {
 
-    public DataManagementToolbarButton(String title) {
+    public DataManagerToolbarButton(String title) {
         super(title);
 
         this.addListener(new ButtonListenerAdapter() {
