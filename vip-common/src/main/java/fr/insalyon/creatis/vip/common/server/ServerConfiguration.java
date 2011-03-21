@@ -76,7 +76,8 @@ public class ServerConfiguration {
     private String dataManagerLFCHost = "lfc-biomed.in2p3.fr";
     private int dataManagerLFCPort = 5010;
     private String dataManagerUsersHome = "/grid/biomed/creatis/vip/data/users";
-    private String dataManagerActivitiesHome = "/grid/biomed/creatis/vip/tools/activities";
+    private String dataManagerGroupsHome = "/grid/biomed/creatis/vip/data/groups";
+    private String dataManagerActivitiesHome = "/grid/biomed/creatis/vip/tools/activitites";
     private String dataManagerWorkflowsHome = "/grid/biomed/creatis/vip/tools/workflows";
 
     public static ServerConfiguration getInstance() {
@@ -128,6 +129,7 @@ public class ServerConfiguration {
             dataManagerLFCHost = prop.getProperty("datamanager.lfc.host", dataManagerLFCHost);
             dataManagerLFCPort = new Integer(prop.getProperty("datamanager.lfc.port", dataManagerLFCPort + ""));
             dataManagerUsersHome = prop.getProperty("datamanager.users.home", dataManagerUsersHome);
+            dataManagerGroupsHome = prop.getProperty("datamanager.groups.home", dataManagerGroupsHome);
             dataManagerActivitiesHome = prop.getProperty("datamanager.activities.home", dataManagerActivitiesHome);
             dataManagerWorkflowsHome = prop.getProperty("datamanager.workflows.home", dataManagerWorkflowsHome);
 
@@ -153,6 +155,7 @@ public class ServerConfiguration {
                 prop.setProperty("datamanager.lfc.host", dataManagerLFCHost);
                 prop.setProperty("datamanager.lfc.port", dataManagerLFCPort + "");
                 prop.setProperty("datamanager.users.home", dataManagerUsersHome);
+                prop.setProperty("datamanager.groups.home", dataManagerGroupsHome);
                 prop.setProperty("datamanager.activities.home", dataManagerActivitiesHome);
                 prop.setProperty("datamanager.workflows.home", dataManagerWorkflowsHome);
 
@@ -246,6 +249,10 @@ public class ServerConfiguration {
 
     public String getDataManagerUsersHome() {
         return dataManagerUsersHome;
+    }
+
+    public String getDataManagerGroupsHome() {
+        return dataManagerGroupsHome;
     }
 
     public String getDataManagerActivitiesHome() {
