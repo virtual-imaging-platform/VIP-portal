@@ -14,8 +14,10 @@ import fr.insalyon.creatis.vip.portal.client.bean.Echogenicity;
 import fr.insalyon.creatis.vip.portal.client.bean.MagneticProperty;
 import fr.insalyon.creatis.vip.portal.client.bean.PhysicalProperty;
 import fr.insalyon.creatis.vip.portal.client.bean.Tissue;
+import fr.insalyon.creatis.vip.portal.server.dao.DAOException;
 import fr.insalyon.creatis.vip.portal.server.dao.TissueDAO;
 import fr.insalyon.creatis.vip.portal.server.dao.derby.connection.PlatformConnection;
+import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -33,21 +35,19 @@ import java.util.logging.Logger;
 public class TissueData implements TissueDAO {
 
     private static TissueData instance;
+    private Connection connection;
 
-    public static TissueData getInstance() {
-        if (instance == null) {
-            instance = new TissueData();
-        }
-        return instance;
+    public TissueData() throws DAOException {
+        this.connection = PlatformConnection.getInstance().getConnection();
     }
 
 //tissues
     public List<Tissue> getTissues() {
-        PlatformConnection connection = PlatformConnection.getInstance();
+        
         Vector<Tissue> t = new Vector<Tissue>();
         PreparedStatement stat;
         try {
-            stat = connection.getConnection().prepareStatement("SELECT name from Tissues");
+            stat = connection.prepareStatement("SELECT name from Tissues");
             ResultSet rs = stat.executeQuery();
             while (rs.next()) {
                 Tissue u = new Tissue(rs.getString("name"));
@@ -60,10 +60,9 @@ public class TissueData implements TissueDAO {
     }
 
     public void addTissue(Tissue t) {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         try {
-            stat = connection.getConnection().prepareStatement("INSERT INTO Tissues VALUES(?,?)");
+            stat = connection.prepareStatement("INSERT INTO Tissues VALUES(?,?)");
             stat.setString(1, t.getTissueName());
             stat.setInt(2, t.getOntologyId());
             stat.executeUpdate();
@@ -78,10 +77,9 @@ public class TissueData implements TissueDAO {
     }
 
     public void deleteTissue(Tissue t) {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         try {
-            stat = connection.getConnection().prepareCall("DELETE FROM Tissues WHERE name=?");
+            stat = connection.prepareCall("DELETE FROM Tissues WHERE name=?");
             stat.setString(1, t.getTissueName());
             stat.executeUpdate();
         } catch (SQLException ex) {
@@ -92,12 +90,11 @@ public class TissueData implements TissueDAO {
 
     //physical properties
     public List<PhysicalProperty> getPhysicalProperties(Tissue t) {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         Vector<PhysicalProperty> result = new Vector<PhysicalProperty>();
         try {
             System.out.println("SELECT physicalPropertyId,author,comment,type,date from PhysicalProperties where tissuename="+t.getTissueName());
-            stat = connection.getConnection().prepareStatement("SELECT physicalPropertyId,author,comment,type,date from PhysicalProperties where tissuename=?");
+            stat = connection.prepareStatement("SELECT physicalPropertyId,author,comment,type,date from PhysicalProperties where tissuename=?");
             stat.setString(1, t.getTissueName());
             ResultSet res = stat.executeQuery();
             while (res.next()) {
@@ -111,14 +108,13 @@ public class TissueData implements TissueDAO {
     }
 
     private int addPhysicalProperty(Tissue t, PhysicalProperty p) {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
 
         int id = getNextPhysicalPropertyId();
 
         Vector<PhysicalProperty> result = new Vector<PhysicalProperty>();
         try {
-            stat = connection.getConnection().prepareStatement("INSERT into PhysicalProperties VALUES(?,?,?,?,?,?)");
+            stat = connection.prepareStatement("INSERT into PhysicalProperties VALUES(?,?,?,?,?,?)");
 
             stat.setString(1, t.getTissueName());
             stat.setInt(2, id);
@@ -136,11 +132,10 @@ public class TissueData implements TissueDAO {
     }
 
     public void updatePhysicalProperty(PhysicalProperty p) {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         Vector<PhysicalProperty> result = new Vector<PhysicalProperty>();
         try {
-            stat = connection.getConnection().prepareStatement("UPDATE PhysicalProperties SET author=?,comment=?,type=? where physicalPropertyId=?");
+            stat = connection.prepareStatement("UPDATE PhysicalProperties SET author=?,comment=?,type=? where physicalPropertyId=?");
           
             stat.setInt(4, p.getId());
             stat.setString(1,p.getAuthor());
@@ -155,27 +150,26 @@ public class TissueData implements TissueDAO {
     }
 
     public void deletePhysicalProperty(PhysicalProperty p) {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         Vector<PhysicalProperty> result = new Vector<PhysicalProperty>();
         try {
-            stat = connection.getConnection().prepareStatement("DELETE FROM PhysicalProperties WHERE physicalPropertyId=?");
+            stat = connection.prepareStatement("DELETE FROM PhysicalProperties WHERE physicalPropertyId=?");
             stat.setInt(1, p.getId());
             stat.executeUpdate();
             
-            stat = connection.getConnection().prepareStatement("DELETE FROM Echogenicities WHERE physicalPropertyId=?");
+            stat = connection.prepareStatement("DELETE FROM Echogenicities WHERE physicalPropertyId=?");
             stat.setInt(1, p.getId());
             stat.executeUpdate();
 
-            stat = connection.getConnection().prepareStatement("DELETE FROM MagneticProperties WHERE physicalPropertyId=?");
+            stat = connection.prepareStatement("DELETE FROM MagneticProperties WHERE physicalPropertyId=?");
             stat.setInt(1, p.getId());
             stat.executeUpdate();
 
-            stat = connection.getConnection().prepareStatement("DELETE FROM ChemicalComponents WHERE physicalPropertyId=?");
+            stat = connection.prepareStatement("DELETE FROM ChemicalComponents WHERE physicalPropertyId=?");
             stat.setInt(1, p.getId());
             stat.executeUpdate();
 
-            stat = connection.getConnection().prepareStatement("DELETE FROM ChemicalBlend WHERE physicalPropertyId=?");
+            stat = connection.prepareStatement("DELETE FROM ChemicalBlend WHERE physicalPropertyId=?");
             stat.setInt(1, p.getId());
             stat.executeUpdate();
 
@@ -185,10 +179,9 @@ public class TissueData implements TissueDAO {
     }
 
     public int getNextPhysicalPropertyId() {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         try {
-            stat = connection.getConnection().prepareCall("SELECT MAX(physicalPropertyId) from PhysicalProperties");
+            stat = connection.prepareCall("SELECT MAX(physicalPropertyId) from PhysicalProperties");
             ResultSet rs = stat.executeQuery();
             
             rs.next();
@@ -203,11 +196,10 @@ public class TissueData implements TissueDAO {
     }
 
     public Echogenicity getEchogenicity(PhysicalProperty p) {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         Echogenicity result = null;
         try {
-            stat = connection.getConnection().prepareStatement("SELECT spatDistInstanceId,ampDistInstanceId from Echogenicities where physicalPropertyId=?");
+            stat = connection.prepareStatement("SELECT spatDistInstanceId,ampDistInstanceId from Echogenicities where physicalPropertyId=?");
             stat.setInt(1, p.getId());
             ResultSet res = stat.executeQuery();
             if (res.next()) {
@@ -227,11 +219,10 @@ public class TissueData implements TissueDAO {
 
     private void deleteAndAddEchogenicity(int id, Echogenicity e){
      //delete any potential echog value
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         Vector<PhysicalProperty> result = new Vector<PhysicalProperty>();
         try {
-            stat = connection.getConnection().prepareStatement("DELETE FROM Echogenicities WHERE physicalPropertyId=?");
+            stat = connection.prepareStatement("DELETE FROM Echogenicities WHERE physicalPropertyId=?");
             stat.setInt(1, id);
             stat.executeUpdate();
 
@@ -244,7 +235,7 @@ public class TissueData implements TissueDAO {
             addDistributionInstance(e.getSpatialDistribution());
             addDistributionInstance(e.getAmplitudeDistribution());
 
-            stat = connection.getConnection().prepareStatement("INSERT into Echogenicities VALUES(?,?,?)");
+            stat = connection.prepareStatement("INSERT into Echogenicities VALUES(?,?,?)");
             stat.setInt(1, id);
             stat.setInt(2, e.getSpatialDistribution().getId());
             stat.setInt(3, e.getAmplitudeDistribution().getId());
@@ -266,12 +257,11 @@ public class TissueData implements TissueDAO {
     }
 
     public int getNextDistributionInstanceId(){
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         Vector<PhysicalProperty> result = new Vector<PhysicalProperty>();
         int id = -1;
         try {
-                stat = connection.getConnection().prepareStatement("SELECT MAX(instanceid) from distributioninstance");
+                stat = connection.prepareStatement("SELECT MAX(instanceid) from distributioninstance");
                 ResultSet res = stat.executeQuery();
                 if(res.next())
                     id = res.getInt(1);              
@@ -289,13 +279,12 @@ public class TissueData implements TissueDAO {
     }
 
     public ChemicalBlend getChemicalBlend(PhysicalProperty p) {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         ChemicalBlend result = null;
         //get list of components
         List<ChemicalBlendComponent> components = new ArrayList<ChemicalBlendComponent>();
         try {
-            stat = connection.getConnection().prepareStatement("SELECT massPercentage,elementName from ChemicalComponents where physicalPropertyId=?");
+            stat = connection.prepareStatement("SELECT massPercentage,elementName from ChemicalComponents where physicalPropertyId=?");
             stat.setInt(1, p.getId());
             ResultSet res = stat.executeQuery();
             while (res.next()) {
@@ -303,7 +292,7 @@ public class TissueData implements TissueDAO {
 
                 
             }
-            stat = connection.getConnection().prepareStatement("SELECT density,phase from ChemicalBlend where physicalPropertyId=?");
+            stat = connection.prepareStatement("SELECT density,phase from ChemicalBlend where physicalPropertyId=?");
             stat.setInt(1, p.getId());
             res = stat.executeQuery();
             if(res.next())
@@ -321,10 +310,9 @@ public class TissueData implements TissueDAO {
         p.setId(id);
 
         //delete previous blend
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         try {
-            stat = connection.getConnection().prepareStatement("DELETE FROM ChemicalBlend,ChemicalComponents WHERE physicalPropertyId=?");
+            stat = connection.prepareStatement("DELETE FROM ChemicalBlend,ChemicalComponents WHERE physicalPropertyId=?");
             stat.setInt(1, p.getId());
 
         } catch (SQLException ex) {
@@ -332,14 +320,14 @@ public class TissueData implements TissueDAO {
         }
         //add blend
         try {
-            stat = connection.getConnection().prepareStatement("INSERT into ChemicalBlend VALUES(?,?,?)");
+            stat = connection.prepareStatement("INSERT into ChemicalBlend VALUES(?,?,?)");
             stat.setInt(1, p.getId());
             stat.setDouble(2, c.getDensity());
             stat.setString(3, c.getPhase());
             stat.executeUpdate();
 
             for (ChemicalBlendComponent comp : c.getComponents()) {
-                stat = connection.getConnection().prepareStatement("INSERT into ChemicalComponents VALUES(?,?,?)");
+                stat = connection.prepareStatement("INSERT into ChemicalComponents VALUES(?,?,?)");
                 stat.setInt(1, p.getId());
                 stat.setDouble(2, comp.getMassRatio());
                 stat.setString(3, comp.getElementName());
@@ -358,11 +346,10 @@ public class TissueData implements TissueDAO {
 
     public String getDistributionName(int instanceid){
         DistributionInstance di = new DistributionInstance();
-         PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         String result = null;
         try{
-            stat = connection.getConnection().prepareStatement("SELECT distname from distributionInstance where instanceId=?");
+            stat = connection.prepareStatement("SELECT distname from distributionInstance where instanceId=?");
             stat.setInt(0, instanceid);
             ResultSet res = stat.executeQuery();
             if(res.next()){
@@ -377,12 +364,11 @@ public class TissueData implements TissueDAO {
     }
 
     public List<MagneticProperty> getMagneticProperties(PhysicalProperty p) {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
 
         List<MagneticProperty> props = new ArrayList<MagneticProperty>();
         try {
-            stat = connection.getConnection().prepareStatement("SELECT propertyName,distInstancId from MagneticProperties where physicalPropertyId=?");
+            stat = connection.prepareStatement("SELECT propertyName,distInstancId from MagneticProperties where physicalPropertyId=?");
             stat.setInt(1, p.getId());
             ResultSet res = stat.executeQuery();
             while (res.next()) {
@@ -399,17 +385,16 @@ public class TissueData implements TissueDAO {
 
     private void deleteAndAddMagneticProperties(int id, List<MagneticProperty> mp){
         //delete existing magnetic properties
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         try {
-            stat = connection.getConnection().prepareStatement("DELETE from MagneticProperties where physicalPropertyId=?");
+            stat = connection.prepareStatement("DELETE from MagneticProperties where physicalPropertyId=?");
             stat.setInt(1, id);
             stat.executeUpdate();
 
             //add new magnetic properties
             for (MagneticProperty m : mp) {
                 addDistributionInstance(m.getDistributionInstance());
-                stat = connection.getConnection().prepareStatement("INSERT INTO MagneticProperties VALUES(?,?,?)");
+                stat = connection.prepareStatement("INSERT INTO MagneticProperties VALUES(?,?,?)");
                 stat.setInt(1, id);
                 stat.setString(2, m.getPropertyName());
                 stat.setInt(3, m.getDistributionInstance().getId());
@@ -436,12 +421,11 @@ public class TissueData implements TissueDAO {
     }
 
     private Distribution getDistribution(String name,String expression) {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
 
         try {
             //get parameters
-            stat = connection.getConnection().prepareStatement("SELECT parameterName,symbol from DistributionParameters where distributionName=?");
+            stat = connection.prepareStatement("SELECT parameterName,symbol from DistributionParameters where distributionName=?");
             stat.setString(1, name);
             ResultSet set1 = stat.executeQuery();
             List<DistributionParameter> dparams = new ArrayList<DistributionParameter>();
@@ -459,11 +443,10 @@ public class TissueData implements TissueDAO {
     }
 
     private String getDistributionExpression(String name) {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         String result = null;
         try {
-            stat = connection.getConnection().prepareStatement("SELECT expression from Distribution where distributionname=?");
+            stat = connection.prepareStatement("SELECT expression from Distribution where distributionname=?");
            ResultSet set = stat.executeQuery();
            if(set.next())
                result = set.getString(1);
@@ -474,12 +457,11 @@ public class TissueData implements TissueDAO {
     }
 
     public List<Distribution> getDistributions() {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
 
         List<Distribution> dists = new ArrayList<Distribution>();
         try {
-            stat = connection.getConnection().prepareStatement("SELECT distributionName,expression from Distribution");
+            stat = connection.prepareStatement("SELECT distributionName,expression from Distribution");
             ResultSet res = stat.executeQuery();
             while (res.next()) {
                 String name = res.getString("distributionName");
@@ -494,16 +476,15 @@ public class TissueData implements TissueDAO {
     }
 
     public void addDistribution(Distribution d) {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         try {
-            stat = connection.getConnection().prepareStatement("INSERT INTO Distribution VALUES(?,?)");
+            stat = connection.prepareStatement("INSERT INTO Distribution VALUES(?,?)");
             stat.setString(1, d.getName());
             stat.setString(2, d.getExpression());
             stat.executeUpdate();
 
             for(DistributionParameter p : d.getParameters()){
-                stat = connection.getConnection().prepareStatement("INSERT INTO DistributionParameters VALUES(?,?,?)");
+                stat = connection.prepareStatement("INSERT INTO DistributionParameters VALUES(?,?,?)");
                 stat.setString(1,d.getName());
                 stat.setString(2,p.getName());
                 stat.setString(3,p.getSymbol());
@@ -516,10 +497,9 @@ public class TissueData implements TissueDAO {
     }
 
     public void updateDistribution(Distribution d) {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         try {
-            stat = connection.getConnection().prepareStatement("UPDATE Distribution set expression=? where distributionName=?");
+            stat = connection.prepareStatement("UPDATE Distribution set expression=? where distributionName=?");
             stat.setString(1, d.getExpression());
             stat.setString(2, d.getName());
             stat.executeUpdate();
@@ -529,10 +509,9 @@ public class TissueData implements TissueDAO {
     }
 
     public void deleteDistribution(Distribution d) {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         try {
-            stat = connection.getConnection().prepareStatement("DELETE from Distribution where distributionName=?");
+            stat = connection.prepareStatement("DELETE from Distribution where distributionName=?");
             stat.setString(1, d.getName());
             stat.executeUpdate();
         } catch (SQLException ex) {
@@ -542,12 +521,11 @@ public class TissueData implements TissueDAO {
 
     public DistributionInstance getDistributionInstance(int instanceId) {
 
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         DistributionInstance di = null;
         try {
             //build distribution
-            stat = connection.getConnection().prepareStatement("SELECT distributionName,expression from Distribution,DistributionInstance where instanceId=? and distName=distributionName");
+            stat = connection.prepareStatement("SELECT distributionName,expression from Distribution,DistributionInstance where instanceId=? and distName=distributionName");
             stat.setInt(1, instanceId);
             ResultSet set = stat.executeQuery();
             Distribution d = null;
@@ -556,7 +534,7 @@ public class TissueData implements TissueDAO {
                 d = getDistribution(set.getString("distributionName"), set.getString("expression"));
             }
              //getvalues
-             stat = connection.getConnection().prepareStatement("SELECT parameterName,value,symbol from DistributionInstanceValues,DistributionParameters where instanceId=? and symbol=parameterSymbol");
+             stat = connection.prepareStatement("SELECT parameterName,value,symbol from DistributionInstanceValues,DistributionParameters where instanceId=? and symbol=parameterSymbol");
              stat.setInt(1, instanceId);
             ResultSet set1 = stat.executeQuery();
             List <DistributionParameterValue> l = new ArrayList<DistributionParameterValue>();
@@ -574,11 +552,10 @@ public class TissueData implements TissueDAO {
     }
 
     public List<DistributionInstance> getDistributionInstances() {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         List<DistributionInstance> instances = new ArrayList<DistributionInstance>();
         try {
-            stat = connection.getConnection().prepareStatement("SELECT instanceId from DistributionInstance");
+            stat = connection.prepareStatement("SELECT instanceId from DistributionInstance");
             ResultSet set = stat.executeQuery();
             while (set.next()) {
                 int id = set.getInt("instanceId");
@@ -594,18 +571,17 @@ public class TissueData implements TissueDAO {
         int id = getNextDistributionInstanceId();
         di.setId(id);
         System.out.println("adding new distribution instance with id "+id);
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         try {
             //adding distribution instance
-            stat = connection.getConnection().prepareStatement("INSERT INTO DistributionInstance VALUES (?,?)");
+            stat = connection.prepareStatement("INSERT INTO DistributionInstance VALUES (?,?)");
             stat.setInt(1, di.getId());
             stat.setString(2, di.getDistributionType().getName());
             stat.executeUpdate();
 
             //adding all parameter values
             for (DistributionParameterValue v : di.getValues()) {
-                stat = connection.getConnection().prepareStatement("INSERT INTO DistributionInstanceValues VALUES (?,?,?)");
+                stat = connection.prepareStatement("INSERT INTO DistributionInstanceValues VALUES (?,?,?)");
                 stat.setInt(1, di.getId());
                 stat.setString(2, v.getParam().getSymbol());
                 stat.setDouble(3, v.getValue());
@@ -617,13 +593,12 @@ public class TissueData implements TissueDAO {
     }
 
     public void updateDistributionInstance(DistributionInstance di) {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         try {
             //cannot update distribution instance
             //update distribution values
             for (DistributionParameterValue v : di.getValues()) {
-                stat = connection.getConnection().prepareStatement("UPDATE DistributionInstanceValues SET value=? where instanceId=? and parameterSymbol=? ");
+                stat = connection.prepareStatement("UPDATE DistributionInstanceValues SET value=? where instanceId=? and parameterSymbol=? ");
                 stat.setDouble(1, v.getValue());
                 stat.setInt(2, di.getId());
                 stat.setString(3, v.getParam().getSymbol());
@@ -636,11 +611,10 @@ public class TissueData implements TissueDAO {
     }
 
     public void deleteDistributionInstance(DistributionInstance di) {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         try {
 
-            stat = connection.getConnection().prepareStatement("DELETE from DistributionInstance,DistributionInstanceValues where instanceId=?");
+            stat = connection.prepareStatement("DELETE from DistributionInstance,DistributionInstanceValues where instanceId=?");
             stat.setInt(1, di.getId());
             stat.executeUpdate();
         } catch (SQLException ex) {
@@ -649,10 +623,9 @@ public class TissueData implements TissueDAO {
     }
 
     public void addMagneticPropertyName(String name) {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         try {
-            stat = connection.getConnection().prepareStatement("INSERT INTO MagneticPropertyNames VALUES(?)");
+            stat = connection.prepareStatement("INSERT INTO MagneticPropertyNames VALUES(?)");
             stat.setString(1, name);
             stat.executeUpdate();
 
@@ -663,10 +636,9 @@ public class TissueData implements TissueDAO {
     }
 
     public void deleteMagneticPropertyName(String name) {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         try {
-            stat = connection.getConnection().prepareStatement("DELETE FROM MagneticPropertyNames WHERE propertyName=?");
+            stat = connection.prepareStatement("DELETE FROM MagneticPropertyNames WHERE propertyName=?");
             stat.setString(1, name);
             stat.executeUpdate();
         } catch (SQLException ex) {
@@ -675,11 +647,10 @@ public class TissueData implements TissueDAO {
     }
 
     public List<String> getMagneticPropertyNames() {
-        PlatformConnection connection = PlatformConnection.getInstance();
         PreparedStatement stat;
         List<String> result = new ArrayList<String>();
         try {
-            stat = connection.getConnection().prepareStatement("SELECT propertyName from MagneticPropertyNames");
+            stat = connection.prepareStatement("SELECT propertyName from MagneticPropertyNames");
             ResultSet set = stat.executeQuery();
             while (set.next()) {
                 result.add(set.getString("propertyName"));

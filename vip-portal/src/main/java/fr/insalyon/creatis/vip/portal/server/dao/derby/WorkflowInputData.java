@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.portal.server.dao.derby;
 
+import fr.insalyon.creatis.vip.portal.server.dao.DAOException;
 import fr.insalyon.creatis.vip.portal.server.dao.derby.connection.PlatformConnection;
 import fr.insalyon.creatis.vip.portal.client.bean.WorkflowInput;
 import fr.insalyon.creatis.vip.portal.server.dao.WorkflowInputDAO;
@@ -52,7 +53,7 @@ public class WorkflowInputData implements WorkflowInputDAO {
 
     private Connection connection;
 
-    public WorkflowInputData() {
+    public WorkflowInputData() throws DAOException {
         connection = PlatformConnection.getInstance().getConnection();
     }
 

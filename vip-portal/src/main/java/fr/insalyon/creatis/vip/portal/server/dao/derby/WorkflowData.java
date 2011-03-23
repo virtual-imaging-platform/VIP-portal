@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.portal.server.dao.derby;
 
+import fr.insalyon.creatis.vip.portal.server.dao.DAOException;
 import fr.insalyon.creatis.vip.portal.server.dao.derby.connection.WorkflowsConnection;
 import fr.insalyon.creatis.vip.portal.client.bean.Workflow;
 import fr.insalyon.creatis.vip.portal.server.dao.WorkflowDAO;
@@ -63,14 +64,14 @@ public class WorkflowData implements WorkflowDAO {
      *
      * @return Unique instance of WorkflowData
      */
-    public static WorkflowData getInstance() {
+    public static WorkflowData getInstance() throws DAOException {
         if (instance == null) {
             instance = new WorkflowData();
         }
         return instance;
     }
 
-    private WorkflowData() {
+    private WorkflowData() throws DAOException {
         connection = WorkflowsConnection.getInstance().getConnection();
     }
 
@@ -244,7 +245,7 @@ public class WorkflowData implements WorkflowDAO {
         List<String> result = new ArrayList<String>();
         PreparedStatement stat = null;
         try {
-            stat = PlatformConnection.getInstance().getConnection().prepareStatement(
+            stat = connection.prepareStatement(
                     "SELECT workflow FROM WorkflowClasses WHERE class=? "
                     + "GROUP BY workflow ORDER BY workflow");
 

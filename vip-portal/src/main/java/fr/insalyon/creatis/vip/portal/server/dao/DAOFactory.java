@@ -34,10 +34,6 @@
  */
 package fr.insalyon.creatis.vip.portal.server.dao;
 
-import fr.insalyon.creatis.vip.portal.server.dao.GroupDAO;
-import fr.insalyon.creatis.vip.portal.server.dao.WorkflowInputDAO;
-import fr.insalyon.creatis.vip.portal.server.dao.JobDAO;
-
 /**
  *
  * @author Rafael Silva
@@ -57,25 +53,23 @@ public abstract class DAOFactory {
         }
     }
 
-    public abstract SystemDAO getSystemDAO();
+    public abstract WorkflowDAO getWorkflowDAO() throws DAOException;
 
-    public abstract WorkflowDAO getWorkflowDAO();
+    public abstract WorkflowInputDAO getWorkflowInputDAO() throws DAOException;
 
-    public abstract WorkflowInputDAO getWorkflowInputDAO();
+    public abstract ApplicationDAO getApplicationDAO() throws DAOException;
 
-    public abstract ApplicationDAO getApplicationDAO();
+    public abstract GroupDAO getGroupDAO() throws DAOException;
 
-    public abstract GroupDAO getGroupDAO();
+    public abstract UserDAO getUserDAO() throws DAOException;
 
-    public abstract UserDAO getUserDAO();
+    public abstract ClassDAO getClassDAO() throws DAOException;
 
-    public abstract ClassDAO getClassDAO();
+    public abstract JobDAO getJobDAO(String workflowID) throws DAOException;
 
-    public abstract JobDAO getJobDAO(String workflowID);
+    public abstract NodeDAO getNodeDAO(String workflowID) throws DAOException;
 
-    public abstract NodeDAO getNodeDAO(String workflowID);
+    public abstract GatelabDAO getGatelabDAO(String workflowID) throws DAOException;
 
-    public abstract GatelabDAO getGatelabDAO(String workflowID);
-
-    public abstract TissueDAO getTissueDAO();
+    public abstract TissueDAO getTissueDAO() throws DAOException;
 }

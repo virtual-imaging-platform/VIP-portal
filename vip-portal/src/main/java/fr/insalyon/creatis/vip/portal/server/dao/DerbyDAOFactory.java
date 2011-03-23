@@ -34,16 +34,12 @@
  */
 package fr.insalyon.creatis.vip.portal.server.dao;
 
-import fr.insalyon.creatis.vip.portal.server.dao.WorkflowInputDAO;
-import fr.insalyon.creatis.vip.portal.server.dao.GroupDAO;
-import fr.insalyon.creatis.vip.portal.server.dao.JobDAO;
 import fr.insalyon.creatis.vip.portal.server.dao.derby.ApplicationData;
 import fr.insalyon.creatis.vip.portal.server.dao.derby.ClassData;
 import fr.insalyon.creatis.vip.portal.server.dao.derby.GatelabData;
 import fr.insalyon.creatis.vip.portal.server.dao.derby.GroupData;
 import fr.insalyon.creatis.vip.portal.server.dao.derby.JobData;
 import fr.insalyon.creatis.vip.portal.server.dao.derby.NodeData;
-import fr.insalyon.creatis.vip.portal.server.dao.derby.SystemData;
 import fr.insalyon.creatis.vip.portal.server.dao.derby.TissueData;
 import fr.insalyon.creatis.vip.portal.server.dao.derby.UserData;
 import fr.insalyon.creatis.vip.portal.server.dao.derby.WorkflowData;
@@ -69,57 +65,52 @@ public class DerbyDAOFactory extends DAOFactory {
     }
 
     @Override
-    public SystemDAO getSystemDAO() {
-        return new SystemData();
-    }
-
-    @Override
-    public WorkflowDAO getWorkflowDAO() {
+    public WorkflowDAO getWorkflowDAO() throws DAOException {
         return WorkflowData.getInstance();
     }
 
     @Override
-    public WorkflowInputDAO getWorkflowInputDAO() {
+    public WorkflowInputDAO getWorkflowInputDAO() throws DAOException {
         return new WorkflowInputData();
     }
 
     @Override
-    public ApplicationDAO getApplicationDAO() {
+    public ApplicationDAO getApplicationDAO() throws DAOException {
         return new ApplicationData();
     }
 
     @Override
-    public ClassDAO getClassDAO() {
+    public ClassDAO getClassDAO() throws DAOException {
         return new ClassData();
     }
 
     @Override
-    public JobDAO getJobDAO(String workflowID) {
+    public JobDAO getJobDAO(String workflowID) throws DAOException {
         return new JobData(workflowID);
     }
 
     @Override
-    public NodeDAO getNodeDAO(String workflowID) {
+    public NodeDAO getNodeDAO(String workflowID) throws DAOException {
         return new NodeData(workflowID);
     }
 
     @Override
-    public GatelabDAO getGatelabDAO(String workflowID) {
+    public GatelabDAO getGatelabDAO(String workflowID) throws DAOException {
         return new GatelabData(workflowID);
     }
 
     @Override
-    public GroupDAO getGroupDAO() {
+    public GroupDAO getGroupDAO() throws DAOException {
         return new GroupData();
     }
 
     @Override
-    public UserDAO getUserDAO() {
+    public UserDAO getUserDAO() throws DAOException {
         return new UserData();
     }
 
     @Override
-    public TissueDAO getTissueDAO() {
+    public TissueDAO getTissueDAO() throws DAOException {
         return new TissueData();
     }
 }

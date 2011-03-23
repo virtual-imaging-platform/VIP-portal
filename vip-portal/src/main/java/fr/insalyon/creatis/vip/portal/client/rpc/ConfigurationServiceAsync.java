@@ -45,13 +45,13 @@ import java.util.List;
  */
 public interface ConfigurationServiceAsync {
 
-    public void addGroup(String groupName, AsyncCallback<String> asyncCallback);
+    public void addGroup(String proxy, String groupName, AsyncCallback<String> asyncCallback);
 
-    public void removeGroup(String groupName, AsyncCallback<Void> asyncCallback);
+    public void removeGroup(String proxy, String groupName, AsyncCallback<Void> asyncCallback);
 
     public void getGroups(AsyncCallback<List<String>> asyncCallback);
 
-    public void updateGroup(String oldName, String newName, AsyncCallback<String> asyncCallback);
+    public void updateGroup(String proxy, String oldName, String newName, AsyncCallback<String> asyncCallback);
 
     public void getUser(String dn, AsyncCallback<User> asyncCallback);
 

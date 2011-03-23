@@ -53,7 +53,7 @@ public class ClassData implements ClassDAO {
 
     private Connection connection;
 
-    public ClassData() {
+    public ClassData() throws DAOException {
         connection = PlatformConnection.getInstance().getConnection();
     }
 

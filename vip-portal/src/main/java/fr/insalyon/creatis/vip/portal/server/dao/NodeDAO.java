@@ -44,5 +44,5 @@ public interface NodeDAO {
 
     public Node getNode(String siteID, String nodeName);
 
-    public Node getNodeByJobID(String jobID);
+    public Node getNodeByJobID(String jobID) throws DAOException;
 }

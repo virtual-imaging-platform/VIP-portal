@@ -91,7 +91,7 @@ public class ApplicationToolbarButton extends ToolbarButton {
                     if (isAdmin) {
                         panel.loadWorkflowData();
                     } else {
-                        String user = Context.getInstance().getAuthentication().getUserName().split(" / ")[0];
+                        String user = Context.getInstance().getAuthentication().getUser();
                         panel.loadWorkflowData(user, null, null, null, null);
                     }
                 }

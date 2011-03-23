@@ -55,7 +55,7 @@ public class UserData implements UserDAO {
 
     private Connection connection;
 
-    public UserData() {
+    public UserData() throws DAOException {
         connection = PlatformConnection.getInstance().getConnection();
     }
 

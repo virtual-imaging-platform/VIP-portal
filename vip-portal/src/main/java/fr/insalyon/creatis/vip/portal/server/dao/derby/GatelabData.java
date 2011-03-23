@@ -1,16 +1,40 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-
-
-/**
+/* Copyright CNRS-CREATIS
  *
- * @author ibrahim
+ * Rafael Silva
+ * rafael.silva@creatis.insa-lyon.fr
+ * http://www.creatis.insa-lyon.fr/~silva
+ *
+ * This software is a grid-enabled data-driven workflow manager and editor.
+ *
+ * This software is governed by the CeCILL  license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * "http://www.cecill.info".
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
  */
-
 package fr.insalyon.creatis.vip.portal.server.dao.derby;
+
+import fr.insalyon.creatis.vip.portal.server.dao.DAOException;
 import fr.insalyon.creatis.vip.portal.server.dao.GatelabDAO;
 import fr.insalyon.creatis.vip.portal.server.dao.derby.connection.JobsConnection;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
@@ -19,32 +43,32 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * @author Ibrahim Kallel, Rafael Silva
+ */
+public class GatelabData implements GatelabDAO {
 
-public class GatelabData implements GatelabDAO
-{
-    
-     private Connection connection;
-     private String workflowID;
+    private Connection connection;
+    private String workflowID;
 
-     public GatelabData(String workflowID)
-     {
-         this.workflowID= workflowID;
-         connection = JobsConnection.getInstance().connect(
-         ServerConfiguration.getInstance().getWorkflowsPath() + "/" + workflowID + "/jobs.db");
-     }
+    public GatelabData(String workflowID) throws DAOException {
+        this.workflowID = workflowID;
+        connection = JobsConnection.getInstance().connect(
+                ServerConfiguration.getInstance().getWorkflowsPath() + "/" + workflowID + "/jobs.db");
+    }
 
-    public long getNumberParticles (){
+    public long getNumberParticles() {
 
-        System.out.println("------>> WorkflowID <<------>>"+ workflowID);
+        System.out.println("------>> WorkflowID <<------>>" + workflowID);
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT somme FROM somme ");
-	    ResultSet rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
             rs.next();
             return rs.getLong("somme");
 
         } catch (SQLException ex) {
-            System.out.println("Erreuurrr..."+ex.getMessage());
+            System.out.println("Erreuurrr..." + ex.getMessage());
             ex.printStackTrace();
             return 0;
         }
@@ -52,16 +76,13 @@ public class GatelabData implements GatelabDAO
 
     }
 
-    public void StopWorkflowSimulation()
-    {
-        try
-          {
+    public void StopWorkflowSimulation() {
+        try {
             PreparedStatement ps = connection.prepareStatement("UPDATE somme SET simulation = 'true' ");
-	    ps.execute();
-          } catch (SQLException ex){ System.out.println("Erreur"+ex.getMessage()); }
+            ps.execute();
+        } catch (SQLException ex) {
+            System.out.println("Erreur" + ex.getMessage());
+        }
 
     }
-
-       
-
 }

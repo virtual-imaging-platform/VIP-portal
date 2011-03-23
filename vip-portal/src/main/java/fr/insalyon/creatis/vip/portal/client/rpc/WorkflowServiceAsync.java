@@ -57,9 +57,9 @@ public interface WorkflowServiceAsync {
 
     public void getLogFiles(String baseDir, AsyncCallback<List<String>> asyncCallback);
 
-    public void getWorkflowSources(String proxyFileName, String workflowName, AsyncCallback<List<String>> asyncCallback);
+    public void getWorkflowSources(String user, String proxyFileName, String workflowName, AsyncCallback<List<String>> asyncCallback);
 
-    public void launchWorkflow(Map<String, String> parameters, String workflowName, String proxyFileName, AsyncCallback<String> asyncCallback);
+    public void launchWorkflow(String user, Map<String, String> parameters, String workflowName, String proxyFileName, AsyncCallback<String> asyncCallback);
 
     public void getWorkflowInputs(String fileName, AsyncCallback<Map<String, String>> asyncCallback);
 

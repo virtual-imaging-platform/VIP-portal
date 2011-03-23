@@ -34,25 +34,18 @@
  */
 package fr.insalyon.creatis.vip.portal.client.view.common.toolbar;
 
-import com.google.gwt.user.client.ui.Frame;
 import com.gwtext.client.core.EventObject;
-import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.menu.BaseItem;
 import com.gwtext.client.widgets.menu.Item;
 import com.gwtext.client.widgets.menu.Menu;
 import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
 import com.gwtext.client.widgets.ToolbarButton;
-import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 import com.gwtext.client.core.Ext;
 import com.gwtext.client.widgets.Panel;
-import com.gwtext.client.widgets.Window;
-import fr.insalyon.creatis.vip.portal.client.view.application.launch.LaunchLeftPanel;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.portal.client.view.gatelab.GatelabLeftPanel;
 import fr.insalyon.creatis.vip.portal.client.view.gatelab.WorkflowsPanel;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *
@@ -79,7 +72,7 @@ public class GatelabToolbarButton extends ToolbarButton {
                 } else {
                     WorkflowsPanel panel = WorkflowsPanel.getInstance();
                     layout.setCenterPanel(panel);
-                    panel.loadWorkflowData(Context.getInstance().getAuthentication().getUserName().split(" / ")[0],
+                    panel.loadWorkflowData(Context.getInstance().getAuthentication().getUser(),
                             "gate", null, null, null);
                 }
                 Ext.get("gate-workflows-grid").mask("Loading data...");

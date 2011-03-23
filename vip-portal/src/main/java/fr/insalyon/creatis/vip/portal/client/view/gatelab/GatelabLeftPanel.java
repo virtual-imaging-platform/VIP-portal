@@ -89,7 +89,7 @@ public class GatelabLeftPanel extends AbstractLeftPanel {
         super(new String[]{"Administrator", "GateLab"});
         this.title = "Simulation";
         collapsed = false;
-        currentUser = Context.getInstance().getAuthentication().getUserName().split(" / ")[0];
+        currentUser = Context.getInstance().getAuthentication().getUser();
     }
 
     @Override

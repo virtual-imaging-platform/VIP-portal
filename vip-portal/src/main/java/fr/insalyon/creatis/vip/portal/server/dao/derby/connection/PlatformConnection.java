@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.portal.server.dao.derby.connection;
 
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
+import fr.insalyon.creatis.vip.portal.server.dao.DAOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -51,19 +52,19 @@ public class PlatformConnection {
     private final String DBURL = "jdbc:derby://localhost:1527/";
     private Connection connection;
 
-    public synchronized static PlatformConnection getInstance() {
+    public synchronized static PlatformConnection getInstance() throws DAOException {
         if (instance == null) {
             instance = new PlatformConnection();
         }
         return instance;
     }
 
-    private PlatformConnection() {
+    private PlatformConnection() throws DAOException {
         connect();
         createTables();
     }
 
-    private void connect() {
+    private void connect() throws DAOException {
         try {
             Class.forName(DRIVER);
             connection = DriverManager.getConnection(DBURL
@@ -79,11 +80,10 @@ public class PlatformConnection {
                 connection.setAutoCommit(true);
 
             } catch (SQLException ex1) {
-                ex1.printStackTrace();
+                throw new DAOException(ex1);
             }
         } catch (ClassNotFoundException ex) {
-            //TODO parse exeception
-            ex.printStackTrace();
+            throw new DAOException(ex);
         }
     }
 

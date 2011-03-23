@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.portal.client.view.system.user;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.gwtext.client.core.EventObject;
+import com.gwtext.client.core.Ext;
 import com.gwtext.client.data.MemoryProxy;
 import com.gwtext.client.data.Record;
 import com.gwtext.client.data.SimpleStore;
@@ -52,6 +53,8 @@ import com.gwtext.client.widgets.form.MultiFieldPanel;
 import com.gwtext.client.widgets.form.TextField;
 import com.gwtext.client.widgets.form.event.ComboBoxListenerAdapter;
 import com.gwtext.client.widgets.layout.VerticalLayout;
+import fr.insalyon.creatis.vip.common.client.bean.Authentication;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
@@ -66,6 +69,7 @@ import java.util.List;
 public class ManageGroupsCenterPanel extends AbstractPanel {
 
     private static ManageGroupsCenterPanel instance;
+    private Authentication auth;
     private Store store;
     private ComboBox cb;
     private FormPanel formPanel;
@@ -86,12 +90,14 @@ public class ManageGroupsCenterPanel extends AbstractPanel {
 
     private ManageGroupsCenterPanel() {
         super(new String[]{"Administrator"});
+        this.auth = Context.getInstance().getAuthentication();
     }
 
     @Override
     protected void buildPanel() {
 
         this.setTitle("Group Management");
+        this.setId("vip-group-mng");
         this.setLayout(new VerticalLayout(15));
         this.setMargins(0, 0, 0, 0);
         this.setPaddings(10, 5, 5, 5);
@@ -173,16 +179,19 @@ public class ManageGroupsCenterPanel extends AbstractPanel {
                                     final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                                         public void onFailure(Throwable caught) {
-                                            MessageBox.alert("Error", "Error executing remove class\n" + caught.getMessage());
+                                            MessageBox.alert("Error", "Error executing remove group\n" + caught.getMessage());
+                                            Ext.get("vip-group-mng").unmask();
                                         }
 
                                         public void onSuccess(Void result) {
                                             formPanel.setVisible(false);
                                             loadComboData();
-                                            MessageBox.alert("The class was successfully removed!");
+                                            Ext.get("vip-group-mng").unmask();
+                                            MessageBox.alert("The group was successfully removed!");
                                         }
                                     };
-                                    service.removeGroup(name, callback);
+                                    service.removeGroup(auth.getProxyFileName(), name, callback);
+                                    Ext.get("vip-group-mng").mask("Removing group...");
                                 }
                             }
                         });
@@ -241,6 +250,7 @@ public class ManageGroupsCenterPanel extends AbstractPanel {
 
                 public void onFailure(Throwable caught) {
                     MessageBox.alert("Error", "Error executing add group\n" + caught.getMessage());
+                    Ext.get("vip-group-mng").unmask();
                 }
 
                 public void onSuccess(String result) {
@@ -248,16 +258,18 @@ public class ManageGroupsCenterPanel extends AbstractPanel {
                         formPanel.setVisible(false);
                         loadComboData();
                     }
+                    Ext.get("vip-group-mng").unmask();
                     MessageBox.alert(result);
                 }
             };
-            service.addGroup(groupName, callback);
+            service.addGroup(auth.getProxyFileName(), groupName, callback);
 
         } else {
             final AsyncCallback<String> callback = new AsyncCallback<String>() {
 
                 public void onFailure(Throwable caught) {
                     MessageBox.alert("Error", "Error executing update group\n" + caught.getMessage());
+                    Ext.get("vip-group-mng").unmask();
                 }
 
                 public void onSuccess(String result) {
@@ -266,10 +278,12 @@ public class ManageGroupsCenterPanel extends AbstractPanel {
                         loadComboData();
                         Layout.getInstance().addClassButton(groupName);
                     }
+                    Ext.get("vip-group-mng").unmask();
                     MessageBox.alert(result);
                 }
             };
-            service.updateGroup(oldName, groupName, callback);
+            service.updateGroup(auth.getProxyFileName(), oldName, groupName, callback);
         }
+        Ext.get("vip-group-mng").mask("Saving group...");
     }
 }

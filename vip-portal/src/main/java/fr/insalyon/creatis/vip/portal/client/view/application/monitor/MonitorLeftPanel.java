@@ -86,7 +86,7 @@ public class MonitorLeftPanel extends AbstractLeftPanel {
     private MonitorLeftPanel() {
         super(null);
         collapsed = false;
-        currentUser = Context.getInstance().getAuthentication().getUserName().split(" / ")[0];
+        currentUser = Context.getInstance().getAuthentication().getUser();
     }
 
     public void setApplicationClass(String applicationClass) {

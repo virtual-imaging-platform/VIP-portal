@@ -38,8 +38,11 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.vip.portal.client.bean.AppClass;
 import fr.insalyon.creatis.vip.portal.client.bean.WorkflowDescriptor;
 import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.portal.server.dao.DAOException;
 import fr.insalyon.creatis.vip.portal.server.dao.DAOFactory;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -48,42 +51,82 @@ import java.util.List;
 public class ApplicationServiceImpl extends RemoteServiceServlet implements ApplicationService {
 
     public String add(WorkflowDescriptor workflowDescriptor) {
-        return DAOFactory.getDAOFactory().getApplicationDAO().add(workflowDescriptor);
+        try {
+            return DAOFactory.getDAOFactory().getApplicationDAO().add(workflowDescriptor);
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     public String update(WorkflowDescriptor workflowDescriptor) {
-        return DAOFactory.getDAOFactory().getApplicationDAO().update(workflowDescriptor);
+        try {
+            return DAOFactory.getDAOFactory().getApplicationDAO().update(workflowDescriptor);
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     public void remove(String name) {
-        DAOFactory.getDAOFactory().getApplicationDAO().remove(name);
+        try {
+            DAOFactory.getDAOFactory().getApplicationDAO().remove(name);
+        } catch (DAOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public WorkflowDescriptor getApplication(String name) {
-        return DAOFactory.getDAOFactory().getApplicationDAO().getApplication(name);
+        try {
+            return DAOFactory.getDAOFactory().getApplicationDAO().getApplication(name);
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     public String addClass(AppClass c) {
-        return DAOFactory.getDAOFactory().getClassDAO().add(c);
+        try {
+            return DAOFactory.getDAOFactory().getClassDAO().add(c);
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     public String updateClass(AppClass c) {
-        return DAOFactory.getDAOFactory().getClassDAO().update(c);
+        try {
+            return DAOFactory.getDAOFactory().getClassDAO().update(c);
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     public void removeClass(String name) {
-        DAOFactory.getDAOFactory().getClassDAO().remove(name);
+        try {
+            DAOFactory.getDAOFactory().getClassDAO().remove(name);
+        } catch (DAOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public List<AppClass> getClasses() {
-        return DAOFactory.getDAOFactory().getClassDAO().getClasses();
+        try {
+            return DAOFactory.getDAOFactory().getClassDAO().getClasses();
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     public List<String> getApplicationsName(String applicationClass) {
-        return DAOFactory.getDAOFactory().getApplicationDAO().getApplicationsName(applicationClass);
+        try {
+            return DAOFactory.getDAOFactory().getApplicationDAO().getApplicationsName(applicationClass);
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     public AppClass getClass(String className) {
-        return DAOFactory.getDAOFactory().getClassDAO().getClass(className);
+        try {
+            return DAOFactory.getDAOFactory().getClassDAO().getClass(className);
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 }

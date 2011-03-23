@@ -53,7 +53,7 @@ public class ApplicationData implements ApplicationDAO {
 
     private Connection connection;
 
-    public ApplicationData() {
+    public ApplicationData() throws DAOException {
         connection = PlatformConnection.getInstance().getConnection();
     }
 

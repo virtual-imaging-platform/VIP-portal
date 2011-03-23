@@ -35,22 +35,13 @@
 package fr.insalyon.creatis.vip.portal.server.rpc;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
-import fr.insalyon.creatis.vip.common.client.bean.Authentication;
 import fr.insalyon.creatis.vip.portal.client.bean.Configuration;
 import fr.insalyon.creatis.vip.portal.client.bean.User;
 import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.portal.server.business.BusinessException;
-import fr.insalyon.creatis.vip.portal.server.business.proxy.MyProxyClient;
 import fr.insalyon.creatis.vip.portal.server.dao.DAOException;
 import fr.insalyon.creatis.vip.portal.server.dao.DAOFactory;
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
-import fr.insalyon.creatis.vip.datamanagement.client.DataManagerConstants;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.cert.X509Certificate;
-import java.util.HashMap;
+import fr.insalyon.creatis.vip.portal.server.business.ConfigurationBusiness;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
@@ -62,78 +53,29 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
 
     public Configuration loadConfiguration() {
 
-        HttpServletRequest request = this.getThreadLocalRequest();
-        Object object = request.getAttribute("javax.servlet.request.X509Certificate");
-        Authentication authentication = null;
-        ServerConfiguration conf = ServerConfiguration.getInstance();
-
-        if (object != null) {
-            X509Certificate certs[] = (X509Certificate[]) object;
-            X509Certificate cert = certs[0];
-
-            String[] subjectDN = cert.getSubjectDN().getName().split(", ");
-            String userDN = "";
-
-            for (int i = subjectDN.length - 1; i >= 0; i--) {
-                userDN += "/" + subjectDN[i];
-            }
-
-            if (DAOFactory.getDAOFactory().getUserDAO().exists(userDN)) {
-                User user = DAOFactory.getDAOFactory().getUserDAO().getUser(userDN);
-                String proxyFileName = "";
-                try {
-                    MyProxyClient myproxy = new MyProxyClient();
-                    proxyFileName = myproxy.getProxy(user.getCanonicalName(), userDN);
-                    authentication = new Authentication(
-                            user.getCanonicalName() + " / " + user.getOrganizationUnit(),
-                            userDN, user.getGroups(), proxyFileName, true);
-
-                    VletAgentClient client = new VletAgentClient(
-                            ServerConfiguration.getInstance().getVletagentHost(),
-                            ServerConfiguration.getInstance().getVletagentPort(),
-                            proxyFileName);
-
-                    client.createDirectory(conf.getDataManagerUsersHome(),
-                            user.getCanonicalName().replace(" ", "_").toLowerCase());
-                    client.createDirectory(conf.getDataManagerUsersHome(),
-                            DataManagerConstants.PUBLIC_HOME);
-                    
-                } catch (BusinessException ex) {
-                    authentication = new Authentication(
-                            user.getCanonicalName() + " / " + user.getOrganizationUnit(),
-                            userDN, new HashMap(), "", false);
-
-                } catch (VletAgentClientException ex) {
-                    ex.printStackTrace();
-                }
-            } else {
-                authentication = new Authentication("Anonymous", "Anonymous", new HashMap(), "", false);
-            }
-        } else {
-            authentication = new Authentication("Anonymous", "Anonymous", new HashMap(), "", false);
-        }
-        
-        URI uri = null;
         try {
-            uri = new URI(conf.getMoteurServer());
-        } catch (URISyntaxException ex) {
+            HttpServletRequest request = this.getThreadLocalRequest();
+            Object object = request.getAttribute("javax.servlet.request.X509Certificate");
+            ConfigurationBusiness business = new ConfigurationBusiness();
+            return business.loadConfiguration(object);
+            
+        } catch (BusinessException ex) {
             ex.printStackTrace();
+            return null;
         }
-        return new Configuration(authentication,
-                conf.getQuickStartURL(),
-                uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort(),
-                conf.getDataManagerLFCHost(), conf.getDataManagerLFCPort());
     }
 
-    public String addGroup(String groupName) {
+    public String addGroup(String proxy, String groupName) {
         try {
-            return DAOFactory.getDAOFactory().getGroupDAO().add(groupName);
-        } catch (DAOException ex) {
+            ConfigurationBusiness business = new ConfigurationBusiness();
+            return business.addGroup(proxy, groupName);
+
+        } catch (BusinessException ex) {
             return ex.getMessage();
         }
     }
 
-    public String updateGroup(String oldName, String newName) {
+    public String updateGroup(String proxy, String oldName, String newName) {
         try {
             return DAOFactory.getDAOFactory().getGroupDAO().update(oldName, newName);
         } catch (DAOException ex) {
@@ -141,35 +83,61 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
         }
     }
 
-    public void removeGroup(String groupName) {
+    public void removeGroup(String proxy, String groupName) {
         try {
-            DAOFactory.getDAOFactory().getGroupDAO().remove(groupName);
-        } catch (DAOException ex) {
+            ConfigurationBusiness business = new ConfigurationBusiness();
+            business.removeGroup(proxy, groupName);
+
+        } catch (BusinessException ex) {
             System.out.println(ex.getMessage());
         }
     }
 
     public List<String> getGroups() {
-        return DAOFactory.getDAOFactory().getGroupDAO().getGroups();
+        try {
+            return DAOFactory.getDAOFactory().getGroupDAO().getGroups();
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     public String addUser(User user) {
-        return DAOFactory.getDAOFactory().getUserDAO().add(user);
+        try {
+            return DAOFactory.getDAOFactory().getUserDAO().add(user);
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     public String updateUser(User user) {
-        return DAOFactory.getDAOFactory().getUserDAO().update(user);
+        try {
+            return DAOFactory.getDAOFactory().getUserDAO().update(user);
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     public void removeUser(String dn) {
-        DAOFactory.getDAOFactory().getUserDAO().remove(dn);
+        try {
+            DAOFactory.getDAOFactory().getUserDAO().remove(dn);
+        } catch (DAOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public List<User> getUsers() {
-        return DAOFactory.getDAOFactory().getUserDAO().getUsers();
+        try {
+            return DAOFactory.getDAOFactory().getUserDAO().getUsers();
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     public User getUser(String dn) {
-        return DAOFactory.getDAOFactory().getUserDAO().getUser(dn);
+        try {
+            return DAOFactory.getDAOFactory().getUserDAO().getUser(dn);
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 }

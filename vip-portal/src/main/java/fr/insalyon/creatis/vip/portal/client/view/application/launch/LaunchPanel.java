@@ -79,7 +79,6 @@ import java.util.Map;
  */
 public class LaunchPanel extends Panel {
 
-    private String rootPath = "/grid/biomed";
     private String workflowName;
     private String applicationClass;
     private FieldSet fieldSet;
@@ -178,7 +177,7 @@ public class LaunchPanel extends Panel {
             }
         };
         Authentication auth = Context.getInstance().getAuthentication();
-        service.getWorkflowSources(auth.getProxyFileName(), workflowName, callback);
+        service.getWorkflowSources(auth.getUser(), auth.getProxyFileName(), workflowName, callback);
     }
 
     private ComboBox getTypeComboBox(String comboID, String label) {
@@ -329,7 +328,6 @@ public class LaunchPanel extends Panel {
                 SelectDataPathWindow window = SelectDataPathWindow.getInstance();
                 window.configure(id, fieldSet);
                 window.display();
-//                new SelectLFNBrowserWindow(rootPath, id, fieldSet);
             }
         });
         mfp.addToRow(browseButton, 60);
@@ -418,7 +416,6 @@ public class LaunchPanel extends Panel {
                 SelectDataPathWindow window = SelectDataPathWindow.getInstance();
                 window.configure(button.getId().substring(button.getId().indexOf("-") + 1), fieldSet);
                 window.display();
-//                new SelectLFNBrowserWindow(rootPath, button.getId().substring(button.getId().indexOf("-") + 1), fieldSet);
             }
         });
         mfp.addToRow(browseButton, 60);
@@ -456,7 +453,8 @@ public class LaunchPanel extends Panel {
         Ext.get("launch-panel-" + panelId).mask("Launching simulation...");
 
         Authentication auth = Context.getInstance().getAuthentication();
-        service.launchWorkflow(getParamatersMap(), workflowName, auth.getProxyFileName(), callback);
+        service.launchWorkflow(auth.getUser(), getParamatersMap(),
+                workflowName, auth.getProxyFileName(), callback);
     }
 
     /**

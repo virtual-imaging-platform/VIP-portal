@@ -51,7 +51,8 @@ public class BottomPanel extends Panel {
 
         Toolbar toolbar = new Toolbar();
         toolbar.addItem(new ToolbarTextItem("Authenticated as : "
-                + Context.getInstance().getAuthentication().getUserName()));
+                + Context.getInstance().getAuthentication().getUser()
+                + " / " + Context.getInstance().getAuthentication().getOrganization()));
         this.setBottomToolbar(toolbar);
     }
 }

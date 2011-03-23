@@ -34,6 +34,8 @@
  */
 package fr.insalyon.creatis.vip.portal.server.dao.derby.connection;
 
+import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
+import fr.insalyon.creatis.vip.portal.server.dao.DAOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -48,7 +50,9 @@ public class JobsConnection {
 
     private static JobsConnection instance;
     private final String DRIVER = "org.apache.derby.jdbc.ClientDriver";
-    private final String DBURL = "jdbc:derby://localhost:1527/";
+    private final String DBURL = "jdbc:derby://"
+            + ServerConfiguration.getInstance().getWorkflowsHost() + ":"
+            + ServerConfiguration.getInstance().getWorkflowsPort() + "/";
     private Map<String, Connection> connections = new HashMap<String, Connection>();
     private Map<String, Integer> usersConnections = new HashMap<String, Integer>();
 
@@ -62,7 +66,7 @@ public class JobsConnection {
     private JobsConnection() {
     }
 
-    public synchronized Connection connect(String dbPath) {
+    public synchronized Connection connect(String dbPath) throws DAOException {
 
         Connection connection;
         try {
@@ -87,16 +91,16 @@ public class JobsConnection {
                 usersConnections.put(dbPath, 1);
 
             } catch (SQLException ex1) {
-                ex1.printStackTrace();
+                throw new DAOException(ex1);
             }
         } catch (ClassNotFoundException ex) {
             //TODO parse exeception
-            ex.printStackTrace();
+            throw new DAOException(ex);
         }
         return null;
     }
 
-    public synchronized void close(String dbPath) {
+    public synchronized void close(String dbPath) throws DAOException {
         try {
             int n = usersConnections.get(dbPath);
             if (n == 1) {
@@ -107,7 +111,7 @@ public class JobsConnection {
                 usersConnections.put(dbPath, n - 1);
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw new DAOException(ex);
         }
     }
 }

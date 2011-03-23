@@ -65,7 +65,7 @@ public class MainLeftPanel extends AbstractLeftPanel {
         if (auth.isProxyValid()) {
             text = "You have valid grid credentials!";
         } else {
-            if (auth.getUserName().equals("Anonymous")) {
+            if (auth.getUser().equals("Anonymous")) {
                 layout.addCenterPanel(QuickstartCenterPanel.getInstance());
                 layout.setActiveCenterPanel("main-center-panel");
                 text = "Welcome to the Virtual Imaging Platform (VIP)";

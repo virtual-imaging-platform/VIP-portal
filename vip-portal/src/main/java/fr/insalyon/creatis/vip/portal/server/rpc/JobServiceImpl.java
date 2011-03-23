@@ -38,6 +38,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.vip.portal.client.bean.Job;
 import fr.insalyon.creatis.vip.portal.client.bean.Node;
 import fr.insalyon.creatis.vip.portal.client.rpc.JobService;
+import fr.insalyon.creatis.vip.portal.server.dao.DAOException;
 import fr.insalyon.creatis.vip.portal.server.dao.DAOFactory;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import java.io.BufferedReader;
@@ -54,11 +55,19 @@ import java.util.Map;
 public class JobServiceImpl extends RemoteServiceServlet implements JobService {
 
     public Map<String, Integer> getStatusMap(String workflowID) {
-        return DAOFactory.getDAOFactory().getJobDAO(workflowID).getStatusMap();
+        try {
+            return DAOFactory.getDAOFactory().getJobDAO(workflowID).getStatusMap();
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     public List<Job> getJobsList(String workflowID) {
-        return DAOFactory.getDAOFactory().getJobDAO(workflowID).getJobs();
+        try {
+            return DAOFactory.getDAOFactory().getJobDAO(workflowID).getJobs();
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     public String getFile(String workflowID, String dir, String fileName, String ext) {
@@ -86,22 +95,42 @@ public class JobServiceImpl extends RemoteServiceServlet implements JobService {
     }
 
     public List<String> getExecutionPerNumberOfJobs(String workflowID, int binSize) {
-        return DAOFactory.getDAOFactory().getJobDAO(workflowID).getExecutionPerNumberOfJobs(binSize);
+        try {
+            return DAOFactory.getDAOFactory().getJobDAO(workflowID).getExecutionPerNumberOfJobs(binSize);
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     public List<String> getDownloadPerNumberOfJobs(String workflowID, int binSize) {
-        return DAOFactory.getDAOFactory().getJobDAO(workflowID).getDownloadPerNumberOfJobs(binSize);
+        try {
+            return DAOFactory.getDAOFactory().getJobDAO(workflowID).getDownloadPerNumberOfJobs(binSize);
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     public List<String> getUploadPerNumberOfJobs(String workflowID, int binSize) {
-        return DAOFactory.getDAOFactory().getJobDAO(workflowID).getUploadPerNumberOfJobs(binSize);
+        try {
+            return DAOFactory.getDAOFactory().getJobDAO(workflowID).getUploadPerNumberOfJobs(binSize);
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     public List<String> getJobsPertTime(String workflowID) {
-        return DAOFactory.getDAOFactory().getJobDAO(workflowID).getJobsPerTime();
+        try {
+            return DAOFactory.getDAOFactory().getJobDAO(workflowID).getJobsPerTime();
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     public Node getNode(String workflowID, String jobID) {
-        return DAOFactory.getDAOFactory().getNodeDAO(workflowID).getNodeByJobID(jobID);
+        try {
+            return DAOFactory.getDAOFactory().getNodeDAO(workflowID).getNodeByJobID(jobID);
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 }

@@ -52,7 +52,7 @@ public class GroupData implements GroupDAO {
 
     private Connection connection;
 
-    public GroupData() {
+    public GroupData() throws DAOException {
         connection = PlatformConnection.getInstance().getConnection();
     }
 

@@ -62,11 +62,11 @@ public interface ConfigurationService extends RemoteService {
 
     public Configuration loadConfiguration();
 
-    public String addGroup(String groupName);
+    public String addGroup(String proxy, String groupName);
 
-    public String updateGroup(String oldName, String newName);
+    public String updateGroup(String proxy, String oldName, String newName);
 
-    public void removeGroup(String groupName);
+    public void removeGroup(String proxy, String groupName);
 
     public List<String> getGroups();
 

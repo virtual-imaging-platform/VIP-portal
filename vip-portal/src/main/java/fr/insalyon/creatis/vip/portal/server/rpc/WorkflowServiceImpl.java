@@ -35,35 +35,26 @@
 package fr.insalyon.creatis.vip.portal.server.rpc;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.vip.portal.client.bean.Workflow;
-import fr.insalyon.creatis.vip.portal.client.bean.WorkflowDescriptor;
 import fr.insalyon.creatis.vip.portal.client.bean.WorkflowInput;
 import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowService;
-import fr.insalyon.creatis.vip.portal.server.business.simulation.ParameterSweep;
-import fr.insalyon.creatis.vip.portal.server.business.simulation.WorkflowMoteurConfig;
+import fr.insalyon.creatis.vip.portal.server.business.BusinessException;
+import fr.insalyon.creatis.vip.portal.server.dao.DAOException;
 import fr.insalyon.creatis.vip.portal.server.dao.DAOFactory;
-import fr.insalyon.creatis.vip.portal.server.business.simulation.parser.GwendiaParser;
 import fr.insalyon.creatis.vip.portal.server.business.simulation.parser.InputParser;
-import fr.insalyon.creatis.vip.portal.server.business.simulation.parser.ScuflParser;
 import fr.insalyon.creatis.vip.portal.server.dao.derby.connection.JobsConnection;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
+import fr.insalyon.creatis.vip.portal.server.business.WorkflowBusiness;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpSession;
-import javax.xml.rpc.ServiceException;
-import org.xml.sax.SAXException;
 
 /**
  *
@@ -73,14 +64,18 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
 
     @Override
     public List<Workflow> getWorkflows(String user, String application, String status, Date startDate, Date endDate) {
-        if (endDate != null) {
-            Calendar c1 = Calendar.getInstance();
-            c1.setTime(endDate);
-            c1.add(Calendar.DATE, 1);
-            endDate = c1.getTime();
-        }
+        try {
+            if (endDate != null) {
+                Calendar c1 = Calendar.getInstance();
+                c1.setTime(endDate);
+                c1.add(Calendar.DATE, 1);
+                endDate = c1.getTime();
+            }
+            return DAOFactory.getDAOFactory().getWorkflowDAO().getList(user, application, status, startDate, endDate);
 
-        return DAOFactory.getDAOFactory().getWorkflowDAO().getList(user, application, status, startDate, endDate);
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     @Override
@@ -121,12 +116,15 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
 
     @Override
     public List<String>[] getApplicationsAndUsersList(String applicationClass) {
-        List<String>[] list = new List[2];
-
-        list[0] = DAOFactory.getDAOFactory().getWorkflowDAO().getUsers();
-        list[1] = DAOFactory.getDAOFactory().getWorkflowDAO().getApplicationsWithClass(applicationClass);
-
-        return list;
+        try {
+            List<String>[] list = new List[2];
+            list[0] = DAOFactory.getDAOFactory().getWorkflowDAO().getUsers();
+            list[1] = DAOFactory.getDAOFactory().getWorkflowDAO().getApplicationsWithClass(applicationClass);
+            return list;
+            
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     @Override
@@ -171,148 +169,112 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         return filesList;
     }
 
-    public List<String> getWorkflowSources(String proxyFileName, String workflowName) {
+    public List<String> getWorkflowSources(String user, String proxyFileName, String workflowName) {
 
-        try {
-            WorkflowDescriptor wd = DAOFactory.getDAOFactory().getApplicationDAO().getApplication(workflowName);
-            URI uri = new URI(wd.getLfn());
+        try {       
+            WorkflowBusiness business = new WorkflowBusiness();
+            return business.getWorkflowSources(user, proxyFileName, workflowName);
 
-            VletAgentClient client = new VletAgentClient(
-                    ServerConfiguration.getInstance().getVletagentHost(),
-                    ServerConfiguration.getInstance().getVletagentPort(),
-                    proxyFileName);
-
-            String workflowPath = client.getRemoteFile(uri.getPath(), new File("").getAbsolutePath() + "/workflows");
-
-            if (workflowPath.endsWith(".gwendia")) {
-                return new GwendiaParser().parse(workflowPath).getSources();
-            } else {
-                return new ScuflParser().parse(workflowPath).getSources();
-            }
-
-        } catch (URISyntaxException ex) {
+        } catch (BusinessException ex) {
             ex.printStackTrace();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } catch (SAXException ex) {
-            ex.printStackTrace();
-        } catch (VletAgentClientException ex) {
-            ex.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public Map<String, String> getWorkflowInputs(String fileName) {
         return new InputParser().parse(fileName);
     }
 
-    public String launchWorkflow(Map<String, String> parametersMap, String workflowName, String proxyFileName) {
-
+    public String launchWorkflow(String user, Map<String, String> parametersMap,
+            String workflowName, String proxyFileName) {
+        
         try {
-            String settings = "GRID=DIRAC\n"
-                    + "SE=ccsrm02.in2p3.fr\n"
-                    + "TIMEOUT=100000\n"
-                    + "RETRYCOUNT=3\n"
-                    + "MULTIJOB=1";
-
-            List<ParameterSweep> parameters = new ArrayList<ParameterSweep>();
-            for (String name : parametersMap.keySet()) {
-                ParameterSweep ps = new ParameterSweep(name);
-                String valuesStr = parametersMap.get(name);
-
-                if (valuesStr.contains("##")) {
-                    String[] values = valuesStr.split("##");
-                    if (values.length != 3) {
-                        throw (new ServiceException("Error in range"));
-                    }
-                    Double start = Double.parseDouble(values[0]);
-                    Double stop = Double.parseDouble(values[1]);
-                    Double step = Double.parseDouble(values[2]);
-
-                    for (double d = start; d <= stop; d += step) {
-                        ps.addValue(d + "");
-                    }
-//                    for (String v : values) {
-//                        ps.addValue(v);
-//                    }
-                } else if (valuesStr.contains("@@")) {
-                    String[] values = valuesStr.split("@@");
-                    for (String v : values) {
-                        ps.addValue(v);
-                    }
-                } else {
-                    ps.addValue(valuesStr);
-                }
-                parameters.add(ps);
-            }
-
-            WorkflowDescriptor wd = DAOFactory.getDAOFactory().getApplicationDAO().getApplication(workflowName);
-            String lfnPath = wd.getLfn().substring(wd.getLfn().lastIndexOf("/") + 1);
-            String workflowPath = new File("").getAbsolutePath() + "/workflows/" + new File(lfnPath).getName();
-
-            WorkflowMoteurConfig moteur = new WorkflowMoteurConfig(ServerConfiguration.getInstance().getMoteurServer(), workflowPath, parameters);
-            moteur.setSettings(settings);
-            String ws = moteur.callWS(proxyFileName);
-
-            return ws;
-
-        } catch (RemoteException ex) {
+            WorkflowBusiness business = new WorkflowBusiness();
+            return business.launch(user, parametersMap, workflowName, proxyFileName);
+        
+        } catch (BusinessException ex) {
             ex.printStackTrace();
-        } catch (ServiceException ex) {
-            ex.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public String addWorkflowInput(WorkflowInput workflowInput) {
-        HttpSession session = this.getThreadLocalRequest().getSession();
-        String user = (String) session.getAttribute("userDN");
-        return DAOFactory.getDAOFactory().getWorkflowInputDAO().addWorkflowInput(user, workflowInput);
+        try {
+            HttpSession session = this.getThreadLocalRequest().getSession();
+            String user = (String) session.getAttribute("userDN");
+            return DAOFactory.getDAOFactory().getWorkflowInputDAO().addWorkflowInput(user, workflowInput);
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     public List<WorkflowInput> getWorkflowsInputByUserAndAppName(String appName) {
-        HttpSession session = this.getThreadLocalRequest().getSession();
-        String user = (String) session.getAttribute("userDN");
-        return DAOFactory.getDAOFactory().getWorkflowInputDAO().getWorkflowInputByUserAndAppName(user, appName);
+        try {
+            HttpSession session = this.getThreadLocalRequest().getSession();
+            String user = (String) session.getAttribute("userDN");
+            return DAOFactory.getDAOFactory().getWorkflowInputDAO().getWorkflowInputByUserAndAppName(user, appName);
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     public WorkflowInput getWorkflowInputByUserAndName(String inputName) {
-        HttpSession session = this.getThreadLocalRequest().getSession();
-        String user = (String) session.getAttribute("userDN");
-        return DAOFactory.getDAOFactory().getWorkflowInputDAO().getWorkflowInputByUserAndName(user, inputName);
+        try {
+            HttpSession session = this.getThreadLocalRequest().getSession();
+            String user = (String) session.getAttribute("userDN");
+            return DAOFactory.getDAOFactory().getWorkflowInputDAO().getWorkflowInputByUserAndName(user, inputName);
+        } catch (DAOException ex) {
+            return null;
+        }
     }
 
     public void removeWorkflowInput(String inputName) {
-        HttpSession session = this.getThreadLocalRequest().getSession();
-        String user = (String) session.getAttribute("userDN");
-        DAOFactory.getDAOFactory().getWorkflowInputDAO().removeWorkflowInput(user, inputName);
+        try {
+            HttpSession session = this.getThreadLocalRequest().getSession();
+            String user = (String) session.getAttribute("userDN");
+            DAOFactory.getDAOFactory().getWorkflowInputDAO().removeWorkflowInput(user, inputName);
+        } catch (DAOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void closeConnection(String workflowID) {
-        JobsConnection.getInstance().close(ServerConfiguration.getInstance().getWorkflowsPath() + "/" + workflowID + "/jobs.db");
+        try {
+            JobsConnection.getInstance().close(ServerConfiguration.getInstance().getWorkflowsPath() + "/" + workflowID + "/jobs.db");
+        } catch (DAOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public List<String> getStats(List<Workflow> workflowIdList, int type, int binSize) {
-        return DAOFactory.getDAOFactory().getWorkflowDAO().getStats(workflowIdList, type, binSize);
+        try {
+            return DAOFactory.getDAOFactory().getWorkflowDAO().getStats(workflowIdList, type, binSize);
+        } catch (DAOException ex) {
+            return null;
+        }
 
     }
 
     public void killWorkflow(String workflowID) {
-        DAOFactory.getDAOFactory().getWorkflowDAO().updateStatus(workflowID, "Killed");
-//        try {    
-//            int[] moteurData = DAOFactory.getDAOFactory().getWorkflowDAO().getMoteurIDAndKey(workflowID);
-//            ClientPreferences prefs = new ClientPreferences(new File("/var/www/cgi-bin/moteurServer/.moteur2"));
-//            System.out.println("----- Moteur ID: " + moteurData[0] + " - KEY: " + moteurData[1]);
-//            Moteur2.setLog(new Log(1));
-//            Moteur2 client = new Moteur2(moteurData[0], moteurData[1], new ExecutionLogger(new Log(1)), null);
-//            client.stopExecution();
-//
-//        } catch (SAXException ex) {
-//            ex.printStackTrace();
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//        } catch (MoteurException ex) {
-//            ex.printStackTrace();
-//        }
+        try {
+            DAOFactory.getDAOFactory().getWorkflowDAO().updateStatus(workflowID, "Killed");
+            //        try {
+            //            int[] moteurData = DAOFactory.getDAOFactory().getWorkflowDAO().getMoteurIDAndKey(workflowID);
+            //            ClientPreferences prefs = new ClientPreferences(new File("/var/www/cgi-bin/moteurServer/.moteur2"));
+            //            System.out.println("----- Moteur ID: " + moteurData[0] + " - KEY: " + moteurData[1]);
+            //            Moteur2.setLog(new Log(1));
+            //            Moteur2 client = new Moteur2(moteurData[0], moteurData[1], new ExecutionLogger(new Log(1)), null);
+            //            client.stopExecution();
+            //
+            //        } catch (SAXException ex) {
+            //            ex.printStackTrace();
+            //        } catch (IOException ex) {
+            //            ex.printStackTrace();
+            //        } catch (MoteurException ex) {
+            //        }
+            //        }
+        } catch (DAOException ex) {
+            ex.printStackTrace();
+        }
     }
 }

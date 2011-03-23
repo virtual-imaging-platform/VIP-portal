@@ -118,7 +118,7 @@ class PropertyPanel extends Panel {
 
 
         authorField = FieldUtil.getTextField("author", 300, "Author", false);
-        authorField.setEmptyText(fr.insalyon.creatis.vip.common.client.view.Context.getInstance().getAuthentication().getUserName());
+        authorField.setEmptyText(fr.insalyon.creatis.vip.common.client.view.Context.getInstance().getAuthentication().getUser());
         authorField.setDisabled(true);
 
         dateField = new DateField("Date","d-M-Y");
@@ -167,7 +167,7 @@ class PropertyPanel extends Panel {
     private void saveProperty() {
 
             java.sql.Date d = new java.sql.Date(dateField.getValue().getTime());
-            currentProp.setAuthor(Context.getInstance().getAuthentication().getUserName());
+            currentProp.setAuthor(Context.getInstance().getAuthentication().getUser());
             currentProp.setComment(commentField.getValueAsString());
             currentProp.setType(cb.getValueAsString());
             currentProp.setDate(d);

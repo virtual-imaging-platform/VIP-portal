@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.portal.server.dao.derby;
 
+import fr.insalyon.creatis.vip.portal.server.dao.DAOException;
 import fr.insalyon.creatis.vip.portal.server.dao.derby.connection.JobsConnection;
 import fr.insalyon.creatis.vip.portal.client.bean.Job;
 import fr.insalyon.creatis.vip.portal.client.bean.Node;
@@ -54,7 +55,7 @@ public class NodeData implements NodeDAO {
     private String workflowID;
     private Connection connection;
 
-    public NodeData(String workflowID) {
+    public NodeData(String workflowID) throws DAOException {
         this.workflowID = workflowID;
         connection = JobsConnection.getInstance().connect(
                 ServerConfiguration.getInstance().getWorkflowsPath() + "/" + workflowID + "/jobs.db");
@@ -95,7 +96,7 @@ public class NodeData implements NodeDAO {
      * @param jobID
      * @return
      */
-    public Node getNodeByJobID(String jobID) {
+    public Node getNodeByJobID(String jobID) throws DAOException {
         Job job = DAOFactory.getDAOFactory().getJobDAO(workflowID).getJob(jobID);
         return getNode(job.getSiteName(), job.getNodeName());
     }

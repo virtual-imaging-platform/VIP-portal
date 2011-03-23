@@ -34,6 +34,8 @@
  */
 package fr.insalyon.creatis.vip.portal.server.dao.derby.connection;
 
+import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
+import fr.insalyon.creatis.vip.portal.server.dao.DAOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -47,33 +49,35 @@ public class WorkflowsConnection {
 
     private static WorkflowsConnection instance;
     private final String DRIVER = "org.apache.derby.jdbc.ClientDriver";
-    private final String DBURL = "jdbc:derby://localhost:1527/";
+    private final String DBURL = "jdbc:derby://" 
+            + ServerConfiguration.getInstance().getWorkflowsHost() + ":"
+            + ServerConfiguration.getInstance().getWorkflowsPort() + "/";
     private Connection connection;
 
-    public synchronized static WorkflowsConnection getInstance() {
+    public synchronized static WorkflowsConnection getInstance() throws DAOException {
         if (instance == null) {
             instance = new WorkflowsConnection();
         }
         return instance;
     }
 
-    private WorkflowsConnection() {
+    private WorkflowsConnection() throws DAOException {
         try {
             Class.forName(DRIVER);
-            connection = DriverManager.getConnection(DBURL + "/var/www/workflows-db;create=true");
+            connection = DriverManager.getConnection(DBURL + ServerConfiguration.getInstance().getWorkflowsDB() + ";create=true");
             connection.setAutoCommit(true);
             createTables();
 
         } catch (SQLException ex) {
             try {
-                connection = DriverManager.getConnection(DBURL + "/var/www/workflows-db");
+                connection = DriverManager.getConnection(DBURL + ServerConfiguration.getInstance().getWorkflowsDB());
                 connection.setAutoCommit(true);
 
             } catch (SQLException ex1) {
-                ex1.printStackTrace();
+                throw new DAOException(ex1);
             }
         } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
+            throw new DAOException(ex);
         }
     }
 
