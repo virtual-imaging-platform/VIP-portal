@@ -50,11 +50,14 @@ public class ServerConfiguration {
     private final String CONF_FILE = "settings.conf";
     private final String PROXIES_DIR = "proxies/";
     private String confDirPath = "";
-    private String workflowsPath = "/var/www/html/workflows";
-    private String workflowsDB = "/var/www/workflows.db";
     private String adminDN = "/O=GRID-FR/C=FR/O=CNRS/OU=CREATIS/CN=Rafael Silva";
     private String proxiesDir;
     private String quickStartURL = "http://www.creatis.insa-lyon.fr/~glatard/grid/index.html";
+    // Workflows
+    private String workflowsPath = "/var/www/html/workflows";
+    private String workflowsDB = "/var/www/workflows.db";
+    private String workflowsHost = "localhost";
+    private int workflowsPort = 1527;
     // Vlet Agent
     private String vletagentHost = "kingkong.grid.creatis.insa-lyon.fr";
     private int vletagentPort = 9006;
@@ -110,7 +113,9 @@ public class ServerConfiguration {
             prop.load(new FileInputStream(confFilePath));
 
             workflowsPath = prop.getProperty("workflows.directory", workflowsPath);
-            workflowsDB = prop.getProperty("workflows.database", workflowsDB);
+            workflowsDB = prop.getProperty("workflows.db.name", workflowsDB);
+            workflowsHost = prop.getProperty("workflows.db.host", workflowsHost);
+            workflowsPort = new Integer(prop.getProperty("workflows.db.port", workflowsPort + ""));
             vletagentHost = prop.getProperty("vletagent.host", vletagentHost);
             vletagentPort = new Integer(prop.getProperty("vletagent.port", vletagentPort + ""));
             moteurServer = prop.getProperty("moteur.host", moteurServer);
@@ -137,7 +142,9 @@ public class ServerConfiguration {
 
             try {
                 prop.setProperty("workflows.directory", workflowsPath);
-                prop.setProperty("workflows.database", workflowsDB);
+                prop.setProperty("workflows.db.name", workflowsDB);
+                prop.setProperty("workflows.db.host", workflowsHost);
+                prop.setProperty("workflows.db.port", workflowsPort + "");
                 prop.setProperty("vletagent.host", vletagentHost);
                 prop.setProperty("vletagent.port", vletagentPort + "");
                 prop.setProperty("moteur.host", moteurServer);
@@ -185,6 +192,14 @@ public class ServerConfiguration {
 
     public String getWorkflowsDB() {
         return workflowsDB;
+    }
+
+    public String getWorkflowsHost() {
+        return workflowsHost;
+    }
+
+    public int getWorkflowsPort() {
+        return workflowsPort;
     }
 
     public String getWorkflowsPath() {

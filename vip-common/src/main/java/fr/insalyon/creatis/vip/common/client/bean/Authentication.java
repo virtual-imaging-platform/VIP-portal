@@ -43,7 +43,8 @@ import java.util.Map;
  */
 public class Authentication implements IsSerializable {
 
-    private String userName;
+    private String user;
+    private String organization;
     private String userDN;
     private Map<String, String> groups;
     private String proxyFileName;
@@ -52,8 +53,9 @@ public class Authentication implements IsSerializable {
     public Authentication() {
     }
 
-    public Authentication(String userName, String userDN, Map<String, String> groups, String proxyFileName, boolean proxyValid) {
-        this.userName = userName;
+    public Authentication(String user, String organization, String userDN, Map<String, String> groups, String proxyFileName, boolean proxyValid) {
+        this.user = user;
+        this.organization = organization;
         this.userDN = userDN;
         this.groups = groups;
         this.proxyFileName = proxyFileName;
@@ -64,8 +66,12 @@ public class Authentication implements IsSerializable {
         return userDN;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUser() {
+        return user;
+    }
+
+    public String getOrganization() {
+        return organization;
     }
 
     public boolean hasGroupAccess(String groupName) {
