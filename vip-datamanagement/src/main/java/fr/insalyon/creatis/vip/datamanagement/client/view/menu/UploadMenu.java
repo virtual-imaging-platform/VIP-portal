@@ -42,6 +42,8 @@ import com.gwtext.client.widgets.menu.BaseItem;
 import com.gwtext.client.widgets.menu.Item;
 import com.gwtext.client.widgets.menu.Menu;
 import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
+import fr.insalyon.creatis.vip.common.client.bean.Authentication;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolServiceAsync;
 import fr.insalyon.creatis.vip.datamanagement.client.view.panel.EastPanel;
@@ -73,34 +75,36 @@ public class UploadMenu extends Menu {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                MessageBox.confirm("Confirm", "Do you really want to clean the operation \"" + UploadPanel.getInstance().getOperationId() + "\"?",
-                        new MessageBox.ConfirmCallback() {
+                if (!UploadPanel.getInstance().getStatus().equals("Running")) {
+                    MessageBox.confirm("Confirm", "Do you really want to clean the operation \"" + UploadPanel.getInstance().getOperationId() + "\"?",
+                            new MessageBox.ConfirmCallback() {
 
-                            public void execute(String btnID) {
-                                if (btnID.toLowerCase().equals("yes")) {
-                                    TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
-                                    AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+                                public void execute(String btnID) {
+                                    if (btnID.toLowerCase().equals("yes")) {
+                                        TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+                                        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
-                                        public void onFailure(Throwable caught) {
-                                            MessageBox.alert("Error", "Error executing clean operation: " + caught.getMessage());
-                                            Ext.get("dm-upload-panel").unmask();
-                                        }
+                                            public void onFailure(Throwable caught) {
+                                                MessageBox.alert("Error", "Error executing clean operation: " + caught.getMessage());
+                                                Ext.get("dm-upload-panel").unmask();
+                                            }
 
-                                        public void onSuccess(Void result) {
-                                            Ext.get("dm-upload-panel").unmask();
-                                            EastPanel.getInstance().loadData();
-                                        }
-                                    };
-//                                    Context context = Context.getInstance();
-//                                    Authentication auth = context.getAuthentication();
-//                                    service.removeOperationById(UploadPanel.getInstance().getOperationId(),
-//                                            auth.getProxyFileName(), callback);
-                                    service.removeOperationById(UploadPanel.getInstance().getOperationId(),
-                                            "/tmp/x509up_u501", callback);
-                                    Ext.get("dm-upload-panel").mask("Cleaning Operation...");
+                                            public void onSuccess(Void result) {
+                                                Ext.get("dm-upload-panel").unmask();
+                                                EastPanel.getInstance().loadData();
+                                            }
+                                        };
+                                        Authentication auth = Context.getInstance().getAuthentication();
+                                        service.removeOperationById(UploadPanel.getInstance().getOperationId(),
+                                                auth.getProxyFileName(), callback);
+                                        Ext.get("dm-upload-panel").mask("Cleaning Operation...");
+                                    }
                                 }
-                            }
-                        });
+                            });
+                } else {
+                    MessageBox.alert("Unable to clean/cancel", "ERROR: Current status is "
+                            +UploadPanel.getInstance().getStatus());
+                }
             }
         });
         cleanItem.setId("dm-clean-upload-menu");

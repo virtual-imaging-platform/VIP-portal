@@ -67,7 +67,11 @@ public class BrowserMenu extends Menu {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                new FileUploadWindow(DataManagerBrowserPanel.getInstance().getPathCBValue());
+                if (!DataManagerBrowserPanel.getInstance().getPathCBValue().equals(DataManagerConstants.ROOT)) {
+                    new FileUploadWindow(DataManagerBrowserPanel.getInstance().getPathCBValue());
+                } else {
+                    MessageBox.alert("You can not upload a file to the root folder.");
+                }
             }
         });
         uploadItem.setId("dm-upload-browser-menu");
@@ -77,31 +81,27 @@ public class BrowserMenu extends Menu {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
-                final String parentDir = DataManagerBrowserPanel.getInstance().getPathCBValue();
-                AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+                if (!DataManagerBrowserPanel.getInstance().getType().equals("Folder")) {
+                    TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+                    final String parentDir = DataManagerBrowserPanel.getInstance().getPathCBValue();
+                    AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
-                    public void onFailure(Throwable caught) {
-                        MessageBox.alert("Error", "Unable to download file: " + caught.getMessage());
-                    }
+                        public void onFailure(Throwable caught) {
+                            MessageBox.alert("Error", "Unable to download file: " + caught.getMessage());
+                        }
 
-                    public void onSuccess(Void result) {
-                        EastPanel.getInstance().loadData();
-                        EastPanel.getInstance().displayDownloadPanel();
-                    }
-                };
-                Authentication auth = Context.getInstance().getAuthentication();
-                String user = auth.getUserName().split(" / ")[0];
-//                service.downloadFile(
-//                        parentDir + "/" + BrowserPanel.getInstance().getName(),
-//                        Context.getInstance().getAuthentication().getUserDN(),
-//                        Context.getInstance().getAuthentication().getProxyFileName(),
-//                        callback);
-                service.downloadFile(user, 
-                        parentDir + "/" + DataManagerBrowserPanel.getInstance().getName(),
-                        Context.getInstance().getAuthentication().getUserDN(),
-                        "/tmp/x509up_u501",
-                        callback);
+                        public void onSuccess(Void result) {
+                            EastPanel.getInstance().loadData();
+                            EastPanel.getInstance().displayDownloadPanel();
+                        }
+                    };
+                    Authentication auth = Context.getInstance().getAuthentication();
+                    service.downloadFile(auth.getUser(),
+                            parentDir + "/" + DataManagerBrowserPanel.getInstance().getName(),
+                            Context.getInstance().getAuthentication().getUserDN(),
+                            Context.getInstance().getAuthentication().getProxyFileName(),
+                            callback);
+                }
             }
         });
         downloadItem.setId("dm-download-browser-menu");
@@ -113,33 +113,31 @@ public class BrowserMenu extends Menu {
             @Override
             public void onClick(BaseItem item, EventObject e) {
                 if (!DataManagerBrowserPanel.getInstance().getPathCBValue().equals(DataManagerConstants.ROOT)) {
-                MessageBox.confirm("Confirm", "Do you really want to delete the file/folder \"" + DataManagerBrowserPanel.getInstance().getName() + "\"?",
-                        new MessageBox.ConfirmCallback() {
+                    MessageBox.confirm("Confirm", "Do you really want to delete the file/folder \"" + DataManagerBrowserPanel.getInstance().getName() + "\"?",
+                            new MessageBox.ConfirmCallback() {
 
-                            public void execute(String btnID) {
-                                if (btnID.toLowerCase().equals("yes")) {
-                                    final String parentDir = DataManagerBrowserPanel.getInstance().getPathCBValue();
-                                    FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
-                                    AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+                                public void execute(String btnID) {
+                                    if (btnID.toLowerCase().equals("yes")) {
+                                        final String parentDir = DataManagerBrowserPanel.getInstance().getPathCBValue();
+                                        FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
+                                        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
-                                        public void onFailure(Throwable caught) {
-                                            MessageBox.alert("Error", "Error executing delete file/folder: " + caught.getMessage());
-                                            Ext.get("dm-browser-panel").unmask();
-                                        }
+                                            public void onFailure(Throwable caught) {
+                                                MessageBox.alert("Error", "Error executing delete file/folder: " + caught.getMessage());
+                                                Ext.get("dm-browser-panel").unmask();
+                                            }
 
-                                        public void onSuccess(Void result) {
-                                            Ext.get("dm-browser-panel").unmask();
-                                            DataManagerBrowserPanel.getInstance().loadData(parentDir, false);
-                                        }
-                                    };
-                                    Authentication auth = Context.getInstance().getAuthentication();
-                                    String user = auth.getUserName().split(" / ")[0];
-//                                        service.delete(auth.getProxyFileName(), parentDir + "/" + name, callback);
-                                    service.delete(user, "/tmp/x509up_u501", parentDir + "/" + DataManagerBrowserPanel.getInstance().getName(), callback);
-                                    Ext.get("dm-browser-panel").mask("Deleting File/Folder...");
+                                            public void onSuccess(Void result) {
+                                                Ext.get("dm-browser-panel").unmask();
+                                                DataManagerBrowserPanel.getInstance().loadData(parentDir, false);
+                                            }
+                                        };
+                                        Authentication auth = Context.getInstance().getAuthentication();
+                                        service.delete(auth.getUser(), auth.getProxyFileName(), parentDir + "/" + DataManagerBrowserPanel.getInstance().getName(), callback);
+                                        Ext.get("dm-browser-panel").mask("Deleting File/Folder...");
+                                    }
                                 }
-                            }
-                        });
+                            });
                 } else {
                     MessageBox.alert("You can not delete a root folder.");
                 }
@@ -152,7 +150,11 @@ public class BrowserMenu extends Menu {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                new CreateFolderWindow(DataManagerBrowserPanel.getInstance().getPathCBValue());
+                if (!DataManagerBrowserPanel.getInstance().getPathCBValue().equals(DataManagerConstants.ROOT)) {
+                    new CreateFolderWindow(DataManagerBrowserPanel.getInstance().getPathCBValue());
+                } else {
+                    MessageBox.alert("You can not create a folder in the root folder.");
+                }
             }
         });
         createFolderItem.setId("dm-createfolder-browser-menu");

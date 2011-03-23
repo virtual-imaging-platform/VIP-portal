@@ -34,6 +34,8 @@
  */
 package fr.insalyon.creatis.vip.datamanagement.client.view.menu;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.Ext;
@@ -42,6 +44,8 @@ import com.gwtext.client.widgets.menu.BaseItem;
 import com.gwtext.client.widgets.menu.Item;
 import com.gwtext.client.widgets.menu.Menu;
 import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
+import fr.insalyon.creatis.vip.common.client.bean.Authentication;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolServiceAsync;
 import fr.insalyon.creatis.vip.datamanagement.client.view.panel.DownloadPanel;
@@ -58,6 +62,27 @@ public class DownloadMenu extends Menu {
 
         this.setId("dm-download-menu");
 
+        Item downloadItem = new Item("Download", new BaseItemListenerAdapter() {
+
+            @Override
+            public void onClick(BaseItem item, EventObject e) {
+                if (DownloadPanel.getInstance().getStatus().equals("Done")) {
+                    Window.open(
+                            GWT.getModuleBaseURL()
+                            + "/filedownloadservice?operationid="
+                            + DownloadPanel.getInstance().getOperationId()
+                            + "&proxy="
+                            + Context.getInstance().getAuthentication().getProxyFileName(),
+                            "", "");
+                } else {
+                    MessageBox.alert("Unable to download", "ERROR: Current status is "
+                            + DownloadPanel.getInstance().getStatus());
+                }
+            }
+        });
+        this.addItem(downloadItem);
+        this.addSeparator();
+
         Item detailsItem = new Item("View Details", new BaseItemListenerAdapter() {
 
             @Override
@@ -69,11 +94,12 @@ public class DownloadMenu extends Menu {
         detailsItem.setId("dm-details-download-menu");
         this.addItem(detailsItem);
 
-        Item cleanItem = new Item("Clean Operation", new BaseItemListenerAdapter() {
+        Item cleanItem = new Item("Clean/Cancel Operation", new BaseItemListenerAdapter() {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                MessageBox.confirm("Confirm", "Do you really want to clean the operation \"" + DownloadPanel.getInstance().getOperationId() + "\"?",
+                if (!DownloadPanel.getInstance().getStatus().equals("Running")) {
+                MessageBox.confirm("Confirm", "Do you really want to clean/cancel this operation \"" + DownloadPanel.getInstance().getOperationId() + "\"?",
                         new MessageBox.ConfirmCallback() {
 
                             public void execute(String btnID) {
@@ -91,16 +117,17 @@ public class DownloadMenu extends Menu {
                                             EastPanel.getInstance().loadData();
                                         }
                                     };
-//                                    Context context = Context.getInstance();
-//                                    Authentication auth = context.getAuthentication();
-//                                    service.removeOperationById(DownloadPanel.getInstance().getOperationId(),
-//                                            auth.getProxyFileName(), callback);
+                                    Authentication auth = Context.getInstance().getAuthentication();
                                     service.removeOperationById(DownloadPanel.getInstance().getOperationId(),
-                                            "/tmp/x509up_u501", callback);
+                                            auth.getProxyFileName(), callback);
                                     Ext.get("dm-download-panel").mask("Cleaning Operation...");
                                 }
                             }
                         });
+                } else {
+                    MessageBox.alert("Unable to clean/cancel", "ERROR: Current status is "
+                            + DownloadPanel.getInstance().getStatus());
+                }
             }
         });
         cleanItem.setId("dm-clean-download-menu");

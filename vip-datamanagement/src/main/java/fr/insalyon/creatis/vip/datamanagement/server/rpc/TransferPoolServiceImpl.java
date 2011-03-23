@@ -61,7 +61,7 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
                     serverConfiguration.getVletagentHost(),
                     serverConfiguration.getVletagentPort(),
                     proxy);
-            
+
             List<Operation> operationsList = client.getOperationsListByUser(userDN);
             List<PoolOperation> poolOperations = new ArrayList<PoolOperation>();
 
@@ -89,8 +89,8 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
             Operation op = client.getOperationById(id);
 
             return new PoolOperation(
-                        op.getId(), op.getRegistration(), op.getSource(),
-                        op.getDest(), op.getType().name(), op.getStatus().name(), op.getUser());
+                    op.getId(), op.getRegistration(), op.getSource(),
+                    op.getDest(), op.getType().name(), op.getStatus().name(), op.getUser());
 
         } catch (VletAgentClientException ex) {
             ex.printStackTrace();
@@ -117,8 +117,10 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
                     serverConfiguration.getVletagentHost(),
                     serverConfiguration.getVletagentPort(),
                     proxy);
-            client.downloadFile(DataManagerUtil.parseBaseDir(user, remoteFile),
-                    serverConfiguration.getDataManagerPath() + "/downloads", userDN);
+            String remotePath = DataManagerUtil.parseBaseDir(user, remoteFile);
+            String localDirPath = serverConfiguration.getDataManagerPath()
+                    + "/downloads" + new File(remotePath).getParent();
+            client.downloadFile(remotePath, localDirPath, userDN);
 
         } catch (VletAgentClientException ex) {
             ex.printStackTrace();

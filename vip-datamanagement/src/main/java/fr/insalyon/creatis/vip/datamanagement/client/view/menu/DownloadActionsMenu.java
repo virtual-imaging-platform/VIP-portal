@@ -32,45 +32,48 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanagement.client.view.panel;
+package fr.insalyon.creatis.vip.datamanagement.client.view.menu;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Window;
 import com.gwtext.client.core.EventObject;
-import fr.insalyon.creatis.vip.datamanagement.client.view.menu.UploadMenu;
+import com.gwtext.client.data.Record;
+import com.gwtext.client.widgets.menu.BaseItem;
+import com.gwtext.client.widgets.menu.Item;
+import com.gwtext.client.widgets.menu.Menu;
+import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
+import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.datamanagement.client.view.panel.DownloadPanel;
 
 /**
  *
  * @author Rafael Silva
  */
-public class UploadPanel extends AbstractOperationPanel {
+public class DownloadActionsMenu extends Menu {
 
-    private static UploadPanel instance;
+    public DownloadActionsMenu() {
+        this.setId("dm-download-actions-menu");
 
-    public static UploadPanel getInstance() {
-        if (instance == null) {
-            instance = new UploadPanel();
-        }
-        return instance;
-    }
+        // Download Selected Operations
+        Item downloadSelectedItem = new Item("Download Selected Files", new BaseItemListenerAdapter() {
 
-    private UploadPanel() {
-        super("dm-upload-panel", "Uploads");
-        this.configureToolbar();
-    }
+            @Override
+            public void onClick(BaseItem item, EventObject e) {
+                Record[] records = DownloadPanel.getInstance().getCbSelectionModel().getSelections();
+                for (Record r : records) {
+                    if (r.getAsString("typeico").equals("Done")) {
+                        Window.open(
+                                GWT.getModuleBaseURL()
+                                + "/filedownloadservice?operationid="
+                                + r.getAsString("operationid")
+                                + "&proxy="
+                                + Context.getInstance().getAuthentication().getProxyFileName(),
+                                "", "");
+                    }
+                }
+            }
+        });
 
-    private void configureToolbar() {
-    }
-
-    @Override
-    protected void showMenu(EventObject e) {
-        if (menu == null) {
-            menu = new UploadMenu();
-        }
-        menu.showAt(e.getXY());
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        instance = null;
+        this.addItem(downloadSelectedItem);
     }
 }

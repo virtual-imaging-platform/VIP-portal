@@ -105,9 +105,7 @@ public class CreateFolderWindow extends Window {
                     Context context = Context.getInstance();
 //                context.setLastGridFolderBrowsed(baseDir);
                     Authentication auth = context.getAuthentication();
-                    String user = auth.getUserName().split(" / ")[0];
-//                service.createDir(user, auth.getProxyFileName(), baseDir, text, callback);
-                    service.createDir(user, "/tmp/x509up_u501", baseDir, text, callback);
+                    service.createDir(auth.getUser(), auth.getProxyFileName(), baseDir, text, callback);
                     Ext.get("dm-browser-panel").mask("Creating Folder...");
                     close();
                 }

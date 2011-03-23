@@ -41,15 +41,14 @@ import com.gwtext.client.dd.DragData;
 import com.gwtext.client.dd.DragSource;
 import com.gwtext.client.dd.DropTarget;
 import com.gwtext.client.dd.DropTargetConfig;
-import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.MessageBox;
-import com.gwtext.client.widgets.Toolbar;
 import com.gwtext.client.widgets.ToolbarButton;
-import com.gwtext.client.widgets.event.ButtonListenerAdapter;
+import com.gwtext.client.widgets.grid.CheckboxSelectionModel;
 import fr.insalyon.creatis.vip.common.client.bean.Authentication;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolServiceAsync;
+import fr.insalyon.creatis.vip.datamanagement.client.view.menu.DownloadActionsMenu;
 import fr.insalyon.creatis.vip.datamanagement.client.view.menu.DownloadMenu;
 
 /**
@@ -69,7 +68,6 @@ public class DownloadPanel extends AbstractOperationPanel {
 
     private DownloadPanel() {
         super("dm-download-panel", "Downloads");
-        this.setTopToolbar(getToolbar());
 
         DropTargetConfig cfg = new DropTargetConfig();
         cfg.setdDdGroup("dm-browser-dd");
@@ -96,16 +94,10 @@ public class DownloadPanel extends AbstractOperationPanel {
                             }
                         };
                         Authentication auth = Context.getInstance().getAuthentication();
-                        String user = auth.getUserName().split(" / ")[0];
-//                    service.downloadFile(
-//                            parentDir + "/" + r.getAsString("fileName"),
-//                            Context.getInstance().getAuthentication().getUserDN(),
-//                            Context.getInstance().getAuthentication().getProxyFileName(),
-//                            callback);
-                        service.downloadFile(user,
+                        service.downloadFile(auth.getUser(),
                                 parentDir + "/" + r.getAsString("fileName"),
                                 Context.getInstance().getAuthentication().getUserDN(),
-                                "/tmp/x509up_u501",
+                                Context.getInstance().getAuthentication().getProxyFileName(),
                                 callback);
                     }
                 }
@@ -117,31 +109,14 @@ public class DownloadPanel extends AbstractOperationPanel {
                 return "x-dd-drop-ok";
             }
         };
+        this.configureToolbar();
     }
 
-    /**
-     *
-     * @return
-     */
-    private Toolbar getToolbar() {
-
-        Toolbar topToolbar = new Toolbar();
-        topToolbar.setId("dm-download-tb");
-
-        // Refresh Button
-        ToolbarButton refreshButton = new ToolbarButton("", new ButtonListenerAdapter() {
-
-            @Override
-            public void onClick(Button button, EventObject e) {
-                EastPanel.getInstance().loadData();
-            }
-        });
-        refreshButton.setIcon("images/icon-refresh.gif");
-        refreshButton.setCls("x-btn-icon");
-
-        topToolbar.addButton(refreshButton);
-
-        return topToolbar;
+    private void configureToolbar() {
+        // Actions Menu
+        ToolbarButton actionsButton = new ToolbarButton("Actions");
+        actionsButton.setMenu(new DownloadActionsMenu());
+        topToolbar.addButton(actionsButton);
     }
 
     @Override
@@ -156,5 +131,9 @@ public class DownloadPanel extends AbstractOperationPanel {
     protected void onDestroy() {
         super.onDestroy();
         instance = null;
+    }
+
+    public CheckboxSelectionModel getCbSelectionModel() {
+        return cbSelectionModel;
     }
 }

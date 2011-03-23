@@ -273,10 +273,8 @@ public abstract class AbstractBrowserPanel extends Panel {
                 }
             };
             Authentication auth = Context.getInstance().getAuthentication();
-            String user = auth.getUserName().split(" / ")[0];
-//        service.listDir(user, auth.getProxyFileName(), baseDir, callback);
-            service.listDir(user, "/tmp/x509up_u501", baseDir, callback);
-            
+            service.listDir(auth.getUser(), auth.getProxyFileName(), baseDir, callback);
+
         } else {
             PagingMemoryProxy proxy = new PagingMemoryProxy(getRootData());
             store.setDataProxy(proxy);

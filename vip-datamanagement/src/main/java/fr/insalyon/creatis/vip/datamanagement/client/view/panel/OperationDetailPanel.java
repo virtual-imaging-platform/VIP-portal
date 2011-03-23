@@ -108,7 +108,6 @@ public class OperationDetailPanel extends Panel {
             public void onSuccess(PoolOperation result) {
                 if (result != null) {
                     Object[][] data = new Object[][]{
-                        {"Operation ID", result.getId()},
                         {"Type", result.getType()},
                         {"Status", result.getStatus()},
                         {"Source", result.getSource()},

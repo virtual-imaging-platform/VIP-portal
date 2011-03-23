@@ -44,7 +44,11 @@ import com.gwtext.client.data.RecordDef;
 import com.gwtext.client.data.SortState;
 import com.gwtext.client.data.Store;
 import com.gwtext.client.data.StringFieldDef;
+import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.Panel;
+import com.gwtext.client.widgets.Toolbar;
+import com.gwtext.client.widgets.ToolbarButton;
+import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 import com.gwtext.client.widgets.grid.BaseColumnConfig;
 import com.gwtext.client.widgets.grid.CellMetadata;
 import com.gwtext.client.widgets.grid.CheckboxColumnConfig;
@@ -67,9 +71,12 @@ import java.util.List;
 public abstract class AbstractOperationPanel extends Panel {
 
     private String operationId;
+    private String status;
     protected Store store;
     protected Menu menu;
+    protected Toolbar topToolbar;
     protected GridPanel grid;
+    protected CheckboxSelectionModel cbSelectionModel;
 
     public AbstractOperationPanel(String id, String title) {
 
@@ -80,6 +87,7 @@ public abstract class AbstractOperationPanel extends Panel {
         this.setMargins(0, 0, 0, 0);
         this.setBorder(false);
         this.add(getGrid());
+        this.setTopToolbar(getToolbar());
     }
 
     private GridPanel getGrid() {
@@ -91,7 +99,7 @@ public abstract class AbstractOperationPanel extends Panel {
         grid.setEnableDragDrop(true);
         grid.setDdGroup("dm-browser-dd");
 
-        CheckboxSelectionModel cbSelectionModel = new CheckboxSelectionModel();
+        cbSelectionModel = new CheckboxSelectionModel();
 
         RecordDef recordDef = new RecordDef(
                 new FieldDef[]{
@@ -113,6 +121,7 @@ public abstract class AbstractOperationPanel extends Panel {
             public void onRowClick(GridPanel grid, int rowIndex, EventObject e) {
                 Record record = grid.getStore().getRecordAt(rowIndex);
                 operationId = record.getAsString("operationid");
+                status = record.getAsString("typeico");
                 showMenu(e);
             }
 
@@ -136,6 +145,25 @@ public abstract class AbstractOperationPanel extends Panel {
         grid.setSelectionModel(cbSelectionModel);
 
         return grid;
+    }
+
+    private Toolbar getToolbar() {
+        topToolbar = new Toolbar();
+
+        // Refresh Button
+        ToolbarButton refreshButton = new ToolbarButton("", new ButtonListenerAdapter() {
+
+            @Override
+            public void onClick(Button button, EventObject e) {
+                EastPanel.getInstance().loadData();
+            }
+        });
+        refreshButton.setIcon("images/icon-refresh.gif");
+        refreshButton.setCls("x-btn-icon");
+
+        topToolbar.addButton(refreshButton);
+
+        return topToolbar;
     }
 
     /**
@@ -188,5 +216,9 @@ public abstract class AbstractOperationPanel extends Panel {
 
     public String getOperationId() {
         return operationId;
+    }
+
+    public String getStatus() {
+        return status;
     }
 }

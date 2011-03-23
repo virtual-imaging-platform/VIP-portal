@@ -56,6 +56,7 @@ public class DataManagerBrowserPanel extends AbstractBrowserPanel {
     private static DataManagerBrowserPanel instance;
     private Menu menu;
     private String name;
+    private String type;
 
     public static DataManagerBrowserPanel getInstance() {
         if (instance == null) {
@@ -94,6 +95,7 @@ public class DataManagerBrowserPanel extends AbstractBrowserPanel {
                 DOM.eventPreventDefault(e.getBrowserEvent());
                 Record record = grid.getStore().getRecordAt(rowIndex);
                 name = record.getAsString("fileName");
+                type = record.getAsString("typeico");
                 showMenu(e);
             }
         });
@@ -115,6 +117,10 @@ public class DataManagerBrowserPanel extends AbstractBrowserPanel {
 
     public String getName() {
         return name;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public CheckboxSelectionModel getCbSelectionModel() {
