@@ -40,10 +40,11 @@ package fr.insalyon.creatis.vip.datamanagement.client;
  */
 public class DataManagerConstants {
 
-    public final static String ROOT = "/";
+    public final static String ROOT = "/vip";
     public final static String USERS_HOME = "home";
     public final static String GROUPS_HOME = "groups";
     public final static String PUBLIC_HOME = "public";
     public final static String ACTIVITIES_HOME = "activities";
     public final static String WORKFLOWS_HOME = "workflows";
+    public final static String CREATIS_HOME = "creatis";
 }

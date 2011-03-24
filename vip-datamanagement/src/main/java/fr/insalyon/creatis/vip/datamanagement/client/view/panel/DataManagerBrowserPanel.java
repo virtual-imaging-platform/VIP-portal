@@ -43,7 +43,6 @@ import com.gwtext.client.widgets.grid.GridPanel;
 import com.gwtext.client.widgets.grid.RowSelectionModel;
 import com.gwtext.client.widgets.grid.event.GridRowListenerAdapter;
 import com.gwtext.client.widgets.menu.Menu;
-import fr.insalyon.creatis.vip.datamanagement.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanagement.client.view.menu.BrowserActionsMenu;
 import fr.insalyon.creatis.vip.datamanagement.client.view.menu.BrowserMenu;
 
@@ -83,9 +82,6 @@ public class DataManagerBrowserPanel extends AbstractBrowserPanel {
                 if (record.getAsString("typeico").equals("Folder")) {
                     String clickedFolderName = record.getAsString("fileName");
                     String parentDir = pathCB.getValue();
-                    if (parentDir.equals(DataManagerConstants.ROOT)) {
-                        parentDir = "";
-                    }
                     loadData(parentDir + "/" + clickedFolderName, true);
                 }
             }

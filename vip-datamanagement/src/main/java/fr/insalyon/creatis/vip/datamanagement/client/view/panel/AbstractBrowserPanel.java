@@ -155,7 +155,7 @@ public abstract class AbstractBrowserPanel extends Panel {
 
         // Path ComboBox
         simulationsStore = FieldUtil.getComboBoxStore(pId + "-path-name");
-        Object[][] data = new Object[][]{{"/"}};
+        Object[][] data = new Object[][]{{DataManagerConstants.ROOT}};
         MemoryProxy usersProxy = new MemoryProxy(data);
         simulationsStore.setDataProxy(usersProxy);
         simulationsStore.load();
@@ -173,7 +173,7 @@ public abstract class AbstractBrowserPanel extends Panel {
                 }
             }
         });
-        pathCB.setValue("/");
+        pathCB.setValue(DataManagerConstants.ROOT);
 
         // Folder up Button
         ToolbarButton folderupButton = new ToolbarButton("", new ButtonListenerAdapter() {
@@ -289,7 +289,8 @@ public abstract class AbstractBrowserPanel extends Panel {
                     {"Folder", DataManagerConstants.PUBLIC_HOME},
                     {"Folder", DataManagerConstants.GROUPS_HOME},
                     {"Folder", DataManagerConstants.ACTIVITIES_HOME},
-                    {"Folder", DataManagerConstants.WORKFLOWS_HOME}
+                    {"Folder", DataManagerConstants.WORKFLOWS_HOME},
+                    {"Folder", DataManagerConstants.CREATIS_HOME}
                 };
     }
 

@@ -44,32 +44,34 @@ import fr.insalyon.creatis.vip.datamanagement.client.DataManagerConstants;
 public class DataManagerUtil {
 
     public static String parseBaseDir(String user, String baseDir) {
-        if (baseDir.contains(DataManagerConstants.USERS_HOME)) {
-            return baseDir.replace(
-                    DataManagerConstants.USERS_HOME,
-                    ServerConfiguration.getInstance().getDataManagerUsersHome()
-                    + "/" + user.replaceAll(" ", "_").toLowerCase());
 
-        } else if (baseDir.contains(DataManagerConstants.PUBLIC_HOME)) {
-            return baseDir.replace(
-                    DataManagerConstants.PUBLIC_HOME,
-                    ServerConfiguration.getInstance().getDataManagerUsersHome()
+        baseDir = parsePath(baseDir, DataManagerConstants.USERS_HOME,
+                ServerConfiguration.getInstance().getDataManagerUsersHome()
+                + "/" + user.replaceAll(" ", "_").toLowerCase());
+
+        baseDir = parsePath(baseDir, DataManagerConstants.PUBLIC_HOME,
+                ServerConfiguration.getInstance().getDataManagerUsersHome()
                     + "/public");
 
-        } else if (baseDir.contains(DataManagerConstants.GROUPS_HOME)) {
-            return baseDir.replace(
-                    DataManagerConstants.GROUPS_HOME,
-                    ServerConfiguration.getInstance().getDataManagerGroupsHome());
+        baseDir = parsePath(baseDir, DataManagerConstants.GROUPS_HOME,
+                ServerConfiguration.getInstance().getDataManagerGroupsHome());
 
-        } else if (baseDir.contains(DataManagerConstants.ACTIVITIES_HOME)) {
-            return baseDir.replace(
-                    DataManagerConstants.ACTIVITIES_HOME,
-                    ServerConfiguration.getInstance().getDataManagerActivitiesHome());
-            
-        } else if (baseDir.contains(DataManagerConstants.WORKFLOWS_HOME)) {
-            return baseDir.replace(
-                    DataManagerConstants.WORKFLOWS_HOME,
-                    ServerConfiguration.getInstance().getDataManagerWorkflowsHome());
+        baseDir = parsePath(baseDir, DataManagerConstants.ACTIVITIES_HOME,
+                ServerConfiguration.getInstance().getDataManagerActivitiesHome());
+
+        baseDir = parsePath(baseDir, DataManagerConstants.WORKFLOWS_HOME,
+                ServerConfiguration.getInstance().getDataManagerWorkflowsHome());
+
+        baseDir = parsePath(baseDir, DataManagerConstants.CREATIS_HOME,
+                "/grid/biomed/creatis");
+
+        return baseDir;
+    }
+
+    private static String parsePath(String baseDir, String pattern, String toReplace) {
+        pattern = DataManagerConstants.ROOT + "/" + pattern;
+        if (baseDir.contains(pattern)) {
+            return baseDir.replace(pattern, toReplace);
         }
         return baseDir;
     }
