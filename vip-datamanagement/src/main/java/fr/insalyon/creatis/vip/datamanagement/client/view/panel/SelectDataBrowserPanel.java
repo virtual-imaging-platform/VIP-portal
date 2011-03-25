@@ -72,9 +72,6 @@ public class SelectDataBrowserPanel extends AbstractBrowserPanel {
                 String parentDir = pathCB.getValue();
                 if (record.getAsString("typeico").equals("Folder")) {
                     String clickedFolderName = record.getAsString("fileName");
-                    if (parentDir.equals(DataManagerConstants.ROOT)) {
-                        parentDir = "";
-                    }
                     loadData(parentDir + "/" + clickedFolderName, true);
                 } else {
                     SelectDataPathWindow window = SelectDataPathWindow.getInstance();
