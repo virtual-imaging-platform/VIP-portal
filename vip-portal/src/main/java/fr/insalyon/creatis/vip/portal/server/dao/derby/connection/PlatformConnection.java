@@ -49,7 +49,9 @@ public class PlatformConnection {
 
     private static PlatformConnection instance;
     private final String DRIVER = "org.apache.derby.jdbc.ClientDriver";
-    private final String DBURL = "jdbc:derby://localhost:1527/";
+    private final String DBURL = "jdbc:derby://" 
+            + ServerConfiguration.getInstance().getDerbyHost() +  ":"
+            + ServerConfiguration.getInstance().getDerbyPort() + "/";
     private Connection connection;
 
     public synchronized static PlatformConnection getInstance() throws DAOException {
@@ -97,8 +99,7 @@ public class PlatformConnection {
                     + "inputs VARCHAR(32000), "
                     + "PRIMARY KEY (username, name, application)"
                     + ")");
-//            stat.executeUpdate("CREATE INDEX name_workflow_input_idx "
-//                    + "ON WorkflowInput(username, name)");
+
         } catch (SQLException ex) {
             System.out.println("Table WorkflowInput already created!");
         }
