@@ -53,6 +53,10 @@ public class BottomPanel extends Panel {
         toolbar.addItem(new ToolbarTextItem("Authenticated as : "
                 + Context.getInstance().getAuthentication().getUser()
                 + " / " + Context.getInstance().getAuthentication().getOrganization()));
+
+        toolbar.addFill();
+        toolbar.addItem(new ToolbarTextItem("v0.2"));
+
         this.setBottomToolbar(toolbar);
     }
 }
