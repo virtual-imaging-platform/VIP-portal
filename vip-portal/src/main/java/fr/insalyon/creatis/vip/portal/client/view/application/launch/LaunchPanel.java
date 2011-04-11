@@ -546,7 +546,7 @@ public class LaunchPanel extends Panel {
                     if (v.length == 3) {
                         stepField.setValue(v[2]);
                     }
-                    if (v.length == 2) {
+                    if (v.length >= 2) {
                         stopField.setValue(v[1]);
                     }
                     startField.setValue(v[0]);
