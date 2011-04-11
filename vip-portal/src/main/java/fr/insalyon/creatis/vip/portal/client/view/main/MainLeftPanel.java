@@ -73,7 +73,7 @@ public class MainLeftPanel extends AbstractLeftPanel {
             } else {
 
                 text = "Warning! You do not have valid credentials uploaded!<br />"
-                        + "Please, go to <a href=\"http://kingkong.grid.creatis.insa-lyon.fr:9008/portal/web/vip/proxy-initialisation\">"
+                        + "Please, go to <a href=\"http://vip.creatis.insa-lyon.fr/portal/web/vip/proxy-initialisation\">"
                         + "our portal</a> to upload your proxy.";
             }
         }

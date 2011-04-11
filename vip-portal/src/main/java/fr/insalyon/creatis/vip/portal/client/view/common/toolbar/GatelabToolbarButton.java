@@ -41,8 +41,8 @@ import com.gwtext.client.widgets.menu.Menu;
 import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
 import com.gwtext.client.widgets.ToolbarButton;
 import com.gwtext.client.core.Ext;
-import com.gwtext.client.widgets.Panel;
 import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.portal.client.view.application.launch.LaunchLeftPanel;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.portal.client.view.gatelab.GatelabLeftPanel;
 import fr.insalyon.creatis.vip.portal.client.view.gatelab.WorkflowsPanel;
@@ -56,16 +56,15 @@ public class GatelabToolbarButton extends ToolbarButton {
     public GatelabToolbarButton(String title) {
         super(title);
 
-
         Menu gateLabMenu = new Menu();
         gateLabMenu.setShadow(true);
         gateLabMenu.setMinWidth(10);
 
-        Item launchGateLabItem = new Item("Monitor simulations", new BaseItemListenerAdapter() {
+        Item launchGateLabItem = new Item("Monitor Simulations", new BaseItemListenerAdapter() {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-             Layout layout = Layout.getInstance();
+                Layout layout = Layout.getInstance();
                 if (layout.hasCenterPanelTab("gate-workflows-panel")) {
                     layout.setActiveCenterPanel("gate-workflows-panel");
                     WorkflowsPanel.getInstance().reloadData();
@@ -80,61 +79,48 @@ public class GatelabToolbarButton extends ToolbarButton {
                 layout.setLeftPanel(panel);
             }
         });
-
         gateLabMenu.addItem(launchGateLabItem);
 
-
-        Item launchDocItem = new Item("Documentation", new BaseItemListenerAdapter() {
+        Item launchItem = new Item("Launch Simulation", new BaseItemListenerAdapter() {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                Layout layout = Layout.getInstance();
-       
-                Panel doc=new Panel("GateLab Documentation");
-                doc.setId("GateLab Documentation");
-                doc.setHtml("<IFRAME src=\"http://www.creatis.insa-lyon.fr/site/fr/gatelab\">");
-                //doc.load("http://www.creatis.insa-lyon.fr/site/fr/gatelab");
-                layout.setCenterPanel(doc);
-
-
-/*
-                
-                Frame doc = new Frame("http://www.creatis.insa-lyon.fr/site/fr/gatelab");
-
-                Window window = new Window();
-                window.add(doc);
-                window.show();
-  */
+                LaunchLeftPanel launchLeftPanel = LaunchLeftPanel.getInstance();
+                launchLeftPanel.setApplicationClass("GATE");
+                Layout.getInstance().setLeftPanel(launchLeftPanel);
             }
         });
+        if (!Context.getInstance().getAuthentication().isProxyValid()) {
+            launchItem.setDisabled(true);
+        }
+        gateLabMenu.addItem(launchItem);
 
-        gateLabMenu.addItem(launchDocItem);
-
-
-
-        /*
-        this.addListener(new ButtonListenerAdapter() {
-
-            @Override
-            public void onClick(Button button, EventObject e) {
-                Layout layout = Layout.getInstance();
-                if (layout.hasCenterPanelTab("gate-workflows-panel")) {
-                    layout.setActiveCenterPanel("gate-workflows-panel");
-                    WorkflowsPanel.getInstance().reloadData();
-                } else {
-                    WorkflowsPanel panel = WorkflowsPanel.getInstance();
-                    layout.setCenterPanel(panel);
-                    panel.loadWorkflowData(Context.getInstance().getAuthentication().getUserName().split(" / ")[0],
-                            "gate", null, null, null);
-                }
-                Ext.get("gate-workflows-grid").mask("Loading data...");
-                GatelabLeftPanel panel = GatelabLeftPanel.getInstance();
-                layout.setLeftPanel(panel);
-            }
-        });
-         */
+//        Item launchDocItem = new Item("Documentation", new BaseItemListenerAdapter() {
+//
+//            @Override
+//            public void onClick(BaseItem item, EventObject e) {
+//                Layout layout = Layout.getInstance();
+//
+//                Panel doc=new Panel("GateLab Documentation");
+//                doc.setId("GateLab Documentation");
+//                doc.setHtml("<IFRAME src=\"http://www.creatis.insa-lyon.fr/site/fr/gatelab\">");
+//                //doc.load("http://www.creatis.insa-lyon.fr/site/fr/gatelab");
+//                layout.setCenterPanel(doc);
+//
+//
+///*
+//
+//                Frame doc = new Frame("http://www.creatis.insa-lyon.fr/site/fr/gatelab");
+//
+//                Window window = new Window();
+//                window.add(doc);
+//                window.show();
+//  */
+//            }
+//        });
+//
+//        gateLabMenu.addItem(launchDocItem);
 
         this.setMenu(gateLabMenu);
-
     }
 }
