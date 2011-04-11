@@ -85,13 +85,13 @@ public interface WorkflowService extends RemoteService {
 
     public String launchWorkflow(String user, Map<String, String> parameters, String workflowName, String proxyFileName);
 
-    public List<WorkflowInput> getWorkflowsInputByUserAndAppName(String appName);
+    public List<WorkflowInput> getWorkflowsInputByUserAndAppName(String user, String appName);
 
-    public String addWorkflowInput(WorkflowInput workflowInput);
+    public String addWorkflowInput(String user, WorkflowInput workflowInput);
 
-    public WorkflowInput getWorkflowInputByUserAndName(String inputName);
+    public WorkflowInput getWorkflowInputByUserAndName(String user, String inputName);
 
-    public void removeWorkflowInput(String inputName);
+    public void removeWorkflowInput(String user, String inputName);
 
     public List<String> getStats( List<Workflow> workflowIdList, int type, int binSize);
 }

@@ -63,17 +63,17 @@ public interface WorkflowServiceAsync {
 
     public void getWorkflowInputs(String fileName, AsyncCallback<Map<String, String>> asyncCallback);
 
-    public void addWorkflowInput(WorkflowInput workflowInput, AsyncCallback<String> asyncCallback);
+    public void addWorkflowInput(String user, WorkflowInput workflowInput, AsyncCallback<String> asyncCallback);
 
     public void closeConnection(String workflowID, AsyncCallback<Void> asyncCallback);
 
     public void killWorkflow(String workflowID, AsyncCallback<Void> asyncCallback);
 
-    public void getWorkflowsInputByUserAndAppName(String appName, AsyncCallback<List<WorkflowInput>> asyncCallback);
+    public void getWorkflowsInputByUserAndAppName(String user, String appName, AsyncCallback<List<WorkflowInput>> asyncCallback);
 
-    public void getWorkflowInputByUserAndName(String inputName, AsyncCallback<WorkflowInput> asyncCallback);
+    public void getWorkflowInputByUserAndName(String user, String inputName, AsyncCallback<WorkflowInput> asyncCallback);
 
-    public void removeWorkflowInput(String inputName, AsyncCallback<Void> asyncCallback);
+    public void removeWorkflowInput(String user, String inputName, AsyncCallback<Void> asyncCallback);
 
     public void getFileURL(String baseDir, String fileName, AsyncCallback<String> asyncCallback);
 
