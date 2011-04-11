@@ -43,6 +43,7 @@ import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 import com.gwtext.client.widgets.form.FormPanel;
 import com.gwtext.client.widgets.form.TextField;
 import com.gwtext.client.widgets.layout.FitLayout;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.portal.client.bean.WorkflowInput;
 import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowServiceAsync;
@@ -103,7 +104,9 @@ public class SaveInputWindow extends Window {
                         MessageBox.alert(result);
                     }
                 };
-                service.addWorkflowInput(wi, callback);
+                service.addWorkflowInput(
+                        Context.getInstance().getAuthentication().getUserDN(),
+                        wi, callback);
             }
         });
         formPanel.addButton(save);

@@ -67,6 +67,7 @@ import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
 import com.gwtext.client.widgets.tree.TreeNode;
 import com.gwtext.client.widgets.tree.TreePanel;
 import com.gwtext.client.widgets.tree.event.TreeNodeListenerAdapter;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.portal.client.bean.WorkflowInput;
 import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowServiceAsync;
@@ -257,7 +258,9 @@ public class LoadInputWindow extends Window {
                 root.setExpanded(true);
             }
         };
-        service.getWorkflowsInputByUserAndAppName(workflowName, callback);
+        service.getWorkflowsInputByUserAndAppName(
+                Context.getInstance().getAuthentication().getUserDN(),
+                workflowName, callback);
     }
 
     private void showContextMenu(EventObject e) {
@@ -291,7 +294,9 @@ public class LoadInputWindow extends Window {
                                                 }
                                             }
                                         };
-                                        service.removeWorkflowInput(nodeToRemove, callback);
+                                        service.removeWorkflowInput(
+                                                Context.getInstance().getAuthentication().getUserDN(),
+                                                nodeToRemove, callback);
                                     }
                                 }
                             });
@@ -341,7 +346,9 @@ public class LoadInputWindow extends Window {
                 store.commitChanges();
             }
         };
-        service.getWorkflowInputByUserAndName(inputName, callback);
+        service.getWorkflowInputByUserAndName(
+                Context.getInstance().getAuthentication().getUserDN(),
+                inputName, callback);
         selectedInput.setValue(inputName);
     }
 
@@ -360,7 +367,9 @@ public class LoadInputWindow extends Window {
             }
         };
         Ext.get(launchPanel.getId()).mask("Loading Input Values...");
-        service.getWorkflowInputByUserAndName(inputName, callback);
+        service.getWorkflowInputByUserAndName(
+                Context.getInstance().getAuthentication().getUserDN(),
+                inputName, callback);
     }
 
     private void cleanGrid() {
