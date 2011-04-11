@@ -64,6 +64,13 @@ public class WorkflowMoteurConfig {
     /**
      * 
      * @param URIaddrWS URI Adress of the web service
+     */
+    public WorkflowMoteurConfig(String URIaddrWS) {
+        addressWS = URIaddrWS;
+    }
+    /**
+     * 
+     * @param URIaddrWS URI Adress of the web service
      * @param workflowPath Path of the xml worflow descriptor file
      * @param parameters List of parameters
      */
@@ -98,7 +105,7 @@ public class WorkflowMoteurConfig {
      * @throws RemoteException
      * @throws VlException
      */
-    public String callWS(String proxyFileName) throws RemoteException, ServiceException {
+    public String launch(String proxyFileName) throws RemoteException, ServiceException {
         
         System.setProperty("javax.net.ssl.trustStore", ServerConfiguration.getInstance().getTruststoreFile());
         System.setProperty("javax.net.ssl.trustStorePassword", ServerConfiguration.getInstance().getTruststorePass());
@@ -117,6 +124,26 @@ public class WorkflowMoteurConfig {
         String res = wfS.getmoteur_service().workflowSubmit(contentXMLworkflow, contentXMLInput.toString(), strProxy, _settings);
 
         return res;
+    }
+
+    /**
+     * 
+     * @param workflowID
+     * @throws RemoteException
+     * @throws ServiceException
+     */
+    public void kill(String workflowID) throws RemoteException, ServiceException {
+
+        System.setProperty("javax.net.ssl.trustStore", ServerConfiguration.getInstance().getTruststoreFile());
+        System.setProperty("javax.net.ssl.trustStorePassword", ServerConfiguration.getInstance().getTruststorePass());
+        System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+
+        String resourcename = "moteur-client-config.wsdd";
+        InputStream is = this.getClass().getClassLoader().getResourceAsStream(resourcename);
+        EngineConfiguration engineConfig = new FileProvider(is);
+        Moteur_ServiceLocator wfS = new Moteur_ServiceLocator(addressWS, engineConfig);
+
+        wfS.getmoteur_service().killWorkflow(workflowID);
     }
 
     public String getContentXMLworkflow() {
