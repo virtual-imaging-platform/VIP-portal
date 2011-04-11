@@ -280,7 +280,6 @@ public abstract class AbstractWorkflowsPanel extends Panel {
                             });
                 }
             });
-            killItem.setDisabled(true);
             contextMenu.addItem(killItem);
         } else {
             Item cleanItem = new Item("Clean Simulation", new BaseItemListenerAdapter() {
