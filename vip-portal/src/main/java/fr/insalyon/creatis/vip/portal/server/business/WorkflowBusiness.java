@@ -159,7 +159,7 @@ public class WorkflowBusiness {
 
             WorkflowMoteurConfig moteur = new WorkflowMoteurConfig(ServerConfiguration.getInstance().getMoteurServer(), workflowPath, parameters);
             moteur.setSettings(settings);
-            String ws = moteur.callWS(proxyFileName);
+            String ws = moteur.launch(proxyFileName);
 
             return ws;
 
@@ -168,6 +168,25 @@ public class WorkflowBusiness {
         } catch (ServiceException ex) {
             throw new BusinessException(ex);
         } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param workflowID
+     * @throws BusinessException
+     */
+    public void kill(String workflowID) throws BusinessException {
+
+        try {
+            WorkflowMoteurConfig moteur = new WorkflowMoteurConfig(
+                    ServerConfiguration.getInstance().getMoteurServer());
+            moteur.kill(workflowID);
+            
+        } catch (RemoteException ex) {
+            throw new BusinessException(ex);
+        } catch (ServiceException ex) {
             throw new BusinessException(ex);
         }
     }
