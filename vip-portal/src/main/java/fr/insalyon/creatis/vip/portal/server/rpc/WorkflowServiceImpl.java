@@ -54,7 +54,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -198,40 +197,32 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         }
     }
 
-    public String addWorkflowInput(WorkflowInput workflowInput) {
+    public String addWorkflowInput(String user, WorkflowInput workflowInput) {
         try {
-            HttpSession session = this.getThreadLocalRequest().getSession();
-            String user = (String) session.getAttribute("userDN");
             return DAOFactory.getDAOFactory().getWorkflowInputDAO().addWorkflowInput(user, workflowInput);
         } catch (DAOException ex) {
             return null;
         }
     }
 
-    public List<WorkflowInput> getWorkflowsInputByUserAndAppName(String appName) {
+    public List<WorkflowInput> getWorkflowsInputByUserAndAppName(String user, String appName) {
         try {
-            HttpSession session = this.getThreadLocalRequest().getSession();
-            String user = (String) session.getAttribute("userDN");
             return DAOFactory.getDAOFactory().getWorkflowInputDAO().getWorkflowInputByUserAndAppName(user, appName);
         } catch (DAOException ex) {
             return null;
         }
     }
 
-    public WorkflowInput getWorkflowInputByUserAndName(String inputName) {
+    public WorkflowInput getWorkflowInputByUserAndName(String user, String inputName) {
         try {
-            HttpSession session = this.getThreadLocalRequest().getSession();
-            String user = (String) session.getAttribute("userDN");
             return DAOFactory.getDAOFactory().getWorkflowInputDAO().getWorkflowInputByUserAndName(user, inputName);
         } catch (DAOException ex) {
             return null;
         }
     }
 
-    public void removeWorkflowInput(String inputName) {
+    public void removeWorkflowInput(String user, String inputName) {
         try {
-            HttpSession session = this.getThreadLocalRequest().getSession();
-            String user = (String) session.getAttribute("userDN");
             DAOFactory.getDAOFactory().getWorkflowInputDAO().removeWorkflowInput(user, inputName);
         } catch (DAOException ex) {
             ex.printStackTrace();
@@ -257,23 +248,9 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
 
     public void killWorkflow(String workflowID) {
         try {
-            DAOFactory.getDAOFactory().getWorkflowDAO().updateStatus(workflowID, "Killed");
-            //        try {
-            //            int[] moteurData = DAOFactory.getDAOFactory().getWorkflowDAO().getMoteurIDAndKey(workflowID);
-            //            ClientPreferences prefs = new ClientPreferences(new File("/var/www/cgi-bin/moteurServer/.moteur2"));
-            //            System.out.println("----- Moteur ID: " + moteurData[0] + " - KEY: " + moteurData[1]);
-            //            Moteur2.setLog(new Log(1));
-            //            Moteur2 client = new Moteur2(moteurData[0], moteurData[1], new ExecutionLogger(new Log(1)), null);
-            //            client.stopExecution();
-            //
-            //        } catch (SAXException ex) {
-            //            ex.printStackTrace();
-            //        } catch (IOException ex) {
-            //            ex.printStackTrace();
-            //        } catch (MoteurException ex) {
-            //        }
-            //        }
-        } catch (DAOException ex) {
+            WorkflowBusiness business = new WorkflowBusiness();
+            business.kill(workflowID);
+        } catch (BusinessException ex) {
             ex.printStackTrace();
         }
     }
