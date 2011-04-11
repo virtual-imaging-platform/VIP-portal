@@ -26,7 +26,9 @@
         <parameter qname="pns:proxy" xmlns:pns="moteur_service" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
         <parameter qname="pns:settings" xmlns:pns="moteur_service" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
       </operation>
-      <parameter name="allowedMethods" value="workflowSubmit"/>
-
+      <operation name="killWorkflow" qname="operNS:killWorkflow" xmlns:operNS="moteur_service" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
+        <parameter qname="pns:workflowID" xmlns:pns="moteur_service" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema" />
+      </operation>
+      <parameter name="allowedMethods" value="workflowSubmit, killWorkflow"/>
   </service>
 </deployment>

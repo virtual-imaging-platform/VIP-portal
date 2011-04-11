@@ -40,6 +40,9 @@ public class Moteur_BindingImpl implements localhost.moteur_service_wsdl.Moteur_
         return null;
     }
 
+    public void killWorkflow(java.lang.String workflowID) throws java.rmi.RemoteException {
+    }
+
     public java.lang.String getVersion() throws java.rmi.RemoteException {
         return null;
     }
