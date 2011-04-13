@@ -263,4 +263,13 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
             ex.printStackTrace();
         }
     }
+
+    public void purgeWorkflow(String workflowID) {
+        try {
+            WorkflowBusiness business = new WorkflowBusiness();
+            business.purge(workflowID);
+        } catch (BusinessException ex) {
+            ex.printStackTrace();
+        }
+    }
 }

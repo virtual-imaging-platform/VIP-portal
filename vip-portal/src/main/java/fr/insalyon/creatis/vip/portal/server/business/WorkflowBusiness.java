@@ -235,4 +235,19 @@ public class WorkflowBusiness {
             throw new BusinessException(ex);
         }
     }
+
+    public void purge(String workflowID) throws BusinessException {
+
+        try {
+            WorkflowDAO workflowDAO = DAOFactory.getDAOFactory().getWorkflowDAO();
+            workflowDAO.delete(workflowID);
+
+            String workflowsPath = ServerConfiguration.getInstance().getWorkflowsPath();
+            File workflowDir = new File(workflowsPath + "/" + workflowID);
+            FileUtils.deleteQuietly(workflowDir);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
 }

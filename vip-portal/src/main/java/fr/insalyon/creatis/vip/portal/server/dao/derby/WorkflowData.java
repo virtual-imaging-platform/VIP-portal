@@ -308,6 +308,19 @@ public class WorkflowData implements WorkflowDAO {
         }
     }
 
+    public void delete(String workflowID) throws DAOException {
+        try {
+            PreparedStatement stat = connection.prepareStatement("DELETE "
+                    + "FROM Workflows WHERE id=?");
+
+            stat.setString(1, workflowID);
+            stat.execute();
+
+        } catch (SQLException ex) {
+            throw new DAOException(ex);
+        }
+    }
+
     public List<String> getStats(List<Workflow> wfIdList, int type, int binSize) {
 
         List<String> list = new ArrayList<String>();

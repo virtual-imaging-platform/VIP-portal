@@ -101,7 +101,19 @@ public interface WorkflowDAO {
      */
     public List<String> getOutputs(String workflowID) throws DAOException;
 
+    /**
+     *
+     * @param workflowID
+     * @throws DAOException
+     */
     public void cleanWorkflow(String workflowID) throws DAOException;
+
+    /**
+     * 
+     * @param workflowID
+     * @throws DAOException
+     */
+    public void delete(String workflowID) throws DAOException;
 
     public List<String> getStats(List<Workflow> workflowIdList, int type, int binSize);
 }
