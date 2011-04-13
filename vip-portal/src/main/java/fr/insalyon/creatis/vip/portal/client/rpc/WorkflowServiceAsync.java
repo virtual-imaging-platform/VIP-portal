@@ -69,6 +69,8 @@ public interface WorkflowServiceAsync {
 
     public void killWorkflow(String workflowID, AsyncCallback<Void> asyncCallback);
 
+    public void cleanWorkflow(String workflowID, String userDN, String proxyFileName, AsyncCallback<Void> asyncCallback);
+
     public void getWorkflowsInputByUserAndAppName(String user, String appName, AsyncCallback<List<WorkflowInput>> asyncCallback);
 
     public void getWorkflowInputByUserAndName(String user, String inputName, AsyncCallback<WorkflowInput> asyncCallback);

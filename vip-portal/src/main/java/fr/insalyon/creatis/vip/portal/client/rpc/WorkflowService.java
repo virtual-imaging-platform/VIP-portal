@@ -67,6 +67,8 @@ public interface WorkflowService extends RemoteService {
 
     public void killWorkflow(String workflowID);
 
+    public void cleanWorkflow(String workflowID, String userDN, String proxyFileName);
+
     public List<Workflow> getWorkflows(String user, String application, String status, Date startDate, Date endDate);
 
     public String getFile(String baseDir, String fileName);
