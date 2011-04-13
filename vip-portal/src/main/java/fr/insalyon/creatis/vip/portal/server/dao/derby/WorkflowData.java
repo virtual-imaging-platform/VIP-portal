@@ -38,7 +38,6 @@ import fr.insalyon.creatis.vip.portal.server.dao.DAOException;
 import fr.insalyon.creatis.vip.portal.server.dao.derby.connection.WorkflowsConnection;
 import fr.insalyon.creatis.vip.portal.client.bean.Workflow;
 import fr.insalyon.creatis.vip.portal.server.dao.WorkflowDAO;
-import fr.insalyon.creatis.vip.portal.server.dao.derby.connection.PlatformConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -273,6 +272,39 @@ public class WorkflowData implements WorkflowDAO {
 
         } catch (SQLException ex) {
             ex.printStackTrace();
+        }
+    }
+
+    public List<String> getOutputs(String workflowID) throws DAOException {
+        List<String> outputs = new ArrayList<String>();
+
+        try {
+            PreparedStatement stat = connection.prepareStatement(
+                    "SELECT path FROM Outputs WHERE workflow_id=?");
+
+            stat.setString(1, workflowID);
+            ResultSet rs = stat.executeQuery();
+
+            while (rs.next()) {
+                outputs.add(rs.getString("path"));
+            }
+
+        } catch (SQLException ex) {
+            throw new DAOException(ex);
+        }
+        return outputs;
+    }
+
+    public void cleanWorkflow(String workflowID) throws DAOException {
+        try {
+            PreparedStatement stat = connection.prepareStatement("DELETE "
+                    + "FROM Outputs WHERE workflow_id=?");
+
+            stat.setString(1, workflowID);
+            stat.execute();
+
+        } catch (SQLException ex) {
+            throw new DAOException(ex);
         }
     }
 

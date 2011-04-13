@@ -86,7 +86,22 @@ public interface WorkflowDAO {
      */
     public List<String> getApplicationsWithClass(String applicationClass);
 
+    /**
+     * 
+     * @param workflowID
+     * @param status
+     */
     public void updateStatus(String workflowID, String status);
 
-     public List<String> getStats( List<Workflow> workflowIdList, int type, int binSize);
+    /**
+     *
+     * @param workflowID
+     * @return
+     * @throws DAOException
+     */
+    public List<String> getOutputs(String workflowID) throws DAOException;
+
+    public void cleanWorkflow(String workflowID) throws DAOException;
+
+    public List<String> getStats(List<Workflow> workflowIdList, int type, int binSize);
 }
