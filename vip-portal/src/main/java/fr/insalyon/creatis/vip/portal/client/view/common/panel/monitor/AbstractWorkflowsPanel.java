@@ -52,6 +52,8 @@ import com.gwtext.client.widgets.menu.BaseItem;
 import com.gwtext.client.widgets.menu.Item;
 import com.gwtext.client.widgets.menu.Menu;
 import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
+import fr.insalyon.creatis.vip.common.client.bean.Authentication;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.portal.client.bean.Workflow;
 import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowServiceAsync;
@@ -224,6 +226,8 @@ public abstract class AbstractWorkflowsPanel extends Panel {
                     image = "ico_completed.png";
                 } else if (status.equals("Killed")) {
                     image = "ico_killed.png";
+                } else if (status.equals("Cleaned")) {
+                    image = "ico_cleaned.png";
                 }
                 return "<img src=\"./images/" + image + "\" style=\"border: 0\"/>";
             }
@@ -281,6 +285,25 @@ public abstract class AbstractWorkflowsPanel extends Panel {
                 }
             });
             contextMenu.addItem(killItem);
+        } else if (status.equals("Cleaned")) {
+            Item purgeItem = new Item("Purge Simulation", new BaseItemListenerAdapter() {
+
+                @Override
+                public void onClick(BaseItem item, EventObject e) {
+                    MessageBox.confirm("Purge Simulation", "Do you really want to purge "
+                            + "this simulation (" + workflowID + ")?",
+                            new MessageBox.ConfirmCallback() {
+
+                                public void execute(String btnID) {
+                                    if (btnID.toLowerCase().equals("yes")) {
+//                                        purgeWorkflow(workflowID);
+                                    }
+                                }
+                            });
+                }
+            });
+            purgeItem.setDisabled(true);
+            contextMenu.addItem(purgeItem);
         } else {
             Item cleanItem = new Item("Clean Simulation", new BaseItemListenerAdapter() {
 
@@ -292,13 +315,12 @@ public abstract class AbstractWorkflowsPanel extends Panel {
 
                                 public void execute(String btnID) {
                                     if (btnID.toLowerCase().equals("yes")) {
-                                        //cleanWorkflow(workflowID);
+                                        cleanWorkflow(workflowID);
                                     }
                                 }
                             });
                 }
             });
-            cleanItem.setDisabled(true);
             contextMenu.addItem(cleanItem);
         }
         contextMenu.showAt(e.getXY());
@@ -323,5 +345,27 @@ public abstract class AbstractWorkflowsPanel extends Panel {
         };
         service.killWorkflow(workflowID, callback);
         Ext.get(appendID + "-workflows-grid").mask("Sending killing signal to " + workflowID + "...");
+    }
+
+    /**
+     * Sends a request to clean the workflow
+     * 
+     * @param workflowID Worflow identification
+     */
+    private void cleanWorkflow(String workflowID) {
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            public void onFailure(Throwable caught) {
+                MessageBox.alert("Error", "Error executing clean simulation\n" + caught.getMessage());
+            }
+
+            public void onSuccess(Void result) {
+                reloadData();
+            }
+        };
+        Authentication auth = Context.getInstance().getAuthentication();
+        service.cleanWorkflow(workflowID, auth.getUserDN(), auth.getProxyFileName(), callback);
+        Ext.get(appendID + "-workflows-grid").mask("Cleaning simulation " + workflowID + "...");
     }
 }
