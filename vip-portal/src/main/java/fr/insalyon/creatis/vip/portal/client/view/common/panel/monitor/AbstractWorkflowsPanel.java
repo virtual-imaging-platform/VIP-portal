@@ -296,13 +296,12 @@ public abstract class AbstractWorkflowsPanel extends Panel {
 
                                 public void execute(String btnID) {
                                     if (btnID.toLowerCase().equals("yes")) {
-//                                        purgeWorkflow(workflowID);
+                                        purgeWorkflow(workflowID);
                                     }
                                 }
                             });
                 }
             });
-            purgeItem.setDisabled(true);
             contextMenu.addItem(purgeItem);
         } else {
             Item cleanItem = new Item("Clean Simulation", new BaseItemListenerAdapter() {
@@ -367,5 +366,26 @@ public abstract class AbstractWorkflowsPanel extends Panel {
         Authentication auth = Context.getInstance().getAuthentication();
         service.cleanWorkflow(workflowID, auth.getUserDN(), auth.getProxyFileName(), callback);
         Ext.get(appendID + "-workflows-grid").mask("Cleaning simulation " + workflowID + "...");
+    }
+
+    /**
+     * Sends a request to purge the workflow
+     *
+     * @param workflowID Workflow identification
+     */
+    private void purgeWorkflow(String workflowID) {
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            public void onFailure(Throwable caught) {
+                MessageBox.alert("Error", "Error executing purge simulation\n" + caught.getMessage());
+            }
+
+            public void onSuccess(Void result) {
+                reloadData();
+            }
+        };
+        service.purgeWorkflow(workflowID, callback);
+        Ext.get(appendID + "-workflows-grid").mask("Purging simulation " + workflowID + "...");
     }
 }
