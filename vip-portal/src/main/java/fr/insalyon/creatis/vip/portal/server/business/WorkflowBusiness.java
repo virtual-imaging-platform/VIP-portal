@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.portal.server.business;
 
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
+import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.datamanagement.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.portal.client.bean.WorkflowDescriptor;
@@ -45,6 +46,7 @@ import fr.insalyon.creatis.vip.portal.server.business.simulation.parser.GwendiaP
 import fr.insalyon.creatis.vip.portal.server.business.simulation.parser.ScuflParser;
 import fr.insalyon.creatis.vip.portal.server.dao.DAOException;
 import fr.insalyon.creatis.vip.portal.server.dao.DAOFactory;
+import fr.insalyon.creatis.vip.portal.server.dao.WorkflowDAO;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -54,6 +56,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.xml.rpc.ServiceException;
+import org.apache.commons.io.FileUtils;
 import org.xml.sax.SAXException;
 
 /**
@@ -183,10 +186,52 @@ public class WorkflowBusiness {
             WorkflowMoteurConfig moteur = new WorkflowMoteurConfig(
                     ServerConfiguration.getInstance().getMoteurServer());
             moteur.kill(workflowID);
-            
+
         } catch (RemoteException ex) {
             throw new BusinessException(ex);
         } catch (ServiceException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param workflowID
+     * @param userDN 
+     * @param proxyFileName 
+     * @throws BusinessException
+     */
+    public void clean(String workflowID, String userDN, String proxyFileName) throws BusinessException {
+
+        try {
+            WorkflowDAO workflowDAO = DAOFactory.getDAOFactory().getWorkflowDAO();
+            workflowDAO.updateStatus(workflowID, "Cleaned");
+            String workflowsPath = ServerConfiguration.getInstance().getWorkflowsPath();
+            File workflowDir = new File(workflowsPath + "/" + workflowID);
+
+            for (File file : workflowDir.listFiles()) {
+                if (!file.getName().equals("jobs.db")
+                        && !file.getName().equals("workflow.out")
+                        && !file.getName().equals("workflow.err")
+                        && !file.getName().equals("gasw.log")) {
+                    
+                    FileUtils.deleteQuietly(file);
+                }
+            }
+            List<String> outputs = workflowDAO.getOutputs(workflowID);
+            VletAgentPoolClient client = new VletAgentPoolClient(
+                    ServerConfiguration.getInstance().getVletagentHost(),
+                    ServerConfiguration.getInstance().getVletagentPort(),
+                    proxyFileName);
+
+            for (String output : outputs) {
+                client.delete(output, userDN);
+            }
+            workflowDAO.cleanWorkflow(workflowID);
+            
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        } catch (VletAgentClientException ex) {
             throw new BusinessException(ex);
         }
     }
