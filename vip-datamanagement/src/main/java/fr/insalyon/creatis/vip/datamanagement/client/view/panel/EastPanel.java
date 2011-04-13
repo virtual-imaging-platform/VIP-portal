@@ -97,7 +97,7 @@ public class EastPanel extends TabPanel {
                     for (PoolOperation op : result) {
                         if (op.getType().equals("Upload")) {
                             uploads.add(op);
-                        } else {
+                        } else if (op.getType().equals("Download")) {
                             downloads.add(op);
                         }
                     }
