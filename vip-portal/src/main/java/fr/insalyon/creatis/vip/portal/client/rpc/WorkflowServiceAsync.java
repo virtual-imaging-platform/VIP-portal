@@ -80,4 +80,6 @@ public interface WorkflowServiceAsync {
     public void getFileURL(String baseDir, String fileName, AsyncCallback<String> asyncCallback);
 
     public void getStats( List<Workflow> workflowIdList, int type, int binSize, AsyncCallback<List<String>> asyncCallback);
+
+    public void purgeWorkflow(String workflowID, AsyncCallback<Void> asyncCallback);
 }
