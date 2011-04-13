@@ -72,7 +72,7 @@ public class DiagramPanel extends Panel {
             }
         };
         if (!completed) {
-            timer.scheduleRepeating(15000);
+            timer.scheduleRepeating(30000);
         }
     }
 

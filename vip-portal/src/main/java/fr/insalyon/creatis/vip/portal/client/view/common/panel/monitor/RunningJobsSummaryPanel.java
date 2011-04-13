@@ -141,7 +141,7 @@ public class RunningJobsSummaryPanel extends Panel {
                 loadJobsData();
             }
         };
-        timer.scheduleRepeating(15000);
+        timer.scheduleRepeating(30000);
     }
 
     private void loadJobsData() {

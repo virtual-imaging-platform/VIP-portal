@@ -181,7 +181,7 @@ public class WorkflowInformationPanel extends Panel {
                     loadWorkflowInputs();
                 }
             };
-            timer.scheduleRepeating(10000);
+            timer.scheduleRepeating(30000);
 
         } else {
             /*
