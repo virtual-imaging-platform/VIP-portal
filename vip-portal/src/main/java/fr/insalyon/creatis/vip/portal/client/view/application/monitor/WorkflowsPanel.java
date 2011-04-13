@@ -53,6 +53,7 @@ import com.gwtext.client.widgets.grid.GridPanel;
 import com.gwtext.client.widgets.grid.GroupingView;
 import com.gwtext.client.widgets.grid.event.GridRowListenerAdapter;
 import com.gwtextux.client.data.PagingMemoryProxy;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.portal.client.bean.Workflow;
 import fr.insalyon.creatis.vip.portal.client.view.common.panel.monitor.AbstractWorkflowsPanel;
 import fr.insalyon.creatis.vip.portal.client.view.common.RowNumberingColumnConfigAdapter;
@@ -112,7 +113,7 @@ public class WorkflowsPanel extends AbstractWorkflowsPanel {
 
         BaseColumnConfig[] columns = new BaseColumnConfig[]{
             new RowNumberingColumnConfigAdapter(30),
-            getIcoStatusColumnConfig(), 
+            getIcoStatusColumnConfig(),
             new ColumnConfig("Application", "application", 180, true, null, "application"),
             new ColumnConfig("Status", "majorstatus", 70, true),
             new ColumnConfig("Simulation ID", "workflowID", 120, true),
@@ -133,13 +134,13 @@ public class WorkflowsPanel extends AbstractWorkflowsPanel {
         gridView.setGroupTextTpl("{[values.rs[0].data[\"majorstatus\"]]}");
         grid.setView(gridView);
         grid.setAnimCollapse(true);
-        
+
         grid.addGridRowListener(new GridRowListenerAdapter() {
 
             @Override
             public void onRowClick(GridPanel grid, int rowIndex, EventObject e) {
                 Record record = grid.getStore().getRecordAt(rowIndex);
-                openTab(record.getAsString("workflowID"), 
+                openTab(record.getAsString("workflowID"),
                         record.getAsString("majorstatus"),
                         record.getAsString("subdate"));
             }
@@ -172,15 +173,30 @@ public class WorkflowsPanel extends AbstractWorkflowsPanel {
      * @param result List of Workflows
      */
     protected void parseResult(List<Workflow> result) {
-        Object[][] data = new Object[result.size()][6];
+        int size = 0;
+        if (Context.getInstance().getAuthentication().isAdmin("Administrator")) {
+            size = result.size();
+        } else {
+            for (Workflow w : result) {
+                if (!w.getMajorStatus().equals("Cleaned")) {
+                    size++;
+                }
+            }
+        }
+        Object[][] data = new Object[size][6];
+        int j = 0;
         for (int i = 0; i < result.size(); i++) {
             Workflow w = result.get(i);
-            data[i][0] = w.getMajorStatus();
-            data[i][1] = w.getApplication();
-            data[i][2] = w.getMajorStatus();
-            data[i][3] = w.getWorkflowID();
-            data[i][4] = w.getUserName();
-            data[i][5] = w.getDate();
+            if (!w.getMajorStatus().equals("Cleaned") ||
+                    Context.getInstance().getAuthentication().isAdmin("Administrator")) {
+                data[j][0] = w.getMajorStatus();
+                data[j][1] = w.getApplication();
+                data[j][2] = w.getMajorStatus();
+                data[j][3] = w.getWorkflowID();
+                data[j][4] = w.getUserName();
+                data[j][5] = w.getDate();
+                j++;
+            }
         }
         PagingMemoryProxy proxy = new PagingMemoryProxy(data);
         store.setDataProxy(proxy);
