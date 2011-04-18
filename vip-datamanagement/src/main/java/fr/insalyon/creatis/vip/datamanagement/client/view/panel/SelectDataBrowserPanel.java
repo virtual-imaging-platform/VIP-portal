@@ -39,7 +39,6 @@ import com.gwtext.client.data.Record;
 import com.gwtext.client.widgets.form.TextField;
 import com.gwtext.client.widgets.grid.GridPanel;
 import com.gwtext.client.widgets.grid.event.GridRowListenerAdapter;
-import fr.insalyon.creatis.vip.datamanagement.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanagement.client.view.window.SelectDataPathWindow;
 
 /**
@@ -72,7 +71,7 @@ public class SelectDataBrowserPanel extends AbstractBrowserPanel {
                 String parentDir = pathCB.getValue();
                 if (record.getAsString("typeico").equals("Folder")) {
                     String clickedFolderName = record.getAsString("fileName");
-                    loadData(parentDir + "/" + clickedFolderName, true);
+                    loadData(parentDir + "/" + clickedFolderName, true, false);
                 } else {
                     SelectDataPathWindow window = SelectDataPathWindow.getInstance();
                     TextField tf = (TextField) window.getFieldSet().findByID(window.getRefID());

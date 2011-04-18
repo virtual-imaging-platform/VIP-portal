@@ -95,7 +95,7 @@ public class CreateFolderWindow extends Window {
 
                     public void onSuccess(Void result) {
                         Ext.get("dm-browser-panel").unmask();
-                        DataManagerBrowserPanel.getInstance().loadData(baseDir, false);
+                        DataManagerBrowserPanel.getInstance().loadData(baseDir, false, true);
                     }
                 };
                 String text = textField.getText();

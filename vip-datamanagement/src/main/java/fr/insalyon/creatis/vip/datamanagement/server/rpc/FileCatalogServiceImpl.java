@@ -50,7 +50,7 @@ import java.util.List;
  */
 public class FileCatalogServiceImpl extends RemoteServiceServlet implements FileCatalogService {
 
-    public List<Data> listDir(String user, String proxyFileName, String baseDir) {
+    public List<Data> listDir(String user, String proxyFileName, String baseDir, boolean refresh) {
         try {
             VletAgentClient client = new VletAgentClient(
                     ServerConfiguration.getInstance().getVletagentHost(),
@@ -58,7 +58,7 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
                     proxyFileName);
 
             List<String> list = client.getFilesAndFoldersList(
-                    DataManagerUtil.parseBaseDir(user, baseDir));
+                    DataManagerUtil.parseBaseDir(user, baseDir), refresh);
 
             List<Data> dataList = new ArrayList<Data>();
             for (String d : list) {

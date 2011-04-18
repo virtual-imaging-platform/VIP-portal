@@ -4,7 +4,7 @@
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip-datamanager</artifactId>
     <packaging>jar</packaging>
-    <version>0.1</version>
+    <version>0.2</version>
     <properties>
         <gwt.version>2.0.4</gwt.version>
         <gwt.ext.version>2.0.6</gwt.ext.version>

@@ -140,7 +140,7 @@ public class BrowserActionsMenu extends Menu {
 
                                             public void onSuccess(Void result) {
                                                 Ext.get("dm-browser-panel").unmask();
-                                                DataManagerBrowserPanel.getInstance().loadData(parentDir, false);
+                                                DataManagerBrowserPanel.getInstance().loadData(parentDir, false, true);
                                             }
                                         };
                                         Context context = Context.getInstance();

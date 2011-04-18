@@ -82,7 +82,7 @@ public class DataManagerBrowserPanel extends AbstractBrowserPanel {
                 if (record.getAsString("typeico").equals("Folder")) {
                     String clickedFolderName = record.getAsString("fileName");
                     String parentDir = pathCB.getValue();
-                    loadData(parentDir + "/" + clickedFolderName, true);
+                    loadData(parentDir + "/" + clickedFolderName, true, false);
                 }
             }
 

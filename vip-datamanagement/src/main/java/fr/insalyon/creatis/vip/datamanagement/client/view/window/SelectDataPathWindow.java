@@ -41,7 +41,6 @@ import com.gwtext.client.widgets.form.FieldSet;
 import com.gwtext.client.widgets.layout.BorderLayout;
 import com.gwtext.client.widgets.layout.BorderLayoutData;
 import com.gwtext.client.widgets.layout.FitLayout;
-import fr.insalyon.creatis.vip.datamanagement.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanagement.client.view.panel.SelectDataBrowserPanel;
 
 /**

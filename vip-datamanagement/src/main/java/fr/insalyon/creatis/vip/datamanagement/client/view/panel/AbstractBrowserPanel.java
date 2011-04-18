@@ -169,7 +169,7 @@ public abstract class AbstractBrowserPanel extends Panel {
                 String path = pathCB.getValue();
 
                 if (path != null && !path.isEmpty()) {
-                    loadData(pathCB.getValue(), false);
+                    loadData(pathCB.getValue(), false, false);
                 }
             }
         });
@@ -186,7 +186,7 @@ public abstract class AbstractBrowserPanel extends Panel {
                     if (newPath.isEmpty()) {
                         newPath = DataManagerConstants.ROOT;
                     }
-                    loadData(newPath, false);
+                    loadData(newPath, false, false);
                 }
             }
         });
@@ -200,7 +200,7 @@ public abstract class AbstractBrowserPanel extends Panel {
             public void onClick(Button button, EventObject e) {
                 String selectedPath = pathCB.getValue();
                 if (!selectedPath.equals(DataManagerConstants.ROOT)) {
-                    loadData(selectedPath, false);
+                    loadData(selectedPath, false, true);
                 }
             }
         });
@@ -218,8 +218,9 @@ public abstract class AbstractBrowserPanel extends Panel {
      * 
      * @param baseDir
      * @param newPath
+     * @param refresh 
      */
-    public void loadData(String baseDir, boolean newPath) {
+    public void loadData(String baseDir, boolean newPath, boolean refresh) {
 
         Record[] records = pathCB.getStore().getRecords();
         Object[][] data;
@@ -273,7 +274,7 @@ public abstract class AbstractBrowserPanel extends Panel {
                 }
             };
             Authentication auth = Context.getInstance().getAuthentication();
-            service.listDir(auth.getUser(), auth.getProxyFileName(), baseDir, callback);
+            service.listDir(auth.getUser(), auth.getProxyFileName(), baseDir, refresh, callback);
 
         } else {
             PagingMemoryProxy proxy = new PagingMemoryProxy(getRootData());
