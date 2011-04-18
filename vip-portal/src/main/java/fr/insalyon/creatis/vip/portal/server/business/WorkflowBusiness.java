@@ -88,7 +88,8 @@ public class WorkflowBusiness {
                     ServerConfiguration.getInstance().getVletagentPort(),
                     proxyFileName);
 
-            String workflowPath = client.getRemoteFile(uri.getPath(), new File("").getAbsolutePath() + "/workflows");
+            String workflowPath = client.getRemoteFile(uri.getPath(),
+                    System.getenv("HOME") + "/.platform/workflows");
 
             if (workflowPath.endsWith(".gwendia")) {
                 return new GwendiaParser().parse(workflowPath).getSources();
@@ -236,6 +237,11 @@ public class WorkflowBusiness {
         }
     }
 
+    /**
+     * 
+     * @param workflowID
+     * @throws BusinessException
+     */
     public void purge(String workflowID) throws BusinessException {
 
         try {
