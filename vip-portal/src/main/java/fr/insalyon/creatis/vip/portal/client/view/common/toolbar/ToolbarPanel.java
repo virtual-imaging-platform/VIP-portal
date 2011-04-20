@@ -38,6 +38,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.gwtext.client.widgets.MessageBox;
 import com.gwtext.client.widgets.Toolbar;
 import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.datamanagement.client.toolbar.DataManagerToolbarButton;
 import fr.insalyon.creatis.vip.portal.client.bean.AppClass;
 import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationServiceAsync;
@@ -65,12 +66,12 @@ public class ToolbarPanel extends AbstractPanel {
         toolbar.setHeight(25);
 
         // Home Menu
-        toolbar.addButton(new HomeToolbarButton("VIP Platform"));
+        toolbar.addButton(new HomeToolbarButton("VIP"));
         toolbar.addSeparator();
 
         // Data Management Menu
         if (Context.getInstance().getAuthentication().isProxyValid()) {
-            toolbar.addButton(new DataManagerToolbarButton("File Transfer"));
+            toolbar.addButton(new DataManagerToolbarButton());
             toolbar.addSeparator();
         }
 

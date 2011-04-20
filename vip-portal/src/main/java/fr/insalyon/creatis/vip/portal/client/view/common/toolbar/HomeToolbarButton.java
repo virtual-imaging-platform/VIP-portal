@@ -36,17 +36,22 @@ package fr.insalyon.creatis.vip.portal.client.view.common.toolbar;
 
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.widgets.Button;
-import com.gwtext.client.widgets.ToolbarButton;
+import com.gwtext.client.widgets.ToolbarMenuButton;
 import com.gwtext.client.widgets.event.ButtonListenerAdapter;
+import com.gwtext.client.widgets.menu.BaseItem;
+import com.gwtext.client.widgets.menu.Item;
+import com.gwtext.client.widgets.menu.Menu;
+import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
 import fr.insalyon.creatis.vip.portal.client.view.main.MainCenterPanel;
 import fr.insalyon.creatis.vip.portal.client.view.main.MainLeftPanel;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.portal.client.view.main.DocumentationLeftPanel;
 
 /**
  *
  * @author Rafael Silva
  */
-public class HomeToolbarButton extends ToolbarButton {
+public class HomeToolbarButton extends ToolbarMenuButton {
 
     public HomeToolbarButton(String title) {
 
@@ -61,5 +66,23 @@ public class HomeToolbarButton extends ToolbarButton {
                 layout.setLeftPanel(new MainLeftPanel());
             }
         });
+
+        Menu homeMenu = new Menu();
+        homeMenu.setShadow(true);
+        homeMenu.setMinWidth(10);
+
+        Item documentationItem = new Item("Documentation", new BaseItemListenerAdapter() {
+
+            @Override
+            public void onClick(BaseItem item, EventObject e) {
+                Layout layout = Layout.getInstance();
+                layout.setLeftPanel(new DocumentationLeftPanel());
+//                layout.setCenterPanel(new DocumentationCenterPanel("home"));
+            }
+        });
+        documentationItem.setDisabled(true);
+        homeMenu.addItem(documentationItem);
+
+        this.setMenu(homeMenu);
     }
 }

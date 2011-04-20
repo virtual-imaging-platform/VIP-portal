@@ -32,29 +32,25 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.portal.client.view.common.toolbar;
 
-import com.gwtext.client.core.EventObject;
-import com.gwtext.client.widgets.Button;
-import com.gwtext.client.widgets.ToolbarButton;
-import com.gwtext.client.widgets.event.ButtonListenerAdapter;
-import fr.insalyon.creatis.vip.datamanagement.client.view.window.DataManagerWindow;
+package fr.insalyon.creatis.vip.portal.client.view.main;
+
+import com.google.gwt.user.client.ui.Frame;
+import com.gwtext.client.widgets.Panel;
+import com.gwtext.client.widgets.layout.FitLayout;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DataManagerToolbarButton extends ToolbarButton {
+public class DocumentationCenterPanel extends Panel {
 
-    public DataManagerToolbarButton(String title) {
-        super(title);
+    public DocumentationCenterPanel(String docName) {
+        this.setTitle("Documentation");
+        this.setPaddings(5, 5, 5, 5);
+        this.setLayout(new FitLayout());
 
-        this.addListener(new ButtonListenerAdapter() {
-
-            @Override
-            public void onClick(Button button, EventObject e) {
-                DataManagerWindow.getInstance().display();
-            }
-        });
+        Frame frame = new Frame("./docs/" + docName + ".html");
+        this.add(frame);
     }
 }
