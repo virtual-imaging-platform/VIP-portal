@@ -52,6 +52,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowServiceAsync;
+import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -63,11 +64,13 @@ import java.util.Map;
  */
 public class LaunchStackSection extends SectionStackSection {
 
+    private String applicationClass;
     private String simulationName;
     private DynamicForm form;
 
-    public LaunchStackSection() {
+    public LaunchStackSection(String applicationClass) {
 
+        this.applicationClass = applicationClass;
         this.setShowHeader(false);
 
         VLayout vLayout = new VLayout();
@@ -198,6 +201,10 @@ public class LaunchStackSection extends SectionStackSection {
                     });
                     iForm.setFields(launchButton);
                     form.addChild(iForm);
+                    
+                    LaunchTab launchTab = (LaunchTab) Layout.getInstance().
+                            getTab("launch-" + applicationClass.toLowerCase() + "-tab");
+                    launchTab.enableSaveButton();
 
                 } else {
                     SC.warn("Unable to download application source file.");
@@ -318,7 +325,12 @@ public class LaunchStackSection extends SectionStackSection {
                 simulationName, context.getProxyFileName(), callback);
     }
 
-    private Map<String, String> getParametersMap() {
+    /**
+     * Gets a map of parameters.
+     * 
+     * @return Map of parameters
+     */
+    public Map<String, String> getParametersMap() {
 
         Map<String, String> paramsMap = new HashMap<String, String>();
 
@@ -331,12 +343,12 @@ public class LaunchStackSection extends SectionStackSection {
 
                 if (((SelectItem) f.getField(name + "-sel-l")).getValueAsString().equals("List")) {
                     paramsMap.put(title,
-                            ((TextItem) f.getField(name + "-list-l")).getValueAsString().trim());
+                            ((TextItem) f.getField(name + "-list-l")).getValueAsString());
                 } else {
                     paramsMap.put(title,
-                            ((TextItem) f.getField(name + "-start-l")).getValueAsString().trim() + "##"
-                            + ((TextItem) f.getField(name + "-stop-l")).getValueAsString().trim() + "##"
-                            + ((TextItem) f.getField(name + "-step-l")).getValueAsString().trim());
+                            ((TextItem) f.getField(name + "-start-l")).getValueAsString() + "##"
+                            + ((TextItem) f.getField(name + "-stop-l")).getValueAsString() + "##"
+                            + ((TextItem) f.getField(name + "-step-l")).getValueAsString());
                 }
             }
         }

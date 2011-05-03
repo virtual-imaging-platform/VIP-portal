@@ -55,6 +55,7 @@ public class LaunchToolStrip extends ToolStrip {
 
     private String applicationClass;
     private SelectItem simulatorItem;
+    private ToolStripButton saveInputButton;
 
     public LaunchToolStrip(final String applicationClass) {
 
@@ -79,10 +80,35 @@ public class LaunchToolStrip extends ToolStrip {
             }
         });
         this.addButton(createButton);
+        
+        saveInputButton = new ToolStripButton("Save Inputs");
+        saveInputButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                
+                LaunchTab launchTab = (LaunchTab) Layout.getInstance().
+                            getTab("launch-" + applicationClass.toLowerCase() + "-tab");
+                new SaveInputWindow(applicationClass, simulatorItem.getValueAsString(), 
+                        launchTab.getParametersMap()).show();
+            }
+        });
+        saveInputButton.setDisabled(true);
+        this.addSeparator();
+        this.addButton(saveInputButton);
 
         loadData();
     }
+    
+    /**
+     * Activates the save input's button
+     */
+    public void enableSaveInputButton() {
+        saveInputButton.setDisabled(false);
+    }
 
+    /**
+     * 
+     */
     private void loadData() {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {

@@ -38,6 +38,7 @@ import com.smartgwt.client.types.VisibilityMode;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+import java.util.Map;
 
 /**
  *
@@ -46,6 +47,8 @@ import com.smartgwt.client.widgets.tab.Tab;
 public class LaunchTab extends Tab {
 
     private LaunchStackSection launchSection;
+    private LaunchToolStrip launchToolStrip;
+    private InputsStackSection inputsSection;
 
     public LaunchTab(String applicationClass) {
 
@@ -54,8 +57,10 @@ public class LaunchTab extends Tab {
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
 
+        launchToolStrip = new LaunchToolStrip(applicationClass);
+                
         VLayout vLayout = new VLayout();
-        vLayout.addMember(new LaunchToolStrip(applicationClass));
+        vLayout.addMember(launchToolStrip);
         vLayout.setWidth100();
         vLayout.setHeight100();
 
@@ -63,8 +68,8 @@ public class LaunchTab extends Tab {
         sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
         sectionStack.setAnimateSections(true);
 
-        launchSection = new LaunchStackSection();
-        InputsStackSection inputsSection = new InputsStackSection(applicationClass);
+        launchSection = new LaunchStackSection(applicationClass);
+        inputsSection = new InputsStackSection(applicationClass);
 
         sectionStack.setSections(launchSection, inputsSection);
         vLayout.addMember(sectionStack);
@@ -78,5 +83,17 @@ public class LaunchTab extends Tab {
     
     public void loadInput(String values) {
         launchSection.loadInput(values);
+    }
+    
+    public Map<String, String> getParametersMap() {
+        return launchSection.getParametersMap();
+    }
+    
+    public void enableSaveButton() {
+        launchToolStrip.enableSaveInputButton();
+    }
+    
+    public void loadInputsList() {
+        inputsSection.loadData();
     }
 }

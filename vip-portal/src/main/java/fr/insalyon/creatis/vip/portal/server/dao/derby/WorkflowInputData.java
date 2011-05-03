@@ -97,7 +97,7 @@ public class WorkflowInputData implements WorkflowInputDAO {
             PreparedStatement stat = connection.prepareStatement("SELECT "
                     + "application, name, inputs "
                     + "FROM WorkflowInput WHERE username=? "
-                    + "ORDER BY application");
+                    + "ORDER BY application, name");
 
             stat.setString(1, user);
             ResultSet rs = stat.executeQuery();

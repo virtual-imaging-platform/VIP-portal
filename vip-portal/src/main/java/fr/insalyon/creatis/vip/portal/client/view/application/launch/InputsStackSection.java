@@ -45,9 +45,13 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.events.DoubleClickEvent;
+import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
+import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -184,9 +188,15 @@ public class InputsStackSection extends SectionStackSection {
         grid.setDetailField("values");
         grid.setSortField("application");
         grid.setSortDirection(SortDirection.ASCENDING);
+        grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
+
+            public void onCellDoubleClick(CellDoubleClickEvent event) {
+                grid.expandRecord(event.getRecord());
+            }
+        });
     }
 
-    private void loadData() {
+    public void loadData() {
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         AsyncCallback<List<WorkflowInput>> callback = new AsyncCallback<List<WorkflowInput>>() {
 

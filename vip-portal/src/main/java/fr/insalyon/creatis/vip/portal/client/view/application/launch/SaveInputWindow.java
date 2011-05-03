@@ -35,18 +35,19 @@
 package fr.insalyon.creatis.vip.portal.client.view.application.launch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.gwtext.client.core.EventObject;
-import com.gwtext.client.widgets.Button;
-import com.gwtext.client.widgets.MessageBox;
-import com.gwtext.client.widgets.Window;
-import com.gwtext.client.widgets.event.ButtonListenerAdapter;
-import com.gwtext.client.widgets.form.FormPanel;
-import com.gwtext.client.widgets.form.TextField;
-import com.gwtext.client.widgets.layout.FitLayout;
+import com.smartgwt.client.types.VerticalAlignment;
+import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Window;
+import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.ButtonItem;
+import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
+import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.portal.client.bean.WorkflowInput;
 import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowServiceAsync;
+import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
 import java.util.Map;
 
 /**
@@ -55,72 +56,76 @@ import java.util.Map;
  */
 public class SaveInputWindow extends Window {
 
-    private TextField name;
+    private DynamicForm form;
+    private TextItem nameItem;
 
-    public SaveInputWindow(final String appName, final Map<String, String> parametersMap) {
+    public SaveInputWindow(final String applicationClass, final String appName,
+            final Map<String, String> parametersMap) {
 
-        this.setTitle("Save Inputs");
+        this.setTitle("Save Inputs for " + appName);
         this.setWidth(350);
         this.setHeight(110);
-        this.setClosable(true);
-        this.setLayout(new FitLayout());
+        this.setShowMinimizeButton(false);
+        this.setIsModal(true);
+        this.setShowModalMask(true);
+        this.centerInPage();
 
-        FormPanel formPanel = new FormPanel();
-        formPanel.setWidth(340);
-        formPanel.setLabelWidth(100);
-        formPanel.setPaddings(10, 5, 5, 5);
+        form = new DynamicForm();
+        form.setHeight100();
+        form.setWidth100();
+        form.setPadding(5);
+        form.setLayoutAlign(VerticalAlignment.BOTTOM);
 
-        name = new TextField("Experiment Name", "name", 200);
-        name.setAllowBlank(false);
-        formPanel.add(name);
+        nameItem = new TextItem("name", "Name");
+        nameItem.setRequired(true);
+        nameItem.setWidth(200);
 
-        Button save = new Button("Save", new ButtonListenerAdapter() {
+        ButtonItem saveButton = new ButtonItem("saveButton", "Save");
+        saveButton.setWidth(60);
+        saveButton.addClickHandler(new ClickHandler() {
 
-            @Override
-            public void onClick(Button button, EventObject e) {
-                if (name.getText().equals("")) {
-                    MessageBox.alert("Error", "An experiment name is required.");
-                    return;
-                }
+            public void onClick(ClickEvent event) {
 
-                StringBuffer sb = new StringBuffer();
-                for (String k : parametersMap.keySet()) {
-                    sb.append(k + "=" + parametersMap.get(k) + "--");
-                }
-
-                WorkflowInput wi = new WorkflowInput(appName, name.getText(), sb.toString());
-
-                WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-                final AsyncCallback<String> callback = new AsyncCallback<String>() {
-
-                    public void onFailure(Throwable caught) {
-                        MessageBox.alert("Error", "Error while saving simulation inputs: " + caught.getMessage());
-                    }
-
-                    public void onSuccess(String result) {
-                        if (!result.contains("Error:")) {
-                            close();
+                if (form.validate()) {
+                    StringBuilder sb = new StringBuilder();
+                    for (String k : parametersMap.keySet()) {
+                        sb.append(k);
+                        sb.append("=");
+                        String value = parametersMap.get(k);
+                        if (value == null) {
+                            value = "";
+                        } else if (value.contains("null")) {
+                            value = value.replaceAll("null", "");
                         }
-                        MessageBox.alert(result);
+                        sb.append(value);
+                        sb.append("--");
                     }
-                };
-                service.addWorkflowInput(
-                        Context.getInstance().getAuthentication().getUserDN(),
-                        wi, callback);
+
+                    WorkflowInput wi = new WorkflowInput(appName,
+                            nameItem.getValueAsString(), sb.toString());
+
+                    WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+                    final AsyncCallback<String> callback = new AsyncCallback<String>() {
+
+                        public void onFailure(Throwable caught) {
+                            SC.warn("Error while saving simulation inputs: " + caught.getMessage());
+                        }
+
+                        public void onSuccess(String result) {
+                            if (!result.contains("Error:")) {
+                                LaunchTab launchTab = (LaunchTab) Layout.getInstance().
+                                        getTab("launch-" + applicationClass.toLowerCase() + "-tab");
+                                launchTab.loadInputsList();
+                                destroy();
+                            }
+                            SC.warn(result);
+                        }
+                    };
+                    service.addWorkflowInput(Context.getInstance().getUserDN(), wi, callback);
+                }
             }
         });
-        formPanel.addButton(save);
-
-        Button cancel = new Button("Cancel", new ButtonListenerAdapter() {
-
-            @Override
-            public void onClick(Button button, EventObject e) {
-                close();
-            }
-        });
-        formPanel.addButton(cancel);
-
-        this.add(formPanel);
-        this.show();
+        form.setFields(nameItem, saveButton);
+        this.addItem(form);
     }
 }

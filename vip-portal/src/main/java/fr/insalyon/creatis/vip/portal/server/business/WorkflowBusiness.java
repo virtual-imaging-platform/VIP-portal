@@ -149,10 +149,10 @@ public class WorkflowBusiness {
                 } else if (valuesStr.contains("@@")) {
                     String[] values = valuesStr.split("@@");
                     for (String v : values) {
-                        ps.addValue(DataManagerUtil.parseBaseDir(user, v));
+                        ps.addValue(DataManagerUtil.parseBaseDir(user, v.trim()));
                     }
                 } else {
-                    ps.addValue(DataManagerUtil.parseBaseDir(user, valuesStr));
+                    ps.addValue(DataManagerUtil.parseBaseDir(user, valuesStr.trim()));
                 }
                 parameters.add(ps);
             }
