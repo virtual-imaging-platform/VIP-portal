@@ -59,6 +59,22 @@ public class Context {
 
     private Context() {
     }
+    
+    public boolean isSystemAdmin() {
+        return authentication.isAdmin("Administrator");
+    }
+    
+    public String getUser() {
+        return authentication.getUser();
+    }
+    
+    public String getUserDN() {
+        return authentication.getUserDN();
+    }
+    
+    public String getProxyFileName() {
+        return authentication.getProxyFileName();
+    }
 
     public Authentication getAuthentication() {
         return authentication;
