@@ -32,31 +32,51 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.portal.client.view.layout;
+package fr.insalyon.creatis.vip.portal.client.view.application.launch;
 
-import com.gwtext.client.widgets.Panel;
-import com.gwtext.client.widgets.Toolbar;
-import com.gwtext.client.widgets.ToolbarTextItem;
-import fr.insalyon.creatis.vip.common.client.view.Context;
+import com.smartgwt.client.types.VisibilityMode;
+import com.smartgwt.client.widgets.layout.SectionStack;
+import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.tab.Tab;
 
 /**
  *
  * @author Rafael Silva
  */
-public class BottomPanel extends Panel {
+public class LaunchTab extends Tab {
 
-    public BottomPanel() {
-        this.setHeight(20);
-        this.setBodyStyle("background-color:#CCCCCC");
+    private LaunchStackSection launchSection;
 
-        Toolbar toolbar = new Toolbar();
-        toolbar.addItem(new ToolbarTextItem("Authenticated as : "
-                + Context.getInstance().getAuthentication().getUser()
-                + " / " + Context.getInstance().getAuthentication().getOrganization()));
+    public LaunchTab(String applicationClass) {
 
-        toolbar.addFill();
-        toolbar.addItem(new ToolbarTextItem("v0.2"));
+        this.setTitle("Launch " + applicationClass);
+        this.setID("launch-" + applicationClass.toLowerCase() + "-tab");
+        this.setCanClose(true);
+        this.setAttribute("paneMargin", 0);
 
-        this.setBottomToolbar(toolbar);
+        VLayout vLayout = new VLayout();
+        vLayout.addMember(new LaunchToolStrip(applicationClass));
+        vLayout.setWidth100();
+        vLayout.setHeight100();
+
+        SectionStack sectionStack = new SectionStack();
+        sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
+        sectionStack.setAnimateSections(true);
+
+        launchSection = new LaunchStackSection();
+        InputsStackSection inputsSection = new InputsStackSection(applicationClass);
+
+        sectionStack.setSections(launchSection, inputsSection);
+        vLayout.addMember(sectionStack);
+
+        this.setPane(vLayout);
+    }
+    
+    public void createSimulation(String simulationName) {
+        launchSection.load(simulationName);
+    }
+    
+    public void loadInput(String values) {
+        launchSection.loadInput(values);
     }
 }

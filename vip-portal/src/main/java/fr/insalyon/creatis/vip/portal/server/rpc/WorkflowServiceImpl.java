@@ -127,29 +127,16 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
     }
 
     @Override
-    public List<String> getLogDir(String baseDir) {
-        List<String> dirsList = new ArrayList<String>();
-
-        File workflowDir = new File(ServerConfiguration.getInstance().getWorkflowsPath()
+    public List<String> getLogs(String baseDir) {
+        List<String> list = new ArrayList<String>();
+        
+        File folder = new File(ServerConfiguration.getInstance().getWorkflowsPath()
                 + "/" + baseDir);
-
-        for (File d : workflowDir.listFiles()) {
-            if (d.isDirectory()) {
-                dirsList.add(d.getName());
-            }
-        }
-
-        return dirsList;
-    }
-
-    public List<String> getLogFiles(String baseDir) {
-        List<String> filesList = new ArrayList<String>();
-
-        File workflowDir = new File(ServerConfiguration.getInstance().getWorkflowsPath()
-                + "/" + baseDir);
-
-        for (File f : workflowDir.listFiles()) {
-            if (!f.isDirectory()) {
+        
+        for (File f : folder.listFiles()) {
+            if (f.isDirectory()) {
+                list.add(f.getName() + "-#-Folder");
+            } else {
                 String fileSize = f.length() + "";
                 if (f.length() >= 1024) {
                     if (f.length() / 1024 >= 1024) {
@@ -159,15 +146,13 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
                     }
                 }
                 String info = f.getName() + "##" + fileSize
-                        + "##" + new Date(f.lastModified()) + "##"
-                        + baseDir;
-                filesList.add(info);
+                        + "##" + new Date(f.lastModified());
+                list.add(info + "-#-File");
             }
         }
-
-        return filesList;
+        return list;
     }
-
+    
     public List<String> getWorkflowSources(String user, String proxyFileName, String workflowName) {
 
         try {       
@@ -205,6 +190,14 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         }
     }
 
+    public List<WorkflowInput> getWorkflowsInputByUser(String user) {
+        try {
+            return DAOFactory.getDAOFactory().getWorkflowInputDAO().getWorkflowInputByUser(user);
+        } catch (DAOException ex) {
+            return null;
+        }
+    }
+    
     public List<WorkflowInput> getWorkflowsInputByUserAndAppName(String user, String appName) {
         try {
             return DAOFactory.getDAOFactory().getWorkflowInputDAO().getWorkflowInputByUserAndAppName(user, appName);

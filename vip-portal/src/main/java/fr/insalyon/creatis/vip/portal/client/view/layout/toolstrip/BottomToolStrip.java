@@ -32,42 +32,34 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.portal.client;
 
-import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
-import fr.insalyon.creatis.vip.portal.client.bean.Configuration;
-import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationService;
-import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationServiceAsync;
+package fr.insalyon.creatis.vip.portal.client.view.layout.toolstrip;
+
+import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import fr.insalyon.creatis.vip.common.client.bean.Authentication;
 import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
 
 /**
  *
  * @author Rafael Silva
  */
-public class Main implements EntryPoint {
+public class BottomToolStrip extends ToolStrip {
 
-    public void onModuleLoad() {
-        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<Configuration> callback = new AsyncCallback<Configuration>() {
-
-            public void onFailure(Throwable caught) {
-                SC.warn("Error executing get user\n" + caught.getMessage());
-            }
-
-            public void onSuccess(Configuration result) {
-                Context context = Context.getInstance();
-                context.setAuthentication(result.getAuthentication());
-                context.setQuickstartURL(result.getQuickstartURL());
-                context.setMoteurServerHost(result.getMoteurServerHost());
-                context.setLfcHost(result.getLfcHost());
-                context.setLfcPort(result.getLfcPort());
-
-                Layout.getInstance();
-            }
-        };
-        service.loadConfiguration(callback);
+    public BottomToolStrip() {
+        this.setWidth100();
+        this.setPadding(2);
+        
+        Authentication auth = Context.getInstance().getAuthentication();
+        Label authLabel = new Label("Authenticated as: " + auth.getUser() 
+                + " / " + auth.getOrganization());
+        authLabel.setWidth(300);
+        this.addMember(authLabel);
+        
+        this.addFill();
+        Label version = new Label("v0.3");
+        version.setAlign(Alignment.RIGHT);
+        this.addMember(version);
     }
 }

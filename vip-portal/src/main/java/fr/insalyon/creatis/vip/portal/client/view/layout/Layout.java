@@ -35,16 +35,14 @@
 package fr.insalyon.creatis.vip.portal.client.view.layout;
 
 import fr.insalyon.creatis.vip.portal.client.view.common.toolbar.ToolbarPanel;
-import com.gwtext.client.core.Margins;
-import com.gwtext.client.core.RegionPosition;
 import com.gwtext.client.widgets.Component;
 import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.TabPanel;
-import com.gwtext.client.widgets.Viewport;
-import com.gwtext.client.widgets.layout.AccordionLayout;
-import com.gwtext.client.widgets.layout.BorderLayout;
-import com.gwtext.client.widgets.layout.BorderLayoutData;
-import com.gwtext.client.widgets.layout.FitLayout;
+import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.portal.client.view.layout.toolstrip.BottomToolStrip;
+import fr.insalyon.creatis.vip.portal.client.view.layout.toolstrip.MainToolStrip;
 
 /**
  *
@@ -53,6 +51,7 @@ import com.gwtext.client.widgets.layout.FitLayout;
 public class Layout {
 
     private static Layout instance;
+    private CenterTabSet centerTabSet;
     private Panel leftPanel;
     private ToolbarPanel toolbarPanel;
     private TabPanel centerPanel;
@@ -66,52 +65,38 @@ public class Layout {
 
     private Layout() {
 
-        Panel borderPanel = new Panel();
-        borderPanel.setLayout(new BorderLayout());
+        VLayout vLayout = new VLayout();
+        vLayout.setWidth100();
+        vLayout.setHeight100();
 
-        // Toolbar
-        toolbarPanel = new ToolbarPanel();
-        borderPanel.add(toolbarPanel, new BorderLayoutData(RegionPosition.NORTH));
+        vLayout.addMember(new MainToolStrip());
 
-        // Bottom Panel
-        BorderLayoutData bottomData = new BorderLayoutData(RegionPosition.SOUTH);
-        bottomData.setMinSize(20);
-        bottomData.setMaxSize(20);
-        bottomData.setMargins(new Margins(0, 0, 0, 0));
-        bottomData.setSplit(true);
-        borderPanel.add(new BottomPanel(), bottomData);
+        HLayout hLayout = new HLayout();
+        hLayout.setWidth100();
+        hLayout.setHeight100();
 
-        // Center Panel
-        centerPanel = new TabPanel();
-        centerPanel.setEnableTabScroll(true);
-        centerPanel.setMargins(0, 0, 0, 0);
-        centerPanel.add(new Panel());
-        borderPanel.add(centerPanel, new BorderLayoutData(RegionPosition.CENTER));
+        centerTabSet = CenterTabSet.getInstance();
+        hLayout.addMember(centerTabSet);
 
-        // Left Panel
-        BorderLayoutData westData = new BorderLayoutData(RegionPosition.WEST);
-        westData.setSplit(true);
-        westData.setMinSize(175);
-        westData.setMaxSize(400);
-        westData.setMinHeight(150);
-        westData.setMargins(new Margins(0, 0, 0, 0));
+        vLayout.addMember(hLayout);
+        vLayout.addMember(new BottomToolStrip());
 
-        leftPanel = new Panel();
-        leftPanel.setCollapsible(true);
-        leftPanel.setCollapsed(true);
-        leftPanel.setWidth(200);
-        leftPanel.setMargins(0, 0, 0, 0);
-        leftPanel.setTitle("VIP Platform");
-        leftPanel.setLayout(new AccordionLayout(true));
-        borderPanel.add(leftPanel, westData);
+        vLayout.draw();
+    }
 
-        Panel panel = new Panel();
-        panel.setBorder(false);
-        panel.setPaddings(0);
-        panel.setLayout(new FitLayout());
-        panel.setHeight("100%");
-        panel.add(borderPanel);
-        new Viewport(panel);
+    public void addCenterTab(Tab tab) {
+        if (centerTabSet.getTab(tab.getID()) == null) {
+            centerTabSet.addTab(tab);
+        }
+        centerTabSet.selectTab(tab.getID());
+    }
+    
+    public void setActiveCenterTab(String id) {
+        centerTabSet.selectTab(id);
+    }
+    
+    public Tab getTab(String id) {
+        return centerTabSet.getTab(id);
     }
 
     public void setLeftPanel(AbstractLeftPanel panel) {

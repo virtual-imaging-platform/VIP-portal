@@ -95,13 +95,18 @@ public class ConfigurationBusiness {
                         proxyFileName = myproxy.getProxy(user.getCanonicalName(), userDN);
 
                         // Voms
-                        VomsClientConf.getInstance().setUserKeyPath(proxyFileName);
-                        VomsClientConf.getInstance().setUserCertPath(proxyFileName);
-                        VomsProxyCredential vpc = new VomsProxyCredential();
-                        GlobusCredential proxy = vpc.getCredential(
-                                "", proxyFileName, "biomed", 31536000, 86400);
-                        OutputStream out = new FileOutputStream(new File(proxyFileName));
-                        proxy.save(out);
+//                        String command = "voms-proxy-init --voms biomed -cert "
+//                                + proxyFileName + " -key " + proxyFileName
+//                                + " -out " + proxyFileName;
+//                        Process process = Runtime.getRuntime().exec(command);
+//                        process.waitFor();
+//                        VomsClientConf.getInstance().setUserKeyPath(proxyFileName);
+//                        VomsClientConf.getInstance().setUserCertPath(proxyFileName);
+//                        VomsProxyCredential vpc = new VomsProxyCredential();
+//                        GlobusCredential proxy = vpc.getCredential(
+//                                "", proxyFileName, "biomed", 31536000, 86400);
+//                        OutputStream out = new FileOutputStream(new File(proxyFileName));
+//                        proxy.save(out);
 
                         // Authentication
                         authentication = new Authentication(
@@ -109,27 +114,28 @@ public class ConfigurationBusiness {
                                 userDN, user.getGroups(), proxyFileName, true);
 
                         // User's folder
-                        VletAgentClient client = new VletAgentClient(
-                                ServerConfiguration.getInstance().getVletagentHost(),
-                                ServerConfiguration.getInstance().getVletagentPort(),
-                                proxyFileName);
+//                        VletAgentClient client = new VletAgentClient(
+//                                ServerConfiguration.getInstance().getVletagentHost(),
+//                                ServerConfiguration.getInstance().getVletagentPort(),
+//                                proxyFileName);
+//
+//                        client.createDirectory(conf.getDataManagerUsersHome(),
+//                                user.getCanonicalName().replace(" ", "_").toLowerCase());
+//                        client.createDirectory(conf.getDataManagerUsersHome(),
+//                                DataManagerConstants.PUBLIC_HOME);
 
-                        client.createDirectory(conf.getDataManagerUsersHome(),
-                                user.getCanonicalName().replace(" ", "_").toLowerCase());
-                        client.createDirectory(conf.getDataManagerUsersHome(),
-                                DataManagerConstants.PUBLIC_HOME);
                     } catch (BusinessException ex) {
                         authentication = new Authentication(
                                 user.getCanonicalName(), user.getOrganizationUnit(),
                                 userDN, new HashMap(), "", false);
 
-                    } catch (VletAgentClientException ex) {
-                        if (!ex.getMessage().contains("ERROR: File/Directory exists or Directory is not empty")) {
-                            throw new BusinessException(ex);
-                        }
-                    } catch (VomsClientException ex) {
-                        throw new BusinessException(ex);
-                    } catch (IOException ex) {
+//                    } catch (VletAgentClientException ex) {
+//                        if (!ex.getMessage().contains("ERROR: File/Directory exists or Directory is not empty")) {
+//                            throw new BusinessException(ex);
+//                        }
+//                    } catch (IOException ex) {
+//                        throw new BusinessException(ex);
+                    } catch (Exception ex) {
                         throw new BusinessException(ex);
                     }
                 } else {

@@ -52,10 +52,8 @@ public interface WorkflowServiceAsync {
     public void getApplicationsAndUsersList(String applicationClass, AsyncCallback<List<String>[]> asyncCallback);
 
     public void getWorkflows(String user, String application, String status, Date startDate, Date endDate, AsyncCallback<List<Workflow>> asyncCallback);
-
-    public void getLogDir(String baseDir, AsyncCallback<List<String>> asyncCallback);
-
-    public void getLogFiles(String baseDir, AsyncCallback<List<String>> asyncCallback);
+    
+    public void getLogs(String baseDir, AsyncCallback<List<String>> asyncCallback);
 
     public void getWorkflowSources(String user, String proxyFileName, String workflowName, AsyncCallback<List<String>> asyncCallback);
 
@@ -71,6 +69,8 @@ public interface WorkflowServiceAsync {
 
     public void cleanWorkflow(String workflowID, String userDN, String proxyFileName, AsyncCallback<Void> asyncCallback);
 
+    public void getWorkflowsInputByUser(String user, AsyncCallback<List<WorkflowInput>> asyncCallback);
+    
     public void getWorkflowsInputByUserAndAppName(String user, String appName, AsyncCallback<List<WorkflowInput>> asyncCallback);
 
     public void getWorkflowInputByUserAndName(String user, String inputName, AsyncCallback<WorkflowInput> asyncCallback);

@@ -78,10 +78,8 @@ public interface WorkflowService extends RemoteService {
     public String getFileURL(String baseDir, String fileName);
 
     public List<String>[] getApplicationsAndUsersList(String applicationClass);
-
-    public List<String> getLogDir(String baseDir);
-
-    public List<String> getLogFiles(String baseDir);
+    
+    public List<String> getLogs(String baseDir);
 
     public List<String> getWorkflowSources(String user, String proxyFileName, String workflowName);
 
@@ -89,6 +87,8 @@ public interface WorkflowService extends RemoteService {
 
     public String launchWorkflow(String user, Map<String, String> parameters, String workflowName, String proxyFileName);
 
+    public List<WorkflowInput> getWorkflowsInputByUser(String user);
+    
     public List<WorkflowInput> getWorkflowsInputByUserAndAppName(String user, String appName);
 
     public String addWorkflowInput(String user, WorkflowInput workflowInput);

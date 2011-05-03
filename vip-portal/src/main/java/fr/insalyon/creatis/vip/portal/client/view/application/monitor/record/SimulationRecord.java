@@ -32,42 +32,75 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.portal.client;
+package fr.insalyon.creatis.vip.portal.client.view.application.monitor.record;
 
-import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
-import fr.insalyon.creatis.vip.portal.client.bean.Configuration;
-import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationService;
-import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationServiceAsync;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
  *
  * @author Rafael Silva
  */
-public class Main implements EntryPoint {
+public class SimulationRecord extends ListGridRecord {
 
-    public void onModuleLoad() {
-        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<Configuration> callback = new AsyncCallback<Configuration>() {
+    public SimulationRecord() {
+    }
 
-            public void onFailure(Throwable caught) {
-                SC.warn("Error executing get user\n" + caught.getMessage());
-            }
+    public SimulationRecord(String application, String status,
+            String simulationId, String user, String date) {
+        
+        setStatusIco(status);
+        setApplication(application);
+        setStatus(status);
+        setSimulationId(simulationId);
+        setUser(user);
+        setDate(date);
+    }
 
-            public void onSuccess(Configuration result) {
-                Context context = Context.getInstance();
-                context.setAuthentication(result.getAuthentication());
-                context.setQuickstartURL(result.getQuickstartURL());
-                context.setMoteurServerHost(result.getMoteurServerHost());
-                context.setLfcHost(result.getLfcHost());
-                context.setLfcPort(result.getLfcPort());
+    public void setStatusIco(String status) {
+        setAttribute("statusIco", "ico_" + status.toLowerCase());
+    }
+    
+    public String getStatusIco() {
+        return getAttributeAsString("statusIco");
+    }
 
-                Layout.getInstance();
-            }
-        };
-        service.loadConfiguration(callback);
+    public void setApplication(String application) {
+        setAttribute("application", application);
+    }
+    
+    public String getApplication() {
+        return getAttributeAsString("application");
+    }
+
+    public void setStatus(String status) {
+        setAttribute("status", status);
+    }
+    
+    public String getStatus() {
+        return getAttributeAsString("status");
+    }
+
+    public void setSimulationId(String simulationId) {
+        setAttribute("simulationId", simulationId);
+    }
+    
+    public String getSimulationId() {
+        return getAttributeAsString("simulationId");
+    }
+
+    public void setUser(String user) {
+        setAttribute("user", user);
+    }
+    
+    public String getUser() {
+        return getAttributeAsString("user");
+    }
+
+    public void setDate(String date) {
+        setAttribute("date", date);
+    }
+    
+    public String getDate() {
+        return getAttributeAsString("date");
     }
 }

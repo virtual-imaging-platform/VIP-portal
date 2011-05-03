@@ -63,9 +63,9 @@ import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.portal.client.view.application.monitor.MonitorLeftPanel;
-import fr.insalyon.creatis.vip.portal.client.view.application.monitor.WorkflowPanel;
-import fr.insalyon.creatis.vip.portal.client.view.application.monitor.WorkflowsPanel;
+//import fr.insalyon.creatis.vip.portal.client.view.application.monitor.MonitorLeftPanel;
+//import fr.insalyon.creatis.vip.portal.client.view.application.monitor.WorkflowPanel;
+//import fr.insalyon.creatis.vip.portal.client.view.application.monitor.WorkflowsPanel;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.datamanagement.client.view.window.SelectDataPathWindow;
 import java.util.ArrayList;
@@ -129,7 +129,7 @@ public class LaunchPanel extends Panel {
 
             @Override
             public void onClick(Button button, EventObject e) {
-                new LoadInputWindow(workflowName, instance);
+//                new LoadInputWindow(workflowName, instance);
             }
         });
         toolbar.addButton(loadButton);
@@ -439,15 +439,15 @@ public class LaunchPanel extends Panel {
                 if (layout.hasCenterPanelTab("app-workflows-panel")) {
                     layout.setActiveCenterPanel("app-workflows-panel");
                 } else {
-                    WorkflowsPanel panel = WorkflowsPanel.getInstance();
-                    layout.setCenterPanel(panel);
-                    panel.setApplicationClass(applicationClass);
-                    panel.loadWorkflowData();
+//                    WorkflowsPanel panel = WorkflowsPanel.getInstance();
+//                    layout.setCenterPanel(panel);
+//                    panel.setApplicationClass(applicationClass);
+//                    panel.loadWorkflowData();
                 }
-                MonitorLeftPanel monitorLeftPanel = MonitorLeftPanel.getInstance();
-                monitorLeftPanel.setApplicationClass(applicationClass);
-                layout.setLeftPanel(monitorLeftPanel);
-                layout.addCenterPanel(new WorkflowPanel(workflowID, "Running"));
+//                MonitorLeftPanel monitorLeftPanel = MonitorLeftPanel.getInstance();
+//                monitorLeftPanel.setApplicationClass(applicationClass);
+//                layout.setLeftPanel(monitorLeftPanel);
+//                layout.addCenterPanel(new WorkflowPanel(workflowID, "Running"));
             }
         };
         Ext.get("launch-panel-" + panelId).mask("Launching simulation...");

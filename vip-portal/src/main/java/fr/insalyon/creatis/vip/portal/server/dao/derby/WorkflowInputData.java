@@ -91,6 +91,31 @@ public class WorkflowInputData implements WorkflowInputDAO {
         }
     }
 
+    public List<WorkflowInput> getWorkflowInputByUser(String user) throws DAOException {
+        try {
+            List<WorkflowInput> inputs = new ArrayList<WorkflowInput>();
+            PreparedStatement stat = connection.prepareStatement("SELECT "
+                    + "application, name, inputs "
+                    + "FROM WorkflowInput WHERE username=? "
+                    + "ORDER BY application");
+
+            stat.setString(1, user);
+            ResultSet rs = stat.executeQuery();
+
+            while (rs.next()) {
+                inputs.add(new WorkflowInput(
+                        rs.getString("application"),
+                        rs.getString("name"),
+                        rs.getString("inputs")));
+            }
+
+            return inputs;
+
+        } catch (SQLException ex) {
+            throw new DAOException(ex);
+        }
+    }
+
     public List<WorkflowInput> getWorkflowInputByUserAndAppName(String user, String appName) {
         try {
             List<WorkflowInput> inputs = new ArrayList<WorkflowInput>();

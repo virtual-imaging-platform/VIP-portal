@@ -42,10 +42,10 @@ import com.gwtext.client.widgets.menu.Item;
 import com.gwtext.client.widgets.menu.Menu;
 import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.portal.client.view.application.launch.LaunchLeftPanel;
+//import fr.insalyon.creatis.vip.portal.client.view.application.launch.LaunchLeftPanel;
 import fr.insalyon.creatis.vip.portal.client.view.application.manage.ManageCenterPanel;
-import fr.insalyon.creatis.vip.portal.client.view.application.monitor.MonitorLeftPanel;
-import fr.insalyon.creatis.vip.portal.client.view.application.monitor.WorkflowsPanel;
+//import fr.insalyon.creatis.vip.portal.client.view.application.monitor.MonitorLeftPanel;
+//import fr.insalyon.creatis.vip.portal.client.view.application.monitor.WorkflowsPanel;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 
 /**
@@ -66,9 +66,9 @@ public class ApplicationToolbarButton extends ToolbarButton {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                LaunchLeftPanel launchLeftPanel = LaunchLeftPanel.getInstance();
-                launchLeftPanel.setApplicationClass(applicationClass);
-                Layout.getInstance().setLeftPanel(launchLeftPanel);
+//                LaunchLeftPanel launchLeftPanel = LaunchLeftPanel.getInstance();
+//                launchLweftPanel.setApplicationClass(applicationClass);
+//                Layout.getInstance().setLeftPanel(launchLeftPanel);
             }
         });
         if (!Context.getInstance().getAuthentication().isProxyValid()) {
@@ -83,22 +83,22 @@ public class ApplicationToolbarButton extends ToolbarButton {
                 Layout layout = Layout.getInstance();
                 if (layout.hasCenterPanelTab("app-workflows-panel")) {
                     layout.setActiveCenterPanel("app-workflows-panel");
-                    WorkflowsPanel.getInstance().reloadData();
+//                    WorkflowsPanel.getInstance().reloadData();
                 } else {
-                    WorkflowsPanel panel = WorkflowsPanel.getInstance();
-                    layout.setCenterPanel(panel);
-                    panel.setApplicationClass(applicationClass);
-                    if (isAdmin) {
-                        panel.loadWorkflowData();
-                    } else {
-                        String user = Context.getInstance().getAuthentication().getUser();
-                        panel.loadWorkflowData(user, null, null, null, null);
-                    }
+//                    WorkflowsPanel panel = WorkflowsPanel.getInstance();
+//                    layout.setCenterPanel(panel);
+//                    panel.setApplicationClass(applicationClass);
+//                    if (isAdmin) {
+//                        panel.loadWorkflowData();
+//                    } else {
+//                        String user = Context.getInstance().getAuthentication().getUser();
+//                        panel.loadWorkflowData(user, null, null, null, null);
+//                    }
                 }
                 Ext.get("app-workflows-grid").mask("Loading data...");
-                MonitorLeftPanel monitorLeftPanel = MonitorLeftPanel.getInstance();
-                monitorLeftPanel.setApplicationClass(applicationClass);
-                layout.setLeftPanel(monitorLeftPanel);
+//                MonitorLeftPanel monitorLeftPanel = MonitorLeftPanel.getInstance();
+//                monitorLeftPanel.setApplicationClass(applicationClass);
+//                layout.setLeftPanel(monitorLeftPanel);
             }
         });
         applicationMenu.addItem(monitorApplicationItem);

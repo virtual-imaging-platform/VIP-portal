@@ -32,42 +32,36 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.portal.client;
+package fr.insalyon.creatis.vip.portal.client.view.layout;
 
-import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
-import fr.insalyon.creatis.vip.portal.client.bean.Configuration;
-import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationService;
-import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationServiceAsync;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
+import com.smartgwt.client.types.VisibilityMode;
+import com.smartgwt.client.widgets.layout.SectionStack;
+import com.smartgwt.client.widgets.layout.SectionStackSection;
 
 /**
  *
  * @author Rafael Silva
  */
-public class Main implements EntryPoint {
+public class LeftSectionStack extends SectionStack {
 
-    public void onModuleLoad() {
-        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<Configuration> callback = new AsyncCallback<Configuration>() {
+    private static LeftSectionStack instance;
 
-            public void onFailure(Throwable caught) {
-                SC.warn("Error executing get user\n" + caught.getMessage());
-            }
+    public static LeftSectionStack getInstance() {
+        if (instance == null) {
+            instance = new LeftSectionStack();
+        }
+        return instance;
+    }
 
-            public void onSuccess(Configuration result) {
-                Context context = Context.getInstance();
-                context.setAuthentication(result.getAuthentication());
-                context.setQuickstartURL(result.getQuickstartURL());
-                context.setMoteurServerHost(result.getMoteurServerHost());
-                context.setLfcHost(result.getLfcHost());
-                context.setLfcPort(result.getLfcPort());
+    private LeftSectionStack() {
+        this.setWidth(200);
+        this.setShowResizeBar(true);
+        this.setVisibilityMode(VisibilityMode.MULTIPLE);
+        this.setAnimateSections(true);
 
-                Layout.getInstance();
-            }
-        };
-        service.loadConfiguration(callback);
+        SectionStackSection vipSection = new SectionStackSection("VIP");
+        vipSection.setExpanded(true);
+
+        this.setSections(vipSection);
     }
 }

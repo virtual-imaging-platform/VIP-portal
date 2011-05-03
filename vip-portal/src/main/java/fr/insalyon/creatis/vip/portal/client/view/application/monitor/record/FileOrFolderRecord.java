@@ -32,61 +32,29 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.portal.client.view.application.monitor;
+package fr.insalyon.creatis.vip.portal.client.view.application.monitor.record;
 
-import com.google.gwt.user.client.Timer;
-import com.gwtext.client.widgets.Panel;
-import com.gwtext.client.widgets.Toolbar;
-import com.gwtext.client.widgets.ToolbarTextItem;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import java.util.Date;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DiagramPanel extends Panel {
-
-    private ToolbarTextItem lastUpdateItem;
-    private Timer timer;
-    private String workflowID;
-
-    public DiagramPanel(String workflowID, boolean completed) {
-
-        this.workflowID = workflowID;
-
-        this.setTitle("Workflow diagram");
-        this.setAutoScroll(true);
-        this.setHtml("<img src=\"" + Context.getInstance().getMoteurServerHost() + "/workflows/" + workflowID + "/html/workflow-image.png\" />");
-
-        Toolbar topToolbar = new Toolbar();
-        topToolbar.addFill();
-        lastUpdateItem = new ToolbarTextItem("Last updated on " + new Date());
-        topToolbar.addItem(lastUpdateItem);
-        this.setTopToolbar(topToolbar);
-
-        timer = new Timer() {
-
-            public void run() {
-                updateImage();
-            }
-        };
-        if (!completed) {
-            timer.scheduleRepeating(30000);
-        }
+public class FileOrFolderRecord extends ListGridRecord {
+    
+    public FileOrFolderRecord() {
     }
-
-    private void updateImage() {
-        lastUpdateItem.setText("Last updated on " + new Date());
-        this.setHtml("");
-        this.doLayout();
-        this.setHtml("<img src=\"" + Context.getInstance().getMoteurServerHost() + "/workflows/" + workflowID + "/html/workflow-image.png\" />");
-        this.doLayout();
+    
+    public FileOrFolderRecord(String name, String type, String baseDir) {
+        this(name, type, baseDir, "", "");
     }
-
-    @Override
-    protected void onDestroy() {
-        timer.cancel();
-        super.destroy();
+    
+    public FileOrFolderRecord(String name, String type, String baseDir, String size, String date) {
+        
+        setAttribute("icon", "icon-" + type);
+        setAttribute("name", name);
+        setAttribute("size", size);
+        setAttribute("lastModified", date);
+        setAttribute("baseDir", baseDir);
     }
 }

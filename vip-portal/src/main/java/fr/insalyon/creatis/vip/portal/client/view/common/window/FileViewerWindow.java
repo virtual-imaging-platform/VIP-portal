@@ -32,42 +32,69 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.portal.client;
+package fr.insalyon.creatis.vip.portal.client.view.common.window;
 
-import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
-import fr.insalyon.creatis.vip.portal.client.bean.Configuration;
-import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationService;
-import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationServiceAsync;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
+import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.Window;
+import fr.insalyon.creatis.vip.portal.client.rpc.JobService;
+import fr.insalyon.creatis.vip.portal.client.rpc.JobServiceAsync;
 
 /**
  *
  * @author Rafael Silva
  */
-public class Main implements EntryPoint {
+public class FileViewerWindow extends Window {
 
-    public void onModuleLoad() {
-        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<Configuration> callback = new AsyncCallback<Configuration>() {
+    private Label label;
+    private String simulationID;
+    private String folder;
+    private String fileName;
+    private String extension;
+    
+    public FileViewerWindow(String title, String simulationID, String folder, 
+            String fileName, String extension) {
+        
+        this.simulationID = simulationID;
+        this.folder = folder;
+        this.fileName = fileName;
+        this.extension = extension;
+        
+        this.setTitle(title);
+        this.setCanDragReposition(true);
+        this.setCanDragResize(true);
+        this.setWidth(700);
+        this.setHeight(450);
+        this.centerInPage();
+        
+        label = new Label();
+        label.setWidth100();
+        label.setHeight100();
+        label.setPadding(5);
+        label.setValign(VerticalAlignment.TOP);
+        
+        this.addItem(label);
+        
+        loadFile();
+    }
+    
+    private void loadFile() {
+        JobServiceAsync service = JobService.Util.getInstance();
+        final AsyncCallback<String> callback = new AsyncCallback<String>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get user\n" + caught.getMessage());
+                SC.warn("Error executing get jobs list: " + caught.getMessage());
             }
 
-            public void onSuccess(Configuration result) {
-                Context context = Context.getInstance();
-                context.setAuthentication(result.getAuthentication());
-                context.setQuickstartURL(result.getQuickstartURL());
-                context.setMoteurServerHost(result.getMoteurServerHost());
-                context.setLfcHost(result.getLfcHost());
-                context.setLfcPort(result.getLfcPort());
-
-                Layout.getInstance();
+            public void onSuccess(String result) {
+                label.setContents(result
+                        .replaceAll("<", "&lt;")
+                        .replaceAll(">", "&gt;")
+                        .replaceAll("\n", "<br />"));
             }
         };
-        service.loadConfiguration(callback);
+        service.getFile(simulationID, folder, fileName, extension, callback);
     }
 }

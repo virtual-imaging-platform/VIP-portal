@@ -32,42 +32,35 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.portal.client;
+package fr.insalyon.creatis.vip.portal.client.view.application.monitor;
 
-import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
-import fr.insalyon.creatis.vip.portal.client.bean.Configuration;
-import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationService;
-import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationServiceAsync;
-import fr.insalyon.creatis.vip.common.client.view.Context;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
 
 /**
  *
  * @author Rafael Silva
  */
-public class Main implements EntryPoint {
+public class SimulationsToolStrip extends ToolStrip {
 
-    public void onModuleLoad() {
-        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<Configuration> callback = new AsyncCallback<Configuration>() {
+    public SimulationsToolStrip() {
+        
+        this.setWidth100();
+        
+        ToolStripButton refreshButton = new ToolStripButton();
+        refreshButton.setIcon("icon-refresh.gif");
+        refreshButton.setTitle("Refresh");
+        refreshButton.addClickHandler(new ClickHandler() {
 
-            public void onFailure(Throwable caught) {
-                SC.warn("Error executing get user\n" + caught.getMessage());
+            public void onClick(ClickEvent event) {
+                SimulationsTab simulationsTab = (SimulationsTab) Layout.getInstance().getTab("simulations-tab");
+                simulationsTab.loadData();
             }
-
-            public void onSuccess(Configuration result) {
-                Context context = Context.getInstance();
-                context.setAuthentication(result.getAuthentication());
-                context.setQuickstartURL(result.getQuickstartURL());
-                context.setMoteurServerHost(result.getMoteurServerHost());
-                context.setLfcHost(result.getLfcHost());
-                context.setLfcPort(result.getLfcPort());
-
-                Layout.getInstance();
-            }
-        };
-        service.loadConfiguration(callback);
+        });
+        
+        this.addButton(refreshButton);
     }
 }

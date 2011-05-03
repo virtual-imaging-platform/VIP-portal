@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+    
     <display-name>VIP-Platform</display-name>
+    
+    <!-- Common Module -->
+    <servlet>
+        <servlet-name>GetFileService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.common.server.rpc.GetFileServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetFileService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/getfileservice</url-pattern>
+    </servlet-mapping>
+    <!-- End Common Module -->
+    
     <servlet>
         <servlet-name>WorkflowService</servlet-name>
         <servlet-class>fr.insalyon.creatis.vip.portal.server.rpc.WorkflowServiceImpl</servlet-class>
@@ -57,7 +70,7 @@
         <servlet-name>TissueService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/tissueservice</url-pattern>
     </servlet-mapping>
-
+   
     <!-- DataManagement Module -->
     <servlet>
         <servlet-name>FileCatalogService</servlet-name>

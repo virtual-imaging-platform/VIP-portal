@@ -6,6 +6,8 @@
 
     <!-- Inherit the core Web Toolkit stuff.-->
     <inherits name="com.google.gwt.user.User" />
+    <!-- Inherit the SmartGWT Toolkit library configuration.-->
+    <inherits name="com.smartgwt.SmartGwt"/>
     <!-- Inherit the GWTExt Toolkit library configuration.-->
     <inherits name="com.gwtext.GwtExt" />
 
@@ -33,8 +35,8 @@
     <servlet class="fr.insalyon.creatis.vip.portal.server.rpc.ApplicationServiceImpl" path="/applicationservice"/>
     <servlet class="fr.insalyon.creatis.vip.portal.server.rpc.GatelabServiceImpl" path="/gatelabservice"/>
 
-    <stylesheet src="js/ext/resources/css/ext-all.css" />
-    <stylesheet src="js/ext/resources/css/xtheme-gray.css" />
+    <!--stylesheet src="js/ext/resources/css/ext-all.css" />
+    <stylesheet src="js/ext/resources/css/xtheme-gray.css" /-->
     <script src="js/ext/adapter/yui/yui-utilities.js" />
     <script src="js/ext/adapter/yui/ext-yui-adapter.js" />
     <script src="js/ext/adapter/ext/ext-base.js" />

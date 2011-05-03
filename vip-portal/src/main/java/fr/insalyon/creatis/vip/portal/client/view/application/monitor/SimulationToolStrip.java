@@ -32,42 +32,38 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.portal.client;
+package fr.insalyon.creatis.vip.portal.client.view.application.monitor;
 
-import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
-import fr.insalyon.creatis.vip.portal.client.bean.Configuration;
-import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationService;
-import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationServiceAsync;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
+import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
+import java.util.Date;
 
 /**
  *
  * @author Rafael Silva
  */
-public class Main implements EntryPoint {
+public class SimulationToolStrip extends ToolStrip {
 
-    public void onModuleLoad() {
-        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<Configuration> callback = new AsyncCallback<Configuration>() {
+    private Label lastUpdated;
 
-            public void onFailure(Throwable caught) {
-                SC.warn("Error executing get user\n" + caught.getMessage());
-            }
+    public SimulationToolStrip(String simulationID) {
+        this.setWidth100();
+        this.setPadding(2);
 
-            public void onSuccess(Configuration result) {
-                Context context = Context.getInstance();
-                context.setAuthentication(result.getAuthentication());
-                context.setQuickstartURL(result.getQuickstartURL());
-                context.setMoteurServerHost(result.getMoteurServerHost());
-                context.setLfcHost(result.getLfcHost());
-                context.setLfcPort(result.getLfcPort());
+        ToolStripMenuButton logsButton = new LogsMenuButton(simulationID);
+        this.addMenuButton(logsButton);
 
-                Layout.getInstance();
-            }
-        };
-        service.loadConfiguration(callback);
+        this.addFill();
+        lastUpdated = new Label();
+        lastUpdated.setWidth(300);
+        lastUpdated.setAlign(Alignment.RIGHT);
+        this.updateDate();
+        this.addMember(lastUpdated);
+    }
+
+    public void updateDate() {
+        this.lastUpdated.setContents("Last updated on " + new Date());
     }
 }

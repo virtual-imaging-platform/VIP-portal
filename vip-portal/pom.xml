@@ -5,7 +5,7 @@
     <name>VIP-Portal</name>
     <artifactId>vip-portal</artifactId>
     <packaging>war</packaging>
-    <version>0.2</version>
+    <version>0.3</version>
     <properties>
         <runTarget>index.html</runTarget>
         <netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>
@@ -141,13 +141,13 @@
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-common</artifactId>
-            <version>0.2</version>
+            <version>0.3</version>
         </dependency>
 
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-datamanager</artifactId>
-            <version>0.2</version>
+            <version>0.3</version>
         </dependency>
         <!-- END VIP MODULES -->
 
@@ -160,7 +160,7 @@
                 <version>2.3.2</version>
                 <configuration>
                     <source>1.5</source>
-                    <target>1.5</target>
+                     <target>1.5</target>
                 </configuration>
             </plugin>
             <plugin>

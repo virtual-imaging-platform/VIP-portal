@@ -42,7 +42,7 @@ import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
 import com.gwtext.client.widgets.ToolbarButton;
 import com.gwtext.client.core.Ext;
 import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.portal.client.view.application.launch.LaunchLeftPanel;
+//import fr.insalyon.creatis.vip.portal.client.view.application.launch.LaunchLeftPanel;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.portal.client.view.gatelab.GatelabLeftPanel;
 import fr.insalyon.creatis.vip.portal.client.view.gatelab.WorkflowsPanel;
@@ -85,9 +85,9 @@ public class GatelabToolbarButton extends ToolbarButton {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                LaunchLeftPanel launchLeftPanel = LaunchLeftPanel.getInstance();
-                launchLeftPanel.setApplicationClass("GATE");
-                Layout.getInstance().setLeftPanel(launchLeftPanel);
+//                LaunchLeftPanel launchLeftPanel = LaunchLeftPanel.getInstance();
+//                launchLeftPanel.setApplicationClass("GATE");
+//                Layout.getInstance().setLeftPanel(launchLeftPanel);
             }
         });
         if (!Context.getInstance().getAuthentication().isProxyValid()) {

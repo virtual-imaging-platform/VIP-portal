@@ -48,6 +48,8 @@ public interface WorkflowInputDAO {
 
     public void removeWorkflowInput(String user, String inputName);
 
+    public List<WorkflowInput> getWorkflowInputByUser(String user) throws DAOException;
+    
     public List<WorkflowInput> getWorkflowInputByUserAndAppName(String user, String appName);
 
     public WorkflowInput getWorkflowInputByUserAndName(String user, String name);

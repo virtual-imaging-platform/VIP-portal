@@ -32,58 +32,22 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.portal.client.view.application.monitor;
+package fr.insalyon.creatis.vip.portal.client.view.application.launch;
 
-import com.gwtext.client.widgets.Panel;
-import fr.insalyon.creatis.vip.portal.client.view.common.panel.monitor.AbstractWorkflowPanel;
-import fr.insalyon.creatis.vip.portal.client.view.common.panel.monitor.CompletedJobsSummaryPanel;
-import fr.insalyon.creatis.vip.portal.client.view.common.panel.monitor.JobsPanel;
-import fr.insalyon.creatis.vip.portal.client.view.common.panel.monitor.RunningJobsSummaryPanel;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
  *
  * @author Rafael Silva
  */
-public class WorkflowPanel extends AbstractWorkflowPanel {
+public class InputRecord extends ListGridRecord {
 
-    private Panel diagramPanel;
-    private Panel jobsSummaryPanel;
-    private Panel jobsPanel;
-    private Panel chartsPanel;
-    private Panel logsPanel;
-
-    public WorkflowPanel(String workflowID, String workflowStatus) {
-
-        super(workflowID, workflowStatus);
-
-        if (completed) {
-            jobsSummaryPanel = new CompletedJobsSummaryPanel(workflowID);
-            tabPanel.add(jobsSummaryPanel);
-
-        } else {
-            jobsSummaryPanel = new RunningJobsSummaryPanel(workflowID);
-            tabPanel.add(jobsSummaryPanel);
-        }
-
-        jobsPanel = new JobsPanel(workflowID, completed);
-        tabPanel.add(jobsPanel);
-
-        diagramPanel = new DiagramPanel(workflowID, completed);
-        tabPanel.add(diagramPanel);
-
-        chartsPanel = new ChartsPanel(workflowID);
-        tabPanel.add(chartsPanel);
-
-        logsPanel = new LogsPanel(workflowID);
-        tabPanel.add(logsPanel);
+    public InputRecord() {
     }
 
-    @Override
-    protected void onDestroy() {
-
-        super.onDestroy();
-        diagramPanel.destroy();
-        jobsSummaryPanel.destroy();
-        jobsPanel.destroy();
+    public InputRecord(String application, String name, String values) {
+        setAttribute("application", application);
+        setAttribute("name", name);
+        setAttribute("values", values);
     }
 }

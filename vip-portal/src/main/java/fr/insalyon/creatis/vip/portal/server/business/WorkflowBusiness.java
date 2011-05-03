@@ -159,7 +159,7 @@ public class WorkflowBusiness {
 
             WorkflowDescriptor wd = DAOFactory.getDAOFactory().getApplicationDAO().getApplication(workflowName);
             String lfnPath = wd.getLfn().substring(wd.getLfn().lastIndexOf("/") + 1);
-            String workflowPath = new File("").getAbsolutePath() + "/workflows/" + new File(lfnPath).getName();
+            String workflowPath = System.getenv("HOME") + "/.platform/workflows/" + new File(lfnPath).getName();
 
             WorkflowMoteurConfig moteur = new WorkflowMoteurConfig(ServerConfiguration.getInstance().getMoteurServer(), workflowPath, parameters);
             moteur.setSettings(settings);

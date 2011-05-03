@@ -32,42 +32,47 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.portal.client;
+package fr.insalyon.creatis.vip.portal.client.view.application;
 
-import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
-import fr.insalyon.creatis.vip.portal.client.bean.Configuration;
-import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationService;
-import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationServiceAsync;
-import fr.insalyon.creatis.vip.common.client.view.Context;
+import com.smartgwt.client.widgets.menu.Menu;
+import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.events.ClickHandler;
+import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
+import fr.insalyon.creatis.vip.portal.client.view.application.launch.LaunchTab;
+import fr.insalyon.creatis.vip.portal.client.view.application.monitor.SimulationsTab;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
 
 /**
  *
  * @author Rafael Silva
  */
-public class Main implements EntryPoint {
+public class ApplicationMenuButton extends ToolStripMenuButton {
 
-    public void onModuleLoad() {
-        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<Configuration> callback = new AsyncCallback<Configuration>() {
+    public ApplicationMenuButton() {
+        this.setTitle("Application");
+        
+        Menu menu = new Menu();
+        menu.setShowShadow(true);
+        menu.setShadowDepth(3);
+        
+        MenuItem launchItem = new MenuItem("Launch Application");
+        launchItem.addClickHandler(new ClickHandler() {
 
-            public void onFailure(Throwable caught) {
-                SC.warn("Error executing get user\n" + caught.getMessage());
+            public void onClick(MenuItemClickEvent event) {
+                Layout.getInstance().addCenterTab(new LaunchTab("Simulation"));
             }
+        });
+        
+        MenuItem monitorItem = new MenuItem("Monitor Application");
+        monitorItem.addClickHandler(new ClickHandler() {
 
-            public void onSuccess(Configuration result) {
-                Context context = Context.getInstance();
-                context.setAuthentication(result.getAuthentication());
-                context.setQuickstartURL(result.getQuickstartURL());
-                context.setMoteurServerHost(result.getMoteurServerHost());
-                context.setLfcHost(result.getLfcHost());
-                context.setLfcPort(result.getLfcPort());
-
-                Layout.getInstance();
+            public void onClick(MenuItemClickEvent event) {
+                Layout.getInstance().addCenterTab(new SimulationsTab());
             }
-        };
-        service.loadConfiguration(callback);
+        });
+        
+        menu.setItems(launchItem, monitorItem);
+        this.setMenu(menu);
     }
 }

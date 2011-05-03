@@ -32,42 +32,41 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.portal.client;
+package fr.insalyon.creatis.vip.portal.client.view.application.monitor;
 
-import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
-import fr.insalyon.creatis.vip.portal.client.bean.Configuration;
-import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationService;
-import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationServiceAsync;
+import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.widgets.HTMLPane;
+import com.smartgwt.client.widgets.layout.SectionStackSection;
 import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
 
 /**
  *
  * @author Rafael Silva
  */
-public class Main implements EntryPoint {
+public class DiagramStackSection extends SectionStackSection {
 
-    public void onModuleLoad() {
-        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<Configuration> callback = new AsyncCallback<Configuration>() {
-
-            public void onFailure(Throwable caught) {
-                SC.warn("Error executing get user\n" + caught.getMessage());
-            }
-
-            public void onSuccess(Configuration result) {
-                Context context = Context.getInstance();
-                context.setAuthentication(result.getAuthentication());
-                context.setQuickstartURL(result.getQuickstartURL());
-                context.setMoteurServerHost(result.getMoteurServerHost());
-                context.setLfcHost(result.getLfcHost());
-                context.setLfcPort(result.getLfcPort());
-
-                Layout.getInstance();
-            }
-        };
-        service.loadConfiguration(callback);
+    private String simulationID;
+    private HTMLPane htmlPane;
+    
+    public DiagramStackSection(String simulationID, boolean completed) {
+        this.simulationID = simulationID;
+        this.setTitle("Simulation Diagram");
+        this.setCanCollapse(true);
+        this.setExpanded(false);
+        this.setResizeable(true);
+        
+        htmlPane = new HTMLPane();
+        htmlPane.setWidth100();
+        htmlPane.setHeight100();
+        htmlPane.setPadding(10);
+        htmlPane.setOverflow(Overflow.AUTO);
+        loadImage();
+               
+        this.addItem(htmlPane);
+    }
+    
+    public void loadImage() {
+        htmlPane.setContents("<img src=\"" + Context.getInstance().getMoteurServerHost() 
+                + "/workflows/" + simulationID + "/html/workflow-image.png\" />");
     }
 }

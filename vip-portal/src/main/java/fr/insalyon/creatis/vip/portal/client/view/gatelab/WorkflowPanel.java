@@ -36,10 +36,10 @@ package fr.insalyon.creatis.vip.portal.client.view.gatelab;
 
 import com.gwtext.client.widgets.Panel;
 import fr.insalyon.creatis.vip.portal.client.view.common.panel.monitor.AbstractWorkflowPanel;
-import fr.insalyon.creatis.vip.portal.client.view.common.panel.monitor.CompletedJobsSummaryPanel;
-import fr.insalyon.creatis.vip.portal.client.view.common.panel.monitor.RunningJobsSummaryPanel;
-import fr.insalyon.creatis.vip.portal.client.view.common.panel.monitor.JobsPanel;
-import fr.insalyon.creatis.vip.portal.client.view.application.monitor.ChartsPanel;
+//import fr.insalyon.creatis.vip.portal.client.view.common.panel.monitor.CompletedJobsSummaryPanel;
+//import fr.insalyon.creatis.vip.portal.client.view.common.panel.monitor.RunningJobsSummaryPanel;
+//import fr.insalyon.creatis.vip.portal.client.view.common.panel.monitor.JobsPanel;
+//import fr.insalyon.creatis.vip.portal.client.view.application.monitor.ChartsPanel;
 /**
  *
  * @author Ibrahim Kallel, Rafael Silva
@@ -59,21 +59,21 @@ public class WorkflowPanel extends AbstractWorkflowPanel {
         tabPanel.add(workflowinformationPanel);
 
         if (completed) {
-            jobsSummaryPanel = new CompletedJobsSummaryPanel(workflowID);
-            tabPanel.add(jobsSummaryPanel);
+//            jobsSummaryPanel = new CompletedJobsSummaryPanel(workflowID);
+//            tabPanel.add(jobsSummaryPanel);
 
         } else {
-            jobsSummaryPanel = new RunningJobsSummaryPanel(workflowID);
-            tabPanel.add(jobsSummaryPanel);
+//            jobsSummaryPanel = new RunningJobsSummaryPanel(workflowID);
+//            tabPanel.add(jobsSummaryPanel);
         }
 
         
 
-        jobsPanel = new JobsPanel(workflowID, completed);
-        tabPanel.add(jobsPanel);
+//        jobsPanel = new JobsPanel(workflowID, completed);
+//        tabPanel.add(jobsPanel);
 
-        chartPanel = new ChartsPanel(workflowID);
-        tabPanel.add(chartPanel);
+//        chartPanel = new ChartsPanel(workflowID);
+//        tabPanel.add(chartPanel);
 
         
 
@@ -86,7 +86,7 @@ public class WorkflowPanel extends AbstractWorkflowPanel {
         
         super.onDestroy();
         jobsSummaryPanel.destroy();
-        jobsPanel.destroy();
+//        jobsPanel.destroy();
         workflowinformationPanel.destroy();
     }
 }
