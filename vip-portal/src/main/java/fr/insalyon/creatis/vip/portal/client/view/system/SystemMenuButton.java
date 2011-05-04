@@ -32,61 +32,77 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.portal.client.view.application;
+package fr.insalyon.creatis.vip.portal.client.view.system;
 
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
-import fr.insalyon.creatis.vip.portal.client.view.application.launch.LaunchTab;
-import fr.insalyon.creatis.vip.portal.client.view.application.manage.ManageTab;
-import fr.insalyon.creatis.vip.portal.client.view.application.monitor.SimulationsTab;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.portal.client.view.system.application.classes.ManageClassesTab;
+import fr.insalyon.creatis.vip.portal.client.view.system.configuration.group.ManageGroupsTab;
+import fr.insalyon.creatis.vip.portal.client.view.system.configuration.user.ManageUsersTab;
 
 /**
  *
  * @author Rafael Silva
  */
-public class ApplicationMenuButton extends ToolStripMenuButton {
+public class SystemMenuButton extends ToolStripMenuButton {
 
-    public ApplicationMenuButton(final String applicationClass, boolean isGroupAdmin) {
-        this.setTitle(applicationClass);
-        
+    public SystemMenuButton() {
+
+        this.setTitle("System");
         Menu menu = new Menu();
         menu.setShowShadow(true);
         menu.setShadowDepth(3);
-        
-        MenuItem launchItem = new MenuItem("Launch " + applicationClass);
-        launchItem.addClickHandler(new ClickHandler() {
+
+        Menu confSubMenu = new Menu();
+        MenuItem manageUsers = new MenuItem("Manage Users");
+        manageUsers.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new LaunchTab(applicationClass));
+                Layout.getInstance().addTab(new ManageUsersTab());
             }
         });
         
-        MenuItem monitorItem = new MenuItem("Monitor " + applicationClass);
-        monitorItem.addClickHandler(new ClickHandler() {
+        MenuItem manageGroups = new MenuItem("Manage Groups");
+        manageGroups.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new SimulationsTab());
+                Layout.getInstance().addTab(new ManageGroupsTab());
             }
         });
         
-        if (isGroupAdmin) {
-            MenuItem manageItem = new MenuItem("Manage " + applicationClass);
-            manageItem.addClickHandler(new ClickHandler() {
+        confSubMenu.setItems(manageUsers, manageGroups);
+        
+        MenuItem configurationItem = new MenuItem("Configuration");
+        configurationItem.setSubmenu(confSubMenu);
+        
+        Menu appSubMenu = new Menu();
+        MenuItem manageApps = new MenuItem("Manage Applications");
+        manageApps.addClickHandler(new ClickHandler() {
 
-                public void onClick(MenuItemClickEvent event) {
-                    Layout.getInstance().addTab(new ManageTab(applicationClass));
-                }
-            });
-            MenuItemSeparator separator = new MenuItemSeparator();
-            menu.setItems(launchItem, monitorItem, separator, manageItem);
-        } else {
-            menu.setItems(launchItem, monitorItem);
-        }
+            public void onClick(MenuItemClickEvent event) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        });
+        
+        MenuItem manageClasses = new MenuItem("Manage Classes");
+        manageClasses.addClickHandler(new ClickHandler() {
+
+            public void onClick(MenuItemClickEvent event) {
+                Layout.getInstance().addTab(new ManageClassesTab());
+            }
+        });
+        
+        appSubMenu.setItems(manageApps, manageClasses);
+        
+        MenuItem applicationItem = new MenuItem("Applications");
+        applicationItem.setSubmenu(appSubMenu);
+
+        menu.setItems(configurationItem, applicationItem);
+
         this.setMenu(menu);
     }
 }

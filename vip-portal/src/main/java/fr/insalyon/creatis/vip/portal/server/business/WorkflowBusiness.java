@@ -39,7 +39,7 @@ import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.datamanagement.server.DataManagerUtil;
-import fr.insalyon.creatis.vip.portal.client.bean.WorkflowDescriptor;
+import fr.insalyon.creatis.vip.portal.client.bean.Application;
 import fr.insalyon.creatis.vip.portal.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.portal.server.business.simulation.WorkflowMoteurConfig;
 import fr.insalyon.creatis.vip.portal.server.business.simulation.parser.GwendiaParser;
@@ -77,7 +77,7 @@ public class WorkflowBusiness {
             String workflowName) throws BusinessException {
 
         try {
-            WorkflowDescriptor wd = DAOFactory.getDAOFactory().getApplicationDAO().getApplication(workflowName);
+            Application wd = DAOFactory.getDAOFactory().getApplicationDAO().getApplication(workflowName);
             ServerConfiguration conf = ServerConfiguration.getInstance();
             URI uri = new URI("lfn://" + conf.getDataManagerLFCHost()
                     + ":" + conf.getDataManagerLFCPort()
@@ -157,7 +157,7 @@ public class WorkflowBusiness {
                 parameters.add(ps);
             }
 
-            WorkflowDescriptor wd = DAOFactory.getDAOFactory().getApplicationDAO().getApplication(workflowName);
+            Application wd = DAOFactory.getDAOFactory().getApplicationDAO().getApplication(workflowName);
             String lfnPath = wd.getLfn().substring(wd.getLfn().lastIndexOf("/") + 1);
             String workflowPath = System.getenv("HOME") + "/.platform/workflows/" + new File(lfnPath).getName();
 

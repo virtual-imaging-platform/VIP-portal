@@ -34,7 +34,7 @@
  */
 package fr.insalyon.creatis.vip.portal.server.dao.derby;
 
-import fr.insalyon.creatis.vip.portal.client.bean.WorkflowDescriptor;
+import fr.insalyon.creatis.vip.portal.client.bean.Application;
 import fr.insalyon.creatis.vip.portal.server.dao.ApplicationDAO;
 import fr.insalyon.creatis.vip.portal.server.dao.DAOException;
 import fr.insalyon.creatis.vip.portal.server.dao.derby.connection.PlatformConnection;
@@ -57,7 +57,7 @@ public class ApplicationData implements ApplicationDAO {
         connection = PlatformConnection.getInstance().getConnection();
     }
 
-    public String add(WorkflowDescriptor workflowDescriptor) {
+    public String add(Application workflowDescriptor) {
         try {
             PreparedStatement ps = connection.prepareStatement(
                     "INSERT INTO WorkflowDescriptor(name, lfn) "
@@ -80,7 +80,7 @@ public class ApplicationData implements ApplicationDAO {
         return "The application was succesfully saved!";
     }
 
-    public String update(WorkflowDescriptor workflowDescriptor) {
+    public String update(Application workflowDescriptor) {
         try {
             PreparedStatement stat = connection.prepareStatement("UPDATE "
                     + "WorkflowDescriptor "
@@ -120,16 +120,54 @@ public class ApplicationData implements ApplicationDAO {
         }
     }
 
+    public List<Application> getApplications(String applicationClass) throws DAOException {
+        try {
+
+            List<Application> applications = new ArrayList<Application>();
+            PreparedStatement stat = null;
+            if (applicationClass == null) {
+                stat = connection.prepareStatement("SELECT name, lfn FROM "
+                        + "WorkflowDescriptor ORDER BY name");
+            } else {
+                stat = connection.prepareStatement("SELECT name, lfn FROM "
+                        + "WorkflowDescriptor wd, WorkflowClasses wc "
+                        + "WHERE (wc.workflow=wd.name AND class=?)");
+                stat.setString(1, applicationClass);
+            }
+
+            ResultSet rs = stat.executeQuery();
+            while (rs.next()) {
+                String name = rs.getString("name");
+                PreparedStatement stat2 = connection.prepareStatement("SELECT "
+                        + "class FROM WorkflowClasses WHERE workflow=?");
+                stat2.setString(1, name);
+                
+                List<String> classes = new ArrayList<String>();
+                ResultSet rs2 = stat2.executeQuery();
+                while (rs2.next()) {
+                    classes.add(rs2.getString("class"));
+                }
+                
+                applications.add(new Application(name, 
+                        rs.getString("lfn"), classes));
+            }
+            return applications;
+
+        } catch (SQLException ex) {
+            throw new DAOException(ex);
+        }
+    }
+    
     public List<String> getApplicationsName(String applicationClass) {
         try {
 
             List<String> applications = new ArrayList<String>();
             PreparedStatement stat = null;
             if (applicationClass == null) {
-                stat = connection.prepareStatement("SELECT name FROM "
+                stat = connection.prepareStatement("SELECT name, lfn FROM "
                         + "WorkflowDescriptor ORDER BY name");
             } else {
-                stat = connection.prepareStatement("SELECT name FROM "
+                stat = connection.prepareStatement("SELECT name, lfn FROM "
                         + "WorkflowDescriptor wd, WorkflowClasses wc "
                         + "WHERE (wc.workflow=wd.name AND class=?)");
                 stat.setString(1, applicationClass);
@@ -147,7 +185,7 @@ public class ApplicationData implements ApplicationDAO {
         return null;
     }
 
-    public WorkflowDescriptor getApplication(String name) {
+    public Application getApplication(String name) {
         try {
             List<String> classes = new ArrayList<String>();
 
@@ -171,7 +209,7 @@ public class ApplicationData implements ApplicationDAO {
             rs = stat.executeQuery();
             rs.next();
             
-            return new WorkflowDescriptor(rs.getString("name"),
+            return new Application(rs.getString("name"),
                     rs.getString("lfn"), classes);
 
         } catch (SQLException ex) {

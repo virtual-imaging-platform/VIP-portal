@@ -38,7 +38,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.portal.client.bean.AppClass;
-import fr.insalyon.creatis.vip.portal.client.bean.WorkflowDescriptor;
+import fr.insalyon.creatis.vip.portal.client.bean.Application;
 import java.util.List;
 
 /**
@@ -60,13 +60,15 @@ public interface ApplicationService extends RemoteService {
         }
     }
 
+    public List<Application> getApplications(String applicationClass);
+    
     public List<String> getApplicationsName(String applicationClass);
 
-    public WorkflowDescriptor getApplication(String name);
+    public Application getApplication(String name);
 
-    public String add(WorkflowDescriptor workflowDescriptor);
+    public String add(Application workflowDescriptor);
 
-    public String update(WorkflowDescriptor workflowDescriptor);
+    public String update(Application workflowDescriptor);
 
     public void remove(String name);
 

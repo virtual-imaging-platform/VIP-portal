@@ -63,7 +63,7 @@ public class SimulationsContextMenu extends Menu {
         viewItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addCenterTab(new SimulationTab(simulationID, status));
+                Layout.getInstance().addTab(new SimulationTab(simulationID, status));
             }
         });
 

@@ -34,13 +34,20 @@
  */
 package fr.insalyon.creatis.vip.portal.client.view.layout.toolstrip;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
-import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
+import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.portal.client.bean.AppClass;
+import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.portal.client.view.application.ApplicationMenuButton;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.portal.client.view.system.SystemMenuButton;
+import java.util.List;
 
 /**
  *
@@ -60,8 +67,32 @@ public class MainToolStrip extends ToolStrip {
         });
         this.addButton(homeButton);
         this.addSeparator();
+        
+        if (Context.getInstance().isSystemAdmin()) {
+            this.addMenuButton(new SystemMenuButton());
+        }
+       
+        loadApplicationMenus();
+    }
+    
+    private void loadApplicationMenus() {
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        final AsyncCallback<List<AppClass>> callback = new AsyncCallback<List<AppClass>>() {
 
-        ToolStripMenuButton appsButton = new ApplicationMenuButton();
-        this.addMenuButton(appsButton);
+            public void onFailure(Throwable caught) {
+                SC.warn("Error executing get classes list\n" + caught.getMessage());
+            }
+
+            public void onSuccess(List<AppClass> result) {
+                for (AppClass appClass : result) {
+                    String[] appGroups = appClass.getGroups().toArray(new String[]{});
+                    if (Context.getInstance().hasGroupAccess(appGroups)) {
+                        addMenuButton(new ApplicationMenuButton(appClass.getName(), 
+                                Context.getInstance().isGroupAdmin(appGroups)));
+                    }
+                }
+            }
+        };
+        service.getClasses(callback);
     }
 }

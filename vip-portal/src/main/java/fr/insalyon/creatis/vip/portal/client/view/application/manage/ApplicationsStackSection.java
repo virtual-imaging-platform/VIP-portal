@@ -32,11 +32,10 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.portal.client.view.application.launch;
+package fr.insalyon.creatis.vip.portal.client.view.application.manage;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ExpansionMode;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
@@ -53,31 +52,32 @@ import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.portal.client.bean.WorkflowInput;
-import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowService;
-import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowServiceAsync;
+import fr.insalyon.creatis.vip.portal.client.bean.Application;
+import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationServiceAsync;
+import fr.insalyon.creatis.vip.portal.client.view.application.launch.LaunchTab;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class InputsStackSection extends SectionStackSection {
+public class ApplicationsStackSection extends SectionStackSection {
 
     private String applicationClass;
     private ListGrid grid;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
 
-    public InputsStackSection(String applicationClass) {
+    public ApplicationsStackSection(String applicationClass) {
 
         this.applicationClass = applicationClass;
-        this.setTitle("Inputs");
+        this.setTitle("Applications");
         this.setCanCollapse(true);
-        this.setExpanded(false);
+        this.setExpanded(true);
         this.setResizeable(true);
 
         configureGrid();
@@ -96,13 +96,6 @@ public class InputsStackSection extends SectionStackSection {
         grid = new ListGrid() {
 
             @Override
-            protected Canvas getExpansionComponent(ListGridRecord record) {
-                Canvas canvas = super.getExpansionComponent(record);
-                canvas.setMargin(5);
-                return canvas;
-            }
-
-            @Override
             protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
                 rollOverRecord = this.getRecord(rowNum);
 
@@ -112,7 +105,7 @@ public class InputsStackSection extends SectionStackSection {
                     rollOverCanvas.setWidth(50);
                     rollOverCanvas.setHeight(22);
 
-                    ImgButton loadImg = getImgButton("icon-load.png", "Load Input");
+                    ImgButton loadImg = getImgButton("icon-edit.png", "Edit");
                     loadImg.addClickHandler(new ClickHandler() {
 
                         public void onClick(ClickEvent event) {
@@ -128,22 +121,15 @@ public class InputsStackSection extends SectionStackSection {
 
                         public void onClick(ClickEvent event) {
                             final String name = rollOverRecord.getAttribute("name");
-                            SC.confirm("Do you really want to remove the entry \"" + name + "\"?", new BooleanCallback() {
+                            SC.confirm("Do you really want to remove the application \"" + name + "\"?", new BooleanCallback() {
 
                                 public void execute(Boolean value) {
                                     if (value != null && value) {
-                                        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-                                        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-                                            public void onFailure(Throwable caught) {
-                                                SC.warn("Error removing entry: " + caught.getMessage());
-                                            }
-
-                                            public void onSuccess(Void v) {
-                                                loadData();
-                                            }
-                                        };
-                                        service.removeWorkflowInput(Context.getInstance().getUserDN(), name, callback);
+                                        String path = rollOverRecord.getAttribute("path");
+                                        List<String> classes = Arrays.asList(
+                                                rollOverRecord.getAttribute("appclasses").split("##"));
+                                        classes.remove(applicationClass);
+                                        remove(new Application(name, path, classes));
                                     }
                                 }
                             });
@@ -168,68 +154,82 @@ public class InputsStackSection extends SectionStackSection {
                 return button;
             }
         };
-
         grid.setWidth100();
         grid.setHeight100();
-        grid.setCanExpandRecords(true);
-        grid.setExpansionMode(ExpansionMode.DETAIL_FIELD);
         grid.setShowRollOverCanvas(true);
         grid.setShowAllRecords(false);
         grid.setShowEmptyMessage(true);
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
 
-        ListGridField applicationField = new ListGridField("application", "Application");
         ListGridField nameField = new ListGridField("name", "Name");
+        ListGridField pathField = new ListGridField("path", "Path");
 
-        grid.setFields(applicationField, nameField);
-        grid.setDetailField("values");
-        grid.setSortField("application");
+        grid.setFields(nameField, pathField);
+        grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 
             public void onCellDoubleClick(CellDoubleClickEvent event) {
-                grid.expandRecord(event.getRecord());
+                //TODO call edit
             }
         });
     }
 
+    /**
+     * Loads list of applications.
+     */
     public void loadData() {
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        AsyncCallback<List<WorkflowInput>> callback = new AsyncCallback<List<WorkflowInput>>() {
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get simulations inputs: " + caught.getMessage());
+                SC.warn("Error executing get applications list\n" + caught.getMessage());
             }
 
-            public void onSuccess(List<WorkflowInput> result) {
+            public void onSuccess(List<Application> result) {
 
-                List<InputRecord> dataList = new ArrayList<InputRecord>();
+                List<ApplicationRecord> dataList = new ArrayList<ApplicationRecord>();
 
-                for (WorkflowInput wi : result) {
-                    String[] inputs = wi.getInputs().split("--");
-                    StringBuilder values = new StringBuilder();
-
-                    int i = 0;
-                    for (String in : inputs) {
-
-                        if (!in.contains("##")) {
-                            in = in.replace("=", " = ");
-                        } else {
-                            in = in.replace("=", " = Start: ");
-                        }
-                        in = in.replace("@@", "; ");
-                        in = in.replaceFirst("##", " - Stop: ");
-                        in = in.replaceFirst("##", " - Step: ");
-                        values.append(in);
-                        values.append("<br />");
-                    }
-                    dataList.add(new InputRecord(wi.getApplication(),
-                            wi.getName(), values.toString()));
+                for (Application app : result) {
+                    dataList.add(new ApplicationRecord(app.getName(), app.getLfn(),
+                            app.getApplicationClasses().toArray(new String[]{})));
                 }
-                grid.setData(dataList.toArray(new InputRecord[]{}));
+                grid.setData(dataList.toArray(new ApplicationRecord[]{}));
             }
         };
-        service.getWorkflowsInputByUser(Context.getInstance().getUserDN(), callback);
+        service.getApplications(applicationClass, callback);
+    }
+
+    /**
+     * Removes the current class from the application.
+     * 
+     * @param application Application object
+     */
+    private void remove(Application application) {
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+
+        final AsyncCallback<String> callback = new AsyncCallback<String>() {
+
+            public void onFailure(Throwable caught) {
+                SC.warn("Error executing remove application\n" + caught.getMessage());
+            }
+
+            public void onSuccess(String result) {
+                if (!result.contains("Error: ")) {
+                    loadData();
+                }
+                SC.say(result);
+            }
+        };
+        service.update(application, callback);
+    }
+    
+    /**
+     * 
+     * @param application Application object
+     */
+    private void edit(Application application) {
+        
     }
 }

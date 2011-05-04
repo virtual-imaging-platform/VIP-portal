@@ -32,40 +32,34 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
+package fr.insalyon.creatis.vip.portal.client.view.application.manage;
 
-package fr.insalyon.creatis.vip.portal.client.rpc;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.portal.client.bean.AppClass;
-import fr.insalyon.creatis.vip.portal.client.bean.Application;
-import java.util.List;
+import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.widgets.layout.SectionStackSection;
+import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
  *
  * @author Rafael Silva
  */
-public interface ApplicationServiceAsync {
+public class EditStackSection extends SectionStackSection {
 
-    public void getApplications(String applicationClass, AsyncCallback<List<Application>> asyncCallback);
+    private String applicationClass;
     
-    public void getApplication(String name, AsyncCallback<Application> asyncCallback);
-
-    public void add(Application workflowDescriptor, AsyncCallback<String> asyncCallback);
-
-    public void update(Application workflowDescriptor, AsyncCallback<String> asyncCallback);
-
-    public void remove(String name, AsyncCallback<Void> asyncCallback);
-
-    public void removeClass(String name, AsyncCallback<Void> asyncCallback);
-
-    public void getClasses(AsyncCallback<List<AppClass>> asyncCallback);
-
-    public void getApplicationsName(String applicationClass, AsyncCallback<List<String>> asyncCallback);
-
-    public void addClass(AppClass c, AsyncCallback<String> asyncCallback);
-
-    public void updateClass(AppClass c, AsyncCallback<String> asyncCallback);
-
-    public void getClass(String className, AsyncCallback<AppClass> asyncCallback);
-
+    public EditStackSection(String applicationClass, boolean newApplication) {
+        
+        this.applicationClass = applicationClass;
+        this.setTitle("Add/Edit " + applicationClass);
+        this.setCanCollapse(true);
+        this.setExpanded(true);
+        this.setResizeable(true);
+        
+        VLayout vLayout = new VLayout();
+        vLayout.setMaxHeight(400);
+        vLayout.setHeight100();
+        vLayout.setOverflow(Overflow.AUTO);
+        vLayout.addMember(null);
+        
+        this.addItem(vLayout);
+    }
 }

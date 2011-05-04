@@ -36,7 +36,7 @@ package fr.insalyon.creatis.vip.portal.server.rpc;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.vip.portal.client.bean.AppClass;
-import fr.insalyon.creatis.vip.portal.client.bean.WorkflowDescriptor;
+import fr.insalyon.creatis.vip.portal.client.bean.Application;
 import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.portal.server.dao.DAOException;
 import fr.insalyon.creatis.vip.portal.server.dao.DAOFactory;
@@ -50,7 +50,7 @@ import java.util.logging.Logger;
  */
 public class ApplicationServiceImpl extends RemoteServiceServlet implements ApplicationService {
 
-    public String add(WorkflowDescriptor workflowDescriptor) {
+    public String add(Application workflowDescriptor) {
         try {
             return DAOFactory.getDAOFactory().getApplicationDAO().add(workflowDescriptor);
         } catch (DAOException ex) {
@@ -58,7 +58,7 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         }
     }
 
-    public String update(WorkflowDescriptor workflowDescriptor) {
+    public String update(Application workflowDescriptor) {
         try {
             return DAOFactory.getDAOFactory().getApplicationDAO().update(workflowDescriptor);
         } catch (DAOException ex) {
@@ -74,9 +74,17 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         }
     }
 
-    public WorkflowDescriptor getApplication(String name) {
+    public Application getApplication(String name) {
         try {
             return DAOFactory.getDAOFactory().getApplicationDAO().getApplication(name);
+        } catch (DAOException ex) {
+            return null;
+        }
+    }
+    
+    public List<Application> getApplications(String applicationClass) {
+        try {
+            return DAOFactory.getDAOFactory().getApplicationDAO().getApplications(applicationClass);
         } catch (DAOException ex) {
             return null;
         }

@@ -52,7 +52,7 @@ import com.gwtext.client.widgets.form.MultiFieldPanel;
 import com.gwtext.client.widgets.form.TextField;
 import com.gwtext.client.widgets.form.event.ComboBoxListenerAdapter;
 import com.gwtext.client.widgets.layout.VerticalLayout;
-import fr.insalyon.creatis.vip.portal.client.bean.WorkflowDescriptor;
+import fr.insalyon.creatis.vip.portal.client.bean.Application;
 import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
@@ -131,13 +131,13 @@ public class ManageCenterPanel extends AbstractPanel {
                 String name = comboBox.getValue();
 
                 ApplicationServiceAsync service = ApplicationService.Util.getInstance();
-                final AsyncCallback<WorkflowDescriptor> callback = new AsyncCallback<WorkflowDescriptor>() {
+                final AsyncCallback<Application> callback = new AsyncCallback<Application>() {
 
                     public void onFailure(Throwable caught) {
                         MessageBox.alert("Error", "Error executing get application\n" + caught.getMessage());
                     }
 
-                    public void onSuccess(WorkflowDescriptor result) {
+                    public void onSuccess(Application result) {
                         newApplication = false;
                         removeButton.setVisible(true);
                         nameField.setReadOnly(true);
@@ -190,7 +190,7 @@ public class ManageCenterPanel extends AbstractPanel {
                     return;
                 }
 
-                save(new WorkflowDescriptor(name, lfn, classes));
+                save(new Application(name, lfn, classes));
             }
         });
         formPanel.addButton(saveButton);
@@ -208,7 +208,7 @@ public class ManageCenterPanel extends AbstractPanel {
                             public void execute(String btnID) {
                                 if (btnID.toLowerCase().equals("yes")) {
                                     classes.remove(applicationClass);
-                                    save(new WorkflowDescriptor(name, lfn, classes));
+                                    save(new Application(name, lfn, classes));
                                 }
                             }
                         });
@@ -267,7 +267,7 @@ public class ManageCenterPanel extends AbstractPanel {
         }
     }
 
-    private void save(WorkflowDescriptor workflowDescriptor) {
+    private void save(Application workflowDescriptor) {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
 
         if (newApplication) {

@@ -84,7 +84,7 @@ public class Layout {
         vLayout.draw();
     }
 
-    public void addCenterTab(Tab tab) {
+    public void addTab(Tab tab) {
         if (centerTabSet.getTab(tab.getID()) == null) {
             centerTabSet.addTab(tab);
         }

@@ -32,39 +32,39 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.portal.client.bean;
+package fr.insalyon.creatis.vip.portal.client.view.application.manage;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-import java.util.List;
+import com.smartgwt.client.types.VisibilityMode;
+import com.smartgwt.client.widgets.layout.SectionStack;
+import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.tab.Tab;
 
 /**
  *
  * @author Rafael Silva
  */
-public class WorkflowDescriptor implements IsSerializable {
+public class ManageTab extends Tab {
 
-    private String name;
-    private String lfn;
-    private List<String> applicationClasses;
+    private ApplicationsStackSection dataStackSection;
+    
+    public ManageTab(String applicationClass) {
+        this.setTitle(applicationClass + " Management");
+        this.setID(applicationClass + "-manage-tab");
+        this.setCanClose(true);
+        
+        VLayout vLayout = new VLayout();
+        
+        SectionStack sectionStack = new SectionStack();
+        sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
+        sectionStack.setAnimateSections(true);
+        sectionStack.setCanResizeSections(true);
+        
+        dataStackSection = new ApplicationsStackSection(applicationClass);
+        
+        sectionStack.setSections(dataStackSection);
+        
+        vLayout.addMember(sectionStack);
 
-    public WorkflowDescriptor() {
-    }
-
-    public WorkflowDescriptor(String name, String lfn, List<String> applicationClasses) {
-        this.name = name;
-        this.lfn = lfn;
-        this.applicationClasses = applicationClasses;
-    }
-
-    public String getLfn() {
-        return lfn;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<String> getApplicationClasses() {
-        return applicationClasses;
+        this.setPane(vLayout);
     }
 }

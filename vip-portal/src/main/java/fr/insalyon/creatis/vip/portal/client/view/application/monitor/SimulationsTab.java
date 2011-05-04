@@ -168,7 +168,7 @@ public class SimulationsTab extends Tab {
             public void onRowMouseDown(RowMouseDownEvent event) {
                 String simulationID = event.getRecord().getAttribute("simulationId");
                 String status = event.getRecord().getAttribute("status");
-                Layout.getInstance().addCenterTab(new SimulationTab(simulationID, status));
+                Layout.getInstance().addTab(new SimulationTab(simulationID, status));
             }
         });
     }

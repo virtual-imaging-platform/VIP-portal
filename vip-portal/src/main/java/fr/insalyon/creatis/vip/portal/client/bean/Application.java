@@ -32,40 +32,39 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
+package fr.insalyon.creatis.vip.portal.client.bean;
 
-package fr.insalyon.creatis.vip.portal.client.rpc;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.portal.client.bean.AppClass;
-import fr.insalyon.creatis.vip.portal.client.bean.Application;
+import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public interface ApplicationServiceAsync {
+public class Application implements IsSerializable {
 
-    public void getApplications(String applicationClass, AsyncCallback<List<Application>> asyncCallback);
-    
-    public void getApplication(String name, AsyncCallback<Application> asyncCallback);
+    private String name;
+    private String lfn;
+    private List<String> applicationClasses;
 
-    public void add(Application workflowDescriptor, AsyncCallback<String> asyncCallback);
+    public Application() {
+    }
 
-    public void update(Application workflowDescriptor, AsyncCallback<String> asyncCallback);
+    public Application(String name, String lfn, List<String> applicationClasses) {
+        this.name = name;
+        this.lfn = lfn;
+        this.applicationClasses = applicationClasses;
+    }
 
-    public void remove(String name, AsyncCallback<Void> asyncCallback);
+    public String getLfn() {
+        return lfn;
+    }
 
-    public void removeClass(String name, AsyncCallback<Void> asyncCallback);
+    public String getName() {
+        return name;
+    }
 
-    public void getClasses(AsyncCallback<List<AppClass>> asyncCallback);
-
-    public void getApplicationsName(String applicationClass, AsyncCallback<List<String>> asyncCallback);
-
-    public void addClass(AppClass c, AsyncCallback<String> asyncCallback);
-
-    public void updateClass(AppClass c, AsyncCallback<String> asyncCallback);
-
-    public void getClass(String className, AsyncCallback<AppClass> asyncCallback);
-
+    public List<String> getApplicationClasses() {
+        return applicationClasses;
+    }
 }

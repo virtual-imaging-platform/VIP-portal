@@ -32,40 +32,54 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
+package fr.insalyon.creatis.vip.portal.client.view.system.application.classes;
 
-package fr.insalyon.creatis.vip.portal.client.rpc;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.portal.client.bean.AppClass;
-import fr.insalyon.creatis.vip.portal.client.bean.Application;
-import java.util.List;
+import com.smartgwt.client.types.VisibilityMode;
+import com.smartgwt.client.widgets.layout.SectionStack;
+import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.tab.Tab;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
 
 /**
  *
  * @author Rafael Silva
  */
-public interface ApplicationServiceAsync {
+public class ManageClassesTab extends Tab {
 
-    public void getApplications(String applicationClass, AsyncCallback<List<Application>> asyncCallback);
-    
-    public void getApplication(String name, AsyncCallback<Application> asyncCallback);
+    private ToolStrip toolStrip;
+    private ClassesStackSection classesStackSection;
+    private EditClassStackSection editStackSection;
 
-    public void add(Application workflowDescriptor, AsyncCallback<String> asyncCallback);
+    public ManageClassesTab() {
 
-    public void update(Application workflowDescriptor, AsyncCallback<String> asyncCallback);
+        this.setTitle("Manage Classes");
+        this.setID("manage-classes-tab");
+        this.setCanClose(true);
 
-    public void remove(String name, AsyncCallback<Void> asyncCallback);
+        VLayout vLayout = new VLayout();
 
-    public void removeClass(String name, AsyncCallback<Void> asyncCallback);
+        toolStrip = new ManageClassesToolStrip();
+        vLayout.addMember(toolStrip);
 
-    public void getClasses(AsyncCallback<List<AppClass>> asyncCallback);
+        SectionStack sectionStack = new SectionStack();
+        sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
+        sectionStack.setAnimateSections(true);
+        sectionStack.setCanResizeSections(true);
 
-    public void getApplicationsName(String applicationClass, AsyncCallback<List<String>> asyncCallback);
+        classesStackSection = new ClassesStackSection();
+        editStackSection = new EditClassStackSection();
 
-    public void addClass(AppClass c, AsyncCallback<String> asyncCallback);
+        sectionStack.setSections(classesStackSection, editStackSection);
+        vLayout.addMember(sectionStack);
 
-    public void updateClass(AppClass c, AsyncCallback<String> asyncCallback);
+        this.setPane(vLayout);
+    }
 
-    public void getClass(String className, AsyncCallback<AppClass> asyncCallback);
+    public void loadClasses() {
+        classesStackSection.loadData();
+    }
 
+    public void setClass(String name, String groups) {
+        editStackSection.setClass(name, groups);
+    }
 }

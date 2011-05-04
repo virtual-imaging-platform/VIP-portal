@@ -34,7 +34,7 @@
  */
 package fr.insalyon.creatis.vip.portal.server.dao;
 
-import fr.insalyon.creatis.vip.portal.client.bean.WorkflowDescriptor;
+import fr.insalyon.creatis.vip.portal.client.bean.Application;
 import java.util.List;
 
 /**
@@ -43,13 +43,15 @@ import java.util.List;
  */
 public interface ApplicationDAO {
 
-    public String add(WorkflowDescriptor workflowDescriptor);
+    public String add(Application workflowDescriptor);
 
-    public String update(WorkflowDescriptor workflowDescriptor);
+    public String update(Application workflowDescriptor);
 
     public void remove(String name);
 
+    public List<Application> getApplications(String applicationClass) throws DAOException;
+    
     public List<String> getApplicationsName(String applicationClass);
 
-    public WorkflowDescriptor getApplication(String name);
+    public Application getApplication(String name);
 }

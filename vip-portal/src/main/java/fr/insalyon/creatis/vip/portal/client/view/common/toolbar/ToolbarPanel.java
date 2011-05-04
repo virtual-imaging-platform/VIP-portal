@@ -66,8 +66,8 @@ public class ToolbarPanel extends AbstractPanel {
         toolbar.setHeight(25);
 
         // Home Menu
-        toolbar.addButton(new HomeToolbarButton("VIP"));
-        toolbar.addSeparator();
+//        toolbar.addButton(new HomeToolbarButton("VIP"));
+//        toolbar.addSeparator();
 
         // Data Management Menu
         if (Context.getInstance().getAuthentication().isProxyValid()) {
@@ -76,9 +76,9 @@ public class ToolbarPanel extends AbstractPanel {
         }
 
         // System Menu
-        if (isSystemAdmin()) {
-            toolbar.addButton(new SystemToolbarButton("System"));
-        }
+//        if (isSystemAdmin()) {
+//            toolbar.addButton(new SystemToolbarButton("System"));
+//        }
 
         // Gatelab Menu
         if (hasGroupAccess(new String[]{"Administrator", "GateLab"})) {
@@ -108,8 +108,8 @@ public class ToolbarPanel extends AbstractPanel {
                 for (AppClass appClass : result) {
                     String[] appGroups = appClass.getGroups().toArray(new String[0]);
                     if (hasGroupAccess(appGroups)) {
-                        toolbar.addButton(new ApplicationToolbarButton(appClass.getName(),
-                                isGroupAdmin(appGroups)));
+//                        toolbar.addButton(new ApplicationToolbarButton(appClass.getName(),
+//                                isGroupAdmin(appGroups)));
                     }
                 }
             }
@@ -118,6 +118,6 @@ public class ToolbarPanel extends AbstractPanel {
     }
 
     public void addClassButton(String className) {
-        toolbar.addButton(new ApplicationToolbarButton(className, false));
+//        toolbar.addButton(new ApplicationToolbarButton(className, false));
     }
 }

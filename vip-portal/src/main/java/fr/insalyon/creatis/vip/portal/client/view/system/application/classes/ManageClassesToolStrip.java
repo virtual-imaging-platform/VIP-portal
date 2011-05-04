@@ -32,57 +32,46 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.portal.client.view.common.toolbar;
+package fr.insalyon.creatis.vip.portal.client.view.system.application.classes;
 
-import com.gwtext.client.core.EventObject;
-import com.gwtext.client.widgets.Button;
-import com.gwtext.client.widgets.ToolbarMenuButton;
-import com.gwtext.client.widgets.event.ButtonListenerAdapter;
-import com.gwtext.client.widgets.menu.BaseItem;
-import com.gwtext.client.widgets.menu.Item;
-import com.gwtext.client.widgets.menu.Menu;
-import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
-import fr.insalyon.creatis.vip.portal.client.view.main.MainCenterPanel;
-import fr.insalyon.creatis.vip.portal.client.view.main.MainLeftPanel;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.portal.client.view.main.DocumentationLeftPanel;
 
 /**
  *
  * @author Rafael Silva
  */
-public class HomeToolbarButton extends ToolbarMenuButton {
+public class ManageClassesToolStrip extends ToolStrip {
 
-    public HomeToolbarButton(String title) {
+    public ManageClassesToolStrip() {
 
-        super(title);
+        this.setWidth100();
 
-        this.addListener(new ButtonListenerAdapter() {
+        ToolStripButton addButton = new ToolStripButton("Add Class");
+        addButton.setIcon("icon-add.png");
+        addButton.addClickHandler(new ClickHandler() {
 
-            @Override
-            public void onClick(Button button, EventObject e) {
-                Layout layout = Layout.getInstance();
-                layout.setCenterPanel(MainCenterPanel.getInstance());
-                layout.setLeftPanel(new MainLeftPanel());
+            public void onClick(ClickEvent event) {
+                ManageClassesTab classTab = (ManageClassesTab) Layout.getInstance().
+                        getTab("manage-classes-tab");
+                classTab.setClass(null, null);
             }
         });
+        this.addButton(addButton);
 
-        Menu homeMenu = new Menu();
-        homeMenu.setShadow(true);
-        homeMenu.setMinWidth(10);
+        ToolStripButton refreshButton = new ToolStripButton("Refresh");
+        refreshButton.setIcon("icon-refresh.gif");
+        refreshButton.addClickHandler(new ClickHandler() {
 
-        Item documentationItem = new Item("Documentation", new BaseItemListenerAdapter() {
-
-            @Override
-            public void onClick(BaseItem item, EventObject e) {
-                Layout layout = Layout.getInstance();
-                layout.setLeftPanel(new DocumentationLeftPanel());
-//                layout.setCenterPanel(new DocumentationCenterPanel("home"));
+            public void onClick(ClickEvent event) {
+                ManageClassesTab classTab = (ManageClassesTab) Layout.getInstance().
+                        getTab("manage-classes-tab");
+                classTab.loadClasses();
             }
         });
-        documentationItem.setDisabled(true);
-        homeMenu.addItem(documentationItem);
-
-        this.setMenu(homeMenu);
+        this.addButton(refreshButton);
     }
 }

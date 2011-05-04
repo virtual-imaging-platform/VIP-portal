@@ -32,40 +32,21 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
+package fr.insalyon.creatis.vip.portal.client.view.system.application.classes;
 
-package fr.insalyon.creatis.vip.portal.client.rpc;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.portal.client.bean.AppClass;
-import fr.insalyon.creatis.vip.portal.client.bean.Application;
-import java.util.List;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
  *
  * @author Rafael Silva
  */
-public interface ApplicationServiceAsync {
+public class ClassRecord extends ListGridRecord {
 
-    public void getApplications(String applicationClass, AsyncCallback<List<Application>> asyncCallback);
-    
-    public void getApplication(String name, AsyncCallback<Application> asyncCallback);
+    public ClassRecord() {
+    }
 
-    public void add(Application workflowDescriptor, AsyncCallback<String> asyncCallback);
-
-    public void update(Application workflowDescriptor, AsyncCallback<String> asyncCallback);
-
-    public void remove(String name, AsyncCallback<Void> asyncCallback);
-
-    public void removeClass(String name, AsyncCallback<Void> asyncCallback);
-
-    public void getClasses(AsyncCallback<List<AppClass>> asyncCallback);
-
-    public void getApplicationsName(String applicationClass, AsyncCallback<List<String>> asyncCallback);
-
-    public void addClass(AppClass c, AsyncCallback<String> asyncCallback);
-
-    public void updateClass(AppClass c, AsyncCallback<String> asyncCallback);
-
-    public void getClass(String className, AsyncCallback<AppClass> asyncCallback);
-
+    public ClassRecord(String name, String groups) {
+        setAttribute("name", name);
+        setAttribute("groups", groups);
+    }
 }
