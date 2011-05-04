@@ -64,6 +64,24 @@ public class Context {
         return authentication.isAdmin("Administrator");
     }
     
+    public boolean isGroupAdmin(String... groups) {
+        for (String groupName : groups) {
+            if (authentication.isAdmin(groupName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public boolean hasGroupAccess(String... groups) {
+        for (String groupName : groups) {
+            if (authentication.hasGroupAccess(groupName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public String getUser() {
         return authentication.getUser();
     }
