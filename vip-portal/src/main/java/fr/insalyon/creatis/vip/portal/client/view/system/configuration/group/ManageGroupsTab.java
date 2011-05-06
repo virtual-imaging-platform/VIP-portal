@@ -53,6 +53,7 @@ public class ManageGroupsTab extends Tab {
         this.setTitle("Manage Groups");
         this.setID("manage-groups-tab");
         this.setCanClose(true);
+        this.setIcon("icon-groups.png");
         
         VLayout vLayout = new VLayout();
         

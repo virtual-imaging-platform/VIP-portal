@@ -191,10 +191,10 @@ public class WorkflowsPanel extends AbstractWorkflowsPanel {
      */
     protected void openTab(String workflowID, String status, String submissionDate) {
         Layout layout = Layout.getInstance();
-        if (layout.hasCenterPanelTab(workflowID)) {
-            layout.setActiveCenterPanel(workflowID);
-        } else {
-            layout.addCenterPanel(new WorkflowPanel(workflowID, submissionDate, status));
-        }
+//        if (layout.hasCenterPanelTab(workflowID)) {
+//            layout.setActiveCenterPanel(workflowID);
+//        } else {
+//            layout.addCenterPanel(new WorkflowPanel(workflowID, submissionDate, status));
+//        }
     }
 }

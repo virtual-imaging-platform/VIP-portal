@@ -14,6 +14,41 @@
     </servlet-mapping>
     <!-- End Common Module -->
     
+    <!-- Data Manager Module -->
+    <servlet>
+        <servlet-name>FileCatalogService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.datamanager.server.rpc.FileCatalogServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FileCatalogService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/filecatalogservice</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>FileUploadService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.datamanager.server.rpc.FileUploadServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FileUploadService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/fileuploadservice</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>FileDownloadService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.datamanager.server.rpc.FileDownloadServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FileDownloadService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/filedownloadservice</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>TransferPoolService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.datamanager.server.rpc.TransferPoolServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>TransferPoolService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/transferpoolservice</url-pattern>
+    </servlet-mapping>
+    <!-- End Data Manager Module -->
+    
     <servlet>
         <servlet-name>WorkflowService</servlet-name>
         <servlet-class>fr.insalyon.creatis.vip.portal.server.rpc.WorkflowServiceImpl</servlet-class>
@@ -70,46 +105,9 @@
         <servlet-name>TissueService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/tissueservice</url-pattern>
     </servlet-mapping>
-   
-    <!-- DataManagement Module -->
-    <servlet>
-        <servlet-name>FileCatalogService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.datamanagement.server.rpc.FileCatalogServiceImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>FileCatalogService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/filecatalogservice</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>FileUploadService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.datamanagement.server.rpc.FileUploadServiceImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>FileUploadService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/fileuploadservice</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>FileDownloadService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.datamanagement.server.rpc.FileDownloadServiceImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>FileDownloadService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/filedownloadservice</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>TransferPoolService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.datamanagement.server.rpc.TransferPoolServiceImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>TransferPoolService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/transferpoolservice</url-pattern>
-    </servlet-mapping>
-    <!-- End DataManagement Module -->
 
     <session-config>
-        <session-timeout>
-            30
-        </session-timeout>
+        <session-timeout>30</session-timeout>
     </session-config>
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>

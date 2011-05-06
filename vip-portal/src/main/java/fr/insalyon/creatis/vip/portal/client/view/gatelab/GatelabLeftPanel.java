@@ -57,7 +57,7 @@ import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
-import fr.insalyon.creatis.vip.portal.client.view.layout.AbstractLeftPanel;
+//import fr.insalyon.creatis.vip.portal.client.view.layout.AbstractLeftPanel;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
 import java.util.Date;
 import java.util.List;
@@ -66,7 +66,7 @@ import java.util.List;
  *
  * @author Ibrahim Kallel, Rafael Silva
  */
-public class GatelabLeftPanel extends AbstractLeftPanel {
+public class GatelabLeftPanel {
 
     private static GatelabLeftPanel instance;
     private Store usersStore;
@@ -86,20 +86,20 @@ public class GatelabLeftPanel extends AbstractLeftPanel {
     }
 
     private GatelabLeftPanel() {
-        super(new String[]{"Administrator", "GateLab"});
-        this.title = "Simulation";
-        collapsed = false;
+//        super(new String[]{"Administrator", "GateLab"});
+//        this.title = "Simulation";
+//        collapsed = false;
         currentUser = Context.getInstance().getAuthentication().getUser();
     }
 
-    @Override
+//    @Override
     public Panel getPanel() {
 
         loadCombosData();
 
-        if (isAuthorized()) {
+//        if (isAuthorized()) {
             FormPanel formPanel = new FormPanel();
-            formPanel.setTitle(title + " Filter");
+//            formPanel.setTitle(title + " Filter");
             formPanel.setBorder(false);
             formPanel.setLayout(new FormLayout());
             formPanel.setLabelAlign(Position.TOP);
@@ -111,11 +111,11 @@ public class GatelabLeftPanel extends AbstractLeftPanel {
             usersStore = FieldUtil.getComboBoxStore("gate-filter-username");
             userCB = FieldUtil.getComboBox("gate-filter-user", "User", 180,
                     "Select User", usersStore, "gate-filter-username");
-            if (isAdmin()) {
+//            if (isAdmin()) {
                 formPanel.add(userCB, new AnchorLayoutData("95%"));
-            } else {
+//            } else {
                 user = currentUser;
-            }
+//            }
 
             // Status
             statusStore = FieldUtil.getComboBoxStore("workflow-filter-status");
@@ -165,8 +165,8 @@ public class GatelabLeftPanel extends AbstractLeftPanel {
                         eDate = null;
                     }
 
-                    WorkflowsPanel wp = (WorkflowsPanel) Layout.getInstance().getCenterPanelTab("gate-workflows-panel");
-                    wp.loadWorkflowData(user, "gate", status, sDate, eDate);
+//                    WorkflowsPanel wp = (WorkflowsPanel) Layout.getInstance().getCenterPanelTab("gate-workflows-panel");
+//                    wp.loadWorkflowData(user, "gate", status, sDate, eDate);
                     Ext.get("gate-workflows-grid").mask("Loading data...");
                 }
             });
@@ -183,11 +183,11 @@ public class GatelabLeftPanel extends AbstractLeftPanel {
             formPanel.addButton(submit);
             formPanel.addButton(reset);
             return formPanel;
-        }
+//        }
 
-        Panel panel = new Panel();
-        panel.setHtml("<p style=\"font-size: 10px\"><strong>Authorization Error</strong></p>");
-        return panel;
+//        Panel panel = new Panel();
+//        panel.setHtml("<p style=\"font-size: 10px\"><strong>Authorization Error</strong></p>");
+//        return panel;
     }
 
     private void loadCombosData() {

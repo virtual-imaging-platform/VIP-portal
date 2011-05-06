@@ -21,7 +21,7 @@
 
     <!-- Project sub-modules -->
     <inherits name="fr.insalyon.creatis.vip.common.Common" />
-    <inherits name="fr.insalyon.creatis.vip.datamanagement.DataManager" />
+    <inherits name="fr.insalyon.creatis.vip.datamanager.DataManager" />
 
     <!-- Specify the app entry point class.-->
     <entry-point class="fr.insalyon.creatis.vip.portal.client.Main"/>
@@ -34,13 +34,5 @@
     <servlet class="fr.insalyon.creatis.vip.portal.server.rpc.ConfigurationServiceImpl" path="/configurationservice"/>
     <servlet class="fr.insalyon.creatis.vip.portal.server.rpc.ApplicationServiceImpl" path="/applicationservice"/>
     <servlet class="fr.insalyon.creatis.vip.portal.server.rpc.GatelabServiceImpl" path="/gatelabservice"/>
-
-    <!--stylesheet src="js/ext/resources/css/ext-all.css" />
-    <stylesheet src="js/ext/resources/css/xtheme-gray.css" /-->
-    <script src="js/ext/adapter/yui/yui-utilities.js" />
-    <script src="js/ext/adapter/yui/ext-yui-adapter.js" />
-    <script src="js/ext/adapter/ext/ext-base.js" />
-    <script src="js/ext/ext-all.js" />
-
 
 </module>

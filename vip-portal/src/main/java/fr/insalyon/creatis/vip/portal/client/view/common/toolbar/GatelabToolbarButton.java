@@ -64,19 +64,19 @@ public class GatelabToolbarButton extends ToolbarButton {
 
             @Override
             public void onClick(BaseItem item, EventObject e) {
-                Layout layout = Layout.getInstance();
-                if (layout.hasCenterPanelTab("gate-workflows-panel")) {
-                    layout.setActiveCenterPanel("gate-workflows-panel");
-                    WorkflowsPanel.getInstance().reloadData();
-                } else {
-                    WorkflowsPanel panel = WorkflowsPanel.getInstance();
-                    layout.setCenterPanel(panel);
-                    panel.loadWorkflowData(Context.getInstance().getAuthentication().getUser(),
-                            "gate", null, null, null);
-                }
+//                Layout layout = Layout.getInstance();
+//                if (layout.hasCenterPanelTab("gate-workflows-panel")) {
+//                    layout.setActiveCenterPanel("gate-workflows-panel");
+//                    WorkflowsPanel.getInstance().reloadData();
+//                } else {
+//                    WorkflowsPanel panel = WorkflowsPanel.getInstance();
+//                    layout.setCenterPanel(panel);
+//                    panel.loadWorkflowData(Context.getInstance().getAuthentication().getUser(),
+//                            "gate", null, null, null);
+//                }
                 Ext.get("gate-workflows-grid").mask("Loading data...");
                 GatelabLeftPanel panel = GatelabLeftPanel.getInstance();
-                layout.setLeftPanel(panel);
+//                layout.setLeftPanel(panel);
             }
         });
         gateLabMenu.addItem(launchGateLabItem);

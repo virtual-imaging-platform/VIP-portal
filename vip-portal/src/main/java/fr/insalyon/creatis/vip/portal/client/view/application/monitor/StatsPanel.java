@@ -34,7 +34,6 @@
  */
 package fr.insalyon.creatis.vip.portal.client.view.application.monitor;
 
-import com.gwtext.client.core.Ext;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.data.ArrayReader;

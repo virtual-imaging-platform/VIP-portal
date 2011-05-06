@@ -55,6 +55,7 @@ public class ManageUsersTab extends Tab {
         this.setTitle("Manage Users");
         this.setID("manage-users-tab");
         this.setCanClose(true);
+        this.setIcon("icon-users.png");
 
         VLayout vLayout = new VLayout();
 

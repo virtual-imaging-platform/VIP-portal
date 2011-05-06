@@ -161,7 +161,7 @@ public class UsersStackSection extends SectionStackSection {
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 
             public void onCellDoubleClick(CellDoubleClickEvent event) {
-                edit(event.getRecord().getAttribute("name"), 
+                edit(event.getRecord().getAttribute("distinguishedName"), 
                         event.getRecord().getAttribute("groups"));
             }
         });

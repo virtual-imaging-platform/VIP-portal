@@ -48,8 +48,10 @@ public class ManageTab extends Tab {
     private ApplicationsStackSection dataStackSection;
     
     public ManageTab(String applicationClass) {
+        
         this.setTitle(applicationClass + " Management");
         this.setID(applicationClass + "-manage-tab");
+        this.setIcon("icon-simulation-manage.png");
         this.setCanClose(true);
         
         VLayout vLayout = new VLayout();

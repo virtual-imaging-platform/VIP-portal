@@ -51,7 +51,7 @@ public class SimulationsToolStrip extends ToolStrip {
         this.setWidth100();
         
         ToolStripButton refreshButton = new ToolStripButton();
-        refreshButton.setIcon("icon-refresh.gif");
+        refreshButton.setIcon("icon-refresh.png");
         refreshButton.setTitle("Refresh");
         refreshButton.addClickHandler(new ClickHandler() {
 

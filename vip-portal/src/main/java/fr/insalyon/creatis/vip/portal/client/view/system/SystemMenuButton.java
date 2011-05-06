@@ -59,6 +59,7 @@ public class SystemMenuButton extends ToolStripMenuButton {
 
         Menu confSubMenu = new Menu();
         MenuItem manageUsers = new MenuItem("Manage Users");
+        manageUsers.setIcon("icon-users.png");
         manageUsers.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -67,6 +68,7 @@ public class SystemMenuButton extends ToolStripMenuButton {
         });
         
         MenuItem manageGroups = new MenuItem("Manage Groups");
+        manageGroups.setIcon("icon-groups.png");
         manageGroups.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {

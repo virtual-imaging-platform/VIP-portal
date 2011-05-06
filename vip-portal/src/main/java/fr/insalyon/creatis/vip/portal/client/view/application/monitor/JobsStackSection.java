@@ -104,12 +104,6 @@ public class JobsStackSection extends SectionStackSection {
                 showContextMenu(event.getRecord());
             }
         });
-        grid.addRowMouseDownHandler(new RowMouseDownHandler() {
-
-            public void onRowMouseDown(RowMouseDownEvent event) {
-                showContextMenu(event.getRecord());
-            }
-        });
     }
 
     public void loadData() {

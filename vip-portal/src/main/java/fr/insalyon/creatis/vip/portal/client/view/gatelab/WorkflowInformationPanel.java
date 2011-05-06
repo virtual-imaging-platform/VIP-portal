@@ -52,7 +52,7 @@ import com.gwtext.client.widgets.ToolbarTextItem;
 import com.gwtext.client.widgets.grid.event.GridCellListenerAdapter;
 import fr.insalyon.creatis.vip.portal.client.rpc.GatelabService;
 import fr.insalyon.creatis.vip.portal.client.rpc.GatelabServiceAsync;
-import fr.insalyon.creatis.vip.portal.client.view.common.toolbar.LogsToolbarButton;
+//import fr.insalyon.creatis.vip.portal.client.view.common.toolbar.LogsToolbarButton;
 import fr.insalyon.creatis.vip.portal.client.view.common.window.lfn.LFNBrowserWindow;
 import java.util.Date;
 import java.util.Map;
@@ -136,8 +136,8 @@ public class WorkflowInformationPanel extends Panel {
         this.add(grid);
 
         Toolbar toolbar = new Toolbar();
-        LogsToolbarButton logsbutton = new LogsToolbarButton(workflowID);
-        toolbar.addButton(logsbutton);
+//        LogsToolbarButton logsbutton = new LogsToolbarButton(workflowID);
+//        toolbar.addButton(logsbutton);
         
         if (this.status.toLowerCase().equals("running")) {
 

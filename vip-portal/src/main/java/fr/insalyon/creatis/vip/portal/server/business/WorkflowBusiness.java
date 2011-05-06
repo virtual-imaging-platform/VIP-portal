@@ -38,7 +38,7 @@ import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
-import fr.insalyon.creatis.vip.datamanagement.server.DataManagerUtil;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.portal.client.bean.Application;
 import fr.insalyon.creatis.vip.portal.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.portal.server.business.simulation.WorkflowMoteurConfig;

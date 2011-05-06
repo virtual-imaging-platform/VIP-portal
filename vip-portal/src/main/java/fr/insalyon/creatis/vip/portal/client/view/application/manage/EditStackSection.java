@@ -34,9 +34,14 @@
  */
 package fr.insalyon.creatis.vip.portal.client.view.application.manage;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.portal.client.bean.Application;
+import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationServiceAsync;
 
 /**
  *
@@ -45,10 +50,12 @@ import com.smartgwt.client.widgets.layout.VLayout;
 public class EditStackSection extends SectionStackSection {
 
     private String applicationClass;
+    private boolean newApplication;
     
     public EditStackSection(String applicationClass, boolean newApplication) {
         
         this.applicationClass = applicationClass;
+        this.newApplication = newApplication;
         this.setTitle("Add/Edit " + applicationClass);
         this.setCanCollapse(true);
         this.setExpanded(true);
@@ -61,5 +68,44 @@ public class EditStackSection extends SectionStackSection {
         vLayout.addMember(null);
         
         this.addItem(vLayout);
+    }
+    
+    private void save(Application workflowDescriptor) {
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+
+        if (newApplication) {
+            final AsyncCallback<String> callback = new AsyncCallback<String>() {
+
+                public void onFailure(Throwable caught) {
+                    SC.warn("Error executing update application\n" + caught.getMessage());
+                }
+
+                public void onSuccess(String result) {
+                    if (!result.contains("Error: ")) {
+//                        formPanel.setVisible(false);
+//                        loadData();
+                    }
+                    SC.say(result);
+                }
+            };
+            service.add(workflowDescriptor, callback);
+
+        } else {
+            final AsyncCallback<String> callback = new AsyncCallback<String>() {
+
+                public void onFailure(Throwable caught) {
+                    SC.warn("Error executing update application\n" + caught.getMessage());
+                }
+
+                public void onSuccess(String result) {
+                    if (!result.contains("Error: ")) {
+//                        formPanel.setVisible(false);
+//                        loadData();
+                    }
+                    SC.say(result);
+                }
+            };
+            service.update(workflowDescriptor, callback);
+        }
     }
 }

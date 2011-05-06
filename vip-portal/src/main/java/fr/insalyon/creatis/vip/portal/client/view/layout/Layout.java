@@ -34,13 +34,13 @@
  */
 package fr.insalyon.creatis.vip.portal.client.view.layout;
 
-import fr.insalyon.creatis.vip.portal.client.view.common.toolbar.ToolbarPanel;
-import com.gwtext.client.widgets.Component;
-import com.gwtext.client.widgets.Panel;
-import com.gwtext.client.widgets.TabPanel;
-import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.types.VisibilityMode;
+import com.smartgwt.client.widgets.layout.SectionStack;
+import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
 import fr.insalyon.creatis.vip.portal.client.view.layout.toolstrip.BottomToolStrip;
 import fr.insalyon.creatis.vip.portal.client.view.layout.toolstrip.MainToolStrip;
 
@@ -52,9 +52,6 @@ public class Layout {
 
     private static Layout instance;
     private CenterTabSet centerTabSet;
-    private Panel leftPanel;
-    private ToolbarPanel toolbarPanel;
-    private TabPanel centerPanel;
 
     public static Layout getInstance() {
         if (instance == null) {
@@ -71,14 +68,26 @@ public class Layout {
 
         vLayout.addMember(new MainToolStrip());
 
-        HLayout hLayout = new HLayout();
-        hLayout.setWidth100();
-        hLayout.setHeight100();
+        SectionStack mainSectionStack = new SectionStack();
+        mainSectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
+        mainSectionStack.setAnimateSections(true);
+        mainSectionStack.setCanResizeSections(true);
+        
+        SectionStackSection mainTabSection = new SectionStackSection();
+        mainTabSection.setCanCollapse(false);
+        mainTabSection.setShowHeader(false);
 
         centerTabSet = CenterTabSet.getInstance();
-        hLayout.addMember(centerTabSet);
+        mainTabSection.addItem(centerTabSet);
+        
+        // Data Manager
+        if (Context.getInstance().hasValidProxy()) {
+            mainSectionStack.setSections(mainTabSection, new DataManagerSection());
+        } else {
+            mainSectionStack.setSections(mainTabSection);
+        }
 
-        vLayout.addMember(hLayout);
+        vLayout.addMember(mainSectionStack);        
         vLayout.addMember(new BottomToolStrip());
 
         vLayout.draw();
@@ -97,54 +106,5 @@ public class Layout {
     
     public Tab getTab(String id) {
         return centerTabSet.getTab(id);
-    }
-
-    public void setLeftPanel(AbstractLeftPanel panel) {
-        leftPanel.removeAll();
-        leftPanel.setTitle(panel.getTitle());
-        leftPanel.setCollapsed(panel.isCollapsed());
-        leftPanel.add(panel.getPanel());
-        leftPanel.doLayout();
-    }
-
-    public void setCenterPanel(Panel panel) {
-        if (centerPanel.getComponent(panel.getId()) == null) {
-            centerPanel.removeAll();
-            centerPanel.add(panel);
-            centerPanel.setActiveTab(0);
-            centerPanel.doLayout();
-        } else {
-            centerPanel.setActiveTab(panel.getId());
-        }
-    }
-
-    public void addCenterPanel(Panel panel) {
-        if (centerPanel.getComponent(panel.getId()) == null) {
-            centerPanel.add(panel);
-            centerPanel.setActiveTab(panel.getId());
-            centerPanel.doLayout();
-        } else {
-            centerPanel.setActiveTab(panel.getId());
-        }
-    }
-
-    public void setActiveCenterPanel(String panelID) {
-        centerPanel.setActiveTab(panelID);
-    }
-
-    public boolean hasCenterPanelTab(String panelID) {
-        return centerPanel.hasItem(panelID);
-    }
-
-    public Component getCenterPanelTab(String panelID) {
-        return centerPanel.getComponent(panelID);
-    }
-
-    public void addClassButton(String className) {
-        toolbarPanel.addClassButton(className);
-    }
-
-    public Panel getLeftPanel() {
-        return leftPanel;
     }
 }

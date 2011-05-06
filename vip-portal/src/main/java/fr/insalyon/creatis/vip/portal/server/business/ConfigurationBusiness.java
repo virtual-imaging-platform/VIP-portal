@@ -38,7 +38,7 @@ import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.vip.common.client.bean.Authentication;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
-import fr.insalyon.creatis.vip.datamanagement.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.portal.client.bean.Configuration;
 import fr.insalyon.creatis.vip.portal.client.bean.User;
 import fr.insalyon.creatis.vip.portal.server.business.proxy.MyProxyClient;
@@ -97,7 +97,7 @@ public class ConfigurationBusiness {
                         // Voms
 //                        String command = "voms-proxy-init --voms biomed -cert "
 //                                + proxyFileName + " -key " + proxyFileName
-//                                + " -out " + proxyFileName;
+//                                + " -out " + proxyFileName + " -noregen";
 //                        Process process = Runtime.getRuntime().exec(command);
 //                        process.waitFor();
 //                        VomsClientConf.getInstance().setUserKeyPath(proxyFileName);

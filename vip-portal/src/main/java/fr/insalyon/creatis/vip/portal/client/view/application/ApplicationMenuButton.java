@@ -59,6 +59,7 @@ public class ApplicationMenuButton extends ToolStripMenuButton {
         menu.setShadowDepth(3);
         
         MenuItem launchItem = new MenuItem("Launch " + applicationClass);
+        launchItem.setIcon("icon-launch.png");
         launchItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -67,6 +68,7 @@ public class ApplicationMenuButton extends ToolStripMenuButton {
         });
         
         MenuItem monitorItem = new MenuItem("Monitor " + applicationClass);
+        monitorItem.setIcon("icon-simulation-monitor.png");
         monitorItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -76,6 +78,7 @@ public class ApplicationMenuButton extends ToolStripMenuButton {
         
         if (isGroupAdmin) {
             MenuItem manageItem = new MenuItem("Manage " + applicationClass);
+            manageItem.setIcon("icon-simulation-manage.png");
             manageItem.addClickHandler(new ClickHandler() {
 
                 public void onClick(MenuItemClickEvent event) {
@@ -83,6 +86,7 @@ public class ApplicationMenuButton extends ToolStripMenuButton {
                 }
             });
             MenuItemSeparator separator = new MenuItemSeparator();
+            manageItem.setEnabled(false);
             menu.setItems(launchItem, monitorItem, separator, manageItem);
         } else {
             menu.setItems(launchItem, monitorItem);

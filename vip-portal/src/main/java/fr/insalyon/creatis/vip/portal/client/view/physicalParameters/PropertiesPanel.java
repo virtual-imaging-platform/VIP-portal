@@ -163,7 +163,7 @@ public class PropertiesPanel extends Panel {
             public void onClick(Button button, EventObject e) {
                 PropertyPanel.getInstance().setTissueName(tissueName);
                 //PropertyPanel.getInstance().setNewProperty(true);
-                Layout.getInstance().setCenterPanel(PropertyPanel.getInstance());
+//                Layout.getInstance().setCenterPanel(PropertyPanel.getInstance());
             }
         });
         toolbar.addButton(newProperty);
@@ -188,7 +188,7 @@ public class PropertiesPanel extends Panel {
                          PropertyPanel.getInstance().setNewProperty(false);
                          PropertyPanel.getInstance().setTissueName(tissueName);
                          PropertyPanel.getInstance().setProperty(propId,propType,propAuthor,propComment,propDate);
-                         Layout.getInstance().setCenterPanel(PropertyPanel.getInstance());
+//                         Layout.getInstance().setCenterPanel(PropertyPanel.getInstance());
                 }
             });
             menu.addItem(view);

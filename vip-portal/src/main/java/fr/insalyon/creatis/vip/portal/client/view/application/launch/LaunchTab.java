@@ -54,6 +54,7 @@ public class LaunchTab extends Tab {
 
         this.setTitle("Launch " + applicationClass);
         this.setID("launch-" + applicationClass.toLowerCase() + "-tab");
+        this.setIcon("icon-launch.png", 16);
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
 

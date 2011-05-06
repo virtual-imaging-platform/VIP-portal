@@ -195,7 +195,7 @@ class PropertyPanel extends Panel {
 
                 public void onSuccess(Void result) {
                     MessageBox.alert(propName + " saved", propName + " was added to tissue " + tissueName);
-                    Layout.getInstance().setCenterPanel(PropertiesPanel.getInstance(tissueName));
+//                    Layout.getInstance().setCenterPanel(PropertiesPanel.getInstance(tissueName));
                 }
             };
             if (propName.equals("Echogenicity")) {

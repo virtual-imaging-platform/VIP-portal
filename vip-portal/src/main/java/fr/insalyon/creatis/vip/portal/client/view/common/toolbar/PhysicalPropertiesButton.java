@@ -32,7 +32,7 @@ class PhysicalPropertiesButton extends ToolbarButton {
             @Override
             public void onClick(BaseItem item, EventObject e) {
                 Layout structure = Layout.getInstance();
-                structure.setLeftPanel(TissuePanel.getInstance());
+//                structure.setLeftPanel(TissuePanel.getInstance());
             }
         });
         manageTissuesItem.setIcon("");
@@ -40,7 +40,7 @@ class PhysicalPropertiesButton extends ToolbarButton {
         Item manageDistributionsItem = new Item("Distributions", new BaseItemListenerAdapter(){
             @Override
             public void onClick(BaseItem item, EventObject e){
-                Layout.getInstance().setCenterPanel(DistributionsCenterPanel.getInstance());
+//                Layout.getInstance().setCenterPanel(DistributionsCenterPanel.getInstance());
             }
 
         });

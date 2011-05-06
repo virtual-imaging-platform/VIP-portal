@@ -291,7 +291,7 @@ public class ManageClassesCenterPanel extends AbstractPanel {
                     if (!result.contains("Error: ")) {
                         formPanel.setVisible(false);
                         loadComboData();
-                        Layout.getInstance().addClassButton(appClass.getName());
+//                        Layout.getInstance().addClassButton(appClass.getName());
                     }
                     MessageBox.alert(result);
                 }

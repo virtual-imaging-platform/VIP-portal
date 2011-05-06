@@ -61,8 +61,10 @@ public class SimulationTab extends Tab {
     private LogsStackSection logsStackSection;
 
     public SimulationTab(String simulationID, String status) {
+        
         this.setTitle(simulationID);
         this.setID(simulationID + "-tab");
+        this.setIcon("icon-simulation-monitor.png");
         this.setCanClose(true);
 
         VLayout vLayout = new VLayout();

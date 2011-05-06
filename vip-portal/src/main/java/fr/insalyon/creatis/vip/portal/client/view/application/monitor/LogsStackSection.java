@@ -169,7 +169,7 @@ public class LogsStackSection extends SectionStackSection {
         toolStrip.addButton(folderUpButton);
 
         ToolStripButton refreshButton = new ToolStripButton();
-        refreshButton.setIcon("icon-refresh.gif");
+        refreshButton.setIcon("icon-refresh.png");
         refreshButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {

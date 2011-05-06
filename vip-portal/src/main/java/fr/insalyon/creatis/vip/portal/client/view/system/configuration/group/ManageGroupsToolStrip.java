@@ -63,7 +63,7 @@ public class ManageGroupsToolStrip extends ToolStrip {
         this.addButton(addButton);
 
         ToolStripButton refreshButton = new ToolStripButton("Refresh");
-        refreshButton.setIcon("icon-refresh.gif");
+        refreshButton.setIcon("icon-refresh.png");
         refreshButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {

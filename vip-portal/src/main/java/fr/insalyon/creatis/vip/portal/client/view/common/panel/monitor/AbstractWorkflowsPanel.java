@@ -140,7 +140,7 @@ public abstract class AbstractWorkflowsPanel extends Panel {
             }
         };
         service.getWorkflows(user, app, status, sDate, eDate, callback);
-        Layout.getInstance().setActiveCenterPanel(id);
+//        Layout.getInstance().setActiveCenterPanel(id);
     }
 
     public void loadWorkflowStats(String user, String app, String status, Date sDate, Date eDate) {
@@ -169,7 +169,7 @@ public abstract class AbstractWorkflowsPanel extends Panel {
 
 
 
-        Layout.getInstance().setActiveCenterPanel(id);
+//        Layout.getInstance().setActiveCenterPanel(id);
     }
 
     /**
@@ -193,8 +193,8 @@ public abstract class AbstractWorkflowsPanel extends Panel {
         Layout layout = Layout.getInstance();
         if (this.statsPanel == null) {
             this.statsPanel = new StatsPanel();
-            layout.addCenterPanel(statsPanel);
-            layout.setActiveCenterPanel("app-workflows-panel");
+//            layout.addCenterPanel(statsPanel);
+//            layout.setActiveCenterPanel("app-workflows-panel");
         }
 
         statsPanel.reloadStats(result);

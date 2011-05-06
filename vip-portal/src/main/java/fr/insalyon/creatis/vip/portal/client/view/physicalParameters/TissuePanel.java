@@ -22,7 +22,7 @@ import com.gwtext.client.widgets.layout.FormLayout;
 import fr.insalyon.creatis.vip.portal.client.bean.Tissue;
 import fr.insalyon.creatis.vip.portal.client.rpc.TissueService;
 import fr.insalyon.creatis.vip.portal.client.rpc.TissueServiceAsync;
-import fr.insalyon.creatis.vip.portal.client.view.layout.AbstractLeftPanel;
+//import fr.insalyon.creatis.vip.portal.client.view.layout.AbstractLeftPanel;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
 import java.util.List;
 
@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author glatard
  */
-public class TissuePanel extends AbstractLeftPanel {
+public class TissuePanel {
 
     private static TissuePanel instance = null;
     //panel used to create/update tissues
@@ -56,7 +56,7 @@ public class TissuePanel extends AbstractLeftPanel {
      * @param title Panel title
      */
     private TissuePanel(final String title) {
-        super(null);
+//        super(null);
     }
 
     private void reloadData() {
@@ -65,7 +65,7 @@ public class TissuePanel extends AbstractLeftPanel {
     }
 
 
-    @Override
+//    @Override
     public Panel getPanel() {
         FormPanel p = new FormPanel();
         p.setTitle("Tissues");
@@ -106,7 +106,7 @@ public class TissuePanel extends AbstractLeftPanel {
 
             @Override
             public void onClick(Button button, EventObject e) {
-                 Layout.getInstance().setCenterPanel(NewTissuePanel.getInstance(instance));
+//                 Layout.getInstance().setCenterPanel(NewTissuePanel.getInstance(instance));
             }
         });
         Toolbar tool = new Toolbar();
@@ -119,7 +119,7 @@ public class TissuePanel extends AbstractLeftPanel {
                 if (tissueName == null) {
                     MessageBox.alert("Please select a tissue first");
                 } else {
-                    Layout.getInstance().setCenterPanel(PropertiesPanel.getInstance(tissueName));
+//                    Layout.getInstance().setCenterPanel(PropertiesPanel.getInstance(tissueName));
                 }
             }
         });
