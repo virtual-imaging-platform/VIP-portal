@@ -93,6 +93,10 @@ public class Context {
     public String getProxyFileName() {
         return authentication.getProxyFileName();
     }
+    
+    public boolean hasValidProxy() {
+        return authentication.isProxyValid();
+    }
 
     public Authentication getAuthentication() {
         return authentication;
