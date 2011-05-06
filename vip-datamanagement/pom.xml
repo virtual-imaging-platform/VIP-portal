@@ -5,10 +5,6 @@
     <artifactId>vip-datamanager</artifactId>
     <packaging>jar</packaging>
     <version>0.3</version>
-    <properties>
-        <gwt.version>2.0.4</gwt.version>
-        <gwt.ext.version>2.0.6</gwt.ext.version>
-    </properties>
     <name>VIP-DataManager</name>
     <dependencies>
         
@@ -22,27 +18,8 @@
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-common</artifactId>
-            <version>0.2</version>
+            <version>0.3</version>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.gwt</groupId>
-            <artifactId>gwt-servlet</artifactId>
-            <version>${gwt.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.gwtextux</groupId>
-            <artifactId>gwtextux</artifactId>
-            <version>0.3.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.extjs</groupId>
-            <artifactId>gxt</artifactId>
-            <version>2.1.1</version>
         </dependency>
 
         <dependency>

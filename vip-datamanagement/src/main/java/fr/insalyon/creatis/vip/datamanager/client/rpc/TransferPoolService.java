@@ -1,4 +1,4 @@
-/* Copyright CNRS-CREATIS
+    /* Copyright CNRS-CREATIS
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
@@ -32,19 +32,38 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanagement.client;
+package fr.insalyon.creatis.vip.datamanager.client.rpc;
+
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
+import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DataManagerConstants {
+public interface TransferPoolService extends RemoteService {
 
-    public final static String ROOT = "/vip";
-    public final static String USERS_HOME = "home";
-    public final static String GROUPS_HOME = "groups";
-    public final static String PUBLIC_HOME = "public";
-    public final static String ACTIVITIES_HOME = "activities";
-    public final static String WORKFLOWS_HOME = "workflows";
-    public final static String CREATIS_HOME = "creatis";
+    public static final String SERVICE_URI = "/transferpoolservice";
+
+    public static class Util {
+
+        public static TransferPoolServiceAsync getInstance() {
+
+            TransferPoolServiceAsync instance = (TransferPoolServiceAsync) GWT.create(TransferPoolService.class);
+            ServiceDefTarget target = (ServiceDefTarget) instance;
+            target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
+            return instance;
+        }
+    }
+
+    public List<PoolOperation> getOperations(String userDN, String proxy);
+
+    public PoolOperation getOperationById(String id, String proxy);
+
+    public void removeOperationById(String id, String proxy);
+
+    public void downloadFile(String user, String remoteFile, String userDN, String proxy);
 }

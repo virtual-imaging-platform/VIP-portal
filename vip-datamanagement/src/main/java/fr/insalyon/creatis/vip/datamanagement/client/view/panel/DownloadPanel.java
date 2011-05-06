@@ -46,8 +46,8 @@ import com.gwtext.client.widgets.ToolbarButton;
 import com.gwtext.client.widgets.grid.CheckboxSelectionModel;
 import fr.insalyon.creatis.vip.common.client.bean.Authentication;
 import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolService;
-import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
 import fr.insalyon.creatis.vip.datamanagement.client.view.menu.DownloadActionsMenu;
 import fr.insalyon.creatis.vip.datamanagement.client.view.menu.DownloadMenu;
 

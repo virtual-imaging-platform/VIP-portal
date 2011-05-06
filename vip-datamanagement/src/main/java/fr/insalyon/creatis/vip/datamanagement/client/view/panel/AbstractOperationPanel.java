@@ -60,8 +60,8 @@ import com.gwtext.client.widgets.grid.Renderer;
 import com.gwtext.client.widgets.grid.event.GridRowListenerAdapter;
 import com.gwtext.client.widgets.layout.FitLayout;
 import com.gwtext.client.widgets.menu.Menu;
-import com.gwtextux.client.data.PagingMemoryProxy;
-import fr.insalyon.creatis.vip.datamanagement.client.bean.PoolOperation;
+//import com.gwtextux.client.data.PagingMemoryProxy;
+import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import java.util.List;
 
 /**
@@ -109,9 +109,9 @@ public abstract class AbstractOperationPanel extends Panel {
                 });
 
         ArrayReader reader = new ArrayReader(recordDef);
-        PagingMemoryProxy proxy = new PagingMemoryProxy(new Object[][]{new Object[]{}});
+//        PagingMemoryProxy proxy = new PagingMemoryProxy(new Object[][]{new Object[]{}});
 
-        store = new Store(proxy, reader);
+//        store = new Store(proxy, reader);
         store.setSortInfo(new SortState("typeico", SortDir.DESC));
         grid.setStore(store);
 
@@ -179,8 +179,8 @@ public abstract class AbstractOperationPanel extends Panel {
             data[i][2] = op.getId();
             i++;
         }
-        PagingMemoryProxy proxy = new PagingMemoryProxy(data);
-        store.setDataProxy(proxy);
+//        PagingMemoryProxy proxy = new PagingMemoryProxy(data);
+//        store.setDataProxy(proxy);
         store.load();
         store.commitChanges();
     }

@@ -63,14 +63,14 @@ import com.gwtext.client.widgets.grid.ColumnModel;
 import com.gwtext.client.widgets.grid.GridPanel;
 import com.gwtext.client.widgets.grid.Renderer;
 import com.gwtext.client.widgets.layout.FitLayout;
-import com.gwtextux.client.data.PagingMemoryProxy;
+//import com.gwtextux.client.data.PagingMemoryProxy;
 import fr.insalyon.creatis.vip.common.client.bean.Authentication;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
-import fr.insalyon.creatis.vip.datamanagement.client.DataManagerConstants;
-import fr.insalyon.creatis.vip.datamanagement.client.bean.Data;
-import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogService;
-import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogServiceAsync;
 import java.util.List;
 
 /**
@@ -115,8 +115,8 @@ public abstract class AbstractBrowserPanel extends Panel {
                 });
 
         ArrayReader reader = new ArrayReader(recordDef);
-        PagingMemoryProxy proxy = new PagingMemoryProxy(getRootData());
-        store = new Store(proxy, reader);
+//        PagingMemoryProxy proxy = new PagingMemoryProxy(getRootData());
+//        store = new Store(proxy, reader);
         store.setSortInfo(new SortState("typeico", SortDir.DESC));
         store.load();
         grid.setStore(store);
@@ -263,8 +263,8 @@ public abstract class AbstractBrowserPanel extends Panel {
                             data[i][1] = d.getName();
                             i++;
                         }
-                        PagingMemoryProxy proxy = new PagingMemoryProxy(data);
-                        store.setDataProxy(proxy);
+//                        PagingMemoryProxy proxy = new PagingMemoryProxy(data);
+//                        store.setDataProxy(proxy);
                         store.load();
                         store.commitChanges();
                     } else {
@@ -277,8 +277,8 @@ public abstract class AbstractBrowserPanel extends Panel {
             service.listDir(auth.getUser(), auth.getProxyFileName(), baseDir, refresh, callback);
 
         } else {
-            PagingMemoryProxy proxy = new PagingMemoryProxy(getRootData());
-            store.setDataProxy(proxy);
+//            PagingMemoryProxy proxy = new PagingMemoryProxy(getRootData());
+//            store.setDataProxy(proxy);
             store.load();
             store.commitChanges();
         }

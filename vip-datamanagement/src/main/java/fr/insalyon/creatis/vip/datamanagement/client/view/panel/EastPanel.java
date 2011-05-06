@@ -40,9 +40,9 @@ import com.gwtext.client.widgets.MessageBox;
 import com.gwtext.client.widgets.TabPanel;
 import fr.insalyon.creatis.vip.common.client.bean.Authentication;
 import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.datamanagement.client.bean.PoolOperation;
-import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolService;
-import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
 import java.util.ArrayList;
 import java.util.List;
 

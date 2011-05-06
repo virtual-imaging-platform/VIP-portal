@@ -32,47 +32,23 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanagement.server;
+package fr.insalyon.creatis.vip.datamanager.client.rpc;
 
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
-import fr.insalyon.creatis.vip.datamanagement.client.DataManagerConstants;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
+import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DataManagerUtil {
+public interface FileCatalogServiceAsync {
 
-    public static String parseBaseDir(String user, String baseDir) {
+    public void listDir(String user, String proxyFileName, String baseDir, boolean refresh, AsyncCallback<List<Data>> asyncCallback);
 
-        baseDir = parsePath(baseDir, DataManagerConstants.USERS_HOME,
-                ServerConfiguration.getInstance().getDataManagerUsersHome()
-                + "/" + user.replaceAll(" ", "_").toLowerCase());
+    public void delete(String user, String proxyFileName, String path, AsyncCallback<Void> asyncCallback);
 
-        baseDir = parsePath(baseDir, DataManagerConstants.PUBLIC_HOME,
-                ServerConfiguration.getInstance().getDataManagerUsersHome()
-                    + "/public");
+    public void createDir(String user, String proxyFileName, String baseDir, String name, AsyncCallback<Void> asyncCallback);
 
-        baseDir = parsePath(baseDir, DataManagerConstants.GROUPS_HOME,
-                ServerConfiguration.getInstance().getDataManagerGroupsHome());
-
-        baseDir = parsePath(baseDir, DataManagerConstants.ACTIVITIES_HOME,
-                ServerConfiguration.getInstance().getDataManagerActivitiesHome());
-
-        baseDir = parsePath(baseDir, DataManagerConstants.WORKFLOWS_HOME,
-                ServerConfiguration.getInstance().getDataManagerWorkflowsHome());
-
-        baseDir = parsePath(baseDir, DataManagerConstants.CREATIS_HOME,
-                "/grid/biomed/creatis");
-
-        return baseDir;
-    }
-
-    private static String parsePath(String baseDir, String pattern, String toReplace) {
-        pattern = DataManagerConstants.ROOT + "/" + pattern;
-        if (baseDir.contains(pattern)) {
-            return baseDir.replace(pattern, toReplace);
-        }
-        return baseDir;
-    }
+    public void deleteFiles(String user, String proxyFileName, List<String> paths, AsyncCallback<Void> asyncCallback);
 }

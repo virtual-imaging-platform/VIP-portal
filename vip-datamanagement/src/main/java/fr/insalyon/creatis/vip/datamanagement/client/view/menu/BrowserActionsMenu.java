@@ -45,14 +45,14 @@ import com.gwtext.client.widgets.menu.Menu;
 import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
 import fr.insalyon.creatis.vip.common.client.bean.Authentication;
 import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.datamanagement.client.DataManagerConstants;
-import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogService;
-import fr.insalyon.creatis.vip.datamanagement.client.rpc.FileCatalogServiceAsync;
-import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolService;
-import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
 import fr.insalyon.creatis.vip.datamanagement.client.view.panel.DataManagerBrowserPanel;
 import fr.insalyon.creatis.vip.datamanagement.client.view.panel.EastPanel;
-import fr.insalyon.creatis.vip.datamanagement.client.view.window.CreateFolderWindow;
+//import fr.insalyon.creatis.vip.datamanagement.client.view.window.CreateFolderWindow;
 import fr.insalyon.creatis.vip.datamanagement.client.view.window.FileUploadWindow;
 import java.util.ArrayList;
 import java.util.List;
@@ -163,7 +163,7 @@ public class BrowserActionsMenu extends Menu {
             @Override
             public void onClick(BaseItem item, EventObject e) {
                 if (!DataManagerBrowserPanel.getInstance().getPathCBValue().equals(DataManagerConstants.ROOT)) {
-                    new CreateFolderWindow(DataManagerBrowserPanel.getInstance().getPathCBValue());
+//                    new CreateFolderWindow(DataManagerBrowserPanel.getInstance().getPathCBValue());
                 } else {
                     MessageBox.alert("You can not create a folder in the root folder.");
                 }

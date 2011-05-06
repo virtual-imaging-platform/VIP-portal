@@ -48,11 +48,11 @@ import com.gwtext.client.widgets.grid.ColumnConfig;
 import com.gwtext.client.widgets.grid.ColumnModel;
 import com.gwtext.client.widgets.grid.GridPanel;
 import com.gwtext.client.widgets.layout.FitLayout;
-import com.gwtextux.client.data.PagingMemoryProxy;
+//import com.gwtextux.client.data.PagingMemoryProxy;
 import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.datamanagement.client.bean.PoolOperation;
-import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolService;
-import fr.insalyon.creatis.vip.datamanagement.client.rpc.TransferPoolServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
 
 /**
  *
@@ -76,7 +76,7 @@ public class OperationDetailPanel extends Panel {
         grid.setMargins(0, 0, 0, 0);
         grid.setWidth(450);
 
-        PagingMemoryProxy proxy = new PagingMemoryProxy(new Object[][]{new Object[]{}});
+//        PagingMemoryProxy proxy = new PagingMemoryProxy(new Object[][]{new Object[]{}});
         RecordDef recordDef = new RecordDef(
                 new FieldDef[]{
                     new StringFieldDef("dm-op-prop"),
@@ -84,7 +84,7 @@ public class OperationDetailPanel extends Panel {
                 });
 
         ArrayReader reader = new ArrayReader(recordDef);
-        store = new Store(proxy, reader);
+//        store = new Store(proxy, reader);
         grid.setStore(store);
 
         ColumnModel columnModel = new ColumnModel(new BaseColumnConfig[]{
@@ -115,8 +115,8 @@ public class OperationDetailPanel extends Panel {
                         {"Date", result.getRegistration().toString()},
                         {"Owner", result.getUser()}};
 
-                    PagingMemoryProxy proxy = new PagingMemoryProxy(data);
-                    store.setDataProxy(proxy);
+//                    PagingMemoryProxy proxy = new PagingMemoryProxy(data);
+//                    store.setDataProxy(proxy);
                     store.load();
                     store.commitChanges();
 

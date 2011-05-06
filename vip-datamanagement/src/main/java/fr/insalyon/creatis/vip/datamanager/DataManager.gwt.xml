@@ -16,12 +16,10 @@
 
     <!-- Specify the app entry point class.                         -->
     <inherits name='com.gwtext.GwtExt' />
-    <inherits name='com.gwtextux.GwtExtUx'/>
-    <inherits name='com.extjs.gxt.ui.GXT'/>
 
     <inherits name='fr.insalyon.creatis.vip.common.Common'/>
 
     <!-- Servlets -->
-    <servlet class="fr.insalyon.creatis.vip.datamanagement.server.rpc.FileCatalogServiceImpl" path="/filecatalogservice"/>
-    <servlet class="fr.insalyon.creatis.vip.datamanagement.server.rpc.TransferPoolServiceImpl" path="/transferpoolservice"/>
+    <servlet class="fr.insalyon.creatis.vip.datamanager.server.rpc.FileCatalogServiceImpl" path="/filecatalogservice"/>
+    <servlet class="fr.insalyon.creatis.vip.datamanager.server.rpc.TransferPoolServiceImpl" path="/transferpoolservice"/>
 </module>
