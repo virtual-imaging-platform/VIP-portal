@@ -36,7 +36,6 @@ package fr.insalyon.creatis.vip.portal.client.view.application.monitor;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.grid.ListGrid;
 import fr.insalyon.creatis.vip.common.client.view.property.AbstractPropertyWindow;
 import fr.insalyon.creatis.vip.common.client.view.property.PropertyRecord;
 import fr.insalyon.creatis.vip.portal.client.bean.Node;
@@ -50,16 +49,15 @@ import fr.insalyon.creatis.vip.portal.client.rpc.JobServiceAsync;
 public class NodeInfoWindow extends AbstractPropertyWindow {
 
     private String simulationID;
-    private String jobID;
-    private ListGrid grid;
+    private String siteName;
+    private String nodeName;
 
-    public NodeInfoWindow(String simulationID, String jobID) {
+    public NodeInfoWindow(String simulationID, String jobID, String siteName, String nodeName) {
         
         super("Node Information for Job ID " + jobID, 550, 240);
-        
         this.simulationID = simulationID;
-        this.jobID = jobID;
-
+        this.siteName = siteName;
+        this.nodeName = nodeName;
         loadData();
     }
 
@@ -99,6 +97,6 @@ public class NodeInfoWindow extends AbstractPropertyWindow {
                 grid.setData(data);
             }
         };
-        service.getNode(simulationID, jobID, callback);
+        service.getNode(simulationID, siteName, nodeName, callback);
     }
 }

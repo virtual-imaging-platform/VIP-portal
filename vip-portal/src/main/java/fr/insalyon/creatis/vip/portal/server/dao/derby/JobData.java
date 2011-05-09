@@ -87,29 +87,31 @@ public class JobData implements JobDAO {
     }
 
     /**
+     * Gets a list of all jobs.
      * 
-     * @return
+     * @return List of jobs
      */
-    public List<Job> getJobs() {
+    public List<Job> getJobs() throws DAOException {
         try {
             List<Job> jobsList = new ArrayList<Job>();
             Statement stat = connection.createStatement();
             ResultSet rs = stat.executeQuery("SELECT "
-                    + "id, status, command, file_name, exit_code FROM jobs "
+                    + "id, status, command, file_name, exit_code, node_site, "
+                    + "node_name, parameters FROM jobs "
                     + "ORDER BY command, id");
 
             while (rs.next()) {
                 jobsList.add(new Job(rs.getString("id"), rs.getString("status"),
                         rs.getString("command"), rs.getString("file_name"),
-                        rs.getInt("exit_code")));
+                        rs.getInt("exit_code"), rs.getString("node_site"),
+                        rs.getString("node_name"), rs.getString("parameters")));
             }
 
             return jobsList;
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw new DAOException(ex);
         }
-        return null;
     }
 
     /**
@@ -120,7 +122,8 @@ public class JobData implements JobDAO {
     public Job getJob(String jobID) {
         try {
             PreparedStatement stat = connection.prepareStatement("SELECT "
-                    + "id, status, command, file_name, exit_code, node_site, node_name "
+                    + "id, status, command, file_name, exit_code, node_site, "
+                    + "node_name, parameters "
                     + "FROM jobs WHERE id = ?");
 
             stat.setString(1, jobID);
@@ -129,10 +132,8 @@ public class JobData implements JobDAO {
             rs.next();
             Job job = new Job(rs.getString("id"), rs.getString("status"),
                     rs.getString("command"), rs.getString("file_name"),
-                    rs.getInt("exit_code"));
-
-            job.setSiteName(rs.getString("node_site"));
-            job.setNodeName(rs.getString("node_name"));
+                    rs.getInt("exit_code"), rs.getString("node_site"),
+                    rs.getString("node_name"), rs.getString("parameters"));
 
             return job;
 

@@ -46,7 +46,12 @@ public interface JobDAO {
 
     public Map<String, Integer> getStatusMap();
 
-    public List<Job> getJobs();
+    /**
+     * Gets a list of all jobs.
+     * 
+     * @return List of jobs
+     */
+    public List<Job> getJobs() throws DAOException;
 
     public Job getJob(String jobID);
 

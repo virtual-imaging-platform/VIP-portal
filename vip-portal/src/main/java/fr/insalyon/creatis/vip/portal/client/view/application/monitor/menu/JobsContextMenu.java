@@ -40,6 +40,7 @@ import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.portal.client.view.application.monitor.NodeInfoWindow;
+import fr.insalyon.creatis.vip.portal.client.view.application.monitor.record.JobRecord;
 import fr.insalyon.creatis.vip.portal.client.view.common.window.FileViewerWindow;
 
 /**
@@ -48,70 +49,72 @@ import fr.insalyon.creatis.vip.portal.client.view.common.window.FileViewerWindow
  */
 public class JobsContextMenu extends Menu {
 
-    public JobsContextMenu(final String simulationID, final String jobID, 
-            String status, final String fileName) {
-        
+    public JobsContextMenu(final String simulationID, final JobRecord job) {
+
         this.setShowShadow(true);
         this.setShadowDepth(10);
         this.setWidth(90);
-        
+
         MenuItem appOutputItem = new MenuItem("View Application Output");
         appOutputItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                new FileViewerWindow("Viewing Application Output for Job ID " + jobID, 
-                        simulationID, "out", fileName, ".sh.app.out").show();
+                new FileViewerWindow("Viewing Application Output for Job ID " + job.getID(),
+                        simulationID, "out", job.getFileName(), ".sh.app.out").show();
             }
         });
-        
+
         MenuItem appErrorItem = new MenuItem("View Application Error");
         appErrorItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                new FileViewerWindow("Viewing Application Error for Job ID " + jobID, 
-                        simulationID, "err", fileName, ".sh.app.err").show();
+                new FileViewerWindow("Viewing Application Error for Job ID " + job.getID(),
+                        simulationID, "err", job.getFileName(), ".sh.app.err").show();
             }
         });
-        
+
         MenuItem outputItem = new MenuItem("View Output File");
         outputItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                new FileViewerWindow("Viewing Output File for Job ID " + jobID, 
-                        simulationID, "out", fileName, ".sh.out").show();
+                new FileViewerWindow("Viewing Output File for Job ID " + job.getID(),
+                        simulationID, "out", job.getFileName(), ".sh.out").show();
             }
         });
-        
+
         MenuItem errorItem = new MenuItem("View Error File");
         errorItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                new FileViewerWindow("Viewing Error File for Job ID " + jobID, 
-                        simulationID, "err", fileName, ".sh.err").show();
+                new FileViewerWindow("Viewing Error File for Job ID " + job.getID(),
+                        simulationID, "err", job.getFileName(), ".sh.err").show();
             }
         });
-        
+
         MenuItem scriptItem = new MenuItem("View Script File");
         scriptItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                new FileViewerWindow("Viewing Script File for Job ID " + jobID, 
-                        simulationID, "sh", fileName, ".sh").show();
+                new FileViewerWindow("Viewing Script File for Job ID " + job.getID(),
+                        simulationID, "sh", job.getFileName(), ".sh").show();
             }
         });
-        
+
         MenuItem nodeItem = new MenuItem("Node Information");
         nodeItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                new NodeInfoWindow(simulationID, jobID).show();
+                new NodeInfoWindow(simulationID, job.getID(),
+                        job.getSiteName(), job.getNodeName()).show();
             }
         });
-        
+
         MenuItemSeparator separator = new MenuItemSeparator();
-        
-        if (status.equals("ERROR") || status.equals("COMPLETED")) {
-            this.setItems(appOutputItem, appErrorItem, separator, 
+
+        if (job.getStatus().equals("ERROR")
+                || job.getStatus().equals("COMPLETED")) {
+
+            this.setItems(appOutputItem, appErrorItem, separator,
                     outputItem, errorItem, separator, scriptItem,
                     separator, nodeItem);
         } else {

@@ -37,17 +37,20 @@ package fr.insalyon.creatis.vip.portal.client.view.application.monitor;
 import fr.insalyon.creatis.vip.portal.client.view.application.monitor.record.JobRecord;
 import fr.insalyon.creatis.vip.portal.client.view.application.monitor.menu.JobsContextMenu;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.ExpansionMode;
 import com.smartgwt.client.types.GroupStartOpen;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
-import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
+import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import fr.insalyon.creatis.vip.portal.client.bean.Job;
 import fr.insalyon.creatis.vip.portal.client.rpc.JobService;
 import fr.insalyon.creatis.vip.portal.client.rpc.JobServiceAsync;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -60,6 +63,7 @@ public class JobsStackSection extends SectionStackSection {
     private ListGrid grid;
 
     public JobsStackSection(String simulationID) {
+        
         this.simulationID = simulationID;
         this.setTitle("Job Details");
         this.setCanCollapse(true);
@@ -67,7 +71,6 @@ public class JobsStackSection extends SectionStackSection {
         this.setResizeable(true);
 
         configureGrid();
-
         this.addItem(grid);
 
         loadData();
@@ -81,25 +84,33 @@ public class JobsStackSection extends SectionStackSection {
         grid.setShowRowNumbers(true);
         grid.setShowEmptyMessage(true);
         grid.setEmptyMessage("<br>No data available.");
+        grid.setCanExpandRecords(true);
+        grid.setExpansionMode(ExpansionMode.DETAIL_FIELD);
 
         ListGridField jobIDField = new ListGridField("jobID", "Job ID");
         ListGridField statusField = new ListGridField("status", "Status");
         ListGridField minorField = new ListGridField("minorStatus", "Minor Status");
         ListGridField commandField = new ListGridField("command", "Command");
         commandField.setHidden(true);
-        ListGridField fileNameField = new ListGridField("fileName", "File Name");
-        fileNameField.setHidden(true);
 
-        grid.setFields(jobIDField, statusField, minorField, commandField, fileNameField);
+        grid.setFields(jobIDField, statusField, minorField, commandField);
 
         grid.setGroupStartOpen(GroupStartOpen.ALL);
         grid.setGroupByField("command");
+        grid.setDetailField("parameters");
 
         grid.addRowContextClickHandler(new RowContextClickHandler() {
 
             public void onRowContextClick(RowContextClickEvent event) {
                 event.cancel();
-                showContextMenu(event.getRecord());
+                JobRecord job = (JobRecord) event.getRecord();
+                new JobsContextMenu(simulationID, job).showContextMenu();
+            }
+        });
+        grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
+
+            public void onCellDoubleClick(CellDoubleClickEvent event) {
+                grid.expandRecord(event.getRecord());
             }
         });
     }
@@ -114,22 +125,15 @@ public class JobsStackSection extends SectionStackSection {
             }
 
             public void onSuccess(List<Job> result) {
-                JobRecord[] data = new JobRecord[result.size()];
-                for (int i = 0; i < result.size(); i++) {
-                    Job j = result.get(i);
-                    data[i] = new JobRecord(j.getId(), j.getStatus(),
-                            j.getCommand(), j.getFileName(), j.getExitCode());
+                List<JobRecord> dataList = new ArrayList<JobRecord>();
+                for (Job j : result) {
+                    dataList.add(new JobRecord(j.getId(), j.getStatus(),
+                            j.getCommand(), j.getFileName(), j.getExitCode(),
+                            j.getSiteName(), j.getNodeName(), j.getParameters()));
                 }
-                grid.setData(data);
+                grid.setData(dataList.toArray(new JobRecord[]{}));
             }
         };
         service.getJobsList(simulationID, callback);
-    }
-
-    private void showContextMenu(ListGridRecord record) {
-        String jobID = record.getAttribute("jobID");
-        String status = record.getAttribute("status");
-        String fileName = record.getAttribute("fileName");
-        new JobsContextMenu(simulationID, jobID, status, fileName).showContextMenu();
     }
 }

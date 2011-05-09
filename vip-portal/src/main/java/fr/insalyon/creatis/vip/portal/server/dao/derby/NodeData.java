@@ -36,9 +36,7 @@ package fr.insalyon.creatis.vip.portal.server.dao.derby;
 
 import fr.insalyon.creatis.vip.portal.server.dao.DAOException;
 import fr.insalyon.creatis.vip.portal.server.dao.derby.connection.JobsConnection;
-import fr.insalyon.creatis.vip.portal.client.bean.Job;
 import fr.insalyon.creatis.vip.portal.client.bean.Node;
-import fr.insalyon.creatis.vip.portal.server.dao.DAOFactory;
 import fr.insalyon.creatis.vip.portal.server.dao.NodeDAO;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import java.sql.Connection;
@@ -52,11 +50,9 @@ import java.sql.SQLException;
  */
 public class NodeData implements NodeDAO {
 
-    private String workflowID;
     private Connection connection;
 
     public NodeData(String workflowID) throws DAOException {
-        this.workflowID = workflowID;
         connection = JobsConnection.getInstance().connect(
                 ServerConfiguration.getInstance().getWorkflowsPath() + "/" + workflowID + "/jobs.db");
     }
@@ -67,7 +63,7 @@ public class NodeData implements NodeDAO {
      * @param nodeName
      * @return
      */
-    public Node getNode(String siteID, String nodeName) {
+    public Node getNode(String siteID, String nodeName) throws DAOException {
         try {
             PreparedStatement stat = connection.prepareStatement("SELECT "
                     + "site, node_name, ncpus, cpu_model_name, cpu_mhz, "
@@ -86,18 +82,7 @@ public class NodeData implements NodeDAO {
                     rs.getDouble("cpu_bogomips"), rs.getInt("mem_total"));
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw new DAOException(ex);
         }
-        return null;
-    }
-
-    /**
-     * 
-     * @param jobID
-     * @return
-     */
-    public Node getNodeByJobID(String jobID) throws DAOException {
-        Job job = DAOFactory.getDAOFactory().getJobDAO(workflowID).getJob(jobID);
-        return getNode(job.getSiteName(), job.getNodeName());
     }
 }

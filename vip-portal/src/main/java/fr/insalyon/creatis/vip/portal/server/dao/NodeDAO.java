@@ -42,7 +42,5 @@ import fr.insalyon.creatis.vip.portal.client.bean.Node;
  */
 public interface NodeDAO {
 
-    public Node getNode(String siteID, String nodeName);
-
-    public Node getNodeByJobID(String jobID) throws DAOException;
+    public Node getNode(String siteID, String nodeName) throws DAOException;
 }

@@ -126,9 +126,9 @@ public class JobServiceImpl extends RemoteServiceServlet implements JobService {
         }
     }
 
-    public Node getNode(String workflowID, String jobID) {
+    public Node getNode(String workflowID, String siteName, String nodeName) {
         try {
-            return DAOFactory.getDAOFactory().getNodeDAO(workflowID).getNodeByJobID(jobID);
+            return DAOFactory.getDAOFactory().getNodeDAO(workflowID).getNode(siteName, nodeName);
         } catch (DAOException ex) {
             return null;
         }

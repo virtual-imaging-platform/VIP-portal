@@ -44,21 +44,27 @@ public class Job implements IsSerializable {
 
     private String id;
     private String status;
-    private String command;
-    private String fileName;
     private int exitCode;
     private String siteName;
     private String nodeName;
+    private String command;
+    private String fileName;
+    private String parameters;
 
     public Job() {
     }
 
-    public Job(String id, String status, String command, String fileName, int exitCode) {
+    public Job(String id, String status, String command, String fileName,
+            int exitCode, String siteName, String nodeName, String parameters) {
+
         this.id = id;
         this.status = status;
         this.command = command;
         this.fileName = fileName;
         this.exitCode = exitCode;
+        this.siteName = siteName;
+        this.nodeName = nodeName;
+        this.parameters = parameters;
     }
 
     public String getCommand() {
@@ -111,5 +117,9 @@ public class Job implements IsSerializable {
 
     public void setSiteName(String siteName) {
         this.siteName = siteName;
+    }
+
+    public String getParameters() {
+        return parameters;
     }
 }

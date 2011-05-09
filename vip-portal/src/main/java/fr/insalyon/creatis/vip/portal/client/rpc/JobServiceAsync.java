@@ -61,5 +61,5 @@ public interface JobServiceAsync {
 
     public void getJobsPertTime(String workflowID, AsyncCallback<List<String>> asyncCallback);
 
-    public void getNode(String workflowID, String jobID, AsyncCallback<Node> asyncCallback);
+    public void getNode(String workflowID, String siteName, String nodeName, AsyncCallback<Node> asyncCallback);
 }

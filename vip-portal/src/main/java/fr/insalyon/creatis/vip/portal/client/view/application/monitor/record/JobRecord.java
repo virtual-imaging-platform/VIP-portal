@@ -45,12 +45,18 @@ public class JobRecord extends ListGridRecord {
     public JobRecord() {
     }
 
-    public JobRecord(String jobID, String status, String command, String fileName, int exitCode) {
-        setJobID(jobID);
-        setStatus(status);
-        setCommand(command);
-        setFileName(fileName);
-        setExitCode(exitCode);
+    public JobRecord(String jobID, String status, String command, String fileName, 
+            int exitCode, String siteName, String nodeName, String parameters) {
+        
+        setAttribute("jobID", jobID);
+        setAttribute("status", status);
+        setAttribute("command", command);
+        setAttribute("fileName", fileName);
+        setAttribute("exitCode", exitCode);
+        setAttribute("siteName", siteName);
+        setAttribute("nodeName", nodeName);
+        setAttribute("parameters", "Parameters: <br />" 
+                + parameters.replaceAll(" ",  "<br />") + "<br />");
         setMinorStatus(status, exitCode);
     }
 
@@ -58,63 +64,39 @@ public class JobRecord extends ListGridRecord {
         return getAttributeAsString("command");
     }
 
-    public void setCommand(String command) {
-        setAttribute("command", command);
-    }
-
     public String getExitCode() {
         return getAttributeAsString("exitCode");
-    }
-
-    public void setExitCode(int exitCode) {
-        setAttribute("exitCode", exitCode);
     }
 
     public String getFileName() {
         return getAttributeAsString("fileName");
     }
 
-    public void setFileName(String fileName) {
-        setAttribute("fileName", fileName);
-    }
-
-    public String getJobID() {
+    public String getID() {
         return getAttributeAsString("jobID");
-    }
-
-    public void setJobID(String id) {
-        setAttribute("jobID", id);
     }
 
     public String getNodeName() {
         return getAttributeAsString("nodeName");
     }
 
-    public void setNodeName(String nodeName) {
-        setAttribute("nodeName", nodeName);
-    }
-
     public String getSiteName() {
         return getAttributeAsString("siteName");
-    }
-
-    public void setSiteName(String siteName) {
-        setAttribute("siteName", siteName);
     }
 
     public String getStatus() {
         return getAttributeAsString("status");
     }
-
-    public void setStatus(String status) {
-        setAttribute("status", status);
-    }
-    
+   
     public String getMinorStatus() {
         return getAttributeAsString("minorStatus");
     }
     
-    public void setMinorStatus(String status, int exitCode) {
+    public String getParameters() {
+        return getAttributeAsString("parameters");
+    }
+    
+    private void setMinorStatus(String status, int exitCode) {
         if (status.equals("COMPLETED") || status.equals("ERROR")) {
             switch (exitCode) {
                 case 0:

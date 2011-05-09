@@ -76,5 +76,5 @@ public interface JobService extends RemoteService {
 
     public List<String> getJobsPertTime(String workflowID);
 
-    public Node getNode(String workflowID, String jobID);
+    public Node getNode(String workflowID, String siteName, String nodeName);
 }
