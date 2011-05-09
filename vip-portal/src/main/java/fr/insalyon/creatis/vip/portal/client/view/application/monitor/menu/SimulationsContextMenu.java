@@ -60,6 +60,7 @@ public class SimulationsContextMenu extends Menu {
         this.setWidth(90);
 
         MenuItem viewItem = new MenuItem("View Simulation");
+        viewItem.setIcon("icon-simulation-view.png");
         viewItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -68,6 +69,7 @@ public class SimulationsContextMenu extends Menu {
         });
 
         MenuItem killItem = new MenuItem("Kill Simulation");
+        killItem.setIcon("icon-kill.png");
         killItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -84,6 +86,7 @@ public class SimulationsContextMenu extends Menu {
         });
 
         MenuItem cleanItem = new MenuItem("Clean Simulation");
+        cleanItem.setIcon("icon-clean.png");
         cleanItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -101,6 +104,7 @@ public class SimulationsContextMenu extends Menu {
         });
 
         MenuItem purgeItem = new MenuItem("Purge Simulation");
+        purgeItem.setIcon("icon-clear.png");
         purgeItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {

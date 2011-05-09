@@ -44,8 +44,6 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.RowMouseDownEvent;
-import com.smartgwt.client.widgets.grid.events.RowMouseDownHandler;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import fr.insalyon.creatis.vip.portal.client.bean.Job;
 import fr.insalyon.creatis.vip.portal.client.rpc.JobService;

@@ -34,7 +34,6 @@
  */
 package fr.insalyon.creatis.vip.portal.client.view.application.monitor;
 
-import fr.insalyon.creatis.vip.portal.client.view.application.monitor.record.PropertyRecord;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.rednels.ofcgwt.client.ChartWidget;
 import com.rednels.ofcgwt.client.model.ChartData;
@@ -63,6 +62,7 @@ import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.common.client.view.property.PropertyRecord;
 import fr.insalyon.creatis.vip.portal.client.rpc.JobService;
 import fr.insalyon.creatis.vip.portal.client.rpc.JobServiceAsync;
 import java.util.ArrayList;

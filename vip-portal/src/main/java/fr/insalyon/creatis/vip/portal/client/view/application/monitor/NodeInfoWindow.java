@@ -34,12 +34,11 @@
  */
 package fr.insalyon.creatis.vip.portal.client.view.application.monitor;
 
-import fr.insalyon.creatis.vip.portal.client.view.application.monitor.record.PropertyRecord;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.grid.ListGrid;
-import com.smartgwt.client.widgets.grid.ListGridField;
+import fr.insalyon.creatis.vip.common.client.view.property.AbstractPropertyWindow;
+import fr.insalyon.creatis.vip.common.client.view.property.PropertyRecord;
 import fr.insalyon.creatis.vip.portal.client.bean.Node;
 import fr.insalyon.creatis.vip.portal.client.rpc.JobService;
 import fr.insalyon.creatis.vip.portal.client.rpc.JobServiceAsync;
@@ -48,35 +47,18 @@ import fr.insalyon.creatis.vip.portal.client.rpc.JobServiceAsync;
  *
  * @author Rafael Silva
  */
-public class NodeInfoWindow extends Window {
+public class NodeInfoWindow extends AbstractPropertyWindow {
 
     private String simulationID;
     private String jobID;
     private ListGrid grid;
 
     public NodeInfoWindow(String simulationID, String jobID) {
+        
+        super("Node Information for Job ID " + jobID, 550, 240);
+        
         this.simulationID = simulationID;
         this.jobID = jobID;
-
-        this.setTitle("Node Information for Job ID " + jobID);
-        this.setCanDragReposition(true);
-        this.setCanDragResize(true);
-        this.setWidth(550);
-        this.setHeight(240);
-        this.centerInPage();
-        
-        grid = new ListGrid();
-        grid.setWidth100();
-        grid.setHeight100();
-        grid.setShowAllRecords(true);
-        grid.setShowEmptyMessage(true);
-        grid.setEmptyMessage("<br>No data available.");
-
-        ListGridField propertyField = new ListGridField("property", "Properties");
-        ListGridField valueField = new ListGridField("value", "Value");
-
-        grid.setFields(propertyField, valueField);
-        this.addItem(grid);
 
         loadData();
     }
