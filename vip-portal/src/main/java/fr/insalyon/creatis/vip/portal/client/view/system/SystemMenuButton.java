@@ -80,9 +80,11 @@ public class SystemMenuButton extends ToolStripMenuButton {
         
         MenuItem configurationItem = new MenuItem("Configuration");
         configurationItem.setSubmenu(confSubMenu);
+        configurationItem.setIcon("icon-configuration.png");
         
         Menu appSubMenu = new Menu();
         MenuItem manageApps = new MenuItem("Manage Applications");
+        manageApps.setIcon("icon-application-manage.png");
         manageApps.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -91,6 +93,7 @@ public class SystemMenuButton extends ToolStripMenuButton {
         });
         
         MenuItem manageClasses = new MenuItem("Manage Classes");
+        manageClasses.setIcon("icon-class.png");
         manageClasses.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -101,6 +104,7 @@ public class SystemMenuButton extends ToolStripMenuButton {
         appSubMenu.setItems(manageApps, manageClasses);
         
         MenuItem applicationItem = new MenuItem("Applications");
+        applicationItem.setIcon("icon-application.png");
         applicationItem.setSubmenu(appSubMenu);
 
         menu.setItems(configurationItem, applicationItem);

@@ -50,6 +50,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
@@ -64,6 +65,7 @@ import java.util.Map;
  */
 public class LaunchStackSection extends SectionStackSection {
 
+    private ModalWindow modal;
     private String applicationClass;
     private String simulationName;
     private DynamicForm form;
@@ -83,6 +85,7 @@ public class LaunchStackSection extends SectionStackSection {
         form.setHeight100();
         vLayout.addMember(form);
 
+        modal = new ModalWindow(vLayout);
         this.addItem(vLayout);
     }
 
@@ -149,6 +152,7 @@ public class LaunchStackSection extends SectionStackSection {
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
             public void onFailure(Throwable caught) {
+                modal.hide();
                 SC.warn("Error executing get application sources list: " + caught.getMessage());
             }
 
@@ -205,12 +209,15 @@ public class LaunchStackSection extends SectionStackSection {
                     LaunchTab launchTab = (LaunchTab) Layout.getInstance().
                             getTab("launch-" + applicationClass.toLowerCase() + "-tab");
                     launchTab.enableSaveButton();
+                    modal.hide();
 
                 } else {
+                    modal.hide();
                     SC.warn("Unable to download application source file.");
                 }
             }
         };
+        modal.show("Loading Launch Panel...", true);
         Context context = Context.getInstance();
         service.getWorkflowSources(context.getUser(),
                 context.getProxyFileName(), simulationName, callback);
@@ -312,14 +319,17 @@ public class LaunchStackSection extends SectionStackSection {
         final AsyncCallback<String> callback = new AsyncCallback<String>() {
 
             public void onFailure(Throwable caught) {
+                modal.hide();
                 SC.warn("Error while launching simulation: " + caught.getMessage());
             }
 
             public void onSuccess(String result) {
                 String simulationID = result.substring(result.lastIndexOf("/") + 1, result.lastIndexOf("."));
+                modal.hide();
                 SC.say("Simulation successfully launched with ID: " + simulationID);
             }
         };
+        modal.show("Launching simulation...", true);
         Context context = Context.getInstance();
         service.launchWorkflow(context.getUser(), getParametersMap(),
                 simulationName, context.getProxyFileName(), callback);

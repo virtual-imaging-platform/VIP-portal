@@ -37,9 +37,7 @@ package fr.insalyon.creatis.vip.portal.client.view.application.monitor;
 import fr.insalyon.creatis.vip.portal.client.view.application.monitor.record.SimulationRecord;
 import fr.insalyon.creatis.vip.portal.client.view.application.monitor.menu.SimulationsContextMenu;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.GroupStartOpen;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.VisibilityMode;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -59,6 +57,8 @@ import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
+import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.portal.client.bean.Workflow;
 import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowServiceAsync;
@@ -74,6 +74,7 @@ import java.util.List;
  */
 public class SimulationsTab extends Tab {
 
+    private ModalWindow modal;
     private ListGrid grid;
     private DynamicForm form;
     private SelectItem userItem;
@@ -122,6 +123,8 @@ public class SimulationsTab extends Tab {
             this.user = Context.getInstance().getUser();
         }
 
+        modal = new ModalWindow(grid);
+        modal.setLoadingIcon("loading.gif");
         loadData();
         loadCombosData();
     }
@@ -135,13 +138,7 @@ public class SimulationsTab extends Tab {
         grid.setShowEmptyMessage(true);
         grid.setEmptyMessage("<br>No data available.");
 
-        ListGridField statusIcoField = new ListGridField("statusIco", " ", 30);
-        statusIcoField.setAlign(Alignment.CENTER);
-        statusIcoField.setType(ListGridFieldType.IMAGE);
-        statusIcoField.setImageURLSuffix(".png");
-        statusIcoField.setImageWidth(12);
-        statusIcoField.setImageHeight(12);
-
+        ListGridField statusIcoField = FieldUtil.getIconGridField("statusIco");
         ListGridField applicationField = new ListGridField("application", "Application");
         ListGridField statusField = new ListGridField("status", "Status");
         ListGridField simulationIdField = new ListGridField("simulationId", "Simulation ID");
@@ -261,9 +258,10 @@ public class SimulationsTab extends Tab {
                 grid.setData(dataList.toArray(new SimulationRecord[]{}));
                 //reloadStats(result);
 //                setStatsPanel(result);
-//                Ext.get(appendID + "-workflows-grid").unmask();
+                modal.hide();
             }
         };
+        modal.show("Loading Simulations...", true);
         service.getWorkflows(user, app, status, startDate, endDate, callback);
         Layout.getInstance().setActiveCenterTab(this.getID());
     }
