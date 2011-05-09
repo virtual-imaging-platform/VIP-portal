@@ -41,16 +41,33 @@ import com.gwtext.client.data.RecordDef;
 import com.gwtext.client.data.Store;
 import com.gwtext.client.data.StringFieldDef;
 import com.gwtext.client.widgets.form.ComboBox;
-import com.gwtext.client.widgets.form.DateField;
 import com.gwtext.client.widgets.form.MultiFieldPanel;
-import com.gwtext.client.widgets.form.NumberField;
 import com.gwtext.client.widgets.form.TextField;
+import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.ListGridFieldType;
+import com.smartgwt.client.widgets.grid.ListGridField;
 
 /**
  *
  * @author Rafael Silva
  */
 public class FieldUtil {
+    
+    /**
+     * Gets a ListGridField configured to display an icon.
+     * 
+     * @param name Field name
+     * @return List grid field
+     */
+    public static ListGridField getIconGridField(String name) {
+        ListGridField iconField = new ListGridField(name, " ", 30);
+        iconField.setAlign(Alignment.CENTER);
+        iconField.setType(ListGridFieldType.IMAGE);
+        iconField.setImageURLSuffix(".png");
+        iconField.setImageWidth(12);
+        iconField.setImageHeight(12);
+        return iconField;
+    }
 
     public static MultiFieldPanel getMultiFieldPanel(String id) {
 
@@ -71,21 +88,6 @@ public class FieldUtil {
         textField.setFieldLabel(label);
 
         return textField;
-    }
-
-    public static NumberField getNumberField(String id, int size, String label,
-            String emptyText, boolean hideLabel) {
-
-        NumberField numberField = new NumberField();
-        numberField.setId(id);
-        numberField.setWidth(size);
-        numberField.setAllowDecimals(false);
-        numberField.setAllowNegative(false);
-        numberField.setFieldLabel(label);
-        numberField.setEmptyText(emptyText);
-        numberField.setHideLabel(hideLabel);
-
-        return numberField;
     }
 
     public static ComboBox getComboBox(String id, String label, int size,
@@ -117,14 +119,5 @@ public class FieldUtil {
                 });
 
         return new Store(memoryProxy, new ArrayReader(recordDef));
-    }
-
-    public static DateField getDateField(String id, int size, String label) {
-
-        DateField dateField = new DateField(label, id, size);
-        dateField.setAllowBlank(true);
-        dateField.setFormat("m/d/Y");
-
-        return dateField;
     }
 }
