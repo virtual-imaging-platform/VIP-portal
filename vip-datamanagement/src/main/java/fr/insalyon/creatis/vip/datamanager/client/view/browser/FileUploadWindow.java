@@ -58,12 +58,13 @@ public class FileUploadWindow extends Window {
     public FileUploadWindow(String baseDir) {
 
         this.setTitle("Upload file to: " + baseDir);
-        this.setWidth(380);
+        this.setWidth(400);
         this.setHeight(110);
         this.setShowMinimizeButton(false);
         this.setIsModal(true);
         this.setShowModalMask(true);
         this.centerInPage();
+        this.setPadding(5);
 
         form = new DynamicForm();
         form.setEncoding(Encoding.MULTIPART);

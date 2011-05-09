@@ -36,27 +36,24 @@ package fr.insalyon.creatis.vip.datamanager.client.view.browser;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.NamedFrame;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.DragDataAction;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.types.SelectionAppearance;
+import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.toolbar.ToolStrip;
-import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,8 +64,7 @@ import java.util.List;
 public class BrowserLayout extends VLayout {
 
     private static BrowserLayout instance;
-    private ToolStrip toolStrip;
-    private SelectItem pathItem;
+    private BrowserToolStrip toolStrip;
     private ListGrid grid;
 
     public static BrowserLayout getInstance() {
@@ -86,9 +82,9 @@ public class BrowserLayout extends VLayout {
         this.setOverflow(Overflow.AUTO);
         this.setShowResizeBar(true);
 
-        configureToolStrip();
         configureGrid();
 
+        toolStrip = new BrowserToolStrip();
         this.addMember(toolStrip);
         this.addMember(grid);
 
@@ -101,126 +97,17 @@ public class BrowserLayout extends VLayout {
         this.addMember(frame);
     }
 
-    private void configureToolStrip() {
-        toolStrip = new ToolStrip();
-        toolStrip.setWidth100();
-
-        pathItem = new SelectItem("path");
-        pathItem.setShowTitle(false);
-        pathItem.setWidth(400);
-        pathItem.setValue(DataManagerConstants.ROOT);
-        toolStrip.addFormItem(pathItem);
-
-        ToolStripButton folderUpButton = new ToolStripButton();
-        folderUpButton.setIcon("icon-folderup.png");
-        folderUpButton.setPrompt("Folder up");
-        folderUpButton.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-                if (!pathItem.getValueAsString().equals(DataManagerConstants.ROOT)) {
-                    String newPath = pathItem.getValueAsString();
-                    loadData(newPath.substring(0, newPath.lastIndexOf("/")), false);
-                }
-            }
-        });
-        toolStrip.addButton(folderUpButton);
-
-        ToolStripButton refreshButton = new ToolStripButton();
-        refreshButton.setIcon("icon-refresh.png");
-        refreshButton.setPrompt("Refresh");
-        refreshButton.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-                loadData(pathItem.getValueAsString(), true);
-            }
-        });
-        toolStrip.addButton(refreshButton);
-
-        ToolStripButton homeButton = new ToolStripButton();
-        homeButton.setIcon("icon-home.png");
-        homeButton.setPrompt("Home");
-        homeButton.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-                loadData(DataManagerConstants.ROOT, false);
-            }
-        });
-        toolStrip.addButton(homeButton);
-
-        ToolStripButton addFolderButton = new ToolStripButton();
-        addFolderButton.setIcon("icon-addfolder.png");
-        addFolderButton.setPrompt("Create Folder");
-        addFolderButton.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-                String path = pathItem.getValueAsString();
-                if (path.equals(DataManagerConstants.ROOT)) {
-                    SC.warn("You cannot create a folder in the root folder.");
-                } else {
-                    new AddFolderWindow(path).show();
-                }
-            }
-        });
-        toolStrip.addButton(addFolderButton);
-
-        toolStrip.addSeparator();
-        ToolStripButton uploadButton = new ToolStripButton();
-        uploadButton.setIcon("icon-upload.png");
-        uploadButton.setPrompt("Upload File");
-        uploadButton.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-                String path = pathItem.getValueAsString();
-                if (path.equals(DataManagerConstants.ROOT)) {
-                    SC.warn("You cannot upload a file in the root folder.");
-                } else {
-                    new FileUploadWindow(path).show();
-                }
-            }
-        });
-        toolStrip.addButton(uploadButton);
-
-        ToolStripButton downloadButton = new ToolStripButton();
-        downloadButton.setIcon("icon-download.png");
-        downloadButton.setPrompt("Download Selected Files");
-        downloadButton.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-                //TODO download files
-            }
-        });
-        toolStrip.addButton(downloadButton);
-        
-        toolStrip.addSeparator();
-        ToolStripButton deleteButton = new ToolStripButton();
-        deleteButton.setIcon("icon-delete-files.png");
-        deleteButton.setPrompt("Delete Selected Files/Folders");
-        deleteButton.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-                //TODO download files
-            }
-        });
-        toolStrip.addButton(deleteButton);
-    }
-
     private void configureGrid() {
         grid = new ListGrid();
         grid.setWidth100();
         grid.setHeight100();
         grid.setShowAllRecords(false);
         grid.setShowEmptyMessage(true);
-        grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
-        grid.setCanDragRecordsOut(true);
-        grid.setDragDataAction(DragDataAction.COPY);
+        grid.setSelectionType(SelectionStyle.SIMPLE);
+        grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
 
-        ListGridField icoField = new ListGridField("icon", " ", 30);
-        icoField.setAlign(Alignment.CENTER);
-        icoField.setType(ListGridFieldType.IMAGE);
-        icoField.setImageURLSuffix(".png");
-        icoField.setImageWidth(12);
-        icoField.setImageHeight(12);
+        ListGridField icoField = FieldUtil.getIconGridField("icon");
         ListGridField nameField = new ListGridField("name", "Name");
 
         grid.setFields(icoField, nameField);
@@ -233,7 +120,7 @@ public class BrowserLayout extends VLayout {
                 String type = event.getRecord().getAttributeAsString("icon");
                 if (type.contains("folder")) {
                     String name = event.getRecord().getAttributeAsString("name");
-                    String path = pathItem.getValueAsString() + "/" + name;
+                    String path = toolStrip.getPath() + "/" + name;
                     loadData(path, false);
                 }
             }
@@ -257,7 +144,7 @@ public class BrowserLayout extends VLayout {
                             dataList.add(new DataRecord(
                                     d.getType().toLowerCase(), d.getName()));
                         }
-                        pathItem.setValue(path);
+                        toolStrip.setPath(path);
                         grid.setData(dataList.toArray(new DataRecord[]{}));
 
                     } else {
@@ -269,7 +156,7 @@ public class BrowserLayout extends VLayout {
             service.listDir(context.getUser(), context.getProxyFileName(), path, refresh, callback);
 
         } else {
-            pathItem.setValue(path);
+            toolStrip.setPath(path);
             grid.setData(
                     new DataRecord[]{
                         new DataRecord("folder", DataManagerConstants.USERS_HOME),
@@ -281,11 +168,15 @@ public class BrowserLayout extends VLayout {
                     });
         }
     }
+    
+    public ListGridRecord[] getGridSelection() {
+        return grid.getSelection();
+    }
 
     public void uploadComplete(String fileName) {
-        SC.say("Upload completed: " + fileName);
+        OperationLayout.getInstance().loadData();
     }
-    
+
     private native void initComplete(BrowserLayout upload) /*-{
     $wnd.uploadComplete = function (fileName) {
     upload.@fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout::uploadComplete(Ljava/lang/String;)(fileName);

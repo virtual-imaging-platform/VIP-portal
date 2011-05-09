@@ -34,52 +34,25 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.operation;
 
-import com.smartgwt.client.widgets.grid.ListGridRecord;
+import fr.insalyon.creatis.vip.common.client.view.property.AbstractPropertyWindow;
+import fr.insalyon.creatis.vip.common.client.view.property.PropertyRecord;
 
 /**
  *
  * @author Rafael Silva
  */
-public class OperationRecord extends ListGridRecord {
+public class OperationDetailsWindow extends AbstractPropertyWindow {
 
-    public OperationRecord() {
-    }
-    
-    public OperationRecord(String id, String type, String status, String source, 
-            String destination, String date, String owner) {
-        
-        setAttribute("typeIcon", "icon-" + type.toLowerCase());
-        setAttribute("statusIcon", "icon-" + status.toLowerCase());
-        setAttribute("operationId", id);
-        setAttribute("type", type);
-        setAttribute("status", status);
-        setAttribute("name", source);
-        setAttribute("destination", destination);
-        setAttribute("date", date);
-        setAttribute("owner", owner);
-    }
-    
-    public String getId() {
-        return getAttributeAsString("operationId");
-    }
-    
-    public String getType() {
-        return getAttributeAsString("type");
-    }
-    
-    public String getStatus() {
-        return getAttributeAsString("status");
-    }
-    
-    public String getSource() {
-        return getAttributeAsString("name");
-    }
-    
-    public String getDestination() {
-        return getAttributeAsString("destination");
-    }
-    
-    public String getDate() {
-        return getAttributeAsString("date");
+    public OperationDetailsWindow(OperationRecord operation) {
+
+        super("Operation Details", 550, 200);
+
+        grid.setData(new PropertyRecord[]{
+            new PropertyRecord("Type", operation.getType()),
+            new PropertyRecord("Status", operation.getStatus()),
+            new PropertyRecord("Source", operation.getSource()),
+            new PropertyRecord("Destination", operation.getDestination()),
+            new PropertyRecord("Date", operation.getDate())
+        });
     }
 }
