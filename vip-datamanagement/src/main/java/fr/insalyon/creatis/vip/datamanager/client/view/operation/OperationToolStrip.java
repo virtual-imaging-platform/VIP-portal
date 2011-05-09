@@ -45,6 +45,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
 
@@ -54,7 +55,7 @@ import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
  */
 public class OperationToolStrip extends ToolStrip {
 
-    public OperationToolStrip() {
+    public OperationToolStrip(final ModalWindow modal) {
         this.setWidth100();
 
         ToolStripButton refreshButton = new ToolStripButton();
@@ -108,13 +109,16 @@ public class OperationToolStrip extends ToolStrip {
                                     AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                                         public void onFailure(Throwable caught) {
+                                            modal.hide();
                                             SC.warn("Error executing clear operations: " + caught.getMessage());
                                         }
 
                                         public void onSuccess(Void result) {
+                                            modal.hide();
                                             OperationLayout.getInstance().loadData();
                                         }
                                     };
+                                    modal.show("Clearing operations...", true);
                                     Context context = Context.getInstance();
                                     service.removeOperationById(op.getId(),
                                             context.getProxyFileName(), callback);

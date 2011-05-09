@@ -44,6 +44,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogServiceAsync;
@@ -59,9 +60,12 @@ import java.util.List;
  */
 public class BrowserToolStrip extends ToolStrip {
 
+    private ModalWindow modal;
     private SelectItem pathItem;
 
-    public BrowserToolStrip() {
+    public BrowserToolStrip(final ModalWindow modal) {
+        
+        this.modal = modal;
         this.setWidth100();
 
         pathItem = new SelectItem("path");
@@ -117,7 +121,7 @@ public class BrowserToolStrip extends ToolStrip {
                 if (path.equals(DataManagerConstants.ROOT)) {
                     SC.warn("You cannot create a folder in the root folder.");
                 } else {
-                    new AddFolderWindow(path).show();
+                    new AddFolderWindow(modal, path).show();
                 }
             }
         });
@@ -134,7 +138,7 @@ public class BrowserToolStrip extends ToolStrip {
                 if (path.equals(DataManagerConstants.ROOT)) {
                     SC.warn("You cannot upload a file in the root folder.");
                 } else {
-                    new FileUploadWindow(path).show();
+                    new FileUploadWindow(modal, path).show();
                 }
             }
         });
@@ -179,13 +183,16 @@ public class BrowserToolStrip extends ToolStrip {
                 AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                     public void onFailure(Throwable caught) {
+                        modal.hide();
                         SC.warn("Unable to download file: " + caught.getMessage());
                     }
 
                     public void onSuccess(Void result) {
+                        modal.hide();
                         OperationLayout.getInstance().loadData();
                     }
                 };
+                modal.show("Adding files to transfer queue...", true);
                 Context context = Context.getInstance();
                 service.downloadFile(
                         context.getUser(),
@@ -212,13 +219,16 @@ public class BrowserToolStrip extends ToolStrip {
                     AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                         public void onFailure(Throwable caught) {
+                            modal.hide();
                             SC.warn("Error executing delete files/folders: " + caught.getMessage());
                         }
 
                         public void onSuccess(Void result) {
+                            modal.hide();
                             BrowserLayout.getInstance().loadData(pathItem.getValueAsString(), true);
                         }
                     };
+                    modal.show("Deleting files/folders...", true);
                     Context context = Context.getInstance();
                     service.deleteFiles(context.getUser(), context.getProxyFileName(), 
                             paths, callback);

@@ -49,6 +49,7 @@ import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
+import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
@@ -64,6 +65,7 @@ import java.util.List;
 public class BrowserLayout extends VLayout {
 
     private static BrowserLayout instance;
+    private ModalWindow modal;
     private BrowserToolStrip toolStrip;
     private ListGrid grid;
 
@@ -84,7 +86,8 @@ public class BrowserLayout extends VLayout {
 
         configureGrid();
 
-        toolStrip = new BrowserToolStrip();
+        modal = new ModalWindow(grid);
+        toolStrip = new BrowserToolStrip(modal);
         this.addMember(toolStrip);
         this.addMember(grid);
 
@@ -134,6 +137,7 @@ public class BrowserLayout extends VLayout {
             AsyncCallback<List<Data>> callback = new AsyncCallback<List<Data>>() {
 
                 public void onFailure(Throwable caught) {
+                    modal.hide();
                     SC.warn("Error executing get files list: " + caught.getMessage());
                 }
 
@@ -146,12 +150,15 @@ public class BrowserLayout extends VLayout {
                         }
                         toolStrip.setPath(path);
                         grid.setData(dataList.toArray(new DataRecord[]{}));
+                        modal.hide();
 
                     } else {
+                        modal.hide();
                         SC.warn("Unable to get list of files.");
                     }
                 }
             };
+            modal.show("Loading folder " + path + "...", true);
             Context context = Context.getInstance();
             service.listDir(context.getUser(), context.getProxyFileName(), path, refresh, callback);
 
@@ -174,6 +181,7 @@ public class BrowserLayout extends VLayout {
     }
 
     public void uploadComplete(String fileName) {
+        modal.hide();
         OperationLayout.getInstance().loadData();
     }
 

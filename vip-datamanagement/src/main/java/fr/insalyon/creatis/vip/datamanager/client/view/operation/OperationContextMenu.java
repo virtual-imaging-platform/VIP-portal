@@ -45,6 +45,7 @@ import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
 
@@ -54,7 +55,7 @@ import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
  */
 public class OperationContextMenu extends Menu {
 
-    public OperationContextMenu(final OperationRecord operation) {
+    public OperationContextMenu(final ModalWindow modal, final OperationRecord operation) {
 
         this.setShowShadow(true);
         this.setShadowDepth(10);
@@ -99,13 +100,16 @@ public class OperationContextMenu extends Menu {
                                 AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                                     public void onFailure(Throwable caught) {
+                                        modal.hide();
                                         SC.warn("Error executing clear operations: " + caught.getMessage());
                                     }
 
                                     public void onSuccess(Void result) {
+                                        modal.hide();
                                         OperationLayout.getInstance().loadData();
                                     }
                                 };
+                                modal.show("Clearing operation...", true);
                                 Context context = Context.getInstance();
                                 service.removeOperationById(operation.getId(),
                                         context.getProxyFileName(), callback);

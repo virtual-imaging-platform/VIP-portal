@@ -47,6 +47,7 @@ import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
+import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
@@ -60,6 +61,7 @@ import java.util.List;
 public class OperationLayout extends VLayout {
 
     private static OperationLayout instance;
+    private ModalWindow modal;
     private OperationToolStrip toolStrip;
     private ListGrid grid;
 
@@ -78,7 +80,8 @@ public class OperationLayout extends VLayout {
         
         configureGrid();
 
-        toolStrip = new OperationToolStrip();
+        modal = new ModalWindow(grid);
+        toolStrip = new OperationToolStrip(modal);
         this.addMember(toolStrip);
         this.addMember(grid);
         
@@ -106,7 +109,7 @@ public class OperationLayout extends VLayout {
             public void onRowContextClick(RowContextClickEvent event) {
                 event.cancel();
                 ListGridRecord record = event.getRecord();
-                new OperationContextMenu((OperationRecord) record).showContextMenu();
+                new OperationContextMenu(modal, (OperationRecord) record).showContextMenu();
             }
         });
     }
@@ -129,12 +132,15 @@ public class OperationLayout extends VLayout {
                                 o.getRegistration().toString(), o.getUser()));
                     }
                     grid.setData(dataList.toArray(new OperationRecord[]{}));
+                    modal.hide();
                     
                 } else {
+                    modal.hide();
                     SC.warn("Unable to get list of operations.");
                 }
             }
         };
+        modal.show("Loading operations...", true);
         Context context = Context.getInstance();
         service.getOperations(context.getUserDN(), context.getProxyFileName(), callback);
     }

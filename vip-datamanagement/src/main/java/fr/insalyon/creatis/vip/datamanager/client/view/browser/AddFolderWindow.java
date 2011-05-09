@@ -44,6 +44,7 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogServiceAsync;
 
@@ -56,7 +57,7 @@ public class AddFolderWindow extends Window {
     private DynamicForm form;
     private TextItem nameItem;
 
-    public AddFolderWindow(final String baseDir) {
+    public AddFolderWindow(final ModalWindow modal, final String baseDir) {
        
         this.setTitle("Create folder into: " + baseDir);
         this.setWidth(350);
@@ -86,13 +87,16 @@ public class AddFolderWindow extends Window {
                     AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                         public void onFailure(Throwable caught) {
+                            modal.hide();
                             SC.warn("Error executing create dir: " + caught.getMessage());
                         }
 
                         public void onSuccess(Void result) {
+                            modal.hide();
                             BrowserLayout.getInstance().loadData(baseDir, true);
                         }
                     };
+                    modal.show("Creating folder...", true);
                     Context context = Context.getInstance();
                     service.createDir(context.getUser(), context.getProxyFileName(),
                             baseDir, nameItem.getValueAsString(), callback);

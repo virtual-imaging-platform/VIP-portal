@@ -45,6 +45,7 @@ import com.smartgwt.client.widgets.form.fields.UploadItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 
 /**
  *
@@ -55,7 +56,7 @@ public class FileUploadWindow extends Window {
     private DynamicForm form;
     private UploadItem fileItem;
 
-    public FileUploadWindow(String baseDir) {
+    public FileUploadWindow(final ModalWindow modal, String baseDir) {
 
         this.setTitle("Upload file to: " + baseDir);
         this.setWidth(400);
@@ -91,6 +92,7 @@ public class FileUploadWindow extends Window {
 
             public void onClick(ClickEvent e) {
                 if (form.validate()) {
+                    modal.show("Uploading file...", true);
                     form.submitForm();
                     destroy();
                 }
