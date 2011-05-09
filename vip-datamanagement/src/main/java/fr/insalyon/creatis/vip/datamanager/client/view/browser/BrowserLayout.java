@@ -35,7 +35,9 @@
 package fr.insalyon.creatis.vip.datamanager.client.view.browser;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.NamedFrame;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SortDirection;
@@ -75,12 +77,14 @@ public class BrowserLayout extends VLayout {
         }
         return instance;
     }
-    
+
     private BrowserLayout() {
 
+        initComplete(this);
         this.setWidth100();
         this.setHeight100();
         this.setOverflow(Overflow.AUTO);
+        this.setShowResizeBar(true);
 
         configureToolStrip();
         configureGrid();
@@ -89,6 +93,12 @@ public class BrowserLayout extends VLayout {
         this.addMember(grid);
 
         loadData(DataManagerConstants.ROOT, false);
+
+        NamedFrame frame = new NamedFrame("uploadTarget");
+        frame.setVisible(false);
+        frame.setHeight("1px");
+        frame.setWidth("1px");
+        this.addMember(frame);
     }
 
     private void configureToolStrip() {
@@ -152,7 +162,7 @@ public class BrowserLayout extends VLayout {
             }
         });
         toolStrip.addButton(addFolderButton);
-        
+
         toolStrip.addSeparator();
         ToolStripButton uploadButton = new ToolStripButton();
         uploadButton.setIcon("icon-upload.png");
@@ -160,11 +170,16 @@ public class BrowserLayout extends VLayout {
         uploadButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                //TODO upload file
+                String path = pathItem.getValueAsString();
+                if (path.equals(DataManagerConstants.ROOT)) {
+                    SC.warn("You cannot upload a file in the root folder.");
+                } else {
+                    new FileUploadWindow(path).show();
+                }
             }
         });
         toolStrip.addButton(uploadButton);
-        
+
         ToolStripButton downloadButton = new ToolStripButton();
         downloadButton.setIcon("icon-download.png");
         downloadButton.setPrompt("Download Selected Files");
@@ -175,6 +190,18 @@ public class BrowserLayout extends VLayout {
             }
         });
         toolStrip.addButton(downloadButton);
+        
+        toolStrip.addSeparator();
+        ToolStripButton deleteButton = new ToolStripButton();
+        deleteButton.setIcon("icon-delete-files.png");
+        deleteButton.setPrompt("Delete Selected Files/Folders");
+        deleteButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                //TODO download files
+            }
+        });
+        toolStrip.addButton(deleteButton);
     }
 
     private void configureGrid() {
@@ -185,6 +212,8 @@ public class BrowserLayout extends VLayout {
         grid.setShowEmptyMessage(true);
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
+        grid.setCanDragRecordsOut(true);
+        grid.setDragDataAction(DragDataAction.COPY);
 
         ListGridField icoField = new ListGridField("icon", " ", 30);
         icoField.setAlign(Alignment.CENTER);
@@ -252,4 +281,14 @@ public class BrowserLayout extends VLayout {
                     });
         }
     }
+
+    public void uploadComplete(String fileName) {
+        SC.say("Upload completed: " + fileName);
+    }
+    
+    private native void initComplete(BrowserLayout upload) /*-{
+    $wnd.uploadComplete = function (fileName) {
+    upload.@fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout::uploadComplete(Ljava/lang/String;)(fileName);
+    };
+    }-*/;
 }

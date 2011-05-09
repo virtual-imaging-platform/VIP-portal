@@ -56,7 +56,7 @@ public class DataManagerSection extends SectionStackSection {
         hLayout.setHeight(350);
         
         hLayout.addMember(BrowserLayout.getInstance());
-        hLayout.addMember(new OperationLayout());
+        hLayout.addMember(OperationLayout.getInstance());
         
         this.addItem(hLayout);
     }

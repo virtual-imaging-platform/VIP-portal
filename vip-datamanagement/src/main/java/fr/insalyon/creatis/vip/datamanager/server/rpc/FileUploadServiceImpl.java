@@ -39,6 +39,7 @@ import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -73,6 +74,8 @@ public class FileUploadServiceImpl extends HttpServlet {
             try {
                 List items = upload.parseRequest(request);
                 Iterator iter = items.iterator();
+                String fileName = null;
+                FileItem fileItem = null;
                 String userdn = null;
                 String user = null;
                 String proxy = null;
@@ -80,43 +83,58 @@ public class FileUploadServiceImpl extends HttpServlet {
 
                 while (iter.hasNext()) {
                     FileItem item = (FileItem) iter.next();
+                    System.out.println("------ " + item.getFieldName());
 
-                    if (item.isFormField()) {
-                        if (item.getFieldName().equals("userdn")) {
-                            userdn = item.getString();
-                        } else if (item.getFieldName().equals("user")) {
-                            user = item.getString();
-                        } else if (item.getFieldName().equals("proxy")) {
-                            proxy = item.getString();
-                        } else if (item.getFieldName().equals("path")) {
-                            path = item.getString();
-                        }
-
-                    } else {
-                        String fileName = item.getName();
-                        if (fileName != null && !fileName.equals("")) {
-                            fileName = new File(fileName).getName();
-                            File uploadedFile = new File(rootDirectory + fileName);
-                            try {
-                                item.write(uploadedFile);
-                                response.getWriter().write(fileName);
-
-                                // Vlet Agent Pool Client
-                                VletAgentPoolClient client = new VletAgentPoolClient(
-                                        ServerConfiguration.getInstance().getVletagentHost(),
-                                        ServerConfiguration.getInstance().getVletagentPort(),
-                                        proxy);
-                                client.uploadFile(
-                                        uploadedFile.getAbsolutePath(),
-                                        DataManagerUtil.parseBaseDir(user, path),
-                                        userdn);
-
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-                        }
+                    if (item.getFieldName().equals("userdn")) {
+                        userdn = item.getString();
+                    } else if (item.getFieldName().equals("user")) {
+                        user = item.getString();
+                    } else if (item.getFieldName().equals("proxy")) {
+                        proxy = item.getString();
+                    } else if (item.getFieldName().equals("path")) {
+                        path = item.getString();
+                    } else if (item.getFieldName().equals("file")) {
+                        fileName = item.getName();
+                        fileItem = item;
                     }
                 }
+                if (fileName != null && !fileName.equals("")) {
+                    fileName = new File(fileName).getName();
+                    File uploadedFile = new File(rootDirectory + fileName);
+                    try {
+                        fileItem.write(uploadedFile);
+                        response.getWriter().write(fileName);
+
+                        // Vlet Agent Pool Client
+                        VletAgentPoolClient client = new VletAgentPoolClient(
+                                ServerConfiguration.getInstance().getVletagentHost(),
+                                ServerConfiguration.getInstance().getVletagentPort(),
+                                proxy);
+                        client.uploadFile(
+                                uploadedFile.getAbsolutePath(),
+                                DataManagerUtil.parseBaseDir(user, path),
+                                userdn);
+
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                response.setContentType("text/html");
+                response.setHeader("Pragma", "No-cache");
+                response.setDateHeader("Expires", 0);
+                response.setHeader("Cache-Control", "no-cache");
+                PrintWriter out = response.getWriter();
+                out.println("<html>");
+                out.println("<body>");
+                out.println("<script type=\"text/javascript\">");
+                out.println("if (parent.uploadComplete) parent.uploadComplete('"
+                        + fileName + "');");
+                out.println("</script>");
+                out.println("</body>");
+                out.println("</html>");
+                out.flush();
+
             } catch (FileUploadException ex) {
                 ex.printStackTrace();
             }
