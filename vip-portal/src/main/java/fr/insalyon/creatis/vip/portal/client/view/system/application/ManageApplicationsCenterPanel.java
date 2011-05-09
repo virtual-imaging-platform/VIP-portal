@@ -58,7 +58,7 @@ import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.portal.client.view.common.panel.CheckboxPanel;
 import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
-import fr.insalyon.creatis.vip.datamanagement.client.view.window.SelectDataPathWindow;
+//import fr.insalyon.creatis.vip.datamanagement.client.view.window.SelectDataPathWindow;
 import fr.insalyon.creatis.vip.portal.client.view.common.panel.AbstractPanel;
 import java.util.ArrayList;
 import java.util.List;
@@ -167,9 +167,9 @@ public class ManageApplicationsCenterPanel extends AbstractPanel {
 
             @Override
             public void onClick(Button button, EventObject e) {
-                SelectDataPathWindow window = SelectDataPathWindow.getInstance();
-                window.configure("simulation-lfn", fieldSet);
-                window.display();
+//                SelectDataPathWindow window = SelectDataPathWindow.getInstance();
+//                window.configure("simulation-lfn", fieldSet);
+//                window.display();
 //                new SelectLFNBrowserWindow("/grid/biomed", "simulation-lfn", fieldSet);
             }
         });
