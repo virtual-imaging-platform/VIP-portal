@@ -46,6 +46,7 @@ import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.portal.client.view.application.ApplicationMenuButton;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.portal.client.view.simulationGUI.SimulationGUIMenuButton;
 import fr.insalyon.creatis.vip.portal.client.view.system.SystemMenuButton;
 import java.util.List;
 
@@ -71,7 +72,8 @@ public class MainToolStrip extends ToolStrip {
         if (Context.getInstance().isSystemAdmin()) {
             this.addMenuButton(new SystemMenuButton());
         }
-       
+        //Kevin Moulin to uncomment this for his release 0.1
+        //this.addMenuButton(new SimulationGUIMenuButton());
         loadApplicationMenus();
     }
     
