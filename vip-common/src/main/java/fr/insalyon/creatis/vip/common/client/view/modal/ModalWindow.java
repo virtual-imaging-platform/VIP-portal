@@ -155,7 +155,7 @@ public class ModalWindow {
     public void hide() {
         long showEndTime = System.currentTimeMillis();
         // don't hide if is showed for less than 1s, avoid flickering
-        int delay = 1000;
+        int delay = 500;
         if (showEndTime - showStartedTime < delay) {
             new Timer() {
 
@@ -250,7 +250,7 @@ public class ModalWindow {
             if (loadingIcon != null) { // icon provided by user
                 label.setIcon(loadingIcon);
             } else { // show default icon from used skin
-                String icon = Page.getSkinImgDir() + "loading.gif";
+                String icon = "loading.gif";
                 label.setIcon(icon);
             }
             if (message.equals("")) { // no spacing, just show the loading icon
