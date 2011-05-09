@@ -36,7 +36,6 @@ package fr.insalyon.creatis.vip.datamanagement.client.view.panel;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.gwtext.client.core.EventObject;
-import com.gwtext.client.data.Record;
 import com.gwtext.client.dd.DragData;
 import com.gwtext.client.dd.DragSource;
 import com.gwtext.client.dd.DropTarget;
@@ -48,8 +47,6 @@ import fr.insalyon.creatis.vip.common.client.bean.Authentication;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
-import fr.insalyon.creatis.vip.datamanagement.client.view.menu.DownloadActionsMenu;
-import fr.insalyon.creatis.vip.datamanagement.client.view.menu.DownloadMenu;
 
 /**
  *
@@ -76,12 +73,12 @@ public class DownloadPanel extends AbstractOperationPanel {
 
             @Override
             public boolean notifyDrop(DragSource source, EventObject e, DragData data) {
-                Record[] rows = DataManagerBrowserPanel.getInstance().getSelectionModel().getSelections();
+//                Record[] rows = DataManagerBrowserPanel.getInstance().getSelectionModel().getSelections();
 
-                for (Record r : rows) {
-                    if (!r.getAsString("typeico").equals("Folder")) {
+//                for (Record r : rows) {
+//                    if (!r.getAsString("typeico").equals("Folder")) {
                         TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
-                        final String parentDir = DataManagerBrowserPanel.getInstance().getPathCBValue();
+//                        final String parentDir = DataManagerBrowserPanel.getInstance().getPathCBValue();
                         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                             public void onFailure(Throwable caught) {
@@ -89,18 +86,18 @@ public class DownloadPanel extends AbstractOperationPanel {
                             }
 
                             public void onSuccess(Void result) {
-                                EastPanel.getInstance().loadData();
-                                EastPanel.getInstance().displayDownloadPanel();
+//                                EastPanel.getInstance().loadData();
+//                                EastPanel.getInstance().displayDownloadPanel();
                             }
                         };
                         Authentication auth = Context.getInstance().getAuthentication();
-                        service.downloadFile(auth.getUser(),
-                                parentDir + "/" + r.getAsString("fileName"),
-                                Context.getInstance().getAuthentication().getUserDN(),
-                                Context.getInstance().getAuthentication().getProxyFileName(),
-                                callback);
-                    }
-                }
+//                        service.downloadFile(auth.getUser(),
+//                                parentDir + "/" + r.getAsString("fileName"),
+//                                Context.getInstance().getAuthentication().getUserDN(),
+//                                Context.getInstance().getAuthentication().getProxyFileName(),
+//                                callback);
+//                    }
+//                }
                 return super.notifyDrop(source, e, data);
             }
 
@@ -115,14 +112,14 @@ public class DownloadPanel extends AbstractOperationPanel {
     private void configureToolbar() {
         // Actions Menu
         ToolbarButton actionsButton = new ToolbarButton("Actions");
-        actionsButton.setMenu(new DownloadActionsMenu());
+//        actionsButton.setMenu(new DownloadActionsMenu());
         topToolbar.addButton(actionsButton);
     }
 
     @Override
     protected void showMenu(EventObject e) {
         if (menu == null) {
-            menu = new DownloadMenu();
+//            menu = new DownloadMenu();
         }
         menu.showAt(e.getXY());
     }

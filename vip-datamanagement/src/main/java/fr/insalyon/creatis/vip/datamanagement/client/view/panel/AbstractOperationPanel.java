@@ -155,7 +155,7 @@ public abstract class AbstractOperationPanel extends Panel {
 
             @Override
             public void onClick(Button button, EventObject e) {
-                EastPanel.getInstance().loadData();
+//                EastPanel.getInstance().loadData();
             }
         });
         refreshButton.setIcon("images/icon-refresh.gif");
