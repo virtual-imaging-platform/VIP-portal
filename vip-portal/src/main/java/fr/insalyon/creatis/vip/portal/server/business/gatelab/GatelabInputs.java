@@ -72,6 +72,10 @@ public class GatelabInputs {
             else
                 if(input.indexOf(".tar.gz")>0)
                     application_name = input.substring(ind + 1, input.indexOf(".tar.gz"));
+                else
+                    if(input.indexOf(".zip")>0)
+                        application_name = input.substring(ind + 1, input.indexOf(".zip"));
+
 
         String outputlink = inputlink + "/output";
 
