@@ -105,15 +105,18 @@ public class FileUploadServiceImpl extends HttpServlet {
                         fileItem.write(uploadedFile);
                         response.getWriter().write(fileName);
 
-                        // Vlet Agent Pool Client
-                        VletAgentPoolClient client = new VletAgentPoolClient(
+                        if(!path.equals("local")){//otherwise we don't want to upload the file to the grid
+                            // Vlet Agent Pool Client
+                            VletAgentPoolClient client = new VletAgentPoolClient(
                                 ServerConfiguration.getInstance().getVletagentHost(),
                                 ServerConfiguration.getInstance().getVletagentPort(),
                                 proxy);
-                        client.uploadFile(
+                            client.uploadFile(
                                 uploadedFile.getAbsolutePath(),
                                 DataManagerUtil.parseBaseDir(user, path),
                                 userdn);
+                        }
+                       
 
                     } catch (Exception ex) {
                         ex.printStackTrace();
