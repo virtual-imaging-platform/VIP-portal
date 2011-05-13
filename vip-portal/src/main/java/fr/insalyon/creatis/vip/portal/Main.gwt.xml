@@ -34,5 +34,5 @@
     <servlet class="fr.insalyon.creatis.vip.portal.server.rpc.ConfigurationServiceImpl" path="/configurationservice"/>
     <servlet class="fr.insalyon.creatis.vip.portal.server.rpc.ApplicationServiceImpl" path="/applicationservice"/>
     <servlet class="fr.insalyon.creatis.vip.portal.server.rpc.GatelabServiceImpl" path="/gatelabservice"/>
-
+    <servlet class="fr.insalyon.creatis.vip.portal.server.rpc.ModelServiceImpl" path="/modelservice"/>
 </module>

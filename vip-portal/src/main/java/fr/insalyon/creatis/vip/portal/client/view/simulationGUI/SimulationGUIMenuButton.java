@@ -7,7 +7,6 @@ package fr.insalyon.creatis.vip.portal.client.view.simulationGUI;
 
 
 
-import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
