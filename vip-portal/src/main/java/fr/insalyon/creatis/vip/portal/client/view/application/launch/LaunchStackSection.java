@@ -51,6 +51,7 @@ import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.datamanager.client.view.selection.PathSelectionWindow;
 import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.portal.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
@@ -175,9 +176,14 @@ public class LaunchStackSection extends SectionStackSection {
                         iForm.setColWidths(120, 75, "*", "*", "*", "*", "*", "*", "*", "*");
 
                         SelectItem selectItem = getTypeSelectItem(name, source);
-                        TextItem listItem = getTextItem(name, "-list-l", 350, false, "", "List", true, null);
+                        final TextItem listItem = getTextItem(name, "-list-l", 350, false, "", "List", true, null);
                         ButtonItem browseItem = getButtonItem(name, "-brow-l", 60, " Browse ", "List");
+                        browseItem.addClickHandler(new ClickHandler() {
 
+                            public void onClick(ClickEvent event) {
+                                new PathSelectionWindow(listItem).show();
+                            }
+                        });
                         TextItem startItem = getTextItem(name, "-start-l", 70, true, "Start", "Range", false, "[0-9.]");
                         TextItem stopItem = getTextItem(name, "-stop-l", 70, true, "Stop", "Range", false, "[0-9.]");
                         TextItem stepItem = getTextItem(name, "-step-l", 70, true, "Step", "Range", false, "[0-9.]");
@@ -187,7 +193,6 @@ public class LaunchStackSection extends SectionStackSection {
 
                         form.addChild(iForm);
                     }
-
                     DynamicForm iForm = new DynamicForm();
                     iForm.setID("button-form-l");
                     iForm.setPadding(5);
