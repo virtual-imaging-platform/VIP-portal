@@ -62,42 +62,6 @@ public class BasicBrowserToolStrip extends ToolStrip {
         pathItem.setWidth(400);
         pathItem.setValue(DataManagerConstants.ROOT);
         this.addFormItem(pathItem);
-
-        ToolStripButton folderUpButton = new ToolStripButton();
-        folderUpButton.setIcon("icon-folderup.png");
-        folderUpButton.setPrompt("Folder up");
-        folderUpButton.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-                if (!pathItem.getValueAsString().equals(DataManagerConstants.ROOT)) {
-                    String newPath = pathItem.getValueAsString();
-                    BrowserLayout.getInstance().loadData(
-                            newPath.substring(0, newPath.lastIndexOf("/")), false);
-                }
-            }
-        });
-        this.addButton(folderUpButton);
-        ToolStripButton refreshButton = new ToolStripButton();
-        refreshButton.setIcon("icon-refresh.png");
-        refreshButton.setPrompt("Refresh");
-        refreshButton.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-                BrowserLayout.getInstance().loadData(pathItem.getValueAsString(), true);
-            }
-        });
-        this.addButton(refreshButton);
-
-        ToolStripButton homeButton = new ToolStripButton();
-        homeButton.setIcon("icon-home.png");
-        homeButton.setPrompt("Home");
-        homeButton.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-                BrowserLayout.getInstance().loadData(DataManagerConstants.ROOT, false);
-            }
-        });
-        this.addButton(homeButton);
     }
 
     public String getPath() {

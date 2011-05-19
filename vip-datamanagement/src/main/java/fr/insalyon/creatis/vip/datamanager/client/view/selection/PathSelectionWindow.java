@@ -41,6 +41,11 @@ import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
+import com.smartgwt.client.widgets.menu.Menu;
+import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.events.ClickHandler;
+import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.BasicBrowserToolStrip;
@@ -56,13 +61,15 @@ public class PathSelectionWindow extends Window {
     private ListGrid grid;
     private ModalWindow modal;
     private TextItem textItem;
+    private Menu contextMenu;
+    private String name;
 
     public PathSelectionWindow(TextItem textItem) {
 
         this.textItem = textItem;
 
-        this.setTitle("Path selection");
-        this.setWidth(450);
+        this.setTitle("Path Selection");
+        this.setWidth(550);
         this.setHeight(350);
         this.setShowMinimizeButton(false);
         this.setIsModal(true);
@@ -70,9 +77,12 @@ public class PathSelectionWindow extends Window {
         this.centerInPage();
 
         grid = BrowserUtil.getListGrid();
-        configureGrid();
         toolStrip = new BasicBrowserToolStrip(modal);
         modal = new ModalWindow(grid);
+        
+        configureGrid();
+        configureToolStrip();
+        configureContextMenu();
 
         this.addItem(toolStrip);
         this.addItem(grid);
@@ -100,7 +110,69 @@ public class PathSelectionWindow extends Window {
 
             public void onCellContextClick(CellContextClickEvent event) {
                 event.cancel();
+                name = event.getRecord().getAttributeAsString("name");
+                contextMenu.showContextMenu();
             }
         });
+    }
+    
+    private void configureToolStrip() {
+
+        ToolStripButton folderUpButton = new ToolStripButton();
+        folderUpButton.setIcon("icon-folderup.png");
+        folderUpButton.setPrompt("Folder up");
+        folderUpButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
+
+            public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
+                if (!toolStrip.getPath().equals(DataManagerConstants.ROOT)) {
+                    String newPath = toolStrip.getPath();
+                    BrowserUtil.loadData(modal, grid, toolStrip, 
+                            newPath.substring(0, newPath.lastIndexOf("/")), false);
+                }
+            }
+        });
+        toolStrip.addButton(folderUpButton);
+        
+        ToolStripButton refreshButton = new ToolStripButton();
+        refreshButton.setIcon("icon-refresh.png");
+        refreshButton.setPrompt("Refresh");
+        refreshButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
+
+            public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
+                BrowserUtil.loadData(modal, grid, toolStrip, toolStrip.getPath(), true);
+            }
+        });
+        toolStrip.addButton(refreshButton);
+
+        ToolStripButton homeButton = new ToolStripButton();
+        homeButton.setIcon("icon-home.png");
+        homeButton.setPrompt("Home");
+        homeButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
+
+            public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
+                BrowserUtil.loadData(modal, grid, toolStrip, DataManagerConstants.ROOT, false);
+            }
+        });
+        toolStrip.addButton(homeButton);
+
+    }
+
+    private void configureContextMenu() {
+        
+        contextMenu = new Menu();
+        contextMenu.setShowShadow(true);
+        contextMenu.setShadowDepth(10);
+        contextMenu.setWidth(90);
+
+        MenuItem selectItem = new MenuItem("Select this path");
+        selectItem.setIcon("icon-select.png");
+        selectItem.addClickHandler(new ClickHandler() {
+
+            public void onClick(MenuItemClickEvent event) {
+                textItem.setValue(toolStrip.getPath() + "/" + name);
+                destroy();
+            }
+        });
+        contextMenu.setItems(selectItem);
     }
 }
