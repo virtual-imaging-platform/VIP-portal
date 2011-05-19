@@ -38,6 +38,8 @@ import fr.insalyon.creatis.vip.portal.client.view.application.monitor.record.Sim
 import fr.insalyon.creatis.vip.portal.client.view.application.monitor.menu.SimulationsContextMenu;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.GroupStartOpen;
+import com.smartgwt.client.types.SelectionAppearance;
+import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.VisibilityMode;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -48,6 +50,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.RowMouseDownEvent;
@@ -95,11 +98,13 @@ public class SimulationsTab extends Tab {
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
 
-        VLayout vLayout = new VLayout();
-        vLayout.addMember(new SimulationsToolStrip());
-
         configureGrid();
         configureForm();
+
+        modal = new ModalWindow(grid);
+
+        VLayout vLayout = new VLayout();
+        vLayout.addMember(new SimulationsToolStrip(modal));
 
         SectionStack sectionStack = new SectionStack();
         sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
@@ -123,8 +128,6 @@ public class SimulationsTab extends Tab {
             this.user = Context.getInstance().getUser();
         }
 
-        modal = new ModalWindow(grid);
-        modal.setLoadingIcon("loading.gif");
         loadData();
         loadCombosData();
     }
@@ -136,6 +139,8 @@ public class SimulationsTab extends Tab {
         grid.setShowAllRecords(false);
         grid.setShowRowNumbers(true);
         grid.setShowEmptyMessage(true);
+        grid.setSelectionType(SelectionStyle.SIMPLE);
+        grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
         grid.setEmptyMessage("<br>No data available.");
 
         ListGridField statusIcoField = FieldUtil.getIconGridField("statusIco");
@@ -157,15 +162,17 @@ public class SimulationsTab extends Tab {
                 event.cancel();
                 String simulationId = event.getRecord().getAttribute("simulationId");
                 String status = event.getRecord().getAttribute("status");
-                new SimulationsContextMenu(simulationId, status).showContextMenu();
+                new SimulationsContextMenu(modal, simulationId, status).showContextMenu();
             }
         });
         grid.addRowMouseDownHandler(new RowMouseDownHandler() {
 
             public void onRowMouseDown(RowMouseDownEvent event) {
-                String simulationID = event.getRecord().getAttribute("simulationId");
-                String status = event.getRecord().getAttribute("status");
-                Layout.getInstance().addTab(new SimulationTab(simulationID, status));
+                if (event.getColNum() != 1) {
+                    String simulationID = event.getRecord().getAttribute("simulationId");
+                    String status = event.getRecord().getAttribute("status");
+                    Layout.getInstance().addTab(new SimulationTab(simulationID, status));
+                }
             }
         });
     }
@@ -301,5 +308,9 @@ public class SimulationsTab extends Tab {
             }
         };
         service.getApplicationsAndUsersList(null, callback);
+    }
+
+    public ListGridRecord[] getGridSelection() {
+        return grid.getSelection();
     }
 }

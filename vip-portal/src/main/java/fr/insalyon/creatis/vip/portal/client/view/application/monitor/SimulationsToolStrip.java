@@ -34,10 +34,20 @@
  */
 package fr.insalyon.creatis.vip.portal.client.view.application.monitor;
 
+import com.smartgwt.client.util.BooleanCallback;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.widgets.menu.Menu;
+import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
+import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.portal.client.view.application.monitor.record.SimulationRecord;
 import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
 
 /**
@@ -46,10 +56,13 @@ import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
  */
 public class SimulationsToolStrip extends ToolStrip {
 
-    public SimulationsToolStrip() {
-        
+    private ModalWindow modal;
+
+    public SimulationsToolStrip(ModalWindow modal) {
+
+        this.modal = modal;
         this.setWidth100();
-        
+
         ToolStripButton refreshButton = new ToolStripButton();
         refreshButton.setIcon("icon-refresh.png");
         refreshButton.setTitle("Refresh");
@@ -60,7 +73,118 @@ public class SimulationsToolStrip extends ToolStrip {
                 simulationsTab.loadData();
             }
         });
-        
+
         this.addButton(refreshButton);
+
+        // Actions
+        Menu menu = new Menu();
+        menu.setShowShadow(true);
+        menu.setShadowDepth(3);
+
+        MenuItem killItem = new MenuItem("Kill Selected Simulations");
+        killItem.setIcon("icon-kill.png");
+        killItem.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+
+            public void onClick(MenuItemClickEvent event) {
+                SC.confirm("Do you really want to kill the selected running simulations?", new BooleanCallback() {
+
+                    public void execute(Boolean value) {
+                        if (value != null && value) {
+                            killSimulations();
+                        }
+                    }
+                });
+            }
+        });
+
+        MenuItem cleanItem = new MenuItem("Clean Selected Simulations");
+        cleanItem.setIcon("icon-clean.png");
+        cleanItem.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+
+            public void onClick(MenuItemClickEvent event) {
+                SC.confirm("Do you really want to clean the selected completed/killed simulations?", new BooleanCallback() {
+
+                    public void execute(Boolean value) {
+                        if (value != null && value) {
+                            cleanSimulations();
+                        }
+                    }
+                });
+            }
+        });
+
+        MenuItem purgeItem = new MenuItem("Purge Selected Simulations");
+        purgeItem.setIcon("icon-clear.png");
+        purgeItem.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+
+            public void onClick(MenuItemClickEvent event) {
+                SC.confirm("Do you really want to clean the selected cleaned simulations?", new BooleanCallback() {
+
+                    public void execute(Boolean value) {
+                        if (value != null && value) {
+                            purgeSimulations();
+                        }
+                    }
+                });
+            }
+        });
+
+        if (Context.getInstance().isSystemAdmin()) {
+            menu.setItems(killItem, cleanItem, purgeItem);
+        } else {
+            menu.setItems(killItem, cleanItem);
+        }
+
+        ToolStripMenuButton actionButton = new ToolStripMenuButton("Actions", menu);
+        actionButton.setIcon("icon-action.png");
+        this.addMenuButton(actionButton);
+    }
+
+    /**
+     * Sends a request to kill the selected running simulations
+     * 
+     */
+    private void killSimulations() {
+        SimulationsTab simulationsTab = (SimulationsTab) Layout.getInstance().getTab("simulations-tab");
+        ListGridRecord[] records = simulationsTab.getGridSelection();
+
+        for (ListGridRecord record : records) {
+            SimulationRecord data = (SimulationRecord) record;
+            if (data.getStatus().equals("Running")) {
+                SimulationActionsUtil.killSimulation(modal, data.getSimulationId());
+            }
+        }
+    }
+
+    /**
+     * Sends a request to clean the selected completed/killed simulations
+     * 
+     */
+    private void cleanSimulations() {
+        SimulationsTab simulationsTab = (SimulationsTab) Layout.getInstance().getTab("simulations-tab");
+        ListGridRecord[] records = simulationsTab.getGridSelection();
+
+        for (ListGridRecord record : records) {
+            SimulationRecord data = (SimulationRecord) record;
+            if (data.getStatus().equals("Completed") || data.getStatus().equals("Killed")) {
+                SimulationActionsUtil.cleanSimulation(modal, data.getSimulationId());
+            }
+        }
+    }
+
+    /**
+     * Sends a request to purge the selected cleaned simulations
+     * 
+     */
+    private void purgeSimulations() {
+        SimulationsTab simulationsTab = (SimulationsTab) Layout.getInstance().getTab("simulations-tab");
+        ListGridRecord[] records = simulationsTab.getGridSelection();
+
+        for (ListGridRecord record : records) {
+            SimulationRecord data = (SimulationRecord) record;
+            if (data.getStatus().equals("Cleaned")) {
+                SimulationActionsUtil.purgeSimulation(modal, data.getSimulationId());
+            }
+        }
     }
 }
