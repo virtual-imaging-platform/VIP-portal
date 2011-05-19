@@ -32,100 +32,75 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client.view.browser;
+package fr.insalyon.creatis.vip.datamanager.client.view.selection;
 
-import com.google.gwt.user.client.ui.NamedFrame;
-import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.types.SelectionAppearance;
-import com.smartgwt.client.types.SelectionStyle;
+import com.smartgwt.client.widgets.Window;
+import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
-import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
-import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
+import fr.insalyon.creatis.vip.datamanager.client.view.common.BasicBrowserToolStrip;
 import fr.insalyon.creatis.vip.datamanager.client.view.util.BrowserUtil;
 
 /**
  *
  * @author Rafael Silva
  */
-public class BrowserLayout extends VLayout {
+public class PathSelectionWindow extends Window {
 
-    private static BrowserLayout instance;
-    private ModalWindow modal;
-    private BrowserToolStrip toolStrip;
+    private BasicBrowserToolStrip toolStrip;
     private ListGrid grid;
+    private ModalWindow modal;
+    private TextItem textItem;
 
-    public static BrowserLayout getInstance() {
-        if (instance == null) {
-            instance = new BrowserLayout();
-        }
-        return instance;
-    }
+    public PathSelectionWindow(TextItem textItem) {
 
-    private BrowserLayout() {
+        this.textItem = textItem;
 
-        initComplete(this);
-        this.setWidth100();
-        this.setHeight100();
-        this.setOverflow(Overflow.AUTO);
-        this.setShowResizeBar(true);
+        this.setTitle("Path selection");
+        this.setWidth(450);
+        this.setHeight(350);
+        this.setShowMinimizeButton(false);
+        this.setIsModal(true);
+        this.setShowModalMask(true);
+        this.centerInPage();
 
         grid = BrowserUtil.getListGrid();
         configureGrid();
-
+        toolStrip = new BasicBrowserToolStrip(modal);
         modal = new ModalWindow(grid);
-        toolStrip = new BrowserToolStrip(modal);
-        this.addMember(toolStrip);
-        this.addMember(grid);
 
-        loadData(DataManagerConstants.ROOT, false);
+        this.addItem(toolStrip);
+        this.addItem(grid);
 
-        NamedFrame frame = new NamedFrame("uploadTarget");
-        frame.setVisible(false);
-        frame.setHeight("1px");
-        frame.setWidth("1px");
-        this.addMember(frame);
+        BrowserUtil.loadData(modal, grid, toolStrip, DataManagerConstants.ROOT, false);
     }
 
     private void configureGrid() {
-        grid.setSelectionType(SelectionStyle.SIMPLE);
-        grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
-
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 String type = event.getRecord().getAttributeAsString("icon");
+                String name = event.getRecord().getAttributeAsString("name");
+
                 if (type.contains("folder")) {
-                    String name = event.getRecord().getAttributeAsString("name");
-                    String path = toolStrip.getPath() + "/" + name;
-                    loadData(path, false);
+                    BrowserUtil.loadData(modal, grid, toolStrip,
+                            toolStrip.getPath() + "/" + name, false);
+                } else {
+                    textItem.setValue(toolStrip.getPath() + "/" + name);
+                    destroy();
                 }
             }
         });
-    }
+        grid.addCellContextClickHandler(new CellContextClickHandler() {
 
-    public void loadData(final String path, boolean refresh) {
-        BrowserUtil.loadData(modal, grid, toolStrip, path, refresh);
+            public void onCellContextClick(CellContextClickEvent event) {
+                event.cancel();
+            }
+        });
     }
-
-    public ListGridRecord[] getGridSelection() {
-        return grid.getSelection();
-    }
-
-    public void uploadComplete(String fileName) {
-        modal.hide();
-        OperationLayout.getInstance().loadData();
-    }
-
-    private native void initComplete(BrowserLayout upload) /*-{
-    $wnd.uploadComplete = function (fileName) {
-    upload.@fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout::uploadComplete(Ljava/lang/String;)(fileName);
-    };
-    }-*/;
 }

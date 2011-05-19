@@ -39,9 +39,7 @@ import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
@@ -50,6 +48,7 @@ import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.view.common.BasicBrowserToolStrip;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,59 +57,12 @@ import java.util.List;
  *
  * @author Rafael Silva
  */
-public class BrowserToolStrip extends ToolStrip {
-
-    private ModalWindow modal;
-    private SelectItem pathItem;
+public class BrowserToolStrip extends BasicBrowserToolStrip {
 
     public BrowserToolStrip(final ModalWindow modal) {
         
-        this.modal = modal;
-        this.setWidth100();
-
-        pathItem = new SelectItem("path");
-        pathItem.setShowTitle(false);
-        pathItem.setWidth(400);
-        pathItem.setValue(DataManagerConstants.ROOT);
-        this.addFormItem(pathItem);
-
-        ToolStripButton folderUpButton = new ToolStripButton();
-        folderUpButton.setIcon("icon-folderup.png");
-        folderUpButton.setPrompt("Folder up");
-        folderUpButton.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-                if (!pathItem.getValueAsString().equals(DataManagerConstants.ROOT)) {
-                    String newPath = pathItem.getValueAsString();
-                    BrowserLayout.getInstance().loadData(
-                            newPath.substring(0, newPath.lastIndexOf("/")), false);
-                }
-            }
-        });
-        this.addButton(folderUpButton);
-
-        ToolStripButton refreshButton = new ToolStripButton();
-        refreshButton.setIcon("icon-refresh.png");
-        refreshButton.setPrompt("Refresh");
-        refreshButton.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-                BrowserLayout.getInstance().loadData(pathItem.getValueAsString(), true);
-            }
-        });
-        this.addButton(refreshButton);
-
-        ToolStripButton homeButton = new ToolStripButton();
-        homeButton.setIcon("icon-home.png");
-        homeButton.setPrompt("Home");
-        homeButton.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-                BrowserLayout.getInstance().loadData(DataManagerConstants.ROOT, false);
-            }
-        });
-        this.addButton(homeButton);
-
+        super(modal);
+        
         ToolStripButton addFolderButton = new ToolStripButton();
         addFolderButton.setIcon("icon-addfolder.png");
         addFolderButton.setPrompt("Create Folder");
@@ -235,13 +187,5 @@ public class BrowserToolStrip extends ToolStrip {
                 }
             }
         });
-    }
-
-    public String getPath() {
-        return pathItem.getValueAsString();
-    }
-
-    public void setPath(String path) {
-        pathItem.setValue(path);
     }
 }
