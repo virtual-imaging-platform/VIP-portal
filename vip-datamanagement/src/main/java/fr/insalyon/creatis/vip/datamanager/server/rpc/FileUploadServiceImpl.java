@@ -83,7 +83,6 @@ public class FileUploadServiceImpl extends HttpServlet {
 
                 while (iter.hasNext()) {
                     FileItem item = (FileItem) iter.next();
-                    System.out.println("------ " + item.getFieldName());
 
                     if (item.getFieldName().equals("userdn")) {
                         userdn = item.getString();
@@ -116,8 +115,6 @@ public class FileUploadServiceImpl extends HttpServlet {
                                 DataManagerUtil.parseBaseDir(user, path),
                                 userdn);
                         }
-                       
-
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
