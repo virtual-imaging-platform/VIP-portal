@@ -44,7 +44,7 @@ import java.util.Map;
  */
 public interface JobDAO {
 
-    public Map<String, Integer> getStatusMap();
+    public Map<String, Integer> getStatusMap() throws DAOException;
 
     /**
      * Gets a list of all jobs.

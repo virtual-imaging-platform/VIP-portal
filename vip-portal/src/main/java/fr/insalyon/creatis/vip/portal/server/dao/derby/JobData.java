@@ -63,15 +63,16 @@ public class JobData implements JobDAO {
     }
 
     /**
-     *
-     * @return
+     * Gets a map with the status of the jobs.
+     * 
+     * @return Jobs status map
      */
-    public Map<String, Integer> getStatusMap() {
+    public Map<String, Integer> getStatusMap() throws DAOException {
         try {
             Map<String, Integer> statusMap = new HashMap<String, Integer>();
             Statement stat = connection.createStatement();
             ResultSet rs = stat.executeQuery("SELECT "
-                    + "status, COUNT(id) as total FROM jobs "
+                    + "status, COUNT(id) AS total FROM jobs "
                     + "GROUP BY status");
 
             while (rs.next()) {
@@ -81,9 +82,8 @@ public class JobData implements JobDAO {
             return statusMap;
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw new DAOException(ex);
         }
-        return null;
     }
 
     /**

@@ -65,7 +65,8 @@ public class SummaryStackSection extends SectionStackSection {
 
     private String simulationID;
     private boolean completed;
-    private String[] states = {"Error", "Completed", "Running", "Queued", "Successfully_Submitted", "Cancelled"};
+    private String[] states = {"Error", "Completed", "Running", "Queued", 
+        "Successfully_Submitted", "Cancelled", "Stalled"};
     private ChartWidget chart;
     private ListGrid grid;
 
@@ -171,12 +172,13 @@ public class SummaryStackSection extends SectionStackSection {
                 hchart.setTooltip("#val# jobs");
                 hchart.setBarwidth(.5);
 
-                hchart.addBars(new HorizontalBarChart.Bar(new Integer(data[0].getJobs()), "#993300"));
-                hchart.addBars(new HorizontalBarChart.Bar(new Integer(data[1].getJobs()), "#cc9933"));
-                hchart.addBars(new HorizontalBarChart.Bar(new Integer(data[2].getJobs()), "#ffff66"));
-                hchart.addBars(new HorizontalBarChart.Bar(new Integer(data[3].getJobs()), "#3399ff"));
-                hchart.addBars(new HorizontalBarChart.Bar(new Integer(data[4].getJobs()), "#99ff66"));
-                hchart.addBars(new HorizontalBarChart.Bar(new Integer(data[5].getJobs()), "#cc0033"));
+                hchart.addBars(new HorizontalBarChart.Bar(new Integer(data[0].getJobs()), "#669999"));
+                hchart.addBars(new HorizontalBarChart.Bar(new Integer(data[1].getJobs()), "#993300"));
+                hchart.addBars(new HorizontalBarChart.Bar(new Integer(data[2].getJobs()), "#cc9933"));
+                hchart.addBars(new HorizontalBarChart.Bar(new Integer(data[3].getJobs()), "#ffff66"));
+                hchart.addBars(new HorizontalBarChart.Bar(new Integer(data[4].getJobs()), "#3399ff"));
+                hchart.addBars(new HorizontalBarChart.Bar(new Integer(data[5].getJobs()), "#99ff66"));
+                hchart.addBars(new HorizontalBarChart.Bar(new Integer(data[6].getJobs()), "#cc0033"));
                 chartData.addElements(hchart);
                 chartData.setTooltipStyle(new ToolTip(MouseStyle.FOLLOW));
 
@@ -194,10 +196,11 @@ public class SummaryStackSection extends SectionStackSection {
                 pie.setNoLabels(true);
                 pie.setTooltip("#label# #val# jobs<br>#percent#");
                 pie.setGradientFill(true);
-                pie.setColours("#008000", "#cc0033","#FEA101");
-                pie.addSlices(new PieChart.Slice(new Integer(data[4].getJobs()), "Completed"));
-                pie.addSlices(new PieChart.Slice(new Integer(data[5].getJobs()), "Error"));
-                pie.addSlices(new PieChart.Slice(new Integer(data[0].getJobs()), "Cancelled"));
+                pie.setColours("#008000", "#cc0033","#FEA101", "#669999");
+                pie.addSlices(new PieChart.Slice(new Integer(data[5].getJobs()), "Completed"));
+                pie.addSlices(new PieChart.Slice(new Integer(data[6].getJobs()), "Error"));
+                pie.addSlices(new PieChart.Slice(new Integer(data[1].getJobs()), "Cancelled"));
+                pie.addSlices(new PieChart.Slice(new Integer(data[0].getJobs()), "Stalled"));
                 
                 chartData.addElements(pie);
                 pie.setAnimateOnShow(false);
