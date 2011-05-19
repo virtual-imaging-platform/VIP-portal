@@ -118,7 +118,7 @@ public class SimulationsToolStrip extends ToolStrip {
         purgeItem.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                SC.confirm("Do you really want to clean the selected cleaned simulations?", new BooleanCallback() {
+                SC.confirm("Do you really want to purge the selected cleaned simulations?", new BooleanCallback() {
 
                     public void execute(Boolean value) {
                         if (value != null && value) {
