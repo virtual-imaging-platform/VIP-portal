@@ -15,7 +15,6 @@
     <!-- Other module inherits                                      -->
 
     <!-- Specify the app entry point class.                         -->
-    <inherits name='com.gwtext.GwtExt' />
 
     <inherits name='fr.insalyon.creatis.vip.common.Common'/>
 
