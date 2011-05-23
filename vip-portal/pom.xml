@@ -8,7 +8,7 @@
     <version>0.3</version>
     <properties>
         <runTarget>index.html</runTarget>
-        <netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>
+        <netbeans.hint.deploy.server>Tomcat70</netbeans.hint.deploy.server>
     </properties>
     <url>http://maven.apache.org</url>
     <dependencies>
@@ -124,6 +124,11 @@
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-gatelab</artifactId>
             <version>0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-simulation-gui</artifactId>
+            <version>0.1</version>
         </dependency>
         <!-- END VIP MODULES -->
 

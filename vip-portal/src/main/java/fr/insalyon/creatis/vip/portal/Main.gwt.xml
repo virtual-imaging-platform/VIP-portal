@@ -21,6 +21,7 @@
     <inherits name="fr.insalyon.creatis.vip.datamanager.DataManager" />
     <inherits name="fr.insalyon.creatis.vip.application.Application" />
     <inherits name="fr.insalyon.creatis.vip.gatelab.GateLab" />
+    <inherits name="fr.insalyon.creatis.vip.simulationgui.SimulationGUI" />
 
     <!-- Specify the app entry point class.-->
     <entry-point class="fr.insalyon.creatis.vip.portal.client.Main"/>
