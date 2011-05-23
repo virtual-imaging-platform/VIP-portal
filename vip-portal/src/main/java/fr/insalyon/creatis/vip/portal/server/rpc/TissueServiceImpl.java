@@ -5,6 +5,7 @@
 package fr.insalyon.creatis.vip.portal.server.rpc;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import fr.insalyon.creatis.vip.portal.client.bean.ChemicalBlend;
 import fr.insalyon.creatis.vip.portal.client.bean.Distribution;
 import fr.insalyon.creatis.vip.portal.client.bean.DistributionInstance;
@@ -13,7 +14,6 @@ import fr.insalyon.creatis.vip.portal.client.bean.MagneticProperty;
 import fr.insalyon.creatis.vip.portal.client.bean.PhysicalProperty;
 import fr.insalyon.creatis.vip.portal.client.bean.Tissue;
 import fr.insalyon.creatis.vip.portal.client.rpc.TissueService;
-import fr.insalyon.creatis.vip.portal.server.dao.DAOException;
 import fr.insalyon.creatis.vip.portal.server.dao.DAOFactory;
 import java.util.List;
 

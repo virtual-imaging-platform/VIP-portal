@@ -6,15 +6,31 @@
         <servlet-name>GetFileService</servlet-name>
         <servlet-class>fr.insalyon.creatis.vip.common.server.rpc.GetFileServiceImpl</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>ModelService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.portal.server.rpc.ModelServiceImpl</servlet-class>
-    </servlet>
     <servlet-mapping>
         <servlet-name>GetFileService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/getfileservice</url-pattern>
     </servlet-mapping>
     <!-- End Common Module -->
+    
+    <!-- Core Module -->
+    <servlet>
+        <servlet-name>ConfigurationService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.core.server.rpc.ConfigurationServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ConfigurationService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/configurationservice</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>ApplicationService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.core.server.rpc.ApplicationServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ApplicationService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/applicationservice</url-pattern>
+    </servlet-mapping>
+    <!-- End Core Module -->
+    
     <!-- Data Manager Module -->
     <servlet>
         <servlet-name>FileCatalogService</servlet-name>
@@ -49,9 +65,11 @@
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/transferpoolservice</url-pattern>
     </servlet-mapping>
     <!-- End Data Manager Module -->
+    
+    <!-- Application Module -->
     <servlet>
         <servlet-name>WorkflowService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.portal.server.rpc.WorkflowServiceImpl</servlet-class>
+        <servlet-class>fr.insalyon.creatis.vip.application.server.rpc.WorkflowServiceImpl</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>WorkflowService</servlet-name>
@@ -59,44 +77,25 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>JobService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.portal.server.rpc.JobServiceImpl</servlet-class>
+        <servlet-class>fr.insalyon.creatis.vip.application.server.rpc.JobServiceImpl</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>JobService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/jobservice</url-pattern>
     </servlet-mapping>
-    <servlet>
-        <servlet-name>LFNService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.portal.server.rpc.LFNServiceImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>LFNService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/lfnservice</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>ConfigurationService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.portal.server.rpc.ConfigurationServiceImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ConfigurationService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/configurationservice</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>ApplicationService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.portal.server.rpc.ApplicationServiceImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ApplicationService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/applicationservice</url-pattern>
-    </servlet-mapping>
+    <!-- End Application Module -->
+    
+    <!-- GateLab Module -->
     <servlet>
         <servlet-name>GatelabService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.portal.server.rpc.GatelabServiceImpl</servlet-class>
+        <servlet-class>fr.insalyon.creatis.vip.gatelab.server.rpc.GateLabServiceImpl</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>GatelabService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/gatelabservice</url-pattern>
     </servlet-mapping>
+    <!-- End GateLab Module -->
+    
     <servlet>
         <servlet-name>TissueService</servlet-name>
         <servlet-class>fr.insalyon.creatis.vip.portal.server.rpc.TissueServiceImpl</servlet-class>
@@ -105,16 +104,23 @@
         <servlet-name>TissueService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/tissueservice</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>ModelService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.portal.server.rpc.ModelServiceImpl</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>ModelService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/modelservice</url-pattern>
     </servlet-mapping>
+
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
+    
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
+    
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>site</web-resource-name>
@@ -128,8 +134,10 @@
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
         </user-data-constraint>
     </security-constraint>
+    
     <login-config>
         <auth-method>CLIENT-CERT</auth-method>
         <realm-name>Client Cert Users-only Area</realm-name>
     </login-config>
+    
 </web-app>

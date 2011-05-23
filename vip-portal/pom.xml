@@ -54,30 +54,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.gwtextux</groupId>
-            <artifactId>gwtextux</artifactId>
-            <version>0.3.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google</groupId>
-            <artifactId>ofcgwt</artifactId>
-            <version>2.0.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.axis</groupId>
-            <artifactId>axis</artifactId>
-            <version>1.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.axis</groupId>
-            <artifactId>axis-saaj</artifactId>
-            <version>1.4</version>
-        </dependency>
-
-        <dependency>
             <groupId>globus-common</groupId>
             <artifactId>jaxrpc</artifactId>
             <version>4.2.1</version>
@@ -87,12 +63,6 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.14</version>
-        </dependency>
-
-        <dependency>
-            <groupId>wsdl4j</groupId>
-            <artifactId>wsdl4j</artifactId>
-            <version>1.6.1</version>
         </dependency>
 
         <dependency>
@@ -111,18 +81,6 @@
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>voms-client</artifactId>
             <version>0.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>fr.cnrs.i3s</groupId>
-            <artifactId>moteur2</artifactId>
-            <version>0.9.13</version>
-        </dependency>
-
-        <dependency>
-            <groupId>bouncycastle</groupId>
-            <artifactId>bcprov-jdk16</artifactId>
-            <version>1.41</version>
         </dependency>
 
         <dependency>
@@ -146,7 +104,25 @@
 
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-core</artifactId>
+            <version>0.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-datamanager</artifactId>
+            <version>0.3</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-application</artifactId>
+            <version>0.3</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-gatelab</artifactId>
             <version>0.3</version>
         </dependency>
         <!-- END VIP MODULES -->

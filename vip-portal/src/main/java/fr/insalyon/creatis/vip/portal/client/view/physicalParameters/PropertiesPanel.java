@@ -34,7 +34,6 @@ import fr.insalyon.creatis.vip.portal.client.bean.PhysicalProperty;
 import fr.insalyon.creatis.vip.portal.client.bean.Tissue;
 import fr.insalyon.creatis.vip.portal.client.rpc.TissueService;
 import fr.insalyon.creatis.vip.portal.client.rpc.TissueServiceAsync;
-import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
 import java.util.List;
 
 /**

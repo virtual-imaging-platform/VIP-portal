@@ -10,9 +10,7 @@ import com.gwtext.client.widgets.menu.BaseItem;
 import com.gwtext.client.widgets.menu.Item;
 import com.gwtext.client.widgets.menu.Menu;
 import com.gwtext.client.widgets.menu.event.BaseItemListenerAdapter;
-import fr.insalyon.creatis.vip.portal.client.view.physicalParameters.TissuePanel;
-import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.portal.client.view.physicalParameters.DistributionsCenterPanel;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
  *

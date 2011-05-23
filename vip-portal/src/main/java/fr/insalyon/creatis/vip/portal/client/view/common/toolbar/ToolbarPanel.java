@@ -34,15 +34,8 @@
  */
 package fr.insalyon.creatis.vip.portal.client.view.common.toolbar;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.gwtext.client.widgets.MessageBox;
 import com.gwtext.client.widgets.Toolbar;
-//import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.portal.client.bean.AppClass;
-import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationService;
-import fr.insalyon.creatis.vip.portal.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.portal.client.view.common.panel.AbstractPanel;
-import java.util.List;
 
 /**
  *
@@ -62,27 +55,7 @@ public class ToolbarPanel extends AbstractPanel {
         this.setHeight(25);
 
         toolbar = new Toolbar();
-        toolbar.setHeight(25);
-
-        // Home Menu
-//        toolbar.addButton(new HomeToolbarButton("VIP"));
-//        toolbar.addSeparator();
-
-        // Data Management Menu
-//        if (Context.getInstance().getAuthentication().isProxyValid()) {
-//            toolbar.addButton(new DataManagerToolbarButton());
-//            toolbar.addSeparator();
-//        }
-
-        // System Menu
-//        if (isSystemAdmin()) {
-//            toolbar.addButton(new SystemToolbarButton("System"));
-//        }
-
-        // Gatelab Menu
-        if (hasGroupAccess(new String[]{"Administrator", "GateLab"})) {
-            toolbar.addButton(new GatelabToolbarButton("GateLab"));
-        }
+//        toolbar.setHeight(25);
 
         // Tissues Menu
         if (hasGroupAccess(new String[]{"Administrator", "Physical Properties"})) {
@@ -90,30 +63,7 @@ public class ToolbarPanel extends AbstractPanel {
         }
 
         // Application Menus
-        loadApplicationMenus();
-
         this.setTopToolbar(toolbar);
-    }
-
-    private void loadApplicationMenus() {
-        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
-        final AsyncCallback<List<AppClass>> callback = new AsyncCallback<List<AppClass>>() {
-
-            public void onFailure(Throwable caught) {
-                MessageBox.alert("Error", "Error executing get classes list\n" + caught.getMessage());
-            }
-
-            public void onSuccess(List<AppClass> result) {
-                for (AppClass appClass : result) {
-                    String[] appGroups = appClass.getGroups().toArray(new String[0]);
-                    if (hasGroupAccess(appGroups)) {
-//                        toolbar.addButton(new ApplicationToolbarButton(appClass.getName(),
-//                                isGroupAdmin(appGroups)));
-                    }
-                }
-            }
-        };
-        service.getClasses(callback);
     }
 
     public void addClassButton(String className) {

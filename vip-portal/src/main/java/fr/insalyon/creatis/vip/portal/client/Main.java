@@ -37,11 +37,13 @@ package fr.insalyon.creatis.vip.portal.client;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
-import fr.insalyon.creatis.vip.portal.client.bean.Configuration;
-import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationService;
-import fr.insalyon.creatis.vip.portal.client.rpc.ConfigurationServiceAsync;
+import fr.insalyon.creatis.vip.application.client.ApplicationInit;
 import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.bean.Configuration;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.gatelab.client.GateLabInit;
 
 /**
  *
@@ -64,6 +66,11 @@ public class Main implements EntryPoint {
                 context.setMoteurServerHost(result.getMoteurServerHost());
                 context.setLfcHost(result.getLfcHost());
                 context.setLfcPort(result.getLfcPort());
+                
+                // Modules Initialization
+                GateLabInit.getInstance();
+                ApplicationInit.getInstance();
+                // End Modules Initialization
 
                 Layout.getInstance();
             }

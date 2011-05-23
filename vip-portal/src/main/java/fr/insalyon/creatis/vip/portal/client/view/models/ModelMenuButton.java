@@ -11,7 +11,7 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
-import fr.insalyon.creatis.vip.portal.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
  *

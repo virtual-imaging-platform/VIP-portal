@@ -4,6 +4,8 @@
  */
 package fr.insalyon.creatis.vip.portal.server.dao.derby;
 
+import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.derby.connection.PlatformConnection;
 import fr.insalyon.creatis.vip.portal.client.bean.ChemicalBlend;
 import fr.insalyon.creatis.vip.portal.client.bean.ChemicalBlendComponent;
 import fr.insalyon.creatis.vip.portal.client.bean.DistributionParameter;
@@ -14,9 +16,7 @@ import fr.insalyon.creatis.vip.portal.client.bean.Echogenicity;
 import fr.insalyon.creatis.vip.portal.client.bean.MagneticProperty;
 import fr.insalyon.creatis.vip.portal.client.bean.PhysicalProperty;
 import fr.insalyon.creatis.vip.portal.client.bean.Tissue;
-import fr.insalyon.creatis.vip.portal.server.dao.DAOException;
 import fr.insalyon.creatis.vip.portal.server.dao.TissueDAO;
-import fr.insalyon.creatis.vip.portal.server.dao.derby.connection.PlatformConnection;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;

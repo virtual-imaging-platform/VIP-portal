@@ -34,16 +34,8 @@
  */
 package fr.insalyon.creatis.vip.portal.server.dao;
 
-import fr.insalyon.creatis.vip.portal.server.dao.derby.ApplicationData;
-import fr.insalyon.creatis.vip.portal.server.dao.derby.ClassData;
-import fr.insalyon.creatis.vip.portal.server.dao.derby.GatelabData;
-import fr.insalyon.creatis.vip.portal.server.dao.derby.GroupData;
-import fr.insalyon.creatis.vip.portal.server.dao.derby.JobData;
-import fr.insalyon.creatis.vip.portal.server.dao.derby.NodeData;
+import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import fr.insalyon.creatis.vip.portal.server.dao.derby.TissueData;
-import fr.insalyon.creatis.vip.portal.server.dao.derby.UserData;
-import fr.insalyon.creatis.vip.portal.server.dao.derby.WorkflowData;
-import fr.insalyon.creatis.vip.portal.server.dao.derby.WorkflowInputData;
 
 /**
  *
@@ -62,51 +54,6 @@ public class DerbyDAOFactory extends DAOFactory {
     }
 
     private DerbyDAOFactory() {
-    }
-
-    @Override
-    public WorkflowDAO getWorkflowDAO() throws DAOException {
-        return WorkflowData.getInstance();
-    }
-
-    @Override
-    public WorkflowInputDAO getWorkflowInputDAO() throws DAOException {
-        return new WorkflowInputData();
-    }
-
-    @Override
-    public ApplicationDAO getApplicationDAO() throws DAOException {
-        return new ApplicationData();
-    }
-
-    @Override
-    public ClassDAO getClassDAO() throws DAOException {
-        return new ClassData();
-    }
-
-    @Override
-    public JobDAO getJobDAO(String workflowID) throws DAOException {
-        return new JobData(workflowID);
-    }
-
-    @Override
-    public NodeDAO getNodeDAO(String workflowID) throws DAOException {
-        return new NodeData(workflowID);
-    }
-
-    @Override
-    public GatelabDAO getGatelabDAO(String workflowID) throws DAOException {
-        return new GatelabData(workflowID);
-    }
-
-    @Override
-    public GroupDAO getGroupDAO() throws DAOException {
-        return new GroupData();
-    }
-
-    @Override
-    public UserDAO getUserDAO() throws DAOException {
-        return new UserData();
     }
 
     @Override

@@ -34,6 +34,8 @@
  */
 package fr.insalyon.creatis.vip.portal.server.dao;
 
+import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+
 /**
  *
  * @author Rafael Silva
@@ -52,24 +54,6 @@ public abstract class DAOFactory {
                 return null;
         }
     }
-
-    public abstract WorkflowDAO getWorkflowDAO() throws DAOException;
-
-    public abstract WorkflowInputDAO getWorkflowInputDAO() throws DAOException;
-
-    public abstract ApplicationDAO getApplicationDAO() throws DAOException;
-
-    public abstract GroupDAO getGroupDAO() throws DAOException;
-
-    public abstract UserDAO getUserDAO() throws DAOException;
-
-    public abstract ClassDAO getClassDAO() throws DAOException;
-
-    public abstract JobDAO getJobDAO(String workflowID) throws DAOException;
-
-    public abstract NodeDAO getNodeDAO(String workflowID) throws DAOException;
-
-    public abstract GatelabDAO getGatelabDAO(String workflowID) throws DAOException;
 
     public abstract TissueDAO getTissueDAO() throws DAOException;
 }
