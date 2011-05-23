@@ -93,6 +93,11 @@
     </build>
     <repositories>
         <repository>
+            <id>creatis-releases</id>
+            <name>Creatis Insa Lyon repository [creatis]</name>
+            <url>http://kingkong.grid.creatis.insa-lyon.fr:9007/nexus/content/repositories/releases</url>
+        </repository>
+        <repository>
             <id>creatis-thirdparty</id>
             <name>Creatis Insa Lyon repository [creatis]</name>
             <url>http://kingkong.grid.creatis.insa-lyon.fr:9007/nexus/content/repositories/thirdparty</url>
