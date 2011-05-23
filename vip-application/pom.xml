@@ -140,6 +140,11 @@
             <name>Creatis Insa Lyon repository [creatis]</name>
             <url>http://kingkong.grid.creatis.insa-lyon.fr:9007/nexus/content/repositories/thirdparty</url>
         </repository>
+        <repository>
+            <id>neurolog-releases</id>
+            <name>NeuroLOG Releases Repository</name>
+            <url>http://nyx.unice.fr:9007/nexus/content/repositories/releases</url>
+        </repository>
     </repositories>
     <distributionManagement>
         <repository>
