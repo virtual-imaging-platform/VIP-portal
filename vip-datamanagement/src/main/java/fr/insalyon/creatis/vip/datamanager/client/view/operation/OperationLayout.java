@@ -42,6 +42,8 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
+import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -77,17 +79,17 @@ public class OperationLayout extends VLayout {
         this.setWidth(400);
         this.setHeight100();
         this.setOverflow(Overflow.AUTO);
-        
+
         configureGrid();
 
         modal = new ModalWindow(grid);
         toolStrip = new OperationToolStrip(modal);
         this.addMember(toolStrip);
         this.addMember(grid);
-        
+
         loadData();
     }
-       
+
     private void configureGrid() {
         grid = new ListGrid();
         grid.setWidth100();
@@ -97,23 +99,25 @@ public class OperationLayout extends VLayout {
         grid.setEmptyMessage("<br>No data available.");
         grid.setSelectionType(SelectionStyle.SIMPLE);
         grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
-        
-        ListGridField iconField = FieldUtil.getIconGridField("typeIcon");        
-        ListGridField statusField = FieldUtil.getIconGridField("statusIcon");        
-        ListGridField nameField = new ListGridField("name", "Name");
-        
-        grid.setFields(iconField, statusField, nameField);
-        
-        grid.addRowContextClickHandler(new RowContextClickHandler() {
 
-            public void onRowContextClick(RowContextClickEvent event) {
+        ListGridField iconField = FieldUtil.getIconGridField("typeIcon");
+        ListGridField statusField = FieldUtil.getIconGridField("statusIcon");
+        ListGridField nameField = new ListGridField("name", "Name");
+
+        grid.setFields(iconField, statusField, nameField);
+
+        grid.addCellContextClickHandler(new CellContextClickHandler() {
+
+            public void onCellContextClick(CellContextClickEvent event) {
                 event.cancel();
-                ListGridRecord record = event.getRecord();
-                new OperationContextMenu(modal, (OperationRecord) record).showContextMenu();
+                if (event.getColNum() != 0) {
+                    ListGridRecord record = event.getRecord();
+                    new OperationContextMenu(modal, (OperationRecord) record).showContextMenu();
+                }
             }
         });
     }
-    
+
     public void loadData() {
         TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
         AsyncCallback<List<PoolOperation>> callback = new AsyncCallback<List<PoolOperation>>() {
@@ -127,13 +131,13 @@ public class OperationLayout extends VLayout {
                 List<OperationRecord> dataList = new ArrayList<OperationRecord>();
                 if (result != null) {
                     for (PoolOperation o : result) {
-                        dataList.add(new OperationRecord(o.getId(), o.getType(), 
-                                o.getStatus(), o.getSource(), o.getDest(), 
+                        dataList.add(new OperationRecord(o.getId(), o.getType(),
+                                o.getStatus(), o.getSource(), o.getDest(),
                                 o.getRegistration().toString(), o.getUser()));
                     }
                     grid.setData(dataList.toArray(new OperationRecord[]{}));
                     modal.hide();
-                    
+
                 } else {
                     modal.hide();
                     SC.warn("Unable to get list of operations.");
@@ -144,7 +148,7 @@ public class OperationLayout extends VLayout {
         Context context = Context.getInstance();
         service.getOperations(context.getUserDN(), context.getProxyFileName(), callback);
     }
-    
+
     public ListGridRecord[] getGridSelection() {
         return grid.getSelection();
     }

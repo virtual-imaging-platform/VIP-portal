@@ -108,6 +108,16 @@ public class BrowserLayout extends VLayout {
                 }
             }
         });
+        grid.addCellContextClickHandler(new CellContextClickHandler() {
+
+            public void onCellContextClick(CellContextClickEvent event) {
+                event.cancel();
+                if (event.getColNum() != 0) {
+                    DataRecord data = (DataRecord) event.getRecord();
+                    new BrowserContextMenu(modal, toolStrip.getPath(), data).showContextMenu();
+                }
+            }
+        });
     }
 
     public void loadData(final String path, boolean refresh) {

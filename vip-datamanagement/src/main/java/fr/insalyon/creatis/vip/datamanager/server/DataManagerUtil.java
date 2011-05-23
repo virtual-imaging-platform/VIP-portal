@@ -36,6 +36,8 @@ package fr.insalyon.creatis.vip.datamanager.server;
 
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  *
@@ -73,6 +75,36 @@ public class DataManagerUtil {
         if (baseDir.contains(pattern)) {
             return baseDir.replace(pattern, toReplace);
         }
+        return baseDir;
+    }
+    
+    public static String parseRealDir(String baseDir) {
+        if (baseDir.contains("lfn://")) {
+            try {
+                baseDir = new URI(baseDir).getPath();
+            } catch (URISyntaxException ex) {
+                ex.printStackTrace();
+            }
+        }
+        
+        baseDir = baseDir.replace(ServerConfiguration.getInstance().getDataManagerWorkflowsHome(),
+                DataManagerConstants.ROOT + "/" + DataManagerConstants.PUBLIC_HOME);
+        
+        baseDir = baseDir.replace(ServerConfiguration.getInstance().getDataManagerWorkflowsHome(),
+                DataManagerConstants.ROOT + "/" + DataManagerConstants.PUBLIC_HOME);
+        
+        baseDir = baseDir.replace(ServerConfiguration.getInstance().getDataManagerGroupsHome(),
+                DataManagerConstants.ROOT + "/" + DataManagerConstants.GROUPS_HOME);
+        
+        baseDir = baseDir.replace(ServerConfiguration.getInstance().getDataManagerActivitiesHome(),
+                DataManagerConstants.ROOT + "/" + DataManagerConstants.ACTIVITIES_HOME);
+        
+        baseDir = baseDir.replace(ServerConfiguration.getInstance().getDataManagerWorkflowsHome(),
+                DataManagerConstants.ROOT + "/" + DataManagerConstants.WORKFLOWS_HOME);
+        
+        baseDir = baseDir.replace("/grid/biomed/creatis",
+                DataManagerConstants.ROOT + "/" + DataManagerConstants.CREATIS_HOME);
+        
         return baseDir;
     }
 }

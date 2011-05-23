@@ -66,4 +66,6 @@ public interface FileCatalogService extends RemoteService {
     public void createDir(String user, String proxyFileName, String baseDir, String name);
 
     public void deleteFiles(String user, String proxyFileName, List<String> paths);
+    
+    public void rename(String user, String proxyFileName, String oldPath, String newPath);
 }

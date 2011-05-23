@@ -121,4 +121,18 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
             ex.printStackTrace();
         }
     }
+
+    public void rename(String user, String proxyFileName, String oldPath, String newPath) {
+        try {
+            VletAgentClient client = new VletAgentClient(
+                    ServerConfiguration.getInstance().getVletagentHost(),
+                    ServerConfiguration.getInstance().getVletagentPort(),
+                    proxyFileName);
+
+            client.rename(DataManagerUtil.parseBaseDir(user, oldPath), newPath);
+
+        } catch (VletAgentClientException ex) {
+            ex.printStackTrace();
+        }
+    }
 }
