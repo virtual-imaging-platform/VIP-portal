@@ -54,33 +54,37 @@ public class ProxyPortlet extends Portlet {
         pane.setStyleName("defaultBorder");
         pane.setOverflow(Overflow.AUTO);
 
+        String contents = "";
         if (Context.getInstance().hasValidProxy()) {
-            pane.setContents("<html>"
+            contents = "<html>"
                     + "<body>"
                     + "<p>You have valid grid credentials.<br />"
                     + "Proxy Validity: " + Context.getInstance().getProxyValidity() + "</p>"
                     + "</body>"
-                    + "</html>");
+                    + "</html>";
 
         } else {
+            
+            String portal = "Please, go to <a href=\"http://vip.creatis.insa-lyon.fr/portal/web/vip/proxy-initialisation\">"
+                        + "our portal</a> to upload your proxy.</p>";
+            
             if (Context.getInstance().getProxyValidity().equals("")) {
-                pane.setContents("<html>"
+                contents = "<html>"
                         + "<body>"
                         + "<p>Warning! You do not have valid credentials uploaded!<br />"
-                        + "Please, go to <a href=\"http://vip.creatis.insa-lyon.fr/portal/web/vip/proxy-initialisation\">"
-                        + "our portal</a> to upload your proxy.</p>"
+                        + portal
                         + "</body>"
-                        + "</html>");
+                        + "</html>";
             } else {
-                pane.setContents("<html>"
+                contents = "<html>"
                         + "<body>"
-                        + "<p>Warning! You do not have valid credentials uploaded!<br />"
-                        + "Please, go to <a href=\"http://vip.creatis.insa-lyon.fr/portal/web/vip/proxy-initialisation\">"
-                        + "our portal</a> to upload your proxy.</p>"
+                        + "<p>Warning! " + Context.getInstance().getProxyValidity() + "<br />"
+                        + portal
                         + "</body>"
-                        + "</html>");
+                        + "</html>";
             }
         }
+        pane.setContents(contents);
 
         this.addItem(pane);
     }
