@@ -32,73 +32,19 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.common.client.bean;
-
-import com.google.gwt.user.client.rpc.IsSerializable;
-import java.util.Map;
+package fr.insalyon.creatis.vip.common.server.dao;
 
 /**
  *
  * @author Rafael Silva
  */
-public class Authentication implements IsSerializable {
+public class DAOException extends Exception {
 
-    private String user;
-    private String organization;
-    private String userDN;
-    private Map<String, String> groups;
-    private String proxyFileName;
-    private boolean proxyValid;
-    private String proxyValidity;
-
-    public Authentication() {
+    public DAOException(String message) {
+        super(message);
     }
 
-    public Authentication(String user, String organization, String userDN,
-            Map<String, String> groups, String proxyFileName,
-            boolean proxyValid, String proxyValidity) {
-
-        this.user = user;
-        this.organization = organization;
-        this.userDN = userDN;
-        this.groups = groups;
-        this.proxyFileName = proxyFileName;
-        this.proxyValid = proxyValid;
-        this.proxyValidity = proxyValidity;
-    }
-
-    public String getUserDN() {
-        return userDN;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public String getOrganization() {
-        return organization;
-    }
-
-    public boolean hasGroupAccess(String groupName) {
-        return groups.containsKey(groupName);
-    }
-
-    public boolean isAdmin(String groupName) {
-        if (groups.containsKey(groupName)) {
-            return groups.get(groupName).equals("admin") ? true : false;
-        }
-        return false;
-    }
-
-    public String getProxyFileName() {
-        return proxyFileName;
-    }
-
-    public boolean isProxyValid() {
-        return proxyValid;
-    }
-
-    public String getProxyValidity() {
-        return proxyValidity;
+    public DAOException(Throwable thrwbl) {
+        super(thrwbl);
     }
 }

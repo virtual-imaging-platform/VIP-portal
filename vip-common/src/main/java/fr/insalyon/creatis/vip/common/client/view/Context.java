@@ -97,6 +97,10 @@ public class Context {
     public boolean hasValidProxy() {
         return authentication.isProxyValid();
     }
+    
+    public String getProxyValidity() {
+        return authentication.getProxyValidity();
+    }
 
     public Authentication getAuthentication() {
         return authentication;
