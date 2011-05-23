@@ -39,6 +39,7 @@
         <module>vip-gatelab</module>
         <module>vip-portal</module>
         <module>vip-simulation-gui</module>
+        <module>vip-models</module>
     </modules>
     <repositories>
         <repository>
