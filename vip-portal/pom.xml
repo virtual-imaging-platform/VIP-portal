@@ -130,6 +130,11 @@
             <artifactId>vip-simulation-gui</artifactId>
             <version>0.1</version>
         </dependency>
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-models</artifactId>
+            <version>0.1</version>
+        </dependency>
         <!-- END VIP MODULES -->
 
     </dependencies>

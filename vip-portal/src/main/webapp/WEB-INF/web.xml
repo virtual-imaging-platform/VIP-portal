@@ -106,7 +106,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>ModelService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.portal.server.rpc.ModelServiceImpl</servlet-class>
+        <servlet-class>fr.insalyon.creatis.vip.models.server.rpc.ModelServiceImpl</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>ModelService</servlet-name>
