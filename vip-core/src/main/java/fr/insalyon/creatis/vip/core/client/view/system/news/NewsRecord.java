@@ -32,56 +32,36 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.dao;
+package fr.insalyon.creatis.vip.core.client.view.system.news;
 
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.derby.ApplicationData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.ClassData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.GroupData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.NewsData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.UserData;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DerbyDAOFactory extends DAOFactory {
+public class NewsRecord extends ListGridRecord {
 
-    private static DAOFactory instance;
-
-    // Singleton
-    protected static DAOFactory getInstance() {
-        if (instance == null) {
-            instance = new DerbyDAOFactory();
-        }
-        return instance;
-    }
-
-    private DerbyDAOFactory() {
-    }
-
-    @Override
-    public ApplicationDAO getApplicationDAO() throws DAOException {
-        return new ApplicationData();
-    }
-
-    @Override
-    public ClassDAO getClassDAO() throws DAOException {
-        return new ClassData();
-    }
-
-    @Override
-    public GroupDAO getGroupDAO() throws DAOException {
-        return new GroupData();
-    }
-
-    @Override
-    public UserDAO getUserDAO() throws DAOException {
-        return new UserData();
+    public NewsRecord(String title, String message, String posted, String author) {
+        setAttribute("title", title);
+        setAttribute("message", message);
+        setAttribute("posted", posted);
+        setAttribute("author", author);
     }
     
-    @Override
-    public NewsDAO getNewsDAO() throws DAOException {
-        return new NewsData();
+    public String getTitle() {
+        return getAttributeAsString("title");
+    }
+    
+    public String getMessage() {
+        return getAttributeAsString("message");
+    }
+    
+    public String getPosted() {
+        return getAttributeAsString("posted");
+    }
+    
+    public String getAuthor() {
+        return getAttributeAsString("author");
     }
 }

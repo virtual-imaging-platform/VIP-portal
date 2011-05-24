@@ -32,56 +32,39 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.dao;
+package fr.insalyon.creatis.vip.core.client.view.portlet.news;
 
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.derby.ApplicationData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.ClassData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.GroupData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.NewsData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.UserData;
+import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.widgets.HTMLPane;
+import com.smartgwt.client.widgets.Window;
+import fr.insalyon.creatis.vip.core.client.view.system.news.NewsRecord;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DerbyDAOFactory extends DAOFactory {
+public class NewsViewerWindow extends Window {
 
-    private static DAOFactory instance;
-
-    // Singleton
-    protected static DAOFactory getInstance() {
-        if (instance == null) {
-            instance = new DerbyDAOFactory();
-        }
-        return instance;
-    }
-
-    private DerbyDAOFactory() {
-    }
-
-    @Override
-    public ApplicationDAO getApplicationDAO() throws DAOException {
-        return new ApplicationData();
-    }
-
-    @Override
-    public ClassDAO getClassDAO() throws DAOException {
-        return new ClassData();
-    }
-
-    @Override
-    public GroupDAO getGroupDAO() throws DAOException {
-        return new GroupData();
-    }
-
-    @Override
-    public UserDAO getUserDAO() throws DAOException {
-        return new UserData();
-    }
-    
-    @Override
-    public NewsDAO getNewsDAO() throws DAOException {
-        return new NewsData();
+    public NewsViewerWindow(NewsRecord record) {
+        
+        this.setTitle("Subject: " + record.getTitle());
+        this.setCanDragReposition(true);
+        this.setCanDragResize(true);
+        this.setWidth(700);
+        this.setHeight(450);
+        this.centerInPage();
+        
+        HTMLPane pane = new HTMLPane();
+        pane.setPadding(10);
+        pane.setOverflow(Overflow.AUTO);
+        pane.setStyleName("defaultBorder");
+        
+        String contents = "<b>Author: </b> " + record.getAuthor() + "<br />"
+                + "<b>Date: </b> " + record.getPosted() + "<br /><br />"
+                + "<b>Message: </b><br /><br />" + record.getMessage();
+        
+        pane.setContents(contents);
+        
+        this.addItem(pane);
     }
 }

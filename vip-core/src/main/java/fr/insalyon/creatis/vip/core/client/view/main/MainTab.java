@@ -38,6 +38,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.view.portlet.DisclaimerPortlet;
 import fr.insalyon.creatis.vip.core.client.view.portlet.ProxyPortlet;
+import fr.insalyon.creatis.vip.core.client.view.portlet.news.NewsPortlet;
 
 /**
  *
@@ -56,6 +57,7 @@ public class MainTab extends Tab {
         portalLayout.setHeight100();
         
         portalLayout.addPortlet(new ProxyPortlet(), 0);
+        portalLayout.addPortlet(new NewsPortlet(), 0);
         portalLayout.addPortlet(new DisclaimerPortlet(), 1);
         
         vLayout.addMember(portalLayout);

@@ -211,6 +211,20 @@ public class PlatformConnection {
         } catch (SQLException ex) {
             System.out.println("Table PlatformGroupsClasses already created!");
         }
+        
+        try {
+            Statement stat = connection.createStatement();
+            stat.executeUpdate("CREATE TABLE PlatformNews ("
+                    + "title VARCHAR(255), "
+                    + "message CLOB, "
+                    + "posted TIMESTAMP, "
+                    + "owner VARCHAR(255), "
+                    + "PRIMARY KEY (title, owner)"
+                    + ")");
+
+        } catch (SQLException ex) {
+            System.out.println("Table PlatformNews already created!");
+        }
 
         //// tissues and physical parameters
         try {

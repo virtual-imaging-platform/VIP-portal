@@ -32,56 +32,62 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.dao;
+package fr.insalyon.creatis.vip.core.server.rpc;
 
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.derby.ApplicationData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.ClassData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.GroupData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.NewsData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.UserData;
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import fr.insalyon.creatis.vip.core.client.bean.News;
+import fr.insalyon.creatis.vip.core.client.rpc.NewsService;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.NewsBusiness;
+import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DerbyDAOFactory extends DAOFactory {
+public class NewsServiceImpl extends RemoteServiceServlet implements NewsService {
 
-    private static DAOFactory instance;
+    public List<News> getNews() {
+        try {
+            NewsBusiness business = new NewsBusiness();
+            return business.getNews();
 
-    // Singleton
-    protected static DAOFactory getInstance() {
-        if (instance == null) {
-            instance = new DerbyDAOFactory();
+        } catch (BusinessException ex) {
+            ex.printStackTrace();
+            return null;
         }
-        return instance;
     }
 
-    private DerbyDAOFactory() {
+    public String add(News news) {
+        try {
+            NewsBusiness business = new NewsBusiness();
+            return business.add(news);
+
+        } catch (BusinessException ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
-    @Override
-    public ApplicationDAO getApplicationDAO() throws DAOException {
-        return new ApplicationData();
+    public String update(News news) {
+        try {
+            NewsBusiness business = new NewsBusiness();
+            return business.update(news);
+
+        } catch (BusinessException ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
-    @Override
-    public ClassDAO getClassDAO() throws DAOException {
-        return new ClassData();
-    }
+    public String remove(News news) {
+        try {
+            NewsBusiness business = new NewsBusiness();
+            return business.remove(news);
 
-    @Override
-    public GroupDAO getGroupDAO() throws DAOException {
-        return new GroupData();
-    }
-
-    @Override
-    public UserDAO getUserDAO() throws DAOException {
-        return new UserData();
-    }
-    
-    @Override
-    public NewsDAO getNewsDAO() throws DAOException {
-        return new NewsData();
+        } catch (BusinessException ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 }

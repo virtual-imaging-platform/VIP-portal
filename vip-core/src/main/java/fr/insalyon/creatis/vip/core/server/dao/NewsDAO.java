@@ -35,53 +35,20 @@
 package fr.insalyon.creatis.vip.core.server.dao;
 
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.derby.ApplicationData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.ClassData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.GroupData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.NewsData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.UserData;
+import fr.insalyon.creatis.vip.core.client.bean.News;
+import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DerbyDAOFactory extends DAOFactory {
-
-    private static DAOFactory instance;
-
-    // Singleton
-    protected static DAOFactory getInstance() {
-        if (instance == null) {
-            instance = new DerbyDAOFactory();
-        }
-        return instance;
-    }
-
-    private DerbyDAOFactory() {
-    }
-
-    @Override
-    public ApplicationDAO getApplicationDAO() throws DAOException {
-        return new ApplicationData();
-    }
-
-    @Override
-    public ClassDAO getClassDAO() throws DAOException {
-        return new ClassData();
-    }
-
-    @Override
-    public GroupDAO getGroupDAO() throws DAOException {
-        return new GroupData();
-    }
-
-    @Override
-    public UserDAO getUserDAO() throws DAOException {
-        return new UserData();
-    }
+public interface NewsDAO {
     
-    @Override
-    public NewsDAO getNewsDAO() throws DAOException {
-        return new NewsData();
-    }
+    public String add(News news);
+    
+    public String remove(News news);
+    
+    public String update(News news);
+    
+    public List<News> getNews() throws DAOException;
 }

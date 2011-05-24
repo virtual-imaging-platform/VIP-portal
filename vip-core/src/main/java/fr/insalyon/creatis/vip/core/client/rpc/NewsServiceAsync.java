@@ -32,56 +32,24 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.dao;
 
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.derby.ApplicationData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.ClassData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.GroupData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.NewsData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.UserData;
+package fr.insalyon.creatis.vip.core.client.rpc;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import fr.insalyon.creatis.vip.core.client.bean.News;
+import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DerbyDAOFactory extends DAOFactory {
+public interface NewsServiceAsync {
 
-    private static DAOFactory instance;
-
-    // Singleton
-    protected static DAOFactory getInstance() {
-        if (instance == null) {
-            instance = new DerbyDAOFactory();
-        }
-        return instance;
-    }
-
-    private DerbyDAOFactory() {
-    }
-
-    @Override
-    public ApplicationDAO getApplicationDAO() throws DAOException {
-        return new ApplicationData();
-    }
-
-    @Override
-    public ClassDAO getClassDAO() throws DAOException {
-        return new ClassData();
-    }
-
-    @Override
-    public GroupDAO getGroupDAO() throws DAOException {
-        return new GroupData();
-    }
-
-    @Override
-    public UserDAO getUserDAO() throws DAOException {
-        return new UserData();
-    }
+    public void getNews(AsyncCallback<List<News>> asyncCallback);
     
-    @Override
-    public NewsDAO getNewsDAO() throws DAOException {
-        return new NewsData();
-    }
+    public void add(News news, AsyncCallback<String> asyncCallback);
+
+    public void update(News news, AsyncCallback<String> asyncCallback);
+
+    public void remove(News news, AsyncCallback<String> asyncCallback);
 }

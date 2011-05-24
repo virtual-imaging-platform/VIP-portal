@@ -62,4 +62,6 @@ public abstract class DAOFactory {
     public abstract UserDAO getUserDAO() throws DAOException;
 
     public abstract ClassDAO getClassDAO() throws DAOException;
+    
+    public abstract NewsDAO getNewsDAO() throws DAOException;
 }

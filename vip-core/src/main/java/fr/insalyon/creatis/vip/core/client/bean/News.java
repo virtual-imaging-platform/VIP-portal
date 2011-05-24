@@ -32,56 +32,48 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.dao;
+package fr.insalyon.creatis.vip.core.client.bean;
 
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.derby.ApplicationData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.ClassData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.GroupData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.NewsData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.UserData;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DerbyDAOFactory extends DAOFactory {
+public class News implements IsSerializable {
 
-    private static DAOFactory instance;
+    private String title;
+    private String message;
+    private String posted;
+    private String author;
 
-    // Singleton
-    protected static DAOFactory getInstance() {
-        if (instance == null) {
-            instance = new DerbyDAOFactory();
-        }
-        return instance;
+    public News() {
     }
 
-    private DerbyDAOFactory() {
-    }
-
-    @Override
-    public ApplicationDAO getApplicationDAO() throws DAOException {
-        return new ApplicationData();
-    }
-
-    @Override
-    public ClassDAO getClassDAO() throws DAOException {
-        return new ClassData();
-    }
-
-    @Override
-    public GroupDAO getGroupDAO() throws DAOException {
-        return new GroupData();
-    }
-
-    @Override
-    public UserDAO getUserDAO() throws DAOException {
-        return new UserData();
+    public News(String title, String message, String author) {
+        this(title, message, null, author);
     }
     
-    @Override
-    public NewsDAO getNewsDAO() throws DAOException {
-        return new NewsData();
+    public News(String title, String message, String posted, String author) {
+        this.title = title;
+        this.message = message;
+        this.posted = posted;
+        this.author = author;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getPosted() {
+        return posted;
+    }
+
+    public String getTitle() {
+        return title;
     }
 }

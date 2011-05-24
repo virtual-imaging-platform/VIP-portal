@@ -43,6 +43,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.system.application.classes.ManageClassesTab;
 import fr.insalyon.creatis.vip.core.client.view.system.configuration.group.ManageGroupsTab;
 import fr.insalyon.creatis.vip.core.client.view.system.configuration.user.ManageUsersTab;
+import fr.insalyon.creatis.vip.core.client.view.system.news.ManageNewsTab;
 
 /**
  *
@@ -57,6 +58,7 @@ public class SystemMenuButton extends ToolStripMenuButton {
         menu.setShowShadow(true);
         menu.setShadowDepth(3);
 
+        // Configuration
         Menu confSubMenu = new Menu();
         MenuItem manageUsers = new MenuItem("Manage Users");
         manageUsers.setIcon("icon-users.png");
@@ -77,11 +79,12 @@ public class SystemMenuButton extends ToolStripMenuButton {
         });
         
         confSubMenu.setItems(manageUsers, manageGroups);
-        
+
         MenuItem configurationItem = new MenuItem("Configuration");
         configurationItem.setSubmenu(confSubMenu);
         configurationItem.setIcon("icon-configuration.png");
-        
+
+        // Application
         Menu appSubMenu = new Menu();
         MenuItem manageApps = new MenuItem("Manage Applications");
         manageApps.setIcon("icon-application-manage.png");
@@ -106,8 +109,18 @@ public class SystemMenuButton extends ToolStripMenuButton {
         MenuItem applicationItem = new MenuItem("Applications");
         applicationItem.setIcon("icon-application.png");
         applicationItem.setSubmenu(appSubMenu);
+        
+        // News
+        MenuItem manageNews = new MenuItem("Manage News");
+        manageNews.setIcon("icon-message.png");
+        manageNews.addClickHandler(new ClickHandler() {
 
-        menu.setItems(configurationItem, applicationItem);
+            public void onClick(MenuItemClickEvent event) {
+                Layout.getInstance().addTab(new ManageNewsTab());
+            }
+        });
+
+        menu.setItems(configurationItem, applicationItem, manageNews);
 
         this.setMenu(menu);
     }

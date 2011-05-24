@@ -32,56 +32,46 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.dao;
+package fr.insalyon.creatis.vip.core.client.view.system.news;
 
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.derby.ApplicationData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.ClassData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.GroupData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.NewsData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.UserData;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DerbyDAOFactory extends DAOFactory {
+public class ManageNewsToolStrip extends ToolStrip {
 
-    private static DAOFactory instance;
+    public ManageNewsToolStrip() {
 
-    // Singleton
-    protected static DAOFactory getInstance() {
-        if (instance == null) {
-            instance = new DerbyDAOFactory();
-        }
-        return instance;
-    }
+        this.setWidth100();
 
-    private DerbyDAOFactory() {
-    }
+        ToolStripButton addButton = new ToolStripButton("Add News");
+        addButton.setIcon("icon-add.png");
+        addButton.addClickHandler(new ClickHandler() {
 
-    @Override
-    public ApplicationDAO getApplicationDAO() throws DAOException {
-        return new ApplicationData();
-    }
+            public void onClick(ClickEvent event) {
+                ManageNewsTab newsTab = (ManageNewsTab) Layout.getInstance().
+                        getTab("manage-news-tab");
+                newsTab.setNews(null);
+            }
+        });
+        this.addButton(addButton);
 
-    @Override
-    public ClassDAO getClassDAO() throws DAOException {
-        return new ClassData();
-    }
+        ToolStripButton refreshButton = new ToolStripButton("Refresh");
+        refreshButton.setIcon("icon-refresh.png");
+        refreshButton.addClickHandler(new ClickHandler() {
 
-    @Override
-    public GroupDAO getGroupDAO() throws DAOException {
-        return new GroupData();
-    }
-
-    @Override
-    public UserDAO getUserDAO() throws DAOException {
-        return new UserData();
-    }
-    
-    @Override
-    public NewsDAO getNewsDAO() throws DAOException {
-        return new NewsData();
+            public void onClick(ClickEvent event) {
+                ManageNewsTab newsTab = (ManageNewsTab) Layout.getInstance().
+                        getTab("manage-news-tab");
+                newsTab.loadNews();
+            }
+        });
+        this.addButton(refreshButton);
     }
 }
