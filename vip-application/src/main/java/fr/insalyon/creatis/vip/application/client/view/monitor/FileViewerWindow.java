@@ -35,9 +35,9 @@
 package fr.insalyon.creatis.vip.application.client.view.monitor;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.VerticalAlignment;
+import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.Window;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
@@ -48,7 +48,7 @@ import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
  */
 public class FileViewerWindow extends Window {
 
-    private Label label;
+    private HTMLPane pane;
     private String simulationID;
     private String folder;
     private String fileName;
@@ -69,13 +69,12 @@ public class FileViewerWindow extends Window {
         this.setHeight(450);
         this.centerInPage();
         
-        label = new Label();
-        label.setWidth100();
-        label.setHeight100();
-        label.setPadding(5);
-        label.setValign(VerticalAlignment.TOP);
-        
-        this.addItem(label);
+        pane = new HTMLPane();
+        pane.setPadding(10);
+        pane.setOverflow(Overflow.AUTO);
+        pane.setStyleName("defaultBorder");
+               
+        this.addItem(pane);
         
         loadFile();
     }
@@ -85,11 +84,11 @@ public class FileViewerWindow extends Window {
         final AsyncCallback<String> callback = new AsyncCallback<String>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get jobs list: " + caught.getMessage());
+                SC.warn("Error executing get file: " + caught.getMessage());
             }
 
             public void onSuccess(String result) {
-                label.setContents(result
+                pane.setContents(result
                         .replaceAll("<", "&lt;")
                         .replaceAll(">", "&gt;")
                         .replaceAll("\n", "<br />"));
