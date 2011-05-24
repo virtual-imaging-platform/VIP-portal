@@ -2,9 +2,13 @@
 <!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 1.7.0//EN"
 "http://google-web-toolkit.googlecode.com/svn/tags/1.7.0/distro-source/core/src/gwt-module.dtd">
 <module>
-    <!-- Inherit the core Web Toolkit stuff.                        -->
-    <inherits name='com.google.gwt.user.User' />
+    <!-- Inherit the core Web Toolkit stuff.-->
+    <inherits name="com.google.gwt.user.User" />
+    <!-- Inherit the SmartGWT Toolkit library configuration.-->
+    <inherits name="com.smartgwt.SmartGwt"/>
     <inherits name="com.google.gwt.core.Core" />
+    <inherits name="com.google.gwt.user.History" />
+    <inherits name="com.google.gwt.i18n.I18N" />
 
     <!-- Inherit the default GWT style sheet.  You can change       -->
     <!-- the theme of your GWT application by uncommenting          -->
@@ -16,6 +20,5 @@
     <!-- Other module inherits                                      -->
 
     <!-- Specify the app entry point class.                         -->
-    <inherits name="com.gwtext.GwtExt" />
     
 </module>

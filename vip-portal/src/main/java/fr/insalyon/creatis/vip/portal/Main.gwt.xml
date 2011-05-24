@@ -4,17 +4,6 @@
 
 <module>
 
-    <!-- Inherit the core Web Toolkit stuff.-->
-    <inherits name="com.google.gwt.user.User" />
-    <!-- Inherit the SmartGWT Toolkit library configuration.-->
-    <inherits name="com.smartgwt.SmartGwt"/>
-    <!-- Inherit the GWTExt Toolkit library configuration.-->
-    <inherits name="com.gwtext.GwtExt" />
-
-    <inherits name="com.google.gwt.core.Core" />
-    <inherits name="com.google.gwt.user.History" />
-    <inherits name="com.google.gwt.i18n.I18N" />
-
     <!-- Project sub-modules -->
     <inherits name="fr.insalyon.creatis.vip.common.Common" />
     <inherits name="fr.insalyon.creatis.vip.core.Core" />
