@@ -29,6 +29,14 @@
         <servlet-name>ApplicationService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/applicationservice</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>NewsService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.core.server.rpc.NewsServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>NewsService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/newsservice</url-pattern>
+    </servlet-mapping>
     <!-- End Core Module -->
     
     <!-- Data Manager Module -->
