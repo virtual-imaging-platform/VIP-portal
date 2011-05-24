@@ -54,6 +54,18 @@
             <artifactId>vlet-agent-client</artifactId>
             <version>0.6</version>
         </dependency>
+        
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.6.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derbyclient</artifactId>
+            <version>10.6.1.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
