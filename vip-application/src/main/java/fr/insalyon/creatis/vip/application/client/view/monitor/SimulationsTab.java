@@ -92,6 +92,8 @@ public class SimulationsTab extends Tab {
     protected Date endDate = null;
     protected HandlerRegistration rowMouseDownHandler;
     protected HandlerRegistration rowContextClickHandler;
+    private SectionStackSection searchSection;
+    private List<Workflow> simulationsList;
 
     public SimulationsTab(String application) {
         this.app = application;
@@ -128,7 +130,7 @@ public class SimulationsTab extends Tab {
         gridSection.setShowHeader(false);
         gridSection.addItem(grid);
 
-        SectionStackSection searchSection = new SectionStackSection("Search");
+        searchSection = new SectionStackSection("Search");
         searchSection.setExpanded(false);
         searchSection.addItem(form);
 
@@ -275,8 +277,11 @@ public class SimulationsTab extends Tab {
                     }
                 }
                 grid.setData(dataList.toArray(new SimulationRecord[]{}));
-                //reloadStats(result);
-//                setStatsPanel(result);
+                StatsTab statsTab = (StatsTab) Layout.getInstance().getTab("stats-tab");
+                if (statsTab != null) {
+                    statsTab.setSimulationsList(result);
+                }
+                simulationsList = result;
                 modal.hide();
             }
         };
@@ -327,5 +332,13 @@ public class SimulationsTab extends Tab {
 
     public ListGridRecord[] getGridSelection() {
         return grid.getSelection();
+    }
+
+    public void expandSearchSection() {
+        this.searchSection.setExpanded(true);
+    }
+
+    public List<Workflow> getSimulationsList() {
+        return simulationsList;
     }
 }

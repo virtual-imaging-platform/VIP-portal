@@ -114,7 +114,18 @@ public class ChartsStackSection extends SectionStackSection {
         chartsItem = new SelectItem("charts", "Chart");
         chartsItem.setValueMap(chartsMap);
         chartsItem.setEmptyDisplayValue("Select a chart...");
+        chartsItem.addChangedHandler(new ChangedHandler() {
 
+            public void onChanged(ChangedEvent event) {
+                int value = new Integer(chartsItem.getValueAsString());
+                if (value == 1) {
+                    binItem.setDisabled(true);
+                } else {
+                    binItem.setDisabled(false);
+                }
+            }
+        });
+        
         binItem = new TextItem("bin", "Bin Size");
         binItem.setWidth(50);
         binItem.setValue("100");
@@ -125,17 +136,6 @@ public class ChartsStackSection extends SectionStackSection {
 
             public void onClick(ClickEvent event) {
                 generateChart();
-            }
-        });
-        generateButtonItem.addChangedHandler(new ChangedHandler() {
-
-            public void onChanged(ChangedEvent event) {
-                int value = new Integer(chartsItem.getValueAsString());
-                if (value == 1) {
-                    binItem.setDisabled(true);
-                } else {
-                    binItem.setDisabled(false);
-                }
             }
         });
         generateButtonItem.setStartRow(false);
