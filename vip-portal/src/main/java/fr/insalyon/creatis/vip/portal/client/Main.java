@@ -71,6 +71,7 @@ public class Main implements EntryPoint {
                 GateLabInit.getInstance();
 //                SimulationGUIInit.getInstance();
 //                ModelInit.getInstance();
+//                PhysicalPropertiesInit.getInstance();
                 ApplicationInit.getInstance();
                 // End Modules Initialization
 

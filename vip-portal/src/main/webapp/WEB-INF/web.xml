@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
-    <display-name>VIP-Platform</display-name>
+    <display-name>VIP</display-name>
     <!-- Common Module -->
     <servlet>
         <servlet-name>GetFileService</servlet-name>
@@ -104,14 +104,18 @@
     </servlet-mapping>
     <!-- End GateLab Module -->
     
+    <!-- Physical Properties Module -->
     <servlet>
         <servlet-name>TissueService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.portal.server.rpc.TissueServiceImpl</servlet-class>
+        <servlet-class>fr.insalyon.creatis.vip.physicalproperties.server.rpc.TissueServiceImpl</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>TissueService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/tissueservice</url-pattern>
     </servlet-mapping>
+    <!-- End Physical Properties Module -->
+    
+    <!-- Models Module -->
     <servlet>
         <servlet-name>ModelService</servlet-name>
         <servlet-class>fr.insalyon.creatis.vip.models.server.rpc.ModelServiceImpl</servlet-class>
@@ -120,7 +124,8 @@
         <servlet-name>ModelService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/modelservice</url-pattern>
     </servlet-mapping>
-
+    <!-- End Models Module -->
+    
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
@@ -147,5 +152,4 @@
         <auth-method>CLIENT-CERT</auth-method>
         <realm-name>Client Cert Users-only Area</realm-name>
     </login-config>
-    
 </web-app>

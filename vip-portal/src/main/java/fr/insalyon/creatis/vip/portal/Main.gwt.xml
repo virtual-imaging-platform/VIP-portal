@@ -26,6 +26,4 @@
     <!-- Specify the app entry point class.-->
     <entry-point class="fr.insalyon.creatis.vip.portal.client.Main"/>
     
-    <!-- Servlets -->
-    <servlet class="fr.insalyon.creatis.vip.portal.server.rpc.WorkflowServiceImpl" path="/tissueservice"/>
 </module>
