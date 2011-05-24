@@ -99,8 +99,8 @@ public class ConfigurationBusiness {
 
                         // Voms
 //                        String command = "voms-proxy-init --voms biomed -cert "
-//                                + proxyFileName + " -key " + proxyFileName
-//                                + " -out " + proxyFileName + " -noregen";
+//                                + proxy.getFileName() + " -key " + proxy.getFileName()
+//                                + " -out " + proxy.getFileName() + " -noregen";
 //                        Process process = Runtime.getRuntime().exec(command);
 //                        process.waitFor();
 //                        VomsClientConf.getInstance().setUserKeyPath(proxyFileName);
