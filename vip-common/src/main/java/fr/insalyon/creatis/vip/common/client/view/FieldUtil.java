@@ -34,15 +34,6 @@
  */
 package fr.insalyon.creatis.vip.common.client.view;
 
-import com.gwtext.client.data.ArrayReader;
-import com.gwtext.client.data.FieldDef;
-import com.gwtext.client.data.MemoryProxy;
-import com.gwtext.client.data.RecordDef;
-import com.gwtext.client.data.Store;
-import com.gwtext.client.data.StringFieldDef;
-import com.gwtext.client.widgets.form.ComboBox;
-import com.gwtext.client.widgets.form.MultiFieldPanel;
-import com.gwtext.client.widgets.form.TextField;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -67,57 +58,5 @@ public class FieldUtil {
         iconField.setImageWidth(12);
         iconField.setImageHeight(12);
         return iconField;
-    }
-
-    public static MultiFieldPanel getMultiFieldPanel(String id) {
-
-        MultiFieldPanel mfp = new MultiFieldPanel();
-        mfp.setBorder(false);
-        mfp.setId(id);
-
-        return mfp;
-    }
-
-    public static TextField getTextField(String id, int size, String label,
-            boolean hideLabel) {
-
-        TextField textField = new TextField(label);
-        textField.setWidth(size);
-        textField.setId(id);
-        textField.setHideLabel(hideLabel);
-        textField.setFieldLabel(label);
-
-        return textField;
-    }
-
-    public static ComboBox getComboBox(String id, String label, int size,
-            String emptyText, Store store, String displayField) {
-        return getComboBox(id, label, size, emptyText, store, displayField, false);
-    }
-
-    public static ComboBox getComboBox(String id, String label, int size,
-            String emptyText, Store store, String displayField, boolean forceSelection) {
-
-        ComboBox comboBox = new ComboBox(label, id, size);
-        comboBox.setReadOnly(true);
-        comboBox.setEmptyText(emptyText);
-        comboBox.setStore(store);
-        comboBox.setDisplayField(displayField);
-        comboBox.setMode(ComboBox.LOCAL);
-        comboBox.setTriggerAction(ComboBox.ALL);
-        comboBox.setForceSelection(forceSelection);
-
-        return comboBox;
-    }
-
-    public static Store getComboBoxStore(String fieldDef) {
-
-        MemoryProxy memoryProxy = new MemoryProxy(new Object[][]{new Object[]{}});
-        RecordDef recordDef = new RecordDef(
-                new FieldDef[]{
-                    new StringFieldDef(fieldDef)
-                });
-
-        return new Store(memoryProxy, new ArrayReader(recordDef));
     }
 }
