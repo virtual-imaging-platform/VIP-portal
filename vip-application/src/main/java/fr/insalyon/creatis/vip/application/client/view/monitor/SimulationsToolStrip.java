@@ -76,7 +76,7 @@ public class SimulationsToolStrip extends ToolStrip {
             }
         });
         this.addButton(refreshButton);
-        
+
         ToolStripButton searchButton = new ToolStripButton();
         searchButton.setIcon("icon-search.png");
         searchButton.setTitle("Search");
@@ -151,22 +151,24 @@ public class SimulationsToolStrip extends ToolStrip {
         ToolStripMenuButton actionButton = new ToolStripMenuButton("Actions", menu);
         actionButton.setIcon("icon-action.png");
         this.addMenuButton(actionButton);
-        
-        ToolStripButton statsButton = new ToolStripButton();
-        statsButton.setIcon("icon-chart.png");
-        statsButton.setTitle("Detailed Stats");
-        statsButton.addClickHandler(new ClickHandler() {
 
-            public void onClick(ClickEvent event) {
-                Layout.getInstance().addTab(new StatsTab());
-                StatsTab statsTab = (StatsTab) Layout.getInstance().getTab("stats-tab");
-                SimulationsTab simulationsTab = (SimulationsTab) Layout.getInstance().getTab(tabID);
-                statsTab.setSimulationsList(simulationsTab.getSimulationsList());
-            }
-        });
+        if (Context.getInstance().isSystemAdmin()) {
+            ToolStripButton statsButton = new ToolStripButton();
+            statsButton.setIcon("icon-chart.png");
+            statsButton.setTitle("Detailed Stats");
+            statsButton.addClickHandler(new ClickHandler() {
 
-        this.addSeparator();
-        this.addButton(statsButton);
+                public void onClick(ClickEvent event) {
+                    Layout.getInstance().addTab(new StatsTab());
+                    StatsTab statsTab = (StatsTab) Layout.getInstance().getTab("stats-tab");
+                    SimulationsTab simulationsTab = (SimulationsTab) Layout.getInstance().getTab(tabID);
+                    statsTab.setSimulationsList(simulationsTab.getSimulationsList());
+                }
+            });
+
+            this.addSeparator();
+            this.addButton(statsButton);
+        }
     }
 
     /**
