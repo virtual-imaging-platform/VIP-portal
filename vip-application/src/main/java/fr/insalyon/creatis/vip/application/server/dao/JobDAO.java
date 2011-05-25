@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao;
 
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import java.util.List;
@@ -63,4 +64,6 @@ public interface JobDAO {
     public List<String> getUploadPerNumberOfJobs(int binSize);
 
     public List<String> getJobsPerTime();
+    
+    public void sendSignal(String jobID, ApplicationConstants.JobStatus status) throws DAOException;
 }

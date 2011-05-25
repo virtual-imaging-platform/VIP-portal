@@ -50,6 +50,7 @@ import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.menu.JobsContextMenu;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.JobRecord;
+import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +60,7 @@ import java.util.List;
  */
 public class JobsStackSection extends SectionStackSection {
 
+    private ModalWindow modal;
     private String simulationID;
     private ListGrid grid;
 
@@ -71,6 +73,7 @@ public class JobsStackSection extends SectionStackSection {
         this.setResizeable(true);
 
         configureGrid();
+        modal = new ModalWindow(grid);
         this.addItem(grid);
 
         loadData();
@@ -104,7 +107,7 @@ public class JobsStackSection extends SectionStackSection {
             public void onRowContextClick(RowContextClickEvent event) {
                 event.cancel();
                 JobRecord job = (JobRecord) event.getRecord();
-                new JobsContextMenu(simulationID, job).showContextMenu();
+                new JobsContextMenu(modal, simulationID, job).showContextMenu();
             }
         });
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {

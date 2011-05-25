@@ -32,37 +32,15 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-
-package fr.insalyon.creatis.vip.application.client.rpc;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.Job;
-import fr.insalyon.creatis.vip.application.client.bean.Node;
-import java.util.List;
-import java.util.Map;
+package fr.insalyon.creatis.vip.application.client;
 
 /**
  *
  * @author Rafael Silva
  */
-public interface JobServiceAsync {
-
-    public void getStatusMap(String workflowID, AsyncCallback<Map<String, Integer>> asyncCallback);
-
-    public void getJobsList(String workflowID, AsyncCallback<List<Job>> asyncCallback);
-
-    public void getFile(String workflowID, String dir, String fileName, String ext, AsyncCallback<String> asyncCallback);
-
-    public void getExecutionPerNumberOfJobs(String workflowID, int binSize, AsyncCallback<List<String>> asyncCallback);
-
-    public void getDownloadPerNumberOfJobs(String workflowID, int binSize, AsyncCallback<List<String>> asyncCallback);
-
-    public void getUploadPerNumberOfJobs(String workflowID, int binSize, AsyncCallback<List<String>> asyncCallback);
-
-    public void getJobsPertTime(String workflowID, AsyncCallback<List<String>> asyncCallback);
-
-    public void getNode(String workflowID, String siteName, String nodeName, AsyncCallback<Node> asyncCallback);
+public class ApplicationConstants {
     
-    public void sendSignal(String workflowID, String jobID, ApplicationConstants.JobStatus status, AsyncCallback<Void> asyncCallback);
+    public static enum JobStatus {
+        KILL, RESCHEDULE
+    };
 }

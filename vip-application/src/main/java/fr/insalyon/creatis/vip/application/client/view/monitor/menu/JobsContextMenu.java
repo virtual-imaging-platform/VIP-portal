@@ -34,14 +34,21 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor.menu;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.util.BooleanCallback;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.rpc.JobService;
+import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.FileViewerWindow;
 import fr.insalyon.creatis.vip.application.client.view.monitor.NodeInfoWindow;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.JobRecord;
+import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 
 /**
  *
@@ -49,8 +56,11 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.record.JobRecord;
  */
 public class JobsContextMenu extends Menu {
 
-    public JobsContextMenu(final String simulationID, final JobRecord job) {
+    private ModalWindow modal;
 
+    public JobsContextMenu(ModalWindow modal, final String simulationID, final JobRecord job) {
+
+        this.modal = modal;
         this.setShowShadow(true);
         this.setShadowDepth(10);
         this.setWidth(90);
@@ -109,6 +119,36 @@ public class JobsContextMenu extends Menu {
             }
         });
 
+        MenuItem killItem = new MenuItem("Send Kill Signal");
+        killItem.addClickHandler(new ClickHandler() {
+
+            public void onClick(MenuItemClickEvent event) {
+                SC.confirm("Do you really want to kill this job?", new BooleanCallback() {
+
+                    public void execute(Boolean value) {
+                        if (value != null && value) {
+                            sendSignal(simulationID, job.getID(), ApplicationConstants.JobStatus.KILL);
+                        }
+                    }
+                });
+            }
+        });
+
+        MenuItem rescheduleItem = new MenuItem("Send Reschedule Signal");
+        rescheduleItem.addClickHandler(new ClickHandler() {
+
+            public void onClick(MenuItemClickEvent event) {
+                SC.confirm("Do you really want to reschedule this job?", new BooleanCallback() {
+
+                    public void execute(Boolean value) {
+                        if (value != null && value) {
+                            sendSignal(simulationID, job.getID(), ApplicationConstants.JobStatus.RESCHEDULE);
+                        }
+                    }
+                });
+            }
+        });
+
         MenuItemSeparator separator = new MenuItemSeparator();
 
         if (job.getStatus().equals("ERROR")
@@ -118,7 +158,27 @@ public class JobsContextMenu extends Menu {
                     outputItem, errorItem, separator, scriptItem,
                     separator, nodeItem);
         } else {
-            this.setItems(scriptItem);
+            this.setItems(scriptItem, separator, killItem, rescheduleItem);
         }
+    }
+
+    private void sendSignal(String simulationID, String jobID, 
+            ApplicationConstants.JobStatus status) {
+        
+        JobServiceAsync service = JobService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Error executing send signal: " + caught.getMessage());
+            }
+
+            public void onSuccess(Void result) {
+                modal.hide();
+                SC.say("Signal Successfully sent.");
+            }
+        };
+        modal.show("Sending signal to job...", true);
+        service.sendSignal(simulationID, jobID, status, callback);
     }
 }

@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao.derby;
 
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.server.dao.JobDAO;
 import fr.insalyon.creatis.vip.application.server.dao.derby.connection.JobsConnection;
@@ -274,5 +275,19 @@ public class JobData implements JobDAO {
 
     public Connection getConnection(){
         return this.connection;
+    }
+    
+    public void sendSignal(String jobID, ApplicationConstants.JobStatus status) throws DAOException {
+        try {
+            PreparedStatement ps = connection.prepareStatement(
+                    "UPDATE Jobs SET status = ? WHERE id = ?");
+            
+            ps.setString(1, status.name());
+            ps.setString(2, jobID);
+            ps.executeUpdate();
+            
+        } catch (SQLException ex) {
+            throw new DAOException(ex);
+        }
     }
 }

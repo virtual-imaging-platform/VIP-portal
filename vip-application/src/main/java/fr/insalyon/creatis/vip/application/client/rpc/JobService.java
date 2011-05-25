@@ -38,6 +38,7 @@ package fr.insalyon.creatis.vip.application.client.rpc;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.bean.Node;
 import java.util.List;
@@ -77,4 +78,6 @@ public interface JobService extends RemoteService {
     public List<String> getJobsPertTime(String workflowID);
 
     public Node getNode(String workflowID, String siteName, String nodeName);
+    
+    public void sendSignal(String workflowID, String jobID, ApplicationConstants.JobStatus status);
 }

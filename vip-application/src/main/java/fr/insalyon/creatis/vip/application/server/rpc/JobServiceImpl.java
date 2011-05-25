@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.application.server.rpc;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.bean.Node;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
@@ -131,6 +132,14 @@ public class JobServiceImpl extends RemoteServiceServlet implements JobService {
             return DAOFactory.getDAOFactory().getNodeDAO(workflowID).getNode(siteName, nodeName);
         } catch (DAOException ex) {
             return null;
+        }
+    }
+    
+    public void sendSignal(String workflowID, String jobID, ApplicationConstants.JobStatus status) {
+        try {
+            DAOFactory.getDAOFactory().getJobDAO(workflowID).sendSignal(jobID, status);
+        } catch (DAOException ex) {
+            ex.printStackTrace();
         }
     }
 }
