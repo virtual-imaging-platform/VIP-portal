@@ -44,6 +44,7 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.proxy.MyProxyClient;
 import fr.insalyon.creatis.vip.core.server.business.proxy.Proxy;
 import fr.insalyon.creatis.vip.core.server.dao.DAOFactory;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.cert.X509Certificate;
@@ -87,14 +88,14 @@ public class ConfigurationBusiness {
                         // MyProxy
                         MyProxyClient myproxy = new MyProxyClient();
                         proxy = myproxy.getProxy(user.getCanonicalName(), userDN);
-                        
+
                         Calendar currentDate = Calendar.getInstance();
                         currentDate.setTime(new Date());
                         currentDate.add(Calendar.DAY_OF_MONTH, 3);
                         Calendar proxyDate = Calendar.getInstance();
-                        proxyDate.setTime(proxy.getEndDate());                       
-                        
-                        boolean validProxy = proxyDate.after(currentDate) ? true : false; 
+                        proxyDate.setTime(proxy.getEndDate());
+
+                        boolean validProxy = proxyDate.after(currentDate) ? true : false;
                         String proxyMsg = validProxy ? proxy.getEndDate().toString() : "Expired Proxy";
 
                         // Voms
@@ -114,19 +115,10 @@ public class ConfigurationBusiness {
                         // Authentication
                         authentication = new Authentication(
                                 user.getCanonicalName(), user.getOrganizationUnit(),
-                                userDN, user.getGroups(), proxy.getFileName(), 
+                                userDN, user.getGroups(), proxy.getFileName(),
                                 validProxy, proxyMsg);
 
-                        // User's folder
-//                        VletAgentClient client = new VletAgentClient(
-//                                ServerConfiguration.getInstance().getVletagentHost(),
-//                                ServerConfiguration.getInstance().getVletagentPort(),
-//                                proxyFileName);
-//
-//                        client.createDirectory(conf.getDataManagerUsersHome(),
-//                                user.getCanonicalName().replace(" ", "_").toLowerCase());
-//                        client.createDirectory(conf.getDataManagerUsersHome(),
-//                                DataManagerConstants.PUBLIC_HOME);
+                        configureUserHome(user, conf, proxy.getFileName());
 
                     } catch (BusinessException ex) {
                         authentication = new Authentication(
@@ -139,8 +131,6 @@ public class ConfigurationBusiness {
 //                        }
 //                    } catch (IOException ex) {
 //                        throw new BusinessException(ex);
-                    } catch (Exception ex) {
-                        throw new BusinessException(ex);
                     }
                 } else {
                     authentication = getAnonymousAuth();
@@ -166,6 +156,39 @@ public class ConfigurationBusiness {
 
     private Authentication getAnonymousAuth() {
         return new Authentication("Anonymous", "", "Anonymous", new HashMap(), "", false, "");
+    }
+
+    /**
+     * 
+     * @param user
+     * @param conf
+     * @param proxyFileName 
+     */
+    private void configureUserHome(User user, ServerConfiguration conf,
+            String proxyFileName) throws BusinessException {
+
+        VletAgentClient client = new VletAgentClient(
+                ServerConfiguration.getInstance().getVletagentHost(),
+                ServerConfiguration.getInstance().getVletagentPort(),
+                proxyFileName);
+
+        try {
+            client.createDirectory(conf.getDataManagerUsersHome(),
+                    user.getCanonicalName().replaceAll(" ", "_").toLowerCase());
+        } catch (VletAgentClientException ex) {
+            if (!ex.getMessage().contains("ERROR: File/Directory exists or Directory is not empty")) {
+                throw new BusinessException(ex);
+            }
+        }
+        try {
+            client.createDirectory(conf.getDataManagerUsersHome(),
+                    user.getCanonicalName().replace(" ", "_").toLowerCase()
+                    + "_" + DataManagerConstants.TRASH_HOME);
+        } catch (VletAgentClientException ex) {
+            if (!ex.getMessage().contains("ERROR: File/Directory exists or Directory is not empty")) {
+                throw new BusinessException(ex);
+            }
+        }
     }
 
     /**
@@ -217,7 +240,7 @@ public class ConfigurationBusiness {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
      * 
      * @param proxy
@@ -232,11 +255,11 @@ public class ConfigurationBusiness {
                     ServerConfiguration.getInstance().getVletagentHost(),
                     ServerConfiguration.getInstance().getVletagentPort(),
                     proxy);
-            client.rename(ServerConfiguration.getInstance().getDataManagerGroupsHome() 
+            client.rename(ServerConfiguration.getInstance().getDataManagerGroupsHome()
                     + "/" + oldName, newName);
-            
+
             return DAOFactory.getDAOFactory().getGroupDAO().update(oldName, newName);
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (VletAgentClientException ex) {
