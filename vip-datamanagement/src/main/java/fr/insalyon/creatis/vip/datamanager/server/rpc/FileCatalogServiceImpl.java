@@ -43,6 +43,7 @@ import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -129,10 +130,19 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
                     ServerConfiguration.getInstance().getVletagentPort(),
                     proxyFileName);
 
-            client.rename(DataManagerUtil.parseBaseDir(user, oldPath), newPath);
+            client.rename(DataManagerUtil.parseBaseDir(user, oldPath),
+                    DataManagerUtil.parseBaseDir(user, newPath));
 
         } catch (VletAgentClientException ex) {
             ex.printStackTrace();
+        }
+    }
+
+    public void renameFiles(String user, String proxyFileName, Map<String, String> paths) {
+
+        for (String oldPath : paths.keySet()) {
+            String newPath = paths.get(oldPath);
+            rename(user, proxyFileName, oldPath, newPath);
         }
     }
 }

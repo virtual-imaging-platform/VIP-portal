@@ -34,13 +34,18 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.browser;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogServiceAsync;
 
 /**
  *
@@ -66,7 +71,7 @@ public class BrowserContextMenu extends Menu {
                 }
             }
         });
-        
+
         MenuItem renameItem = new MenuItem("Rename");
         renameItem.setIcon("icon-edit.png");
         renameItem.addClickHandler(new ClickHandler() {
@@ -80,6 +85,49 @@ public class BrowserContextMenu extends Menu {
             }
         });
 
-        this.setItems(uploadItem, renameItem);
+        MenuItem deleteItem = new MenuItem("Delete");
+        deleteItem.setIcon("icon-delete.png");
+        deleteItem.addClickHandler(new ClickHandler() {
+
+            public void onClick(MenuItemClickEvent event) {
+                if (baseDir.equals(DataManagerConstants.ROOT)) {
+                    SC.warn("You cannot delete a folder in the root folder.");
+                } else {
+                    delete(modal, baseDir, data.getName());
+                }
+            }
+        });
+
+        this.setItems(uploadItem, renameItem, deleteItem);
+    }
+
+    private void delete(final ModalWindow modal, final String baseDir, final String name) {
+        SC.confirm("Do you really want to delete \"" + name + "\"?", new BooleanCallback() {
+
+            public void execute(Boolean value) {
+                if (value != null && value) {
+                    FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
+                    AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                        public void onFailure(Throwable caught) {
+                            modal.hide();
+                            SC.warn("Error executing delete files/folders: " + caught.getMessage());
+                        }
+
+                        public void onSuccess(Void result) {
+                            modal.hide();
+                            BrowserLayout.getInstance().loadData(baseDir, true);
+                        }
+                    };
+                    modal.show("Deleting " + name + "...", true);
+                    Context context = Context.getInstance();
+                    String oldPath = baseDir + "/" + name;
+                    String newPath = DataManagerConstants.ROOT + "/" 
+                            + DataManagerConstants.TRASH_HOME + "/" + name;
+                    service.rename(context.getUser(), context.getProxyFileName(),
+                            oldPath, newPath, callback);
+                }
+            }
+        });
     }
 }

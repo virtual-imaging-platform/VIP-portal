@@ -32,7 +32,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client.view.util;
+package fr.insalyon.creatis.vip.datamanager.client.view.browser;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.SortDirection;
@@ -46,7 +46,6 @@ import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogServiceAsync;
-import fr.insalyon.creatis.vip.datamanager.client.view.browser.DataRecord;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.BasicBrowserToolStrip;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +62,7 @@ public class BrowserUtil {
      * @return Elementary browser list grid
      */
     public static ListGrid getListGrid() {
-        
+
         ListGrid grid = new ListGrid();
         grid.setWidth100();
         grid.setHeight100();
@@ -77,10 +76,10 @@ public class BrowserUtil {
         grid.setFields(icoField, nameField);
         grid.setSortField("icon");
         grid.setSortDirection(SortDirection.DESCENDING);
-        
+
         return grid;
     }
-    
+
     /**
      * Loads the data from a path to the grid and updates the tool strip.
      * 
@@ -125,15 +124,22 @@ public class BrowserUtil {
 
         } else {
             toolStrip.setPath(path);
-            grid.setData(
-                    new DataRecord[]{
-                        new DataRecord("folder", DataManagerConstants.USERS_HOME),
-                        new DataRecord("folder", DataManagerConstants.PUBLIC_HOME),
-                        new DataRecord("folder", DataManagerConstants.GROUPS_HOME),
-                        new DataRecord("folder", DataManagerConstants.ACTIVITIES_HOME),
-                        new DataRecord("folder", DataManagerConstants.WORKFLOWS_HOME),
-                        new DataRecord("folder", DataManagerConstants.CREATIS_HOME)
-                    });
+            if (Context.getInstance().isSystemAdmin()) {
+                grid.setData(
+                        new DataRecord[]{
+                            new DataRecord("folder", DataManagerConstants.USERS_HOME),
+                            new DataRecord("folder", DataManagerConstants.TRASH_HOME),
+                            new DataRecord("folder", DataManagerConstants.GROUPS_HOME),
+                            new DataRecord("folder", DataManagerConstants.BIOMED_HOME)
+                        });
+            } else {
+                grid.setData(
+                        new DataRecord[]{
+                            new DataRecord("folder", DataManagerConstants.USERS_HOME),
+                            new DataRecord("folder", DataManagerConstants.TRASH_HOME),
+                            new DataRecord("folder", DataManagerConstants.GROUPS_HOME)
+                        });
+            }
         }
     }
 }

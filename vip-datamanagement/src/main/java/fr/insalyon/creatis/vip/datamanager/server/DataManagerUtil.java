@@ -50,22 +50,17 @@ public class DataManagerUtil {
         baseDir = parsePath(baseDir, DataManagerConstants.USERS_HOME,
                 ServerConfiguration.getInstance().getDataManagerUsersHome()
                 + "/" + user.replaceAll(" ", "_").toLowerCase());
-
-        baseDir = parsePath(baseDir, DataManagerConstants.PUBLIC_HOME,
+        
+        baseDir = parsePath(baseDir, DataManagerConstants.TRASH_HOME,
                 ServerConfiguration.getInstance().getDataManagerUsersHome()
-                    + "/public");
+                + "/" + user.replaceAll(" ", "_").toLowerCase() 
+                + "_" + DataManagerConstants.TRASH_HOME);
 
         baseDir = parsePath(baseDir, DataManagerConstants.GROUPS_HOME,
                 ServerConfiguration.getInstance().getDataManagerGroupsHome());
 
-        baseDir = parsePath(baseDir, DataManagerConstants.ACTIVITIES_HOME,
-                ServerConfiguration.getInstance().getDataManagerActivitiesHome());
-
-        baseDir = parsePath(baseDir, DataManagerConstants.WORKFLOWS_HOME,
-                ServerConfiguration.getInstance().getDataManagerWorkflowsHome());
-
-        baseDir = parsePath(baseDir, DataManagerConstants.CREATIS_HOME,
-                "/grid/biomed/creatis");
+        baseDir = parsePath(baseDir, DataManagerConstants.BIOMED_HOME,
+                "/grid/biomed");
 
         return baseDir;
     }
@@ -86,24 +81,12 @@ public class DataManagerUtil {
                 ex.printStackTrace();
             }
         }
-        
-        baseDir = baseDir.replace(ServerConfiguration.getInstance().getDataManagerWorkflowsHome(),
-                DataManagerConstants.ROOT + "/" + DataManagerConstants.PUBLIC_HOME);
-        
-        baseDir = baseDir.replace(ServerConfiguration.getInstance().getDataManagerWorkflowsHome(),
-                DataManagerConstants.ROOT + "/" + DataManagerConstants.PUBLIC_HOME);
-        
+               
         baseDir = baseDir.replace(ServerConfiguration.getInstance().getDataManagerGroupsHome(),
                 DataManagerConstants.ROOT + "/" + DataManagerConstants.GROUPS_HOME);
-        
-        baseDir = baseDir.replace(ServerConfiguration.getInstance().getDataManagerActivitiesHome(),
-                DataManagerConstants.ROOT + "/" + DataManagerConstants.ACTIVITIES_HOME);
-        
-        baseDir = baseDir.replace(ServerConfiguration.getInstance().getDataManagerWorkflowsHome(),
-                DataManagerConstants.ROOT + "/" + DataManagerConstants.WORKFLOWS_HOME);
-        
-        baseDir = baseDir.replace("/grid/biomed/creatis",
-                DataManagerConstants.ROOT + "/" + DataManagerConstants.CREATIS_HOME);
+              
+        baseDir = baseDir.replace("/grid/biomed",
+                DataManagerConstants.ROOT + "/" + DataManagerConstants.BIOMED_HOME);
         
         return baseDir;
     }

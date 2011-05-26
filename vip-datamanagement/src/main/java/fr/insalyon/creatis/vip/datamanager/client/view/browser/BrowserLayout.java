@@ -48,7 +48,6 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
-import fr.insalyon.creatis.vip.datamanager.client.view.util.BrowserUtil;
 
 /**
  *

@@ -50,8 +50,8 @@ import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.BasicBrowserToolStrip;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -60,10 +60,10 @@ import java.util.List;
 public class BrowserToolStrip extends BasicBrowserToolStrip {
 
     public BrowserToolStrip(final ModalWindow modal) {
-        
+
         super(modal);
-        
-                ToolStripButton folderUpButton = new ToolStripButton();
+
+        ToolStripButton folderUpButton = new ToolStripButton();
         folderUpButton.setIcon("icon-folderup.png");
         folderUpButton.setPrompt("Folder up");
         folderUpButton.addClickHandler(new ClickHandler() {
@@ -143,7 +143,6 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         });
         this.addButton(downloadButton);
 
-        this.addSeparator();
         ToolStripButton deleteButton = new ToolStripButton();
         deleteButton.setIcon("icon-delete.png");
         deleteButton.setPrompt("Delete Selected Files/Folders");
@@ -159,6 +158,37 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
             }
         });
         this.addButton(deleteButton);
+
+        this.addSeparator();
+        ToolStripButton trashButton = new ToolStripButton();
+        trashButton.setIcon("icon-trash.png");
+        trashButton.setPrompt("Trash");
+        trashButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                BrowserLayout.getInstance().loadData(DataManagerConstants.ROOT 
+                        + "/" + DataManagerConstants.TRASH_HOME, false);
+            }
+        });
+        this.addButton(trashButton);
+        
+        ToolStripButton emptyTrashButton = new ToolStripButton();
+        emptyTrashButton.setIcon("icon-trash-empty.png");
+        emptyTrashButton.setPrompt("Empty Trash");
+        emptyTrashButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                SC.confirm("Do you really want to remove the items in the trash permanently?", new BooleanCallback() {
+
+                    public void execute(Boolean value) {
+                        if (value != null && value) {
+                            emptyTrash();
+                        }
+                    }
+                });
+            }
+        });
+        this.addButton(emptyTrashButton);
     }
 
     private void downloadFiles() {
@@ -193,11 +223,13 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
     private void delete() {
         ListGridRecord[] records = BrowserLayout.getInstance().getGridSelection();
-        final List<String> paths = new ArrayList<String>();
+        final Map<String, String> paths = new HashMap<String, String>();
 
         for (ListGridRecord record : records) {
             DataRecord data = (DataRecord) record;
-            paths.add(pathItem.getValueAsString() + "/" + data.getName());
+            paths.put(pathItem.getValueAsString() + "/" + data.getName(), 
+                    DataManagerConstants.ROOT + "/" + 
+                    DataManagerConstants.TRASH_HOME + "/" + data.getName());
         }
         SC.confirm("Do you really want to delete the files/folders \"" + paths + "\"?", new BooleanCallback() {
 
@@ -218,10 +250,13 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                     };
                     modal.show("Deleting files/folders...", true);
                     Context context = Context.getInstance();
-                    service.deleteFiles(context.getUser(), context.getProxyFileName(), 
+                    service.renameFiles(context.getUser(), context.getProxyFileName(),
                             paths, callback);
                 }
             }
         });
+    }
+
+    private void emptyTrash() {
     }
 }

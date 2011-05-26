@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.datamanager.client.rpc;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -53,4 +54,6 @@ public interface FileCatalogServiceAsync {
     public void deleteFiles(String user, String proxyFileName, List<String> paths, AsyncCallback<Void> asyncCallback);
     
     public void rename(String user, String proxyFileName, String oldPath, String newPath, AsyncCallback<Void> asyncCallback);
+    
+    public void renameFiles(String user, String proxyFileName, Map<String, String> paths, AsyncCallback<Void> asyncCallback);
 }

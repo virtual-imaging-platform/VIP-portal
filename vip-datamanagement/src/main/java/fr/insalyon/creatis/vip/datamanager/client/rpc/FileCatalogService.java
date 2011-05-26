@@ -39,6 +39,7 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -68,4 +69,6 @@ public interface FileCatalogService extends RemoteService {
     public void deleteFiles(String user, String proxyFileName, List<String> paths);
     
     public void rename(String user, String proxyFileName, String oldPath, String newPath);
+    
+    public void renameFiles(String user, String proxyFileName, Map<String, String> paths);
 }
