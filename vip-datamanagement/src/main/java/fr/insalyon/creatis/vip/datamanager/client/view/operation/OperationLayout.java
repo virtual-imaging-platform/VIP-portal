@@ -95,7 +95,6 @@ public class OperationLayout extends VLayout {
                 loadData();
             }
         };
-        timer.scheduleRepeating(15000);
     }
 
     private void configureGrid() {
@@ -138,13 +137,21 @@ public class OperationLayout extends VLayout {
 
                 List<OperationRecord> dataList = new ArrayList<OperationRecord>();
                 if (result != null) {
+                    boolean hasActiveOperations = false;
                     for (PoolOperation o : result) {
+                        if (o.getStatus().equals("Running")) {
+                            hasActiveOperations = true;
+                        }
                         dataList.add(new OperationRecord(o.getId(), o.getType(),
                                 o.getStatus(), o.getSource(), o.getDest(),
                                 o.getRegistration().toString(), o.getUser()));
                     }
                     grid.setData(dataList.toArray(new OperationRecord[]{}));
                     modal.hide();
+
+                    if (!hasActiveOperations) {
+                        timer.cancel();
+                    }
 
                 } else {
                     modal.hide();
@@ -159,5 +166,9 @@ public class OperationLayout extends VLayout {
 
     public ListGridRecord[] getGridSelection() {
         return grid.getSelection();
+    }
+
+    public void activateAutoRefresh() {
+        timer.scheduleRepeating(15000);
     }
 }
