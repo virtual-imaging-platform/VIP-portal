@@ -194,7 +194,7 @@ public class ConfigurationBusiness {
                     proxy);
             client.delete(
                     ServerConfiguration.getInstance().getDataManagerGroupsHome()
-                    + "/" + groupName);
+                    + "/" + groupName.replaceAll(" ", "_"));
 
             DAOFactory.getDAOFactory().getGroupDAO().remove(groupName);
 
@@ -220,7 +220,7 @@ public class ConfigurationBusiness {
                     ServerConfiguration.getInstance().getVletagentPort(),
                     proxy);
             client.rename(ServerConfiguration.getInstance().getDataManagerGroupsHome()
-                    + "/" + oldName, newName);
+                    + "/" + oldName.replaceAll(" ", "_"), newName.replaceAll(" ", "_"));
 
             return DAOFactory.getDAOFactory().getGroupDAO().update(oldName, newName);
 
