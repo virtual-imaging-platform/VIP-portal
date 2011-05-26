@@ -95,7 +95,7 @@ public class OperationLayout extends VLayout {
                 loadData();
             }
         };
-        timer.scheduleRepeating(10000);
+        timer.scheduleRepeating(15000);
     }
 
     private void configureGrid() {
