@@ -65,7 +65,7 @@ public class DataManagerUtil {
             for (String groupName : DAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
                 baseDir = parsePath(baseDir, groupName,
                         ServerConfiguration.getInstance().getDataManagerGroupsHome() 
-                        + "/" + groupName);
+                        + "/" + groupName.replaceAll(" ", "_"));
             }
         } catch (DAOException ex) {
             ex.printStackTrace();
