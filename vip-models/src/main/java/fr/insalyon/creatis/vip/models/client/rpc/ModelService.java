@@ -8,8 +8,7 @@ package fr.insalyon.creatis.vip.models.client.rpc;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import fr.insalyon.creatis.vip.models.client.bean.SimulationObjectModel;
-import fr.insalyon.creatis.vip.models.client.bean.SimulationObjectModel.ObjectType;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import java.util.List;
 
 /**

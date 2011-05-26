@@ -22,9 +22,9 @@ import com.smartgwt.client.widgets.tree.events.LeafClickEvent;
 import com.smartgwt.client.widgets.tree.events.LeafClickHandler;
 import com.smartgwt.client.widgets.tree.events.LeafContextClickEvent;
 import com.smartgwt.client.widgets.tree.events.LeafContextClickHandler;
-import fr.insalyon.creatis.vip.models.client.bean.SimulationObjectModel;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 
 import java.util.List;
 
@@ -89,6 +89,7 @@ class ModelImportTab extends Tab {
                 model = result;
                 display(model);
                 ModelImportTab.getInstance().setTitle("New model");
+                SC.say("Model initialized");
             }
         };
         ms.createModel("New model", callback);

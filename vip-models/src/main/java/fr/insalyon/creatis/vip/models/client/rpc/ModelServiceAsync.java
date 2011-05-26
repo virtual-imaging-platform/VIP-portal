@@ -6,7 +6,7 @@
 package fr.insalyon.creatis.vip.models.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.models.client.bean.SimulationObjectModel;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import java.util.List;
 
 /**

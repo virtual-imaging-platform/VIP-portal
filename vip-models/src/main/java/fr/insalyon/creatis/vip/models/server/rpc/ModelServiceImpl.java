@@ -8,7 +8,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectModelFactory;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
-import fr.insalyon.creatis.vip.models.server.business.BeanFactory;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -85,11 +85,11 @@ public class ModelServiceImpl extends RemoteServiceServlet implements ModelServi
         return files;
     }
 
-    public fr.insalyon.creatis.vip.models.client.bean.SimulationObjectModel createModel(String modelName) {
-         return BeanFactory.getVIPSimulationObjectModel(SimulationObjectModelFactory.createModel(modelName));
+    public SimulationObjectModel createModel(String modelName) {
+         return SimulationObjectModelFactory.createModel(modelName);
     }
 
-    public fr.insalyon.creatis.vip.models.client.bean.SimulationObjectModel.ObjectType getObjectType(String objectName) {
+    public SimulationObjectModel.ObjectType getObjectType(String objectName) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }
