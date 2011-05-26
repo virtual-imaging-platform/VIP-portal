@@ -41,8 +41,7 @@ package fr.insalyon.creatis.vip.datamanager.client;
 public class DataManagerConstants {
 
     public final static String ROOT = "/vip";
-    public final static String USERS_HOME = "home";
-    public final static String TRASH_HOME = "trash";
-    public final static String GROUPS_HOME = "groups";
-    public final static String BIOMED_HOME = "biomed";
+    public final static String USERS_HOME = "Home";
+    public final static String TRASH_HOME = "Trash";
+    public final static String BIOMED_HOME = "Biomed";
 }

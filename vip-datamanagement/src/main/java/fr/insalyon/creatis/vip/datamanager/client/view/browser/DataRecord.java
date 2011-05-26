@@ -44,16 +44,20 @@ public class DataRecord extends ListGridRecord {
 
     public DataRecord() {
     }
-    
+
     public DataRecord(String type, String name) {
-        setAttribute("icon", "icon-" + type);
+        if (name.equals("Trash")) {
+            setAttribute("icon", "icon-trash");
+        } else {
+            setAttribute("icon", "icon-" + type);
+        }
         setAttribute("name", name);
     }
-    
+
     public String getType() {
         return getAttributeAsString("icon");
     }
-    
+
     public String getName() {
         return getAttributeAsString("name");
     }

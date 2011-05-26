@@ -139,15 +139,15 @@ public class BrowserUtil {
                     toolStrip.setPath(path);
 
                     List<DataRecord> records = new ArrayList<DataRecord>();
-
                     records.add(new DataRecord("folder", DataManagerConstants.USERS_HOME));
-                    records.add(new DataRecord("folder", DataManagerConstants.TRASH_HOME));
 
                     for (String groupName : result.getGroups().keySet()) {
                         if (!groupName.equals("Administrator")) {
                             records.add(new DataRecord("folder", groupName));
                         }
                     }
+
+                    records.add(new DataRecord("folder", DataManagerConstants.TRASH_HOME));
 
                     if (Context.getInstance().isSystemAdmin()) {
                         records.add(new DataRecord("folder", DataManagerConstants.BIOMED_HOME));
