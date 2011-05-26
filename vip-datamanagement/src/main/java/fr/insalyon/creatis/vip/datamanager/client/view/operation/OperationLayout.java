@@ -139,7 +139,7 @@ public class OperationLayout extends VLayout {
                 if (result != null) {
                     boolean hasActiveOperations = false;
                     for (PoolOperation o : result) {
-                        if (o.getStatus().equals("Running")) {
+                        if (o.getStatus().equals("Running") || o.getStatus().equals("Queued")) {
                             hasActiveOperations = true;
                         }
                         dataList.add(new OperationRecord(o.getId(), o.getType(),
