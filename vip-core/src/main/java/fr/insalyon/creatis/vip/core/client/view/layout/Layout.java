@@ -39,8 +39,6 @@ import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
 import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.BottomToolStrip;
 import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
 
@@ -52,6 +50,7 @@ public class Layout {
 
     private static Layout instance;
     private CenterTabSet centerTabSet;
+    private SectionStack mainSectionStack;
 
     public static Layout getInstance() {
         if (instance == null) {
@@ -68,7 +67,7 @@ public class Layout {
 
         vLayout.addMember(MainToolStrip.getInstance());
 
-        SectionStack mainSectionStack = new SectionStack();
+        mainSectionStack = new SectionStack();
         mainSectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
         mainSectionStack.setAnimateSections(true);
         mainSectionStack.setCanResizeSections(true);
@@ -80,12 +79,7 @@ public class Layout {
         centerTabSet = CenterTabSet.getInstance();
         mainTabSection.addItem(centerTabSet);
         
-        // Data Manager
-        if (Context.getInstance().hasValidProxy()) {
-            mainSectionStack.setSections(mainTabSection, new DataManagerSection());
-        } else {
-            mainSectionStack.setSections(mainTabSection);
-        }
+        mainSectionStack.setSections(mainTabSection);
 
         vLayout.addMember(mainSectionStack);        
         vLayout.addMember(new BottomToolStrip());
@@ -106,5 +100,9 @@ public class Layout {
     
     public Tab getTab(String id) {
         return centerTabSet.getTab(id);
+    }
+    
+    public void addMainSection(SectionStackSection section) {
+        mainSectionStack.addSection(section);
     }
 }

@@ -44,7 +44,6 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.proxy.MyProxyClient;
 import fr.insalyon.creatis.vip.core.server.business.proxy.Proxy;
 import fr.insalyon.creatis.vip.core.server.dao.DAOFactory;
-import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.cert.X509Certificate;
@@ -118,8 +117,6 @@ public class ConfigurationBusiness {
                                 userDN, user.getGroups(), proxy.getFileName(),
                                 validProxy, proxyMsg);
 
-                        configureUserHome(user, conf, proxy.getFileName());
-
                     } catch (BusinessException ex) {
                         authentication = new Authentication(
                                 user.getCanonicalName(), user.getOrganizationUnit(),
@@ -156,39 +153,6 @@ public class ConfigurationBusiness {
 
     private Authentication getAnonymousAuth() {
         return new Authentication("Anonymous", "", "Anonymous", new HashMap(), "", false, "");
-    }
-
-    /**
-     * 
-     * @param user
-     * @param conf
-     * @param proxyFileName 
-     */
-    private void configureUserHome(User user, ServerConfiguration conf,
-            String proxyFileName) throws BusinessException {
-
-        VletAgentClient client = new VletAgentClient(
-                ServerConfiguration.getInstance().getVletagentHost(),
-                ServerConfiguration.getInstance().getVletagentPort(),
-                proxyFileName);
-
-        try {
-            client.createDirectory(conf.getDataManagerUsersHome(),
-                    user.getCanonicalName().replaceAll(" ", "_").toLowerCase());
-        } catch (VletAgentClientException ex) {
-            if (!ex.getMessage().contains("ERROR: File/Directory exists or Directory is not empty")) {
-                throw new BusinessException(ex);
-            }
-        }
-        try {
-            client.createDirectory(conf.getDataManagerUsersHome(),
-                    user.getCanonicalName().replace(" ", "_").toLowerCase()
-                    + "_" + DataManagerConstants.TRASH_HOME);
-        } catch (VletAgentClientException ex) {
-            if (!ex.getMessage().contains("ERROR: File/Directory exists or Directory is not empty")) {
-                throw new BusinessException(ex);
-            }
-        }
     }
 
     /**

@@ -23,13 +23,6 @@
         </dependency>
         
         <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-datamanager</artifactId>
-            <version>0.3</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
             <groupId>bouncycastle</groupId>
             <artifactId>bcprov-jdk16</artifactId>
             <version>1.41</version>
