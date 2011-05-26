@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.operation;
 
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SelectionAppearance;
@@ -44,8 +45,6 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
@@ -63,6 +62,7 @@ import java.util.List;
 public class OperationLayout extends VLayout {
 
     private static OperationLayout instance;
+    private Timer timer;
     private ModalWindow modal;
     private OperationToolStrip toolStrip;
     private ListGrid grid;
@@ -88,6 +88,14 @@ public class OperationLayout extends VLayout {
         this.addMember(grid);
 
         loadData();
+
+        timer = new Timer() {
+
+            public void run() {
+                loadData();
+            }
+        };
+        timer.scheduleRepeating(10000);
     }
 
     private void configureGrid() {
