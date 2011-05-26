@@ -44,6 +44,7 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.proxy.MyProxyClient;
 import fr.insalyon.creatis.vip.core.server.business.proxy.Proxy;
 import fr.insalyon.creatis.vip.core.server.dao.DAOFactory;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.cert.X509Certificate;
@@ -126,8 +127,8 @@ public class ConfigurationBusiness {
 //                        if (!ex.getMessage().contains("ERROR: File/Directory exists or Directory is not empty")) {
 //                            throw new BusinessException(ex);
 //                        }
-//                    } catch (IOException ex) {
-//                        throw new BusinessException(ex);
+                    } catch (Exception ex) {
+                        throw new BusinessException(ex);
                     }
                 } else {
                     authentication = getAnonymousAuth();
