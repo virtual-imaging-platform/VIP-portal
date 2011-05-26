@@ -83,8 +83,6 @@ public class ServerConfiguration {
     private int dataManagerLFCPort = 5010;
     private String dataManagerUsersHome = "/grid/biomed/creatis/vip/data/users";
     private String dataManagerGroupsHome = "/grid/biomed/creatis/vip/data/groups";
-    private String dataManagerActivitiesHome = "/grid/biomed/creatis/vip/tools/activitites";
-    private String dataManagerWorkflowsHome = "/grid/biomed/creatis/vip/tools/workflows";
 
     public static ServerConfiguration getInstance() {
         if (instance == null) {
@@ -140,8 +138,6 @@ public class ServerConfiguration {
             dataManagerLFCPort = new Integer(prop.getProperty("datamanager.lfc.port", dataManagerLFCPort + ""));
             dataManagerUsersHome = prop.getProperty("datamanager.users.home", dataManagerUsersHome);
             dataManagerGroupsHome = prop.getProperty("datamanager.groups.home", dataManagerGroupsHome);
-            dataManagerActivitiesHome = prop.getProperty("datamanager.activities.home", dataManagerActivitiesHome);
-            dataManagerWorkflowsHome = prop.getProperty("datamanager.workflows.home", dataManagerWorkflowsHome);
 
         } catch (IOException e) {
 
@@ -170,8 +166,6 @@ public class ServerConfiguration {
                 prop.setProperty("datamanager.lfc.port", dataManagerLFCPort + "");
                 prop.setProperty("datamanager.users.home", dataManagerUsersHome);
                 prop.setProperty("datamanager.groups.home", dataManagerGroupsHome);
-                prop.setProperty("datamanager.activities.home", dataManagerActivitiesHome);
-                prop.setProperty("datamanager.workflows.home", dataManagerWorkflowsHome);
 
                 prop.store(new FileOutputStream(confFilePath), "VIP Configuration File");
 
@@ -275,14 +269,6 @@ public class ServerConfiguration {
 
     public String getDataManagerGroupsHome() {
         return dataManagerGroupsHome;
-    }
-
-    public String getDataManagerActivitiesHome() {
-        return dataManagerActivitiesHome;
-    }
-
-    public String getDataManagerWorkflowsHome() {
-        return dataManagerWorkflowsHome;
     }
 
     public String getDerbyHost() {
