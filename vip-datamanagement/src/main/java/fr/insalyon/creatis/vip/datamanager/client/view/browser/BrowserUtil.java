@@ -42,6 +42,9 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
@@ -123,23 +126,39 @@ public class BrowserUtil {
             service.listDir(context.getUser(), context.getProxyFileName(), path, refresh, callback);
 
         } else {
-            toolStrip.setPath(path);
-            if (Context.getInstance().isSystemAdmin()) {
-                grid.setData(
-                        new DataRecord[]{
-                            new DataRecord("folder", DataManagerConstants.USERS_HOME),
-                            new DataRecord("folder", DataManagerConstants.TRASH_HOME),
-                            new DataRecord("folder", DataManagerConstants.GROUPS_HOME),
-                            new DataRecord("folder", DataManagerConstants.BIOMED_HOME)
-                        });
-            } else {
-                grid.setData(
-                        new DataRecord[]{
-                            new DataRecord("folder", DataManagerConstants.USERS_HOME),
-                            new DataRecord("folder", DataManagerConstants.TRASH_HOME),
-                            new DataRecord("folder", DataManagerConstants.GROUPS_HOME)
-                        });
-            }
+
+            ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+            AsyncCallback<User> callback = new AsyncCallback<User>() {
+
+                public void onFailure(Throwable caught) {
+                    modal.hide();
+                    SC.warn("Error executing get files list: " + caught.getMessage());
+                }
+
+                public void onSuccess(User result) {
+                    toolStrip.setPath(path);
+
+                    List<DataRecord> records = new ArrayList<DataRecord>();
+
+                    records.add(new DataRecord("folder", DataManagerConstants.USERS_HOME));
+                    records.add(new DataRecord("folder", DataManagerConstants.TRASH_HOME));
+
+                    for (String groupName : result.getGroups().keySet()) {
+                        if (!groupName.equals("Administrator")) {
+                            records.add(new DataRecord("folder", groupName));
+                        }
+                    }
+
+                    if (Context.getInstance().isSystemAdmin()) {
+                        records.add(new DataRecord("folder", DataManagerConstants.BIOMED_HOME));
+                    }
+
+                    grid.setData(records.toArray(new DataRecord[]{}));
+                    modal.hide();
+                }
+            };
+            modal.show("Loading " + DataManagerConstants.ROOT + "...", true);
+            service.getUser(Context.getInstance().getUserDN(), callback);
         }
     }
 }

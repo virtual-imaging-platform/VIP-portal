@@ -35,6 +35,8 @@
 package fr.insalyon.creatis.vip.datamanager.server;
 
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
+import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOFactory;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -50,17 +52,24 @@ public class DataManagerUtil {
         baseDir = parsePath(baseDir, DataManagerConstants.USERS_HOME,
                 ServerConfiguration.getInstance().getDataManagerUsersHome()
                 + "/" + user.replaceAll(" ", "_").toLowerCase());
-        
+
         baseDir = parsePath(baseDir, DataManagerConstants.TRASH_HOME,
                 ServerConfiguration.getInstance().getDataManagerUsersHome()
-                + "/" + user.replaceAll(" ", "_").toLowerCase() 
+                + "/" + user.replaceAll(" ", "_").toLowerCase()
                 + "_" + DataManagerConstants.TRASH_HOME);
-
-        baseDir = parsePath(baseDir, DataManagerConstants.GROUPS_HOME,
-                ServerConfiguration.getInstance().getDataManagerGroupsHome());
 
         baseDir = parsePath(baseDir, DataManagerConstants.BIOMED_HOME,
                 "/grid/biomed");
+        
+        try {
+            for (String groupName : DAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
+                baseDir = parsePath(baseDir, groupName,
+                        ServerConfiguration.getInstance().getDataManagerGroupsHome() 
+                        + "/" + groupName);
+            }
+        } catch (DAOException ex) {
+            ex.printStackTrace();
+        }
 
         return baseDir;
     }
@@ -72,7 +81,7 @@ public class DataManagerUtil {
         }
         return baseDir;
     }
-    
+
     public static String parseRealDir(String baseDir) {
         if (baseDir.contains("lfn://")) {
             try {
@@ -81,13 +90,19 @@ public class DataManagerUtil {
                 ex.printStackTrace();
             }
         }
-               
+
+        if (baseDir.contains(ServerConfiguration.getInstance().getDataManagerUsersHome())) {
+            baseDir = baseDir.replace(ServerConfiguration.getInstance().getDataManagerUsersHome() + "/", "");
+            baseDir = baseDir.substring(baseDir.indexOf("/"), baseDir.length());
+            baseDir = DataManagerConstants.ROOT + "/" + DataManagerConstants.USERS_HOME + baseDir;
+        }
+
         baseDir = baseDir.replace(ServerConfiguration.getInstance().getDataManagerGroupsHome(),
-                DataManagerConstants.ROOT + "/" + DataManagerConstants.GROUPS_HOME);
-              
+                DataManagerConstants.ROOT);
+
         baseDir = baseDir.replace("/grid/biomed",
                 DataManagerConstants.ROOT + "/" + DataManagerConstants.BIOMED_HOME);
-        
+
         return baseDir;
     }
 }

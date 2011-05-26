@@ -32,30 +32,46 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client.rpc;
+package fr.insalyon.creatis.vip.datamanager.client;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
-import java.util.List;
-import java.util.Map;
+import com.smartgwt.client.util.SC;
+import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
 
 /**
  *
  * @author Rafael Silva
  */
-public interface FileCatalogServiceAsync {
+public class DataManagerInit {
 
-    public void configureDataManager(String user, String proxyFileName, AsyncCallback<Void> asyncCallback);
-    
-    public void listDir(String user, String proxyFileName, String baseDir, boolean refresh, AsyncCallback<List<Data>> asyncCallback);
+    private static DataManagerInit instance;
 
-    public void delete(String user, String proxyFileName, String path, AsyncCallback<Void> asyncCallback);
+    public static DataManagerInit getInstance() {
+        if (instance == null) {
+            instance = new DataManagerInit();
+        }
+        return instance;
+    }
 
-    public void createDir(String user, String proxyFileName, String baseDir, String name, AsyncCallback<Void> asyncCallback);
+    private DataManagerInit() {
+        FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
+        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
-    public void deleteFiles(String user, String proxyFileName, List<String> paths, AsyncCallback<Void> asyncCallback);
-    
-    public void rename(String user, String proxyFileName, String oldPath, String newPath, AsyncCallback<Void> asyncCallback);
-    
-    public void renameFiles(String user, String proxyFileName, Map<String, String> paths, AsyncCallback<Void> asyncCallback);
+            public void onFailure(Throwable caught) {
+                SC.warn("Error executing configure File Transfer: " + caught.getMessage());
+            }
+
+            public void onSuccess(Void result) {
+                if (Context.getInstance().hasValidProxy()) {
+                    Layout.getInstance().addMainSection(new DataManagerSection());
+                }
+            }
+        };
+        Context context = Context.getInstance();
+        service.configureDataManager(context.getUser(), context.getProxyFileName(), callback);
+    }
 }

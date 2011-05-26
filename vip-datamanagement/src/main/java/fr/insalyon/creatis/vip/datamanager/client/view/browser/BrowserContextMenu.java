@@ -39,6 +39,7 @@ import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.common.client.view.Context;
@@ -46,6 +47,9 @@ import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 
 /**
  *
@@ -69,6 +73,15 @@ public class BrowserContextMenu extends Menu {
                 } else {
                     new FileUploadWindow(modal, baseDir).show();
                 }
+            }
+        });
+
+        MenuItem downloadItem = new MenuItem("Download");
+        downloadItem.setIcon("icon-download.png");
+        downloadItem.addClickHandler(new ClickHandler() {
+
+            public void onClick(MenuItemClickEvent event) {
+                download(modal, baseDir, data);
             }
         });
 
@@ -98,36 +111,93 @@ public class BrowserContextMenu extends Menu {
             }
         });
 
-        this.setItems(uploadItem, renameItem, deleteItem);
+        MenuItemSeparator separator = new MenuItemSeparator();
+
+        this.setItems(uploadItem, downloadItem, separator, renameItem, deleteItem);
     }
 
     private void delete(final ModalWindow modal, final String baseDir, final String name) {
-        SC.confirm("Do you really want to delete \"" + name + "\"?", new BooleanCallback() {
 
-            public void execute(Boolean value) {
-                if (value != null && value) {
-                    FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
-                    AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+        if (baseDir.equals(DataManagerConstants.ROOT + "/" + DataManagerConstants.TRASH_HOME)) {
+            SC.confirm("Do you really want to permanently delete \"" + name + "\"?", new BooleanCallback() {
 
-                        public void onFailure(Throwable caught) {
-                            modal.hide();
-                            SC.warn("Error executing delete files/folders: " + caught.getMessage());
-                        }
+                public void execute(Boolean value) {
+                    if (value != null && value) {
+                        FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
+                        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
-                        public void onSuccess(Void result) {
-                            modal.hide();
-                            BrowserLayout.getInstance().loadData(baseDir, true);
-                        }
-                    };
-                    modal.show("Deleting " + name + "...", true);
-                    Context context = Context.getInstance();
-                    String oldPath = baseDir + "/" + name;
-                    String newPath = DataManagerConstants.ROOT + "/" 
-                            + DataManagerConstants.TRASH_HOME + "/" + name;
-                    service.rename(context.getUser(), context.getProxyFileName(),
-                            oldPath, newPath, callback);
+                            public void onFailure(Throwable caught) {
+                                modal.hide();
+                                SC.warn("Error executing delete files/folders: " + caught.getMessage());
+                            }
+
+                            public void onSuccess(Void result) {
+                                modal.hide();
+                                BrowserLayout.getInstance().loadData(baseDir, true);
+                            }
+                        };
+                        modal.show("Deleting " + name + "...", true);
+                        Context context = Context.getInstance();
+                        service.delete(context.getUser(), context.getProxyFileName(),
+                                baseDir + "/" + name, callback);
+                    }
                 }
-            }
-        });
+            });
+
+        } else {
+            SC.confirm("Do you really want to delete \"" + name + "\"?", new BooleanCallback() {
+
+                public void execute(Boolean value) {
+                    if (value != null && value) {
+                        FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
+                        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                            public void onFailure(Throwable caught) {
+                                modal.hide();
+                                SC.warn("Error executing delete files/folders: " + caught.getMessage());
+                            }
+
+                            public void onSuccess(Void result) {
+                                modal.hide();
+                                BrowserLayout.getInstance().loadData(baseDir, true);
+                            }
+                        };
+                        modal.show("Deleting " + name + "...", true);
+                        Context context = Context.getInstance();
+                        String oldPath = baseDir + "/" + name;
+                        String newPath = DataManagerConstants.ROOT + "/"
+                                + DataManagerConstants.TRASH_HOME + "/" + name;
+                        service.rename(context.getUser(), context.getProxyFileName(),
+                                oldPath, newPath, callback);
+                    }
+                }
+            });
+        }
+    }
+
+    private void download(final ModalWindow modal, final String baseDir, DataRecord data) {
+        if (data.getType().contains("file")) {
+            TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+            AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                public void onFailure(Throwable caught) {
+                    modal.hide();
+                    SC.warn("Unable to download file: " + caught.getMessage());
+                }
+
+                public void onSuccess(Void result) {
+                    modal.hide();
+                    OperationLayout.getInstance().loadData();
+                    OperationLayout.getInstance().activateAutoRefresh();
+                }
+            };
+            modal.show("Adding files to transfer queue...", true);
+            Context context = Context.getInstance();
+            service.downloadFile(
+                    context.getUser(),
+                    baseDir + "/" + data.getName(),
+                    context.getUserDN(), context.getProxyFileName(),
+                    callback);
+        }
     }
 }

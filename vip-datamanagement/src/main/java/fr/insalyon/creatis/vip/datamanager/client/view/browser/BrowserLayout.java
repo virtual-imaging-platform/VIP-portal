@@ -130,6 +130,7 @@ public class BrowserLayout extends VLayout {
     public void uploadComplete(String fileName) {
         modal.hide();
         OperationLayout.getInstance().loadData();
+        OperationLayout.getInstance().activateAutoRefresh();
     }
 
     private native void initComplete(BrowserLayout upload) /*-{

@@ -44,13 +44,16 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.BasicBrowserToolStrip;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -166,26 +169,19 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         trashButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                BrowserLayout.getInstance().loadData(DataManagerConstants.ROOT 
+                BrowserLayout.getInstance().loadData(DataManagerConstants.ROOT
                         + "/" + DataManagerConstants.TRASH_HOME, false);
             }
         });
         this.addButton(trashButton);
-        
+
         ToolStripButton emptyTrashButton = new ToolStripButton();
         emptyTrashButton.setIcon("icon-trash-empty.png");
         emptyTrashButton.setPrompt("Empty Trash");
         emptyTrashButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                SC.confirm("Do you really want to remove the items in the trash permanently?", new BooleanCallback() {
-
-                    public void execute(Boolean value) {
-                        if (value != null && value) {
-                            emptyTrash();
-                        }
-                    }
-                });
+                emptyTrash();
             }
         });
         this.addButton(emptyTrashButton);
@@ -208,6 +204,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                     public void onSuccess(Void result) {
                         modal.hide();
                         OperationLayout.getInstance().loadData();
+                        OperationLayout.getInstance().activateAutoRefresh();
                     }
                 };
                 modal.show("Adding files to transfer queue...", true);
@@ -227,9 +224,9 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
         for (ListGridRecord record : records) {
             DataRecord data = (DataRecord) record;
-            paths.put(pathItem.getValueAsString() + "/" + data.getName(), 
-                    DataManagerConstants.ROOT + "/" + 
-                    DataManagerConstants.TRASH_HOME + "/" + data.getName());
+            paths.put(pathItem.getValueAsString() + "/" + data.getName(),
+                    DataManagerConstants.ROOT + "/"
+                    + DataManagerConstants.TRASH_HOME + "/" + data.getName());
         }
         SC.confirm("Do you really want to delete the files/folders \"" + paths + "\"?", new BooleanCallback() {
 
@@ -258,5 +255,47 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
     }
 
     private void emptyTrash() {
+        SC.confirm("Do you really want to remove the items in the trash permanently?", new BooleanCallback() {
+
+            public void execute(Boolean value) {
+                if (value != null && value) {
+                    final FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
+                    AsyncCallback<List<Data>> callback = new AsyncCallback<List<Data>>() {
+
+                        public void onFailure(Throwable caught) {
+                            modal.hide();
+                            SC.warn("Error executing delete files/folders: " + caught.getMessage());
+                        }
+
+                        public void onSuccess(List<Data> result) {
+
+                            List<String> paths = new ArrayList<String>();
+                            for (Data data : result) {
+                                paths.add(pathItem.getValueAsString() + "/" + data.getName());
+                            }
+                            AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                                public void onFailure(Throwable caught) {
+                                    modal.hide();
+                                    SC.warn("Error executing empty trash: " + caught.getMessage());
+                                }
+
+                                public void onSuccess(Void result) {
+                                    modal.hide();
+                                    BrowserLayout.getInstance().loadData(pathItem.getValueAsString(), true);
+                                }
+                            };
+                            Context context = Context.getInstance();
+                            service.deleteFiles(context.getUser(), context.getProxyFileName(),
+                                    paths, callback);
+                        }
+                    };
+                    modal.show("Emptying Trash...", true);
+                    Context context = Context.getInstance();
+                    service.listDir(context.getUser(), context.getProxyFileName(),
+                            pathItem.getValueAsString(), true, callback);
+                }
+            }
+        });
     }
 }
