@@ -43,6 +43,7 @@ import fr.insalyon.creatis.vip.core.client.bean.Configuration;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerInit;
 import fr.insalyon.creatis.vip.gatelab.client.GateLabInit;
 
 /**
@@ -68,6 +69,7 @@ public class Main implements EntryPoint {
                 context.setLfcPort(result.getLfcPort());
                 
                 // Modules Initialization
+                DataManagerInit.getInstance();
                 GateLabInit.getInstance();
 //                SimulationGUIInit.getInstance();
 //                ModelInit.getInstance();
