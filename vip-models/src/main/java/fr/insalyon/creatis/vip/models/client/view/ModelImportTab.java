@@ -5,6 +5,7 @@
 package fr.insalyon.creatis.vip.models.client.view;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.NamedFrame;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.TreeModelType;
 import com.smartgwt.client.util.SC;
@@ -25,6 +26,7 @@ import com.smartgwt.client.widgets.tree.events.LeafContextClickHandler;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
+import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 
 import java.util.List;
 
@@ -37,8 +39,8 @@ class ModelImportTab extends Tab {
 
     private static ModelImportTab instance = null;
 
-    private SimulationObjectModel model = null;
-    private TreeGrid modelTreeGrid;
+    protected ModalWindow modal;    
+    private ModelDisplay modelDisplay;
     private VLayout fileVLayout;
 
     public static ModelImportTab getInstance() {
@@ -56,18 +58,9 @@ class ModelImportTab extends Tab {
         this.setTitle("Import model");
         this.setID("model-import-tab");
         this.setCanClose(true);
-
-        modelTreeGrid = new TreeGrid();
+        initComplete(this);
         fileVLayout = new VLayout();
-
-//        modelTreeGrid.setCanAcceptDrop(true);
-//        modelTreeGrid.setCanAcceptDroppedRecords(true);
-//        modelTreeGrid.addFolderDropHandler(new FolderDropHandler(){
-//
-//            public void onFolderDrop(FolderDropEvent event) {
-//                SC.say("drop!");
-//            }
-//        });
+        modal = new ModalWindow(fileVLayout);
        
         Button addButton = new Button("Upload zip file");
         addButton.setIcon("icon-add.png");
@@ -77,40 +70,62 @@ class ModelImportTab extends Tab {
                 new FileUploadWindow("local").show();
             }
         });
-
-
+        
+       
 //create a new model that will be iteratively populated
         ModelServiceAsync ms = ModelService.Util.getInstance();
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
             public void onFailure(Throwable caught) {
+                modal.hide();
                 SC.warn("Cannot initialize the model");
             }
             public void onSuccess(SimulationObjectModel result) {
-                model = result;
-                display(model);
-                ModelImportTab.getInstance().setTitle("New model");
+               //TODO display model
+                modal.hide();
                 SC.say("Model initialized");
             }
         };
+        modal.show("Initializing the model",true);
         ms.createModel("New model", callback);
 
         HStack hs = new HStack(10);
         hs.addMember(fileVLayout);
-        hs.addMember(modelTreeGrid);
+        hs.addMember(modelDisplay);
 
+        NamedFrame frame = new NamedFrame("uploadTarget");
+        frame.setVisible(false);
+        frame.setHeight("1px");
+        frame.setWidth("1px");
+     
+        
         VLayout vl = new VLayout();
+        vl.addMember(frame);
         vl.addMember(addButton);
         vl.addMember(hs);
 
         this.setPane(vl);
     }
 
+     public void uploadComplete(String fileName) {
+        //modal.hide();
+//        OperationLayout.getInstance().loadData();
+        addFile(fileName);
+    }
+
+    private native void initComplete(ModelImportTab upload) /*-{
+    $wnd.uploadComplete = function (fileName) {
+    upload.@fr.insalyon.creatis.vip.models.client.view.ModelImportTab::uploadComplete(Ljava/lang/String;)(fileName);
+    };
+    }-*/;
+    
     void addFile(final String zipName) {
+        //should be put in uploadComplete
         ModelServiceAsync ms = ModelService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error processing file\n");
+                modal.hide();
+                SC.warn("Error processing file");
             }
 
             public void onSuccess(List<String> result) {
@@ -118,37 +133,14 @@ class ModelImportTab extends Tab {
                 for (String s : result) {
                     message += " - " + s;
                 }
-                SC.say(message);
+                modal.hide();
+                SC.say("Retrieved zip file content");
                 addFileBox(zipName, result);
 
             }
         };
+        modal.show("Processing zip file",true);
         ms.getFiles(zipName, callback);
-    }
-
- 
-
-    public class FileTreeNode extends TreeNode {
-
-        public FileTreeNode(String zipFileName, String fileName) {
-            setAttribute("ArchiveName", zipFileName);
-            setAttribute("FileName", fileName);
-            setAttribute("isOpen", true);
-
-            setAttribute("description", getDescription(zipFileName));
-
-            //extract file
-        }
-    }
-
-    public String getDescription(String fileName) {
-        String description = "unrecognized file";
-        String ext = fileName.substring(fileName.lastIndexOf('.'), fileName.length() - 1);
-        if (ext.equals("vtu")) {
-            description = "US scatterers";
-        }
-        return description;
-
     }
 
     public void addFileBox(String zipName, List<String> result) {
@@ -207,54 +199,35 @@ class ModelImportTab extends Tab {
         fileVLayout.addMember(window);
     }
 
-    public void resetTab() {
+    public class FileTreeNode extends TreeNode {
 
-        fileVLayout.clear();
-    }
-
-    private void display(SimulationObjectModel model) {
-        TreeGrid tg = new TreeGrid();
-        modelTreeGrid = tg;
-
-    }
-
-    public class ModelTreeNode extends TreeNode {
-
-        public ModelTreeNode(String zipFileName, String fileName) {
+        public FileTreeNode(String zipFileName, String fileName) {
             setAttribute("ArchiveName", zipFileName);
             setAttribute("FileName", fileName);
             setAttribute("isOpen", true);
 
-            setAttribute("description", getDescription(zipFileName));
+            setAttribute("description", getFileDescription(zipFileName));
 
             //extract file
         }
     }
-    
-  
+
+    public String getFileDescription(String fileName) {
+        String description = "unrecognized file";
+        String ext = fileName.substring(fileName.lastIndexOf('.'), fileName.length() - 1);
+        if (ext.equals("vtu")) {
+            description = "US scatterers";
+        }
+        return description;
+
+    }
+
+   public void resetTab() {
+
+        fileVLayout.clear();
+    }
+      
+   
 }
-// final TabSet tabSet = new TabSet();
-//        tabSet.setTabBarPosition(Side.TOP);
-//        tabSet.setWidth(250);
-//        tabSet.setHeight(200);
-//
-//        Tab tTab1 = new Tab("T1", "icon_calendar.png");
-//        Img tImg1 = new Img("icon_calendar.png", 48, 48);
-//        tTab1.setPane(tImg1);
-//
-//        Tab tTab2 = new Tab("T2", "icon_calendar.png");
-//        Img tImg2 = new Img("icon_calendar.png", 48, 48);
-//        tTab2.setPane(tImg2);
-//
-//        tabSet.addTab(tTab1);
-//        tabSet.addTab(tTab2);
-//
-//        tabSet.addDropHandler(new DropHandler() {
-//
-//            public void onDrop(DropEvent event) {
-//
-//                SC.say("Droped: " + EventHandler.getDragTarget().toString());
-//            }
-//        });
-//    }
+
 

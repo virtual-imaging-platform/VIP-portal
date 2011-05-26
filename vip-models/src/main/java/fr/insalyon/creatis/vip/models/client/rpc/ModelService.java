@@ -9,6 +9,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
 import java.util.List;
 
 /**
@@ -32,6 +33,9 @@ public interface ModelService extends RemoteService {
 
     public List<String> getFiles(String modelZipFile);
     public SimulationObjectModel createModel(String modelName);
+    public List<SimulationObjectModelLight> listAllModels();
+    public SimulationObjectModel getADAM();
+    public void completeModel(SimulationObjectModel som);
 //    public Timepoint createAndAddTimepoint(SimulationObjectModel objectModel, Calendar startingDate);
 //    public void setObjecLayerResolution(ObjectLayer objectLayer, Resolution newResolution);
 //    public Instant createAndAddInstant(Timepoint timePoint, String duration);

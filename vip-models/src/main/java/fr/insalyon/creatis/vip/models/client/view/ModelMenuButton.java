@@ -40,12 +40,22 @@ public class ModelMenuButton extends ToolStripMenuButton{
         browse.addClickHandler(new ClickHandler(){
 
             public void onClick(MenuItemClickEvent event) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                ModelBrowseTab.getInstance().resetTab();
+                Layout.getInstance().addTab(ModelBrowseTab.getInstance());
             }
         });
-        browse.setEnabled(false);
+        browse.setEnabled(true);
+        
+        MenuItem adam = new MenuItem("Adam");
+        adam.setIcon("icon-adam.png");
+        adam.addClickHandler(new ClickHandler() {
 
-        menu.setItems(imp,browse);
+            public void onClick(MenuItemClickEvent event) {
+                Layout.getInstance().addTab(ImportAdamTab.getInstance());
+            }
+        });
+
+        menu.setItems(imp,browse,adam);
         this.setMenu(menu);
     }
 

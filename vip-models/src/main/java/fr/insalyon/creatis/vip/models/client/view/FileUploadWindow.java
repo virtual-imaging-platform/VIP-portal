@@ -62,7 +62,7 @@ public class FileUploadWindow extends Window {
             public void onClick(ClickEvent e) {
                 if (form.validate()) {
                     form.submitForm();
-                    ModelImportTab.getInstance().addFile(fileItem.getValueAsString());
+                   // ModelImportTab.getInstance().addFile(fileItem.getValueAsString());
                     destroy();
                    
                 }

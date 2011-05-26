@@ -6,11 +6,14 @@ package fr.insalyon.creatis.vip.models.server.rpc;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectModelFactory;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectModelQueryer;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,15 +39,7 @@ public class ModelServiceImpl extends RemoteServiceServlet implements ModelServi
         ArrayList<String> files = new ArrayList<String>();
         byte[] buf = new byte[1024];
         try {
-        // TODO discuss with Rafael how to fix
-            if (!(new File(rootDirectory + modelZipFile)).exists()) {
-                try {
-                    Thread.currentThread().sleep(3000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-
+        
             ZipInputStream zipinputstream = null;
             ZipEntry zipentry;
             zipinputstream = new ZipInputStream(new FileInputStream(rootDirectory + modelZipFile));
@@ -91,5 +86,18 @@ public class ModelServiceImpl extends RemoteServiceServlet implements ModelServi
 
     public SimulationObjectModel.ObjectType getObjectType(String objectName) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public List<SimulationObjectModelLight> listAllModels() {
+        return SimulationObjectModelQueryer.getAllModels();
+    }
+
+    public SimulationObjectModel getADAM() {
+      return SimulationObjectModelFactory.rebuildObjectModelFromAnnotationFile("/tmp/adam.rdf", false);
+
+    }
+
+    public void completeModel(SimulationObjectModel som) {
+        SimulationObjectModelFactory.completeModel(som);
     }
 }
