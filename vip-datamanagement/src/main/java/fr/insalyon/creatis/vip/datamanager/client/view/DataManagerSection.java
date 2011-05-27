@@ -45,6 +45,16 @@ import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout
  */
 public class DataManagerSection extends SectionStackSection {
 
+    private static DataManagerSection instance = null;
+    
+    public static SectionStackSection getInstance() {
+        if(instance == null){
+            instance = new DataManagerSection();
+        }
+        return instance;
+            
+    }
+
     public DataManagerSection() {
 
         this.setTitle("File Transfer");
