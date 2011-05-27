@@ -32,7 +32,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.system.configuration.group;
+package fr.insalyon.creatis.vip.core.client.view.system.application.application;
 
 import com.smartgwt.client.types.VisibilityMode;
 import com.smartgwt.client.widgets.layout.SectionStack;
@@ -44,44 +44,42 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
  *
  * @author Rafael Silva
  */
-public class ManageGroupsTab extends Tab {
+public class ManageApplicationsTab extends Tab {
 
     private ToolStrip toolStrip;
-    private GroupsStackSection groupsStackSection;
-    private EditGroupStackSection editStackSection;
-    
-    public ManageGroupsTab() {
-        
-        this.setTitle("Manage Groups");
-        this.setID("manage-groups-tab");
+    private ApplicationsStackSection appsStackSection;
+    private EditApplicationStackSection editStackSection;
+
+    public ManageApplicationsTab() {
+
+        this.setTitle("Manage Applications");
+        this.setID("manage-apps-tab");
         this.setCanClose(true);
-        this.setIcon("icon-groups.png");
-        
+
         VLayout vLayout = new VLayout();
-        
-        toolStrip = new ManageGroupsToolStrip();
+
+        toolStrip = new ManageApplicationsToolStrip();
         vLayout.addMember(toolStrip);
-        
+
         SectionStack sectionStack = new SectionStack();
         sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
         sectionStack.setAnimateSections(true);
         sectionStack.setCanResizeSections(true);
-        
-        groupsStackSection = new GroupsStackSection();
-        editStackSection = new EditGroupStackSection();
-        
-        sectionStack.setSections(groupsStackSection, editStackSection);
-        
+
+        appsStackSection = new ApplicationsStackSection();
+        editStackSection = new EditApplicationStackSection();
+
+        sectionStack.setSections(appsStackSection, editStackSection);
         vLayout.addMember(sectionStack);
 
         this.setPane(vLayout);
     }
     
-    public void loadGroups() {
-        groupsStackSection.loadData();
+    public void loadApplications() {
+        appsStackSection.loadData();
     }
-    
-    public void setGroup(String name) {
-        editStackSection.setGroup(name);
+
+    public void setApplication(String name, String lfn, String classes) {
+        editStackSection.setApplication(name, lfn, classes);
     }
 }

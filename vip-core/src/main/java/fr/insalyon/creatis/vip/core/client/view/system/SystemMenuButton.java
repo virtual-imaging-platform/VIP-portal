@@ -40,6 +40,7 @@ import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.system.application.application.ManageApplicationsTab;
 import fr.insalyon.creatis.vip.core.client.view.system.application.classes.ManageClassesTab;
 import fr.insalyon.creatis.vip.core.client.view.system.configuration.group.ManageGroupsTab;
 import fr.insalyon.creatis.vip.core.client.view.system.configuration.user.ManageUsersTab;
@@ -91,7 +92,7 @@ public class SystemMenuButton extends ToolStripMenuButton {
         manageApps.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                Layout.getInstance().addTab(new ManageApplicationsTab());
             }
         });
         

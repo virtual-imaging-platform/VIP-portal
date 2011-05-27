@@ -32,56 +32,46 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.system.configuration.group;
+package fr.insalyon.creatis.vip.core.client.view.system.application.application;
 
-import com.smartgwt.client.types.VisibilityMode;
-import com.smartgwt.client.widgets.layout.SectionStack;
-import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.tab.Tab;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
  *
  * @author Rafael Silva
  */
-public class ManageGroupsTab extends Tab {
+public class ManageApplicationsToolStrip extends ToolStrip {
 
-    private ToolStrip toolStrip;
-    private GroupsStackSection groupsStackSection;
-    private EditGroupStackSection editStackSection;
-    
-    public ManageGroupsTab() {
+    public ManageApplicationsToolStrip() {
         
-        this.setTitle("Manage Groups");
-        this.setID("manage-groups-tab");
-        this.setCanClose(true);
-        this.setIcon("icon-groups.png");
-        
-        VLayout vLayout = new VLayout();
-        
-        toolStrip = new ManageGroupsToolStrip();
-        vLayout.addMember(toolStrip);
-        
-        SectionStack sectionStack = new SectionStack();
-        sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
-        sectionStack.setAnimateSections(true);
-        sectionStack.setCanResizeSections(true);
-        
-        groupsStackSection = new GroupsStackSection();
-        editStackSection = new EditGroupStackSection();
-        
-        sectionStack.setSections(groupsStackSection, editStackSection);
-        
-        vLayout.addMember(sectionStack);
+        this.setWidth100();
 
-        this.setPane(vLayout);
-    }
-    
-    public void loadGroups() {
-        groupsStackSection.loadData();
-    }
-    
-    public void setGroup(String name) {
-        editStackSection.setGroup(name);
+        ToolStripButton addButton = new ToolStripButton("Add Application");
+        addButton.setIcon("icon-add.png");
+        addButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
+                        getTab("manage-apps-tab");
+                appsTab.setApplication(null, null, null);
+            }
+        });
+        this.addButton(addButton);
+
+        ToolStripButton refreshButton = new ToolStripButton("Refresh");
+        refreshButton.setIcon("icon-refresh.png");
+        refreshButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
+                        getTab("manage-apps-tab");
+                appsTab.loadApplications();
+            }
+        });
+        this.addButton(refreshButton);
     }
 }

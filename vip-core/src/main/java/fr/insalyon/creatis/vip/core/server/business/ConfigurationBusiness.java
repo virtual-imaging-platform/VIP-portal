@@ -98,11 +98,11 @@ public class ConfigurationBusiness {
                         String proxyMsg = validProxy ? proxy.getEndDate().toString() : "Expired Proxy";
 
                         // Voms
-//                        String command = "voms-proxy-init --voms biomed -cert "
-//                                + proxy.getFileName() + " -key " + proxy.getFileName()
-//                                + " -out " + proxy.getFileName() + " -noregen";
-//                        Process process = Runtime.getRuntime().exec(command);
-//                        process.waitFor();
+                        String command = "voms-proxy-init --voms biomed -cert "
+                                + proxy.getFileName() + " -key " + proxy.getFileName()
+                                + " -out " + proxy.getFileName() + " -noregen";
+                        Process process = Runtime.getRuntime().exec(command);
+                        process.waitFor();
 //                        VomsClientConf.getInstance().setUserKeyPath(proxyFileName);
 //                        VomsClientConf.getInstance().setUserCertPath(proxyFileName);
 //                        VomsProxyCredential vpc = new VomsProxyCredential();
