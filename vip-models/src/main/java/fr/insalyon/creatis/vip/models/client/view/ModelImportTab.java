@@ -40,7 +40,6 @@ class ModelImportTab extends Tab {
     private static ModelImportTab instance = null;
 
     protected ModalWindow modal;    
-    private ModelDisplay modelDisplay;
     private VLayout fileVLayout;
 
     public static ModelImportTab getInstance() {
@@ -90,7 +89,6 @@ class ModelImportTab extends Tab {
 
         HStack hs = new HStack(10);
         hs.addMember(fileVLayout);
-        hs.addMember(modelDisplay);
 
         NamedFrame frame = new NamedFrame("uploadTarget");
         frame.setVisible(false);
@@ -146,9 +144,9 @@ class ModelImportTab extends Tab {
     public void addFileBox(String zipName, List<String> result) {
 
         Window window = new Window();
-        window.setTitle(zipName+" - drag and drop files to the model window");
+        window.setTitle(zipName);
         window.setWidth(260);
-        window.setHeight(230);
+        window.setHeight(300);
         window.setCanDragReposition(true);
         window.setCanDragResize(true);
 

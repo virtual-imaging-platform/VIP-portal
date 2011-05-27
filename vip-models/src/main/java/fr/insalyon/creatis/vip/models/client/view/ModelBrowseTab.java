@@ -21,12 +21,18 @@ import com.smartgwt.client.widgets.grid.events.RowMouseDownHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
+import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 import java.util.ArrayList;
 import java.util.List;
+import sun.security.krb5.Config;
 
 /**
  *
@@ -36,9 +42,9 @@ public class ModelBrowseTab  extends Tab{
 
     private static ModelBrowseTab instance = null;
     
-    private ModelDisplay md;
     protected ListGrid grid;
     protected ModalWindow modal;
+    
     protected HandlerRegistration rowContextClickHandler;
     protected HandlerRegistration rowMouseDownHandler;
     
@@ -59,41 +65,17 @@ public class ModelBrowseTab  extends Tab{
         modal = new ModalWindow(grid);
         
         VLayout layout = new VLayout();
-        
-        Button listButton = new Button();
-        listButton.setIcon("icon-list.png");
-        listButton.setTitle("List models");
-        listButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                ModelServiceAsync ms = ModelService.Util.getInstance();
-                final AsyncCallback<List<SimulationObjectModelLight>> callback = new AsyncCallback<List<SimulationObjectModelLight>>() {
 
-                    public void onFailure(Throwable caught) {
-                        SC.warn("Cannot list models");
-                        modal.hide();
-                    }
-
-                    public void onSuccess(List<SimulationObjectModelLight> result) {
-                        SC.say("Model listed");
-                        List<SimulationObjectModelLightRecord> dataList = new ArrayList<SimulationObjectModelLightRecord>();
-
-                        for (SimulationObjectModelLight s : result) {
-                            dataList.add(new SimulationObjectModelLightRecord(s.getModelName(), s.getSemanticAxes().toString(), "" + s.isLongitudinal(), "" + s.isMoving(), s.getURI()));
-                        }
-
-                        grid.setData(dataList.toArray(new SimulationObjectModelLightRecord[]{}));
-                        modal.hide();
-                    }
-                };
-                ms.listAllModels(callback);
-                modal.show("Loading Models...", true);
-            }
-        });
-        layout.addMember(listButton);
+        loadModels();
         layout.addMember(grid);
-        layout.addMember(md);
+        
+        //this will be triggered from the context menu
+        //TODO: call model.storageURL when Germain implements it
+        String lfnModel = "/grid/biomed/creatis/vip/data/groups/VIP/Models/adam.zip";
+        downloadModel(lfnModel) ;
+        
         this.setPane(layout);
-       
+
     }
     
     public void resetTab(){
@@ -141,6 +123,46 @@ public class ModelBrowseTab  extends Tab{
 //                }
             }
         });
+    }
+
+    private void loadModels() {
+        ModelServiceAsync ms = ModelService.Util.getInstance();
+        final AsyncCallback<List<SimulationObjectModelLight>> callback = new AsyncCallback<List<SimulationObjectModelLight>>() {
+            public void onFailure(Throwable caught) {
+                SC.warn("Cannot list models");
+                modal.hide();
+            }
+            public void onSuccess(List<SimulationObjectModelLight> result) {
+                SC.say("Model listed");
+                List<SimulationObjectModelLightRecord> dataList = new ArrayList<SimulationObjectModelLightRecord>();
+                for (SimulationObjectModelLight s : result) {
+                    dataList.add(new SimulationObjectModelLightRecord(s.getModelName(), s.getSemanticAxes().toString(), "" + s.isLongitudinal(), "" + s.isMoving(), s.getURI()));
+                }
+                grid.setData(dataList.toArray(new SimulationObjectModelLightRecord[]{}));
+                modal.hide();
+            }
+        };
+        ms.listAllModels(callback);
+        modal.show("Loading Models...", true);
+
+    }
+
+    private void downloadModel(String lfnModel) {
+        TransferPoolServiceAsync tps = new TransferPoolService.Util().getInstance();
+        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            public void onFailure(Throwable caught) {
+                SC.warn("Cannot download model file.");
+            }
+
+            public void onSuccess(Void result) {
+                SC.say("Model file download is in progress.");
+                Layout.getInstance().openDataManagerSection();
+
+            }
+        };
+        tps.downloadFile(Context.getInstance().getUser(), lfnModel, Context.getInstance().getUserDN(), Context.getInstance().getProxyFileName(), callback);
+      
     }
     
 }

@@ -36,7 +36,8 @@ public class ModelMenuButton extends ToolStripMenuButton{
             }
         });
 
-        MenuItem browse = new MenuItem("Browse");
+        MenuItem browse = new MenuItem("List");
+        browse.setIcon("icon-list.png");
         browse.addClickHandler(new ClickHandler(){
 
             public void onClick(MenuItemClickEvent event) {

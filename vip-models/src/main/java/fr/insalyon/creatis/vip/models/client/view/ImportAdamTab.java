@@ -7,6 +7,9 @@ package fr.insalyon.creatis.vip.models.client.view;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.TreeModelType;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Button;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tree.Tree;
@@ -28,6 +31,7 @@ public class ImportAdamTab extends Tab {
     
     protected ModalWindow modal;
     protected  VLayout layout;
+    protected SimulationObjectModel model = null;
     
     public static ImportAdamTab getInstance(){
         if(instance == null){
@@ -59,6 +63,7 @@ public class ImportAdamTab extends Tab {
                 if(result!= null){
                 SC.say("ADAM successfully retrieved. It has "+result.getTimepoints().size()+" timepoints");
                 layout.addMember(new ModelDisplay(result));
+                model = result;
                 }
                 else
                     SC.say("Cannot load ADAM");
@@ -66,33 +71,32 @@ public class ImportAdamTab extends Tab {
         };
         modal.show("Loading ADAM", true);
         ms.getADAM(callback);
-//        
-//        Button importAdam = new Button();
-//        importAdam.setTitle("Import to repository");
-//        //importAdam.setIcon("icon-adam.png");
-//        
-//        importAdam.addClickHandler(new ClickHandler() {
-//            private AsyncCallback<Void> callback1 = new AsyncCallback<Void>() {
-//
-//                public void onFailure(Throwable caught) {
-//                    modal.hide();
-//                    SC.warn("Cannot import model to repository");
-//                }
-//
-//                public void onSuccess(Void result) {
-//                    modal.hide();
-//                    SC.say("Model successfully imported.");
-//                }
-//            };
-//
-//            public void onClick(ClickEvent event) {
-//                ModelServiceAsync ms = ModelService.Util.getInstance();
-//                modal.show("Importing model",true);
-//                ms.completeModel(md.getModel(), callback1);
-//            }
-//        });
-//        
-//        layout.addMember(md);        
+        
+        Button importAdam = new Button();
+        importAdam.setTitle("Import");
+        importAdam.setIcon("icon-adam.png");
+        
+        importAdam.addClickHandler(new ClickHandler() {
+            private AsyncCallback<Void> callback1 = new AsyncCallback<Void>() {
+
+                public void onFailure(Throwable caught) {
+                    modal.hide();
+                    SC.warn("Cannot import model to repository");
+                }
+
+                public void onSuccess(Void result) {
+                    modal.hide();
+                    SC.say("Model successfully imported.");
+                }
+            };
+
+            public void onClick(ClickEvent event) {
+                ModelServiceAsync ms = ModelService.Util.getInstance();
+                modal.show("Importing model",true);
+                ms.completeModel(model, callback1);
+            }
+        });
+        layout.addMember(importAdam);
         this.setPane(layout);
     
     }
