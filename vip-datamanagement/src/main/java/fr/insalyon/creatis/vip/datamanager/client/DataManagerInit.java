@@ -67,7 +67,7 @@ public class DataManagerInit {
 
             public void onSuccess(Void result) {
                 if (Context.getInstance().hasValidProxy()) {
-                    Layout.getInstance().addMainSection(new DataManagerSection());
+                    Layout.getInstance().addMainSection(DataManagerSection.getInstance());
                 }
             }
         };
