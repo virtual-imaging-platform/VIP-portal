@@ -35,12 +35,14 @@
 package fr.insalyon.creatis.vip.application.server.rpc;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Workflow;
 import fr.insalyon.creatis.vip.application.client.bean.WorkflowInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputParser;
 import fr.insalyon.creatis.vip.application.server.dao.DAOFactory;
+import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAO;
 import fr.insalyon.creatis.vip.application.server.dao.derby.connection.JobsConnection;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
@@ -72,7 +74,32 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
                 c1.add(Calendar.DATE, 1);
                 endDate = c1.getTime();
             }
-            return DAOFactory.getDAOFactory().getWorkflowDAO().getList(user, application, status, startDate, endDate);
+            WorkflowDAO workflowDAO = DAOFactory.getDAOFactory().getWorkflowDAO();
+            List<Workflow> workflows = workflowDAO.getList(user, application, status, startDate, endDate);
+            WorkflowBusiness business = new WorkflowBusiness();
+
+            for (Workflow workflow : workflows) {
+                if (workflow.getMajorStatus().equals(ApplicationConstants.WorkflowStatus.Running.name())) {
+                    try {
+                        String workflowStatus = business.getStatus(workflow.getWorkflowID());
+                        
+                        if (workflowStatus.equals(ApplicationConstants.MoteurStatus.COMPLETE.name())) {
+                            workflowDAO.updateStatus(workflow.getWorkflowID(), 
+                                    ApplicationConstants.WorkflowStatus.Completed.name());
+                            workflow.setMajorStatus(ApplicationConstants.WorkflowStatus.Completed.name());
+                        
+                        } else if (workflowStatus.equals(ApplicationConstants.MoteurStatus.TERMINATED.name()) ||
+                                workflowStatus.contains(ApplicationConstants.MoteurStatus.UNKNOWN.name())) {
+                            workflowDAO.updateStatus(workflow.getWorkflowID(), 
+                                    ApplicationConstants.WorkflowStatus.Killed.name());
+                            workflow.setMajorStatus(ApplicationConstants.WorkflowStatus.Killed.name());
+                        }
+                    } catch (BusinessException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+            return workflows;
 
         } catch (DAOException ex) {
             return null;
@@ -119,19 +146,19 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
     public List<String>[] getApplicationsAndUsersList(String applicationClass) {
         try {
             fr.insalyon.creatis.vip.core.server.dao.DAOFactory daoFactory = fr.insalyon.creatis.vip.core.server.dao.DAOFactory.getDAOFactory();
-            
+
             List<String> users = new ArrayList<String>();
             for (User user : daoFactory.getUserDAO().getUsers()) {
                 users.add(user.getCanonicalName());
             }
-            
+
             List<String> apps = new ArrayList<String>();
             for (Application app : daoFactory.getApplicationDAO().getApplications(applicationClass)) {
                 apps.add(app.getName());
             }
-            
+
             return new List[]{users, apps};
-            
+
         } catch (DAOException ex) {
             return null;
         }
@@ -140,10 +167,10 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
     @Override
     public List<String> getLogs(String baseDir) {
         List<String> list = new ArrayList<String>();
-        
+
         File folder = new File(ServerConfiguration.getInstance().getWorkflowsPath()
                 + "/" + baseDir);
-        
+
         for (File f : folder.listFiles()) {
             if (f.isDirectory()) {
                 list.add(f.getName() + "-#-Folder");
@@ -163,10 +190,10 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         }
         return list;
     }
-    
+
     public List<String> getWorkflowSources(String user, String proxyFileName, String workflowName) {
 
-        try {       
+        try {
             WorkflowBusiness business = new WorkflowBusiness();
             return business.getWorkflowSources(user, proxyFileName, workflowName);
 
@@ -182,11 +209,11 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
 
     public String launchWorkflow(String user, Map<String, String> parametersMap,
             String workflowName, String proxyFileName) {
-        
+
         try {
             WorkflowBusiness business = new WorkflowBusiness();
             return business.launch(user, parametersMap, workflowName, proxyFileName);
-        
+
         } catch (BusinessException ex) {
             ex.printStackTrace();
             return null;
@@ -208,7 +235,7 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
             return null;
         }
     }
-    
+
     public List<WorkflowInput> getWorkflowsInputByUserAndAppName(String user, String appName) {
         try {
             return DAOFactory.getDAOFactory().getWorkflowInputDAO().getWorkflowInputByUserAndAppName(user, appName);

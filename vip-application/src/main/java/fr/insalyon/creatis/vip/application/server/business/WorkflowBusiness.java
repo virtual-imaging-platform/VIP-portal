@@ -54,6 +54,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.rpc.ServiceException;
@@ -78,9 +79,8 @@ public class WorkflowBusiness {
             String workflowName) throws BusinessException {
 
         try {
-            Application wd = fr.insalyon.creatis.vip.core.server.dao.DAOFactory
-                    .getDAOFactory().getApplicationDAO().getApplication(workflowName);
-            
+            Application wd = fr.insalyon.creatis.vip.core.server.dao.DAOFactory.getDAOFactory().getApplicationDAO().getApplication(workflowName);
+
             ServerConfiguration conf = ServerConfiguration.getInstance();
             URI uri = new URI("lfn://" + conf.getDataManagerLFCHost()
                     + ":" + conf.getDataManagerLFCPort()
@@ -92,8 +92,8 @@ public class WorkflowBusiness {
                     proxyFileName);
 
             String workflowPath = client.getRemoteFile(uri.getPath(),
-                    System.getenv("HOME") + "/.platform/workflows/" + 
-                    uri.getPath().substring(0, uri.getPath().lastIndexOf("/")));
+                    System.getenv("HOME") + "/.platform/workflows/"
+                    + uri.getPath().substring(0, uri.getPath().lastIndexOf("/")));
 
             if (workflowPath.endsWith(".gwendia")) {
                 return new GwendiaParser().parse(workflowPath).getSources();
@@ -161,12 +161,11 @@ public class WorkflowBusiness {
                 parameters.add(ps);
             }
 
-            Application wd = fr.insalyon.creatis.vip.core.server.dao.DAOFactory
-                    .getDAOFactory().getApplicationDAO().getApplication(workflowName);
-            
+            Application wd = fr.insalyon.creatis.vip.core.server.dao.DAOFactory.getDAOFactory().getApplicationDAO().getApplication(workflowName);
+
             String path = DataManagerUtil.parseBaseDir(user, wd.getLfn());
             String workflowPath = System.getenv("HOME") + "/.platform/workflows/" + path;
-            
+
             WorkflowMoteurConfig moteur = new WorkflowMoteurConfig(ServerConfiguration.getInstance().getMoteurServer(), workflowPath, parameters);
             moteur.setSettings(settings);
             String ws = moteur.launch(proxyFileName);
@@ -221,7 +220,7 @@ public class WorkflowBusiness {
                         && !file.getName().equals("workflow.out")
                         && !file.getName().equals("workflow.err")
                         && !file.getName().equals("gasw.log")) {
-                    
+
                     FileUtils.deleteQuietly(file);
                 }
             }
@@ -235,7 +234,7 @@ public class WorkflowBusiness {
                 client.delete(output, userDN);
             }
             workflowDAO.cleanWorkflow(workflowID);
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (VletAgentClientException ex) {
@@ -259,6 +258,25 @@ public class WorkflowBusiness {
             FileUtils.deleteQuietly(workflowDir);
 
         } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param workflowID
+     * @throws BusinessException 
+     */
+    public String getStatus(String workflowID) throws BusinessException {
+
+        try {
+            WorkflowMoteurConfig moteur = new WorkflowMoteurConfig(
+                    ServerConfiguration.getInstance().getMoteurServer());
+            return moteur.getStatus(workflowID);
+
+        } catch (RemoteException ex) {
+            throw new BusinessException(ex);
+        } catch (ServiceException ex) {
             throw new BusinessException(ex);
         }
     }

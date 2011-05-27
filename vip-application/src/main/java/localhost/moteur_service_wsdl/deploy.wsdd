@@ -29,6 +29,9 @@
       <operation name="killWorkflow" qname="operNS:killWorkflow" xmlns:operNS="moteur_service" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="" >
         <parameter qname="pns:workflowID" xmlns:pns="moteur_service" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema" />
       </operation>
-      <parameter name="allowedMethods" value="workflowSubmit, killWorkflow"/>
+      <operation name="getWorkflowStatus" qname="operNS:getWorkflowStatus" xmlns:operNS="moteur_service" returnQName="retNS:workflowStatus" xmlns:retNS="moteur_service" returnType="rtns:string" xmlns:rtns="http://www.w3.org/2001/XMLSchema" soapAction="">
+        <parameter qname="pns:workflowID" xmlns:pns="moteur_service" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema" />
+      </operation>
+      <parameter name="allowedMethods" value="workflowSubmit, killWorkflow, getWorkflowStatus"/>
   </service>
 </deployment>

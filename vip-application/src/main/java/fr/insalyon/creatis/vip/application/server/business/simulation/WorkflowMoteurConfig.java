@@ -121,9 +121,7 @@ public class WorkflowMoteurConfig {
         EngineConfiguration engineConfig = new FileProvider(is);
         Moteur_ServiceLocator wfS = new Moteur_ServiceLocator(addressWS, engineConfig);
 
-        String res = wfS.getmoteur_service().workflowSubmit(contentXMLworkflow, contentXMLInput.toString(), strProxy, _settings);
-
-        return res;
+        return wfS.getmoteur_service().workflowSubmit(contentXMLworkflow, contentXMLInput.toString(), strProxy, _settings);
     }
 
     /**
@@ -144,6 +142,26 @@ public class WorkflowMoteurConfig {
         Moteur_ServiceLocator wfS = new Moteur_ServiceLocator(addressWS, engineConfig);
 
         wfS.getmoteur_service().killWorkflow(workflowID);
+    }
+    
+    /**
+     * 
+     * @param workflowID
+     * @throws RemoteException
+     * @throws ServiceException
+     */
+    public String getStatus(String workflowID) throws RemoteException, ServiceException {
+
+        System.setProperty("javax.net.ssl.trustStore", ServerConfiguration.getInstance().getTruststoreFile());
+        System.setProperty("javax.net.ssl.trustStorePassword", ServerConfiguration.getInstance().getTruststorePass());
+        System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+
+        String resourcename = "moteur-client-config.wsdd";
+        InputStream is = this.getClass().getClassLoader().getResourceAsStream(resourcename);
+        EngineConfiguration engineConfig = new FileProvider(is);
+        Moteur_ServiceLocator wfS = new Moteur_ServiceLocator(addressWS, engineConfig);
+
+        return wfS.getmoteur_service().getWorkflowStatus(workflowID);
     }
 
     public String getContentXMLworkflow() {

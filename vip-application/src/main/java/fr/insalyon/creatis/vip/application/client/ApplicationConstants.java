@@ -43,4 +43,12 @@ public class ApplicationConstants {
     public static enum JobStatus {
         KILL, RESCHEDULE
     };
+    
+    public static enum WorkflowStatus {
+        Running, Completed, Killed, Cleaned
+    };
+    
+    public static enum MoteurStatus {
+        RUNNING, COMPLETE, TERMINATED, UNKNOWN
+    };
 }

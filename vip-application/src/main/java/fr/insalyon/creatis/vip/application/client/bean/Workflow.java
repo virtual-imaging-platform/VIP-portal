@@ -88,6 +88,10 @@ public class Workflow implements IsSerializable {
         return majorStatus;
     }
 
+    public void setMajorStatus(String majorStatus) {
+        this.majorStatus = majorStatus;
+    }
+
     public String getMinorStatus() {
         return minorStatus;
     }

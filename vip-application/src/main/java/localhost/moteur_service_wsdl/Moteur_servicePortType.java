@@ -43,6 +43,8 @@ public interface Moteur_servicePortType extends java.rmi.Remote {
     public java.lang.String workflowSubmit(java.lang.String scuflDocument, java.lang.String inputDocument, java.lang.String proxy, java.lang.String settings) throws java.rmi.RemoteException;
 
     public void killWorkflow(java.lang.String workflowID) throws java.rmi.RemoteException;
+    
+    public java.lang.String getWorkflowStatus(java.lang.String workflowID) throws java.rmi.RemoteException;
 
     /**
      * Service definition of function ns__getVersion

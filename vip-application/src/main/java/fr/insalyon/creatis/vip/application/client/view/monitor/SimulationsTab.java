@@ -57,6 +57,7 @@ import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Workflow;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
@@ -268,7 +269,7 @@ public class SimulationsTab extends Tab {
                 List<SimulationRecord> dataList = new ArrayList<SimulationRecord>();
 
                 for (Workflow w : result) {
-                    if (!w.getMajorStatus().equals("Cleaned")
+                    if (!w.getMajorStatus().equals(ApplicationConstants.WorkflowStatus.Cleaned.name())
                             || Context.getInstance().isSystemAdmin()) {
 
                         dataList.add(new SimulationRecord(w.getApplication(),
