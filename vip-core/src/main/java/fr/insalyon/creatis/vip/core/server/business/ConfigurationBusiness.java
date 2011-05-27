@@ -121,11 +121,7 @@ public class ConfigurationBusiness {
                         authentication = new Authentication(
                                 user.getCanonicalName(), user.getOrganizationUnit(),
                                 userDN, new HashMap(), "", false, "");
-
-//                    } catch (VletAgentClientException ex) {
-//                        if (!ex.getMessage().contains("ERROR: File/Directory exists or Directory is not empty")) {
-//                            throw new BusinessException(ex);
-//                        }
+                        
                     } catch (Exception ex) {
                         throw new BusinessException(ex);
                     }
