@@ -9,9 +9,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
@@ -22,17 +19,14 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
 import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 import java.util.ArrayList;
 import java.util.List;
-import sun.security.krb5.Config;
 
 /**
  *
@@ -157,7 +151,7 @@ public class ModelBrowseTab  extends Tab{
 
             public void onSuccess(Void result) {
                 SC.say("Model file download is in progress.");
-                Layout.getInstance().openDataManagerSection();
+                DataManagerSection.getInstance().setExpanded(true);
 
             }
         };
