@@ -100,7 +100,7 @@ public class BrowserLayout extends VLayout {
 
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 String type = event.getRecord().getAttributeAsString("icon");
-                if (type.contains("folder")) {
+                if (type.contains("folder") || type.contains("trash")) {
                     String name = event.getRecord().getAttributeAsString("name");
                     String path = toolStrip.getPath() + "/" + name;
                     loadData(path, false);
