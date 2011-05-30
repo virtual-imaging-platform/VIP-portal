@@ -49,6 +49,7 @@ public class DocumentationTab extends Tab {
         
         this.setTitle("Documentation");
         this.setID("documentation-tab");
+        this.setCanClose(true);
         
         HTMLPane pane = new HTMLPane();
         pane.setOverflow(Overflow.AUTO);
