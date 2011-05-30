@@ -46,7 +46,6 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.core.client.bean.AppClass;
 import fr.insalyon.creatis.vip.core.client.bean.News;
 import fr.insalyon.creatis.vip.core.client.rpc.NewsService;
 import fr.insalyon.creatis.vip.core.client.rpc.NewsServiceAsync;
@@ -96,6 +95,8 @@ public class EditNewsStackSection extends SectionStackSection {
         richTextEditor.setOverflow(Overflow.HIDDEN);
         richTextEditor.setCanDragResize(true);
         richTextEditor.setShowEdges(true);
+        richTextEditor.setControlGroups("fontControls", "formatControls", 
+                "styleControls", "editControls", "colorControls", "insertControls");
         vLayout.addMember(richTextEditor);
 
         IButton saveButton = new IButton("Save");

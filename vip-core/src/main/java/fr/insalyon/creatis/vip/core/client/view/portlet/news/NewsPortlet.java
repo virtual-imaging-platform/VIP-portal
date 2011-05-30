@@ -60,7 +60,7 @@ public class NewsPortlet extends Portlet {
     public NewsPortlet() {
 
         this.setTitle("News");
-        this.setHeight(250);
+        this.setHeight(200);
 
         configureGrid();
 
