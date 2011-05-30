@@ -36,6 +36,7 @@ public interface ModelService extends RemoteService {
     public List<SimulationObjectModelLight> listAllModels();
     public SimulationObjectModel getADAM();
     public SimulationObjectModel rebuildObjectModelFromTripleStore(String uri);
+    public SimulationObjectModel rebuildObjectModelFromAnnotationFile(String fileName);
     public void completeModel(SimulationObjectModel som);
 //    public Timepoint createAndAddTimepoint(SimulationObjectModel objectModel, Calendar startingDate);
 //    public void setObjecLayerResolution(ObjectLayer objectLayer, Resolution newResolution);

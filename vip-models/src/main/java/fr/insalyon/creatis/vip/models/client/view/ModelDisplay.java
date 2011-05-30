@@ -70,7 +70,11 @@ public class ModelDisplay extends TreeGrid {
                         description+=olp.getFileNames().toString().replace("[", "").replace("]", "") +")";
                         objectLayerParts[nolp++] = new ModelTreeNode(""+(2+id++),description,false);
                                             }
-                    objectLayers[nol++]=new ModelTreeNode(""+(2+id++),ol.getType()+" layer",false, objectLayerParts);
+                    String description =ol.getType().toString().replace("_", " ");
+                    if(!ol.getResolution().equals(ObjectLayer.Resolution.none))
+                            description+=" ("+ol.getResolution().toString()+" resolution) ";
+                    description+=" layer";
+                    objectLayers[nol++]=new ModelTreeNode(""+(2+id++),description,false, objectLayerParts);
                 }
                 instants[nit++] = new ModelTreeNode(""+(2+id++),"Instant ("+it.getDuration()+")",true, objectLayers);
             }

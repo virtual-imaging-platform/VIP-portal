@@ -28,11 +28,11 @@ public class ModelMenuButton extends ToolStripMenuButton{
         menu.setShadowDepth(3);
 
         MenuItem imp = new MenuItem("Import");
+        imp.setIcon("icon-add.png");
         imp.addClickHandler(new ClickHandler(){
 
             public void onClick(MenuItemClickEvent event) {
-                ModelImportTab.getInstance().resetTab();
-                Layout.getInstance().addTab(ModelImportTab.getInstance());
+                Layout.getInstance().addTab(new ModelImportTab());
             }
         });
 
@@ -41,8 +41,7 @@ public class ModelMenuButton extends ToolStripMenuButton{
         browse.addClickHandler(new ClickHandler(){
 
             public void onClick(MenuItemClickEvent event) {
-                ModelBrowseTab.getInstance().resetTab();
-                Layout.getInstance().addTab(ModelBrowseTab.getInstance());
+                Layout.getInstance().addTab(new ModelBrowseTab());
             }
         });
         browse.setEnabled(true);

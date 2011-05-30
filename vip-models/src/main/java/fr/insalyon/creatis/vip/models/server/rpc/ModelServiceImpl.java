@@ -14,6 +14,7 @@ import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Simulat
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,29 +47,29 @@ public class ModelServiceImpl extends RemoteServiceServlet implements ModelServi
             zipentry = zipinputstream.getNextEntry();
             while (zipentry != null) {
                 //for each entry to be extracted
-//                String entryName = zipentry.getName();
-//
-//                FileOutputStream fileoutputstream;
-//                File newFile = new File(entryName);
-//                String directory = newFile.getParent();
-//
-//                if (directory == null) {
-//                    if (newFile.isDirectory()) {
-//                        break;
-//                    }
-//                }
-//                int n;
-//                fileoutputstream = new FileOutputStream(
-//                        rootDirectory + entryName);
-//
-//                while ((n = zipinputstream.read(buf, 0, 1024)) > -1) {
-//                    fileoutputstream.write(buf, 0, n);
-//                }
-//
-//                fileoutputstream.close();
-//                zipinputstream.closeEntry();
+                String entryName = zipentry.getName();
+                if (entryName.endsWith(".rdf")) { //extract only the annotations.
+                    FileOutputStream fileoutputstream;
+                    File newFile = new File(entryName);
+                    String directory = newFile.getParent();
 
-                files.add(zipentry.getName());
+                    if (directory == null) {
+                        if (newFile.isDirectory()) {
+                            break;
+                        }
+                    }
+                    int n;
+                    fileoutputstream = new FileOutputStream(
+                            rootDirectory + entryName);
+
+                    while ((n = zipinputstream.read(buf, 0, 1024)) > -1) {
+                        fileoutputstream.write(buf, 0, n);
+                    }
+
+                    fileoutputstream.close();
+                    zipinputstream.closeEntry();
+                }
+                files.add(rootDirectory + entryName);
                 zipentry = zipinputstream.getNextEntry();
 
 
@@ -103,5 +104,9 @@ public class ModelServiceImpl extends RemoteServiceServlet implements ModelServi
 
     public SimulationObjectModel rebuildObjectModelFromTripleStore(String uri) {
        return SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri);
+    }
+
+    public SimulationObjectModel rebuildObjectModelFromAnnotationFile(String fileName) {
+         return SimulationObjectModelFactory.rebuildObjectModelFromAnnotationFile(fileName, true);
     }
 }

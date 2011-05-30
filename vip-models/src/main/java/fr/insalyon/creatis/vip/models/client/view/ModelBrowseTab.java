@@ -35,22 +35,14 @@ import java.util.List;
  */
 public class ModelBrowseTab extends Tab {
 
-    private static ModelBrowseTab instance = null;
     protected ListGrid grid;
     protected ModalWindow modal;
     protected HandlerRegistration rowContextClickHandler;
     protected HandlerRegistration rowMouseDownHandler;
 
-    public static ModelBrowseTab getInstance() {
-        if (instance == null) {
-            instance = new ModelBrowseTab();
-        }
-        return instance;
-    }
+    public ModelBrowseTab() {
 
-    private ModelBrowseTab() {
-
-        this.setTitle("Browse models");
+        this.setTitle("List models");
         this.setID("model-browse-tab");
         this.setCanClose(true);
 
@@ -174,21 +166,5 @@ public class ModelBrowseTab extends Tab {
 
     }
 
-    private void downloadModel(String lfnModel) {
-        TransferPoolServiceAsync tps = new TransferPoolService.Util().getInstance();
-        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-            public void onFailure(Throwable caught) {
-                SC.warn("Cannot download model file.");
-            }
-
-            public void onSuccess(Void result) {
-                SC.say("Model file download is in progress.");
-                DataManagerSection.getInstance().setExpanded(true);
-
-            }
-        };
-        tps.downloadFile(Context.getInstance().getUser(), lfnModel, Context.getInstance().getUserDN(), Context.getInstance().getProxyFileName(), callback);
-
-    }
+   
 }
