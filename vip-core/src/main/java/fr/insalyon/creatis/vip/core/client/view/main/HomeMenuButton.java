@@ -32,37 +32,49 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.layout.toolstrip;
+package fr.insalyon.creatis.vip.core.client.view.main;
 
-import com.smartgwt.client.widgets.toolbar.ToolStrip;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.core.client.view.main.HomeMenuButton;
-import fr.insalyon.creatis.vip.core.client.view.system.SystemMenuButton;
+import com.smartgwt.client.widgets.menu.Menu;
+import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.events.ClickHandler;
+import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
  *
  * @author Rafael Silva
  */
-public class MainToolStrip extends ToolStrip {
+public class HomeMenuButton extends ToolStripMenuButton {
 
-    private static MainToolStrip instance;
+    public HomeMenuButton() {
 
-    public static MainToolStrip getInstance() {
-        if (instance == null) {
-            instance = new MainToolStrip();
-        }
-        return instance;
-    }
-
-    private MainToolStrip() {
+        this.setTitle("VIP");
+        Menu menu = new Menu();
+        menu.setShowShadow(true);
+        menu.setShadowDepth(3);
         
-        this.setWidth100();
+        // Home
+        MenuItem homeItem = new MenuItem("Home");
+        homeItem.setIcon("icon-home.png");
+        homeItem.addClickHandler(new ClickHandler() {
 
-        this.addMenuButton(new HomeMenuButton());
-        this.addSeparator();
+            public void onClick(MenuItemClickEvent event) {
+                Layout.getInstance().setActiveCenterTab("home-tab");
+            }
+        });
+        
+        // Documentation
+        MenuItem documentationItem = new MenuItem("Documentation");
+        documentationItem.setIcon("icon-information.png");
+        documentationItem.addClickHandler(new ClickHandler() {
 
-        if (Context.getInstance().isSystemAdmin()) {
-            this.addMenuButton(new SystemMenuButton());
-        }
+            public void onClick(MenuItemClickEvent event) {
+                Layout.getInstance().addTab(new DocumentationTab());
+            }
+        });
+
+        menu.setItems(homeItem, documentationItem);
+        this.setMenu(menu);
     }
 }

@@ -32,37 +32,35 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.layout.toolstrip;
+package fr.insalyon.creatis.vip.core.client.view.main;
 
-import com.smartgwt.client.widgets.toolbar.ToolStrip;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.core.client.view.main.HomeMenuButton;
-import fr.insalyon.creatis.vip.core.client.view.system.SystemMenuButton;
+import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.core.client.view.portlet.DisclaimerPortlet;
+import fr.insalyon.creatis.vip.core.client.view.portlet.ProxyPortlet;
+import fr.insalyon.creatis.vip.core.client.view.portlet.news.NewsPortlet;
 
 /**
  *
  * @author Rafael Silva
  */
-public class MainToolStrip extends ToolStrip {
+public class HomeTab extends Tab {
 
-    private static MainToolStrip instance;
+    public HomeTab() {
 
-    public static MainToolStrip getInstance() {
-        if (instance == null) {
-            instance = new MainToolStrip();
-        }
-        return instance;
-    }
+        this.setTitle("Home");
+        this.setID("home-tab");
 
-    private MainToolStrip() {
+        VLayout vLayout = new VLayout();
+        PortalLayout portalLayout = new PortalLayout(2);
+        portalLayout.setWidth100();
+        portalLayout.setHeight100();
         
-        this.setWidth100();
-
-        this.addMenuButton(new HomeMenuButton());
-        this.addSeparator();
-
-        if (Context.getInstance().isSystemAdmin()) {
-            this.addMenuButton(new SystemMenuButton());
-        }
+        portalLayout.addPortlet(new ProxyPortlet(), 0);
+        portalLayout.addPortlet(new NewsPortlet(), 0);
+        portalLayout.addPortlet(new DisclaimerPortlet(), 1);
+        
+        vLayout.addMember(portalLayout);
+        this.setPane(vLayout);
     }
 }

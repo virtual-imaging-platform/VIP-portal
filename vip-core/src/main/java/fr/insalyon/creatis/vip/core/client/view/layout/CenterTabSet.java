@@ -37,7 +37,7 @@ package fr.insalyon.creatis.vip.core.client.view.layout;
 
 import com.smartgwt.client.types.Side;
 import com.smartgwt.client.widgets.tab.TabSet;
-import fr.insalyon.creatis.vip.core.client.view.main.MainTab;
+import fr.insalyon.creatis.vip.core.client.view.main.HomeTab;
 
 /**
  *
@@ -59,6 +59,6 @@ public class CenterTabSet extends TabSet {
         this.setTabBarPosition(Side.TOP);
         this.setWidth100();
         this.setHeight100();
-        this.addTab(new MainTab());
+        this.addTab(new HomeTab());
    }
 }

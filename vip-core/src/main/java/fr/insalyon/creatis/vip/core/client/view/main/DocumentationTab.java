@@ -34,33 +34,28 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.main;
 
-import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.types.ContentsType;
+import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.tab.Tab;
-import fr.insalyon.creatis.vip.core.client.view.portlet.DisclaimerPortlet;
-import fr.insalyon.creatis.vip.core.client.view.portlet.ProxyPortlet;
-import fr.insalyon.creatis.vip.core.client.view.portlet.news.NewsPortlet;
 
 /**
  *
  * @author Rafael Silva
  */
-public class MainTab extends Tab {
+public class DocumentationTab extends Tab {
 
-    public MainTab() {
-
-        this.setTitle("Home");
-        this.setID("home-tab");
-
-        VLayout vLayout = new VLayout();
-        PortalLayout portalLayout = new PortalLayout(2);
-        portalLayout.setWidth100();
-        portalLayout.setHeight100();
+    public DocumentationTab() {
         
-        portalLayout.addPortlet(new ProxyPortlet(), 0);
-        portalLayout.addPortlet(new NewsPortlet(), 0);
-        portalLayout.addPortlet(new DisclaimerPortlet(), 1);
+        this.setTitle("Documentation");
+        this.setID("documentation-tab");
         
-        vLayout.addMember(portalLayout);
-        this.setPane(vLayout);
+        HTMLPane pane = new HTMLPane();
+        pane.setOverflow(Overflow.AUTO);
+        pane.setStyleName("defaultBorder");
+        pane.setContentsURL("documentation/index.html");
+        pane.setContentsType(ContentsType.PAGE);
+        
+        this.setPane(pane);
     }
 }
