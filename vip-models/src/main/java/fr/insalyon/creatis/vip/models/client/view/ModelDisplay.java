@@ -38,8 +38,6 @@ public class ModelDisplay extends TreeGrid {
         setWidth(700);  
         setHeight(800);  
         setCanEdit(true);  
-        setNodeIcon("adam.png");  
-        setFolderIcon("adam.png"); 
         setShowOpenIcons(false);  
         setShowDropIcons(false); 
         setAutoFetchData(true);  

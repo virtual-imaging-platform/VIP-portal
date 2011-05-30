@@ -20,4 +20,6 @@ public interface ModelServiceAsync {
     public void listAllModels(AsyncCallback<List<SimulationObjectModelLight>> asyncCallback);
     public void getADAM(AsyncCallback<SimulationObjectModel> asyncCallback);
     public void completeModel(SimulationObjectModel som, AsyncCallback<Void> asyncCallback);
+
+    public void rebuildObjectModelFromTripleStore(String uri, AsyncCallback<SimulationObjectModel> callback);
 }

@@ -100,4 +100,8 @@ public class ModelServiceImpl extends RemoteServiceServlet implements ModelServi
     public void completeModel(SimulationObjectModel som) {
         SimulationObjectModelFactory.completeModel(som);
     }
+
+    public SimulationObjectModel rebuildObjectModelFromTripleStore(String uri) {
+       return SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri);
+    }
 }
