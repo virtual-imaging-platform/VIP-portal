@@ -35,7 +35,7 @@
 package fr.insalyon.creatis.vip.models.client;
 
 import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.models.client.view.ModelMenuButton;
+import fr.insalyon.creatis.vip.models.client.view.ModelButton;
 import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
 
 /**
@@ -55,7 +55,7 @@ public class ModelInit {
 
     private ModelInit() {
         if (Context.getInstance().hasGroupAccess(new String[]{"Administrator", "VIP"})) {
-            MainToolStrip.getInstance().addMenuButton(new ModelMenuButton());
+            MainToolStrip.getInstance().addButton(new ModelButton());
         }
     }
 }

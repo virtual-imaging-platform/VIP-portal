@@ -24,6 +24,7 @@ import com.smartgwt.client.widgets.tree.events.LeafClickEvent;
 import com.smartgwt.client.widgets.tree.events.LeafClickHandler;
 import com.smartgwt.client.widgets.tree.events.LeafContextClickEvent;
 import com.smartgwt.client.widgets.tree.events.LeafContextClickHandler;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectModelFactory;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
@@ -31,10 +32,12 @@ import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
+import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 import fr.insalyon.creatis.vip.models.client.ModelConstants;
 
 import java.util.List;
@@ -91,28 +94,38 @@ class ModelImportTab extends Tab {
                             }
 
                             public void onSuccess(SimulationObjectModel result) {
-
-                                result.setStorageURL(lfn);
-
-                                ModelServiceAsync mms = ModelService.Util.getInstance();
-                                AsyncCallback<Void> callback1 = new AsyncCallback<Void>() {
-
+                                ModelServiceAsync ssu = ModelService.Util.getInstance();
+                                AsyncCallback<SimulationObjectModel> cbssu = new AsyncCallback<SimulationObjectModel>() {
                                     public void onFailure(Throwable caught) {
-                                        modal.hide();
-                                        SC.warn("Cannot commit model to the Triple Store");
+                                        SC.warn("Cannot set the model storage URL");
                                     }
+                                    public void onSuccess(SimulationObjectModel result) {
+                                        ModelServiceAsync mms = ModelService.Util.getInstance();
+                                        AsyncCallback<Void> callback1 = new AsyncCallback<Void>() {
 
-                                    public void onSuccess(Void result) {
-                                        modal.hide();
-                                        SC.say("Model successfully comitted to the Triple Store");
+                                            public void onFailure(Throwable caught) {
+                                                modal.hide();
+                                                SC.warn("Cannot commit model to the Triple Store");
+                                            }
+
+                                            public void onSuccess(Void result) {
+                                                modal.hide();
+                                                SC.say("Model successfully comitted to the Triple Store");
+                                                ModelBrowseTab modelsTab = (ModelBrowseTab) Layout.getInstance().getTab("model-browse-tab");
+                                                if (modelsTab != null) {
+                                                    modelsTab.loadModels();
+                                                }
+                                                OperationLayout.getInstance().loadData();
+                                                OperationLayout.getInstance().activateAutoRefresh();
+                                            }
+                                        };
+                                        mms.completeModel(result, callback1);
                                     }
                                 };
-                                mms.completeModel(result, callback1);
+                                ssu.setStorageUrl(result, lfn, cbssu);
                             }
                         };
-                      
                         ms.rebuildObjectModelFromAnnotationFile(rdfFile, callback);
-
                     }
                 }
             }
@@ -139,6 +152,7 @@ class ModelImportTab extends Tab {
         this.setPane(vl);
 
         new FileUploadWindow("local").show();
+        
     }
 
     public void uploadComplete(String fileName) {
@@ -265,15 +279,15 @@ class ModelImportTab extends Tab {
             public void onSuccess(Void result) {
                 SC.say("Added zip file to the upload pool");
                 DataManagerSection.getInstance().setExpanded(true);
-               BrowserLayout.getInstance().loadData(ModelConstants.MODEL_HOME, true);
+                BrowserLayout.getInstance().loadData(ModelConstants.MODEL_HOME, true);
             }
         };
         TransferPoolServiceAsync tps = new TransferPoolService.Util().getInstance();
-        String lfn = ModelConstants.MODEL_HOME ;
+        String lfn = ModelConstants.MODEL_HOME;
         //TODO: check if this exists
         tps.uploadFile(Context.getInstance().getUser(), lfn, file, Context.getInstance().getUserDN(), Context.getInstance().getProxyFileName(), callback);
-        
-        return lfn;
+
+        return lfn + "/" + file;
 
     }
 }

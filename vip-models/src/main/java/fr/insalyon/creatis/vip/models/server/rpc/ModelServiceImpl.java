@@ -109,4 +109,19 @@ public class ModelServiceImpl extends RemoteServiceServlet implements ModelServi
     public SimulationObjectModel rebuildObjectModelFromAnnotationFile(String fileName) {
          return SimulationObjectModelFactory.rebuildObjectModelFromAnnotationFile(fileName, true);
     }
+
+    public SimulationObjectModel setStorageUrl(SimulationObjectModel som, String url) {
+        SimulationObjectModelFactory.setStorageURL(som, url);
+        return som;
+    }
+
+    public void removeObjectModelFromTripleStore(String uri) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void deleteAllModelsInTheTripleStore() {
+        SimulationObjectModelFactory.deleteAllModelsInTheTripleStore();
+    }
+    
+    
 }

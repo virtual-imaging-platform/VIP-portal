@@ -86,15 +86,12 @@ class ModelTab extends Tab {
         };
         modal.show("Loading model", true);
         ms.rebuildObjectModelFromTripleStore(uri, callback);
-     
-       
-            
         
         this.setPane(layout);
 
     }
     
-     private void downloadModel(String lfnModel) {
+     private void downloadModel(final String lfnModel) {
         TransferPoolServiceAsync tps = new TransferPoolService.Util().getInstance();
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 

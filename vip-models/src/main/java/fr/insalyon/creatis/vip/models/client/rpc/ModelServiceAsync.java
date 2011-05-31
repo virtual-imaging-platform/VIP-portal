@@ -29,4 +29,10 @@ public interface ModelServiceAsync {
     public void rebuildObjectModelFromTripleStore(String uri, AsyncCallback<SimulationObjectModel> callback);
 
     public void rebuildObjectModelFromAnnotationFile(String fileName, AsyncCallback<SimulationObjectModel> asyncCallback);
+    
+     public void setStorageUrl(SimulationObjectModel som, String url, AsyncCallback<SimulationObjectModel> asyncCallback);
+     
+     public void removeObjectModelFromTripleStore(String uri, AsyncCallback<Void> asyncCallback);
+     
+     public void deleteAllModelsInTheTripleStore(AsyncCallback<Void> asyncCallback);
 }

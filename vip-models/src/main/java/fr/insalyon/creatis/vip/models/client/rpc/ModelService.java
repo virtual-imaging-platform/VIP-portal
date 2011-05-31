@@ -38,18 +38,7 @@ public interface ModelService extends RemoteService {
     public SimulationObjectModel rebuildObjectModelFromTripleStore(String uri);
     public SimulationObjectModel rebuildObjectModelFromAnnotationFile(String fileName);
     public void completeModel(SimulationObjectModel som);
-//    public Timepoint createAndAddTimepoint(SimulationObjectModel objectModel, Calendar startingDate);
-//    public void setObjecLayerResolution(ObjectLayer objectLayer, Resolution newResolution);
-//    public Instant createAndAddInstant(Timepoint timePoint, String duration);
-//    public ObjectLayer createObjectLayerAndAddLayerPart(SimulationObjectModel objectModel, int timePointIndex, int instantIndex, Resolution layerResolution, ObjectLayerPart objectLayerPart);
-//    public void addObjectLayerPart(ObjectLayer objectLayer, ObjectLayerPart objectLayerPart);
-//    public ObjectLayerPart createObjectLayerPart(String objectName, ArrayList<String> fileNames, int objectLabel, Format fileFormat, int objectPriority);
-//    public void addPhysicalParametersLayerToInstant(PhysicalParametersLayer physicalParametersLayer, Instant instant);
-//    public void addPhysicalParametersLayerToObjectLayer(PhysicalParametersLayer physicalParametersLayer, ObjectLayer objectLayer);
-//    public PhysicalParametersLayer createPhysicalParametersLayer(PhysicalParameterType physicalParametersType, ArrayList<String> fileNames, double b0);
-//    public PhysicalParameter createPhysicalParameter(PhysicalParameterType physicalParameterType, ArrayList<String> fileNames);
-//others to be added on request
-
-    //public ObjectType getObjectType(String objectName);
-
+    public SimulationObjectModel setStorageUrl(SimulationObjectModel som, String url);
+    public void removeObjectModelFromTripleStore(String uri);
+    public void deleteAllModelsInTheTripleStore();
 }
