@@ -51,4 +51,6 @@ public interface TransferPoolServiceAsync {
     public void removeOperationById(String id, String proxy, AsyncCallback<Void> asyncCallback);
 
     public void downloadFile(String user, String remoteFile, String userDN, String proxy, AsyncCallback<Void> asyncCallback);
+    
+    public void uploadFile(String user, String remoteFile, String localFile, String userDN, String proxy, AsyncCallback<Void> asyncCallback);
 }

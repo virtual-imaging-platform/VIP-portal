@@ -66,4 +66,6 @@ public interface TransferPoolService extends RemoteService {
     public void removeOperationById(String id, String proxy);
 
     public void downloadFile(String user, String remoteFile, String userDN, String proxy);
+    
+    public void uploadFile(String user, String remoteFile, String localFile, String userDN, String proxy);
 }
