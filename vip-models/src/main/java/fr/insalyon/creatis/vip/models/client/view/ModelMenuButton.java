@@ -46,16 +46,7 @@ public class ModelMenuButton extends ToolStripMenuButton{
         });
         browse.setEnabled(true);
         
-        MenuItem adam = new MenuItem("Adam");
-        adam.setIcon("icon-adam.png");
-        adam.addClickHandler(new ClickHandler() {
-
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(ImportAdamTab.getInstance());
-            }
-        });
-
-        menu.setItems(imp,browse,adam);
+        menu.setItems(imp,browse);
         this.setMenu(menu);
     }
 

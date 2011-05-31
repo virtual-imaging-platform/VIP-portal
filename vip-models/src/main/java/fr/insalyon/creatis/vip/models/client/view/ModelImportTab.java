@@ -34,6 +34,7 @@ import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
+import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
 import fr.insalyon.creatis.vip.models.client.ModelConstants;
 
 import java.util.List;
@@ -129,10 +130,11 @@ class ModelImportTab extends Tab {
         label.setValign(VerticalAlignment.CENTER);
         label.setWrap(false);
         label.setShowEdges(false);
-        label.setContents("<b>Annotation file:</b>");
+        label.setContents("");
         vl.addMember(files);
-        vl.addMember(label);
+        
         vl.addMember(upload);
+        vl.addMember(label);
 
         this.setPane(vl);
 
@@ -168,7 +170,6 @@ class ModelImportTab extends Tab {
                     message += " - " + s;
                 }
                 modal.hide();
-                SC.say("Retrieved zip file content");
                 displayFiles(zipName, result);
 
             }
@@ -237,7 +238,7 @@ class ModelImportTab extends Tab {
     }
 
     private void updateLabel() {
-        label.setContents("<b>Annotation file:</b> " + rdfFile.substring(rdfFile.lastIndexOf('/')+1));
+        label.setContents("(Annotations: " + rdfFile.substring(rdfFile.lastIndexOf('/')+1)+")");
     }
 
     public class FileTreeNode extends TreeNode {
@@ -264,10 +265,11 @@ class ModelImportTab extends Tab {
             public void onSuccess(Void result) {
                 SC.say("Added zip file to the upload pool");
                 DataManagerSection.getInstance().setExpanded(true);
+               BrowserLayout.getInstance().loadData(ModelConstants.MODEL_HOME, true);
             }
         };
         TransferPoolServiceAsync tps = new TransferPoolService.Util().getInstance();
-        String lfn = ModelConstants.MODEL_HOME + "/"+file;
+        String lfn = ModelConstants.MODEL_HOME ;
         //TODO: check if this exists
         tps.uploadFile(Context.getInstance().getUser(), lfn, file, Context.getInstance().getUserDN(), Context.getInstance().getProxyFileName(), callback);
         

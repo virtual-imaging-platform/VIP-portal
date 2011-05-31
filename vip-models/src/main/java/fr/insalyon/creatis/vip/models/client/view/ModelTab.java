@@ -55,8 +55,7 @@ class ModelTab extends Tab {
 
             public void onSuccess(SimulationObjectModel result) {
                 modal.hide();
-                if (result != null) {
-                    SC.say("Model successfully retrieved. It has " + result.getTimepoints().size() + " timepoint(s)");
+                if (result != null) {   
                     layout.addMember(new ModelDisplay(result));
                     model = result;
                   

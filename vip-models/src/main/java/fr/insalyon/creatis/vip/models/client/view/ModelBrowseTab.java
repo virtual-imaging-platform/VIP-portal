@@ -117,7 +117,6 @@ public class ModelBrowseTab extends Tab {
             }
 
             public void onSuccess(List<SimulationObjectModelLight> result) {
-                SC.say("Model listed");
                 List<SimulationObjectModelLightRecord> dataList = new ArrayList<SimulationObjectModelLightRecord>();
                 for (SimulationObjectModelLight s : result) {
                     String type = "";
