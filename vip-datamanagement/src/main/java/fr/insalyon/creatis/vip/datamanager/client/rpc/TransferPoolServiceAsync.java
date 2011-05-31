@@ -40,7 +40,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Silva, Tristan Glatard
  */
 public interface TransferPoolServiceAsync {
 

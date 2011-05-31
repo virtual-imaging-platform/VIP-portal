@@ -45,12 +45,10 @@ import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Silva, Tristan Glatard
  */
 public class TransferPoolServiceImpl extends RemoteServiceServlet implements TransferPoolService {
 
@@ -129,15 +127,19 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
         }
     }
 
-    public void uploadFile(String user, String remoteFile, String localFile, String userDN, String proxy) {
-        String localPath = "file://"+serverConfiguration.getDataManagerPath()+"/uploads/"+localFile;      
-         VletAgentPoolClient client = new VletAgentPoolClient(
+    public void uploadFile(String user, String remoteFile, String localFile, 
+            String userDN, String proxy) {
+        try {
+            VletAgentPoolClient client = new VletAgentPoolClient(
                     serverConfiguration.getVletagentHost(),
                     serverConfiguration.getVletagentPort(),
                     proxy);
-       String remotePath = DataManagerUtil.parseBaseDir(user, remoteFile);
-        try {
-            client.uploadFile(localPath, remotePath,userDN);
+
+            String localPath = "file://" + serverConfiguration.getDataManagerPath()
+                    + "/uploads/" + localFile;
+            String remotePath = DataManagerUtil.parseBaseDir(user, remoteFile);
+            client.uploadFile(localPath, remotePath, userDN);
+
         } catch (VletAgentClientException ex) {
             ex.printStackTrace();
         }
