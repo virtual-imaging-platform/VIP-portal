@@ -45,6 +45,7 @@ import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerInit;
 import fr.insalyon.creatis.vip.gatelab.client.GateLabInit;
+import fr.insalyon.creatis.vip.models.client.ModelInit;
 
 /**
  *
@@ -72,7 +73,7 @@ public class Main implements EntryPoint {
                 DataManagerInit.getInstance();
                 GateLabInit.getInstance();
 //                SimulationGUIInit.getInstance();
-//                ModelInit.getInstance();
+                ModelInit.getInstance();
 //                PhysicalPropertiesInit.getInstance();
                 ApplicationInit.getInstance();
                 // End Modules Initialization
