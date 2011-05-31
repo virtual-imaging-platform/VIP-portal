@@ -106,6 +106,7 @@ public class SimulationsTab extends Tab {
     public SimulationsTab() {
         this.setID("simulations-tab");
         configure();
+        simulationItem.setDisabled(true);
     }
 
     private void configure() {
