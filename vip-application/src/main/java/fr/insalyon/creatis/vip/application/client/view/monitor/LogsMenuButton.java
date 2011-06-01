@@ -72,6 +72,15 @@ public class LogsMenuButton extends ToolStripMenuButton {
             }
         });
         
+        MenuItem simulationInputsItem = new MenuItem("Simulation Inputs File");
+        simulationInputsItem.addClickHandler(new ClickHandler() {
+
+            public void onClick(MenuItemClickEvent event) {
+                new FileViewerWindow("Simulation Inputs File", simulationID, 
+                        "", "input-m2", ".xml").show();
+            }
+        });
+
         MenuItem simulationDescItem = new MenuItem("Simulation Descriptor File");
         simulationDescItem.addClickHandler(new ClickHandler() {
 
@@ -81,7 +90,8 @@ public class LogsMenuButton extends ToolStripMenuButton {
             }
         });
         
-        menu.setItems(simulationOutItem, simulationErrItem, simulationDescItem);
+        menu.setItems(simulationOutItem, simulationErrItem, simulationInputsItem, 
+                simulationDescItem);
         this.setMenu(menu);
     }
 }
