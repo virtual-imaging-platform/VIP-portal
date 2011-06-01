@@ -45,7 +45,7 @@
         <dependency>
             <groupId>fr.cnrs.i3s</groupId>
             <artifactId>NeuSemStore-simulation-objects</artifactId>
-            <version>0.0.7-SNAPSHOT</version>
+            <version>0.0.7</version>
         </dependency>
     </dependencies>
     <build>
@@ -114,6 +114,16 @@
             <id>creatis-thirdparty</id>
             <name>Creatis Insa Lyon repository [creatis]</name>
             <url>http://kingkong.grid.creatis.insa-lyon.fr:9007/nexus/content/repositories/thirdparty</url>
+        </repository>
+         <repository>
+            <id>neurolog-thirdparty</id>
+            <name>NeuroLOG Third-party Repository</name>
+            <url>http://nyx.unice.fr:9007/nexus/content/repositories/thirdparty</url>
+        </repository>
+        <repository>
+            <id>neurolog-releases</id>
+            <name>NeuroLOG Releases Repository</name>
+            <url>http://nyx.unice.fr:9007/nexus/content/repositories/releases</url>
         </repository>
     </repositories>
     <distributionManagement>
