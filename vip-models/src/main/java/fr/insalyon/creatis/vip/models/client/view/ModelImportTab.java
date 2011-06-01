@@ -111,7 +111,7 @@ class ModelImportTab extends Tab {
                                             public void onSuccess(Void result) {
                                                 modal.hide();
                                                 SC.say("Model successfully comitted to the Triple Store");
-                                                ModelBrowseTab modelsTab = (ModelBrowseTab) Layout.getInstance().getTab("model-browse-tab");
+                                                ModelListTab modelsTab = (ModelListTab) Layout.getInstance().getTab("model-browse-tab");
                                                 if (modelsTab != null) {
                                                     modelsTab.loadModels();
                                                 }

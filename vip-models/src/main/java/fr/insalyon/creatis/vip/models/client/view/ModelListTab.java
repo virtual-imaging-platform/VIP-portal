@@ -38,14 +38,14 @@ import java.util.List;
  *
  * @author glatard
  */
-public class ModelBrowseTab extends Tab {
+public class ModelListTab extends Tab {
 
     protected ListGrid grid;
     protected ModalWindow modal;
     protected HandlerRegistration rowContextClickHandler;
     protected HandlerRegistration rowMouseDownHandler;
 
-    public ModelBrowseTab() {
+    public ModelListTab() {
 
         this.setTitle("List models");
         this.setID("model-browse-tab");
@@ -65,7 +65,7 @@ public class ModelBrowseTab extends Tab {
         refreshButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                ModelBrowseTab modelsTab = (ModelBrowseTab) Layout.getInstance().getTab("model-browse-tab");
+                ModelListTab modelsTab = (ModelListTab) Layout.getInstance().getTab("model-browse-tab");
                 modelsTab.loadModels();
             }
         });
@@ -100,7 +100,7 @@ public class ModelBrowseTab extends Tab {
 
                                 public void onSuccess(Void result) {
                                     SC.say("All models were deleted");
-                                    ModelBrowseTab modelsTab = (ModelBrowseTab) Layout.getInstance().getTab("model-browse-tab");
+                                    ModelListTab modelsTab = (ModelListTab) Layout.getInstance().getTab("model-browse-tab");
                                     modelsTab.loadModels();
                                 }
                             };
@@ -150,7 +150,7 @@ public class ModelBrowseTab extends Tab {
         ListGridField movementField = new ListGridField("movement", "Movement");
         ListGridField URIField = new ListGridField("uri", "URI");
 
-        grid.setFields(modelNameField);//, typeField, longitudinalField, movementField, URIField);
+        grid.setFields(modelNameField, typeField, longitudinalField, movementField, URIField);
 
         rowContextClickHandler = grid.addRowContextClickHandler(new RowContextClickHandler() {
 
@@ -167,7 +167,7 @@ public class ModelBrowseTab extends Tab {
         rowMouseDownHandler = grid.addRowMouseDownHandler(new RowMouseDownHandler() {
 
             public void onRowMouseDown(RowMouseDownEvent event) {
-                Layout.getInstance().addTab(new ModelTab(event.getRecord().getAttribute("uri")));
+                Layout.getInstance().addTab(new ModelDisplayTab(event.getRecord().getAttribute("uri")));
             }
         });
     }

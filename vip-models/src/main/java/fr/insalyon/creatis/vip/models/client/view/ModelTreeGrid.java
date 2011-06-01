@@ -21,7 +21,7 @@ import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Timepoi
  *
  * @author glatard
  */
-public class ModelDisplay extends TreeGrid {
+public class ModelTreeGrid extends TreeGrid {
 
    private SimulationObjectModel model = null;
 
@@ -30,7 +30,7 @@ public class ModelDisplay extends TreeGrid {
     }
    
 
-    public ModelDisplay(SimulationObjectModel model){
+    public ModelTreeGrid(SimulationObjectModel model){
         this.model = model;
         
         //init the tree grid

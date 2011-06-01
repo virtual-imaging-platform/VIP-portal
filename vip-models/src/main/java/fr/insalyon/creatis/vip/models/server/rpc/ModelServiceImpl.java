@@ -99,6 +99,7 @@ public class ModelServiceImpl extends RemoteServiceServlet implements ModelServi
     }
 
     public void completeModel(SimulationObjectModel som) {
+        SimulationObjectModelFactory.inferModelSemanticAxes(som);
         SimulationObjectModelFactory.completeModel(som);
     }
 

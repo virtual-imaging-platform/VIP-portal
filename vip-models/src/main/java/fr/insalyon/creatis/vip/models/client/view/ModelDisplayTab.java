@@ -28,13 +28,13 @@ import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
  *
  * @author glatard
  */
-class ModelTab extends Tab {
+class ModelDisplayTab extends Tab {
 
     protected ModalWindow modal;
     protected VLayout layout;
     protected SimulationObjectModel model = null;
 
-    public ModelTab(final String uri) {
+    public ModelDisplayTab(final String uri) {
 
         this.setTitle("Model");
         this.setID(uri);
@@ -56,7 +56,7 @@ class ModelTab extends Tab {
             public void onSuccess(SimulationObjectModel result) {
                 modal.hide();
                 if (result != null) {   
-                    layout.addMember(new ModelDisplay(result));
+                    layout.addMember(new ModelTreeGrid(result));
                     model = result;
                   
                     Button download = new Button("Download");

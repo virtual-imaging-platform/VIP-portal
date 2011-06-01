@@ -23,7 +23,7 @@ public class ModelButton extends ToolStripButton{
         this.setTitle("Models");
        this.addClickHandler(new ClickHandler() {
              public void onClick(ClickEvent event) {
-                  Layout.getInstance().addTab(new ModelBrowseTab());
+                  Layout.getInstance().addTab(new ModelListTab());
             }
         }); 
         
@@ -45,7 +45,7 @@ public class ModelButton extends ToolStripButton{
 //        browse.addClickHandler(new ClickHandler(){
 //
 //            public void onClick(MenuItemClickEvent event) {
-//                Layout.getInstance().addTab(new ModelBrowseTab());
+//                Layout.getInstance().addTab(new ModelListTab());
 //            }
 //        });
 //        browse.setEnabled(true);
