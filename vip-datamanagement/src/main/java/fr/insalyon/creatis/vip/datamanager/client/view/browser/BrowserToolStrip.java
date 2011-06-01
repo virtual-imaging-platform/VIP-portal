@@ -228,7 +228,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                     DataManagerConstants.ROOT + "/"
                     + DataManagerConstants.TRASH_HOME + "/" + data.getName());
         }
-        SC.confirm("Do you really want to delete the files/folders \"" + paths + "\"?", new BooleanCallback() {
+        SC.confirm("Do you really want to delete the selected files/folders?", new BooleanCallback() {
 
             public void execute(Boolean value) {
                 if (value != null && value) {
