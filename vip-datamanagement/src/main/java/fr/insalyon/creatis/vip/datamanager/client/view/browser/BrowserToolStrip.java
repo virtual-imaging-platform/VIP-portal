@@ -271,7 +271,9 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
                             List<String> paths = new ArrayList<String>();
                             for (Data data : result) {
-                                paths.add(pathItem.getValueAsString() + "/" + data.getName());
+                                paths.add(DataManagerConstants.ROOT + "/" 
+                                        + DataManagerConstants.TRASH_HOME 
+                                        + "/" + data.getName());
                             }
                             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
@@ -282,7 +284,9 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
                                 public void onSuccess(Void result) {
                                     modal.hide();
-                                    BrowserLayout.getInstance().loadData(pathItem.getValueAsString(), true);
+                                    BrowserLayout.getInstance().loadData(
+                                            DataManagerConstants.ROOT + "/" 
+                                            + DataManagerConstants.TRASH_HOME, true);
                                 }
                             };
                             Context context = Context.getInstance();
@@ -293,7 +297,8 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                     modal.show("Emptying Trash...", true);
                     Context context = Context.getInstance();
                     service.listDir(context.getUser(), context.getProxyFileName(),
-                            pathItem.getValueAsString(), true, callback);
+                            DataManagerConstants.ROOT + "/" + DataManagerConstants.TRASH_HOME, 
+                            true, callback);
                 }
             }
         });
