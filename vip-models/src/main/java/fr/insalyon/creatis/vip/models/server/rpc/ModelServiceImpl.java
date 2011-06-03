@@ -1,6 +1,36 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/* Copyright CNRS-CREATIS
+ *
+ * Rafael Silva
+ * rafael.silva@creatis.insa-lyon.fr
+ * http://www.creatis.insa-lyon.fr/~silva
+ *
+ * This software is a grid-enabled data-driven workflow manager and editor.
+ *
+ * This software is governed by the CeCILL  license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * "http://www.cecill.info".
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
  */
 package fr.insalyon.creatis.vip.models.server.rpc;
 
@@ -13,7 +43,6 @@ import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,22 +54,23 @@ import java.util.zip.ZipInputStream;
 
 /**
  *
- * @author glatard
+ * @author Tristan Glatard
  */
-public class ModelServiceImpl extends RemoteServiceServlet implements ModelService  {
+public class ModelServiceImpl extends RemoteServiceServlet implements ModelService {
 
-    public List<String> getFiles(String modelZipFile)  {
+    public List<String> getFiles(String modelZipFile) {
         System.out.println("Calling getFiles " + modelZipFile);
-        if(modelZipFile.lastIndexOf(".zip")==-1)
+        if (modelZipFile.lastIndexOf(".zip") == -1) {
             this.doUnexpectedFailure(new Exception("This is not a zip file"));
-            
-        
+        }
+
+
         String rootDirectory = ServerConfiguration.getInstance().getDataManagerPath() + "/uploads/";
 
         ArrayList<String> files = new ArrayList<String>();
         byte[] buf = new byte[1024];
         try {
-        
+
             ZipInputStream zipinputstream = null;
             ZipEntry zipentry;
             zipinputstream = new ZipInputStream(new FileInputStream(rootDirectory + modelZipFile));
@@ -71,8 +101,6 @@ public class ModelServiceImpl extends RemoteServiceServlet implements ModelServi
                 }
                 files.add(rootDirectory + entryName);
                 zipentry = zipinputstream.getNextEntry();
-
-
             }
             zipinputstream.close();
         } catch (IOException ex) {
@@ -82,7 +110,7 @@ public class ModelServiceImpl extends RemoteServiceServlet implements ModelServi
     }
 
     public SimulationObjectModel createModel(String modelName) {
-         return SimulationObjectModelFactory.createModel(modelName);
+        return SimulationObjectModelFactory.createModel(modelName);
     }
 
     public SimulationObjectModel.ObjectType getObjectType(String objectName) {
@@ -94,7 +122,7 @@ public class ModelServiceImpl extends RemoteServiceServlet implements ModelServi
     }
 
     public SimulationObjectModel getADAM() {
-      return SimulationObjectModelFactory.rebuildObjectModelFromAnnotationFile("/tmp/adam.rdf", false);
+        return SimulationObjectModelFactory.rebuildObjectModelFromAnnotationFile("/tmp/adam.rdf", false);
 
     }
 
@@ -104,11 +132,11 @@ public class ModelServiceImpl extends RemoteServiceServlet implements ModelServi
     }
 
     public SimulationObjectModel rebuildObjectModelFromTripleStore(String uri) {
-       return SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri);
+        return SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri);
     }
 
     public SimulationObjectModel rebuildObjectModelFromAnnotationFile(String fileName) {
-         return SimulationObjectModelFactory.rebuildObjectModelFromAnnotationFile(fileName, true);
+        return SimulationObjectModelFactory.rebuildObjectModelFromAnnotationFile(fileName, true);
     }
 
     public SimulationObjectModel setStorageUrl(SimulationObjectModel som, String url) {
@@ -123,6 +151,4 @@ public class ModelServiceImpl extends RemoteServiceServlet implements ModelServi
     public void deleteAllModelsInTheTripleStore() {
         SimulationObjectModelFactory.deleteAllModelsInTheTripleStore();
     }
-    
-    
 }

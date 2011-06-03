@@ -1,12 +1,41 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/* Copyright CNRS-CREATIS
+ *
+ * Rafael Silva
+ * rafael.silva@creatis.insa-lyon.fr
+ * http://www.creatis.insa-lyon.fr/~silva
+ *
+ * This software is a grid-enabled data-driven workflow manager and editor.
+ *
+ * This software is governed by the CeCILL  license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * "http://www.cecill.info".
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
  */
 package fr.insalyon.creatis.vip.models.client.view;
 
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
@@ -23,12 +52,8 @@ import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
-import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 import java.util.ArrayList;
@@ -36,7 +61,7 @@ import java.util.List;
 
 /**
  *
- * @author glatard
+ * @author Tristan Glatard
  */
 public class ModelListTab extends Tab {
 
@@ -58,7 +83,7 @@ public class ModelListTab extends Tab {
 
         ToolStrip toolStrip = new ToolStrip();
         toolStrip.setWidth100();
-        
+
         ToolStripButton refreshButton = new ToolStripButton();
         refreshButton.setIcon("icon-refresh.png");
         refreshButton.setTitle("Refresh");
@@ -70,27 +95,28 @@ public class ModelListTab extends Tab {
             }
         });
         toolStrip.addButton(refreshButton);
-        
+
         ToolStripButton addButton = new ToolStripButton();
         addButton.setIcon("icon-add.png");
         addButton.setTitle("Upload");
         addButton.addClickHandler(new ClickHandler() {
+
             public void onClick(ClickEvent event) {
                 Layout.getInstance().addTab(new ModelImportTab());
             }
         });
         toolStrip.addButton(addButton);
-        
+
         ToolStripButton deleteButton = new ToolStripButton();
         deleteButton.setIcon("icon-clear.png");
         deleteButton.setTitle("Delete all");
-        deleteButton.addClickHandler(new ClickHandler(){
+        deleteButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-         SC.confirm("Do you really want to delete all the models? zip files will not be removed.", new BooleanCallback() {
+                SC.confirm("Do you really want to delete all the models? zip files will not be removed.", new BooleanCallback() {
 
                     public void execute(Boolean value) {
-                        
+
                         if (value != null && value) {
                             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
@@ -104,7 +130,7 @@ public class ModelListTab extends Tab {
                                     modelsTab.loadModels();
                                 }
                             };
-                            
+
                             ModelServiceAsync ms = ModelService.Util.getInstance();
                             ms.deleteAllModelsInTheTripleStore(callback);
                         }
@@ -113,9 +139,9 @@ public class ModelListTab extends Tab {
             }
         });
         toolStrip.addButton(deleteButton);
-        
+
         loadModels();
-        
+
         layout.addMember(toolStrip);
         layout.addMember(grid);
 
@@ -154,10 +180,10 @@ public class ModelListTab extends Tab {
 
         rowContextClickHandler = grid.addRowContextClickHandler(new RowContextClickHandler() {
 
-        public void onRowContextClick(RowContextClickEvent event) {
+            public void onRowContextClick(RowContextClickEvent event) {
                 event.cancel();
                 //call download model method below to download the model zip file.
-                
+
                 //SC.say("context click");
 //                String simulationId = event.getRecord().getAttribute("simulationId");
 //                String status = event.getRecord().getAttribute("status");
@@ -227,8 +253,5 @@ public class ModelListTab extends Tab {
         };
         ms.listAllModels(callback);
         modal.show("Loading Models...", true);
-
     }
-
-   
 }

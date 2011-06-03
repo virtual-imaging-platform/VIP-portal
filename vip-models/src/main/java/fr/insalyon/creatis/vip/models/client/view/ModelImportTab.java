@@ -1,6 +1,36 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/* Copyright CNRS-CREATIS
+ *
+ * Rafael Silva
+ * rafael.silva@creatis.insa-lyon.fr
+ * http://www.creatis.insa-lyon.fr/~silva
+ *
+ * This software is a grid-enabled data-driven workflow manager and editor.
+ *
+ * This software is governed by the CeCILL  license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * "http://www.cecill.info".
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
  */
 package fr.insalyon.creatis.vip.models.client.view;
 
@@ -24,14 +54,11 @@ import com.smartgwt.client.widgets.tree.events.LeafClickEvent;
 import com.smartgwt.client.widgets.tree.events.LeafClickHandler;
 import com.smartgwt.client.widgets.tree.events.LeafContextClickEvent;
 import com.smartgwt.client.widgets.tree.events.LeafContextClickHandler;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectModelFactory;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
@@ -44,11 +71,11 @@ import java.util.List;
 
 /**
  *
- * @author glatard
+ * @author Tristan Glatard
  */
 class ModelImportTab extends Tab {
-    //private final ToolStrip toolStrip; 
 
+    //private final ToolStrip toolStrip; 
     protected ModalWindow modal;
     private VLayout vl;
     private VLayout files;
@@ -84,7 +111,7 @@ class ModelImportTab extends Tab {
                         modal.show("Uploading " + zipFile, true);
                         final String lfn = uploadModel(zipFile);
                         modal.show("Committing annotations to the Triple Store", true);
-//                        //commit rdf annotations
+                        //commit rdf annotations
                         ModelServiceAsync ms = ModelService.Util.getInstance();
                         AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
@@ -96,9 +123,11 @@ class ModelImportTab extends Tab {
                             public void onSuccess(SimulationObjectModel result) {
                                 ModelServiceAsync ssu = ModelService.Util.getInstance();
                                 AsyncCallback<SimulationObjectModel> cbssu = new AsyncCallback<SimulationObjectModel>() {
+
                                     public void onFailure(Throwable caught) {
                                         SC.warn("Cannot set the model storage URL");
                                     }
+
                                     public void onSuccess(SimulationObjectModel result) {
                                         ModelServiceAsync mms = ModelService.Util.getInstance();
                                         AsyncCallback<Void> callback1 = new AsyncCallback<Void>() {
@@ -136,7 +165,6 @@ class ModelImportTab extends Tab {
         frame.setHeight("1px");
         frame.setWidth("1px");
 
-
         vl.addMember(frame);
 
         label.setAlign(Alignment.LEFT);
@@ -145,18 +173,17 @@ class ModelImportTab extends Tab {
         label.setShowEdges(false);
         label.setContents("");
         vl.addMember(files);
-        
+
         vl.addMember(upload);
         vl.addMember(label);
 
         this.setPane(vl);
 
         new FileUploadWindow("local").show();
-        
     }
 
     public void uploadComplete(String fileName) {
-        //modal.hide();
+//        modal.hide();
 //        OperationLayout.getInstance().loadData();
         setZipFile(fileName);
     }
@@ -167,7 +194,7 @@ class ModelImportTab extends Tab {
     };
     }-*/;
 
-    void setZipFile(final String zipName) {
+    private void setZipFile(final String zipName) {
         zipFile = zipName;
 
         ModelServiceAsync ms = ModelService.Util.getInstance();
@@ -210,7 +237,7 @@ class ModelImportTab extends Tab {
         fileTree.setOpenProperty("isOpen");
         TreeNode[] fileData = new TreeNode[result.size()];
         for (int i = 0; i < result.size(); i++) {
-            String name = result.get(i).substring(result.get(i).lastIndexOf('/')+1);
+            String name = result.get(i).substring(result.get(i).lastIndexOf('/') + 1);
             if (name.endsWith(".rdf")) {
                 rdfFile = result.get(i);
                 updateLabel();
@@ -252,7 +279,7 @@ class ModelImportTab extends Tab {
     }
 
     private void updateLabel() {
-        label.setContents("(Annotations: " + rdfFile.substring(rdfFile.lastIndexOf('/')+1)+")");
+        label.setContents("(Annotations: " + rdfFile.substring(rdfFile.lastIndexOf('/') + 1) + ")");
     }
 
     public class FileTreeNode extends TreeNode {
@@ -285,9 +312,10 @@ class ModelImportTab extends Tab {
         TransferPoolServiceAsync tps = new TransferPoolService.Util().getInstance();
         String lfn = ModelConstants.MODEL_HOME;
         //TODO: check if this exists
-        tps.uploadFile(Context.getInstance().getUser(), lfn, file, Context.getInstance().getUserDN(), Context.getInstance().getProxyFileName(), callback);
+        tps.uploadFile(Context.getInstance().getUser(), lfn, file, 
+                Context.getInstance().getUserDN(), 
+                Context.getInstance().getProxyFileName(), callback);
 
         return lfn + "/" + file;
-
     }
 }
