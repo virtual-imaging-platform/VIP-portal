@@ -92,7 +92,7 @@ public class SystemMenuButton extends ToolStripMenuButton {
         manageApps.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new ManageApplicationsTab());
+                Layout.getInstance().addTab(new ManageApplicationsTab(null));
             }
         });
         

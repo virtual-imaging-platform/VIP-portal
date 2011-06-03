@@ -57,6 +57,7 @@ import fr.insalyon.creatis.vip.core.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -65,12 +66,14 @@ import java.util.List;
  */
 public class ApplicationsStackSection extends SectionStackSection {
 
+    private String applicationClass;
     private ListGrid grid;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
 
-    public ApplicationsStackSection() {
+    public ApplicationsStackSection(String applicationClass) {
 
+        this.applicationClass = applicationClass;
         this.setTitle("Applications");
         this.setCanCollapse(true);
         this.setExpanded(true);
@@ -120,7 +123,16 @@ public class ApplicationsStackSection extends SectionStackSection {
 
                                 public void execute(Boolean value) {
                                     if (value != null && value) {
-                                        remove(name);
+                                        if (applicationClass == null) {
+                                            remove(name);
+                                        } else {
+                                            String lfn = rollOverRecord.getAttribute("lfn");
+                                            String classes = rollOverRecord.getAttribute("classes");
+                                            List<String> classesList = Arrays.asList(
+                                                    classes.split(", "));
+                                            classesList.remove(applicationClass);
+                                            remove(new Application(name, lfn, classesList));
+                                        }
                                     }
                                 }
                             });
@@ -192,7 +204,7 @@ public class ApplicationsStackSection extends SectionStackSection {
                 grid.setData(dataList.toArray(new ApplicationRecord[]{}));
             }
         };
-        service.getApplications(null, callback);
+        service.getApplications(applicationClass, callback);
     }
 
     private void remove(String name) {
@@ -211,7 +223,31 @@ public class ApplicationsStackSection extends SectionStackSection {
         };
         service.remove(name, callback);
     }
-    
+
+    /**
+     * Removes the current class from the application.
+     * 
+     * @param application Application object
+     */
+    private void remove(Application application) {
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+
+        final AsyncCallback<String> callback = new AsyncCallback<String>() {
+
+            public void onFailure(Throwable caught) {
+                SC.warn("Error executing remove application\n" + caught.getMessage());
+            }
+
+            public void onSuccess(String result) {
+                if (!result.contains("Error: ")) {
+                    loadData();
+                }
+                SC.say(result);
+            }
+        };
+        service.update(application, callback);
+    }
+
     private void edit(String name, String lfn, String classes) {
         ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                 getTab("manage-apps-tab");

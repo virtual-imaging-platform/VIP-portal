@@ -61,14 +61,16 @@ import java.util.List;
  */
 public class EditApplicationStackSection extends SectionStackSection {
 
+    private String applicationClass;
     private boolean newApplication = true;
     private DynamicForm form;
     private TextItem nameItem;
     private TextItem lfnItem;
     private SelectItem classesPickList;
 
-    public EditApplicationStackSection() {
+    public EditApplicationStackSection(String applicationClass) {
 
+        this.applicationClass = applicationClass;
         this.setTitle("Add Application");
         this.setCanCollapse(true);
         this.setExpanded(true);
@@ -142,7 +144,11 @@ public class EditApplicationStackSection extends SectionStackSection {
             this.nameItem.setValue("");
             this.nameItem.setDisabled(false);
             this.lfnItem.setValue("");
-            this.classesPickList.setValues(new String[]{});
+            if (applicationClass == null) {
+                this.classesPickList.setValues(new String[]{});
+            } else {
+                this.classesPickList.setValues(new String[]{applicationClass});
+            }
             this.newApplication = true;
         }
     }
@@ -209,6 +215,12 @@ public class EditApplicationStackSection extends SectionStackSection {
                     dataList.add(c.getName());
                 }
                 classesPickList.setValueMap(dataList.toArray(new String[]{}));
+                if (applicationClass != null) {
+                    classesPickList.setValues(new String[]{applicationClass});
+                    classesPickList.setDisabled(true);
+                } else {
+                    classesPickList.setDisabled(false);
+                }
             }
         };
         service.getClasses(callback);

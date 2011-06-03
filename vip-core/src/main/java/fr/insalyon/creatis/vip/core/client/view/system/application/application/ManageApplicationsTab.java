@@ -50,7 +50,7 @@ public class ManageApplicationsTab extends Tab {
     private ApplicationsStackSection appsStackSection;
     private EditApplicationStackSection editStackSection;
 
-    public ManageApplicationsTab() {
+    public ManageApplicationsTab(String applicationClass) {
 
         this.setTitle("Manage Applications");
         this.setID("manage-apps-tab");
@@ -66,8 +66,8 @@ public class ManageApplicationsTab extends Tab {
         sectionStack.setAnimateSections(true);
         sectionStack.setCanResizeSections(true);
 
-        appsStackSection = new ApplicationsStackSection();
-        editStackSection = new EditApplicationStackSection();
+        appsStackSection = new ApplicationsStackSection(applicationClass);
+        editStackSection = new EditApplicationStackSection(applicationClass);
 
         sectionStack.setSections(appsStackSection, editStackSection);
         vLayout.addMember(sectionStack);
