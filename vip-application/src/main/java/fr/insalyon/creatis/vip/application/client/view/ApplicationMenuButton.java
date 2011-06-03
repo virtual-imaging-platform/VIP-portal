@@ -41,9 +41,9 @@ import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
-import fr.insalyon.creatis.vip.application.client.view.manage.ManageTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationsTab;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.system.application.application.ManageApplicationsTab;
 
 /**
  *
@@ -82,12 +82,13 @@ public class ApplicationMenuButton extends ToolStripMenuButton {
             manageItem.addClickHandler(new ClickHandler() {
 
                 public void onClick(MenuItemClickEvent event) {
-                    Layout.getInstance().addTab(new ManageTab(applicationClass));
+                    Layout.getInstance().addTab(new ManageApplicationsTab(applicationClass));
                 }
             });
+            
             MenuItemSeparator separator = new MenuItemSeparator();
-            manageItem.setEnabled(false);
             menu.setItems(launchItem, monitorItem, separator, manageItem);
+            
         } else {
             menu.setItems(launchItem, monitorItem);
         }

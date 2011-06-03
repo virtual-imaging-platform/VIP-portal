@@ -91,7 +91,8 @@ public class FileViewerWindow extends Window {
                 pane.setContents(result
                         .replaceAll("<", "&lt;")
                         .replaceAll(">", "&gt;")
-                        .replaceAll("\n", "<br />"));
+                        .replaceAll("\n", "<br />")
+                        .replaceAll(" ", "&nbsp;"));
             }
         };
         service.getFile(simulationID, folder, fileName, extension, callback);
