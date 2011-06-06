@@ -10,7 +10,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
  *
  * @author moulin
  */
-public class SimulationGUIInit {
+public class SimulationGUIInit{
     private static SimulationGUIInit instance;
 
     public static SimulationGUIInit getInstance() {

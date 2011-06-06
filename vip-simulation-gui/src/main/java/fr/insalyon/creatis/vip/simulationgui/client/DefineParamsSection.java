@@ -5,16 +5,19 @@
 
 package fr.insalyon.creatis.vip.simulationgui.client;
 
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
+import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.Scene;
+
+
 
 /**
  *
  * @author glatard
  */
 class DefineParamsSection extends SectionStackSection{
-
-    public DefineParamsSection() {
-        this.setTitle("Parameters");
-    }
-
+          
+        public DefineParamsSection() {
+        this.setTitle("Parameters"); 
+}
 }

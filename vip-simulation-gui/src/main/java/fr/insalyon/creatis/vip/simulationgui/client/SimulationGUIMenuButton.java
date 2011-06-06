@@ -33,7 +33,14 @@ public class SimulationGUIMenuButton extends ToolStripMenuButton {
             Layout.getInstance().addTab(new SimulationGUITab());
             }
        });
-       menu.setItems(launch);
+       MenuItem relaunch= new MenuItem("Ouvrir une simulation existante");
+       relaunch.addClickHandler(new ClickHandler(){
+                public void onClick(MenuItemClickEvent event) {
+             Layout.getInstance().addTab(new SimulationGUITab());
+                }
+       });
+       menu.setItems(launch,relaunch);
+       
        this.setMenu(menu);
     }
 

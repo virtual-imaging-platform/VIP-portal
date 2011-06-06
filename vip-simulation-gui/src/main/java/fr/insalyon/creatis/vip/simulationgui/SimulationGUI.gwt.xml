@@ -18,7 +18,7 @@
     <inherits name='fr.insalyon.creatis.vip.common.Common'/>
     <inherits name='fr.insalyon.creatis.vip.datamanager.DataManager'/>
     <inherits name='fr.insalyon.creatis.vip.core.Core'/>
-
+    <inherits name='com.googlecode.gwtgl.binding'/>
     <!-- Servlets -->
 <!--    <servlet class="fr.insalyon.creatis.vip.gatelab.server.rpc.GateLabServiceImpl" path="/gatelabservice"/>-->
 </module>

@@ -35,8 +35,17 @@
             <version>0.3</version>
             <scope>provided</scope>
         </dependency>
-        
-
+        <dependency>
+            <groupId>gwtgl</groupId>
+            <artifactId>gwtgl</artifactId>
+            <version>0.3</version>
+   
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.gwtgl</groupId>
+            <artifactId>gwtgl-source</artifactId>
+            <version>0.3</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -51,7 +60,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>gwt-maven-plugin</artifactId>
-                <version>1.2</version>
+                <version>2.2.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -90,6 +99,8 @@
                 <includes>
                     <include>**/*.java</include>
                     <include>**/*.xml</include>
+                    <include>**/*.txt</include>
+                    <include>**/*.png</include>
                 </includes>
             </resource>
         </resources>
