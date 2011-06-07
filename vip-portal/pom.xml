@@ -36,7 +36,7 @@
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-datamanager</artifactId>
-            <version>0.3</version>
+            <version>0.3.1</version>
         </dependency>
         
         <dependency>
