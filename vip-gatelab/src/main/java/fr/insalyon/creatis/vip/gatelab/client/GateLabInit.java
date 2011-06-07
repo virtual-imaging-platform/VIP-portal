@@ -60,7 +60,8 @@ public class GateLabInit {
 
     private GateLabInit() {
 
-        if (Context.getInstance().hasGroupAccess(new String[]{"Administrator", "GateLab"})) {
+        String[] groups = new String[]{"Administrator", "GateLab"};
+        if (Context.getInstance().hasGroupAccess(groups)) {
             // Simulation close tab
             CenterTabSet.getInstance().addCloseClickHandler(new CloseClickHandler() {
 
@@ -71,7 +72,8 @@ public class GateLabInit {
                     }
                 }
             });
-            MainToolStrip.getInstance().addMenuButton(new GateLabMenuButton());
+            MainToolStrip.getInstance().addMenuButton(new GateLabMenuButton(
+                    Context.getInstance().isGroupAdmin(groups)));
         }
     }
 }

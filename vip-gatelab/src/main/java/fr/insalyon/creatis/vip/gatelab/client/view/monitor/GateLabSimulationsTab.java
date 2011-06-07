@@ -45,9 +45,9 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
  */
 public class GateLabSimulationsTab extends SimulationsTab {
 
-    public GateLabSimulationsTab() {
+    public GateLabSimulationsTab(boolean isGroupAdmin) {
         
-        super("gate");
+        super("gate", isGroupAdmin);
         grid.getField("application").setHidden(true);
         
         rowMouseDownHandler.removeHandler();

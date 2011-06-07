@@ -49,7 +49,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
  */
 public class GateLabMenuButton extends ToolStripMenuButton {
 
-    public GateLabMenuButton() {
+    public GateLabMenuButton(final boolean groupAdmin) {
         
         this.setTitle("GateLab");
         
@@ -71,7 +71,7 @@ public class GateLabMenuButton extends ToolStripMenuButton {
         monitorItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new GateLabSimulationsTab());
+                Layout.getInstance().addTab(new GateLabSimulationsTab(groupAdmin));
             }
         });
         
