@@ -39,6 +39,7 @@ import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.common.client.view.Context;
@@ -62,9 +63,12 @@ import java.util.Map;
  */
 public class BrowserToolStrip extends BasicBrowserToolStrip {
 
-    public BrowserToolStrip(final ModalWindow modal) {
+    private BasicBrowserToolStrip toolStrip;
+    
+    public BrowserToolStrip(final ModalWindow modal, final ListGrid grid) {
 
         super(modal);
+        this.toolStrip = this;
 
         ToolStripButton folderUpButton = new ToolStripButton();
         folderUpButton.setIcon("icon-folderup.png");
@@ -112,7 +116,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                 if (path.equals(DataManagerConstants.ROOT)) {
                     SC.warn("You cannot create a folder in the root folder.");
                 } else {
-                    new AddFolderWindow(modal, path).show();
+                    new AddFolderWindow(modal, path, grid, toolStrip).show();
                 }
             }
         });

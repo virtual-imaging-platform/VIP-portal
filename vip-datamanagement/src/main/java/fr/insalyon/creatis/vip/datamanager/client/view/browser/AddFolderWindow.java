@@ -43,10 +43,12 @@ import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
+import com.smartgwt.client.widgets.grid.ListGrid;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.view.common.BasicBrowserToolStrip;
 
 /**
  *
@@ -57,7 +59,8 @@ public class AddFolderWindow extends Window {
     private DynamicForm form;
     private TextItem nameItem;
 
-    public AddFolderWindow(final ModalWindow modal, final String baseDir) {
+    public AddFolderWindow(final ModalWindow modal, final String baseDir, 
+            final ListGrid grid, final BasicBrowserToolStrip toolStrip) {
        
         this.setTitle("Create folder into: " + baseDir);
         this.setWidth(350);
@@ -93,7 +96,7 @@ public class AddFolderWindow extends Window {
 
                         public void onSuccess(Void result) {
                             modal.hide();
-                            BrowserLayout.getInstance().loadData(baseDir, true);
+                            BrowserUtil.loadData(modal, grid, toolStrip, baseDir, true);
                         }
                     };
                     modal.show("Creating folder...", true);

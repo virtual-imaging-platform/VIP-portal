@@ -4,7 +4,7 @@
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip-datamanager</artifactId>
     <packaging>jar</packaging>
-    <version>0.3</version>
+    <version>0.3.1</version>
     <name>VIP-DataManager</name>
     <dependencies>
         
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-core</artifactId>
-            <version>0.3</version>
+            <version>0.3.1</version>
             <scope>provided</scope>
         </dependency>
 

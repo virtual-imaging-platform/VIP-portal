@@ -79,7 +79,7 @@ public class BrowserLayout extends VLayout {
         configureGrid();
 
         modal = new ModalWindow(grid);
-        toolStrip = new BrowserToolStrip(modal);
+        toolStrip = new BrowserToolStrip(modal, grid);
         this.addMember(toolStrip);
         this.addMember(grid);
 

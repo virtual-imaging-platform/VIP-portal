@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.selection;
 
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -48,6 +49,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.client.view.browser.AddFolderWindow;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.BasicBrowserToolStrip;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserUtil;
 
@@ -79,7 +81,7 @@ public class PathSelectionWindow extends Window {
         grid = BrowserUtil.getListGrid();
         toolStrip = new BasicBrowserToolStrip(modal);
         modal = new ModalWindow(grid);
-        
+
         configureGrid();
         configureToolStrip();
         configureContextMenu();
@@ -115,7 +117,7 @@ public class PathSelectionWindow extends Window {
             }
         });
     }
-    
+
     private void configureToolStrip() {
 
         ToolStripButton folderUpButton = new ToolStripButton();
@@ -126,13 +128,13 @@ public class PathSelectionWindow extends Window {
             public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
                 if (!toolStrip.getPath().equals(DataManagerConstants.ROOT)) {
                     String newPath = toolStrip.getPath();
-                    BrowserUtil.loadData(modal, grid, toolStrip, 
+                    BrowserUtil.loadData(modal, grid, toolStrip,
                             newPath.substring(0, newPath.lastIndexOf("/")), false);
                 }
             }
         });
         toolStrip.addButton(folderUpButton);
-        
+
         ToolStripButton refreshButton = new ToolStripButton();
         refreshButton.setIcon("icon-refresh.png");
         refreshButton.setPrompt("Refresh");
@@ -155,10 +157,25 @@ public class PathSelectionWindow extends Window {
         });
         toolStrip.addButton(homeButton);
 
+        ToolStripButton addFolderButton = new ToolStripButton();
+        addFolderButton.setIcon("icon-addfolder.png");
+        addFolderButton.setPrompt("Create Folder");
+        addFolderButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
+
+            public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
+                String path = toolStrip.getPath();
+                if (path.equals(DataManagerConstants.ROOT)) {
+                    SC.warn("You cannot create a folder in the root folder.");
+                } else {
+                    new AddFolderWindow(modal, path, grid, toolStrip).show();
+                }
+            }
+        });
+        toolStrip.addButton(addFolderButton);
     }
 
     private void configureContextMenu() {
-        
+
         contextMenu = new Menu();
         contextMenu.setShowShadow(true);
         contextMenu.setShadowDepth(10);
