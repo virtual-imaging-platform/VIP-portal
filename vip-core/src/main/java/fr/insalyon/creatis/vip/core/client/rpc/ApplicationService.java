@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -66,11 +66,13 @@ public interface ApplicationService extends RemoteService {
 
     public Application getApplication(String name);
 
-    public String add(Application workflowDescriptor);
+    public String add(Application application);
 
-    public String update(Application workflowDescriptor);
+    public String update(Application application);
 
     public void remove(String name);
+    
+    public void removeClassFromApplication(String applicationClass, String applicationName);
 
     public String addClass(AppClass c);
 

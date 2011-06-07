@@ -48,17 +48,17 @@ import java.util.List;
  */
 public class ApplicationServiceImpl extends RemoteServiceServlet implements ApplicationService {
 
-    public String add(Application workflowDescriptor) {
+    public String add(Application application) {
         try {
-            return DAOFactory.getDAOFactory().getApplicationDAO().add(workflowDescriptor);
+            return DAOFactory.getDAOFactory().getApplicationDAO().add(application);
         } catch (DAOException ex) {
             return null;
         }
     }
 
-    public String update(Application workflowDescriptor) {
+    public String update(Application application) {
         try {
-            return DAOFactory.getDAOFactory().getApplicationDAO().update(workflowDescriptor);
+            return DAOFactory.getDAOFactory().getApplicationDAO().update(application);
         } catch (DAOException ex) {
             return null;
         }
@@ -67,6 +67,14 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
     public void remove(String name) {
         try {
             DAOFactory.getDAOFactory().getApplicationDAO().remove(name);
+        } catch (DAOException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    public void removeClassFromApplication(String applicationClass, String applicationName) {
+        try {
+            DAOFactory.getDAOFactory().getApplicationDAO().removeClassFromApplication(applicationClass, applicationName);
         } catch (DAOException ex) {
             ex.printStackTrace();
         }

@@ -120,6 +120,19 @@ public class ApplicationData implements ApplicationDAO {
         }
     }
 
+    public void removeClassFromApplication(String applicationClass, String name) throws DAOException {
+        try {
+            PreparedStatement ps = connection.prepareStatement("DELETE "
+                    + "FROM WorkflowClasses WHERE class=? AND workflow=?");
+            ps.setString(1, applicationClass);
+            ps.setString(2, name);
+            ps.execute();
+            
+        } catch (SQLException ex) {
+            throw new DAOException(ex);
+        }
+    }
+
     public List<Application> getApplications(String applicationClass) throws DAOException {
         try {
 
@@ -141,14 +154,14 @@ public class ApplicationData implements ApplicationDAO {
                 PreparedStatement stat2 = connection.prepareStatement("SELECT "
                         + "class FROM WorkflowClasses WHERE workflow=?");
                 stat2.setString(1, name);
-                
+
                 List<String> classes = new ArrayList<String>();
                 ResultSet rs2 = stat2.executeQuery();
                 while (rs2.next()) {
                     classes.add(rs2.getString("class"));
                 }
-                
-                applications.add(new Application(name, 
+
+                applications.add(new Application(name,
                         rs.getString("lfn"), classes));
             }
             return applications;
@@ -157,7 +170,7 @@ public class ApplicationData implements ApplicationDAO {
             throw new DAOException(ex);
         }
     }
-    
+
     public List<String> getApplicationsName(String applicationClass) {
         try {
 
@@ -208,7 +221,7 @@ public class ApplicationData implements ApplicationDAO {
             stat.setString(1, name);
             rs = stat.executeQuery();
             rs.next();
-            
+
             return new Application(rs.getString("name"),
                     rs.getString("lfn"), classes);
 

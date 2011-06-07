@@ -126,12 +126,7 @@ public class ApplicationsStackSection extends SectionStackSection {
                                         if (applicationClass == null) {
                                             remove(name);
                                         } else {
-                                            String lfn = rollOverRecord.getAttribute("lfn");
-                                            String classes = rollOverRecord.getAttribute("classes");
-                                            List<String> classesList = Arrays.asList(
-                                                    classes.split(", "));
-                                            classesList.remove(applicationClass);
-                                            remove(new Application(name, lfn, classesList));
+                                            remove(applicationClass, name);
                                         }
                                     }
                                 }
@@ -229,23 +224,21 @@ public class ApplicationsStackSection extends SectionStackSection {
      * 
      * @param application Application object
      */
-    private void remove(Application application) {
+    private void remove(String applicationClass, String applicationName) {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
 
-        final AsyncCallback<String> callback = new AsyncCallback<String>() {
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {
                 SC.warn("Error executing remove application\n" + caught.getMessage());
             }
 
-            public void onSuccess(String result) {
-                if (!result.contains("Error: ")) {
-                    loadData();
-                }
-                SC.say(result);
+            public void onSuccess(Void result) {
+                SC.say("The application was successfully removed!");
+                loadData();
             }
         };
-        service.update(application, callback);
+        service.removeClassFromApplication(applicationClass, applicationName, callback);
     }
 
     private void edit(String name, String lfn, String classes) {

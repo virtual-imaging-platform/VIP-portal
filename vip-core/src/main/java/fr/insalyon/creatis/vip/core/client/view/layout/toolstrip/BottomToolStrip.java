@@ -58,7 +58,7 @@ public class BottomToolStrip extends ToolStrip {
         this.addMember(authLabel);
         
         this.addFill();
-        Label version = new Label("v0.3");
+        Label version = new Label("v0.3.1");
         version.setAlign(Alignment.RIGHT);
         this.addMember(version);
     }

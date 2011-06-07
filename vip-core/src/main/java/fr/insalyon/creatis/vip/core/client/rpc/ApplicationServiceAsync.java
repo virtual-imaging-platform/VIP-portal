@@ -55,6 +55,8 @@ public interface ApplicationServiceAsync {
     public void update(Application workflowDescriptor, AsyncCallback<String> asyncCallback);
 
     public void remove(String name, AsyncCallback<Void> asyncCallback);
+    
+    public void removeClassFromApplication(String applicationClass, String applicationName, AsyncCallback<Void> asyncCallback);
 
     public void removeClass(String name, AsyncCallback<Void> asyncCallback);
 

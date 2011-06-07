@@ -49,6 +49,8 @@ public interface ApplicationDAO {
     public String update(Application workflowDescriptor);
 
     public void remove(String name);
+    
+    public void removeClassFromApplication(String applicationClass, String name) throws DAOException;
 
     public List<Application> getApplications(String applicationClass) throws DAOException;
     

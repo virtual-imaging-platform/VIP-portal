@@ -4,7 +4,7 @@
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip-core</artifactId>
     <packaging>jar</packaging>
-    <version>0.3</version>
+    <version>0.3.1</version>
     <name>VIP-Core</name>
     <dependencies>
         
