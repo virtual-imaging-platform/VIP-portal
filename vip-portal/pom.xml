@@ -42,13 +42,13 @@
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-application</artifactId>
-            <version>0.3</version>
+            <version>0.3.1</version>
         </dependency>
         
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-gatelab</artifactId>
-            <version>0.3</version>
+            <version>0.3.1</version>
         </dependency>
         
         <dependency>
