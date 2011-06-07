@@ -60,7 +60,7 @@ public class SimulationTab extends Tab {
     private DiagramStackSection diagramStackSection;
     private LogsStackSection logsStackSection;
 
-    public SimulationTab(String simulationID, String status) {
+    public SimulationTab(String simulationID, String status, boolean groupAdmin) {
         
         this.setTitle(simulationID);
         this.setID(simulationID + "-tab");
@@ -88,7 +88,7 @@ public class SimulationTab extends Tab {
                 chartsStackSection,
                 diagramStackSection);
 
-        if (Context.getInstance().isSystemAdmin()) {
+        if (Context.getInstance().isSystemAdmin() || groupAdmin) {
             logsStackSection = new LogsStackSection(simulationID);
             sectionStack.addSection(logsStackSection);
         }

@@ -51,7 +51,7 @@ import fr.insalyon.creatis.vip.core.client.view.system.application.application.M
  */
 public class ApplicationMenuButton extends ToolStripMenuButton {
 
-    public ApplicationMenuButton(final String applicationClass, boolean isGroupAdmin) {
+    public ApplicationMenuButton(final String applicationClass, final boolean isGroupAdmin) {
         this.setTitle(applicationClass);
         
         Menu menu = new Menu();
@@ -72,7 +72,7 @@ public class ApplicationMenuButton extends ToolStripMenuButton {
         monitorItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new SimulationsTab());
+                Layout.getInstance().addTab(new SimulationsTab(isGroupAdmin));
             }
         });
         

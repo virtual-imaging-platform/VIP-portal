@@ -52,7 +52,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 public class SimulationsContextMenu extends Menu {
 
     public SimulationsContextMenu(final ModalWindow modal, final String simulationID,
-            final String status) {
+            final String status, final boolean groupAdmin) {
 
         this.setShowShadow(true);
         this.setShadowDepth(10);
@@ -63,7 +63,8 @@ public class SimulationsContextMenu extends Menu {
         viewItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new SimulationTab(simulationID, status));
+                Layout.getInstance().addTab(new SimulationTab(simulationID, 
+                        status, groupAdmin));
             }
         });
 

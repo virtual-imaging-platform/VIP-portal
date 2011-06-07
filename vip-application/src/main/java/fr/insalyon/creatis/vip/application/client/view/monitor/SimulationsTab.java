@@ -95,15 +95,18 @@ public class SimulationsTab extends Tab {
     protected HandlerRegistration rowContextClickHandler;
     private SectionStackSection searchSection;
     private List<Workflow> simulationsList;
+    private boolean groupAdmin;
 
-    public SimulationsTab(String application) {
+    public SimulationsTab(String application, boolean groupAdmin) {
         this.app = application;
+        this.groupAdmin = groupAdmin;
         this.setID(application + "-simulations-tab");
         configure();
         simulationItem.setDisabled(true);
     }
 
-    public SimulationsTab() {
+    public SimulationsTab(boolean groupAdmin) {
+        this.groupAdmin = groupAdmin;
         this.setID("simulations-tab");
         configure();
         simulationItem.setDisabled(true);
@@ -141,7 +144,7 @@ public class SimulationsTab extends Tab {
 
         this.setPane(vLayout);
 
-        if (!Context.getInstance().isSystemAdmin()) {
+        if (!Context.getInstance().isSystemAdmin() && !groupAdmin) {
             this.user = Context.getInstance().getUser();
         }
 
@@ -176,7 +179,8 @@ public class SimulationsTab extends Tab {
                 event.cancel();
                 String simulationId = event.getRecord().getAttribute("simulationId");
                 String status = event.getRecord().getAttribute("status");
-                new SimulationsContextMenu(modal, simulationId, status).showContextMenu();
+                new SimulationsContextMenu(modal, simulationId, status, 
+                        groupAdmin).showContextMenu();
             }
         });
         rowMouseDownHandler = grid.addRowMouseDownHandler(new RowMouseDownHandler() {
@@ -185,7 +189,8 @@ public class SimulationsTab extends Tab {
                 if (event.getColNum() != 1) {
                     String simulationID = event.getRecord().getAttribute("simulationId");
                     String status = event.getRecord().getAttribute("status");
-                    Layout.getInstance().addTab(new SimulationTab(simulationID, status));
+                    Layout.getInstance().addTab(new SimulationTab(simulationID, 
+                            status, groupAdmin));
                 }
             }
         });
@@ -211,7 +216,7 @@ public class SimulationsTab extends Tab {
 
             public void onClick(ClickEvent event) {
 
-                if (Context.getInstance().isSystemAdmin()) {
+                if (Context.getInstance().isSystemAdmin() || groupAdmin) {
                     String userText = userItem.getValueAsString();
                     user = userText == null || userText.isEmpty() || userText.equals("All") ? null : userText;
                 }
@@ -247,7 +252,7 @@ public class SimulationsTab extends Tab {
             }
         });
 
-        if (Context.getInstance().isSystemAdmin()) {
+        if (Context.getInstance().isSystemAdmin() || groupAdmin) {
             form.setFields(userItem, startDateItem, simulationItem,
                     endDateItem, statusItem, submitItem, resetItem);
         } else {
