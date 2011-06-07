@@ -34,11 +34,16 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.Window;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
 
@@ -48,37 +53,41 @@ import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
  */
 public class FileViewerWindow extends Window {
 
+    private ToolStrip toolStrip;
     private HTMLPane pane;
     private String simulationID;
     private String folder;
     private String fileName;
     private String extension;
-    
-    public FileViewerWindow(String title, String simulationID, String folder, 
+
+    public FileViewerWindow(String title, String simulationID, String folder,
             String fileName, String extension) {
-        
+
         this.simulationID = simulationID;
         this.folder = folder;
         this.fileName = fileName;
         this.extension = extension;
-        
+
         this.setTitle(title);
         this.setCanDragReposition(true);
         this.setCanDragResize(true);
         this.setWidth(700);
         this.setHeight(450);
         this.centerInPage();
-        
+
         pane = new HTMLPane();
         pane.setPadding(10);
         pane.setOverflow(Overflow.AUTO);
         pane.setStyleName("defaultBorder");
-               
+
+        configureToolStrip();
+
+        this.addItem(toolStrip);
         this.addItem(pane);
-        
+
         loadFile();
     }
-    
+
     private void loadFile() {
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<String> callback = new AsyncCallback<String>() {
@@ -91,10 +100,41 @@ public class FileViewerWindow extends Window {
                 pane.setContents(result
                         .replaceAll("<", "&lt;")
                         .replaceAll(">", "&gt;")
-                        .replaceAll("\n", "<br />")
-                        .replaceAll(" ", "&nbsp;"));
+                        .replaceAll("\n", "<br />"));
             }
         };
         service.getFile(simulationID, folder, fileName, extension, callback);
+    }
+
+    private void configureToolStrip() {
+
+        toolStrip = new ToolStrip();
+        toolStrip.setWidth100();
+
+        ToolStripButton refreshButton = new ToolStripButton();
+        refreshButton.setIcon("icon-refresh.png");
+        refreshButton.setTitle("Refresh");
+        refreshButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                loadFile();
+            }
+        });
+        toolStrip.addButton(refreshButton);
+
+        ToolStripButton downloadButton = new ToolStripButton();
+        downloadButton.setIcon("icon-download.png");
+        downloadButton.setTitle("Download");
+        downloadButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                com.google.gwt.user.client.Window.open(
+                        GWT.getModuleBaseURL()
+                        + "/getfileservice?filepath=" + "/" + simulationID
+                        + "/" + folder + "/" + fileName + extension,
+                        "", "");
+            }
+        });
+        toolStrip.addButton(downloadButton);
     }
 }
