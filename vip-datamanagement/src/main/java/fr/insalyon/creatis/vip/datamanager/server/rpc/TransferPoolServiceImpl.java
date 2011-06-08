@@ -66,10 +66,12 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
             List<PoolOperation> poolOperations = new ArrayList<PoolOperation>();
 
             for (Operation op : operationsList) {
-                String source = new File(op.getSource()).getName();
-                poolOperations.add(new PoolOperation(
-                        op.getId(), op.getRegistration(), source,
-                        op.getDest(), op.getType().name(), op.getStatus().name(), op.getUser()));
+                if (op.getType() != Operation.Type.Delete) {
+                    String source = new File(op.getSource()).getName();
+                    poolOperations.add(new PoolOperation(op.getId(),
+                            op.getRegistration(), source, op.getDest(), 
+                            op.getType().name(), op.getStatus().name(), op.getUser()));
+                }
             }
 
             return poolOperations;
@@ -127,7 +129,7 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
         }
     }
 
-    public void uploadFile(String user, String remoteFile, String localFile, 
+    public void uploadFile(String user, String remoteFile, String localFile,
             String userDN, String proxy) {
         try {
             VletAgentPoolClient client = new VletAgentPoolClient(

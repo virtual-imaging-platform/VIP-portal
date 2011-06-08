@@ -139,14 +139,12 @@ public class OperationLayout extends VLayout {
                 if (result != null) {
                     boolean hasActiveOperations = false;
                     for (PoolOperation o : result) {
-                        if (!o.getType().equals("Delete")) {
-                            if (o.getStatus().equals("Running") || o.getStatus().equals("Queued")) {
-                                hasActiveOperations = true;
-                            }
-                            dataList.add(new OperationRecord(o.getId(), o.getType(),
-                                    o.getStatus(), o.getSource(), o.getDest(),
-                                    o.getRegistration().toString(), o.getUser()));
+                        if (o.getStatus().equals("Running") || o.getStatus().equals("Queued")) {
+                            hasActiveOperations = true;
                         }
+                        dataList.add(new OperationRecord(o.getId(), o.getType(),
+                                o.getStatus(), o.getSource(), o.getDest(),
+                                o.getRegistration().toString(), o.getUser()));
                     }
                     grid.setData(dataList.toArray(new OperationRecord[]{}));
                     modal.hide();
