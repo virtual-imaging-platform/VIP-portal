@@ -142,7 +142,6 @@ public class ConfigurationBusiness {
             throw new BusinessException(ex);
         }
         return new Configuration(authentication,
-                conf.getQuickStartURL(),
                 uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort(),
                 conf.getDataManagerLFCHost(), conf.getDataManagerLFCPort());
     }
