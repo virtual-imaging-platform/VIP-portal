@@ -44,7 +44,6 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class Configuration implements IsSerializable {
 
     private Authentication authentication;
-    private String quickstartURL;
     private String moteurServerHost;
     private String lfcHost;
     private int lfcPort;
@@ -52,10 +51,10 @@ public class Configuration implements IsSerializable {
     public Configuration() {
     }
 
-    public Configuration(Authentication authentication, String quickstartURL,
-            String moteurServerHost, String lfcHost, int lfcPort) {
+    public Configuration(Authentication authentication, String moteurServerHost, 
+            String lfcHost, int lfcPort) {
+        
         this.authentication = authentication;
-        this.quickstartURL = quickstartURL;
         this.moteurServerHost = moteurServerHost;
         this.lfcHost = lfcHost;
         this.lfcPort = lfcPort;
@@ -67,10 +66,6 @@ public class Configuration implements IsSerializable {
 
     public String getMoteurServerHost() {
         return moteurServerHost;
-    }
-
-    public String getQuickstartURL() {
-        return quickstartURL;
     }
 
     public String getLfcHost() {
