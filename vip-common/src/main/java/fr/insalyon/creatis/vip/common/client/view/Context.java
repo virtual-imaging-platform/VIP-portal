@@ -44,7 +44,6 @@ public class Context {
 
     private static Context instance;
     private Authentication authentication;
-    private String quickstartURL;
     private String moteurServerHost;
     private String lastGridFolderBrowsed;
     private String lfcHost;
@@ -90,6 +89,10 @@ public class Context {
         return authentication.getUserDN();
     }
     
+    public String getOrganization() {
+        return authentication.getOrganization();
+    }
+    
     public String getProxyFileName() {
         return authentication.getProxyFileName();
     }
@@ -100,10 +103,6 @@ public class Context {
     
     public String getProxyValidity() {
         return authentication.getProxyValidity();
-    }
-
-    public Authentication getAuthentication() {
-        return authentication;
     }
 
     public void setAuthentication(Authentication authentication) {
@@ -124,14 +123,6 @@ public class Context {
 
     public void setMoteurServerHost(String moteurServerHost) {
         this.moteurServerHost = moteurServerHost;
-    }
-
-    public String getQuickstartURL() {
-        return quickstartURL;
-    }
-
-    public void setQuickstartURL(String quickstartURL) {
-        this.quickstartURL = quickstartURL;
     }
 
     public String getLfcHost() {
