@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -45,6 +45,7 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import fr.insalyon.creatis.agent.vlet.common.bean.Operation;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
@@ -59,7 +60,7 @@ public class OperationToolStrip extends ToolStrip {
     public OperationToolStrip(final ModalWindow modal) {
         this.setWidth100();
         this.setPadding(2);
-        
+
         Label titleLabel = new Label("Pool of Transfers");
         titleLabel.setWidth(90);
         this.addMember(titleLabel);
@@ -84,7 +85,10 @@ public class OperationToolStrip extends ToolStrip {
             public void onClick(ClickEvent event) {
                 for (ListGridRecord record : OperationLayout.getInstance().getGridSelection()) {
                     OperationRecord op = (OperationRecord) record;
-                    if (op.getStatus().equals("Done")) {
+
+                    if (op.getType().equals("Download")
+                            && op.getStatus().equals("Done")) {
+
                         Window.open(
                                 GWT.getModuleBaseURL()
                                 + "/filedownloadservice?operationid="
