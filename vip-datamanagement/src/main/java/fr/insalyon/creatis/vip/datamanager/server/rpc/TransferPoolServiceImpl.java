@@ -67,9 +67,17 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
 
             for (Operation op : operationsList) {
                 if (op.getType() != Operation.Type.Delete) {
-                    String source = new File(op.getSource()).getName();
+                    String source = "";
+                    String dest = "";
+                    if (op.getType() == Operation.Type.Download) {
+                        source = DataManagerUtil.parseRealDir(op.getSource());
+                        dest = "Platform";
+                    } else {
+                        source = new File(op.getSource()).getName();
+                        dest = DataManagerUtil.parseRealDir(op.getDest());
+                    }
                     poolOperations.add(new PoolOperation(op.getId(),
-                            op.getRegistration(), source, op.getDest(), 
+                            op.getRegistration(), source, dest, 
                             op.getType().name(), op.getStatus().name(), op.getUser()));
                 }
             }

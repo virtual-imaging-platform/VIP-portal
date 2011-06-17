@@ -143,7 +143,8 @@ public class BrowserUtil {
 
                     for (String groupName : result.getGroups().keySet()) {
                         if (!groupName.equals("Administrator")) {
-                            records.add(new DataRecord("folder", groupName));
+                            records.add(new DataRecord("folder", groupName 
+                                    + DataManagerConstants.GROUP_APPEND));
                         }
                     }
 

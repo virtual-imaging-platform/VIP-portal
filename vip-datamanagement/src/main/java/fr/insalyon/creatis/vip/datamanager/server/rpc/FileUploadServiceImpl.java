@@ -62,7 +62,8 @@ public class FileUploadServiceImpl extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String rootDirectory = ServerConfiguration.getInstance().getDataManagerPath() + "/uploads/";
+        String rootDirectory = ServerConfiguration.getInstance().getDataManagerPath() 
+                + "/uploads/" + System.nanoTime() + "/";
         File dir = new File(rootDirectory);
         if (!dir.exists()) {
             dir.mkdirs();

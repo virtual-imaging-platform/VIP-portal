@@ -39,6 +39,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -57,6 +58,12 @@ public class OperationToolStrip extends ToolStrip {
 
     public OperationToolStrip(final ModalWindow modal) {
         this.setWidth100();
+        this.setPadding(2);
+        
+        Label titleLabel = new Label("Pool of Transfers");
+        titleLabel.setWidth(90);
+        this.addMember(titleLabel);
+        this.addSeparator();
 
         ToolStripButton refreshButton = new ToolStripButton();
         refreshButton.setIcon("icon-refresh.png");

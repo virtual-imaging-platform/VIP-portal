@@ -60,12 +60,18 @@ public class DataManagerUtil {
 
         baseDir = parsePath(baseDir, DataManagerConstants.BIOMED_HOME,
                 "/grid/biomed");
-        
+
         try {
             for (String groupName : DAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
+                String folderName = groupName.replaceAll(" ", "_");
+                
+                baseDir = parsePath(baseDir, groupName + DataManagerConstants.GROUP_APPEND,
+                        ServerConfiguration.getInstance().getDataManagerGroupsHome()
+                        + "/" + folderName);
+
                 baseDir = parsePath(baseDir, groupName,
-                        ServerConfiguration.getInstance().getDataManagerGroupsHome() 
-                        + "/" + groupName.replaceAll(" ", "_"));
+                        ServerConfiguration.getInstance().getDataManagerGroupsHome()
+                        + "/" + folderName);
             }
         } catch (DAOException ex) {
             ex.printStackTrace();
@@ -93,12 +99,26 @@ public class DataManagerUtil {
 
         if (baseDir.contains(ServerConfiguration.getInstance().getDataManagerUsersHome())) {
             baseDir = baseDir.replace(ServerConfiguration.getInstance().getDataManagerUsersHome() + "/", "");
-            baseDir = baseDir.substring(baseDir.indexOf("/"), baseDir.length());
-            baseDir = DataManagerConstants.ROOT + "/" + DataManagerConstants.USERS_HOME + baseDir;
+            if (baseDir.indexOf("/") != -1) {
+                baseDir = baseDir.substring(baseDir.indexOf("/"), baseDir.length());
+            } else {
+                baseDir = "";
+            }
+            baseDir = DataManagerConstants.ROOT + "/" 
+                    + DataManagerConstants.USERS_HOME + baseDir;
         }
 
-        baseDir = baseDir.replace(ServerConfiguration.getInstance().getDataManagerGroupsHome(),
-                DataManagerConstants.ROOT);
+        try {
+            for (String groupName : DAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
+                baseDir = baseDir.replace(
+                        ServerConfiguration.getInstance().getDataManagerGroupsHome()
+                        + "/" + groupName.replaceAll(" ", "_"), 
+                        DataManagerConstants.ROOT + "/" + groupName 
+                        + DataManagerConstants.GROUP_APPEND);
+            }
+        } catch (DAOException ex) {
+            ex.printStackTrace();
+        }
 
         baseDir = baseDir.replace("/grid/biomed",
                 DataManagerConstants.ROOT + "/" + DataManagerConstants.BIOMED_HOME);

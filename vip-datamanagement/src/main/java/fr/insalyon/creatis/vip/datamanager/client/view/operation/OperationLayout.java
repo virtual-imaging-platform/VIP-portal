@@ -40,6 +40,7 @@ import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.grid.HoverCustomizer;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -108,7 +109,23 @@ public class OperationLayout extends VLayout {
         grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
 
         ListGridField iconField = FieldUtil.getIconGridField("typeIcon");
+        iconField.setShowHover(true);
+        iconField.setHoverCustomizer(new HoverCustomizer() {
+
+            public String hoverHTML(Object value, ListGridRecord record, int rowNum, int colNum) {
+                OperationRecord operationRecord = (OperationRecord) record;
+                return operationRecord.getType();
+            }
+        });
         ListGridField statusField = FieldUtil.getIconGridField("statusIcon");
+        statusField.setShowHover(true);
+        statusField.setHoverCustomizer(new HoverCustomizer() {
+
+            public String hoverHTML(Object value, ListGridRecord record, int rowNum, int colNum) {
+                OperationRecord operationRecord = (OperationRecord) record;
+                return operationRecord.getStatus();
+            }
+        });
         ListGridField nameField = new ListGridField("name", "Name");
 
         grid.setFields(iconField, statusField, nameField);

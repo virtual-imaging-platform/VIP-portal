@@ -63,7 +63,7 @@ public class DataManagerSection extends SectionStackSection {
         this.setResizeable(true);
         
         HLayout hLayout = new HLayout();
-        hLayout.setHeight(350);
+        hLayout.setHeight100();
         
         hLayout.addMember(BrowserLayout.getInstance());
         hLayout.addMember(OperationLayout.getInstance());

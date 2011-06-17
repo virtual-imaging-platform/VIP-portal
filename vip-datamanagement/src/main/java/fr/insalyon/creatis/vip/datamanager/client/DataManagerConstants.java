@@ -44,4 +44,5 @@ public class DataManagerConstants {
     public final static String USERS_HOME = "Home";
     public final static String TRASH_HOME = "Trash";
     public final static String BIOMED_HOME = "Biomed";
+    public final static String GROUP_APPEND = " (group)";
 }
