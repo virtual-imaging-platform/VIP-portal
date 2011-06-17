@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -39,20 +39,21 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author Rafael Silva
  */
 public class ServerConfiguration {
-
+    
+    private static Logger logger = Logger.getLogger(ServerConfiguration.class);
     private static ServerConfiguration instance;
     private final String CONF_FILE = "settings.conf";
     private final String PROXIES_DIR = "proxies/";
     private String confDirPath = "";
     private String adminDN = "/O=GRID-FR/C=FR/O=CNRS/OU=CREATIS/CN=Rafael Silva";
     private String proxiesDir;
-    private String quickStartURL = "http://www.creatis.insa-lyon.fr/~glatard/grid/index.html";
     // Derby
     private String derbyHost = "localhost";
     private int derbyPort = 1527;
@@ -62,16 +63,16 @@ public class ServerConfiguration {
     private String workflowsHost = "localhost";
     private int workflowsPort = 1527;
     // Vlet Agent
-    private String vletagentHost = "kingkong.grid.creatis.insa-lyon.fr";
+    private String vletagentHost = "localhost";
     private int vletagentPort = 9006;
     // Moteur
-    private String moteurServer = "https://kingkong.grid.creatis.insa-lyon.fr:9010/cgi-bin/moteurServer/moteur_server";
+    private String moteurServer = "https://localhost:443/cgi-bin/moteurServer/moteur_server";
     // Apache
-    private String apacheHost = "kingkong.grid.creatis.insa-lyon.fr";
+    private String apacheHost = "localhost";
     private int apacheSSLPort = 80;
     // MyProxy
-    private String myProxyHost = "kingkong.grid.creatis.insa-lyon.fr";
-    private int myProxyPort = 9011;
+    private String myProxyHost = "localhost";
+    private int myProxyPort = 7211;
     // KeyStore
     private String keystoreFile = "/usr/local/apache-tomcat-6.0.29/conf/keystore.jks";
     private String keystorePass = "";
@@ -132,7 +133,6 @@ public class ServerConfiguration {
             truststorePass = prop.getProperty("truststore.password", truststorePass);
             apacheHost = prop.getProperty("apache.host", apacheHost);
             apacheSSLPort = new Integer(prop.getProperty("apache.ssl.port", apacheSSLPort + ""));
-            quickStartURL = prop.getProperty("quickstart.url", quickStartURL);
             dataManagerPath = prop.getProperty("datamanager.path", dataManagerPath);
             dataManagerLFCHost = prop.getProperty("datamanager.lfc.host", dataManagerLFCHost);
             dataManagerLFCPort = new Integer(prop.getProperty("datamanager.lfc.port", dataManagerLFCPort + ""));
@@ -141,6 +141,7 @@ public class ServerConfiguration {
 
         } catch (IOException e) {
 
+            logger.info("Configuration file not found. Creating default file.");
             try {
                 prop.setProperty("derby.host", derbyHost);
                 prop.setProperty("derby.port", derbyPort + "");
@@ -160,7 +161,6 @@ public class ServerConfiguration {
                 prop.setProperty("truststore.password", truststorePass);
                 prop.setProperty("apache.host", apacheHost);
                 prop.setProperty("apache.ssl.port", apacheSSLPort + "");
-                prop.setProperty("quickstart.url", quickStartURL);
                 prop.setProperty("datamanager.path", dataManagerPath);
                 prop.setProperty("datamanager.lfc.host", dataManagerLFCHost);
                 prop.setProperty("datamanager.lfc.port", dataManagerLFCPort + "");
@@ -170,7 +170,7 @@ public class ServerConfiguration {
                 prop.store(new FileOutputStream(confFilePath), "VIP Configuration File");
 
             } catch (IOException ex) {
-                ex.printStackTrace();
+                logger.error(ex);
             }
         }
     }
@@ -245,10 +245,6 @@ public class ServerConfiguration {
 
     public String getTruststorePass() {
         return truststorePass;
-    }
-
-    public String getQuickStartURL() {
-        return quickStartURL;
     }
 
     public String getDataManagerPath() {

@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -45,6 +45,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -52,6 +53,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class GetFileServiceImpl extends HttpServlet {
 
+    private static Logger logger = Logger.getLogger(GetFileServiceImpl.class);
+    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -63,6 +66,7 @@ public class GetFileServiceImpl extends HttpServlet {
             File file = new File(
                     ServerConfiguration.getInstance().getWorkflowsPath() 
                     + filepath);
+            logger.info("Sending file '" + filepath + "' to user.");
             int length = 0;
             ServletOutputStream op = resp.getOutputStream();
             ServletContext context = getServletConfig().getServletContext();
