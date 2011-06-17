@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -50,6 +50,7 @@ import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import org.apache.log4j.PropertyConfigurator;
 
 /**
  *
@@ -65,6 +66,9 @@ public class ConfigurationBusiness {
      */
     public Configuration loadConfiguration(Object object) throws BusinessException {
 
+        PropertyConfigurator.configure(ConfigurationBusiness.class.getClassLoader()
+                    .getResource("vipLog4j.properties"));
+        
         Authentication authentication = null;
         ServerConfiguration conf = ServerConfiguration.getInstance();
 
@@ -103,13 +107,6 @@ public class ConfigurationBusiness {
 //                                + " -out " + proxy.getFileName() + " -noregen";
 //                        Process process = Runtime.getRuntime().exec(command);
 //                        process.waitFor();
-//                        VomsClientConf.getInstance().setUserKeyPath(proxyFileName);
-//                        VomsClientConf.getInstance().setUserCertPath(proxyFileName);
-//                        VomsProxyCredential vpc = new VomsProxyCredential();
-//                        GlobusCredential proxy = vpc.getCredential(
-//                                "", proxyFileName, "biomed", 31536000, 86400);
-//                        OutputStream out = new FileOutputStream(new File(proxyFileName));
-//                        proxy.save(out);
 
                         // Authentication
                         authentication = new Authentication(

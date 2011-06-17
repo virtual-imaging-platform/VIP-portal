@@ -44,6 +44,7 @@ import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOFactory;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -51,6 +52,8 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class ConfigurationServiceImpl extends RemoteServiceServlet implements ConfigurationService {
 
+    private static Logger logger = Logger.getLogger(ConfigurationServiceImpl.class);
+    
     public Configuration loadConfiguration() {
 
         try {
@@ -60,7 +63,7 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
             return business.loadConfiguration(object);
             
         } catch (BusinessException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
             return null;
         }
     }
@@ -71,6 +74,7 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
             return business.addGroup(proxy, groupName);
 
         } catch (BusinessException ex) {
+            logger.error(ex);
             return ex.getMessage();
         }
     }
@@ -81,6 +85,7 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
             return business.updateGroup(proxy, oldName, newName);
             
         } catch (BusinessException ex) {
+            logger.error(ex);
             return ex.getMessage();
         }
     }
@@ -91,7 +96,7 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
             business.removeGroup(proxy, groupName);
 
         } catch (BusinessException ex) {
-            System.out.println(ex.getMessage());
+            logger.error(ex);
         }
     }
 
@@ -99,6 +104,7 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
         try {
             return DAOFactory.getDAOFactory().getGroupDAO().getGroups();
         } catch (DAOException ex) {
+            logger.error(ex);
             return null;
         }
     }
@@ -107,6 +113,7 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
         try {
             return DAOFactory.getDAOFactory().getUserDAO().add(user);
         } catch (DAOException ex) {
+            logger.error(ex);
             return null;
         }
     }
@@ -115,6 +122,7 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
         try {
             return DAOFactory.getDAOFactory().getUserDAO().update(user);
         } catch (DAOException ex) {
+            logger.error(ex);
             return null;
         }
     }
@@ -123,7 +131,7 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
         try {
             DAOFactory.getDAOFactory().getUserDAO().remove(dn);
         } catch (DAOException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
     }
 
@@ -131,6 +139,7 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
         try {
             return DAOFactory.getDAOFactory().getUserDAO().getUsers();
         } catch (DAOException ex) {
+            logger.error(ex);
             return null;
         }
     }
@@ -139,6 +148,7 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
         try {
             return DAOFactory.getDAOFactory().getUserDAO().getUser(dn);
         } catch (DAOException ex) {
+            logger.error(ex);
             return null;
         }
     }

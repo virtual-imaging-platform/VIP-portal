@@ -41,6 +41,7 @@ import fr.insalyon.creatis.vip.core.client.bean.Application;
 import fr.insalyon.creatis.vip.core.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.core.server.dao.DAOFactory;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -48,10 +49,13 @@ import java.util.List;
  */
 public class ApplicationServiceImpl extends RemoteServiceServlet implements ApplicationService {
 
+    private static Logger logger = Logger.getLogger(ApplicationServiceImpl.class);
+    
     public String add(Application application) {
         try {
             return DAOFactory.getDAOFactory().getApplicationDAO().add(application);
         } catch (DAOException ex) {
+            logger.error(ex);
             return null;
         }
     }
@@ -60,6 +64,7 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             return DAOFactory.getDAOFactory().getApplicationDAO().update(application);
         } catch (DAOException ex) {
+            logger.error(ex);
             return null;
         }
     }
@@ -68,7 +73,7 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             DAOFactory.getDAOFactory().getApplicationDAO().remove(name);
         } catch (DAOException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
     }
     
@@ -76,7 +81,7 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             DAOFactory.getDAOFactory().getApplicationDAO().removeClassFromApplication(applicationClass, applicationName);
         } catch (DAOException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
     }
 
@@ -84,6 +89,7 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             return DAOFactory.getDAOFactory().getApplicationDAO().getApplication(name);
         } catch (DAOException ex) {
+            logger.error(ex);
             return null;
         }
     }
@@ -92,6 +98,7 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             return DAOFactory.getDAOFactory().getApplicationDAO().getApplications(applicationClass);
         } catch (DAOException ex) {
+            logger.error(ex);
             return null;
         }
     }
@@ -100,6 +107,7 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             return DAOFactory.getDAOFactory().getClassDAO().add(c);
         } catch (DAOException ex) {
+            logger.error(ex);
             return null;
         }
     }
@@ -108,6 +116,7 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             return DAOFactory.getDAOFactory().getClassDAO().update(c);
         } catch (DAOException ex) {
+            logger.error(ex);
             return null;
         }
     }
@@ -116,7 +125,7 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             DAOFactory.getDAOFactory().getClassDAO().remove(name);
         } catch (DAOException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
     }
 
@@ -124,6 +133,7 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             return DAOFactory.getDAOFactory().getClassDAO().getClasses();
         } catch (DAOException ex) {
+            logger.error(ex);
             return null;
         }
     }
@@ -132,6 +142,7 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             return DAOFactory.getDAOFactory().getApplicationDAO().getApplicationsName(applicationClass);
         } catch (DAOException ex) {
+            logger.error(ex);
             return null;
         }
     }
@@ -140,6 +151,7 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             return DAOFactory.getDAOFactory().getClassDAO().getClass(className);
         } catch (DAOException ex) {
+            logger.error(ex);
             return null;
         }
     }

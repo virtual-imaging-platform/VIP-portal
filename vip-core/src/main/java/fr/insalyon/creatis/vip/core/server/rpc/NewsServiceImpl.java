@@ -40,6 +40,7 @@ import fr.insalyon.creatis.vip.core.client.rpc.NewsService;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.NewsBusiness;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -47,13 +48,15 @@ import java.util.List;
  */
 public class NewsServiceImpl extends RemoteServiceServlet implements NewsService {
 
+    private static Logger logger = Logger.getLogger(NewsServiceImpl.class);
+    
     public List<News> getNews() {
         try {
             NewsBusiness business = new NewsBusiness();
             return business.getNews();
 
         } catch (BusinessException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
             return null;
         }
     }
@@ -64,7 +67,7 @@ public class NewsServiceImpl extends RemoteServiceServlet implements NewsService
             return business.add(news);
 
         } catch (BusinessException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
             return null;
         }
     }
@@ -75,7 +78,7 @@ public class NewsServiceImpl extends RemoteServiceServlet implements NewsService
             return business.update(news);
 
         } catch (BusinessException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
             return null;
         }
     }
@@ -86,7 +89,7 @@ public class NewsServiceImpl extends RemoteServiceServlet implements NewsService
             return business.remove(news);
 
         } catch (BusinessException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
             return null;
         }
     }

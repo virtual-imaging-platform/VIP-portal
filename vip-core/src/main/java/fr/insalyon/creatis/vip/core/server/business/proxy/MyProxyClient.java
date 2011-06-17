@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -105,6 +105,7 @@ import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -142,7 +143,6 @@ public class MyProxyClient {
     // CONSTANTS
     private final String VERSION = "VERSION=MYPROXYv2";
     private final String GETCOMMAND = "COMMAND=0";
-    private final String INFOCOMMAND = "COMMAND=2";
     private final String USERNAME = "USERNAME=";
     private final String PASSPHRASE = "PASSPHRASE=";
     private final String LIFETIME = "LIFETIME=31536000";
@@ -169,6 +169,34 @@ public class MyProxyClient {
             String proxyFileName = ServerConfiguration.getInstance().getProxiesDir()
                     + "x509up_" + userCN.toLowerCase().replace(" ", "_");
 
+            if (new File(proxyFileName).exists()) {
+
+                FileInputStream is = new FileInputStream(proxyFileName);
+                CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                boolean valid = true;
+                Date endDate = null;
+
+                while (is.available() > 0) {
+                    X509Certificate certificate = (X509Certificate) cf.generateCertificate(is);
+                    Calendar currentDate = Calendar.getInstance();
+                    currentDate.setTime(new Date());
+                    currentDate.add(Calendar.DAY_OF_MONTH, 1);
+                    try {
+                        certificate.checkValidity(currentDate.getTime());
+                        if (endDate != null && certificate.getNotAfter().getTime() < endDate.getTime()) {
+                            endDate = certificate.getNotAfter();
+                        } else {
+                            endDate = certificate.getNotAfter();
+                        }
+                    } catch (Exception ex1) {
+                        valid = false;
+                        break;
+                    }
+                }
+                if (valid) {
+                    return new Proxy(proxyFileName, endDate);
+                }
+            }
             connect();
             logon(userDN);
             getCredentials(userCN);
