@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -75,8 +75,10 @@ public class BrowserUtil {
 
         ListGridField icoField = FieldUtil.getIconGridField("icon");
         ListGridField nameField = new ListGridField("name", "Name");
+        ListGridField sizeField = new ListGridField("length", "Size", 100);
+        ListGridField dateField = new ListGridField("modificationDate", "Modification Date", 160);
 
-        grid.setFields(icoField, nameField);
+        grid.setFields(icoField, nameField, sizeField, dateField);
         grid.setSortField("icon");
         grid.setSortDirection(SortDirection.DESCENDING);
 
@@ -109,7 +111,8 @@ public class BrowserUtil {
                         List<DataRecord> dataList = new ArrayList<DataRecord>();
                         for (Data d : result) {
                             dataList.add(new DataRecord(
-                                    d.getType().toLowerCase(), d.getName()));
+                                    d.getType().toLowerCase(), d.getName(),
+                                    d.getLength(), d.getModificationDate()));
                         }
                         toolStrip.setPath(path);
                         grid.setData(dataList.toArray(new DataRecord[]{}));
@@ -139,19 +142,19 @@ public class BrowserUtil {
                     toolStrip.setPath(path);
 
                     List<DataRecord> records = new ArrayList<DataRecord>();
-                    records.add(new DataRecord("folder", DataManagerConstants.USERS_HOME));
+                    records.add(new DataRecord("folder", DataManagerConstants.USERS_HOME, "", ""));
 
                     for (String groupName : result.getGroups().keySet()) {
                         if (!groupName.equals("Administrator")) {
                             records.add(new DataRecord("folder", groupName 
-                                    + DataManagerConstants.GROUP_APPEND));
+                                    + DataManagerConstants.GROUP_APPEND, "", ""));
                         }
                     }
 
-                    records.add(new DataRecord("folder", DataManagerConstants.TRASH_HOME));
+                    records.add(new DataRecord("folder", DataManagerConstants.TRASH_HOME, "", ""));
 
                     if (Context.getInstance().isSystemAdmin()) {
-                        records.add(new DataRecord("folder", DataManagerConstants.BIOMED_HOME));
+                        records.add(new DataRecord("folder", DataManagerConstants.BIOMED_HOME, "", ""));
                     }
 
                     grid.setData(records.toArray(new DataRecord[]{}));

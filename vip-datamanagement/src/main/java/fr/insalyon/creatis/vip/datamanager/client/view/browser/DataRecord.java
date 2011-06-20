@@ -45,13 +45,15 @@ public class DataRecord extends ListGridRecord {
     public DataRecord() {
     }
 
-    public DataRecord(String type, String name) {
+    public DataRecord(String type, String name, String length, String date) {
         if (name.equals("Trash")) {
             setAttribute("icon", "icon-trash");
         } else {
             setAttribute("icon", "icon-" + type);
         }
         setAttribute("name", name);
+        setAttribute("length", length);
+        setAttribute("modificationDate", date);
     }
 
     public String getType() {
@@ -60,5 +62,13 @@ public class DataRecord extends ListGridRecord {
 
     public String getName() {
         return getAttributeAsString("name");
+    }
+    
+    public String getLength() {
+        return getAttributeAsString("length");
+    }
+    
+    public String getModificationDate() {
+        return getAttributeAsString("modificationDate");
     }
 }

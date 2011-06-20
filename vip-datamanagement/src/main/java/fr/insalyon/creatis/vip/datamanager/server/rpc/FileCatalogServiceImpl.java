@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -37,11 +37,14 @@ package fr.insalyon.creatis.vip.datamanager.server.rpc;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
+import fr.insalyon.creatis.agent.vlet.common.bean.GridData;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -59,14 +62,28 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
                     ServerConfiguration.getInstance().getVletagentPort(),
                     proxyFileName);
 
-            List<String> list = client.getFilesAndFoldersList(
+            List<GridData> list = client.getFolderData(
                     DataManagerUtil.parseBaseDir(user, baseDir), refresh);
 
             List<Data> dataList = new ArrayList<Data>();
-            for (String d : list) {
-                if (!d.isEmpty()) {
-                    String[] data = d.split("--");
-                    dataList.add(new Data(data[0], data[1]));
+            for (GridData data : list) {
+                if (data.getType() == GridData.Type.Folder) {
+                    dataList.add(new Data(data.getName(),
+                            data.getType().name()));
+
+                } else {
+                    long length = data.getLength();
+                    String size = length + " B";
+                    NumberFormat nf = new DecimalFormat("#.##");
+                    if (length / 1024 > 0) {
+                        if (length / (1024 * 1024) > 0) {
+                            size = nf.format(length / (double) (1024 * 1024)) + " MB";
+                        } else {
+                            size = nf.format(length / (double) 1024) + " KB";
+                        }
+                    }
+                    dataList.add(new Data(data.getName(), data.getType().name(),
+                            size, data.getModificationDate()));
                 }
             }
             return dataList;
@@ -146,7 +163,7 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
             rename(user, proxyFileName, oldPath, newPath);
         }
     }
-    
+
     public void configureDataManager(String user, String proxyFileName) {
 
         VletAgentClient client = new VletAgentClient(

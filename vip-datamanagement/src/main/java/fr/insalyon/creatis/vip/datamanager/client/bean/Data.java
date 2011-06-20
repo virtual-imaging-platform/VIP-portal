@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -44,13 +44,21 @@ public class Data implements IsSerializable {
 
     private String name;
     private String type;
+    private String length;
+    private String modificationDate;
 
     public Data() {
     }
 
     public Data(String name, String type) {
+        this(name, type, "", "");
+    }
+
+    public Data(String name, String type, String length, String modificationDate) {
         this.name = name;
         this.type = type;
+        this.length = length;
+        this.modificationDate = modificationDate;
     }
 
     public String getName() {
@@ -59,5 +67,13 @@ public class Data implements IsSerializable {
 
     public String getType() {
         return type;
+    }
+
+    public String getLength() {
+        return length;
+    }
+
+    public String getModificationDate() {
+        return modificationDate;
     }
 }
