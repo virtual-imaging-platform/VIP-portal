@@ -46,7 +46,7 @@ import org.apache.log4j.Logger;
  * @author Rafael Silva
  */
 public class ServerConfiguration {
-    
+
     private static Logger logger = Logger.getLogger(ServerConfiguration.class);
     private static ServerConfiguration instance;
     private final String CONF_FILE = "settings.conf";
@@ -84,6 +84,10 @@ public class ServerConfiguration {
     private int dataManagerLFCPort = 5010;
     private String dataManagerUsersHome = "/grid/biomed/creatis/vip/data/users";
     private String dataManagerGroupsHome = "/grid/biomed/creatis/vip/data/groups";
+    // Provenance
+    private String provenanceDBUser = "vip";
+    private String provenanceDBPass = "";
+    private String provenanceDBURL = "jdbc:mysql://localhost:3306/SDB2";
 
     public static ServerConfiguration getInstance() {
         if (instance == null) {
@@ -138,6 +142,9 @@ public class ServerConfiguration {
             dataManagerLFCPort = new Integer(prop.getProperty("datamanager.lfc.port", dataManagerLFCPort + ""));
             dataManagerUsersHome = prop.getProperty("datamanager.users.home", dataManagerUsersHome);
             dataManagerGroupsHome = prop.getProperty("datamanager.groups.home", dataManagerGroupsHome);
+            provenanceDBUser = prop.getProperty("provenance.db.user", provenanceDBUser);
+            provenanceDBPass = prop.getProperty("provenance.db.pass", provenanceDBPass);
+            provenanceDBURL = prop.getProperty("provenance.db.url", provenanceDBURL);
 
         } catch (IOException e) {
 
@@ -166,6 +173,9 @@ public class ServerConfiguration {
                 prop.setProperty("datamanager.lfc.port", dataManagerLFCPort + "");
                 prop.setProperty("datamanager.users.home", dataManagerUsersHome);
                 prop.setProperty("datamanager.groups.home", dataManagerGroupsHome);
+                prop.setProperty("provenance.db.user", provenanceDBUser);
+                prop.setProperty("provenance.db.pass", provenanceDBPass);
+                prop.setProperty("provenance.db.url", provenanceDBURL);
 
                 prop.store(new FileOutputStream(confFilePath), "VIP Configuration File");
 
@@ -273,5 +283,17 @@ public class ServerConfiguration {
 
     public int getDerbyPort() {
         return derbyPort;
+    }
+
+    public String getProvenanceDBPass() {
+        return provenanceDBPass;
+    }
+
+    public String getProvenanceDBURL() {
+        return provenanceDBURL;
+    }
+
+    public String getProvenanceDBUser() {
+        return provenanceDBUser;
     }
 }
