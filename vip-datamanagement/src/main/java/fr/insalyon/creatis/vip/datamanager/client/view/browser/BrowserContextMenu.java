@@ -45,6 +45,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerContext;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
@@ -85,13 +86,39 @@ public class BrowserContextMenu extends Menu {
             }
         });
 
+        MenuItem cutItem = new MenuItem("Cut");
+        cutItem.setIcon("icon-cut.png");
+        cutItem.addClickHandler(new ClickHandler() {
+
+            public void onClick(MenuItemClickEvent event) {
+                if (baseDir.equals(DataManagerConstants.ROOT)) {
+                    SC.warn("You cannot cut a folder from the root folder.");
+                } else {
+                    DataManagerContext.getInstance().setCutAction(baseDir, data.getName());
+                }
+            }
+        });
+
+        MenuItem pasteItem = new MenuItem("Paste");
+        pasteItem.setIcon("icon-paste.png");
+        pasteItem.addClickHandler(new ClickHandler() {
+
+            public void onClick(MenuItemClickEvent event) {
+                if (baseDir.equals(DataManagerConstants.ROOT)) {
+                    SC.warn("You cannot paste in the root folder.");
+                } else {
+                    paste(modal, baseDir);
+                }
+            }
+        });
+
         MenuItem renameItem = new MenuItem("Rename");
         renameItem.setIcon("icon-edit.png");
         renameItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
                 if (baseDir.equals(DataManagerConstants.ROOT)) {
-                    SC.warn("You cannot rename a folder in the root folder.");
+                    SC.warn("You cannot rename a folder from the root folder.");
                 } else {
                     new RenameWindow(modal, baseDir, data.getName()).show();
                 }
@@ -104,13 +131,13 @@ public class BrowserContextMenu extends Menu {
 
             public void onClick(MenuItemClickEvent event) {
                 if (baseDir.equals(DataManagerConstants.ROOT)) {
-                    SC.warn("You cannot delete a folder in the root folder.");
+                    SC.warn("You cannot delete a folder from the root folder.");
                 } else {
                     delete(modal, baseDir, data.getName());
                 }
             }
         });
-        
+
         MenuItem propertiesItem = new MenuItem("Properties");
         propertiesItem.addClickHandler(new ClickHandler() {
 
@@ -124,8 +151,14 @@ public class BrowserContextMenu extends Menu {
         });
 
         MenuItemSeparator separator = new MenuItemSeparator();
-        this.setItems(uploadItem, downloadItem, separator, renameItem, 
-                deleteItem, separator, propertiesItem);
+
+        if (DataManagerContext.getInstance().hasCutAction()) {
+            this.setItems(uploadItem, downloadItem, separator, cutItem, pasteItem,
+                    separator, renameItem, deleteItem, separator, propertiesItem);
+        } else {
+            this.setItems(uploadItem, downloadItem, separator, cutItem, separator,
+                    renameItem, deleteItem, separator, propertiesItem);
+        }
     }
 
     private void delete(final ModalWindow modal, final String baseDir, final String name) {
@@ -210,6 +243,37 @@ public class BrowserContextMenu extends Menu {
                     baseDir + "/" + data.getName(),
                     context.getUserDN(), context.getProxyFileName(),
                     callback);
+        }
+    }
+
+    private void paste(final ModalWindow modal, final String baseDir) {
+        FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
+        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Error executing paste command: " + caught.getMessage());
+            }
+
+            public void onSuccess(Void result) {
+                DataManagerContext.getInstance().resetCutAction();
+                modal.hide();
+                BrowserLayout.getInstance().loadData(baseDir, true);
+            }
+        };
+
+        if (!baseDir.equals(DataManagerContext.getInstance().getCutFolder())) {
+
+            String oldPath = DataManagerContext.getInstance().getCutFolder() + "/"
+                    + DataManagerContext.getInstance().getCutName();
+            String newPath = baseDir + "/" + DataManagerContext.getInstance().getCutName();
+
+            modal.show("Moving " + oldPath + " to " + newPath + "...", true);
+            Context context = Context.getInstance();
+            service.rename(context.getUser(), context.getProxyFileName(),
+                    oldPath, newPath, callback);
+        } else {
+            SC.warn("Unable to move data into the same folder.");
         }
     }
 }
