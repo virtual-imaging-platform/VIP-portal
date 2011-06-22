@@ -34,57 +34,37 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.browser;
 
-import com.smartgwt.client.widgets.grid.ListGridRecord;
+import fr.insalyon.creatis.vip.common.client.view.property.AbstractPropertyWindow;
+import fr.insalyon.creatis.vip.common.client.view.property.PropertyRecord;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DataRecord extends ListGridRecord {
+public class DataPropertiesWindow extends AbstractPropertyWindow {
 
-    public DataRecord() {
-    }
+    public DataPropertiesWindow(String baseDir, DataRecord record) {
 
-    public DataRecord(String type, String name) {
-        this(type, name, "", "", "", "");
-    }
+        super("Properties for " + baseDir + "/" + record.getName(), 550, 240);
 
-    public DataRecord(String type, String name, String length, String date,
-            String replicas, String permissions) {
-        if (name.equals("Trash")) {
-            setAttribute("icon", "icon-trash");
-        } else {
-            setAttribute("icon", "icon-" + type);
+        List<PropertyRecord> data = new ArrayList<PropertyRecord>();
+        data.add(new PropertyRecord("Folder", baseDir));
+        data.add(new PropertyRecord("Name", record.getName()));
+        data.add(new PropertyRecord("Type", record.getType()));
+        
+        if (record.getType().equals("file")) {
+            data.add(new PropertyRecord("Size", record.getLength()));
+            data.add(new PropertyRecord("Modification Date", record.getModificationDate()));
         }
-        setAttribute("name", name);
-        setAttribute("length", length);
-        setAttribute("modificationDate", date);
-        setAttribute("type", type);
-        setAttribute("replicas", replicas);
-        setAttribute("permissions", permissions);
-    }
+        
+        data.add(new PropertyRecord("Permissions", record.getPermissions()));
+        
+        if (record.getType().equals("file")) {
+            data.add(new PropertyRecord("Replicas", record.getReplicas()));
+        }
 
-    public String getType() {
-        return getAttributeAsString("type");
-    }
-
-    public String getName() {
-        return getAttributeAsString("name");
-    }
-
-    public String getLength() {
-        return getAttributeAsString("length");
-    }
-
-    public String getModificationDate() {
-        return getAttributeAsString("modificationDate");
-    }
-
-    public String getReplicas() {
-        return getAttributeAsString("replicas");
-    }
-
-    public String getPermissions() {
-        return getAttributeAsString("permissions");
+        grid.setData(data.toArray(new PropertyRecord[]{}));
     }
 }

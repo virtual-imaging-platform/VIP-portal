@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -41,10 +41,12 @@ import fr.insalyon.creatis.agent.vlet.common.bean.Operation;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -52,6 +54,7 @@ import java.util.List;
  */
 public class TransferPoolServiceImpl extends RemoteServiceServlet implements TransferPoolService {
 
+    private static Logger logger = Logger.getLogger(TransferPoolServiceImpl.class);
     private ServerConfiguration serverConfiguration = ServerConfiguration.getInstance();
 
     public List<PoolOperation> getOperations(String userDN, String proxy) {
@@ -84,8 +87,10 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
 
             return poolOperations;
 
+        } catch (DataManagerException ex) {
+            logger.error(ex);
         } catch (VletAgentClientException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return null;
     }
@@ -103,7 +108,7 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
                     op.getDest(), op.getType().name(), op.getStatus().name(), op.getUser());
 
         } catch (VletAgentClientException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return null;
     }
@@ -117,7 +122,7 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
             client.removeOperationById(id);
 
         } catch (VletAgentClientException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
     }
 
@@ -132,8 +137,10 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
                     + "/downloads" + new File(remotePath).getParent();
             client.downloadFile(remotePath, localDirPath, userDN);
 
+        } catch (DataManagerException ex) {
+            logger.error(ex);
         } catch (VletAgentClientException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
     }
 
@@ -150,8 +157,10 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
             String remotePath = DataManagerUtil.parseBaseDir(user, remoteFile);
             client.uploadFile(localPath, remotePath, userDN);
 
+        } catch (DataManagerException ex) {
+            logger.error(ex);
         } catch (VletAgentClientException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
     }
 }

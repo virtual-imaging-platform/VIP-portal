@@ -35,6 +35,8 @@
 package fr.insalyon.creatis.vip.datamanager.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -46,19 +48,24 @@ public class Data implements IsSerializable {
     private String type;
     private String length;
     private String modificationDate;
+    private List<String> replicas;
+    private String permissions;
 
     public Data() {
     }
 
-    public Data(String name, String type) {
-        this(name, type, "", "");
+    public Data(String name, String type, String permissions) {
+        this(name, type, "", "", new ArrayList<String>(), permissions);
     }
 
-    public Data(String name, String type, String length, String modificationDate) {
+    public Data(String name, String type, String length, String modificationDate,
+            List<String> replicas, String permissions) {
         this.name = name;
         this.type = type;
         this.length = length;
         this.modificationDate = modificationDate;
+        this.replicas = replicas;
+        this.permissions = permissions;
     }
 
     public String getName() {
@@ -75,5 +82,13 @@ public class Data implements IsSerializable {
 
     public String getModificationDate() {
         return modificationDate;
+    }
+
+    public String getPermissions() {
+        return permissions;
+    }
+
+    public List<String> getReplicas() {
+        return replicas;
     }
 }

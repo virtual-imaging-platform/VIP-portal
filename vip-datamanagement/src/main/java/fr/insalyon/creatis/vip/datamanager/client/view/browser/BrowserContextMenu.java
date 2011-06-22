@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -110,10 +110,22 @@ public class BrowserContextMenu extends Menu {
                 }
             }
         });
+        
+        MenuItem propertiesItem = new MenuItem("Properties");
+        propertiesItem.addClickHandler(new ClickHandler() {
+
+            public void onClick(MenuItemClickEvent event) {
+                if (baseDir.equals(DataManagerConstants.ROOT)) {
+                    SC.warn("There are no properties for root folders.");
+                } else {
+                    new DataPropertiesWindow(baseDir, data).show();
+                }
+            }
+        });
 
         MenuItemSeparator separator = new MenuItemSeparator();
-
-        this.setItems(uploadItem, downloadItem, separator, renameItem, deleteItem);
+        this.setItems(uploadItem, downloadItem, separator, renameItem, 
+                deleteItem, separator, propertiesItem);
     }
 
     private void delete(final ModalWindow modal, final String baseDir, final String name) {

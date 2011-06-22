@@ -32,59 +32,19 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client.view.browser;
-
-import com.smartgwt.client.widgets.grid.ListGridRecord;
+package fr.insalyon.creatis.vip.datamanager.server;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DataRecord extends ListGridRecord {
+public class DataManagerException extends Exception {
 
-    public DataRecord() {
+    public DataManagerException(String message) {
+        super(message);
     }
 
-    public DataRecord(String type, String name) {
-        this(type, name, "", "", "", "");
-    }
-
-    public DataRecord(String type, String name, String length, String date,
-            String replicas, String permissions) {
-        if (name.equals("Trash")) {
-            setAttribute("icon", "icon-trash");
-        } else {
-            setAttribute("icon", "icon-" + type);
-        }
-        setAttribute("name", name);
-        setAttribute("length", length);
-        setAttribute("modificationDate", date);
-        setAttribute("type", type);
-        setAttribute("replicas", replicas);
-        setAttribute("permissions", permissions);
-    }
-
-    public String getType() {
-        return getAttributeAsString("type");
-    }
-
-    public String getName() {
-        return getAttributeAsString("name");
-    }
-
-    public String getLength() {
-        return getAttributeAsString("length");
-    }
-
-    public String getModificationDate() {
-        return getAttributeAsString("modificationDate");
-    }
-
-    public String getReplicas() {
-        return getAttributeAsString("replicas");
-    }
-
-    public String getPermissions() {
-        return getAttributeAsString("permissions");
+    public DataManagerException(Throwable thrwbl) {
+        super(thrwbl);
     }
 }

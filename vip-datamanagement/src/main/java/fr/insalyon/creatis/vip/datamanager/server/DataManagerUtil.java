@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -47,7 +47,7 @@ import java.net.URISyntaxException;
  */
 public class DataManagerUtil {
 
-    public static String parseBaseDir(String user, String baseDir) {
+    public static String parseBaseDir(String user, String baseDir) throws DataManagerException {
 
         baseDir = parsePath(baseDir, DataManagerConstants.USERS_HOME,
                 ServerConfiguration.getInstance().getDataManagerUsersHome()
@@ -74,7 +74,7 @@ public class DataManagerUtil {
                         + "/" + folderName);
             }
         } catch (DAOException ex) {
-            ex.printStackTrace();
+            throw new DataManagerException(ex);
         }
 
         return baseDir;
@@ -88,12 +88,12 @@ public class DataManagerUtil {
         return baseDir;
     }
 
-    public static String parseRealDir(String baseDir) {
-        if (baseDir.contains("lfn://")) {
+    public static String parseRealDir(String baseDir) throws DataManagerException {
+        if (baseDir.startsWith("lfn://")) {
             try {
                 baseDir = new URI(baseDir).getPath();
             } catch (URISyntaxException ex) {
-                ex.printStackTrace();
+                throw new DataManagerException(ex);
             }
         }
 
@@ -117,7 +117,7 @@ public class DataManagerUtil {
                         + DataManagerConstants.GROUP_APPEND);
             }
         } catch (DAOException ex) {
-            ex.printStackTrace();
+            throw new DataManagerException(ex);
         }
 
         baseDir = baseDir.replace("/grid/biomed",

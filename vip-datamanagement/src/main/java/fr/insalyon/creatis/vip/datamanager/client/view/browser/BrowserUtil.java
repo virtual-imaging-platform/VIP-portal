@@ -110,9 +110,17 @@ public class BrowserUtil {
                     if (result != null) {
                         List<DataRecord> dataList = new ArrayList<DataRecord>();
                         for (Data d : result) {
+                            String replicas = "";
+                            for (String replica : d.getReplicas()) {
+                                if (!replicas.isEmpty()) {
+                                    replicas += ", ";
+                                }
+                                replicas += replica;
+                            }
                             dataList.add(new DataRecord(
                                     d.getType().toLowerCase(), d.getName(),
-                                    d.getLength(), d.getModificationDate()));
+                                    d.getLength(), d.getModificationDate(),
+                                    replicas, d.getPermissions()));
                         }
                         toolStrip.setPath(path);
                         grid.setData(dataList.toArray(new DataRecord[]{}));
@@ -142,19 +150,19 @@ public class BrowserUtil {
                     toolStrip.setPath(path);
 
                     List<DataRecord> records = new ArrayList<DataRecord>();
-                    records.add(new DataRecord("folder", DataManagerConstants.USERS_HOME, "", ""));
+                    records.add(new DataRecord("folder", DataManagerConstants.USERS_HOME));
 
                     for (String groupName : result.getGroups().keySet()) {
                         if (!groupName.equals("Administrator")) {
                             records.add(new DataRecord("folder", groupName 
-                                    + DataManagerConstants.GROUP_APPEND, "", ""));
+                                    + DataManagerConstants.GROUP_APPEND));
                         }
                     }
 
-                    records.add(new DataRecord("folder", DataManagerConstants.TRASH_HOME, "", ""));
+                    records.add(new DataRecord("folder", DataManagerConstants.TRASH_HOME));
 
                     if (Context.getInstance().isSystemAdmin()) {
-                        records.add(new DataRecord("folder", DataManagerConstants.BIOMED_HOME, "", ""));
+                        records.add(new DataRecord("folder", DataManagerConstants.BIOMED_HOME));
                     }
 
                     grid.setData(records.toArray(new DataRecord[]{}));

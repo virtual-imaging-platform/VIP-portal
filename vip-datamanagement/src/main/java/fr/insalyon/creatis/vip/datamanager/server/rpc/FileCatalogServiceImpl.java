@@ -42,18 +42,22 @@ import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author Rafael Silva
  */
 public class FileCatalogServiceImpl extends RemoteServiceServlet implements FileCatalogService {
+
+    private static Logger logger = Logger.getLogger(FileCatalogServiceImpl.class);
 
     public List<Data> listDir(String user, String proxyFileName, String baseDir, boolean refresh) {
         try {
@@ -64,12 +68,13 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
 
             List<GridData> list = client.getFolderData(
                     DataManagerUtil.parseBaseDir(user, baseDir), refresh);
+            logger.info("Data List: " + list.size());
 
             List<Data> dataList = new ArrayList<Data>();
             for (GridData data : list) {
                 if (data.getType() == GridData.Type.Folder) {
                     dataList.add(new Data(data.getName(),
-                            data.getType().name()));
+                            data.getType().name(), data.getPermissions()));
 
                 } else {
                     long length = data.getLength();
@@ -83,13 +88,16 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
                         }
                     }
                     dataList.add(new Data(data.getName(), data.getType().name(),
-                            size, data.getModificationDate()));
+                            size, data.getModificationDate(), data.getReplicas(),
+                            data.getPermissions()));
                 }
             }
             return dataList;
 
+        } catch (DataManagerException ex) {
+            logger.error(ex);
         } catch (VletAgentClientException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return null;
     }
@@ -103,8 +111,10 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
 
             client.delete(DataManagerUtil.parseBaseDir(user, path));
 
+        } catch (DataManagerException ex) {
+            logger.error(ex);
         } catch (VletAgentClientException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
     }
 
@@ -117,13 +127,16 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
 
             List<String> parsedPaths = new ArrayList<String>();
             for (String path : paths) {
-                parsedPaths.add(DataManagerUtil.parseBaseDir(user, path));
+                try {
+                    parsedPaths.add(DataManagerUtil.parseBaseDir(user, path));
+                } catch (DataManagerException ex) {
+                    logger.error(ex);
+                }
             }
-
             client.deleteFiles(parsedPaths);
 
         } catch (VletAgentClientException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
     }
 
@@ -136,8 +149,10 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
 
             client.createDirectory(DataManagerUtil.parseBaseDir(user, baseDir), name);
 
+        } catch (DataManagerException ex) {
+            logger.error(ex);
         } catch (VletAgentClientException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
     }
 
@@ -151,8 +166,10 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
             client.rename(DataManagerUtil.parseBaseDir(user, oldPath),
                     DataManagerUtil.parseBaseDir(user, newPath));
 
+        } catch (DataManagerException ex) {
+            logger.error(ex);
         } catch (VletAgentClientException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
     }
 
@@ -176,7 +193,7 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
                     user.replaceAll(" ", "_").toLowerCase());
         } catch (VletAgentClientException ex) {
             if (!ex.getMessage().contains("ERROR: File/Directory exists or Directory is not empty")) {
-                ex.printStackTrace();
+                logger.error(ex);
             }
         }
         try {
@@ -185,7 +202,7 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
                     + "_" + DataManagerConstants.TRASH_HOME);
         } catch (VletAgentClientException ex) {
             if (!ex.getMessage().contains("ERROR: File/Directory exists or Directory is not empty")) {
-                ex.printStackTrace();
+                logger.error(ex);
             }
         }
     }
