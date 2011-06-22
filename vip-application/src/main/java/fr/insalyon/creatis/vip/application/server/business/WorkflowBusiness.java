@@ -47,6 +47,7 @@ import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.client.bean.Application;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.io.File;
 import java.io.IOException;
@@ -54,7 +55,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.rpc.ServiceException;
@@ -101,6 +101,8 @@ public class WorkflowBusiness {
                 return new ScuflParser().parse(workflowPath).getSources();
             }
 
+        } catch (DataManagerException ex) {
+            throw new BusinessException(ex);
         } catch (URISyntaxException ex) {
             throw new BusinessException(ex);
         } catch (IOException ex) {
@@ -172,6 +174,8 @@ public class WorkflowBusiness {
 
             return ws;
 
+        } catch (DataManagerException ex) {
+            throw new BusinessException(ex);
         } catch (RemoteException ex) {
             throw new BusinessException(ex);
         } catch (ServiceException ex) {
