@@ -68,7 +68,6 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
 
             List<GridData> list = client.getFolderData(
                     DataManagerUtil.parseBaseDir(user, baseDir), refresh);
-            logger.info("Data List: " + list.size());
 
             List<Data> dataList = new ArrayList<Data>();
             for (GridData data : list) {
