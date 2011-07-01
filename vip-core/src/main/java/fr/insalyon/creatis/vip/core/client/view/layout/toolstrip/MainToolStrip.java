@@ -62,7 +62,7 @@ public class MainToolStrip extends ToolStrip {
         this.addSeparator();
 
         if (Context.getInstance().isSystemAdmin()) {
-            this.addMenuButton(new SystemMenuButton());
+            this.addMenuButton(SystemMenuButton.getInstance());
         }
     }
 }

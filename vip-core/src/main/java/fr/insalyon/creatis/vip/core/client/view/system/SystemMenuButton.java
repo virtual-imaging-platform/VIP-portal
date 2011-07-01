@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -52,7 +52,16 @@ import fr.insalyon.creatis.vip.core.client.view.system.news.ManageNewsTab;
  */
 public class SystemMenuButton extends ToolStripMenuButton {
 
-    public SystemMenuButton() {
+    private static SystemMenuButton instance;
+    
+    public static SystemMenuButton getInstance() {
+        if (instance == null) {
+            instance = new SystemMenuButton();
+        }
+        return instance;
+    }
+    
+    private SystemMenuButton() {
 
         this.setTitle("System");
         Menu menu = new Menu();
