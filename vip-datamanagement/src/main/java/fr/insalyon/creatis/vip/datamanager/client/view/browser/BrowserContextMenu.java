@@ -236,9 +236,32 @@ public class BrowserContextMenu extends Menu {
                     OperationLayout.getInstance().activateAutoRefresh();
                 }
             };
-            modal.show("Adding files to transfer queue...", true);
+            modal.show("Adding file to transfer queue...", true);
             Context context = Context.getInstance();
             service.downloadFile(
+                    context.getUser(),
+                    baseDir + "/" + data.getName(),
+                    context.getUserDN(), context.getProxyFileName(),
+                    callback);
+
+        } else {
+            TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+            AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                public void onFailure(Throwable caught) {
+                    modal.hide();
+                    SC.warn("Unable to download folder: " + caught.getMessage());
+                }
+
+                public void onSuccess(Void result) {
+                    modal.hide();
+                    OperationLayout.getInstance().loadData();
+                    OperationLayout.getInstance().activateAutoRefresh();
+                }
+            };
+            modal.show("Adding folder to transfer queue...", true);
+            Context context = Context.getInstance();
+            service.downloadFolder(
                     context.getUser(),
                     baseDir + "/" + data.getName(),
                     context.getUserDN(), context.getProxyFileName(),

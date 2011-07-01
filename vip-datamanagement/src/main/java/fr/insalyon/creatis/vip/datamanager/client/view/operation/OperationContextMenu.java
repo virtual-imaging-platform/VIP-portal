@@ -61,7 +61,7 @@ public class OperationContextMenu extends Menu {
         this.setShadowDepth(10);
         this.setWidth(90);
 
-        MenuItem downloadItem = new MenuItem("Download File");
+        MenuItem downloadItem = new MenuItem("Download");
         downloadItem.setIcon("icon-download.png");
         downloadItem.addClickHandler(new ClickHandler() {
 

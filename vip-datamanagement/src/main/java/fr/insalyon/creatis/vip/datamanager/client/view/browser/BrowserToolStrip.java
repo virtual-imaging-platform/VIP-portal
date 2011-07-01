@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -64,7 +64,7 @@ import java.util.Map;
 public class BrowserToolStrip extends BasicBrowserToolStrip {
 
     private BasicBrowserToolStrip toolStrip;
-    
+
     public BrowserToolStrip(final ModalWindow modal, final ListGrid grid) {
 
         super(modal);
@@ -145,7 +145,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         downloadButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                downloadFiles();
+                download();
             }
         });
         this.addButton(downloadButton);
@@ -191,7 +191,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         this.addButton(emptyTrashButton);
     }
 
-    private void downloadFiles() {
+    private void download() {
         ListGridRecord[] records = BrowserLayout.getInstance().getGridSelection();
 
         for (ListGridRecord record : records) {
@@ -214,6 +214,28 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                 modal.show("Adding files to transfer queue...", true);
                 Context context = Context.getInstance();
                 service.downloadFile(
+                        context.getUser(),
+                        pathItem.getValueAsString() + "/" + data.getName(),
+                        context.getUserDN(), context.getProxyFileName(),
+                        callback);
+            } else {
+                TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+                AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                    public void onFailure(Throwable caught) {
+                        modal.hide();
+                        SC.warn("Unable to download folder: " + caught.getMessage());
+                    }
+
+                    public void onSuccess(Void result) {
+                        modal.hide();
+                        OperationLayout.getInstance().loadData();
+                        OperationLayout.getInstance().activateAutoRefresh();
+                    }
+                };
+                modal.show("Adding folder to transfer queue...", true);
+                Context context = Context.getInstance();
+                service.downloadFolder(
                         context.getUser(),
                         pathItem.getValueAsString() + "/" + data.getName(),
                         context.getUserDN(), context.getProxyFileName(),
@@ -275,8 +297,8 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
                             List<String> paths = new ArrayList<String>();
                             for (Data data : result) {
-                                paths.add(DataManagerConstants.ROOT + "/" 
-                                        + DataManagerConstants.TRASH_HOME 
+                                paths.add(DataManagerConstants.ROOT + "/"
+                                        + DataManagerConstants.TRASH_HOME
                                         + "/" + data.getName());
                             }
                             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
@@ -289,7 +311,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                                 public void onSuccess(Void result) {
                                     modal.hide();
                                     BrowserLayout.getInstance().loadData(
-                                            DataManagerConstants.ROOT + "/" 
+                                            DataManagerConstants.ROOT + "/"
                                             + DataManagerConstants.TRASH_HOME, true);
                                 }
                             };
@@ -301,7 +323,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                     modal.show("Emptying Trash...", true);
                     Context context = Context.getInstance();
                     service.listDir(context.getUser(), context.getProxyFileName(),
-                            DataManagerConstants.ROOT + "/" + DataManagerConstants.TRASH_HOME, 
+                            DataManagerConstants.ROOT + "/" + DataManagerConstants.TRASH_HOME,
                             true, callback);
                 }
             }

@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -48,6 +48,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -55,6 +57,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class FileDownloadServiceImpl extends HttpServlet {
 
+    private static Logger logger = Logger.getLogger(FileDownloadServiceImpl.class);
+    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -72,7 +76,11 @@ public class FileDownloadServiceImpl extends HttpServlet {
                         proxy);
                 Operation operation = client.getOperationById(operationId);
 
-                File file = new File(operation.getDest() + "/" + new File(operation.getSource()).getName());
+                File file = new File(operation.getDest());
+                if (file.isDirectory()) {
+                    file = new File(operation.getDest() + "/" 
+                            + FilenameUtils.getName(operation.getSource()));
+                }
                 int length = 0;
                 ServletOutputStream op = resp.getOutputStream();
                 ServletContext context = getServletConfig().getServletContext();
@@ -94,7 +102,7 @@ public class FileDownloadServiceImpl extends HttpServlet {
                 op.flush();
                 op.close();
             } catch (VletAgentClientException ex) {
-                ex.printStackTrace();
+                logger.error(ex);
             }
         }
     }

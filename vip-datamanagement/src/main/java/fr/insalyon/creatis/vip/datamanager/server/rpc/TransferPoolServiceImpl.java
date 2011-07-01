@@ -43,9 +43,9 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -76,7 +76,7 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
                         source = DataManagerUtil.parseRealDir(op.getSource());
                         dest = "Platform";
                     } else {
-                        source = new File(op.getSource()).getName();
+                        source = FilenameUtils.getName(op.getSource());
                         dest = DataManagerUtil.parseRealDir(op.getDest());
                     }
                     poolOperations.add(new PoolOperation(op.getId(),
@@ -134,8 +134,27 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
                     proxy);
             String remotePath = DataManagerUtil.parseBaseDir(user, remoteFile);
             String localDirPath = serverConfiguration.getDataManagerPath()
-                    + "/downloads" + new File(remotePath).getParent();
+                    + "/downloads" + FilenameUtils.getFullPath(remotePath);
+            
             client.downloadFile(remotePath, localDirPath, userDN);
+
+        } catch (DataManagerException ex) {
+            logger.error(ex);
+        } catch (VletAgentClientException ex) {
+            logger.error(ex);
+        }
+    }
+    
+    public void downloadFolder(String user, String remoteFolder, String userDN, String proxy) {
+        try {
+            VletAgentPoolClient client = new VletAgentPoolClient(
+                    serverConfiguration.getVletagentHost(),
+                    serverConfiguration.getVletagentPort(),
+                    proxy);
+            String remotePath = DataManagerUtil.parseBaseDir(user, remoteFolder);
+            String localDirPath = serverConfiguration.getDataManagerPath()
+                    + "/downloads" + remotePath;
+            client.downloadFolder(remotePath, localDirPath, userDN);
 
         } catch (DataManagerException ex) {
             logger.error(ex);

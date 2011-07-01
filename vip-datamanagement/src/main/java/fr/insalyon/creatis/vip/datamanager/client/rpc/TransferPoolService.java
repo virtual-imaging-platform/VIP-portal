@@ -1,8 +1,8 @@
-    /* Copyright CNRS-CREATIS
+/* Copyright CNRS-CREATIS
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -66,6 +66,8 @@ public interface TransferPoolService extends RemoteService {
     public void removeOperationById(String id, String proxy);
 
     public void downloadFile(String user, String remoteFile, String userDN, String proxy);
+    
+    public void downloadFolder(String user, String remoteFolder, String userDN, String proxy);
     
     public void uploadFile(String user, String remoteFile, String localFile, String userDN, String proxy);
 }
