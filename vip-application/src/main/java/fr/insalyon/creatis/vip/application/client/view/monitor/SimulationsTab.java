@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -168,7 +168,7 @@ public class SimulationsTab extends Tab {
         ListGridField statusField = new ListGridField("status", "Status");
         ListGridField simulationIdField = new ListGridField("simulationId", "Simulation ID");
         ListGridField userField = new ListGridField("user", "User");
-        ListGridField dateField = new ListGridField("date", "Date");
+        ListGridField dateField = FieldUtil.getDateField();
 
         grid.setFields(statusIcoField, applicationField, statusField,
                 simulationIdField, userField, dateField);
