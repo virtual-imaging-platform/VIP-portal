@@ -32,55 +32,39 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client.view.operation;
+package fr.insalyon.creatis.vip.datamanager.client.view;
 
-import com.smartgwt.client.widgets.grid.ListGridRecord;
-import java.util.Date;
+import com.smartgwt.client.widgets.menu.Menu;
+import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.events.ClickHandler;
+import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.datamanager.client.view.operation.manage.ManageOperationsTab;
 
 /**
  *
  * @author Rafael Silva
  */
-public class OperationRecord extends ListGridRecord {
+public class DataManagerMenuItem extends MenuItem {
 
-    public OperationRecord() {
-    }
-    
-    public OperationRecord(String id, String type, String status, String source, 
-            String destination, Date date, String owner) {
+    public DataManagerMenuItem() {
         
-        setAttribute("typeIcon", "icon-" + type.toLowerCase());
-        setAttribute("statusIcon", "icon-" + status.toLowerCase());
-        setAttribute("operationId", id);
-        setAttribute("type", type);
-        setAttribute("status", status);
-        setAttribute("name", source);
-        setAttribute("destination", destination);
-        setAttribute("date", date);
-        setAttribute("owner", owner);
-    }
-    
-    public String getId() {
-        return getAttributeAsString("operationId");
-    }
-    
-    public String getType() {
-        return getAttributeAsString("type");
-    }
-    
-    public String getStatus() {
-        return getAttributeAsString("status");
-    }
-    
-    public String getSource() {
-        return getAttributeAsString("name");
-    }
-    
-    public String getDestination() {
-        return getAttributeAsString("destination");
-    }
-    
-    public String getDate() {
-        return getAttributeAsString("date");
+        this.setTitle("File Transfer");
+        this.setIcon("icon-datamanager.png");
+        
+        // Operations
+        Menu menu = new Menu();
+        
+        MenuItem manageOperations = new MenuItem("Manage Operations");
+        manageOperations.setIcon("icon-datamanager-op.png");
+        manageOperations.addClickHandler(new ClickHandler() {
+
+            public void onClick(MenuItemClickEvent event) {
+                Layout.getInstance().addTab(new ManageOperationsTab());
+            }
+        });
+        
+        menu.setItems(manageOperations);
+        this.setSubmenu(menu);
     }
 }

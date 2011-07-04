@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -38,8 +38,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.system.SystemMenuButton;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerMenuItem;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
 
 /**
@@ -58,6 +60,7 @@ public class DataManagerInit {
     }
 
     private DataManagerInit() {
+               
         FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
@@ -73,5 +76,9 @@ public class DataManagerInit {
         };
         Context context = Context.getInstance();
         service.configureDataManager(context.getUser(), context.getProxyFileName(), callback);
+        
+        if (context.isSystemAdmin()) {
+            SystemMenuButton.getInstance().getMenu().addItem(new DataManagerMenuItem());
+        }
     }
 }

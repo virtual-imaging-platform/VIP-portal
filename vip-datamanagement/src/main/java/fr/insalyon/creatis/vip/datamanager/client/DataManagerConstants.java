@@ -45,4 +45,6 @@ public class DataManagerConstants {
     public final static String TRASH_HOME = "Trash";
     public final static String BIOMED_HOME = "Biomed";
     public final static String GROUP_APPEND = " (group)";
+    // Tab Identifications
+    public final static String MANAGE_OPERATIONS_TAB = "manage-operations-tab";
 }

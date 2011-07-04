@@ -59,15 +59,21 @@ public interface TransferPoolService extends RemoteService {
         }
     }
 
+    public List<PoolOperation> getOperations(String proxy);
+    
     public List<PoolOperation> getOperations(String userDN, String proxy);
 
     public PoolOperation getOperationById(String id, String proxy);
 
     public void removeOperationById(String id, String proxy);
+    
+    public void removeOperations(List<String> ids, String proxy);
 
     public void downloadFile(String user, String remoteFile, String userDN, String proxy);
     
     public void downloadFolder(String user, String remoteFolder, String userDN, String proxy);
     
     public void uploadFile(String user, String remoteFile, String localFile, String userDN, String proxy);
+    
+    public void clearDeleteOperations(String proxy);
 }

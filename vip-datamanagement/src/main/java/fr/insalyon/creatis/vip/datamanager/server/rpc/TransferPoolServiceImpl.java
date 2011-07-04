@@ -57,6 +57,46 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
     private static Logger logger = Logger.getLogger(TransferPoolServiceImpl.class);
     private ServerConfiguration serverConfiguration = ServerConfiguration.getInstance();
 
+    public List<PoolOperation> getOperations(String proxy) {
+
+        try {
+            VletAgentPoolClient client = new VletAgentPoolClient(
+                    serverConfiguration.getVletagentHost(),
+                    serverConfiguration.getVletagentPort(),
+                    proxy);
+
+            List<Operation> operationsList = client.getAllOperations();
+            List<PoolOperation> poolOperations = new ArrayList<PoolOperation>();
+
+            for (Operation op : operationsList) {
+                String source = "";
+                String dest = "";
+                if (op.getType() == Operation.Type.Download) {
+                    source = DataManagerUtil.parseRealDir(op.getSource());
+                    dest = "Platform";
+                } else if (op.getType() == Operation.Type.Delete) {
+                    source = DataManagerUtil.parseRealDir(op.getSource());
+                } else {
+                    source = FilenameUtils.getName(op.getSource());
+                    dest = DataManagerUtil.parseRealDir(op.getDest());
+                }
+                String user = op.getUser().substring(op.getUser().lastIndexOf("CN=") 
+                        + 3, op.getUser().length());
+                poolOperations.add(new PoolOperation(op.getId(),
+                        op.getRegistration(), source, dest,
+                        op.getType().name(), op.getStatus().name(), user));
+            }
+
+            return poolOperations;
+
+        } catch (DataManagerException ex) {
+            logger.error(ex);
+        } catch (VletAgentClientException ex) {
+            logger.error(ex);
+        }
+        return null;
+    }
+
     public List<PoolOperation> getOperations(String userDN, String proxy) {
 
         try {
@@ -80,7 +120,7 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
                         dest = DataManagerUtil.parseRealDir(op.getDest());
                     }
                     poolOperations.add(new PoolOperation(op.getId(),
-                            op.getRegistration(), source, dest, 
+                            op.getRegistration(), source, dest,
                             op.getType().name(), op.getStatus().name(), op.getUser()));
                 }
             }
@@ -113,6 +153,22 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
         return null;
     }
 
+    public void removeOperations(List<String> ids, String proxy) {
+        try {
+            VletAgentPoolClient client = new VletAgentPoolClient(
+                    serverConfiguration.getVletagentHost(),
+                    serverConfiguration.getVletagentPort(),
+                    proxy);
+
+            for (String id : ids) {
+                client.removeOperationById(id);
+            }
+
+        } catch (VletAgentClientException ex) {
+            logger.error(ex);
+        }
+    }
+
     public void removeOperationById(String id, String proxy) {
         try {
             VletAgentPoolClient client = new VletAgentPoolClient(
@@ -135,7 +191,7 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
             String remotePath = DataManagerUtil.parseBaseDir(user, remoteFile);
             String localDirPath = serverConfiguration.getDataManagerPath()
                     + "/downloads" + FilenameUtils.getFullPath(remotePath);
-            
+
             client.downloadFile(remotePath, localDirPath, userDN);
 
         } catch (DataManagerException ex) {
@@ -144,7 +200,7 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
             logger.error(ex);
         }
     }
-    
+
     public void downloadFolder(String user, String remoteFolder, String userDN, String proxy) {
         try {
             VletAgentPoolClient client = new VletAgentPoolClient(
@@ -165,6 +221,7 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
 
     public void uploadFile(String user, String remoteFile, String localFile,
             String userDN, String proxy) {
+
         try {
             VletAgentPoolClient client = new VletAgentPoolClient(
                     serverConfiguration.getVletagentHost(),
@@ -178,6 +235,21 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
 
         } catch (DataManagerException ex) {
             logger.error(ex);
+        } catch (VletAgentClientException ex) {
+            logger.error(ex);
+        }
+    }
+
+    public void clearDeleteOperations(String proxy) {
+
+        try {
+            VletAgentPoolClient client = new VletAgentPoolClient(
+                    serverConfiguration.getVletagentHost(),
+                    serverConfiguration.getVletagentPort(),
+                    proxy);
+
+            client.clearDeleteOperations();
+
         } catch (VletAgentClientException ex) {
             logger.error(ex);
         }
