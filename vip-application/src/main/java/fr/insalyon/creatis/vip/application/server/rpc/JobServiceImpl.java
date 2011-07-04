@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -48,6 +48,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -55,6 +56,8 @@ import java.util.Map;
  */
 public class JobServiceImpl extends RemoteServiceServlet implements JobService {
 
+    private static Logger logger = Logger.getLogger(JobServiceImpl.class);
+    
     public Map<String, Integer> getStatusMap(String workflowID) {
         try {
             return DAOFactory.getDAOFactory().getJobDAO(workflowID).getStatusMap();
@@ -90,9 +93,9 @@ public class JobServiceImpl extends RemoteServiceServlet implements JobService {
             return sb.toString();
 
         } catch (IOException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
+            return null;
         }
-        return null;
     }
 
     public List<String> getExecutionPerNumberOfJobs(String workflowID, int binSize) {
@@ -139,7 +142,6 @@ public class JobServiceImpl extends RemoteServiceServlet implements JobService {
         try {
             DAOFactory.getDAOFactory().getJobDAO(workflowID).sendSignal(jobID, status);
         } catch (DAOException ex) {
-            ex.printStackTrace();
         }
     }
 }

@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -45,9 +45,10 @@ public class JobRecord extends ListGridRecord {
     public JobRecord() {
     }
 
-    public JobRecord(String jobID, String status, String command, String fileName, 
-            int exitCode, String siteName, String nodeName, String parameters) {
-        
+    public JobRecord(String jobID, String status, String command, String fileName,
+            int exitCode, String siteName, String nodeName, String parameters,
+            int minorStatus) {
+
         setAttribute("jobID", jobID);
         setAttribute("status", status);
         setAttribute("command", command);
@@ -55,9 +56,9 @@ public class JobRecord extends ListGridRecord {
         setAttribute("exitCode", exitCode);
         setAttribute("siteName", siteName);
         setAttribute("nodeName", nodeName);
-        setAttribute("parameters", "Parameters: <br />" 
-                + parameters.replaceAll(" ",  "<br />") + "<br />");
-        setMinorStatus(status, exitCode);
+        setAttribute("parameters", "Parameters: <br />"
+                + parameters.replaceAll(" ", "<br />") + "<br />");
+        setMinorStatus(status, exitCode, minorStatus);
     }
 
     public String getCommand() {
@@ -87,16 +88,16 @@ public class JobRecord extends ListGridRecord {
     public String getStatus() {
         return getAttributeAsString("status");
     }
-   
+
     public String getMinorStatus() {
         return getAttributeAsString("minorStatus");
     }
-    
+
     public String getParameters() {
         return getAttributeAsString("parameters");
     }
-    
-    private void setMinorStatus(String status, int exitCode) {
+
+    private void setMinorStatus(String status, int exitCode, int minorStatus) {
         if (status.equals("COMPLETED") || status.equals("ERROR")) {
             switch (exitCode) {
                 case 0:
@@ -116,6 +117,27 @@ public class JobRecord extends ListGridRecord {
                     break;
                 default:
                     setAttribute("minorStatus", "Retrieving Status");
+            }
+
+        } else {
+            switch (minorStatus) {
+                case 1:
+                    setAttribute("minorStatus", "Job Set Up");
+                    break;
+                case 2:
+                    setAttribute("minorStatus", "Downloading Background Script");
+                    break;
+                case 3:
+                    setAttribute("minorStatus", "Downloading Inputs");
+                    break;
+                case 4:
+                    setAttribute("minorStatus", "Application Execution");
+                    break;
+                case 5:
+                    setAttribute("minorStatus", "Uploading Results");
+                    break;
+                default:
+                    setAttribute("minorStatus", "");
             }
         }
     }

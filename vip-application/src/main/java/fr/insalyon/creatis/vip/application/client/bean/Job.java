@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -50,12 +50,14 @@ public class Job implements IsSerializable {
     private String command;
     private String fileName;
     private String parameters;
+    private int minorStatus;
 
     public Job() {
     }
 
     public Job(String id, String status, String command, String fileName,
-            int exitCode, String siteName, String nodeName, String parameters) {
+            int exitCode, String siteName, String nodeName, String parameters,
+            int minorStatus) {
 
         this.id = id;
         this.status = status;
@@ -65,6 +67,7 @@ public class Job implements IsSerializable {
         this.siteName = siteName;
         this.nodeName = nodeName;
         this.parameters = parameters;
+        this.minorStatus = minorStatus;
     }
 
     public String getCommand() {
@@ -121,5 +124,13 @@ public class Job implements IsSerializable {
 
     public String getParameters() {
         return parameters;
+    }
+
+    public int getMinorStatus() {
+        return minorStatus;
+    }
+
+    public void setMinorStatus(int minorStatus) {
+        this.minorStatus = minorStatus;
     }
 }

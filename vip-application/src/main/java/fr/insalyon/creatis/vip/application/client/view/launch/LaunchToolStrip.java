@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -39,6 +39,8 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.core.client.rpc.ApplicationService;
@@ -64,13 +66,9 @@ public class LaunchToolStrip extends ToolStrip {
 
         simulatorItem = new SelectItem(applicationClass);
         simulatorItem.setWidth(300);
+        simulatorItem.addChangedHandler(new ChangedHandler() {
 
-        this.addFormItem(simulatorItem);
-
-        ToolStripButton createButton = new ToolStripButton("Create");
-        createButton.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
+            public void onChanged(ChangedEvent event) {
                 String simulationName = simulatorItem.getValueAsString();
                 if (simulationName != null && !simulationName.isEmpty()) {
                     LaunchTab launchTab = (LaunchTab) Layout.getInstance().
@@ -79,16 +77,17 @@ public class LaunchToolStrip extends ToolStrip {
                 }
             }
         });
-        this.addButton(createButton);
-        
+
+        this.addFormItem(simulatorItem);
+
         saveInputButton = new ToolStripButton("Save Inputs");
         saveInputButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                
+
                 LaunchTab launchTab = (LaunchTab) Layout.getInstance().
-                            getTab("launch-" + applicationClass.toLowerCase() + "-tab");
-                new SaveInputWindow(applicationClass, simulatorItem.getValueAsString(), 
+                        getTab("launch-" + applicationClass.toLowerCase() + "-tab");
+                new SaveInputWindow(applicationClass, simulatorItem.getValueAsString(),
                         launchTab.getParametersMap()).show();
             }
         });
@@ -98,7 +97,7 @@ public class LaunchToolStrip extends ToolStrip {
 
         loadData();
     }
-    
+
     /**
      * Activates the save input's button
      */

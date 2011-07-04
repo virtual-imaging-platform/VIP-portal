@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -132,7 +132,8 @@ public class JobsStackSection extends SectionStackSection {
                 for (Job j : result) {
                     dataList.add(new JobRecord(j.getId(), j.getStatus(),
                             j.getCommand(), j.getFileName(), j.getExitCode(),
-                            j.getSiteName(), j.getNodeName(), j.getParameters()));
+                            j.getSiteName(), j.getNodeName(), j.getParameters(),
+                            j.getMinorStatus()));
                 }
                 grid.setData(dataList.toArray(new JobRecord[]{}));
             }

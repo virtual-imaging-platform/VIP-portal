@@ -55,8 +55,6 @@ public interface JobDAO {
      */
     public List<Job> getJobs() throws DAOException;
 
-    public Job getJob(String jobID);
-
     public List<String> getExecutionPerNumberOfJobs(int binSize);
 
     public List<String> getDownloadPerNumberOfJobs(int binSize);

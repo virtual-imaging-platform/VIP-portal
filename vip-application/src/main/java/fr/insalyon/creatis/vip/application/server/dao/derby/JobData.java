@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -56,6 +57,7 @@ import java.util.Map;
  */
 public class JobData implements JobDAO {
 
+    private static Logger logger = Logger.getLogger(JobData.class);
     private Connection connection;
 
     public JobData(String workflowID) throws DAOException {
@@ -83,6 +85,7 @@ public class JobData implements JobDAO {
             return statusMap;
 
         } catch (SQLException ex) {
+            logger.error(ex);
             throw new DAOException(ex);
         }
     }
@@ -95,53 +98,52 @@ public class JobData implements JobDAO {
     public List<Job> getJobs() throws DAOException {
         try {
             List<Job> jobsList = new ArrayList<Job>();
-            Statement stat = connection.createStatement();
-            ResultSet rs = stat.executeQuery("SELECT "
-                    + "id, status, command, file_name, exit_code, node_site, "
-                    + "node_name, parameters FROM jobs "
-                    + "ORDER BY command, id");
 
+            ResultSet rs = connection.getMetaData().getTables(null, null, "%", null);
+            boolean hasMinorStatus = false;
             while (rs.next()) {
-                jobsList.add(new Job(rs.getString("id"), rs.getString("status"),
-                        rs.getString("command"), rs.getString("file_name"),
-                        rs.getInt("exit_code"), rs.getString("node_site"),
-                        rs.getString("node_name"), rs.getString("parameters")));
+                if (rs.getString(3).toLowerCase().equals("jobsminorstatus")) {
+                    hasMinorStatus = true;
+                }
             }
 
+            Statement stat = connection.createStatement();
+            if (hasMinorStatus) {
+                rs = stat.executeQuery("SELECT "
+                        + "j.id, status, command, file_name, exit_code, node_site, "
+                        + "node_name, parameters, COALESCE(ms, -1) AS ms "
+                        + "FROM Jobs AS j LEFT JOIN "
+                        + "(SELECT id, max(minor_status) AS ms "
+                        + "FROM JobsMinorStatus GROUP BY id) AS jm "
+                        + "ON j.id = jm.id ORDER BY j.id");
+
+                while (rs.next()) {
+                    jobsList.add(new Job(rs.getString("id"), rs.getString("status"),
+                            rs.getString("command"), rs.getString("file_name"),
+                            rs.getInt("exit_code"), rs.getString("node_site"),
+                            rs.getString("node_name"), rs.getString("parameters"),
+                            rs.getInt("ms")));
+                }
+
+            } else {
+                rs = stat.executeQuery("SELECT "
+                        + "id, status, command, file_name, exit_code, node_site, "
+                        + "node_name, parameters FROM jobs "
+                        + "ORDER BY command, id");
+
+                while (rs.next()) {
+                    jobsList.add(new Job(rs.getString("id"), rs.getString("status"),
+                            rs.getString("command"), rs.getString("file_name"),
+                            rs.getInt("exit_code"), rs.getString("node_site"),
+                            rs.getString("node_name"), rs.getString("parameters"), -1));
+                }
+            }
             return jobsList;
 
         } catch (SQLException ex) {
+            logger.error(ex);
             throw new DAOException(ex);
         }
-    }
-
-    /**
-     * 
-     * @param jobID
-     * @return
-     */
-    public Job getJob(String jobID) {
-        try {
-            PreparedStatement stat = connection.prepareStatement("SELECT "
-                    + "id, status, command, file_name, exit_code, node_site, "
-                    + "node_name, parameters "
-                    + "FROM jobs WHERE id = ?");
-
-            stat.setString(1, jobID);
-            ResultSet rs = stat.executeQuery();
-
-            rs.next();
-            Job job = new Job(rs.getString("id"), rs.getString("status"),
-                    rs.getString("command"), rs.getString("file_name"),
-                    rs.getInt("exit_code"), rs.getString("node_site"),
-                    rs.getString("node_name"), rs.getString("parameters"));
-
-            return job;
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return null;
     }
 
     /**
@@ -172,7 +174,7 @@ public class JobData implements JobDAO {
             return list;
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return null;
     }
@@ -205,7 +207,7 @@ public class JobData implements JobDAO {
             return list;
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return null;
     }
@@ -237,7 +239,7 @@ public class JobData implements JobDAO {
             return list;
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return null;
     }
@@ -268,26 +270,27 @@ public class JobData implements JobDAO {
             return list;
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return null;
     }
 
-    public Connection getConnection(){
-        return this.connection;
-    }
-    
     public void sendSignal(String jobID, ApplicationConstants.JobStatus status) throws DAOException {
         try {
             PreparedStatement ps = connection.prepareStatement(
                     "UPDATE Jobs SET status = ? WHERE id = ?");
-            
+
             ps.setString(1, status.name());
             ps.setString(2, jobID);
             ps.executeUpdate();
-            
+
         } catch (SQLException ex) {
+            logger.error(ex);
             throw new DAOException(ex);
         }
+    }
+
+    public Connection getConnection() {
+        return this.connection;
     }
 }
