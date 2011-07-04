@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.application.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import java.util.Date;
 
 /**
  *
@@ -45,21 +46,21 @@ public class Workflow implements IsSerializable {
     private String application;
     private String workflowID;
     private String userName;
-    private String date;
+    private Date date;
     private String majorStatus;
     private String minorStatus;
 
     public Workflow() {
     }
 
-    public Workflow(String application, String workflowID, String userName, String date) {
+    public Workflow(String application, String workflowID, String userName, Date date) {
         this.application = application;
         this.workflowID = workflowID;
         this.userName = userName;
         this.date = date;
     }
 
-    public Workflow(String application, String workflowID, String userName, String date, String majorStatus, String minorStatus) {
+    public Workflow(String application, String workflowID, String userName, Date date, String majorStatus, String minorStatus) {
         this.application = application;
         this.workflowID = workflowID;
         this.userName = userName;
@@ -72,7 +73,7 @@ public class Workflow implements IsSerializable {
         return application;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 

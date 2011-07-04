@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.application.client.view.monitor.record;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import java.util.Date;
 
 /**
  *
@@ -46,60 +47,36 @@ public class SimulationRecord extends ListGridRecord {
     }
 
     public SimulationRecord(String application, String status,
-            String simulationId, String user, String date) {
+            String simulationId, String user, Date date) {
         
-        setStatusIco(status);
-        setApplication(application);
-        setStatus(status);
-        setSimulationId(simulationId);
-        setUser(user);
-        setDate(date);
-    }
-
-    public void setStatusIco(String status) {
         setAttribute("statusIco", "ico_" + status.toLowerCase());
+        setAttribute("application", application);
+        setAttribute("status", status);
+        setAttribute("simulationId", simulationId);
+        setAttribute("user", user);
+        setAttribute("date", date);
     }
-    
+   
     public String getStatusIco() {
         return getAttributeAsString("statusIco");
-    }
-
-    public void setApplication(String application) {
-        setAttribute("application", application);
     }
     
     public String getApplication() {
         return getAttributeAsString("application");
     }
-
-    public void setStatus(String status) {
-        setAttribute("status", status);
-    }
     
     public String getStatus() {
         return getAttributeAsString("status");
     }
-
-    public void setSimulationId(String simulationId) {
-        setAttribute("simulationId", simulationId);
-    }
-    
+   
     public String getSimulationId() {
         return getAttributeAsString("simulationId");
     }
-
-    public void setUser(String user) {
-        setAttribute("user", user);
-    }
-    
+   
     public String getUser() {
         return getAttributeAsString("user");
     }
-
-    public void setDate(String date) {
-        setAttribute("date", date);
-    }
-    
+   
     public String getDate() {
         return getAttributeAsString("date");
     }

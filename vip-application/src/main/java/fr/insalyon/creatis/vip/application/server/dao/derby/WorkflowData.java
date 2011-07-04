@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -44,7 +44,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -146,14 +145,13 @@ public class WorkflowData implements WorkflowDAO {
      */
     private List<Workflow> processResultSet(ResultSet rs) throws SQLException {
         List<Workflow> workflows = new ArrayList<Workflow>();
-        SimpleDateFormat f = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 
         while (rs.next()) {
             workflows.add(new Workflow(
                     rs.getString("application"),
                     rs.getString("id"),
                     rs.getString("username"),
-                    f.format(rs.getTimestamp("launched")),
+                    new Date(rs.getTimestamp("launched").getTime()),
                     rs.getString("status"),
                     rs.getString("minor_status")));
         }
