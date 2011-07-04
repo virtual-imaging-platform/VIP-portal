@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -36,9 +36,13 @@ package fr.insalyon.creatis.vip.application.client;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.menu.Menu;
+import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.events.CloseClickHandler;
 import com.smartgwt.client.widgets.tab.events.TabCloseClickEvent;
+import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
+import fr.insalyon.creatis.vip.application.client.view.ApplicationMenu;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.core.client.bean.AppClass;
 import fr.insalyon.creatis.vip.core.client.rpc.ApplicationService;
@@ -56,6 +60,8 @@ import java.util.List;
 public class ApplicationInit {
 
     private static ApplicationInit instance;
+    private ToolStripMenuButton applications;
+    private Menu appsMenu;
 
     public static ApplicationInit getInstance() {
         if (instance == null) {
@@ -76,7 +82,7 @@ public class ApplicationInit {
                 }
             }
         });
-        
+
         // Load application menus
         loadApplicationMenus();
     }
@@ -92,14 +98,31 @@ public class ApplicationInit {
             public void onSuccess(List<AppClass> result) {
                 for (AppClass appClass : result) {
                     String[] appGroups = appClass.getGroups().toArray(new String[]{});
-                    if (Context.getInstance().hasGroupAccess(appGroups)) {
+
+                    if (Context.getInstance().isSystemAdmin()) {
+                        MenuItem item = new MenuItem(appClass.getName());
+                        item.setSubmenu(new ApplicationMenu(appClass.getName(),
+                                Context.getInstance().isGroupAdmin(appGroups)));
+                        appsMenu.addItem(item);
+
+                    } else if (Context.getInstance().hasGroupAccess(appGroups)) {
                         MainToolStrip.getInstance().addMenuButton(
                                 new ApplicationMenuButton(appClass.getName(),
                                 Context.getInstance().isGroupAdmin(appGroups)));
                     }
                 }
+                if (Context.getInstance().isSystemAdmin()) {
+                    applications.setMenu(appsMenu);
+                    MainToolStrip.getInstance().addMenuButton(applications);
+                }
             }
         };
+        if (Context.getInstance().isSystemAdmin()) {
+            applications = new ToolStripMenuButton("Applications");
+            appsMenu = new Menu();
+            appsMenu.setShowShadow(true);
+            appsMenu.setShadowDepth(3);
+        }
         service.getClasses(callback);
     }
 }

@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -34,16 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.client.view;
 
-import com.smartgwt.client.widgets.menu.Menu;
-import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.MenuItemSeparator;
-import com.smartgwt.client.widgets.menu.events.ClickHandler;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
-import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
-import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationsTab;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.system.application.application.ManageApplicationsTab;
 
 /**
  *
@@ -52,46 +43,8 @@ import fr.insalyon.creatis.vip.core.client.view.system.application.application.M
 public class ApplicationMenuButton extends ToolStripMenuButton {
 
     public ApplicationMenuButton(final String applicationClass, final boolean isGroupAdmin) {
+        
         this.setTitle(applicationClass);
-        
-        Menu menu = new Menu();
-        menu.setShowShadow(true);
-        menu.setShadowDepth(3);
-        
-        MenuItem launchItem = new MenuItem("Launch " + applicationClass);
-        launchItem.setIcon("icon-launch.png");
-        launchItem.addClickHandler(new ClickHandler() {
-
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new LaunchTab(applicationClass));
-            }
-        });
-        
-        MenuItem monitorItem = new MenuItem("Monitor " + applicationClass);
-        monitorItem.setIcon("icon-simulation-monitor.png");
-        monitorItem.addClickHandler(new ClickHandler() {
-
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new SimulationsTab(isGroupAdmin));
-            }
-        });
-        
-        if (isGroupAdmin) {
-            MenuItem manageItem = new MenuItem("Manage " + applicationClass);
-            manageItem.setIcon("icon-simulation-manage.png");
-            manageItem.addClickHandler(new ClickHandler() {
-
-                public void onClick(MenuItemClickEvent event) {
-                    Layout.getInstance().addTab(new ManageApplicationsTab(applicationClass));
-                }
-            });
-            
-            MenuItemSeparator separator = new MenuItemSeparator();
-            menu.setItems(launchItem, monitorItem, separator, manageItem);
-            
-        } else {
-            menu.setItems(launchItem, monitorItem);
-        }
-        this.setMenu(menu);
+        this.setMenu(new ApplicationMenu(applicationClass, isGroupAdmin));
     }
 }
