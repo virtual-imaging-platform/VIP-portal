@@ -77,7 +77,7 @@ public class OperationLayout extends VLayout {
 
     private OperationLayout() {
 
-        this.setWidth(400);
+        this.setWidth(550);
         this.setHeight100();
         this.setOverflow(Overflow.AUTO);
 
@@ -127,8 +127,9 @@ public class OperationLayout extends VLayout {
             }
         });
         ListGridField nameField = new ListGridField("name", "Name");
+        ListGridField dateField = FieldUtil.getDateField();
 
-        grid.setFields(iconField, statusField, nameField);
+        grid.setFields(iconField, statusField, nameField, dateField);
 
         grid.addCellContextClickHandler(new CellContextClickHandler() {
 
