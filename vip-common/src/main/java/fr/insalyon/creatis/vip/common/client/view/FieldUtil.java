@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.common.client.view;
 
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.DateDisplayFormat;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.widgets.grid.ListGridField;
 
@@ -58,5 +59,17 @@ public class FieldUtil {
         iconField.setImageWidth(12);
         iconField.setImageHeight(12);
         return iconField;
+    }
+    
+    /**
+     * Gets a ListGridField configured to display dates.
+     * 
+     * @return List grid field
+     */
+    public static ListGridField getDateField() {
+        ListGridField dateField = new ListGridField("date", "Date", 120);
+        dateField.setType(ListGridFieldType.DATE);
+        dateField.setDateFormatter(DateDisplayFormat.TOUSSHORTDATETIME);
+        return dateField;
     }
 }
