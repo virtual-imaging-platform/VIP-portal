@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>fr.insalyon.creatis</groupId>
+        <artifactId>vip</artifactId>
+        <version>0.4</version>
+        <relativePath>..</relativePath>
+    </parent>
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip-application</artifactId>
     <packaging>jar</packaging>
-    <version>0.3.1</version>
+    <version>${vip.application.version}</version>
     <name>VIP-Application</name>
     <dependencies>
         
@@ -18,23 +24,30 @@
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-common</artifactId>
-            <version>0.3.1</version>
+            <version>${vip.common.version}</version>
             <scope>provided</scope>
         </dependency>
         
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-core</artifactId>
-            <version>0.3.1</version>
+            <version>${vip.core.version}</version>
             <scope>provided</scope>
         </dependency>
         
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-datamanager</artifactId>
-            <version>0.3.1</version>
+            <version>${vip.datamanager.version}</version>
             <scope>provided</scope>
         </dependency>
+        
+<!--        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-provenance</artifactId>
+            <version>${vip.provenance.version}</version>
+            <scope>provided</scope>
+        </dependency>-->
                         
         <dependency>
             <groupId>com.rednels.ofcgwt</groupId>
