@@ -10,12 +10,14 @@
     <properties>
         <vip.common.version>0.4</vip.common.version>
         <vip.core.version>0.4</vip.core.version>
-        <vip.application.version>0.3.2</vip.application.version>
+        <vip.application.version>0.4</vip.application.version>
         <vip.datamanager.version>0.4</vip.datamanager.version>
+        <vip.datamanager-applet.version>0.1</vip.datamanager-applet.version>
         <vip.portal.version>0.4</vip.portal.version>
         <vip.gatelab.version>0.3.1</vip.gatelab.version>
         <vip.simulation-gui.version>0.1</vip.simulation-gui.version>
         <vip.models.version>0.1</vip.models.version>
+        <vip.provenance.version>0.1</vip.provenance.version>
         <vip.physical-properties.version>0.1</vip.physical-properties.version>
     </properties>
     
@@ -51,10 +53,12 @@
         <module>vip-core</module>
         <module>vip-application</module>
         <module>vip-datamanagement</module>
+        <module>vip-datamanager-applet</module>
         <module>vip-gatelab</module>
         <module>vip-portal</module>
         <module>vip-simulation-gui</module>
         <module>vip-models</module>
+<!--        <module>vip-provenance</module>-->
         <module>vip-physical-properties</module>
     </modules>
     
@@ -62,30 +66,30 @@
         <repository>
             <id>creatis-releases</id>
             <name>Creatis Insa Lyon repository [creatis]</name>
-            <url>http://kingkong.grid.creatis.insa-lyon.fr:9007/nexus/content/repositories/releases</url>
+            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/releases</url>
         </repository>
         <repository>
             <id>creatis-thirdparty</id>
             <name>Creatis Insa Lyon repository [creatis]</name>
-            <url>http://kingkong.grid.creatis.insa-lyon.fr:9007/nexus/content/repositories/thirdparty</url>
+            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/thirdparty</url>
         </repository>
     </repositories>
     
     <distributionManagement>
         <repository>
             <id>releases</id>
-            <url>http://kingkong.grid.creatis.insa-lyon.fr:9007/nexus/content/repositories/releases</url>
+            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/releases</url>
         </repository>
         <snapshotRepository>
             <id>snapshots</id>
             <name>Internal Snapshots</name>
-            <url>http://kingkong.grid.creatis.insa-lyon.fr:9007/nexus/content/repositories/snapshots</url>
+            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
     
     <scm>
         <connection>scm:svn:https://svn.creatis.insa-lyon.fr/svn/vip/Portal</connection>
         <developerConnection>scm:svn:https://svn.creatis.insa-lyon.fr/svn/vip/Portal</developerConnection>
-        <url>http://kingkong.grid.creatis.insa-lyon.fr:9002/projects/vip</url>
+        <url>http://vip.creatis.insa-lyon.fr:9002/projects/vip</url>
     </scm>
 </project>
