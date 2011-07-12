@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -53,10 +53,11 @@ import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.application.client.bean.WorkflowInput;
+import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +69,7 @@ import java.util.List;
 public class InputsStackSection extends SectionStackSection {
 
     private String applicationClass;
+    private InputsToolStrip toolStrip;
     private ListGrid grid;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
@@ -81,11 +83,14 @@ public class InputsStackSection extends SectionStackSection {
         this.setResizeable(true);
 
         configureGrid();
+        ModalWindow modal = new ModalWindow(grid);
+        toolStrip = new InputsToolStrip(modal);
 
         VLayout vLayout = new VLayout();
         vLayout.setMaxHeight(400);
         vLayout.setHeight100();
         vLayout.setOverflow(Overflow.AUTO);
+        vLayout.addMember(toolStrip);
         vLayout.addMember(grid);
 
         this.addItem(vLayout);
@@ -196,17 +201,17 @@ public class InputsStackSection extends SectionStackSection {
 
     public void loadData() {
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        AsyncCallback<List<WorkflowInput>> callback = new AsyncCallback<List<WorkflowInput>>() {
+        AsyncCallback<List<SimulationInput>> callback = new AsyncCallback<List<SimulationInput>>() {
 
             public void onFailure(Throwable caught) {
                 SC.warn("Error executing get simulations inputs: " + caught.getMessage());
             }
 
-            public void onSuccess(List<WorkflowInput> result) {
+            public void onSuccess(List<SimulationInput> result) {
 
                 List<InputRecord> dataList = new ArrayList<InputRecord>();
 
-                for (WorkflowInput wi : result) {
+                for (SimulationInput wi : result) {
                     String[] inputs = wi.getInputs().split("--");
                     StringBuilder values = new StringBuilder();
 

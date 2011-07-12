@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -46,15 +46,17 @@ import java.util.Map;
  */
 public class LaunchTab extends Tab {
 
+    private String applicationClass;
+    private SectionStack sectionStack;
     private LaunchStackSection launchSection;
     private LaunchToolStrip launchToolStrip;
     private InputsStackSection inputsSection;
 
     public LaunchTab(String applicationClass) {
 
+        this.applicationClass = applicationClass;
         this.setTitle("Launch " + applicationClass);
         this.setID("launch-" + applicationClass.toLowerCase() + "-tab");
-//        this.setIcon("icon-launch.png");
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
 
@@ -65,14 +67,13 @@ public class LaunchTab extends Tab {
         vLayout.setWidth100();
         vLayout.setHeight100();
 
-        SectionStack sectionStack = new SectionStack();
+        sectionStack = new SectionStack();
         sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
         sectionStack.setAnimateSections(true);
 
         launchSection = new LaunchStackSection(applicationClass);
-        inputsSection = new InputsStackSection(applicationClass);
 
-        sectionStack.setSections(launchSection, inputsSection);
+        sectionStack.setSections(launchSection);
         vLayout.addMember(sectionStack);
 
         this.setPane(vLayout);
@@ -96,5 +97,12 @@ public class LaunchTab extends Tab {
     
     public void loadInputsList() {
         inputsSection.loadData();
+    }
+    
+    public void addInputsSection() {
+        if (inputsSection == null) {
+            inputsSection = new InputsStackSection(applicationClass);
+            sectionStack.addSection(inputsSection);
+        }
     }
 }
