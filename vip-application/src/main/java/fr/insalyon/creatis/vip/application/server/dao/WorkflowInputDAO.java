@@ -35,7 +35,7 @@
 
 package fr.insalyon.creatis.vip.application.server.dao;
 
-import fr.insalyon.creatis.vip.application.client.bean.WorkflowInput;
+import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import java.util.List;
 
@@ -45,13 +45,13 @@ import java.util.List;
  */
 public interface WorkflowInputDAO {
 
-    public String addWorkflowInput(String user, WorkflowInput workflowInput);
+    public String addWorkflowInput(String user, SimulationInput workflowInput);
 
     public void removeWorkflowInput(String user, String inputName);
 
-    public List<WorkflowInput> getWorkflowInputByUser(String user) throws DAOException;
+    public List<SimulationInput> getWorkflowInputByUser(String user) throws DAOException;
     
-    public List<WorkflowInput> getWorkflowInputByUserAndAppName(String user, String appName);
+    public List<SimulationInput> getWorkflowInputByUserAndAppName(String user, String appName);
 
-    public WorkflowInput getWorkflowInputByUserAndName(String user, String name);
+    public SimulationInput getWorkflowInputByUserAndName(String user, String name);
 }

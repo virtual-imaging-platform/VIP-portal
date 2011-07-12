@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -37,7 +37,7 @@ package fr.insalyon.creatis.vip.application.server.dao;
 import fr.insalyon.creatis.vip.application.server.dao.derby.JobData;
 import fr.insalyon.creatis.vip.application.server.dao.derby.NodeData;
 import fr.insalyon.creatis.vip.application.server.dao.derby.WorkflowData;
-import fr.insalyon.creatis.vip.application.server.dao.derby.WorkflowInputData;
+import fr.insalyon.creatis.vip.application.server.dao.h2.WorkflowInputData;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 
 /**
