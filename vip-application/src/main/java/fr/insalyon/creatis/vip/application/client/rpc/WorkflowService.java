@@ -39,7 +39,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.application.client.bean.Workflow;
-import fr.insalyon.creatis.vip.application.client.bean.WorkflowInput;
+import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -87,13 +87,13 @@ public interface WorkflowService extends RemoteService {
 
     public String launchWorkflow(String user, Map<String, String> parameters, String workflowName, String proxyFileName);
 
-    public List<WorkflowInput> getWorkflowsInputByUser(String user);
+    public List<SimulationInput> getWorkflowsInputByUser(String user);
     
-    public List<WorkflowInput> getWorkflowsInputByUserAndAppName(String user, String appName);
+    public List<SimulationInput> getWorkflowsInputByUserAndAppName(String user, String appName);
 
-    public String addWorkflowInput(String user, WorkflowInput workflowInput);
+    public String addWorkflowInput(String user, SimulationInput workflowInput);
 
-    public WorkflowInput getWorkflowInputByUserAndName(String user, String inputName);
+    public SimulationInput getWorkflowInputByUserAndName(String user, String inputName);
 
     public void removeWorkflowInput(String user, String inputName);
 

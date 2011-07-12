@@ -36,7 +36,7 @@ package fr.insalyon.creatis.vip.application.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.application.client.bean.Workflow;
-import fr.insalyon.creatis.vip.application.client.bean.WorkflowInput;
+import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +61,7 @@ public interface WorkflowServiceAsync {
 
     public void getWorkflowInputs(String fileName, AsyncCallback<Map<String, String>> asyncCallback);
 
-    public void addWorkflowInput(String user, WorkflowInput workflowInput, AsyncCallback<String> asyncCallback);
+    public void addWorkflowInput(String user, SimulationInput workflowInput, AsyncCallback<String> asyncCallback);
 
     public void closeConnection(String workflowID, AsyncCallback<Void> asyncCallback);
 
@@ -69,11 +69,11 @@ public interface WorkflowServiceAsync {
 
     public void cleanWorkflow(String workflowID, String userDN, String proxyFileName, AsyncCallback<Void> asyncCallback);
 
-    public void getWorkflowsInputByUser(String user, AsyncCallback<List<WorkflowInput>> asyncCallback);
+    public void getWorkflowsInputByUser(String user, AsyncCallback<List<SimulationInput>> asyncCallback);
     
-    public void getWorkflowsInputByUserAndAppName(String user, String appName, AsyncCallback<List<WorkflowInput>> asyncCallback);
+    public void getWorkflowsInputByUserAndAppName(String user, String appName, AsyncCallback<List<SimulationInput>> asyncCallback);
 
-    public void getWorkflowInputByUserAndName(String user, String inputName, AsyncCallback<WorkflowInput> asyncCallback);
+    public void getWorkflowInputByUserAndName(String user, String inputName, AsyncCallback<SimulationInput> asyncCallback);
 
     public void removeWorkflowInput(String user, String inputName, AsyncCallback<Void> asyncCallback);
 
