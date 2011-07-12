@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,7 +32,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.dao.derby.connection;
+package fr.insalyon.creatis.vip.core.server.dao.h2;
 
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
@@ -48,10 +48,8 @@ import java.sql.Statement;
 public class PlatformConnection {
 
     private static PlatformConnection instance;
-    private final String DRIVER = "org.apache.derby.jdbc.ClientDriver";
-    private final String DBURL = "jdbc:derby://" 
-            + ServerConfiguration.getInstance().getDerbyHost() +  ":"
-            + ServerConfiguration.getInstance().getDerbyPort() + "/";
+    private final String DRIVER = "org.h2.Driver";
+    private final String DBURL = "jdbc:h2:";
     private Connection connection;
 
     public synchronized static PlatformConnection getInstance() throws DAOException {
@@ -71,14 +69,14 @@ public class PlatformConnection {
             Class.forName(DRIVER);
             connection = DriverManager.getConnection(DBURL
                     + ServerConfiguration.getInstance().getConfDirPath()
-                    + "vip.db;create=true");
+                    + "db/vip.db;create=true");
             connection.setAutoCommit(true);
 
         } catch (SQLException ex) {
             try {
                 connection = DriverManager.getConnection(DBURL
                         + ServerConfiguration.getInstance().getConfDirPath()
-                        + "vip.db");
+                        + "db/vip.db");
                 connection.setAutoCommit(true);
 
             } catch (SQLException ex1) {

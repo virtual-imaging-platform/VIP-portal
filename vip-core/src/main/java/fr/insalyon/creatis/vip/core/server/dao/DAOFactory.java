@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -42,14 +42,14 @@ import fr.insalyon.creatis.vip.common.server.dao.DAOException;
  */
 public abstract class DAOFactory {
 
-    public static final int DERBY = 1;
-    public static int factory = DERBY;
+    public static final int H2 = 1;
+    public static int factory = H2;
 
     public static DAOFactory getDAOFactory() {
 
         switch (factory) {
-            case DERBY:
-                return DerbyDAOFactory.getInstance();
+            case H2:
+                return H2DAOFactory.getInstance();
             default:
                 return null;
         }

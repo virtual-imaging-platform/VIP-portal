@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -35,29 +35,29 @@
 package fr.insalyon.creatis.vip.core.server.dao;
 
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.derby.ApplicationData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.ClassData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.GroupData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.NewsData;
-import fr.insalyon.creatis.vip.core.server.dao.derby.UserData;
+import fr.insalyon.creatis.vip.core.server.dao.h2.ApplicationData;
+import fr.insalyon.creatis.vip.core.server.dao.h2.ClassData;
+import fr.insalyon.creatis.vip.core.server.dao.h2.GroupData;
+import fr.insalyon.creatis.vip.core.server.dao.h2.NewsData;
+import fr.insalyon.creatis.vip.core.server.dao.h2.UserData;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DerbyDAOFactory extends DAOFactory {
+public class H2DAOFactory extends DAOFactory {
 
     private static DAOFactory instance;
 
     // Singleton
     protected static DAOFactory getInstance() {
         if (instance == null) {
-            instance = new DerbyDAOFactory();
+            instance = new H2DAOFactory();
         }
         return instance;
     }
 
-    private DerbyDAOFactory() {
+    private H2DAOFactory() {
     }
 
     @Override

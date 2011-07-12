@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,11 +32,10 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.dao.derby;
+package fr.insalyon.creatis.vip.core.server.dao.h2;
 
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
-import fr.insalyon.creatis.vip.core.server.dao.derby.connection.PlatformConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
