@@ -37,7 +37,7 @@ package fr.insalyon.creatis.vip.application.server.rpc;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Workflow;
-import fr.insalyon.creatis.vip.application.client.bean.WorkflowInput;
+import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputParser;
@@ -220,7 +220,7 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         }
     }
 
-    public String addWorkflowInput(String user, WorkflowInput workflowInput) {
+    public String addWorkflowInput(String user, SimulationInput workflowInput) {
         try {
             return DAOFactory.getDAOFactory().getWorkflowInputDAO().addWorkflowInput(user, workflowInput);
         } catch (DAOException ex) {
@@ -228,7 +228,7 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         }
     }
 
-    public List<WorkflowInput> getWorkflowsInputByUser(String user) {
+    public List<SimulationInput> getWorkflowsInputByUser(String user) {
         try {
             return DAOFactory.getDAOFactory().getWorkflowInputDAO().getWorkflowInputByUser(user);
         } catch (DAOException ex) {
@@ -236,7 +236,7 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         }
     }
 
-    public List<WorkflowInput> getWorkflowsInputByUserAndAppName(String user, String appName) {
+    public List<SimulationInput> getWorkflowsInputByUserAndAppName(String user, String appName) {
         try {
             return DAOFactory.getDAOFactory().getWorkflowInputDAO().getWorkflowInputByUserAndAppName(user, appName);
         } catch (DAOException ex) {
@@ -244,7 +244,7 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         }
     }
 
-    public WorkflowInput getWorkflowInputByUserAndName(String user, String inputName) {
+    public SimulationInput getWorkflowInputByUserAndName(String user, String inputName) {
         try {
             return DAOFactory.getDAOFactory().getWorkflowInputDAO().getWorkflowInputByUserAndName(user, inputName);
         } catch (DAOException ex) {
