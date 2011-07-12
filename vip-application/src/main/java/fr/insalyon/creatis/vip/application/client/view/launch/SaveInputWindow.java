@@ -43,7 +43,7 @@ import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
-import fr.insalyon.creatis.vip.application.client.bean.WorkflowInput;
+import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.common.client.view.Context;
@@ -101,7 +101,7 @@ public class SaveInputWindow extends Window {
                         sb.append("--");
                     }
 
-                    WorkflowInput wi = new WorkflowInput(appName,
+                    SimulationInput wi = new SimulationInput(appName,
                             nameItem.getValueAsString(), sb.toString());
 
                     WorkflowServiceAsync service = WorkflowService.Util.getInstance();
