@@ -59,7 +59,7 @@ public class InputsToolStrip extends ToolStrip {
         loadButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                new FileUploadWindow(modal, "local", "inputsComplete").show();
+//                new FileUploadWindow(modal, "local", "inputsComplete").show();
             }
         });
         this.addButton(loadButton);
