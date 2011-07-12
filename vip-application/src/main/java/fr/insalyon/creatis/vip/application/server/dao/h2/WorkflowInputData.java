@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,12 +32,12 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.server.dao.derby;
+package fr.insalyon.creatis.vip.application.server.dao.h2;
 
-import fr.insalyon.creatis.vip.application.client.bean.WorkflowInput;
+import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.server.dao.WorkflowInputDAO;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.derby.connection.PlatformConnection;
+import fr.insalyon.creatis.vip.core.server.dao.h2.PlatformConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -57,30 +57,30 @@ public class WorkflowInputData implements WorkflowInputDAO {
         connection = PlatformConnection.getInstance().getConnection();
     }
 
-    public String addWorkflowInput(String user, WorkflowInput workflowInput) {
+    public String addWorkflowInput(String user, SimulationInput SimulationInput) {
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO WorkflowInput(username, application, name, inputs) "
+                    "INSERT INTO SimulationInput(username, application, name, inputs) "
                     + "VALUES (?, ?, ?, ?)");
 
             ps.setString(1, user);
-            ps.setString(2, workflowInput.getApplication());
-            ps.setString(3, workflowInput.getName());
-            ps.setString(4, workflowInput.getInputs());
+            ps.setString(2, SimulationInput.getApplication());
+            ps.setString(3, SimulationInput.getName());
+            ps.setString(4, SimulationInput.getInputs());
             ps.execute();
 
             return "Input values were succesfully saved!";
 
         } catch (SQLException ex) {
             ex.printStackTrace();
-            return "Error: an entry named \"" + workflowInput.getName() + "\" already exists.";
+            return "Error: an entry named \"" + SimulationInput.getName() + "\" already exists.";
         }
     }
 
     public void removeWorkflowInput(String user, String inputName) {
         try {
             PreparedStatement stat = connection.prepareStatement("DELETE "
-                    + "FROM WorkflowInput WHERE username=? AND name=?");
+                    + "FROM SimulationInput WHERE username=? AND name=?");
 
             stat.setString(1, user);
             stat.setString(2, inputName);
@@ -91,19 +91,19 @@ public class WorkflowInputData implements WorkflowInputDAO {
         }
     }
 
-    public List<WorkflowInput> getWorkflowInputByUser(String user) throws DAOException {
+    public List<SimulationInput> getWorkflowInputByUser(String user) throws DAOException {
         try {
-            List<WorkflowInput> inputs = new ArrayList<WorkflowInput>();
+            List<SimulationInput> inputs = new ArrayList<SimulationInput>();
             PreparedStatement stat = connection.prepareStatement("SELECT "
                     + "application, name, inputs "
-                    + "FROM WorkflowInput WHERE username=? "
+                    + "FROM SimulationInput WHERE username=? "
                     + "ORDER BY application, name");
 
             stat.setString(1, user);
             ResultSet rs = stat.executeQuery();
 
             while (rs.next()) {
-                inputs.add(new WorkflowInput(
+                inputs.add(new SimulationInput(
                         rs.getString("application"),
                         rs.getString("name"),
                         rs.getString("inputs")));
@@ -116,12 +116,12 @@ public class WorkflowInputData implements WorkflowInputDAO {
         }
     }
 
-    public List<WorkflowInput> getWorkflowInputByUserAndAppName(String user, String appName) {
+    public List<SimulationInput> getWorkflowInputByUserAndAppName(String user, String appName) {
         try {
-            List<WorkflowInput> inputs = new ArrayList<WorkflowInput>();
+            List<SimulationInput> inputs = new ArrayList<SimulationInput>();
             PreparedStatement stat = connection.prepareStatement("SELECT "
                     + "username, application, name, inputs "
-                    + "FROM WorkflowInput WHERE username=? AND application=? "
+                    + "FROM SimulationInput WHERE username=? AND application=? "
                     + "ORDER BY name");
 
             stat.setString(1, user);
@@ -129,7 +129,7 @@ public class WorkflowInputData implements WorkflowInputDAO {
             ResultSet rs = stat.executeQuery();
 
             while (rs.next()) {
-                inputs.add(new WorkflowInput(
+                inputs.add(new SimulationInput(
                         rs.getString("application"),
                         rs.getString("name"),
                         rs.getString("inputs")));
@@ -143,11 +143,11 @@ public class WorkflowInputData implements WorkflowInputDAO {
         return null;
     }
 
-    public WorkflowInput getWorkflowInputByUserAndName(String user, String name) {
+    public SimulationInput getWorkflowInputByUserAndName(String user, String name) {
         try {
             PreparedStatement stat = connection.prepareStatement("SELECT "
                     + "username, application, name, inputs "
-                    + "FROM WorkflowInput WHERE username=? AND name=? "
+                    + "FROM SimulationInput WHERE username=? AND name=? "
                     + "ORDER BY name");
 
             stat.setString(1, user);
@@ -155,7 +155,7 @@ public class WorkflowInputData implements WorkflowInputDAO {
             ResultSet rs = stat.executeQuery();
 
             rs.next();
-            return new WorkflowInput(
+            return new SimulationInput(
                     rs.getString("application"),
                     rs.getString("name"),
                     rs.getString("inputs"));
