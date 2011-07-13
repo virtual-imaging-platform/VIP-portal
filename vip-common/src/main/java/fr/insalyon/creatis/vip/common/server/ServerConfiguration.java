@@ -54,9 +54,9 @@ public class ServerConfiguration {
     private String confDirPath = "";
     private String adminDN = "/O=GRID-FR/C=FR/O=CNRS/OU=CREATIS/CN=Rafael Silva";
     private String proxiesDir;
-    // Derby
-    private String derbyHost = "localhost";
-    private int derbyPort = 1527;
+    // H2
+    private String h2Host = "localhost";
+    private int h2Port = 8082;
     // Workflows
     private String workflowsPath = "/var/www/html/workflows";
     private String workflowsDB = "/var/www/workflows.db";
@@ -118,8 +118,8 @@ public class ServerConfiguration {
         try {
             prop.load(new FileInputStream(confFilePath));
 
-            derbyHost = prop.getProperty("derby.host", derbyHost);
-            derbyPort = new Integer(prop.getProperty("derby.port", derbyPort + ""));
+            h2Host = prop.getProperty("h2.host", h2Host);
+            h2Port = new Integer(prop.getProperty("h2.port", h2Port + ""));
             workflowsPath = prop.getProperty("workflows.directory", workflowsPath);
             workflowsDB = prop.getProperty("workflows.db.name", workflowsDB);
             workflowsHost = prop.getProperty("workflows.db.host", workflowsHost);
@@ -150,8 +150,8 @@ public class ServerConfiguration {
 
             logger.info("Configuration file not found. Creating default file.");
             try {
-                prop.setProperty("derby.host", derbyHost);
-                prop.setProperty("derby.port", derbyPort + "");
+                prop.setProperty("h2.host", h2Host);
+                prop.setProperty("h2.port", h2Port + "");
                 prop.setProperty("workflows.directory", workflowsPath);
                 prop.setProperty("workflows.db.name", workflowsDB);
                 prop.setProperty("workflows.db.host", workflowsHost);
@@ -277,12 +277,12 @@ public class ServerConfiguration {
         return dataManagerGroupsHome;
     }
 
-    public String getDerbyHost() {
-        return derbyHost;
+    public String getH2Host() {
+        return h2Host;
     }
 
-    public int getDerbyPort() {
-        return derbyPort;
+    public int geth2Port() {
+        return h2Port;
     }
 
     public String getProvenanceDBPass() {
