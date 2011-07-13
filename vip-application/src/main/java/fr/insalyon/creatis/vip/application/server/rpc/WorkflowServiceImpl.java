@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -58,6 +58,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -65,6 +66,8 @@ import java.util.Map;
  */
 public class WorkflowServiceImpl extends RemoteServiceServlet implements WorkflowService {
 
+    private static final Logger logger = Logger.getLogger(WorkflowServiceImpl.class);
+    
     @Override
     public List<Workflow> getWorkflows(String user, String application, String status, Date startDate, Date endDate) {
         try {
@@ -95,7 +98,6 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
                             workflow.setMajorStatus(ApplicationConstants.WorkflowStatus.Killed.name());
                         }
                     } catch (BusinessException ex) {
-                        ex.printStackTrace();
                     }
                 }
             }
@@ -128,7 +130,7 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
             return sb.toString();
 
         } catch (IOException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return null;
     }
@@ -198,7 +200,6 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
             return business.getWorkflowSources(user, proxyFileName, workflowName);
 
         } catch (BusinessException ex) {
-            ex.printStackTrace();
             return null;
         }
     }
@@ -215,7 +216,6 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
             return business.launch(user, parametersMap, workflowName, proxyFileName);
 
         } catch (BusinessException ex) {
-            ex.printStackTrace();
             return null;
         }
     }
@@ -256,7 +256,6 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         try {
             DAOFactory.getDAOFactory().getWorkflowInputDAO().removeWorkflowInput(user, inputName);
         } catch (DAOException ex) {
-            ex.printStackTrace();
         }
     }
 
@@ -264,7 +263,6 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         try {
             JobsConnection.getInstance().close(ServerConfiguration.getInstance().getWorkflowsPath() + "/" + workflowID + "/jobs.db");
         } catch (DAOException ex) {
-            ex.printStackTrace();
         }
     }
 
@@ -282,7 +280,6 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
             WorkflowBusiness business = new WorkflowBusiness();
             business.kill(workflowID);
         } catch (BusinessException ex) {
-            ex.printStackTrace();
         }
     }
 
@@ -291,7 +288,6 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
             WorkflowBusiness business = new WorkflowBusiness();
             business.clean(workflowID, userDN, proxyFileName);
         } catch (BusinessException ex) {
-            ex.printStackTrace();
         }
     }
 
@@ -300,7 +296,6 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
             WorkflowBusiness business = new WorkflowBusiness();
             business.purge(workflowID);
         } catch (BusinessException ex) {
-            ex.printStackTrace();
         }
     }
 }

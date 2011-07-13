@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -59,6 +59,7 @@ import java.util.List;
 import java.util.Map;
 import javax.xml.rpc.ServiceException;
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
 /**
@@ -67,6 +68,8 @@ import org.xml.sax.SAXException;
  */
 public class WorkflowBusiness {
 
+    private static final Logger logger = Logger.getLogger(WorkflowBusiness.class);
+    
     /**
      * 
      * @param user
@@ -102,16 +105,22 @@ public class WorkflowBusiness {
             }
 
         } catch (DataManagerException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         } catch (URISyntaxException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         } catch (IOException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         } catch (SAXException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         } catch (VletAgentClientException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         } catch (DAOException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -175,12 +184,16 @@ public class WorkflowBusiness {
             return ws;
 
         } catch (DataManagerException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         } catch (RemoteException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         } catch (ServiceException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         } catch (DAOException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -198,8 +211,10 @@ public class WorkflowBusiness {
             moteur.kill(workflowID);
 
         } catch (RemoteException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         } catch (ServiceException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -240,8 +255,10 @@ public class WorkflowBusiness {
             workflowDAO.cleanWorkflow(workflowID);
 
         } catch (DAOException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         } catch (VletAgentClientException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -262,6 +279,7 @@ public class WorkflowBusiness {
             FileUtils.deleteQuietly(workflowDir);
 
         } catch (DAOException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -279,8 +297,10 @@ public class WorkflowBusiness {
             return moteur.getStatus(workflowID);
 
         } catch (RemoteException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         } catch (ServiceException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         }
     }

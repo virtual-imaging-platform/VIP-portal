@@ -44,6 +44,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -51,16 +52,17 @@ import java.util.List;
  */
 public class WorkflowInputData implements WorkflowInputDAO {
 
+    private static final Logger logger = Logger.getLogger(WorkflowInputData.class);
     private Connection connection;
 
     public WorkflowInputData() throws DAOException {
         connection = PlatformConnection.getInstance().getConnection();
     }
 
-    public String addWorkflowInput(String user, SimulationInput SimulationInput) {
+    public String addWorkflowInput(String user, SimulationInput SimulationInput) throws DAOException {
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO SimulationInput(username, application, name, inputs) "
+                    "INSERT INTO WorkflowInput(username, application, name, inputs) "
                     + "VALUES (?, ?, ?, ?)");
 
             ps.setString(1, user);
@@ -72,22 +74,23 @@ public class WorkflowInputData implements WorkflowInputDAO {
             return "Input values were succesfully saved!";
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
-            return "Error: an entry named \"" + SimulationInput.getName() + "\" already exists.";
+            logger.error(ex);
+            throw new DAOException("Error: an entry named \"" + SimulationInput.getName() + "\" already exists.");
         }
     }
 
-    public void removeWorkflowInput(String user, String inputName) {
+    public void removeWorkflowInput(String user, String inputName) throws DAOException {
         try {
             PreparedStatement stat = connection.prepareStatement("DELETE "
-                    + "FROM SimulationInput WHERE username=? AND name=?");
+                    + "FROM WorkflowInput WHERE username=? AND name=?");
 
             stat.setString(1, user);
             stat.setString(2, inputName);
             stat.execute();
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
+            throw new DAOException(ex);
         }
     }
 
@@ -96,7 +99,7 @@ public class WorkflowInputData implements WorkflowInputDAO {
             List<SimulationInput> inputs = new ArrayList<SimulationInput>();
             PreparedStatement stat = connection.prepareStatement("SELECT "
                     + "application, name, inputs "
-                    + "FROM SimulationInput WHERE username=? "
+                    + "FROM WorkflowInput WHERE username=? "
                     + "ORDER BY application, name");
 
             stat.setString(1, user);
@@ -112,16 +115,17 @@ public class WorkflowInputData implements WorkflowInputDAO {
             return inputs;
 
         } catch (SQLException ex) {
+            logger.error(ex);
             throw new DAOException(ex);
         }
     }
 
-    public List<SimulationInput> getWorkflowInputByUserAndAppName(String user, String appName) {
+    public List<SimulationInput> getWorkflowInputByUserAndAppName(String user, String appName) throws DAOException {
         try {
             List<SimulationInput> inputs = new ArrayList<SimulationInput>();
             PreparedStatement stat = connection.prepareStatement("SELECT "
                     + "username, application, name, inputs "
-                    + "FROM SimulationInput WHERE username=? AND application=? "
+                    + "FROM WorkflowInput WHERE username=? AND application=? "
                     + "ORDER BY name");
 
             stat.setString(1, user);
@@ -138,16 +142,16 @@ public class WorkflowInputData implements WorkflowInputDAO {
             return inputs;
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
+            throw new DAOException(ex);
         }
-        return null;
     }
 
-    public SimulationInput getWorkflowInputByUserAndName(String user, String name) {
+    public SimulationInput getWorkflowInputByUserAndName(String user, String name) throws DAOException {
         try {
             PreparedStatement stat = connection.prepareStatement("SELECT "
                     + "username, application, name, inputs "
-                    + "FROM SimulationInput WHERE username=? AND name=? "
+                    + "FROM WorkflowInput WHERE username=? AND name=? "
                     + "ORDER BY name");
 
             stat.setString(1, user);
@@ -161,8 +165,8 @@ public class WorkflowInputData implements WorkflowInputDAO {
                     rs.getString("inputs"));
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
+            throw new DAOException(ex);
         }
-        return null;
     }
 }

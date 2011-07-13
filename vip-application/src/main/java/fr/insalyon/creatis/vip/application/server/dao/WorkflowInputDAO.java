@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -45,13 +45,13 @@ import java.util.List;
  */
 public interface WorkflowInputDAO {
 
-    public String addWorkflowInput(String user, SimulationInput workflowInput);
+    public String addWorkflowInput(String user, SimulationInput workflowInput) throws DAOException;
 
-    public void removeWorkflowInput(String user, String inputName);
+    public void removeWorkflowInput(String user, String inputName) throws DAOException;
 
     public List<SimulationInput> getWorkflowInputByUser(String user) throws DAOException;
     
-    public List<SimulationInput> getWorkflowInputByUserAndAppName(String user, String appName);
+    public List<SimulationInput> getWorkflowInputByUserAndAppName(String user, String appName) throws DAOException;
 
-    public SimulationInput getWorkflowInputByUserAndName(String user, String name);
+    public SimulationInput getWorkflowInputByUserAndName(String user, String name) throws DAOException;
 }
