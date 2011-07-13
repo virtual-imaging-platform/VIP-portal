@@ -47,9 +47,6 @@ import java.sql.Statement;
 public class PlatformConnection {
 
     private static PlatformConnection instance;
-    private final String DRIVER = "org.h2.Driver";
-    private final String DBURL = "jdbc:h2:tcp://"
-            + ServerConfiguration.getInstance().getH2Host() + "/";
     private Connection connection;
 
     public synchronized static PlatformConnection getInstance() throws DAOException {
@@ -60,33 +57,8 @@ public class PlatformConnection {
     }
 
     private PlatformConnection() throws DAOException {
-//        connect();
-//        createTables();
     }
 
-//    private void connect() throws DAOException {
-//        connection = getServletContext().getAttribute("connection");
-//        try {
-//            Class.forName(DRIVER);
-//            connection = DriverManager.getConnection(DBURL
-//                    + ServerConfiguration.getInstance().getConfDirPath()
-//                    + "db/vip.db;create=true");
-//            connection.setAutoCommit(true);
-//
-//        } catch (SQLException ex) {
-//            try {
-//                connection = DriverManager.getConnection(DBURL
-//                        + ServerConfiguration.getInstance().getConfDirPath()
-//                        + "db/vip.db");
-//                connection.setAutoCommit(true);
-//
-//            } catch (SQLException ex1) {
-//                throw new DAOException(ex1);
-//            }
-//        } catch (ClassNotFoundException ex) {
-//            throw new DAOException(ex);
-//        }
-//    }
     public void createTables() {
         try {
             Statement stat = connection.createStatement();
