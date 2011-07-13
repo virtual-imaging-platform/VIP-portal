@@ -49,7 +49,7 @@ public class PlatformConnection {
 
     private static PlatformConnection instance;
     private final String DRIVER = "org.h2.Driver";
-    private final String DBURL = "jdbc:h2:";
+    private final String DBURL = "jdbc:h2:tcp://localhost";
     private Connection connection;
 
     public synchronized static PlatformConnection getInstance() throws DAOException {
