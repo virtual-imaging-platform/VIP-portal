@@ -4,7 +4,7 @@
     
     <context-param>
         <param-name>db.url</param-name>
-        <param-value>jdbc:h2:tcp://localhost/~/.platform/db/vip.db</param-value>
+        <param-value>jdbc:h2:tcp://localhost/~/.platform/db/vip.db;DB_CLOSE_ON_EXIT=FALSE</param-value>
     </context-param>
     <context-param>
         <param-name>db.user</param-name>
@@ -62,14 +62,14 @@
     <!-- End Core Module -->
     
     <!-- Provenance Module -->
-<!--    <servlet>
+    <servlet>
         <servlet-name>ProvenanceService</servlet-name>
         <servlet-class>fr.insalyon.creatis.vip.provenance.server.rpc.ProvenanceServiceImpl</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>ProvenanceService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/provenanceservice</url-pattern>
-    </servlet-mapping>-->
+    </servlet-mapping>
     <!-- End Provenance Module -->
     
     <!-- Data Manager Module -->
