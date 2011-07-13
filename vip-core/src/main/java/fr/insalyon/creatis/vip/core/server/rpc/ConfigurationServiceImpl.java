@@ -42,6 +42,8 @@ import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOFactory;
+import fr.insalyon.creatis.vip.core.server.dao.h2.PlatformConnection;
+import java.sql.Connection;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
@@ -57,11 +59,18 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
     public Configuration loadConfiguration() {
 
         try {
+            PlatformConnection.getInstance().setConnection(
+                    (Connection) getServletContext().getAttribute("connection"));
+            PlatformConnection.getInstance().createTables();
+            
             HttpServletRequest request = this.getThreadLocalRequest();
             Object object = request.getAttribute("javax.servlet.request.X509Certificate");
             ConfigurationBusiness business = new ConfigurationBusiness();
             return business.loadConfiguration(object);
             
+        } catch (DAOException ex) {
+            logger.error(ex);
+            return null;
         } catch (BusinessException ex) {
             logger.error(ex);
             return null;

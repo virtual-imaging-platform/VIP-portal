@@ -37,7 +37,6 @@ package fr.insalyon.creatis.vip.core.server.dao.h2;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -49,8 +48,8 @@ public class PlatformConnection {
 
     private static PlatformConnection instance;
     private final String DRIVER = "org.h2.Driver";
-    private final String DBURL = "jdbc:h2:tcp://" 
-            + ServerConfiguration.getInstance().getH2Host();
+    private final String DBURL = "jdbc:h2:tcp://"
+            + ServerConfiguration.getInstance().getH2Host() + "/";
     private Connection connection;
 
     public synchronized static PlatformConnection getInstance() throws DAOException {
@@ -61,34 +60,34 @@ public class PlatformConnection {
     }
 
     private PlatformConnection() throws DAOException {
-        connect();
-        createTables();
+//        connect();
+//        createTables();
     }
 
-    private void connect() throws DAOException {
-        try {
-            Class.forName(DRIVER);
-            connection = DriverManager.getConnection(DBURL
-                    + ServerConfiguration.getInstance().getConfDirPath()
-                    + "db/vip.db;create=true");
-            connection.setAutoCommit(true);
-
-        } catch (SQLException ex) {
-            try {
-                connection = DriverManager.getConnection(DBURL
-                        + ServerConfiguration.getInstance().getConfDirPath()
-                        + "db/vip.db");
-                connection.setAutoCommit(true);
-
-            } catch (SQLException ex1) {
-                throw new DAOException(ex1);
-            }
-        } catch (ClassNotFoundException ex) {
-            throw new DAOException(ex);
-        }
-    }
-
-    private void createTables() {
+//    private void connect() throws DAOException {
+//        connection = getServletContext().getAttribute("connection");
+//        try {
+//            Class.forName(DRIVER);
+//            connection = DriverManager.getConnection(DBURL
+//                    + ServerConfiguration.getInstance().getConfDirPath()
+//                    + "db/vip.db;create=true");
+//            connection.setAutoCommit(true);
+//
+//        } catch (SQLException ex) {
+//            try {
+//                connection = DriverManager.getConnection(DBURL
+//                        + ServerConfiguration.getInstance().getConfDirPath()
+//                        + "db/vip.db");
+//                connection.setAutoCommit(true);
+//
+//            } catch (SQLException ex1) {
+//                throw new DAOException(ex1);
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            throw new DAOException(ex);
+//        }
+//    }
+    public void createTables() {
         try {
             Statement stat = connection.createStatement();
             stat.executeUpdate("CREATE TABLE WorkflowInput ("
@@ -210,7 +209,7 @@ public class PlatformConnection {
         } catch (SQLException ex) {
             System.out.println("Table PlatformGroupsClasses already created!");
         }
-        
+
         try {
             Statement stat = connection.createStatement();
             stat.executeUpdate("CREATE TABLE PlatformNews ("
@@ -362,5 +361,9 @@ public class PlatformConnection {
 
     public Connection getConnection() {
         return connection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
     }
 }
