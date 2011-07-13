@@ -49,7 +49,8 @@ public class PlatformConnection {
 
     private static PlatformConnection instance;
     private final String DRIVER = "org.h2.Driver";
-    private final String DBURL = "jdbc:h2:tcp://localhost";
+    private final String DBURL = "jdbc:h2:tcp://" 
+            + ServerConfiguration.getInstance().getH2Host();
     private Connection connection;
 
     public synchronized static PlatformConnection getInstance() throws DAOException {
