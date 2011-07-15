@@ -37,6 +37,11 @@ package fr.insalyon.creatis.vip.common.client.view;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DateDisplayFormat;
 import com.smartgwt.client.types.ListGridFieldType;
+import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.FormItem;
+import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 
 /**
@@ -44,7 +49,7 @@ import com.smartgwt.client.widgets.grid.ListGridField;
  * @author Rafael Silva
  */
 public class FieldUtil {
-    
+
     /**
      * Gets a ListGridField configured to display an icon.
      * 
@@ -60,7 +65,7 @@ public class FieldUtil {
         iconField.setImageHeight(12);
         return iconField;
     }
-    
+
     /**
      * Gets a ListGridField configured to display dates.
      * 
@@ -71,5 +76,46 @@ public class FieldUtil {
         dateField.setType(ListGridFieldType.DATE);
         dateField.setDateFormatter(DateDisplayFormat.TOUSSHORTDATETIME);
         return dateField;
+    }
+
+    /**
+     * Gets a DynamicForm with the specified list of items set.
+     * 
+     * @param items List of form items
+     * @return 
+     */
+    public static DynamicForm getForm(FormItem... items) {
+        DynamicForm form = new DynamicForm();
+        form.setFields(items);
+        return form;
+    }
+
+    /**
+     * Gets a TextItem configured according to the provided parameters.
+     * 
+     * @param size Field size
+     * @param showTitle If title should be displayed
+     * @param title Title to be displayed
+     * @param keyPressFilter Regular expression filter
+     * @return 
+     */
+    public static TextItem getTextItem(int size, boolean showTitle, String title,
+            String keyPressFilter) {
+
+        TextItem textItem = new TextItem();
+        textItem.setTitle(title);
+        textItem.setShowTitle(showTitle);
+        textItem.setWidth(size);
+        textItem.setKeyPressFilter(keyPressFilter);
+        textItem.setAlign(Alignment.LEFT);
+        textItem.setRequired(true);
+        textItem.addChangedHandler(new ChangedHandler() {
+
+            public void onChanged(ChangedEvent event) {
+                event.getItem().validate();
+            }
+        });
+
+        return textItem;
     }
 }
