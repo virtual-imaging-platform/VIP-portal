@@ -40,7 +40,6 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
-import fr.insalyon.creatis.vip.datamanager.client.view.browser.FileUploadWindow;
 
 /**
  *

@@ -38,7 +38,6 @@ import com.smartgwt.client.types.VisibilityMode;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import java.util.Map;
 
 /**
  *
@@ -52,21 +51,18 @@ public class LaunchTab extends Tab {
     private LaunchToolStrip launchToolStrip;
     private InputsStackSection inputsSection;
 
-    public LaunchTab(String applicationClass, String applicationName){
-       initTab("Launch " + applicationName,applicationClass,false,"launch-" + applicationName.toLowerCase() + "-tab");
-       createSimulation(applicationName,applicationName);
+    public LaunchTab(String applicationClass, String applicationName) {
+        initTab("Launch " + applicationName, applicationClass, false, 
+                "launch-" + applicationName.toLowerCase() + "-tab");
+        createSimulation(applicationName);
     }
-    
-    public LaunchTab(String applicationClass) {
 
-       initTab("Launch " + applicationClass,applicationClass,true,"launch-" + applicationClass.toLowerCase() + "-tab");
+    public LaunchTab(String applicationClass) {
+        initTab("Launch " + applicationClass, applicationClass, true, 
+                "launch-" + applicationClass.toLowerCase() + "-tab");
     }
-    
-    public void setInputValue(String inputName, String value){
-    //to be implemented by Rafael Ferreira da Silva
-    }
-    
-    private void initTab(String title, String applicationClass, boolean showToolStrip, String id){
+
+    private void initTab(String title, String applicationClass, boolean showToolStrip, String id) {
         this.applicationClass = applicationClass;
         this.setTitle(title);
         this.setID(id);
@@ -74,9 +70,11 @@ public class LaunchTab extends Tab {
         this.setAttribute("paneMargin", 0);
 
         launchToolStrip = new LaunchToolStrip(applicationClass);
-                
+
         VLayout vLayout = new VLayout();
-        if(showToolStrip) vLayout.addMember(launchToolStrip);
+        if (showToolStrip) {
+            vLayout.addMember(launchToolStrip);
+        }
         vLayout.setWidth100();
         vLayout.setHeight100();
 
@@ -91,34 +89,37 @@ public class LaunchTab extends Tab {
 
         this.setPane(vLayout);
     }
-    
+
     public void createSimulation(String simulationName) {
         launchSection.load(simulationName);
     }
-     public void createSimulation(String simulationName,String id) {
-        launchSection.load(simulationName,id);
-    }
-    
+
     public void loadInput(String values) {
         launchSection.loadInput(values);
     }
-    
-    public Map<String, String> getParametersMap() {
-        return launchSection.getParametersMap();
-    }
-    
-    public void enableSaveButton() {
-        launchToolStrip.enableSaveInputButton();
-    }
-    
+
     public void loadInputsList() {
         inputsSection.loadData();
     }
-    
+
     public void addInputsSection() {
         if (inputsSection == null) {
             inputsSection = new InputsStackSection(applicationClass);
             sectionStack.addSection(inputsSection);
         }
+    }
+
+    /**
+     * Sets a value to an input name. The value should be in the following forms:
+     * 
+     * For single list field: a string
+     * For multiple list fields: strings separated by '; '
+     * For ranges: an string like 'Start: 0 - Stop: 0 - Step: 0'
+     * 
+     * @param inputName
+     * @param value 
+     */
+    public void setInputValue(String inputName, String value) {
+        launchSection.setInputValue(inputName, value);
     }
 }

@@ -36,8 +36,6 @@ package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
@@ -74,40 +72,15 @@ public class LaunchToolStrip extends ToolStrip {
                     LaunchTab launchTab = (LaunchTab) Layout.getInstance().
                             getTab("launch-" + applicationClass.toLowerCase() + "-tab");
                     launchTab.createSimulation(simulationName);
+                    launchTab.addInputsSection();
                 }
             }
         });
-
         this.addFormItem(simulatorItem);
-
-        saveInputButton = new ToolStripButton("Save Inputs");
-        saveInputButton.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-
-                LaunchTab launchTab = (LaunchTab) Layout.getInstance().
-                        getTab("launch-" + applicationClass.toLowerCase() + "-tab");
-                new SaveInputWindow(applicationClass, simulatorItem.getValueAsString(),
-                        launchTab.getParametersMap()).show();
-            }
-        });
-        saveInputButton.setDisabled(true);
-        this.addSeparator();
-        this.addButton(saveInputButton);
-
+        
         loadData();
     }
 
-    /**
-     * Activates the save input's button
-     */
-    public void enableSaveInputButton() {
-        saveInputButton.setDisabled(false);
-    }
-
-    /**
-     * 
-     */
     private void loadData() {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {

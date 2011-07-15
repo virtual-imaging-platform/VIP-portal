@@ -1,0 +1,215 @@
+/* Copyright CNRS-CREATIS
+ *
+ * Rafael Silva
+ * rafael.silva@creatis.insa-lyon.fr
+ * http://www.rafaelsilva.com
+ *
+ * This software is a grid-enabled data-driven workflow manager and editor.
+ *
+ * This software is governed by the CeCILL  license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * "http://www.cecill.info".
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.application.client.view.launch;
+
+import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
+import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ *
+ * @author Rafael Silva
+ */
+public class InputHLayout extends VLayout {
+
+    private static enum InputType {
+
+        List, Range;
+
+        public static String[] valuesAsString() {
+            List<String> list = new ArrayList<String>();
+            for (InputType type : values()) {
+                list.add(type.name());
+            }
+            return list.toArray(new String[]{});
+        }
+    };
+    private String name;
+    private HLayout hLayout;
+    private SelectItem selectItem;
+    // List items
+    private VLayout listLayout;
+    // Range Items
+    private TextItem startItem;
+    private TextItem stopItem;
+    private TextItem stepItem;
+    private DynamicForm startItemForm;
+    private DynamicForm stopItemForm;
+    private DynamicForm stepItemForm;
+
+    public InputHLayout(String name) {
+
+        this.name = name;
+
+        hLayout = new HLayout(3);
+
+        Label label = new Label(name + ":");
+        label.setWidth(150);
+        label.setAlign(Alignment.RIGHT);
+        hLayout.addMember(label);
+
+        configureTypeSelectItem(name);
+        hLayout.addMember(FieldUtil.getForm(selectItem));
+
+        // List
+        listLayout = new VLayout();
+        listLayout.addMember(new ListHLayout(listLayout, true));
+        hLayout.addMember(listLayout);
+
+        // Range
+        startItem = FieldUtil.getTextItem(70, true, "Start", "[0-9.]");
+        stopItem = FieldUtil.getTextItem(70, true, "Stop", "[0-9.]");
+        stepItem = FieldUtil.getTextItem(70, true, "Step", "[0-9.]");
+        startItemForm = FieldUtil.getForm(startItem);
+        stopItemForm = FieldUtil.getForm(stopItem);
+        stepItemForm = FieldUtil.getForm(stepItem);
+
+        this.addMember(hLayout);
+    }
+
+    private void configureTypeSelectItem(String title) {
+        selectItem = new SelectItem();
+        selectItem.setShowTitle(false);
+        selectItem.setValueMap(InputType.valuesAsString());
+        selectItem.setValue(InputType.List.name());
+        selectItem.setWidth(70);
+        selectItem.addChangedHandler(new ChangedHandler() {
+
+            public void onChanged(ChangedEvent event) {
+                InputType type = InputType.valueOf((String) event.getValue());
+                if (type == InputType.List) {
+                    setList();
+                } else {
+                    setRange();
+                }
+            }
+        });
+    }
+
+    private void setList() {
+        hLayout.addMember(listLayout);
+        hLayout.removeMember(startItemForm);
+        hLayout.removeMember(stopItemForm);
+        hLayout.removeMember(stepItemForm);
+    }
+
+    private void setRange() {
+        hLayout.removeMember(listLayout);
+        hLayout.addMember(startItemForm);
+        hLayout.addMember(stopItemForm);
+        hLayout.addMember(stepItemForm);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean validate() {
+
+        InputType type = InputType.valueOf(selectItem.getValueAsString());
+        if (type == InputType.List) {
+            boolean valid = true;
+            for (Canvas canvas : listLayout.getMembers()) {
+                if (canvas instanceof ListHLayout) {
+                    ListHLayout item = (ListHLayout) canvas;
+                    if (!item.validate()) {
+                        valid = false;
+                    }
+                }
+            }
+            return valid;
+
+        } else {
+            return startItem.validate() && stopItem.validate() && stepItem.validate();
+        }
+    }
+
+    public String getValue() {
+
+        InputType type = InputType.valueOf(selectItem.getValueAsString());
+        if (type == InputType.List) {
+            StringBuilder sb = new StringBuilder();
+            for (Canvas canvas : listLayout.getMembers()) {
+                if (canvas instanceof ListHLayout) {
+                    ListHLayout item = (ListHLayout) canvas;
+                    if (sb.length() > 0) {
+                        sb.append("@@");
+                    }
+                    sb.append(item.getValue());
+                }
+            }
+            return sb.toString();
+
+        } else {
+            return startItem.getValueAsString() + "##"
+                    + stopItem.getValueAsString() + "##"
+                    + stepItem.getValueAsString();
+        }
+    }
+
+    public void setValue(String value) {
+
+        if (value.contains("Start: ")) { // Range
+            selectItem.setValue(InputType.Range.name());
+            setRange();
+            String[] v = value.split("[:-]");
+            startItem.setValue(v[1].trim());
+            stopItem.setValue(v[3].trim());
+            stepItem.setValue(v[5].trim());
+        
+        } else { // List
+            selectItem.setValue(InputType.List.name());
+            setList();
+            listLayout.removeMembers(listLayout.getMembers());
+            boolean master = true;
+            for (String v : value.split("; ")) {
+                listLayout.addMember(new ListHLayout(listLayout, master, v));
+                if (master) {
+                    master = false;
+                }
+            }
+        }
+    }
+}

@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -35,28 +35,22 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.FormItemIfFunction;
-import com.smartgwt.client.widgets.form.fields.ButtonItem;
-import com.smartgwt.client.widgets.form.fields.FormItem;
-import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
+import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.datamanager.client.view.selection.PathSelectionWindow;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,31 +58,33 @@ import java.util.Map;
  *
  * @author Rafael Silva
  */
- public class LaunchStackSection extends SectionStackSection {
+public class LaunchStackSection extends SectionStackSection {
 
     private ModalWindow modal;
     private String applicationClass;
     private String simulationName;
+    private VLayout layout;
+    private VLayout formLayout;
     private DynamicForm form;
-    private String tabId;
+
     public LaunchStackSection(String applicationClass) {
 
         this.applicationClass = applicationClass;
 
         this.setShowHeader(false);
-        tabId="launch-" + applicationClass.toLowerCase() + "-tab";
-        VLayout vLayout = new VLayout();
-        vLayout.setHeight100();
-        vLayout.setMargin(10);
-        vLayout.setOverflow(Overflow.AUTO);
+        layout = new VLayout();
+        layout.setWidth100();
+        layout.setHeight100();
+        layout.setPadding(10);
+        layout.setOverflow(Overflow.AUTO);
 
-        form = new DynamicForm();
-        form.setWidth(650);
-        form.setHeight100();
-        vLayout.addMember(form);
+        formLayout = new VLayout(3);
+        formLayout.setWidth100();
+        formLayout.setAutoHeight();
+        layout.addMember(formLayout);
 
-        modal = new ModalWindow(vLayout);
-        this.addItem(vLayout);
+        modal = new ModalWindow(layout);
+        this.addItem(layout);
     }
 
     /**
@@ -100,12 +96,7 @@ import java.util.Map;
         this.simulationName = simulationName;
         loadData();
     }
-    public void load(String simulationName,String id)
-    {
-        this.simulationName = simulationName;
-        this.tabId="launch-" + id.toLowerCase() + "-tab";
-        loadData();
-    }
+
     /**
      * Loads input values from string.
      * 
@@ -117,32 +108,46 @@ import java.util.Map;
 
         for (String input : values.split("<br />")) {
             String[] s = input.split(" = ");
-            String v = s[1] != null ? s[1] : "";
-            valuesMap.put(s[0].replace(" ", "-"), v);
+            valuesMap.put(s[0], s[1] != null ? s[1] : "");
         }
 
-        for (Canvas c : form.getChildren()) {
-            DynamicForm f = (DynamicForm) c;
-            String name = f.getID().substring(0, f.getID().indexOf("-form-l"));
-            name = name.replace(" ", "-");
-            String value = valuesMap.get(name);
+        StringBuilder sb = new StringBuilder();
+        for (Canvas canvas : formLayout.getMembers()) {
+            if (canvas instanceof InputHLayout) {
+                InputHLayout input = (InputHLayout) canvas;
+                String value = valuesMap.get(input.getName());
 
-            if (value != null) {
-                if (value.contains("Start: ")) { // Range
-                    f.getField(name + "-sel-l").setValue("Range");
-                    String[] v = value.split("[:-]");
-                    f.getField(name + "-start-l").setValue(v[1].trim());
-                    f.getField(name + "-stop-l").setValue(v[3].trim());
-                    f.getField(name + "-step-l").setValue(v[5].trim());
-
-                } else { // List
-                    f.getField(name + "-sel-l").setValue("List");
-                    f.getField(name + "-list-l").setValue(value);
+                if (value != null) {
+                    input.setValue(value);
+                } else {
+                    sb.append("Could not find value for parameter \""
+                            + input.getName() + "\"<br />");
                 }
-                f.redraw();
-            } else if (!name.equals("button")) {
-                SC.warn("Could not find value for parameter \"" + name + "\"");
-                return;
+            }
+        }
+        if (sb.length() > 0) {
+            SC.warn(sb.toString());
+        }
+    }
+    
+    /**
+     * Sets a value to an input name. The value should be in the following forms:
+     * 
+     * For single list field: a string
+     * For multiple list fields: strings separated by '; '
+     * For ranges: an string like 'Start: 0 - Stop: 0 - Step: 0'
+     * 
+     * @param inputName
+     * @param value 
+     */
+    public void setInputValue(String inputName, String value) {
+        
+        for (Canvas canvas : formLayout.getMembers()) {
+            if (canvas instanceof InputHLayout) {
+                InputHLayout input = (InputHLayout) canvas;
+                if (input.getName().equals(inputName)) {
+                    input.setValue(value);
+                }
             }
         }
     }
@@ -152,13 +157,10 @@ import java.util.Map;
      */
     private void loadData() {
 
-        for (Canvas c : form.getChildren()) {
-            form.removeChild(c);
-        }
+        formLayout.removeMembers(formLayout.getMembers());
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
-           
 
             public void onFailure(Throwable caught) {
                 modal.hide();
@@ -168,61 +170,35 @@ import java.util.Map;
             public void onSuccess(List<String> result) {
 
                 if (result != null) {
-                    int count = 0;
-
                     for (String source : result) {
-
-                        String name = (simulationName+"-"+source).replace(" ", "-");
-
-                        DynamicForm iForm = new DynamicForm();
-                        iForm.setID(name + "-form-l");
-                        iForm.setPadding(5);
-                        iForm.setTop(count++ * 30);
-                        iForm.setWidth(650);
-                        iForm.setNumCols(10);
-                        iForm.setFixedColWidths(true);
-                        iForm.setColWidths(120, 75, "*", "*", "*", "*", "*", "*", "*", "*");
-
-                        SelectItem selectItem = getTypeSelectItem(name, source);
-                        final TextItem listItem = getTextItem(name, "-list-l", 350, false, "", "List", true, null);
-                        ButtonItem browseItem = getButtonItem(name, "-brow-l", 60, " Browse ", "List");
-                        browseItem.addClickHandler(new ClickHandler() {
-
-                            public void onClick(ClickEvent event) {
-                                new PathSelectionWindow(listItem).show();
-                            }
-                        });
-                        TextItem startItem = getTextItem(name, "-start-l", 70, true, "Start", "Range", false, "[0-9.]");
-                        TextItem stopItem = getTextItem(name, "-stop-l", 70, true, "Stop", "Range", false, "[0-9.]");
-                        TextItem stepItem = getTextItem(name, "-step-l", 70, true, "Step", "Range", false, "[0-9.]");
-
-                        iForm.setFields(selectItem, listItem, browseItem,
-                                startItem, stopItem, stepItem);
-
-                        form.addChild(iForm);
+                        formLayout.addMember(new InputHLayout(source));
                     }
-                    DynamicForm iForm = new DynamicForm();
-                    iForm.setID("button-form-l"+simulationName.replace(" ", "-"));
-                    iForm.setPadding(5);
-                    iForm.setTop(count++ * 30);
-                    iForm.setWidth(650);
-                    
-                    String idLaunchButton="launch-l-"+simulationName.replace(" ", "-");
-                    ButtonItem launchButton = new ButtonItem(idLaunchButton, " Launch ");
-                    launchButton.setWidth(80);
-                    launchButton.setAlign(Alignment.CENTER);
+
+                    HLayout buttonsLayout = new HLayout(5);
+                    buttonsLayout.setAlign(VerticalAlignment.CENTER);
+                    buttonsLayout.setMargin(20);
+                    formLayout.addMember(buttonsLayout);
+
+                    IButton launchButton = new IButton("Launch");
                     launchButton.addClickHandler(new ClickHandler() {
 
                         public void onClick(ClickEvent event) {
-                            launch();
+                            if (validate()) {
+                                launch();
+                            }
                         }
                     });
-                    iForm.setFields(launchButton);
-                    form.addChild(iForm);
-                    
-                    LaunchTab launchTab = (LaunchTab) Layout.getInstance().
-                            getTab(tabId);
-                    launchTab.enableSaveButton();
+                    buttonsLayout.addMember(launchButton);
+
+                    IButton saveButton = new IButton("Save Inputs");
+                    saveButton.addClickHandler(new ClickHandler() {
+
+                        public void onClick(ClickEvent event) {
+                            new SaveInputWindow(applicationClass, simulationName,
+                                    getParametersMap()).show();
+                        }
+                    });
+                    buttonsLayout.addMember(saveButton);
                     modal.hide();
 
                 } else {
@@ -238,95 +214,25 @@ import java.util.Map;
     }
 
     /**
+     * Validates the form before launch a simulation.
      * 
-     * @param name
-     * @param label
-     * @return 
+     * @return Result of the validation
      */
-    private SelectItem getTypeSelectItem(String name, String label) {
-
-        SelectItem selectItem = new SelectItem(name + "-sel-l", label);
-        LinkedHashMap<String, String> selectMap = new LinkedHashMap<String, String>();
-        selectMap.put("List", "List"); //TODO For multiple lists separe by '@@'
-        selectMap.put("Range", "Range");
-//        selectMap.put("Tag", "Tag"); //TODO Handle tags
-        selectItem.setValueMap(selectMap);
-        selectItem.setValue("List");
-        selectItem.setWidth(75);
-        selectItem.setRedrawOnChange(true);
-
-        return selectItem;
+    private boolean validate() {
+        boolean valid = true;
+        for (Canvas canvas : formLayout.getMembers()) {
+            if (canvas instanceof InputHLayout) {
+                InputHLayout input = (InputHLayout) canvas;
+                if (!input.validate()) {
+                    valid = false;
+                }
+            }
+        }
+        return valid;
     }
 
     /**
-     * 
-     * @param name
-     * @param extName
-     * @param size
-     * @param showTitle
-     * @param title
-     * @param optionName
-     * @param visible
-     * @param keyPressFilter
-     * @return 
-     */
-    private TextItem getTextItem(String name, final String extName, int size,
-            boolean showTitle, String title, final String optionName,
-            boolean visible, String keyPressFilter) {
-
-        TextItem textItem = new TextItem(name + extName, title);
-        textItem.setShowTitle(showTitle);
-        textItem.setWidth(size);
-        textItem.setStartRow(false);
-        textItem.setVisible(visible);
-        textItem.setKeyPressFilter(keyPressFilter);
-        textItem.setAlign(Alignment.LEFT);
-
-        textItem.setShowIfCondition(new FormItemIfFunction() {
-
-            public boolean execute(FormItem item, Object value, DynamicForm form) {
-                String name = item.getName().substring(0, item.getName().indexOf(extName));
-                return form.getValue(name + "-sel-l").equals(optionName);
-            }
-        });
-
-        return textItem;
-    }
-
-    /**
-     * 
-     * @param name
-     * @param extName
-     * @param size 
-     * @param title
-     * @param optionName
-     * @return 
-     */
-    private ButtonItem getButtonItem(String name, final String extName, int size,
-            String title, final String optionName) {
-
-        ButtonItem buttonItem = new ButtonItem(name + extName, title);
-        buttonItem.setWidth(size);
-        buttonItem.setStartRow(false);
-        buttonItem.setShowIfCondition(new FormItemIfFunction() {
-
-            public boolean execute(FormItem item, Object value, DynamicForm form) {
-                String name = item.getName().substring(0, item.getName().indexOf(extName));
-                return form.getValue(name + "-sel-l").equals(optionName);
-            }
-        });
-        buttonItem.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-                //TODO Browse window
-            }
-        });
-
-        return buttonItem;
-    }
-
-    /**
-     * Launches a simulation
+     * Launches a simulation.
      */
     private void launch() {
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
@@ -358,24 +264,13 @@ import java.util.Map;
 
         Map<String, String> paramsMap = new HashMap<String, String>();
 
-        for (Canvas c : form.getChildren()) {
-            DynamicForm f = (DynamicForm) c;
-            String name = f.getID().substring(0, f.getID().indexOf("-form-l"));
-
-            if (!name.equals("button")) {
-                String title = f.getField(name + "-sel-l").getTitle();
-
-                if (((SelectItem) f.getField(name + "-sel-l")).getValueAsString().equals("List")) {
-                    paramsMap.put(title,
-                            ((TextItem) f.getField(name + "-list-l")).getValueAsString());
-                } else {
-                    paramsMap.put(title,
-                            ((TextItem) f.getField(name + "-start-l")).getValueAsString() + "##"
-                            + ((TextItem) f.getField(name + "-stop-l")).getValueAsString() + "##"
-                            + ((TextItem) f.getField(name + "-step-l")).getValueAsString());
-                }
+        for (Canvas canvas : formLayout.getMembers()) {
+            if (canvas instanceof InputHLayout) {
+                InputHLayout input = (InputHLayout) canvas;
+                paramsMap.put(input.getName(), input.getValue());
             }
         }
+
         return paramsMap;
     }
 
@@ -410,5 +305,4 @@ import java.util.Map;
     public void setSimulationName(String simulationName) {
         this.simulationName = simulationName;
     }
-    
 }
