@@ -64,18 +64,19 @@ import java.util.Map;
  *
  * @author Rafael Silva
  */
-public class LaunchStackSection extends SectionStackSection {
+ public class LaunchStackSection extends SectionStackSection {
 
     private ModalWindow modal;
     private String applicationClass;
     private String simulationName;
     private DynamicForm form;
-
+    private String tabId;
     public LaunchStackSection(String applicationClass) {
 
         this.applicationClass = applicationClass;
-        this.setShowHeader(false);
 
+        this.setShowHeader(false);
+        tabId="launch-" + applicationClass.toLowerCase() + "-tab";
         VLayout vLayout = new VLayout();
         vLayout.setHeight100();
         vLayout.setMargin(10);
@@ -99,7 +100,12 @@ public class LaunchStackSection extends SectionStackSection {
         this.simulationName = simulationName;
         loadData();
     }
-
+    public void load(String simulationName,String id)
+    {
+        this.simulationName = simulationName;
+        this.tabId="launch-" + id.toLowerCase() + "-tab";
+        loadData();
+    }
     /**
      * Loads input values from string.
      * 
@@ -118,6 +124,7 @@ public class LaunchStackSection extends SectionStackSection {
         for (Canvas c : form.getChildren()) {
             DynamicForm f = (DynamicForm) c;
             String name = f.getID().substring(0, f.getID().indexOf("-form-l"));
+            name = name.replace(" ", "-");
             String value = valuesMap.get(name);
 
             if (value != null) {
@@ -151,6 +158,7 @@ public class LaunchStackSection extends SectionStackSection {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+           
 
             public void onFailure(Throwable caught) {
                 modal.hide();
@@ -164,7 +172,7 @@ public class LaunchStackSection extends SectionStackSection {
 
                     for (String source : result) {
 
-                        String name = source.replace(" ", "-");
+                        String name = (simulationName+"-"+source).replace(" ", "-");
 
                         DynamicForm iForm = new DynamicForm();
                         iForm.setID(name + "-form-l");
@@ -194,12 +202,13 @@ public class LaunchStackSection extends SectionStackSection {
                         form.addChild(iForm);
                     }
                     DynamicForm iForm = new DynamicForm();
-                    iForm.setID("button-form-l");
+                    iForm.setID("button-form-l"+simulationName.replace(" ", "-"));
                     iForm.setPadding(5);
                     iForm.setTop(count++ * 30);
                     iForm.setWidth(650);
-
-                    ButtonItem launchButton = new ButtonItem("launch-l", " Launch ");
+                    
+                    String idLaunchButton="launch-l-"+simulationName.replace(" ", "-");
+                    ButtonItem launchButton = new ButtonItem(idLaunchButton, " Launch ");
                     launchButton.setWidth(80);
                     launchButton.setAlign(Alignment.CENTER);
                     launchButton.addClickHandler(new ClickHandler() {
@@ -212,7 +221,7 @@ public class LaunchStackSection extends SectionStackSection {
                     form.addChild(iForm);
                     
                     LaunchTab launchTab = (LaunchTab) Layout.getInstance().
-                            getTab("launch-" + applicationClass.toLowerCase() + "-tab");
+                            getTab(tabId);
                     launchTab.enableSaveButton();
                     modal.hide();
 
@@ -369,4 +378,37 @@ public class LaunchStackSection extends SectionStackSection {
         }
         return paramsMap;
     }
+
+    public String getApplicationClass() {
+        return applicationClass;
+    }
+
+    public void setApplicationClass(String applicationClass) {
+        this.applicationClass = applicationClass;
+    }
+
+    public DynamicForm getForm() {
+        return form;
+    }
+
+    public void setForm(DynamicForm form) {
+        this.form = form;
+    }
+
+    public ModalWindow getModal() {
+        return modal;
+    }
+
+    public void setModal(ModalWindow modal) {
+        this.modal = modal;
+    }
+
+    public String getSimulationName() {
+        return simulationName;
+    }
+
+    public void setSimulationName(String simulationName) {
+        this.simulationName = simulationName;
+    }
+    
 }

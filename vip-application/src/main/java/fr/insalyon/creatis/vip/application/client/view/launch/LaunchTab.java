@@ -52,18 +52,31 @@ public class LaunchTab extends Tab {
     private LaunchToolStrip launchToolStrip;
     private InputsStackSection inputsSection;
 
+    public LaunchTab(String applicationClass, String applicationName){
+       initTab("Launch " + applicationName,applicationClass,false,"launch-" + applicationName.toLowerCase() + "-tab");
+       createSimulation(applicationName,applicationName);
+    }
+    
     public LaunchTab(String applicationClass) {
 
+       initTab("Launch " + applicationClass,applicationClass,true,"launch-" + applicationClass.toLowerCase() + "-tab");
+    }
+    
+    public void setInputValue(String inputName, String value){
+    //to be implemented by Rafael Ferreira da Silva
+    }
+    
+    private void initTab(String title, String applicationClass, boolean showToolStrip, String id){
         this.applicationClass = applicationClass;
-        this.setTitle("Launch " + applicationClass);
-        this.setID("launch-" + applicationClass.toLowerCase() + "-tab");
+        this.setTitle(title);
+        this.setID(id);
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
 
         launchToolStrip = new LaunchToolStrip(applicationClass);
                 
         VLayout vLayout = new VLayout();
-        vLayout.addMember(launchToolStrip);
+        if(showToolStrip) vLayout.addMember(launchToolStrip);
         vLayout.setWidth100();
         vLayout.setHeight100();
 
@@ -81,6 +94,9 @@ public class LaunchTab extends Tab {
     
     public void createSimulation(String simulationName) {
         launchSection.load(simulationName);
+    }
+     public void createSimulation(String simulationName,String id) {
+        launchSection.load(simulationName,id);
     }
     
     public void loadInput(String values) {
