@@ -74,6 +74,14 @@
     
     <!-- Data Manager Module -->
     <servlet>
+        <servlet-name>DataManagerService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.datamanager.server.rpc.DataManagerServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DataManagerService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/datamanagerservice</url-pattern>
+    </servlet-mapping>
+    <servlet>
         <servlet-name>FileCatalogService</servlet-name>
         <servlet-class>fr.insalyon.creatis.vip.datamanager.server.rpc.FileCatalogServiceImpl</servlet-class>
     </servlet>
