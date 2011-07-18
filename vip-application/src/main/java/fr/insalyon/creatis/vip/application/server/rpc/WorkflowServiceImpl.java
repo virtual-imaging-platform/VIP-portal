@@ -67,7 +67,7 @@ import org.apache.log4j.Logger;
 public class WorkflowServiceImpl extends RemoteServiceServlet implements WorkflowService {
 
     private static final Logger logger = Logger.getLogger(WorkflowServiceImpl.class);
-    
+
     @Override
     public List<Workflow> getWorkflows(String user, String application, String status, Date startDate, Date endDate) {
         try {
@@ -85,15 +85,15 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
                 if (workflow.getMajorStatus().equals(ApplicationConstants.WorkflowStatus.Running.name())) {
                     try {
                         String workflowStatus = business.getStatus(workflow.getWorkflowID());
-                        
+
                         if (workflowStatus.equals(ApplicationConstants.MoteurStatus.COMPLETE.name())) {
-                            workflowDAO.updateStatus(workflow.getWorkflowID(), 
+                            workflowDAO.updateStatus(workflow.getWorkflowID(),
                                     ApplicationConstants.WorkflowStatus.Completed.name());
                             workflow.setMajorStatus(ApplicationConstants.WorkflowStatus.Completed.name());
-                        
-                        } else if (workflowStatus.equals(ApplicationConstants.MoteurStatus.TERMINATED.name()) ||
-                                workflowStatus.contains(ApplicationConstants.MoteurStatus.UNKNOWN.name())) {
-                            workflowDAO.updateStatus(workflow.getWorkflowID(), 
+
+                        } else if (workflowStatus.equals(ApplicationConstants.MoteurStatus.TERMINATED.name())
+                                || workflowStatus.contains(ApplicationConstants.MoteurStatus.UNKNOWN.name())) {
+                            workflowDAO.updateStatus(workflow.getWorkflowID(),
                                     ApplicationConstants.WorkflowStatus.Killed.name());
                             workflow.setMajorStatus(ApplicationConstants.WorkflowStatus.Killed.name());
                         }
@@ -205,7 +205,13 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
     }
 
     public Map<String, String> getWorkflowInputs(String fileName) {
-        return new InputParser().parse(fileName);
+        
+        try {
+            return new InputParser().parse(fileName);
+        
+        } catch (BusinessException ex) {
+            return null;
+        }
     }
 
     public String launchWorkflow(String user, Map<String, String> parametersMap,

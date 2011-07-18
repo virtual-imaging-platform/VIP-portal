@@ -40,12 +40,6 @@ import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.VisibilityMode;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.ButtonItem;
-import com.smartgwt.client.widgets.form.fields.DateItem;
-import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -69,7 +63,6 @@ import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -80,12 +73,6 @@ public class SimulationsTab extends Tab {
 
     protected ModalWindow modal;
     protected ListGrid grid;
-    protected DynamicForm form;
-    protected SelectItem userItem;
-    protected SelectItem simulationItem;
-    protected SelectItem statusItem;
-    protected DateItem startDateItem;
-    protected DateItem endDateItem;
     protected String user = null;
     protected String app = null;
     protected String status = null;
@@ -102,14 +89,12 @@ public class SimulationsTab extends Tab {
         this.groupAdmin = groupAdmin;
         this.setID(application + "-simulations-tab");
         configure();
-        simulationItem.setDisabled(true);
     }
 
     public SimulationsTab(boolean groupAdmin) {
         this.groupAdmin = groupAdmin;
         this.setID("simulations-tab");
         configure();
-        simulationItem.setDisabled(true);
     }
 
     private void configure() {
@@ -119,8 +104,6 @@ public class SimulationsTab extends Tab {
         this.setAttribute("paneMargin", 0);
 
         configureGrid();
-        configureForm();
-
         modal = new ModalWindow(grid);
 
         VLayout vLayout = new VLayout();
@@ -135,9 +118,7 @@ public class SimulationsTab extends Tab {
         gridSection.setShowHeader(false);
         gridSection.addItem(grid);
 
-        searchSection = new SectionStackSection("Search");
-        searchSection.setExpanded(false);
-        searchSection.addItem(form);
+        searchSection = new SearchStackSection(this.getID(), groupAdmin);
 
         sectionStack.setSections(gridSection, searchSection);
         vLayout.addMember(sectionStack);
@@ -149,7 +130,6 @@ public class SimulationsTab extends Tab {
         }
 
         loadData();
-        loadCombosData();
     }
 
     private void configureGrid() {
@@ -179,7 +159,7 @@ public class SimulationsTab extends Tab {
                 event.cancel();
                 String simulationId = event.getRecord().getAttribute("simulationId");
                 String status = event.getRecord().getAttribute("status");
-                new SimulationsContextMenu(modal, simulationId, status, 
+                new SimulationsContextMenu(modal, simulationId, status,
                         groupAdmin).showContextMenu();
             }
         });
@@ -189,76 +169,11 @@ public class SimulationsTab extends Tab {
                 if (event.getColNum() != 1) {
                     String simulationID = event.getRecord().getAttribute("simulationId");
                     String status = event.getRecord().getAttribute("status");
-                    Layout.getInstance().addTab(new SimulationTab(simulationID, 
+                    Layout.getInstance().addTab(new SimulationTab(simulationID,
                             status, groupAdmin));
                 }
             }
         });
-    }
-
-    private void configureForm() {
-        form = new DynamicForm();
-        form.setWidth(500);
-        form.setNumCols(4);
-
-        userItem = new SelectItem("userFilter", "User");
-        simulationItem = new SelectItem("simualtionFilter", "Simulation");
-        statusItem = new SelectItem("statusFilter", "Status");
-
-        startDateItem = new DateItem("startDateFilter", "Start Date");
-        startDateItem.setUseTextField(true);
-
-        endDateItem = new DateItem("endDateFilter", "End Date");
-        endDateItem.setUseTextField(true);
-
-        ButtonItem submitItem = new ButtonItem("submitFilter", " Submit ");
-        submitItem.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-
-                if (Context.getInstance().isSystemAdmin() || groupAdmin) {
-                    String userText = userItem.getValueAsString();
-                    user = userText == null || userText.isEmpty() || userText.equals("All") ? null : userText;
-                }
-
-                if (!simulationItem.isDisabled()) {
-                    String simuText = simulationItem.getValueAsString();
-                    app = simuText == null || simuText.isEmpty() || simuText.equals("All") ? null : simuText;
-                }
-
-                String statusText = statusItem.getValueAsString();
-                status = statusText == null || statusText.isEmpty() || statusText.equals("All") ? null : statusText;
-
-                Date startDateValue = startDateItem.getValueAsDate();
-                startDate = startDateValue == null ? null : startDateValue;
-
-                Date endDateValue = endDateItem.getValueAsDate();
-                endDate = endDateValue == null ? null : endDateValue;
-
-                loadData();
-            }
-        });
-
-        ButtonItem resetItem = new ButtonItem("resetFilter", " Reset ");
-        resetItem.setStartRow(false);
-        resetItem.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-                userItem.setValue("All");
-                simulationItem.setValue("All");
-                statusItem.setValue("All");
-                startDateItem.setValue("");
-                endDateItem.setValue("");
-            }
-        });
-
-        if (Context.getInstance().isSystemAdmin() || groupAdmin) {
-            form.setFields(userItem, startDateItem, simulationItem,
-                    endDateItem, statusItem, submitItem, resetItem);
-        } else {
-            form.setFields(simulationItem, startDateItem,
-                    statusItem, endDateItem, submitItem, resetItem);
-        }
     }
 
     public void loadData() {
@@ -297,46 +212,6 @@ public class SimulationsTab extends Tab {
         Layout.getInstance().setActiveCenterTab(this.getID());
     }
 
-    private void loadCombosData() {
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        final AsyncCallback<List<String>[]> callback = new AsyncCallback<List<String>[]>() {
-
-            public void onFailure(Throwable caught) {
-                SC.warn("Error executing get users and applications lists\n" + caught.getMessage());
-            }
-
-            public void onSuccess(List<String>[] result) {
-                LinkedHashMap<String, String> usersMap = new LinkedHashMap<String, String>();
-                usersMap.put("All", "All");
-                for (String s : result[0]) {
-                    usersMap.put(s, s);
-                }
-                userItem.setValueMap(usersMap);
-                userItem.setValue("All");
-
-                LinkedHashMap<String, String> simulationMap = new LinkedHashMap<String, String>();
-                simulationMap.put("All", "All");
-                for (String s : result[1]) {
-                    simulationMap.put(s, s);
-                }
-                simulationItem.setValueMap(simulationMap);
-                simulationItem.setValue("All");
-
-                LinkedHashMap<String, String> statusMap = new LinkedHashMap<String, String>();
-                statusMap.put("All", "All");
-                statusMap.put("Completed", "Completed");
-                statusMap.put("Running", "Running");
-                statusMap.put("Killed", "Killed");
-                if (Context.getInstance().isSystemAdmin()) {
-                    statusMap.put("Cleaned", "Cleaned");
-                }
-                statusItem.setValueMap(statusMap);
-                statusItem.setValue("All");
-            }
-        };
-        service.getApplicationsAndUsersList(null, callback);
-    }
-
     public ListGridRecord[] getGridSelection() {
         return grid.getSelection();
     }
@@ -347,5 +222,25 @@ public class SimulationsTab extends Tab {
 
     public List<Workflow> getSimulationsList() {
         return simulationsList;
+    }
+
+    public void setApp(String app) {
+        this.app = app;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 }

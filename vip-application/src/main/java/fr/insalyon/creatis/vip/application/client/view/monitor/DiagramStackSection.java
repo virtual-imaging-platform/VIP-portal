@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -48,7 +48,7 @@ public class DiagramStackSection extends SectionStackSection {
     private String simulationID;
     private HTMLPane htmlPane;
     
-    public DiagramStackSection(String simulationID, boolean completed) {
+    public DiagramStackSection(String simulationID) {
         this.simulationID = simulationID;
         this.setTitle("Simulation Diagram");
         this.setCanCollapse(true);

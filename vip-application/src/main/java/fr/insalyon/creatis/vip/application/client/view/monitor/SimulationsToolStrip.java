@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -39,12 +39,8 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.menu.Menu;
-import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
-import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.SimulationRecord;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
@@ -89,16 +85,12 @@ public class SimulationsToolStrip extends ToolStrip {
         });
         this.addButton(searchButton);
 
-        // Actions
-        Menu menu = new Menu();
-        menu.setShowShadow(true);
-        menu.setShadowDepth(3);
+        ToolStripButton killButton = new ToolStripButton();
+        killButton.setIcon("icon-kill.png");
+        killButton.setTitle("Kill Simulations");
+        killButton.addClickHandler(new ClickHandler() {
 
-        MenuItem killItem = new MenuItem("Kill Selected Simulations");
-        killItem.setIcon("icon-kill.png");
-        killItem.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-
-            public void onClick(MenuItemClickEvent event) {
+            public void onClick(ClickEvent event) {
                 SC.confirm("Do you really want to kill the selected running simulations?", new BooleanCallback() {
 
                     public void execute(Boolean value) {
@@ -109,12 +101,14 @@ public class SimulationsToolStrip extends ToolStrip {
                 });
             }
         });
+        this.addButton(killButton);
 
-        MenuItem cleanItem = new MenuItem("Clean Selected Simulations");
-        cleanItem.setIcon("icon-clean.png");
-        cleanItem.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+        ToolStripButton cleanButton = new ToolStripButton();
+        cleanButton.setIcon("icon-clean.png");
+        cleanButton.setTitle("Clean Simulations");
+        cleanButton.addClickHandler(new ClickHandler() {
 
-            public void onClick(MenuItemClickEvent event) {
+            public void onClick(ClickEvent event) {
                 SC.confirm("Do you really want to clean the selected completed/killed simulations?", new BooleanCallback() {
 
                     public void execute(Boolean value) {
@@ -125,32 +119,27 @@ public class SimulationsToolStrip extends ToolStrip {
                 });
             }
         });
-
-        MenuItem purgeItem = new MenuItem("Purge Selected Simulations");
-        purgeItem.setIcon("icon-clear.png");
-        purgeItem.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-
-            public void onClick(MenuItemClickEvent event) {
-                SC.confirm("Do you really want to purge the selected cleaned simulations?", new BooleanCallback() {
-
-                    public void execute(Boolean value) {
-                        if (value != null && value) {
-                            purgeSimulations();
-                        }
-                    }
-                });
-            }
-        });
+        this.addButton(cleanButton);
 
         if (Context.getInstance().isSystemAdmin()) {
-            menu.setItems(killItem, cleanItem, purgeItem);
-        } else {
-            menu.setItems(killItem, cleanItem);
-        }
+            ToolStripButton purgeButton = new ToolStripButton();
+            purgeButton.setIcon("icon-clear.png");
+            purgeButton.setTitle("Purge Simulations");
+            purgeButton.addClickHandler(new ClickHandler() {
 
-        ToolStripMenuButton actionButton = new ToolStripMenuButton("Actions", menu);
-        actionButton.setIcon("icon-action.png");
-        this.addMenuButton(actionButton);
+                public void onClick(ClickEvent event) {
+                    SC.confirm("Do you really want to purge the selected cleaned simulations?", new BooleanCallback() {
+
+                        public void execute(Boolean value) {
+                            if (value != null && value) {
+                                purgeSimulations();
+                            }
+                        }
+                    });
+                }
+            });
+            this.addButton(purgeButton);
+        }
 
         if (Context.getInstance().isSystemAdmin()) {
             ToolStripButton statsButton = new ToolStripButton();

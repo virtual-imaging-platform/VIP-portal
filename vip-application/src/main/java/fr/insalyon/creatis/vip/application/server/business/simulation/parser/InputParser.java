@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -34,10 +34,12 @@
  */
 package fr.insalyon.creatis.vip.application.server.business.simulation.parser;
 
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.log4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -51,6 +53,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class InputParser extends DefaultHandler {
 
+    private static final Logger logger = Logger.getLogger(InputParser.class);
     private XMLReader reader;
     private Map<String, String> inputsMap;
     private String name;
@@ -60,7 +63,7 @@ public class InputParser extends DefaultHandler {
         inputsMap = new HashMap<String, String>();
     }
 
-    public Map<String, String> parse(String fileName) {
+    public Map<String, String> parse(String fileName) throws BusinessException {
         try {
             reader = XMLReaderFactory.createXMLReader();
             reader.setContentHandler(this);
@@ -69,11 +72,12 @@ public class InputParser extends DefaultHandler {
             return inputsMap;
 
         } catch (IOException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
+            throw new BusinessException(ex);
         } catch (SAXException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
+            throw new BusinessException(ex);
         }
-        return null;
     }
 
     @Override
@@ -101,7 +105,7 @@ public class InputParser extends DefaultHandler {
     public void characters(char[] ch, int start, int length) throws SAXException {
         if (value != null) {
             String chars = new String(ch);
-            value += chars.substring(start,start+length);
+            value += chars.substring(start, start + length);
         }
     }
 }

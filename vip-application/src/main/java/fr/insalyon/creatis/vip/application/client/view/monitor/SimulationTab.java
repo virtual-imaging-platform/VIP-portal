@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -44,6 +44,7 @@ import com.smartgwt.client.widgets.tab.events.TabDeselectedHandler;
 import com.smartgwt.client.widgets.tab.events.TabSelectedEvent;
 import com.smartgwt.client.widgets.tab.events.TabSelectedHandler;
 import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.provenance.client.view.application.ProvenanceStackSection;
 
 /**
  *
@@ -59,6 +60,7 @@ public class SimulationTab extends Tab {
     private ChartsStackSection chartsStackSection;
     private DiagramStackSection diagramStackSection;
     private LogsStackSection logsStackSection;
+    private ProvenanceStackSection provenanceStackSection;
 
     public SimulationTab(String simulationID, String status, boolean groupAdmin) {
         
@@ -80,9 +82,11 @@ public class SimulationTab extends Tab {
         summaryStackSection = new SummaryStackSection(simulationID, completed);
         jobsStackSection = new JobsStackSection(simulationID);
         chartsStackSection = new ChartsStackSection(simulationID);
-        diagramStackSection = new DiagramStackSection(simulationID, completed);
+        diagramStackSection = new DiagramStackSection(simulationID);
+        provenanceStackSection = new ProvenanceStackSection(simulationID, completed);
 
         sectionStack.setSections(
+                provenanceStackSection,
                 summaryStackSection,
                 jobsStackSection,
                 chartsStackSection,
