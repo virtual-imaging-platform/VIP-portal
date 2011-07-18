@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -35,9 +35,11 @@
 package fr.insalyon.creatis.vip.gatelab.server.business;
 
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.util.Map;
 import java.util.HashMap;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -45,6 +47,7 @@ import java.util.HashMap;
  */
 public class GateLabInputs {
 
+    private final static Logger logger = Logger.getLogger(GateLabInputs.class);
     private Map<String, String> inputsMap;
     private String inputfile;
 
@@ -56,67 +59,55 @@ public class GateLabInputs {
     }
 
     public Map<String, String> getWorkflowInputs() {
+        try {
+            String input = inputsMap.get("input_tgz");
 
-        String input = inputsMap.get("input_tgz");
+            int ind = input.lastIndexOf("/");
+            String inputlink = input.substring(0, ind);
 
-        int ind = input.lastIndexOf("/");
-        String inputlink = input.substring(0, ind);
+            String application_name = "unknown";
 
-        String application_name="unknown";
-
-        if(input.indexOf(".zip")>0)
-            application_name = input.substring(ind + 1, input.indexOf(".zip"));
-        else
-            if(input.indexOf(".tgz")>0)
+            if (input.indexOf(".zip") > 0) {
+                application_name = input.substring(ind + 1, input.indexOf(".zip"));
+                
+            } else if (input.indexOf(".tgz") > 0) {
                 application_name = input.substring(ind + 1, input.indexOf(".tgz"));
-            else
-                if(input.indexOf(".tar.gz")>0)
-                    application_name = input.substring(ind + 1, input.indexOf(".tar.gz"));
-                else
-                    if(input.indexOf(".zip")>0)
-                        application_name = input.substring(ind + 1, input.indexOf(".zip"));
+                
+            } else if (input.indexOf(".tar.gz") > 0) {
+                application_name = input.substring(ind + 1, input.indexOf(".tar.gz"));
+                
+            } else if (input.indexOf(".zip") > 0) {
+                application_name = input.substring(ind + 1, input.indexOf(".zip"));
+            }
 
+            String outputlink = inputlink + "/output";
 
-        String outputlink = inputlink + "/output";
+            String release = inputsMap.get("fgate_release_tgz");
+            ind = release.lastIndexOf("/") + 1;
+            release = release.substring(ind, release.indexOf(".tar.gz"));
 
+            String particles = inputsMap.get("nParticles");
 
-        String release = inputsMap.get("fgate_release_tgz");
-        ind = release.lastIndexOf("/") + 1;
-        release = release.substring(ind, release.indexOf(".tar.gz"));
+            String simtype = inputsMap.get("wrapperType");
+            if (simtype.equals("dyn")) {
+                simtype = "Dynamic";
+            } else {
+                simtype = "Static";
+            }
 
+            Map<String, String> inputMap = new HashMap<String, String>();
+            inputMap.put("application_name", application_name);
+            inputMap.put("inputlink", DataManagerUtil.parseRealDir(inputlink));
+            inputMap.put("outputlink", DataManagerUtil.parseRealDir(outputlink));
+            inputMap.put("gate_version", release);
+            inputMap.put("particles", particles);
+            inputMap.put("simulation", simtype);
 
-        String particles = inputsMap.get("nParticles");
-
-        String simtype = inputsMap.get("wrapperType");
-        if (simtype.equals("dyn")) {
-            simtype = "Dynamic";
-        } else {
-            simtype = "Static";
+            return inputMap;
+            
+        } catch (DataManagerException ex) {
+            logger.error(ex);
+            return null;
         }
-
-        Map<String, String> inputMap = new HashMap<String, String>();
-        inputMap.put("application_name", application_name);
-        inputMap.put("inputlink", DataManagerUtil.parseRealDir(inputlink));
-        inputMap.put("outputlink", DataManagerUtil.parseRealDir(outputlink));
-        inputMap.put("gate_version", release);
-        inputMap.put("particles", particles);
-        inputMap.put("simulation", simtype);
-
-        return inputMap;
-
     }
 }
-
-
-
-         
-        
-
-    
-
-
-
-    
-    
-
-  
