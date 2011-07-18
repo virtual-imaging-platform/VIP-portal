@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.datamanager.applet.upload;
 
+import fr.insalyon.creatis.devtools.FileUtils;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -170,22 +171,7 @@ public class UploadFiles extends javax.swing.JApplet {
 
             } else {
                 ImageIcon icon = new ImageIcon(UploadFiles.class.getClassLoader().getResource("images/icon-file.png"));
-
-                long length = f.length();
-                String size = length + " B";
-                NumberFormat nf = new DecimalFormat("#.##");
-                if (length / 1024 > 0) {
-                    if (length / (1024 * 1024) > 0) {
-                        if (length / (1024 * 1024 * 1024) > 0) {
-                            size = nf.format(length / (double) (1024 * 1024 * 1024)) + " GB";
-                        } else {
-                            size = nf.format(length / (double) (1024 * 1024)) + " MB";
-                        }
-                    } else {
-                        size = nf.format(length / (double) 1024) + " KB";
-                    }
-                }
-
+                String size = FileUtils.parseFileSize(f.length());
                 SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss z");
                 String date = sdf.format(new Date(f.lastModified()));
                 model.addRow(new Object[]{icon, f.getName(), size, date});
