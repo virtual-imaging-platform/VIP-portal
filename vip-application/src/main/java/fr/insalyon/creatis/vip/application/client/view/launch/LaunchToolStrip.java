@@ -55,7 +55,6 @@ public class LaunchToolStrip extends ToolStrip {
 
     private String applicationClass;
     private SelectItem simulatorItem;
-    private ToolStripButton saveInputButton;
 
     public LaunchToolStrip(final String applicationClass) {
 
