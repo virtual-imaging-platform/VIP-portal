@@ -42,7 +42,6 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.AddFolderWindow;
-import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserUtil;
 
 /**
  *

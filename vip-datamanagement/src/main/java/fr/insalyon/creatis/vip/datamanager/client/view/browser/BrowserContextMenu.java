@@ -46,8 +46,8 @@ import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerContext;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
@@ -170,7 +170,7 @@ public class BrowserContextMenu extends Menu {
 
                 public void execute(Boolean value) {
                     if (value != null && value) {
-                        FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
+                        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                             public void onFailure(Throwable caught) {
@@ -196,7 +196,7 @@ public class BrowserContextMenu extends Menu {
 
                 public void execute(Boolean value) {
                     if (value != null && value) {
-                        FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
+                        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                             public void onFailure(Throwable caught) {
@@ -272,7 +272,7 @@ public class BrowserContextMenu extends Menu {
     }
 
     private void paste(final ModalWindow modal, final String baseDir) {
-        FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
+        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {

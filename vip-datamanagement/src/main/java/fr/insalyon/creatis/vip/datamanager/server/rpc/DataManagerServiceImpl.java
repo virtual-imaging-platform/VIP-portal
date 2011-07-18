@@ -36,20 +36,85 @@ package fr.insalyon.creatis.vip.datamanager.server.rpc;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author Rafael Silva
  */
 public class DataManagerServiceImpl extends RemoteServiceServlet implements DataManagerService {
-       
+
     public void configureDataManager(String user, String proxyFileName) {
 
         try {
             DataManagerBusiness business = new DataManagerBusiness();
             business.configureDataManager(user, proxyFileName);
+
+        } catch (BusinessException ex) {
+        }
+    }
+
+    public List<Data> listDir(String user, String proxyFileName, String baseDir, 
+            boolean refresh) {
+        try {
+            LFCBusiness business = new LFCBusiness();
+            return business.listDir(user, proxyFileName, baseDir, refresh);
+            
+        } catch (BusinessException ex) {
+            return null;
+        }
+    }
+
+    public void delete(String user, String proxyFileName, String path) {
+        
+        try {
+            LFCBusiness business = new LFCBusiness();
+            business.delete(user, proxyFileName, path);
+            
+        } catch (BusinessException ex) {
+        }
+    }
+
+    public void deleteFiles(String user, String proxyFileName, List<String> paths) {
+        
+        try {
+            LFCBusiness business = new LFCBusiness();
+            business.deleteFiles(user, proxyFileName, paths);
+            
+        } catch (BusinessException ex) {
+        }
+    }
+
+    public void createDir(String user, String proxyFileName, String baseDir, String name) {
+        
+        try {
+            LFCBusiness business = new LFCBusiness();
+            business.createDir(user, proxyFileName, baseDir, name);
+            
+        } catch (BusinessException ex) {
+        }
+    }
+
+    public void rename(String user, String proxyFileName, String oldPath, String newPath) {
+        
+        try {
+            LFCBusiness business = new LFCBusiness();
+            business.rename(user, proxyFileName, oldPath, newPath);
+            
+        } catch (BusinessException ex) {
+        }
+    }
+
+    public void renameFiles(String user, String proxyFileName, Map<String, String> paths) {
+
+        try {
+            LFCBusiness business = new LFCBusiness();
+            business.renameFiles(user, proxyFileName, paths);
             
         } catch (BusinessException ex) {
         }

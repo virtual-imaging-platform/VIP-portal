@@ -82,14 +82,6 @@
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/datamanagerservice</url-pattern>
     </servlet-mapping>
     <servlet>
-        <servlet-name>FileCatalogService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.datamanager.server.rpc.FileCatalogServiceImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>FileCatalogService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/filecatalogservice</url-pattern>
-    </servlet-mapping>
-    <servlet>
         <servlet-name>FileUploadService</servlet-name>
         <servlet-class>fr.insalyon.creatis.vip.datamanager.server.rpc.FileUploadServiceImpl</servlet-class>
     </servlet>

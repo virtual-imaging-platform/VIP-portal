@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.browser;
 
+import fr.insalyon.creatis.vip.datamanager.client.view.common.BrowserUtil;
 import com.google.gwt.user.client.ui.NamedFrame;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SelectionAppearance;

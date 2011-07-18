@@ -6,6 +6,5 @@
 
     <!-- Servlets -->
     <servlet class="fr.insalyon.creatis.vip.datamanager.server.rpc.DataManagerServiceImpl" path="/datamanagerservice"/>
-    <servlet class="fr.insalyon.creatis.vip.datamanager.server.rpc.FileCatalogServiceImpl" path="/filecatalogservice"/>
     <servlet class="fr.insalyon.creatis.vip.datamanager.server.rpc.TransferPoolServiceImpl" path="/transferpoolservice"/>
 </module>

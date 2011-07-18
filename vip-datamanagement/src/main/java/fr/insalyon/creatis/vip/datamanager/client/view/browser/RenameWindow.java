@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -45,8 +45,8 @@ import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 
 /**
  *
@@ -84,7 +84,7 @@ public class RenameWindow extends Window {
 
             public void onClick(ClickEvent event) {
                 if (form.validate()) {
-                    FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
+                    DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                     AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                         public void onFailure(Throwable caught) {

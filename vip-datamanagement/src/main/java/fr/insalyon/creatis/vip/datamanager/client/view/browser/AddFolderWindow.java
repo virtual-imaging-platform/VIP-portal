@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.browser;
 
+import fr.insalyon.creatis.vip.datamanager.client.view.common.BrowserUtil;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
@@ -46,8 +47,8 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.BasicBrowserToolStrip;
 
 /**
@@ -86,7 +87,7 @@ public class AddFolderWindow extends Window {
 
             public void onClick(ClickEvent event) {
                 if (form.validate()) {
-                    FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
+                    DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                     AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                         public void onFailure(Throwable caught) {

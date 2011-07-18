@@ -32,7 +32,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client.view.browser;
+package fr.insalyon.creatis.vip.datamanager.client.view.common;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.SortDirection;
@@ -47,9 +47,9 @@ import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogServiceAsync;
-import fr.insalyon.creatis.vip.datamanager.client.view.common.BasicBrowserToolStrip;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.view.browser.DataRecord;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -98,7 +98,7 @@ public class BrowserUtil {
             final BasicBrowserToolStrip toolStrip, final String path, boolean refresh) {
 
         if (!path.equals(DataManagerConstants.ROOT)) {
-            FileCatalogServiceAsync service = FileCatalogService.Util.getInstance();
+            DataManagerServiceAsync service = DataManagerService.Util.getInstance();
             AsyncCallback<List<Data>> callback = new AsyncCallback<List<Data>>() {
 
                 public void onFailure(Throwable caught) {

@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server;
 
+import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOFactory;
@@ -48,6 +49,13 @@ import java.net.URISyntaxException;
  */
 public class DataManagerUtil {
 
+    /**
+     * 
+     * @param user
+     * @param baseDir
+     * @return
+     * @throws DataManagerException 
+     */
     public static String parseBaseDir(String user, String baseDir) throws DataManagerException {
 
         baseDir = parsePath(baseDir, DataManagerConstants.USERS_HOME,
@@ -81,6 +89,13 @@ public class DataManagerUtil {
         return baseDir;
     }
 
+    /**
+     * 
+     * @param baseDir
+     * @param pattern
+     * @param toReplace
+     * @return 
+     */
     private static String parsePath(String baseDir, String pattern, String toReplace) {
         pattern = DataManagerConstants.ROOT + "/" + pattern;
         if (baseDir.contains(pattern)) {
@@ -89,6 +104,12 @@ public class DataManagerUtil {
         return baseDir;
     }
 
+    /**
+     * 
+     * @param baseDir
+     * @return
+     * @throws DataManagerException 
+     */
     public static String parseRealDir(String baseDir) throws DataManagerException {
         if (baseDir.startsWith("lfn://")) {
             try {
@@ -127,18 +148,37 @@ public class DataManagerUtil {
         return baseDir;
     }
 
+    /**
+     * 
+     * @param local
+     * @return 
+     */
     public static String getUploadRootDirectory(boolean local) {
+
         String rootDirectory = ServerConfiguration.getInstance().getDataManagerPath()
                 + "/uploads/";
-        
+
         if (!local) {
             rootDirectory += System.nanoTime() + "/";
         }
-        
+
         File dir = new File(rootDirectory);
         if (!dir.exists()) {
             dir.mkdirs();
         }
         return rootDirectory;
+    }
+
+    /**
+     * 
+     * @param proxyFileName
+     * @return 
+     */
+    public static VletAgentClient getVletAgentClient(String proxyFileName) {
+
+        return new VletAgentClient(
+                ServerConfiguration.getInstance().getVletagentHost(),
+                ServerConfiguration.getInstance().getVletagentPort(),
+                proxyFileName);
     }
 }

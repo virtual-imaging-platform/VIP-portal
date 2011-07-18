@@ -32,16 +32,13 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.server.rpc;
+package fr.insalyon.creatis.vip.datamanager.server.business;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.agent.vlet.common.bean.GridData;
 import fr.insalyon.creatis.devtools.FileUtils;
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.util.ArrayList;
@@ -53,19 +50,18 @@ import org.apache.log4j.Logger;
  *
  * @author Rafael Silva
  */
-public class FileCatalogServiceImpl extends RemoteServiceServlet implements FileCatalogService {
+public class LFCBusiness {
 
-    private static Logger logger = Logger.getLogger(FileCatalogServiceImpl.class);
+    private static final Logger logger = Logger.getLogger(LFCBusiness.class);
 
-    public List<Data> listDir(String user, String proxyFileName, String baseDir, boolean refresh) {
+    public List<Data> listDir(String user, String proxyFileName, String baseDir,
+            boolean refresh) throws BusinessException {
+
         try {
-            VletAgentClient client = new VletAgentClient(
-                    ServerConfiguration.getInstance().getVletagentHost(),
-                    ServerConfiguration.getInstance().getVletagentPort(),
-                    proxyFileName);
 
-            List<GridData> list = client.getFolderData(
-                    DataManagerUtil.parseBaseDir(user, baseDir), refresh);
+            List<GridData> list = DataManagerUtil.getVletAgentClient(
+                    proxyFileName).getFolderData(DataManagerUtil.parseBaseDir(
+                    user, baseDir), refresh);
 
             List<Data> dataList = new ArrayList<Data>();
             for (GridData data : list) {
@@ -84,34 +80,30 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
 
         } catch (DataManagerException ex) {
             logger.error(ex);
+            throw new BusinessException(ex);
         } catch (VletAgentClientException ex) {
             logger.error(ex);
+            throw new BusinessException(ex);
         }
-        return null;
     }
 
-    public void delete(String user, String proxyFileName, String path) {
-        try {
-            VletAgentClient client = new VletAgentClient(
-                    ServerConfiguration.getInstance().getVletagentHost(),
-                    ServerConfiguration.getInstance().getVletagentPort(),
-                    proxyFileName);
+    public void delete(String user, String proxyFileName, String path) throws BusinessException {
 
-            client.delete(DataManagerUtil.parseBaseDir(user, path));
+        try {
+            DataManagerUtil.getVletAgentClient(proxyFileName).delete(
+                    DataManagerUtil.parseBaseDir(user, path));
 
         } catch (DataManagerException ex) {
             logger.error(ex);
+            throw new BusinessException(ex);
         } catch (VletAgentClientException ex) {
             logger.error(ex);
+            throw new BusinessException(ex);
         }
     }
 
-    public void deleteFiles(String user, String proxyFileName, List<String> paths) {
+    public void deleteFiles(String user, String proxyFileName, List<String> paths) throws BusinessException {
         try {
-            VletAgentClient client = new VletAgentClient(
-                    ServerConfiguration.getInstance().getVletagentHost(),
-                    ServerConfiguration.getInstance().getVletagentPort(),
-                    proxyFileName);
 
             List<String> parsedPaths = new ArrayList<String>();
             for (String path : paths) {
@@ -121,47 +113,46 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
                     logger.error(ex);
                 }
             }
-            client.deleteFiles(parsedPaths);
+            DataManagerUtil.getVletAgentClient(proxyFileName).deleteFiles(parsedPaths);
 
         } catch (VletAgentClientException ex) {
             logger.error(ex);
+            throw new BusinessException(ex);
         }
     }
 
-    public void createDir(String user, String proxyFileName, String baseDir, String name) {
-        try {
-            VletAgentClient client = new VletAgentClient(
-                    ServerConfiguration.getInstance().getVletagentHost(),
-                    ServerConfiguration.getInstance().getVletagentPort(),
-                    proxyFileName);
+    public void createDir(String user, String proxyFileName, String baseDir, String name) throws BusinessException {
 
-            client.createDirectory(DataManagerUtil.parseBaseDir(user, baseDir), name);
+        try {
+            DataManagerUtil.getVletAgentClient(proxyFileName).createDirectory(
+                    DataManagerUtil.parseBaseDir(user, baseDir), name);
 
         } catch (DataManagerException ex) {
             logger.error(ex);
+            throw new BusinessException(ex);
         } catch (VletAgentClientException ex) {
             logger.error(ex);
+            throw new BusinessException(ex);
         }
     }
 
-    public void rename(String user, String proxyFileName, String oldPath, String newPath) {
-        try {
-            VletAgentClient client = new VletAgentClient(
-                    ServerConfiguration.getInstance().getVletagentHost(),
-                    ServerConfiguration.getInstance().getVletagentPort(),
-                    proxyFileName);
+    public void rename(String user, String proxyFileName, String oldPath, String newPath) throws BusinessException {
 
-            client.rename(DataManagerUtil.parseBaseDir(user, oldPath),
+        try {
+            DataManagerUtil.getVletAgentClient(proxyFileName).rename(
+                    DataManagerUtil.parseBaseDir(user, oldPath),
                     DataManagerUtil.parseBaseDir(user, newPath));
 
         } catch (DataManagerException ex) {
             logger.error(ex);
+            throw new BusinessException(ex);
         } catch (VletAgentClientException ex) {
             logger.error(ex);
+            throw new BusinessException(ex);
         }
     }
 
-    public void renameFiles(String user, String proxyFileName, Map<String, String> paths) {
+    public void renameFiles(String user, String proxyFileName, Map<String, String> paths) throws BusinessException {
 
         for (String oldPath : paths.keySet()) {
             String newPath = paths.get(oldPath);
