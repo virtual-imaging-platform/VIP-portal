@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -34,7 +34,6 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.selection;
 
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -46,10 +45,8 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
-import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import fr.insalyon.creatis.vip.datamanager.client.view.browser.AddFolderWindow;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.BasicBrowserToolStrip;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserUtil;
 
@@ -79,11 +76,10 @@ public class PathSelectionWindow extends Window {
         this.centerInPage();
 
         grid = BrowserUtil.getListGrid();
-        toolStrip = new BasicBrowserToolStrip(modal);
         modal = new ModalWindow(grid);
+        toolStrip = new BasicBrowserToolStrip(modal, grid);
 
         configureGrid();
-        configureToolStrip();
         configureContextMenu();
 
         this.addItem(toolStrip);
@@ -116,62 +112,6 @@ public class PathSelectionWindow extends Window {
                 contextMenu.showContextMenu();
             }
         });
-    }
-
-    private void configureToolStrip() {
-
-        ToolStripButton folderUpButton = new ToolStripButton();
-        folderUpButton.setIcon("icon-folderup.png");
-        folderUpButton.setPrompt("Folder up");
-        folderUpButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-            public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-                if (!toolStrip.getPath().equals(DataManagerConstants.ROOT)) {
-                    String newPath = toolStrip.getPath();
-                    BrowserUtil.loadData(modal, grid, toolStrip,
-                            newPath.substring(0, newPath.lastIndexOf("/")), false);
-                }
-            }
-        });
-        toolStrip.addButton(folderUpButton);
-
-        ToolStripButton refreshButton = new ToolStripButton();
-        refreshButton.setIcon("icon-refresh.png");
-        refreshButton.setPrompt("Refresh");
-        refreshButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-            public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-                BrowserUtil.loadData(modal, grid, toolStrip, toolStrip.getPath(), true);
-            }
-        });
-        toolStrip.addButton(refreshButton);
-
-        ToolStripButton homeButton = new ToolStripButton();
-        homeButton.setIcon("icon-home.png");
-        homeButton.setPrompt("Home");
-        homeButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-            public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-                BrowserUtil.loadData(modal, grid, toolStrip, DataManagerConstants.ROOT, false);
-            }
-        });
-        toolStrip.addButton(homeButton);
-
-        ToolStripButton addFolderButton = new ToolStripButton();
-        addFolderButton.setIcon("icon-addfolder.png");
-        addFolderButton.setPrompt("Create Folder");
-        addFolderButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
-            public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-                String path = toolStrip.getPath();
-                if (path.equals(DataManagerConstants.ROOT)) {
-                    SC.warn("You cannot create a folder in the root folder.");
-                } else {
-                    new AddFolderWindow(modal, path, grid, toolStrip).show();
-                }
-            }
-        });
-        toolStrip.addButton(addFolderButton);
     }
 
     private void configureContextMenu() {

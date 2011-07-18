@@ -34,10 +34,15 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.common;
 
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.client.view.browser.AddFolderWindow;
+import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserUtil;
 
 /**
  *
@@ -45,12 +50,14 @@ import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
  */
 public class BasicBrowserToolStrip extends ToolStrip {
 
+    private BasicBrowserToolStrip toolStrip;
     protected ModalWindow modal;
     protected SelectItem pathItem;
 
-    public BasicBrowserToolStrip(ModalWindow modal) {
+    public BasicBrowserToolStrip(final ModalWindow modal, final ListGrid grid) {
 
         this.modal = modal;
+        this.toolStrip = this;
         this.setWidth100();
 
         pathItem = new SelectItem("path");
@@ -58,6 +65,59 @@ public class BasicBrowserToolStrip extends ToolStrip {
         pathItem.setWidth(400);
         pathItem.setValue(DataManagerConstants.ROOT);
         this.addFormItem(pathItem);
+
+        ToolStripButton folderUpButton = new ToolStripButton();
+        folderUpButton.setIcon("icon-folderup.png");
+        folderUpButton.setPrompt("Folder up");
+        folderUpButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
+
+            public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
+                if (!pathItem.getValueAsString().equals(DataManagerConstants.ROOT)) {
+                    String newPath = pathItem.getValueAsString();
+                    BrowserUtil.loadData(modal, grid, toolStrip,
+                            newPath.substring(0, newPath.lastIndexOf("/")), false);
+                }
+            }
+        });
+        this.addButton(folderUpButton);
+        
+        ToolStripButton refreshButton = new ToolStripButton();
+        refreshButton.setIcon("icon-refresh.png");
+        refreshButton.setPrompt("Refresh");
+        refreshButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
+
+            public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
+                BrowserUtil.loadData(modal, grid, toolStrip, pathItem.getValueAsString(), true);
+            }
+        });
+        this.addButton(refreshButton);
+        
+        ToolStripButton homeButton = new ToolStripButton();
+        homeButton.setIcon("icon-home.png");
+        homeButton.setPrompt("Home");
+        homeButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
+
+            public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
+                BrowserUtil.loadData(modal, grid, toolStrip, DataManagerConstants.ROOT, false);
+            }
+        });
+        this.addButton(homeButton);
+        
+        ToolStripButton addFolderButton = new ToolStripButton();
+        addFolderButton.setIcon("icon-addfolder.png");
+        addFolderButton.setPrompt("Create Folder");
+        addFolderButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
+
+            public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
+                String path = toolStrip.getPath();
+                if (path.equals(DataManagerConstants.ROOT)) {
+                    SC.warn("You cannot create a folder in the root folder.");
+                } else {
+                    new AddFolderWindow(modal, path, grid, toolStrip).show();
+                }
+            }
+        });
+        this.addButton(addFolderButton);
     }
 
     public String getPath() {
