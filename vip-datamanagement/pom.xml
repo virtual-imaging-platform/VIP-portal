@@ -34,6 +34,13 @@
             <version>${vip.core.version}</version>
             <scope>provided</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-datamanager-applet</artifactId>
+            <version>${vip.datamanager-applet.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>
@@ -104,27 +111,4 @@
             </resource>
         </resources>
     </build>
-    <repositories>
-        <repository>
-            <id>creatis-releases</id>
-            <name>Creatis Insa Lyon repository [creatis]</name>
-            <url>http://kingkong.grid.creatis.insa-lyon.fr:9007/nexus/content/repositories/releases</url>
-        </repository>
-        <repository>
-            <id>creatis-thirdparty</id>
-            <name>Creatis Insa Lyon repository [creatis]</name>
-            <url>http://kingkong.grid.creatis.insa-lyon.fr:9007/nexus/content/repositories/thirdparty</url>
-        </repository>
-    </repositories>
-    <distributionManagement>
-        <repository>
-            <id>releases</id>
-            <url>http://kingkong.grid.creatis.insa-lyon.fr:9007/nexus/content/repositories/releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>Internal Snapshots</name>
-            <url>http://kingkong.grid.creatis.insa-lyon.fr:9007/nexus/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>

@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -51,6 +51,7 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -58,16 +59,13 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
  */
 public class FileUploadServiceImpl extends HttpServlet {
 
+    private static Logger logger = Logger.getLogger(FileUploadServiceImpl.class);
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String rootDirectory = ServerConfiguration.getInstance().getDataManagerPath() 
-                + "/uploads/" + System.nanoTime() + "/";
-        File dir = new File(rootDirectory);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
+        String rootDirectory = DataManagerUtil.getUploadRootDirectory();
 
         if (ServletFileUpload.isMultipartContent(request)) {
             FileItemFactory factory = new DiskFileItemFactory();
@@ -81,6 +79,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                 String user = null;
                 String proxy = null;
                 String path = null;
+                String target = "uploadComplete";
 
                 while (iter.hasNext()) {
                     FileItem item = (FileItem) iter.next();
@@ -96,6 +95,8 @@ public class FileUploadServiceImpl extends HttpServlet {
                     } else if (item.getFieldName().equals("file")) {
                         fileName = item.getName();
                         fileItem = item;
+                    } else if (item.getFieldName().equals("target")) {
+                        target = item.getString();
                     }
                 }
                 if (fileName != null && !fileName.equals("")) {
@@ -117,7 +118,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                                 userdn);
                         }
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        logger.error(ex);
                     }
                 }
 
@@ -129,7 +130,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                 out.println("<html>");
                 out.println("<body>");
                 out.println("<script type=\"text/javascript\">");
-                out.println("if (parent.uploadComplete) parent.uploadComplete('"
+                out.println("if (parent." + target + ") parent." + target + "('"
                         + fileName + "');");
                 out.println("</script>");
                 out.println("</body>");
@@ -137,7 +138,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                 out.flush();
 
             } catch (FileUploadException ex) {
-                ex.printStackTrace();
+                logger.error(ex);
             }
         }
     }

@@ -59,6 +59,7 @@ public class BrowserLayout extends VLayout {
     private ModalWindow modal;
     private BrowserToolStrip toolStrip;
     private ListGrid grid;
+    private DataUploadWindow dataUploadWindow;
 
     public static BrowserLayout getInstance() {
         if (instance == null) {
@@ -126,8 +127,16 @@ public class BrowserLayout extends VLayout {
     public ListGridRecord[] getGridSelection() {
         return grid.getSelection();
     }
+    
+    public void setDataUploadWindow(DataUploadWindow dataUploadWindow) {
+        this.dataUploadWindow = dataUploadWindow;
+    }
 
     public void uploadComplete(String fileName) {
+        if (dataUploadWindow != null) {
+            dataUploadWindow.destroy();
+            dataUploadWindow = null;
+        }
         modal.hide();
         OperationLayout.getInstance().loadData();
         OperationLayout.getInstance().activateAutoRefresh();

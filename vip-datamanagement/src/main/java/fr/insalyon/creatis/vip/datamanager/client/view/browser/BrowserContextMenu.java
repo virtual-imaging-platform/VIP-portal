@@ -64,7 +64,7 @@ public class BrowserContextMenu extends Menu {
         this.setShadowDepth(10);
         this.setWidth(90);
 
-        MenuItem uploadItem = new MenuItem("Upload File");
+        MenuItem uploadItem = new MenuItem("Upload");
         uploadItem.setIcon("icon-upload.png");
         uploadItem.addClickHandler(new ClickHandler() {
 
@@ -72,7 +72,9 @@ public class BrowserContextMenu extends Menu {
                 if (baseDir.equals(DataManagerConstants.ROOT)) {
                     SC.warn("You cannot upload a file in the root folder.");
                 } else {
-                    new FileUploadWindow(modal, baseDir).show();
+                    DataUploadWindow window = new DataUploadWindow(modal, baseDir);
+                    BrowserLayout.getInstance().setDataUploadWindow(window);
+                    window.show();
                 }
             }
         });

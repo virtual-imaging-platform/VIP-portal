@@ -125,7 +125,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         this.addSeparator();
         ToolStripButton uploadButton = new ToolStripButton();
         uploadButton.setIcon("icon-upload.png");
-        uploadButton.setPrompt("Upload File");
+        uploadButton.setPrompt("Upload");
         uploadButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
@@ -133,7 +133,9 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                 if (path.equals(DataManagerConstants.ROOT)) {
                     SC.warn("You cannot upload a file in the root folder.");
                 } else {
-                    new FileUploadWindow(modal, path).show();
+                    DataUploadWindow window = new DataUploadWindow(modal, path);
+                    BrowserLayout.getInstance().setDataUploadWindow(window);
+                    window.show();
                 }
             }
         });

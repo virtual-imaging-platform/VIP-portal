@@ -38,6 +38,7 @@ import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOFactory;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -64,7 +65,7 @@ public class DataManagerUtil {
         try {
             for (String groupName : DAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
                 String folderName = groupName.replaceAll(" ", "_");
-                
+
                 baseDir = parsePath(baseDir, groupName + DataManagerConstants.GROUP_APPEND,
                         ServerConfiguration.getInstance().getDataManagerGroupsHome()
                         + "/" + folderName);
@@ -104,7 +105,7 @@ public class DataManagerUtil {
             } else {
                 baseDir = "";
             }
-            baseDir = DataManagerConstants.ROOT + "/" 
+            baseDir = DataManagerConstants.ROOT + "/"
                     + DataManagerConstants.USERS_HOME + baseDir;
         }
 
@@ -112,8 +113,8 @@ public class DataManagerUtil {
             for (String groupName : DAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
                 baseDir = baseDir.replace(
                         ServerConfiguration.getInstance().getDataManagerGroupsHome()
-                        + "/" + groupName.replaceAll(" ", "_"), 
-                        DataManagerConstants.ROOT + "/" + groupName 
+                        + "/" + groupName.replaceAll(" ", "_"),
+                        DataManagerConstants.ROOT + "/" + groupName
                         + DataManagerConstants.GROUP_APPEND);
             }
         } catch (DAOException ex) {
@@ -124,5 +125,15 @@ public class DataManagerUtil {
                 DataManagerConstants.ROOT + "/" + DataManagerConstants.BIOMED_HOME);
 
         return baseDir;
+    }
+
+    public static String getUploadRootDirectory() {
+        String rootDirectory = ServerConfiguration.getInstance().getDataManagerPath()
+                + "/uploads/" + System.nanoTime() + "/";
+        File dir = new File(rootDirectory);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        return rootDirectory;
     }
 }

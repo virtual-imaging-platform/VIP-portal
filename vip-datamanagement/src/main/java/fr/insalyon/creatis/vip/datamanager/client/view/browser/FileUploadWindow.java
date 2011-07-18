@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -56,7 +56,7 @@ public class FileUploadWindow extends Window {
     private DynamicForm form;
     private UploadItem fileItem;
 
-    public FileUploadWindow(final ModalWindow modal, String baseDir) {
+    public FileUploadWindow(final ModalWindow modal, String baseDir, String target) {
 
         this.setTitle("Upload file to: " + baseDir);
         this.setWidth(400);
@@ -71,7 +71,7 @@ public class FileUploadWindow extends Window {
         form.setEncoding(Encoding.MULTIPART);
         form.setMethod(FormMethod.POST);
         form.setAction(GWT.getModuleBaseURL() + "/fileuploadservice");
-        form.setTarget("uploadTarget");
+        form.setTarget(target);
         
         fileItem = new UploadItem("file");
         fileItem.setTitle("File");
@@ -86,6 +86,8 @@ public class FileUploadWindow extends Window {
         proxyItem.setValue(Context.getInstance().getProxyFileName());
         HiddenItem pathItem = new HiddenItem("path");
         pathItem.setValue(baseDir);
+        HiddenItem targetItem = new HiddenItem("target");
+        targetItem.setValue(target);
         
         ButtonItem uploadButton = new ButtonItem("Upload");
         uploadButton.addClickHandler(new ClickHandler() {
@@ -100,7 +102,7 @@ public class FileUploadWindow extends Window {
         });
         
         form.setItems(fileItem, userItem, userdnItem, proxyItem, 
-                pathItem, uploadButton);
+                pathItem, targetItem, uploadButton);
         
         this.addItem(form);
     }
