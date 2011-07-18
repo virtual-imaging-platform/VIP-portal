@@ -60,7 +60,7 @@ public class SimulationTab extends Tab {
     private ChartsStackSection chartsStackSection;
     private DiagramStackSection diagramStackSection;
     private LogsStackSection logsStackSection;
-    private ProvenanceStackSection provenanceStackSection;
+//    private ProvenanceStackSection provenanceStackSection;
 
     public SimulationTab(String simulationID, String status, boolean groupAdmin) {
         
@@ -83,10 +83,10 @@ public class SimulationTab extends Tab {
         jobsStackSection = new JobsStackSection(simulationID);
         chartsStackSection = new ChartsStackSection(simulationID);
         diagramStackSection = new DiagramStackSection(simulationID);
-        provenanceStackSection = new ProvenanceStackSection(simulationID, completed);
+//        provenanceStackSection = new ProvenanceStackSection(simulationID, completed);
 
         sectionStack.setSections(
-                provenanceStackSection,
+//                provenanceStackSection,
                 summaryStackSection,
                 jobsStackSection,
                 chartsStackSection,
