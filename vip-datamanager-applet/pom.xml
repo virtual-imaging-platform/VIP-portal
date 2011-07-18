@@ -96,34 +96,10 @@
                 <configuration>
                     <keystore>/usr/local/apache-tomcat-6.0.29/conf/keystore.jks</keystore>
                     <alias>1</alias>
-                    <storepass></storepass>
-                    <keypass></keypass>
+                    <storepass>Ra@#sil89</storepass>
+                    <keypass>Ra@#sil89</keypass>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
-    <repositories>
-        <repository>
-            <id>creatis-releases</id>
-            <name>Creatis Insa Lyon repository [creatis]</name>
-            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/releases</url>
-        </repository>
-        <repository>
-            <id>creatis-thirdparty</id>
-            <name>Creatis Insa Lyon repository [creatis]</name>
-            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/thirdparty</url>
-        </repository>
-    </repositories>
-    <distributionManagement>
-        <repository>
-            <id>releases</id>
-            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>Internal Snapshots</name>
-            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>
