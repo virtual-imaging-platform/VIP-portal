@@ -89,10 +89,10 @@ public class InputsToolStrip extends ToolStrip {
 
             public void onFailure(Throwable caught) {
                 SC.warn("Error executing load simulation inputs\n" + caught.getMessage());
+                modal.hide();
             }
 
             public void onSuccess(String result) {
-                SC.say("INPUTS: " + result);
                 LaunchTab launchTab = (LaunchTab) Layout.getInstance().getTab(tabID);
                 launchTab.loadInput(result);
                 modal.hide();
