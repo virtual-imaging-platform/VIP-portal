@@ -50,6 +50,7 @@ import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 /**
@@ -58,6 +59,8 @@ import org.apache.log4j.PropertyConfigurator;
  */
 public class ConfigurationBusiness {
 
+    private final static Logger logger = Logger.getLogger(ConfigurationBusiness.class);
+    
     /**
      * 
      * @param object
@@ -138,6 +141,8 @@ public class ConfigurationBusiness {
         } catch (URISyntaxException ex) {
             throw new BusinessException(ex);
         }
+        
+        logger.info("Connected: " + authentication.getUser());
         return new Configuration(authentication,
                 uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort(),
                 conf.getDataManagerLFCHost(), conf.getDataManagerLFCPort());
