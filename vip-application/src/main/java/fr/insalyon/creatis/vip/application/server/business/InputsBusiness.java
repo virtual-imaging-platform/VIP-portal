@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,28 +32,24 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client.rpc;
+package fr.insalyon.creatis.vip.application.server.business;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
-import java.util.List;
-import java.util.Map;
+import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputParser;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 
 /**
  *
  * @author Rafael Silva
  */
-public interface FileCatalogServiceAsync {
-    
-    public void listDir(String user, String proxyFileName, String baseDir, boolean refresh, AsyncCallback<List<Data>> asyncCallback);
+public class InputsBusiness {
 
-    public void delete(String user, String proxyFileName, String path, AsyncCallback<Void> asyncCallback);
+    public String getWorkflowInputs(String fileName) throws BusinessException {
 
-    public void createDir(String user, String proxyFileName, String baseDir, String name, AsyncCallback<Void> asyncCallback);
-
-    public void deleteFiles(String user, String proxyFileName, List<String> paths, AsyncCallback<Void> asyncCallback);
-    
-    public void rename(String user, String proxyFileName, String oldPath, String newPath, AsyncCallback<Void> asyncCallback);
-    
-    public void renameFiles(String user, String proxyFileName, Map<String, String> paths, AsyncCallback<Void> asyncCallback);
+        fileName = DataManagerUtil.getUploadRootDirectory(true) + fileName;
+        String inputs = new InputParser().parse(fileName);
+        new DataManagerBusiness().deleteLocalFile(fileName);
+        return inputs;
+    }
 }

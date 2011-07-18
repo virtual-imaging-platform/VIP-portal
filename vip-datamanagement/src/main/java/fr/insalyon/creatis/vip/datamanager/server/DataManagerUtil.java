@@ -127,9 +127,14 @@ public class DataManagerUtil {
         return baseDir;
     }
 
-    public static String getUploadRootDirectory() {
+    public static String getUploadRootDirectory(boolean local) {
         String rootDirectory = ServerConfiguration.getInstance().getDataManagerPath()
-                + "/uploads/" + System.nanoTime() + "/";
+                + "/uploads/";
+        
+        if (!local) {
+            rootDirectory += System.nanoTime() + "/";
+        }
+        
         File dir = new File(rootDirectory);
         if (!dir.exists()) {
             dir.mkdirs();

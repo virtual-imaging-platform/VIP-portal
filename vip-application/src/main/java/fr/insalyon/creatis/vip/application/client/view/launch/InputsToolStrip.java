@@ -34,12 +34,18 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.NamedFrame;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
+import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.datamanager.client.view.browser.FileUploadWindow;
 
 /**
  *
@@ -47,8 +53,14 @@ import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
  */
 public class InputsToolStrip extends ToolStrip {
 
-    public InputsToolStrip(final ModalWindow modal) {
+    private ModalWindow modal;
+    private String tabID;
+    
+    public InputsToolStrip(final ModalWindow modal, String tabID) {
 
+        this.tabID = tabID;
+        this.modal = modal;
+        
         initComplete(this);
         this.setWidth100();
 
@@ -58,14 +70,35 @@ public class InputsToolStrip extends ToolStrip {
         loadButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-//                new FileUploadWindow(modal, "local", "inputsComplete").show();
+                new FileUploadWindow(modal, "local", "inputsComplete").show();
             }
         });
         this.addButton(loadButton);
+        
+        NamedFrame frame = new NamedFrame("inputsComplete");
+        frame.setVisible(false);
+        frame.setHeight("1px");
+        frame.setWidth("1px");
+        this.addMember(frame);
     }
 
     public void uploadComplete(String fileName) {
         SC.say("FILENAME: " + fileName);
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<String> callback = new AsyncCallback<String>() {
+
+            public void onFailure(Throwable caught) {
+                SC.warn("Error executing load simulation inputs\n" + caught.getMessage());
+            }
+
+            public void onSuccess(String result) {
+                SC.say("INPUTS: " + result);
+                LaunchTab launchTab = (LaunchTab) Layout.getInstance().getTab(tabID);
+                launchTab.loadInput(result);
+                modal.hide();
+            }
+        };
+        service.getWorkflowInputs(fileName, callback);
     }
 
     private native void initComplete(InputsToolStrip upload) /*-{

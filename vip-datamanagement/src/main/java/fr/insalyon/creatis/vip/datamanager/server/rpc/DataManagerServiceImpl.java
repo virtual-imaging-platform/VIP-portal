@@ -32,53 +32,26 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client;
+package fr.insalyon.creatis.vip.datamanager.server.rpc;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.system.SystemMenuButton;
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerMenuItem;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
+import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DataManagerInit {
+public class DataManagerServiceImpl extends RemoteServiceServlet implements DataManagerService {
+       
+    public void configureDataManager(String user, String proxyFileName) {
 
-    private static DataManagerInit instance;
-
-    public static DataManagerInit getInstance() {
-        if (instance == null) {
-            instance = new DataManagerInit();
-        }
-        return instance;
-    }
-
-    private DataManagerInit() {
-               
-        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-            public void onFailure(Throwable caught) {
-                SC.warn("Error executing configure File Transfer: " + caught.getMessage());
-            }
-
-            public void onSuccess(Void result) {
-                if (Context.getInstance().hasValidProxy()) {
-                    Layout.getInstance().addMainSection(DataManagerSection.getInstance());
-                }
-            }
-        };
-        Context context = Context.getInstance();
-        service.configureDataManager(context.getUser(), context.getProxyFileName(), callback);
-        
-        if (context.isSystemAdmin()) {
-            SystemMenuButton.getInstance().getMenu().addItem(new DataManagerMenuItem());
+        try {
+            DataManagerBusiness business = new DataManagerBusiness();
+            business.configureDataManager(user, proxyFileName);
+            
+        } catch (BusinessException ex) {
         }
     }
 }

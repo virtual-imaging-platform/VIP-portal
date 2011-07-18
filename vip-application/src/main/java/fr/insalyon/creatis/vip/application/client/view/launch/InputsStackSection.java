@@ -68,15 +68,15 @@ import java.util.List;
  */
 public class InputsStackSection extends SectionStackSection {
 
-    private String applicationClass;
+    private String tabID;
     private InputsToolStrip toolStrip;
     private ListGrid grid;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
 
-    public InputsStackSection(String applicationClass) {
+    public InputsStackSection(String tabID) {
 
-        this.applicationClass = applicationClass;
+        this.tabID = tabID;
         this.setTitle("Inputs");
         this.setCanCollapse(true);
         this.setExpanded(false);
@@ -84,7 +84,7 @@ public class InputsStackSection extends SectionStackSection {
 
         configureGrid();
         ModalWindow modal = new ModalWindow(grid);
-        toolStrip = new InputsToolStrip(modal);
+        toolStrip = new InputsToolStrip(modal, tabID);
 
         VLayout vLayout = new VLayout();
         vLayout.setMaxHeight(400);
@@ -122,8 +122,7 @@ public class InputsStackSection extends SectionStackSection {
 
                         public void onClick(ClickEvent event) {
                             String values = rollOverRecord.getAttribute("values");
-                            LaunchTab launchTab = (LaunchTab) Layout.getInstance().
-                                    getTab("launch-" + applicationClass.toLowerCase() + "-tab");
+                            LaunchTab launchTab = (LaunchTab) Layout.getInstance().getTab(tabID);
                             launchTab.loadInput(values);
                         }
                     });

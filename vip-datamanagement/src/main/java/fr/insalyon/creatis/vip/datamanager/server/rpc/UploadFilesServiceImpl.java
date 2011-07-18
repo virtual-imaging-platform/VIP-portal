@@ -76,8 +76,6 @@ public class UploadFilesServiceImpl extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String rootDirectory = DataManagerUtil.getUploadRootDirectory();
-
         boolean overwrite = true;
         user = req.getHeader("user");
         userdn = req.getHeader("userdn");
@@ -87,6 +85,9 @@ public class UploadFilesServiceImpl extends HttpServlet {
         boolean single = Boolean.valueOf(req.getHeader("single"));
         boolean unzip = Boolean.valueOf(req.getHeader("unzip"));
         this.usePool = Boolean.valueOf(req.getHeader("pool"));
+
+        boolean local = path.equals("local") ? true : false;
+        String rootDirectory = DataManagerUtil.getUploadRootDirectory(local);
 
         File uploadedFile = new File(rootDirectory + fileName);
         if (uploadedFile.exists() && overwrite) {
@@ -111,9 +112,8 @@ public class UploadFilesServiceImpl extends HttpServlet {
             fos.close();
         }
 
-        if (!path.equals("local")) { //otherwise we don't want to upload the file to the grid
+        if (!local) {
             try {
-
                 if (usePool) {
                     poolClient = new VletAgentPoolClient(
                             ServerConfiguration.getInstance().getVletagentHost(),
@@ -175,7 +175,7 @@ public class UploadFilesServiceImpl extends HttpServlet {
             throws VletAgentClientException, DataManagerException {
 
         if (usePool) {
-            poolClient.uploadFile(fileName, 
+            poolClient.uploadFile(fileName,
                     DataManagerUtil.parseBaseDir(user, dir), userdn);
         } else {
             client.uploadFile(fileName, DataManagerUtil.parseBaseDir(user, dir));

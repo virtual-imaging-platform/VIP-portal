@@ -60,12 +60,10 @@ import org.apache.log4j.Logger;
 public class FileUploadServiceImpl extends HttpServlet {
 
     private static Logger logger = Logger.getLogger(FileUploadServiceImpl.class);
-    
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        String rootDirectory = DataManagerUtil.getUploadRootDirectory();
 
         if (ServletFileUpload.isMultipartContent(request)) {
             FileItemFactory factory = new DiskFileItemFactory();
@@ -100,22 +98,26 @@ public class FileUploadServiceImpl extends HttpServlet {
                     }
                 }
                 if (fileName != null && !fileName.equals("")) {
+
+                    boolean local = path.equals("local") ? true : false;
+                    String rootDirectory = DataManagerUtil.getUploadRootDirectory(local);
                     fileName = new File(fileName).getName();
                     File uploadedFile = new File(rootDirectory + fileName);
+
                     try {
                         fileItem.write(uploadedFile);
                         response.getWriter().write(fileName);
 
-                        if(!path.equals("local")){//otherwise we don't want to upload the file to the grid
+                        if (!local) {
                             // Vlet Agent Pool Client
                             VletAgentPoolClient client = new VletAgentPoolClient(
-                                ServerConfiguration.getInstance().getVletagentHost(),
-                                ServerConfiguration.getInstance().getVletagentPort(),
-                                proxy);
+                                    ServerConfiguration.getInstance().getVletagentHost(),
+                                    ServerConfiguration.getInstance().getVletagentPort(),
+                                    proxy);
                             client.uploadFile(
-                                uploadedFile.getAbsolutePath(),
-                                DataManagerUtil.parseBaseDir(user, path),
-                                userdn);
+                                    uploadedFile.getAbsolutePath(),
+                                    DataManagerUtil.parseBaseDir(user, path),
+                                    userdn);
                         }
                     } catch (Exception ex) {
                         logger.error(ex);

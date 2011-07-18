@@ -35,10 +35,12 @@
 package fr.insalyon.creatis.vip.application.server.rpc;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import fr.insalyon.creatis.devtools.FileUtils;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Workflow;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
+import fr.insalyon.creatis.vip.application.server.business.InputsBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputParser;
 import fr.insalyon.creatis.vip.application.server.dao.DAOFactory;
@@ -177,14 +179,7 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
             if (f.isDirectory()) {
                 list.add(f.getName() + "-#-Folder");
             } else {
-                String fileSize = f.length() + "";
-                if (f.length() >= 1024) {
-                    if (f.length() / 1024 >= 1024) {
-                        fileSize = f.length() / 1024 / 1024 + " MB";
-                    } else {
-                        fileSize = f.length() / 1024 + " KB";
-                    }
-                }
+                String fileSize = FileUtils.parseFileSize(f.length());
                 String info = f.getName() + "##" + fileSize
                         + "##" + new Date(f.lastModified());
                 list.add(info + "-#-File");
@@ -204,12 +199,14 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         }
     }
 
-    public Map<String, String> getWorkflowInputs(String fileName) {
+    public String getWorkflowInputs(String fileName) {
         
         try {
-            return new InputParser().parse(fileName);
+            InputsBusiness business = new InputsBusiness();
+            return business.getWorkflowInputs(fileName);
         
         } catch (BusinessException ex) {
+            logger.error(ex);
             return null;
         }
     }

@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,70 +32,30 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-
-package fr.insalyon.creatis.vip.application.client.rpc;
+package fr.insalyon.creatis.vip.datamanager.client.rpc;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import fr.insalyon.creatis.vip.application.client.bean.Workflow;
-import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  *
  * @author Rafael Silva
  */
-public interface WorkflowService extends RemoteService {
+public interface DataManagerService extends RemoteService {
 
-    public static final String SERVICE_URI = "/workflowservice";
+    public static final String SERVICE_URI = "/datamanagerservice";
 
     public static class Util {
 
-        public static WorkflowServiceAsync getInstance() {
+        public static DataManagerServiceAsync getInstance() {
 
-            WorkflowServiceAsync instance = (WorkflowServiceAsync) GWT.create(WorkflowService.class);
+            DataManagerServiceAsync instance = (DataManagerServiceAsync) GWT.create(DataManagerService.class);
             ServiceDefTarget target = (ServiceDefTarget) instance;
             target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
             return instance;
         }
     }
 
-    public void closeConnection(String workflowID);
-
-    public void killWorkflow(String workflowID);
-
-    public void cleanWorkflow(String workflowID, String userDN, String proxyFileName);
-
-    public void purgeWorkflow(String workflowID);
-    
-    public List<Workflow> getWorkflows(String user, String application, String status, Date startDate, Date endDate);
-
-    public String getFile(String baseDir, String fileName);
-
-    public String getFileURL(String baseDir, String fileName);
-
-    public List<String>[] getApplicationsAndUsersList(String applicationClass);
-    
-    public List<String> getLogs(String baseDir);
-
-    public List<String> getWorkflowSources(String user, String proxyFileName, String workflowName);
-
-    public String getWorkflowInputs(String fileName);
-
-    public String launchWorkflow(String user, Map<String, String> parameters, String workflowName, String proxyFileName);
-
-    public List<SimulationInput> getWorkflowsInputByUser(String user);
-    
-    public List<SimulationInput> getWorkflowsInputByUserAndAppName(String user, String appName);
-
-    public String addWorkflowInput(String user, SimulationInput workflowInput);
-
-    public SimulationInput getWorkflowInputByUserAndName(String user, String inputName);
-
-    public void removeWorkflowInput(String user, String inputName);
-
-    public List<String> getStats( List<Workflow> workflowIdList, int type, int binSize);
+    public void configureDataManager(String user, String proxyFileName);
 }

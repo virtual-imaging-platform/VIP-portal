@@ -37,8 +37,6 @@ package fr.insalyon.creatis.vip.application.server.business.simulation.parser;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.log4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -55,21 +53,21 @@ public class InputParser extends DefaultHandler {
 
     private static final Logger logger = Logger.getLogger(InputParser.class);
     private XMLReader reader;
-    private Map<String, String> inputsMap;
+    private StringBuilder inputs;
     private String name;
     private String value;
 
     public InputParser() {
-        inputsMap = new HashMap<String, String>();
+        inputs = new StringBuilder();
     }
 
-    public Map<String, String> parse(String fileName) throws BusinessException {
+    public String parse(String fileName) throws BusinessException {
         try {
             reader = XMLReaderFactory.createXMLReader();
             reader.setContentHandler(this);
             reader.parse(new InputSource(new FileReader(fileName)));
 
-            return inputsMap;
+            return inputs.toString();
 
         } catch (IOException ex) {
             logger.error(ex);
@@ -87,22 +85,49 @@ public class InputParser extends DefaultHandler {
             name = attributes.getValue("name");
             return;
         }
+        if (localName.equals("PARAMETER_RANGE")) {
+            name = attributes.getValue("name");
+            return;
+        }
+        if (localName.equals("START")) {
+            value = "Start: ";
+            return;
+        }
+        if (localName.equals("END")) {
+            value += " - Stop: ";
+            return;
+        }
+        if (localName.equals("STEP")) {
+            value += " - Step: ";
+            return;
+        }
         if (localName.equals("VAL")) {
-            value = "";
+            if (value == null || value.isEmpty()) {
+                value = "";
+            } else {
+                value += "; ";
+            }
             return;
         }
     }
 
     @Override
     public void endElement(String uri, String localName, String qName) {
-        if (localName.equals("VAL")) {
-            inputsMap.put(name, value);
+
+        if (localName.equals("PARAMETER_LIST")
+                || localName.equals("PARAMETER_RANGE")) {
+
+            inputs.append(name);
+            inputs.append(" = ");
+            inputs.append(value);
+            inputs.append("<br />");
             value = null;
         }
     }
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
+
         if (value != null) {
             String chars = new String(ch);
             value += chars.substring(start, start + length);

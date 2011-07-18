@@ -59,7 +59,7 @@ public interface WorkflowServiceAsync {
 
     public void launchWorkflow(String user, Map<String, String> parameters, String workflowName, String proxyFileName, AsyncCallback<String> asyncCallback);
 
-    public void getWorkflowInputs(String fileName, AsyncCallback<Map<String, String>> asyncCallback);
+    public void getWorkflowInputs(String fileName, AsyncCallback<String> asyncCallback);
 
     public void addWorkflowInput(String user, SimulationInput workflowInput, AsyncCallback<String> asyncCallback);
 

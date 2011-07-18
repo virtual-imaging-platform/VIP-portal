@@ -45,25 +45,27 @@ import com.smartgwt.client.widgets.tab.Tab;
  */
 public class LaunchTab extends Tab {
 
-    private String applicationClass;
     private SectionStack sectionStack;
     private LaunchStackSection launchSection;
     private LaunchToolStrip launchToolStrip;
     private InputsStackSection inputsSection;
 
     public LaunchTab(String applicationClass, String applicationName) {
+        
         initTab("Launch " + applicationName, applicationClass, false, 
                 "launch-" + applicationName.toLowerCase() + "-tab");
         createSimulation(applicationName);
+        addInputsSection();
     }
 
     public LaunchTab(String applicationClass) {
+        
         initTab("Launch " + applicationClass, applicationClass, true, 
                 "launch-" + applicationClass.toLowerCase() + "-tab");
     }
 
     private void initTab(String title, String applicationClass, boolean showToolStrip, String id) {
-        this.applicationClass = applicationClass;
+
         this.setTitle(title);
         this.setID(id);
         this.setCanClose(true);
@@ -104,7 +106,7 @@ public class LaunchTab extends Tab {
 
     public void addInputsSection() {
         if (inputsSection == null) {
-            inputsSection = new InputsStackSection(applicationClass);
+            inputsSection = new InputsStackSection(this.getID());
             sectionStack.addSection(inputsSection);
         }
     }

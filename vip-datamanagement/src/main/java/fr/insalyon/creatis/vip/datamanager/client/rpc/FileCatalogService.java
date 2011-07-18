@@ -59,8 +59,6 @@ public interface FileCatalogService extends RemoteService {
             return instance;
         }
     }
-
-    public void configureDataManager(String user, String proxyFileName);
     
     public List<Data> listDir(String user, String proxyFileName, String baseDir, boolean refresh);
 

@@ -40,7 +40,6 @@ import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.agent.vlet.common.bean.GridData;
 import fr.insalyon.creatis.devtools.FileUtils;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
-import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerException;
@@ -167,32 +166,6 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
         for (String oldPath : paths.keySet()) {
             String newPath = paths.get(oldPath);
             rename(user, proxyFileName, oldPath, newPath);
-        }
-    }
-
-    public void configureDataManager(String user, String proxyFileName) {
-
-        VletAgentClient client = new VletAgentClient(
-                ServerConfiguration.getInstance().getVletagentHost(),
-                ServerConfiguration.getInstance().getVletagentPort(),
-                proxyFileName);
-
-        try {
-            client.createDirectory(ServerConfiguration.getInstance().getDataManagerUsersHome(),
-                    user.replaceAll(" ", "_").toLowerCase());
-        } catch (VletAgentClientException ex) {
-            if (!ex.getMessage().contains("ERROR: File/Directory exists or Directory is not empty")) {
-                logger.error(ex);
-            }
-        }
-        try {
-            client.createDirectory(ServerConfiguration.getInstance().getDataManagerUsersHome(),
-                    user.replace(" ", "_").toLowerCase()
-                    + "_" + DataManagerConstants.TRASH_HOME);
-        } catch (VletAgentClientException ex) {
-            if (!ex.getMessage().contains("ERROR: File/Directory exists or Directory is not empty")) {
-                logger.error(ex);
-            }
         }
     }
 }
