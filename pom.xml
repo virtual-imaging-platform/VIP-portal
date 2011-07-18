@@ -14,7 +14,7 @@
         <vip.datamanager.version>0.4</vip.datamanager.version>
         <vip.datamanager-applet.version>0.1</vip.datamanager-applet.version>
         <vip.portal.version>0.4</vip.portal.version>
-        <vip.gatelab.version>0.3.1</vip.gatelab.version>
+        <vip.gatelab.version>0.3.2</vip.gatelab.version>
         <vip.simulation-gui.version>0.1</vip.simulation-gui.version>
         <vip.models.version>0.1</vip.models.version>
         <vip.provenance.version>0.1</vip.provenance.version>
@@ -58,7 +58,7 @@
         <module>vip-portal</module>
         <module>vip-simulation-gui</module>
         <module>vip-models</module>
-<!--        <module>vip-provenance</module>-->
+        <module>vip-provenance</module>
         <module>vip-physical-properties</module>
     </modules>
     
