@@ -38,14 +38,13 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.agent.vlet.common.bean.GridData;
+import fr.insalyon.creatis.devtools.FileUtils;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.FileCatalogService;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -76,16 +75,7 @@ public class FileCatalogServiceImpl extends RemoteServiceServlet implements File
                             data.getType().name(), data.getPermissions()));
 
                 } else {
-                    long length = data.getLength();
-                    String size = length + " B";
-                    NumberFormat nf = new DecimalFormat("#.##");
-                    if (length / 1024 > 0) {
-                        if (length / (1024 * 1024) > 0) {
-                            size = nf.format(length / (double) (1024 * 1024)) + " MB";
-                        } else {
-                            size = nf.format(length / (double) 1024) + " KB";
-                        }
-                    }
+                    String size = FileUtils.parseFileSize(data.getLength());
                     dataList.add(new Data(data.getName(), data.getType().name(),
                             size, data.getModificationDate(), data.getReplicas(),
                             data.getPermissions()));
