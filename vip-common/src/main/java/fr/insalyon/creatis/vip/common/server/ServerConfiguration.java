@@ -35,10 +35,8 @@
 package fr.insalyon.creatis.vip.common.server;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Properties;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
 
 /**
@@ -54,9 +52,6 @@ public class ServerConfiguration {
     private String confDirPath = "";
     private String adminDN = "/O=GRID-FR/C=FR/O=CNRS/OU=CREATIS/CN=Rafael Silva";
     private String proxiesDir;
-    // H2
-    private String h2Host = "localhost";
-    private int h2Port = 8082;
     // Workflows
     private String workflowsPath = "/var/www/html/workflows";
     private String workflowsDB = "/var/www/workflows.db";
@@ -78,6 +73,10 @@ public class ServerConfiguration {
     private String keystorePass = "";
     private String truststoreFile = "/usr/local/apache-tomcat-6.0.29/conf/truststore.jks";
     private String truststorePass = "";
+    // Mail
+    private String mailSmtpHost = "";
+    private String mailFrom = "";
+    private String[] newsRecipients = new String[]{};
     // Data Management
     private String dataManagerPath = "/tmp";
     private String dataManagerLFCHost = "lfc-biomed.in2p3.fr";
@@ -98,90 +97,50 @@ public class ServerConfiguration {
 
     private ServerConfiguration() {
 
-        // Configuration Directory
-        confDirPath = System.getenv("HOME") + "/.platform/";
-        File cDir = new File(confDirPath);
-        if (!cDir.exists()) {
-            cDir.mkdir();
-        }
-        String confFilePath = confDirPath + CONF_FILE;
-
-        // Proxies Directory
-        proxiesDir = confDirPath + PROXIES_DIR;
-        File pDir = new File(proxiesDir);
-        if (!pDir.exists()) {
-            pDir.mkdir();
-        }
-
-        Properties prop = new Properties();
-
         try {
-            prop.load(new FileInputStream(confFilePath));
-
-            h2Host = prop.getProperty("h2.host", h2Host);
-            h2Port = new Integer(prop.getProperty("h2.port", h2Port + ""));
-            workflowsPath = prop.getProperty("workflows.directory", workflowsPath);
-            workflowsDB = prop.getProperty("workflows.db.name", workflowsDB);
-            workflowsHost = prop.getProperty("workflows.db.host", workflowsHost);
-            workflowsPort = new Integer(prop.getProperty("workflows.db.port", workflowsPort + ""));
-            vletagentHost = prop.getProperty("vletagent.host", vletagentHost);
-            vletagentPort = new Integer(prop.getProperty("vletagent.port", vletagentPort + ""));
-            moteurServer = prop.getProperty("moteur.host", moteurServer);
-            adminDN = prop.getProperty("admin.dn", adminDN);
-            adminDN = prop.getProperty("admin.dn", adminDN);
-            myProxyHost = prop.getProperty("myproxy.host", myProxyHost);
-            myProxyPort = new Integer(prop.getProperty("myproxy.port", myProxyPort + ""));
-            keystoreFile = prop.getProperty("keystore.file", keystoreFile);
-            keystorePass = prop.getProperty("keystore.password", keystorePass);
-            truststoreFile = prop.getProperty("truststore.file", truststoreFile);
-            truststorePass = prop.getProperty("truststore.password", truststorePass);
-            apacheHost = prop.getProperty("apache.host", apacheHost);
-            apacheSSLPort = new Integer(prop.getProperty("apache.ssl.port", apacheSSLPort + ""));
-            dataManagerPath = prop.getProperty("datamanager.path", dataManagerPath);
-            dataManagerLFCHost = prop.getProperty("datamanager.lfc.host", dataManagerLFCHost);
-            dataManagerLFCPort = new Integer(prop.getProperty("datamanager.lfc.port", dataManagerLFCPort + ""));
-            dataManagerUsersHome = prop.getProperty("datamanager.users.home", dataManagerUsersHome);
-            dataManagerGroupsHome = prop.getProperty("datamanager.groups.home", dataManagerGroupsHome);
-            provenanceDBUser = prop.getProperty("provenance.db.user", provenanceDBUser);
-            provenanceDBPass = prop.getProperty("provenance.db.pass", provenanceDBPass);
-            provenanceDBURL = prop.getProperty("provenance.db.url", provenanceDBURL);
-
-        } catch (IOException e) {
-
-            logger.info("Configuration file not found. Creating default file.");
-            try {
-                prop.setProperty("h2.host", h2Host);
-                prop.setProperty("h2.port", h2Port + "");
-                prop.setProperty("workflows.directory", workflowsPath);
-                prop.setProperty("workflows.db.name", workflowsDB);
-                prop.setProperty("workflows.db.host", workflowsHost);
-                prop.setProperty("workflows.db.port", workflowsPort + "");
-                prop.setProperty("vletagent.host", vletagentHost);
-                prop.setProperty("vletagent.port", vletagentPort + "");
-                prop.setProperty("moteur.host", moteurServer);
-                prop.setProperty("admin.dn", adminDN);
-                prop.setProperty("myproxy.host", myProxyHost);
-                prop.setProperty("myproxy.port", myProxyPort + "");
-                prop.setProperty("keystore.file", keystoreFile);
-                prop.setProperty("keystore.password", keystorePass);
-                prop.setProperty("truststore.file", truststoreFile);
-                prop.setProperty("truststore.password", truststorePass);
-                prop.setProperty("apache.host", apacheHost);
-                prop.setProperty("apache.ssl.port", apacheSSLPort + "");
-                prop.setProperty("datamanager.path", dataManagerPath);
-                prop.setProperty("datamanager.lfc.host", dataManagerLFCHost);
-                prop.setProperty("datamanager.lfc.port", dataManagerLFCPort + "");
-                prop.setProperty("datamanager.users.home", dataManagerUsersHome);
-                prop.setProperty("datamanager.groups.home", dataManagerGroupsHome);
-                prop.setProperty("provenance.db.user", provenanceDBUser);
-                prop.setProperty("provenance.db.pass", provenanceDBPass);
-                prop.setProperty("provenance.db.url", provenanceDBURL);
-
-                prop.store(new FileOutputStream(confFilePath), "VIP Configuration File");
-
-            } catch (IOException ex) {
-                logger.error(ex);
+            // Proxies Directory
+            confDirPath = System.getenv("HOME") + "/.platform/";
+            proxiesDir = confDirPath + PROXIES_DIR;
+            File pDir = new File(proxiesDir);
+            if (!pDir.exists()) {
+                pDir.mkdir();
             }
+
+            String confFilePath = confDirPath + CONF_FILE;
+            PropertiesConfiguration config = new PropertiesConfiguration(confFilePath);
+
+            workflowsPath = config.getString("workflows.directory", workflowsPath);
+            workflowsDB = config.getString("workflows.db.name", workflowsDB);
+            workflowsHost = config.getString("workflows.db.host", workflowsHost);
+            workflowsPort = config.getInt("workflows.db.port", workflowsPort);
+            vletagentHost = config.getString("vletagent.host", vletagentHost);
+            vletagentPort = config.getInt("vletagent.port", vletagentPort);
+            moteurServer = config.getString("moteur.host", moteurServer);
+            adminDN = config.getString("admin.dn", adminDN);
+            myProxyHost = config.getString("myproxy.host", myProxyHost);
+            myProxyPort = config.getInt("myproxy.port", myProxyPort);
+            keystoreFile = config.getString("keystore.file", keystoreFile);
+            keystorePass = config.getString("keystore.password", keystorePass);
+            truststoreFile = config.getString("truststore.file", truststoreFile);
+            truststorePass = config.getString("truststore.password", truststorePass);
+            apacheHost = config.getString("apache.host", apacheHost);
+            apacheSSLPort = config.getInt("apache.ssl.port", apacheSSLPort);
+            mailSmtpHost = config.getString("mail.smtp.host", mailSmtpHost);
+            mailFrom = config.getString("mail.from", mailFrom);
+            newsRecipients = config.getStringArray("news.recipients");
+            dataManagerPath = config.getString("datamanager.path", dataManagerPath);
+            dataManagerLFCHost = config.getString("datamanager.lfc.host", dataManagerLFCHost);
+            dataManagerLFCPort = config.getInt("datamanager.lfc.port", dataManagerLFCPort);
+            dataManagerUsersHome = config.getString("datamanager.users.home", dataManagerUsersHome);
+            dataManagerGroupsHome = config.getString("datamanager.groups.home", dataManagerGroupsHome);
+            provenanceDBUser = config.getString("provenance.db.user", provenanceDBUser);
+            provenanceDBPass = config.getString("provenance.db.pass", provenanceDBPass);
+            provenanceDBURL = config.getString("provenance.db.url", provenanceDBURL);
+            
+            config.save();
+
+        } catch (ConfigurationException ex) {
+            logger.error(ex);
         }
     }
 
@@ -257,6 +216,18 @@ public class ServerConfiguration {
         return truststorePass;
     }
 
+    public String getMailFrom() {
+        return mailFrom;
+    }
+
+    public String getMailSmtpHost() {
+        return mailSmtpHost;
+    }
+
+    public String[] getNewsRecipients() {
+        return newsRecipients;
+    }
+
     public String getDataManagerPath() {
         return dataManagerPath;
     }
@@ -275,14 +246,6 @@ public class ServerConfiguration {
 
     public String getDataManagerGroupsHome() {
         return dataManagerGroupsHome;
-    }
-
-    public String getH2Host() {
-        return h2Host;
-    }
-
-    public int geth2Port() {
-        return h2Port;
     }
 
     public String getProvenanceDBPass() {
