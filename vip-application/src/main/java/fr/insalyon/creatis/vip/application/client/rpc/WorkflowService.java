@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -95,7 +95,7 @@ public interface WorkflowService extends RemoteService {
 
     public SimulationInput getWorkflowInputByUserAndName(String user, String inputName);
 
-    public void removeWorkflowInput(String user, String inputName);
+    public void removeWorkflowInput(String user, String inputName, String application);
 
     public List<String> getStats( List<Workflow> workflowIdList, int type, int binSize);
 }

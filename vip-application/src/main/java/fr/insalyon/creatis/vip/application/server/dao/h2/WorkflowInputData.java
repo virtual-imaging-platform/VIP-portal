@@ -79,13 +79,14 @@ public class WorkflowInputData implements WorkflowInputDAO {
         }
     }
 
-    public void removeWorkflowInput(String user, String inputName) throws DAOException {
+    public void removeWorkflowInput(String user, String inputName, String application) throws DAOException {
         try {
             PreparedStatement stat = connection.prepareStatement("DELETE "
-                    + "FROM WorkflowInput WHERE username=? AND name=?");
+                    + "FROM WorkflowInput WHERE username=? AND name=? AND application=?");
 
             stat.setString(1, user);
             stat.setString(2, inputName);
+            stat.setString(3, application);
             stat.execute();
 
         } catch (SQLException ex) {

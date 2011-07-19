@@ -47,7 +47,7 @@ public interface WorkflowInputDAO {
 
     public String addWorkflowInput(String user, SimulationInput workflowInput) throws DAOException;
 
-    public void removeWorkflowInput(String user, String inputName) throws DAOException;
+    public void removeWorkflowInput(String user, String inputName, String application) throws DAOException;
 
     public List<SimulationInput> getWorkflowInputByUser(String user) throws DAOException;
     

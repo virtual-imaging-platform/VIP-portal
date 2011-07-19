@@ -132,6 +132,7 @@ public class InputsStackSection extends SectionStackSection {
 
                         public void onClick(ClickEvent event) {
                             final String name = rollOverRecord.getAttribute("name");
+                            final String application = rollOverRecord.getAttribute("application");
                             SC.confirm("Do you really want to remove the entry \"" + name + "\"?", new BooleanCallback() {
 
                                 public void execute(Boolean value) {
@@ -147,7 +148,9 @@ public class InputsStackSection extends SectionStackSection {
                                                 loadData();
                                             }
                                         };
-                                        service.removeWorkflowInput(Context.getInstance().getUserDN(), name, callback);
+                                        service.removeWorkflowInput(
+                                                Context.getInstance().getUserDN(), 
+                                                name, application, callback);
                                     }
                                 }
                             });

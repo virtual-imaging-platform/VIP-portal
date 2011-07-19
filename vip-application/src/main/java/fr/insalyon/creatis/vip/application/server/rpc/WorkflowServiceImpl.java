@@ -42,7 +42,6 @@ import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.server.business.InputsBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
-import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputParser;
 import fr.insalyon.creatis.vip.application.server.dao.DAOFactory;
 import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAO;
 import fr.insalyon.creatis.vip.application.server.dao.derby.connection.JobsConnection;
@@ -255,9 +254,9 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         }
     }
 
-    public void removeWorkflowInput(String user, String inputName) {
+    public void removeWorkflowInput(String user, String inputName, String application) {
         try {
-            DAOFactory.getDAOFactory().getWorkflowInputDAO().removeWorkflowInput(user, inputName);
+            DAOFactory.getDAOFactory().getWorkflowInputDAO().removeWorkflowInput(user, inputName, application);
         } catch (DAOException ex) {
         }
     }
