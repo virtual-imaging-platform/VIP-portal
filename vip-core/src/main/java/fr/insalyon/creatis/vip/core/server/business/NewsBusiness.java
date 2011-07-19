@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -34,10 +34,22 @@
  */
 package fr.insalyon.creatis.vip.core.server.business;
 
+import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.client.bean.News;
 import fr.insalyon.creatis.vip.core.server.dao.DAOFactory;
+import java.io.UnsupportedEncodingException;
+import java.security.Security;
+import java.util.Date;
 import java.util.List;
+import java.util.Properties;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -45,10 +57,12 @@ import java.util.List;
  */
 public class NewsBusiness {
 
+    private final static Logger logger = Logger.getLogger(NewsBusiness.class);
+
     public List<News> getNews() throws BusinessException {
         try {
             return DAOFactory.getDAOFactory().getNewsDAO().getNews();
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -56,8 +70,10 @@ public class NewsBusiness {
 
     public String add(News news) throws BusinessException {
         try {
-            return DAOFactory.getDAOFactory().getNewsDAO().add(news);
-            
+            String result = DAOFactory.getDAOFactory().getNewsDAO().add(news);
+            sendEmail(news.getTitle(), news.getMessage());
+            return result;
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -66,7 +82,7 @@ public class NewsBusiness {
     public String update(News news) throws BusinessException {
         try {
             return DAOFactory.getDAOFactory().getNewsDAO().update(news);
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -75,8 +91,59 @@ public class NewsBusiness {
     public String remove(News news) throws BusinessException {
         try {
             return DAOFactory.getDAOFactory().getNewsDAO().remove(news);
-            
+
         } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    public void sendEmail(String subject, String content) throws BusinessException {
+
+        try {
+            Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+            Properties props = new Properties();
+            props.setProperty("mail.transport.protocol", "smtp");
+            props.setProperty("mail.host", "smtp.creatis.insa-lyon.fr");
+
+            Session session = Session.getDefaultInstance(props);
+            session.setDebug(false);
+
+            MimeMessage mimeMessage = new MimeMessage(session);
+            mimeMessage.setContent(content, "text/html");
+            mimeMessage.addHeader("Content-Type", "text/html");
+
+            InternetAddress from = new InternetAddress(
+                    ServerConfiguration.getInstance().getMailFrom(),
+                    "VIP News");
+            mimeMessage.setReplyTo(new InternetAddress[]{from});
+            mimeMessage.setFrom(from);
+            mimeMessage.setSentDate(new Date());
+            mimeMessage.setSubject("[VIP-News] " + subject);
+
+            Transport transport = session.getTransport();
+            transport.connect();
+
+            InternetAddress[] addressTo = null;
+            String[] recipients = ServerConfiguration.getInstance().getNewsRecipients();
+            
+            if (recipients != null && recipients.length > 0) {
+                addressTo = new InternetAddress[recipients.length];
+                for (int i = 0; i < recipients.length; i++) {
+                    addressTo[i] = new InternetAddress(recipients[i]);
+                }
+                mimeMessage.setRecipients(Message.RecipientType.TO, addressTo);
+
+                transport.sendMessage(mimeMessage, addressTo);
+                transport.close();
+
+            } else {
+                logger.warn("There's no recipients to send the news.");
+            }
+        } catch (UnsupportedEncodingException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        } catch (MessagingException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
