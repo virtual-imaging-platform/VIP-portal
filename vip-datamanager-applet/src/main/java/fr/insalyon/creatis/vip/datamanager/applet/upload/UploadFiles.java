@@ -39,8 +39,6 @@ import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,7 +46,11 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import netscape.javascript.JSObject;
 
 /**
@@ -154,6 +156,14 @@ public class UploadFiles extends javax.swing.JApplet {
             jTable.getColumn(colsName[i]).setPreferredWidth(colsSize[i]);
             jTable.getColumn(colsName[i]).setCellRenderer(new CellRender());
         }
+
+//        List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+//        sortKeys.add(new RowSorter.SortKey(1, SortOrder.DESCENDING));
+//        sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
+
+        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(model);
+//        sorter.setSortKeys(sortKeys);
+        jTable.setRowSorter(sorter);
     }
 
     private void loadData(String baseDir) {
@@ -294,7 +304,7 @@ private void jButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     try {
         if (jTable.getSelectedRowCount() == 0) {
             JOptionPane.showMessageDialog(null, "No data selected.", "Error", JOptionPane.ERROR_MESSAGE);
-            
+
         } else {
             jButton.setText("Uploading...");
             jButton.setEnabled(false);
@@ -339,14 +349,13 @@ private void jButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     }
 
     private void loadRoot() {
-        
+
         jTextField.setText("");
         model.getDataVector().removeAllElements();
         currentDir = null;
-        
+
         for (File root : File.listRoots()) {
-            ImageIcon icon = new ImageIcon(UploadFiles.class.getClassLoader()
-                    .getResource("images/icon-folder.png"));
+            ImageIcon icon = new ImageIcon(UploadFiles.class.getClassLoader().getResource("images/icon-folder.png"));
             model.addRow(new Object[]{icon, root.toString(), "", ""});
         }
     }

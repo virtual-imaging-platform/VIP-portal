@@ -96,8 +96,8 @@
                 <configuration>
                     <keystore>/usr/local/apache-tomcat-6.0.29/conf/keystore.jks</keystore>
                     <alias>1</alias>
-                    <storepass></storepass>
-                    <keypass></keypass>
+                    <storepass>Ra@#sil89</storepass>
+                    <keypass>Ra@#sil89</keypass>
                 </configuration>
             </plugin>
         </plugins>
