@@ -71,6 +71,8 @@ public interface TransferPoolService extends RemoteService {
 
     public void downloadFile(String user, String remoteFile, String userDN, String proxy);
     
+    public void downloadFiles(String user, List<String> remoteFiles, String packName, String userDN, String proxy);
+    
     public void downloadFolder(String user, String remoteFolder, String userDN, String proxy);
     
     public void uploadFile(String user, String remoteFile, String localFile, String userDN, String proxy);

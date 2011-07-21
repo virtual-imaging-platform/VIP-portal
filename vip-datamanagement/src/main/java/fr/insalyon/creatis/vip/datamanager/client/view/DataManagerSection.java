@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -47,7 +47,7 @@ public class DataManagerSection extends SectionStackSection {
 
     private static DataManagerSection instance = null;
     
-    public static SectionStackSection getInstance() {
+    public static DataManagerSection getInstance() {
         if(instance == null){
             instance = new DataManagerSection();
         }
@@ -55,7 +55,7 @@ public class DataManagerSection extends SectionStackSection {
             
     }
 
-    public DataManagerSection() {
+    private DataManagerSection() {
 
         this.setTitle("File Transfer");
         this.setCanCollapse(true);
@@ -69,5 +69,9 @@ public class DataManagerSection extends SectionStackSection {
         hLayout.addMember(OperationLayout.getInstance());
         
         this.addItem(hLayout);
+    }
+    
+    public void expand() {
+        this.setExpanded(true);
     }
 }

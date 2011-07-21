@@ -49,6 +49,9 @@ public class OperationRecord extends ListGridRecord {
     public OperationRecord(String id, String type, String status, String source, 
             String destination, Date date, String owner) {
         
+        if (type.equals("Download_Files")) {
+            type = "Download";
+        }
         setAttribute("typeIcon", "icon-" + type.toLowerCase());
         setAttribute("statusIcon", "icon-" + status.toLowerCase());
         setAttribute("operationId", id);

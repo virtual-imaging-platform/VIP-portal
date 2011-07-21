@@ -200,6 +200,31 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
             logger.error(ex);
         }
     }
+    
+    public void downloadFiles(String user, List<String> remoteFiles, String packName, 
+            String userDN, String proxy) {
+        
+        try {
+            VletAgentPoolClient client = new VletAgentPoolClient(
+                    serverConfiguration.getVletagentHost(),
+                    serverConfiguration.getVletagentPort(),
+                    proxy);
+            
+            List<String> remotePaths = new ArrayList<String>();
+            for (String remoteFile : remoteFiles) {
+                remotePaths.add(DataManagerUtil.parseBaseDir(user, remoteFile));
+            }
+            String localDirPath = serverConfiguration.getDataManagerPath()
+                    + "/downloads/" + packName;
+
+            client.downloadFiles(remotePaths.toArray(new String[]{}), localDirPath, userDN);
+
+        } catch (DataManagerException ex) {
+            logger.error(ex);
+        } catch (VletAgentClientException ex) {
+            logger.error(ex);
+        }
+    }
 
     public void downloadFolder(String user, String remoteFolder, String userDN, String proxy) {
         try {
