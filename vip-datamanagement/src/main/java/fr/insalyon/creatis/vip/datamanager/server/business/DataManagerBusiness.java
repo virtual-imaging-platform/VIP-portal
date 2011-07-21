@@ -36,10 +36,15 @@ package fr.insalyon.creatis.vip.datamanager.server.business;
 
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
+import fr.insalyon.creatis.agent.vlet.common.bean.CachedFile;
+import fr.insalyon.creatis.devtools.FileUtils;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.log4j.Logger;
 
 /**
@@ -47,23 +52,24 @@ import org.apache.log4j.Logger;
  * @author Rafael Silva
  */
 public class DataManagerBusiness {
-    
+
     private final static Logger logger = Logger.getLogger(DataManagerBusiness.class);
-    
+    private ServerConfiguration serverConfiguration = ServerConfiguration.getInstance();
+
     public void configureDataManager(String user, String proxyFileName) throws BusinessException {
-        
+
         VletAgentClient client = new VletAgentClient(
                 ServerConfiguration.getInstance().getVletagentHost(),
                 ServerConfiguration.getInstance().getVletagentPort(),
                 proxyFileName);
 
         String errorMessage = "ERROR: File/Directory exists or "
-                    + "Directory is not empty";
-        
+                + "Directory is not empty";
+
         try {
             client.createDirectory(ServerConfiguration.getInstance().getDataManagerUsersHome(),
                     user.replaceAll(" ", "_").toLowerCase());
-            
+
         } catch (VletAgentClientException ex) {
             if (!ex.getMessage().contains(errorMessage)) {
                 logger.error(ex);
@@ -74,7 +80,7 @@ public class DataManagerBusiness {
             client.createDirectory(ServerConfiguration.getInstance().getDataManagerUsersHome(),
                     user.replace(" ", "_").toLowerCase()
                     + "_" + DataManagerConstants.TRASH_HOME);
-            
+
         } catch (VletAgentClientException ex) {
             if (!ex.getMessage().contains(errorMessage)) {
                 logger.error(ex);
@@ -82,14 +88,56 @@ public class DataManagerBusiness {
             }
         }
     }
-    
+
     public void deleteLocalFile(String fileName) throws BusinessException {
-        
+
         File file = new File(fileName);
         if (file.exists()) {
             file.delete();
         } else {
             logger.error("File '" + fileName + "' does not exist.");
+        }
+    }
+
+    public List<DMCachedFile> getCachedFiles(String proxy) throws BusinessException {
+
+        try {
+            VletAgentClient client = new VletAgentClient(
+                    serverConfiguration.getVletagentHost(),
+                    serverConfiguration.getVletagentPort(),
+                    proxy);
+
+            List<CachedFile> cachedFilesList = client.getCachedFiles();
+            List<DMCachedFile> dmCachedFiles = new ArrayList<DMCachedFile>();
+
+            for (CachedFile cf : cachedFilesList) {
+                dmCachedFiles.add(new DMCachedFile(cf.getPath(),
+                        cf.getName(), FileUtils.parseFileSize((long) cf.getSize()),
+                        cf.getFrequency(), cf.getLastUsage()));
+            }
+
+            return dmCachedFiles;
+
+        } catch (VletAgentClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
+    public void deleteCachedFiles(String proxy, List<String> cachedFiles) throws BusinessException {
+
+        try {
+            VletAgentClient client = new VletAgentClient(
+                    serverConfiguration.getVletagentHost(),
+                    serverConfiguration.getVletagentPort(),
+                    proxy);
+
+            for (String path : cachedFiles) {
+                client.deleteCachedFile(path);
+            }
+        } catch (VletAgentClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
         }
     }
 }

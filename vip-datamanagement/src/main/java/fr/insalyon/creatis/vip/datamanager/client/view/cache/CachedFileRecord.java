@@ -32,20 +32,47 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client;
+package fr.insalyon.creatis.vip.datamanager.client.view.cache;
+
+import com.smartgwt.client.widgets.grid.ListGridRecord;
+import java.util.Date;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DataManagerConstants {
+public class CachedFileRecord extends ListGridRecord {
 
-    public final static String ROOT = "/vip";
-    public final static String USERS_HOME = "Home";
-    public final static String TRASH_HOME = "Trash";
-    public final static String BIOMED_HOME = "Biomed";
-    public final static String GROUP_APPEND = " (group)";
-    // Tab Identifications
-    public final static String MANAGE_OPERATIONS_TAB = "manage-operations-tab";
-    public final static String MANAGE_CACHED_FILES_TAB = "manage-cached-files-tab";
+    public CachedFileRecord() {
+    }
+ 
+    public CachedFileRecord(String path, String name, String size, 
+            int frequency, Date lastUsage) {
+        
+        setAttribute("path", path);
+        setAttribute("name", name);
+        setAttribute("size", size);
+        setAttribute("frequency", frequency);
+        setAttribute("date", lastUsage);
+    }
+    
+    public String getPath() {
+        return getAttributeAsString("path");
+    }
+    
+    public String getName() {
+        return getAttributeAsString("name");
+    }
+    
+    public String getSize() {
+        return getAttributeAsString("size");
+    }
+    
+    public int getFrequency() {
+        return getAttributeAsInt("frequency");
+    }
+    
+    public Date getLastUsage() {
+        return getAttributeAsDate("date");
+    }
 }

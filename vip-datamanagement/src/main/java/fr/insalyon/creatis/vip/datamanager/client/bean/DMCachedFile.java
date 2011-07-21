@@ -32,20 +32,51 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client;
+package fr.insalyon.creatis.vip.datamanager.client.bean;
+
+import com.google.gwt.user.client.rpc.IsSerializable;
+import java.util.Date;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DataManagerConstants {
+public class DMCachedFile implements IsSerializable {
 
-    public final static String ROOT = "/vip";
-    public final static String USERS_HOME = "Home";
-    public final static String TRASH_HOME = "Trash";
-    public final static String BIOMED_HOME = "Biomed";
-    public final static String GROUP_APPEND = " (group)";
-    // Tab Identifications
-    public final static String MANAGE_OPERATIONS_TAB = "manage-operations-tab";
-    public final static String MANAGE_CACHED_FILES_TAB = "manage-cached-files-tab";
+    private String path;
+    private String name;
+    private String size;
+    private int frequency;
+    private Date lastUsage;
+
+    public DMCachedFile() {
+    }
+
+    public DMCachedFile(String path, String name, String size, int frequency, Date lastUsage) {
+        this.path = path;
+        this.name = name;
+        this.size = size;
+        this.frequency = frequency;
+        this.lastUsage = lastUsage;
+    }
+
+    public int getFrequency() {
+        return frequency;
+    }
+
+    public Date getLastUsage() {
+        return lastUsage;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public String getSize() {
+        return size;
+    }
 }

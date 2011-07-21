@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.datamanager.server.rpc;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
@@ -115,6 +116,27 @@ public class DataManagerServiceImpl extends RemoteServiceServlet implements Data
         try {
             LFCBusiness business = new LFCBusiness();
             business.renameFiles(user, proxyFileName, paths);
+            
+        } catch (BusinessException ex) {
+        }
+    }
+    
+    public List<DMCachedFile> getCachedFiles(String proxy) {
+        
+        try {
+            DataManagerBusiness business = new DataManagerBusiness();
+            return business.getCachedFiles(proxy);
+            
+        } catch (BusinessException ex) {
+            return null;
+        }
+    }
+    
+    public void deleteCachedFiles(List<String> cachedFiles, String proxy) {
+        
+        try {
+            DataManagerBusiness business = new DataManagerBusiness();
+            business.deleteCachedFiles(proxy, cachedFiles);
             
         } catch (BusinessException ex) {
         }

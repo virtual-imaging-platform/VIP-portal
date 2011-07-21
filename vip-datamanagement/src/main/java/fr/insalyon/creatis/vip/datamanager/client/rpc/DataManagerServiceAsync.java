@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.datamanager.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import java.util.List;
 import java.util.Map;
@@ -58,4 +59,8 @@ public interface DataManagerServiceAsync {
     public void rename(String user, String proxyFileName, String oldPath, String newPath, AsyncCallback<Void> asyncCallback);
 
     public void renameFiles(String user, String proxyFileName, Map<String, String> paths, AsyncCallback<Void> asyncCallback);
+    
+    public void getCachedFiles(String proxy, AsyncCallback<List<DMCachedFile>> asyncCallback);
+    
+    public void deleteCachedFiles(List<String> cachedFiles, String proxy, AsyncCallback<Void> asyncCallback);
 }

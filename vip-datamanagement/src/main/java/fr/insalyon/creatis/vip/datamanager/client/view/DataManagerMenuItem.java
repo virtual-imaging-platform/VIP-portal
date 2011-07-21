@@ -39,6 +39,7 @@ import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.datamanager.client.view.cache.ManageCachedFilesTab;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.manage.ManageOperationsTab;
 
 /**
@@ -64,7 +65,16 @@ public class DataManagerMenuItem extends MenuItem {
             }
         });
         
-        menu.setItems(manageOperations);
+        MenuItem manageCachedFiles = new MenuItem("Manage Cached Files");
+        manageCachedFiles.setIcon("icon-datamanager-cache.png");
+        manageCachedFiles.addClickHandler(new ClickHandler() {
+
+            public void onClick(MenuItemClickEvent event) {
+                Layout.getInstance().addTab(new ManageCachedFilesTab());
+            }
+        });
+        
+        menu.setItems(manageOperations, manageCachedFiles);
         this.setSubmenu(menu);
     }
 }
