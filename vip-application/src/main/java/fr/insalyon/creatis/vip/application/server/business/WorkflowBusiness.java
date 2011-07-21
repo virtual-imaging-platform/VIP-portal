@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.application.server.business;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
+import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowMoteurConfig;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.GwendiaParser;
@@ -286,21 +287,30 @@ public class WorkflowBusiness {
 
     /**
      * 
-     * @param workflowID
+     * @param simulationID
      * @throws BusinessException 
      */
-    public String getStatus(String workflowID) throws BusinessException {
+    public String getStatus(String simulationID) throws BusinessException {
 
         try {
             WorkflowMoteurConfig moteur = new WorkflowMoteurConfig(
                     ServerConfiguration.getInstance().getMoteurServer());
-            return moteur.getStatus(workflowID);
+            return moteur.getStatus(simulationID);
 
         } catch (RemoteException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         } catch (ServiceException ex) {
             logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+    
+    public List<InOutData> getInOutData(String simulationID) throws BusinessException {
+        
+        try {
+            return DAOFactory.getDAOFactory().getWorkflowDAO().getInOutData(simulationID);
+        } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }

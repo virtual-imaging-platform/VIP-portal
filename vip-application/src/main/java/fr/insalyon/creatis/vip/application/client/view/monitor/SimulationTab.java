@@ -60,6 +60,7 @@ public class SimulationTab extends Tab {
     private ChartsStackSection chartsStackSection;
     private DiagramStackSection diagramStackSection;
     private LogsStackSection logsStackSection;
+    private InOutDataStackSection inoutStackSection;
 //    private ProvenanceStackSection provenanceStackSection;
 
     public SimulationTab(String simulationID, String status, boolean groupAdmin) {
@@ -83,10 +84,12 @@ public class SimulationTab extends Tab {
         jobsStackSection = new JobsStackSection(simulationID);
         chartsStackSection = new ChartsStackSection(simulationID);
         diagramStackSection = new DiagramStackSection(simulationID);
+        inoutStackSection = new InOutDataStackSection(simulationID);
 //        provenanceStackSection = new ProvenanceStackSection(simulationID, completed);
 
         sectionStack.setSections(
 //                provenanceStackSection,
+                inoutStackSection,
                 summaryStackSection,
                 jobsStackSection,
                 chartsStackSection,
@@ -131,6 +134,7 @@ public class SimulationTab extends Tab {
     }
 
     private void updateData() {
+        inoutStackSection.loadData();
         summaryStackSection.loadData();
         jobsStackSection.loadData();
         diagramStackSection.loadImage();

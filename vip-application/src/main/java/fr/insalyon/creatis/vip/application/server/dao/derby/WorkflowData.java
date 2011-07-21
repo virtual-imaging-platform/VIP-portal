@@ -34,10 +34,13 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao.derby;
 
+import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Workflow;
 import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAO;
 import fr.insalyon.creatis.vip.application.server.dao.derby.connection.WorkflowsConnection;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerException;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -47,6 +50,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -54,6 +58,7 @@ import java.util.List;
  */
 public class WorkflowData implements WorkflowDAO {
 
+    private final static Logger logger = Logger.getLogger(WorkflowData.class);
     private static WorkflowData instance;
     private Connection connection;
 
@@ -121,7 +126,7 @@ public class WorkflowData implements WorkflowDAO {
             return processResultSet(stat.executeQuery());
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return null;
     }
@@ -177,36 +182,7 @@ public class WorkflowData implements WorkflowDAO {
             return users;
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
-
-    /**
-     * Gets the moteur identification and key for a specific workflow.
-     *
-     * @param workflowID Workflow identification
-     * @return Array with moteur identification at position 0 and key at position 1
-     */
-    public int[] getMoteurIDAndKey(String workflowID) {
-        try {
-            int[] moteurData = new int[2];
-            PreparedStatement stat = connection.prepareStatement(
-                    "SELECT moteur_id, moteur_key "
-                    + "FROM Workflows WHERE id=?");
-
-            stat.setString(1, workflowID);
-
-            ResultSet rs = stat.executeQuery();
-            rs.next();
-
-            moteurData[0] = rs.getInt("moteur_id");
-            moteurData[1] = rs.getInt("moteur_key");
-
-            return moteurData;
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return null;
     }
@@ -221,7 +197,7 @@ public class WorkflowData implements WorkflowDAO {
             stat.executeUpdate();
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
     }
 
@@ -314,7 +290,7 @@ public class WorkflowData implements WorkflowDAO {
                             }
 
                         } catch (SQLException ex) {
-                            ex.printStackTrace();
+                            logger.error(ex);
                         }
 
                         break;
@@ -342,13 +318,13 @@ public class WorkflowData implements WorkflowDAO {
                             }
 
                         } catch (SQLException ex) {
-                            ex.printStackTrace();
+                            logger.error(ex);
                         }
                         break;
 
                     default:
                         stringExe = jd.getExecutionPerNumberOfJobs(1000000).get(0);
-                        System.out.println("No type defined for stats, using default execution stats");
+                        logger.info("No type defined for stats, using default execution stats");
                 }
 
 
@@ -357,20 +333,54 @@ public class WorkflowData implements WorkflowDAO {
             switch (type) {
                 case 1:
                     list.add(Integer.toString(nbJobs) + "##" + Integer.toString(execTime) + "##" + Integer.toString(uploadTime) + "##" + Integer.toString(downloadTime));
-                    System.out.println("getStats case 1 list contains " + Integer.toString(nbJobs) + "##" + Integer.toString(execTime) + "##" + Integer.toString(uploadTime) + "##" + Integer.toString(downloadTime));
+                    logger.info("getStats case 1 list contains " + Integer.toString(nbJobs) + "##" + Integer.toString(execTime) + "##" + Integer.toString(uploadTime) + "##" + Integer.toString(downloadTime));
                     break;
                 case 2:
                     nbJobs = completed + cancelled + error;
                     list.add(Integer.toString(nbJobs) + "##" + Integer.toString(completed) + "##" + Integer.toString(cancelled) + "##" + Integer.toString(error));
-                    System.out.println("getStats case 2 list contains " + Integer.toString(nbJobs) + "##" + Integer.toString(completed) + "##" + Integer.toString(cancelled) + "##" + Integer.toString(error));
+                    logger.info("getStats case 2 list contains " + Integer.toString(nbJobs) + "##" + Integer.toString(completed) + "##" + Integer.toString(cancelled) + "##" + Integer.toString(error));
                     break;
                 default:
 
-                    System.out.println("No type defined for stats, using default execution stats");
+                    logger.info("No type defined for stats, using default execution stats");
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return list;
+    }
+
+    /**
+     * 
+     * @param simulationID
+     * @return
+     * @throws DAOException 
+     */
+    public List<InOutData> getInOutData(String simulationID) throws DAOException {
+        
+        try {
+            List<InOutData> data = new ArrayList<InOutData>();
+            PreparedStatement stat = connection.prepareStatement(
+                    "SELECT path, processor, port FROM Outputs WHERE workflow_id=?");
+
+            stat.setString(1, simulationID);
+            ResultSet rs = stat.executeQuery();
+
+            while (rs.next()) {
+                try {
+                    data.add(new InOutData(
+                            DataManagerUtil.parseRealDir(rs.getString("path")),
+                            rs.getString("processor"),
+                            rs.getString("port")));
+                } catch (DataManagerException ex) {
+                    logger.warn(ex);
+                }
+            }
+            return data;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
     }
 }

@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao;
 
+import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Workflow;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import java.util.Date;
@@ -66,14 +67,6 @@ public interface WorkflowDAO {
     public List<String> getApplications();
 
     /**
-     * Gets the moteur identification and key for a specific workflow.
-     *
-     * @param workflowID Workflow identification
-     * @return Array with moteur identification at position 0 and key at position 1
-     */
-    public int[] getMoteurIDAndKey(String workflowID);
-
-    /**
      * 
      * @param workflowID
      * @param status
@@ -103,4 +96,12 @@ public interface WorkflowDAO {
     public void delete(String workflowID) throws DAOException;
 
     public List<String> getStats(List<Workflow> workflowIdList, int type, int binSize);
+    
+    /**
+     * 
+     * @param simulationID
+     * @return
+     * @throws DAOException 
+     */
+    public List<InOutData> getInOutData(String simulationID) throws DAOException;
 }

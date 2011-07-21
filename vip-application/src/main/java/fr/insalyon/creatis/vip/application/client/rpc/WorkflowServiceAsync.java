@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.application.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Workflow;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import java.util.Date;
@@ -52,7 +53,7 @@ public interface WorkflowServiceAsync {
     public void getApplicationsAndUsersList(String applicationClass, AsyncCallback<List<String>[]> asyncCallback);
 
     public void getWorkflows(String user, String application, String status, Date startDate, Date endDate, AsyncCallback<List<Workflow>> asyncCallback);
-    
+
     public void getLogs(String baseDir, AsyncCallback<List<String>> asyncCallback);
 
     public void getWorkflowSources(String user, String proxyFileName, String workflowName, AsyncCallback<List<String>> asyncCallback);
@@ -70,7 +71,7 @@ public interface WorkflowServiceAsync {
     public void cleanWorkflow(String workflowID, String userDN, String proxyFileName, AsyncCallback<Void> asyncCallback);
 
     public void getWorkflowsInputByUser(String user, AsyncCallback<List<SimulationInput>> asyncCallback);
-    
+
     public void getWorkflowsInputByUserAndAppName(String user, String appName, AsyncCallback<List<SimulationInput>> asyncCallback);
 
     public void getWorkflowInputByUserAndName(String user, String inputName, AsyncCallback<SimulationInput> asyncCallback);
@@ -79,7 +80,9 @@ public interface WorkflowServiceAsync {
 
     public void getFileURL(String baseDir, String fileName, AsyncCallback<String> asyncCallback);
 
-    public void getStats( List<Workflow> workflowIdList, int type, int binSize, AsyncCallback<List<String>> asyncCallback);
+    public void getStats(List<Workflow> workflowIdList, int type, int binSize, AsyncCallback<List<String>> asyncCallback);
 
     public void purgeWorkflow(String workflowID, AsyncCallback<Void> asyncCallback);
+
+    public void getInOutData(String simulationID, AsyncCallback<List<InOutData>> asyncCallback);
 }

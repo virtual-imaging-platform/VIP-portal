@@ -38,8 +38,10 @@ package fr.insalyon.creatis.vip.application.client.rpc;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Workflow;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
+import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +83,7 @@ public interface WorkflowService extends RemoteService {
     
     public List<String> getLogs(String baseDir);
 
-    public List<String> getWorkflowSources(String user, String proxyFileName, String workflowName);
+    public List<String> getWorkflowSources(String user, String proxyFileName, String workflowName) throws ApplicationException;
 
     public String getWorkflowInputs(String fileName);
 
@@ -98,4 +100,6 @@ public interface WorkflowService extends RemoteService {
     public void removeWorkflowInput(String user, String inputName, String application);
 
     public List<String> getStats( List<Workflow> workflowIdList, int type, int binSize);
+    
+    public List<InOutData> getInOutData(String simulationID);
 }
