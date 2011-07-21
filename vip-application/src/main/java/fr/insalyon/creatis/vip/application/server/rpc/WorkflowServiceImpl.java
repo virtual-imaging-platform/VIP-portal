@@ -37,9 +37,11 @@ package fr.insalyon.creatis.vip.application.server.rpc;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.devtools.FileUtils;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Workflow;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
+import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.InputsBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.application.server.dao.DAOFactory;
@@ -187,23 +189,24 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         return list;
     }
 
-    public List<String> getWorkflowSources(String user, String proxyFileName, String workflowName) {
+    public List<String> getWorkflowSources(String user, String proxyFileName, 
+            String workflowName) throws ApplicationException {
 
         try {
             WorkflowBusiness business = new WorkflowBusiness();
             return business.getWorkflowSources(user, proxyFileName, workflowName);
 
         } catch (BusinessException ex) {
-            return null;
+            throw new ApplicationException(ex);
         }
     }
 
     public String getWorkflowInputs(String fileName) {
-        
+
         try {
             InputsBusiness business = new InputsBusiness();
             return business.getWorkflowInputs(fileName);
-        
+
         } catch (BusinessException ex) {
             logger.error(ex);
             return null;
@@ -298,6 +301,15 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
             WorkflowBusiness business = new WorkflowBusiness();
             business.purge(workflowID);
         } catch (BusinessException ex) {
+        }
+    }
+
+    public List<InOutData> getInOutData(String simulationID) {
+        try {
+            WorkflowBusiness business = new WorkflowBusiness();
+            return business.getInOutData(simulationID);
+        } catch (BusinessException ex) {
+            return null;
         }
     }
 }
