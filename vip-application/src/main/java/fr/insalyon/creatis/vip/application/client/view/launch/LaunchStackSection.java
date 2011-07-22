@@ -145,7 +145,7 @@ public class LaunchStackSection extends SectionStackSection {
         for (Canvas canvas : formLayout.getMembers()) {
             if (canvas instanceof InputHLayout) {
                 InputHLayout input = (InputHLayout) canvas;
-                if (input.getName().equals(inputName)) {
+                if (input.getName().equals(inputName)) { 
                     input.setValue(value);
                 }
             }
