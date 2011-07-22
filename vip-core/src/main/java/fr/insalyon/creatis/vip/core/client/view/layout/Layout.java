@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.core.client.view.layout;
 
 import com.smartgwt.client.types.VisibilityMode;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -87,13 +88,18 @@ public class Layout {
         vLayout.draw();
     }
 
-    public void addTab(Tab tab) {
+    public void addTab(Tab tab){
+        addTab(tab, true);
+    }
+    
+    public void addTab(Tab tab, boolean select) {
         if (centerTabSet.getTab(tab.getID()) == null) {
             centerTabSet.addTab(tab);
         }
-        centerTabSet.selectTab(tab.getID());
+        if(select)
+            centerTabSet.selectTab(tab.getID());
     }
-    
+       
     public void setActiveCenterTab(String id) {
         centerTabSet.selectTab(id);
     }
@@ -104,5 +110,12 @@ public class Layout {
     
     public void addMainSection(SectionStackSection section) {
         mainSectionStack.addSection(section);
+    }
+    
+    public void removeTab(Tab tab) {
+        if (centerTabSet.getTab(tab.getID()) != null) {
+            centerTabSet.removeTab(tab);
+        }
+        
     }
 }
