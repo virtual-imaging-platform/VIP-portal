@@ -14,7 +14,7 @@
     <version>${vip.portal.version}</version>
     <properties>
         <runTarget>index.html</runTarget>
-        <netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>
+        <netbeans.hint.deploy.server>Tomcat70</netbeans.hint.deploy.server>
     </properties>
     <url>http://maven.apache.org</url>
     <dependencies>
@@ -81,11 +81,11 @@
             <version>${vip.models.version}</version>
         </dependency>
         
-<!--        <dependency>
+      <!--dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-physical-properties</artifactId>
             <version>0.1</version>
-        </dependency>-->
+        </dependency-->
         <!-- END VIP MODULES -->
 
     </dependencies>
