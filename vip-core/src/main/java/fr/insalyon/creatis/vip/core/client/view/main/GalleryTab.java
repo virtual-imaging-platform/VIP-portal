@@ -34,57 +34,29 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.main;
 
-import com.smartgwt.client.widgets.menu.Menu;
-import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.ClickHandler;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
-import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import com.smartgwt.client.types.ContentsType;
+import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.widgets.HTMLPane;
+import com.smartgwt.client.widgets.tab.Tab;
 
 /**
  *
  * @author Rafael Silva
  */
-public class HomeMenuButton extends ToolStripMenuButton {
+public class GalleryTab extends Tab {
 
-    public HomeMenuButton() {
-
-        this.setTitle("VIP");
-        Menu menu = new Menu();
-        menu.setShowShadow(true);
-        menu.setShadowDepth(3);
+    public GalleryTab() {
         
-        // Home
-        MenuItem homeItem = new MenuItem("Home");
-        homeItem.setIcon("icon-home.png");
-        homeItem.addClickHandler(new ClickHandler() {
-
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().setActiveCenterTab("home-tab");
-            }
-        });
+        this.setTitle("Gallery");
+        this.setID("gallery-tab");
+        this.setCanClose(true);
         
-        // Documentation
-        MenuItem documentationItem = new MenuItem("Documentation");
-        documentationItem.setIcon("icon-information.png");
-        documentationItem.addClickHandler(new ClickHandler() {
-
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new DocumentationTab());
-            }
-        });
-
-        //Gallery
-        MenuItem galleryItem = new MenuItem("Gallery");
-        galleryItem.setIcon("icon-gallery.png");
-        galleryItem.addClickHandler(new ClickHandler() {
-
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new GalleryTab());
-            }
-        });
+        HTMLPane pane = new HTMLPane();
+        pane.setOverflow(Overflow.AUTO);
+        pane.setStyleName("defaultBorder");
+        pane.setContentsURL("gallery/index.html");
+        pane.setContentsType(ContentsType.PAGE);
         
-        menu.setItems(homeItem, documentationItem, galleryItem);
-        this.setMenu(menu);
+        this.setPane(pane);
     }
 }
