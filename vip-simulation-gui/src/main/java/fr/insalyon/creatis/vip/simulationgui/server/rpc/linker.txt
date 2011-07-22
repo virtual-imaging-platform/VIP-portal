@@ -1,0 +1,5 @@
+US,FIELD-II v0.2,FIELD-II v0.1.2
+PET,PET-Sorteo v0.2
+CT,Sindbad
+MRI,Simri16 v0.1
+MRI(TEST),testWFSimriPrep-forKevin,Simri16 v0.1

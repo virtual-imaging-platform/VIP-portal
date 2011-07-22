@@ -4,7 +4,6 @@
     <!-- Inherit the core Web Toolkit stuff.                        -->
     <inherits name='com.google.gwt.user.User' />
     <inherits name="com.google.gwt.core.Core" />
-
     <!-- Inherit the default GWT style sheet.  You can change       -->
     <!-- the theme of your GWT application by uncommenting          -->
     <!-- any one of the following lines.                            -->
@@ -18,7 +17,18 @@
     <inherits name='fr.insalyon.creatis.vip.common.Common'/>
     <inherits name='fr.insalyon.creatis.vip.datamanager.DataManager'/>
     <inherits name='fr.insalyon.creatis.vip.core.Core'/>
+    <inherits name='fr.insalyon.creatis.vip.models.Models'/>
+    <inherits name='fr.insalyon.creatis.vip.application.Application'/>
     <inherits name='com.googlecode.gwtgl.binding'/>
+   <inherits name="fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjects" />
+   
     <!-- Servlets -->
-<!--    <servlet class="fr.insalyon.creatis.vip.gatelab.server.rpc.GateLabServiceImpl" path="/gatelabservice"/>-->
+     <servlet  class="fr.insalyon.creatis.vip.simulationgui.server.rpc.VTKControllerImpl" path="/vtkcontroller"/>
+      <servlet class="fr.insalyon.creatis.vip.models.server.rpc.ModelServiceImpl" path="/modelservice"/>
+      <servlet class="fr.insalyon.creatis.vip.application.server.rpc.WorkflowServiceImpl" path="/workflowservice"/>
+    <servlet class="fr.insalyon.creatis.vip.application.server.rpc.JobServiceImpl" path="/jobservice"/>
+
+<!--
+
+<servlet class="fr.insalyon.creatis.vip.gatelab.server.rpc.GateLabServiceImpl" path="/gatelabservice"/>-->
 </module>

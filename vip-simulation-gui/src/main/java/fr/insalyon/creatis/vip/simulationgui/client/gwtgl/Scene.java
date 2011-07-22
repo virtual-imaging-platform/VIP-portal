@@ -1,6 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**  
+ * Sönke Sothmann, Steffen Schäfer : http://code.google.com/p/gwtgl/
+ *
  */
 package fr.insalyon.creatis.vip.simulationgui.client.gwtgl;
 
@@ -8,14 +8,9 @@ package fr.insalyon.creatis.vip.simulationgui.client.gwtgl;
 import static com.google.gwt.core.client.GWT.log;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.event.dom.client.LoadEvent;
-import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
@@ -23,154 +18,190 @@ import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
-import com.google.gwt.resources.client.ImageResource;
-import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Image;
-
-import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.event.dom.client.MouseWheelEvent;
+import com.google.gwt.event.dom.client.MouseWheelHandler;
 import com.googlecode.gwtgl.array.Float32Array;
+import com.googlecode.gwtgl.array.Uint16Array;
 import com.googlecode.gwtgl.binding.WebGLBuffer;
 import com.googlecode.gwtgl.binding.WebGLCanvas;
 import com.googlecode.gwtgl.binding.WebGLProgram;
 import com.googlecode.gwtgl.binding.WebGLRenderingContext;
 import com.googlecode.gwtgl.binding.WebGLShader;
-import com.googlecode.gwtgl.binding.WebGLTexture;
 import com.googlecode.gwtgl.binding.WebGLUniformLocation;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.events.MouseOutEvent;
 
-
-import fr.insalyon.creatis.vip.simulationgui.client.util.MatrixWidget;
 import fr.insalyon.creatis.vip.simulationgui.client.util.math.FloatMatrix;
 import fr.insalyon.creatis.vip.simulationgui.client.util.math.MatrixUtil;
-import fr.insalyon.creatis.vip.simulationgui.client.util.mesh.CubeFactory;
-import fr.insalyon.creatis.vip.simulationgui.client.util.mesh.Mesh;
+import fr.insalyon.creatis.vip.simulationgui.client.util.math.Vector3f;
+
+
 
 /**
  *
  * @author moulin
  */
-public class Scene extends Canvas{
-    
-        private Mesh cube = CubeFactory.createNewInstance(1.0f);
-        private int angleX = 0;
-        private int angleY = 0;
-        private int angleZ = 0;
-        private float translateZ = -2;
-        private float translateX=0;
-        private float translateY=0;
-        //private float translateMouseX=0;
-        //private float translateMouseY=0;
-        private float xMouse=0;
-        private float yMouse=0;
-        boolean checkMouse=false;
-        private FloatMatrix perspectiveMatrix;
-        private FloatMatrix translationMatrix;
-        private FloatMatrix rotationMatrix;
-        private FloatMatrix resultingMatrix;
-        
+
+public class Scene extends Canvas {
+
         private WebGLProgram shaderProgram;
-        private int vertexPositionAttribute;
-        private int textureCoordAttribute;
-        private WebGLBuffer vertexBuffer;
-        private WebGLBuffer vertexTextureCoordBuffer;
-        private WebGLUniformLocation projectionMatrixUniform;
-        private WebGLUniformLocation textureUniform;
-        private WebGLTexture texture;
+        
+        private int vertexPositionAttribute[]=new int[6];
+        private int vertexColorAttribute[]=new int[6];
+        
+        private WebGLBuffer vertexBuffer[]= new WebGLBuffer[6];
+        private WebGLBuffer indexBuffer[]= new WebGLBuffer[6];;
+        private WebGLBuffer colorBuffer[]= new WebGLBuffer[6];;
+        
+        private WebGLUniformLocation projectionMatrixUniform; //projection matrix
+        private WebGLCanvas webGLCanvas = new WebGLCanvas("500px", "500px");
         private WebGLRenderingContext glContext;
-       private WebGLCanvas webGLCanvas = new WebGLCanvas("500px", "500px");
+        
+        private FloatMatrix perspectiveMatrix;
+        private FloatMatrix translationCameraMatrix;
+        private FloatMatrix rotationCameraMatrix;
+        private FloatMatrix translationMatrix[]= new FloatMatrix[6];
+        private FloatMatrix rotationMatrix[]= new FloatMatrix[6];
+        private FloatMatrix resultingMatrix[]= new FloatMatrix[6];
+        private Object3D Object[]= new Object3D[6];
+        
+        // lighting
+        private Vector3f lightingDirection = new Vector3f(0, -1, -1);
+        private float directionalColorRed = 1.0f;
+        private float directionalColorGreen = 0.1f;
+        private float directionalColorBlue = 0.1f;
+        private float ambientColorRed = 0.5f;
+        private float ambientColorGreen = 0.5f;
+        private float ambientColorBlue = 0.5f;
+        
+        // For mouse control
+        private int xMouseRot=0;
+        private int yMouseRot=0;
+        private float xMouseDrag=0;
+        private float yMouseDrag=0;
+        boolean checkMouse=false;
+        
+        // Minimun of object : camera and model
+        private ObjectModel mod;
+        private Camera cam;
+        private int NUM_OBJECT=5;
+        private float stepOfView=2.0f;
        
         private static Scene instance;
-       
+        
         public static Scene getInstance() {
             if (instance == null) {
                 instance = new Scene();
             }
             return instance;
-        }
-    
-        private Scene()
-        {   
-               
+        } 
+        private Scene(){   
+                cam=Camera.getInstance();
+                mod=ObjectModel.getInstance();
+                
+                Object[0]=mod;
+                Object[1]=Object[2]=Object[3]=Object[4]=null;
+                
                 glContext = webGLCanvas.getGlContext();
                 glContext.viewport(0, 0, 500, 500); 
+                
                 this.setWidth(500);
                 this.setHeight(500);
                 this.addChild(webGLCanvas);
                 init();
-        }
-       
-        
-        public void AddObject ()
-        {
-          
-        }
-         
+        }   
         private void init() {
+                createShaderProgram();
                 initParams();
-                initShaders();
                 initBuffers();
-                initTexture();
-                initControls(); 
-                //draw_object();
-                showMatrices();
+                initControls();
+                drawObject();
         }
+        private void initParams() {
+                glContext.viewport(0, 0, this.getOffsetWidth(), this.getOffsetHeight());
+                
+                // Set the background color
+                glContext.clearColor(1.0f, 1.0f, 1.0f, 1.0f);
+                // Set the clear depth (everything is cleared)
+                glContext.clearDepth(1.0f);
 
-        /**
-         * Updates the Matrix widgets every 500ms
-         */
-        private void showMatrices() {
-                Timer timer = new Timer() {
-                       
-                        public void run() {
-                                draw_object();
-                        }
-                };
-                timer.scheduleRepeating(5);
+                // Activate depth test and set the depth function
+                glContext.enable(WebGLRenderingContext.DEPTH_TEST);
+                glContext.depthFunc(WebGLRenderingContext.LEQUAL);
+              
+                checkErrors();
         }
-
-        /**
-         * Initializes the controls of the example.
-         */
-       private void initControls() {
+        private void initBuffers() {
+             
+            // refresh the height context to the simulator child !
+            changeHeighContext(ObjectModel.getInstance().getBoundingBox());
+            for(int i=0;i<=NUM_OBJECT;i++)
+            {
+               if(Object[i]!=null)
+                {
+                // create the vertexBuffer
+                vertexBuffer[i] = glContext.createBuffer();
+                glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vertexBuffer[i]);
+             
+                 
+                glContext.bufferData(WebGLRenderingContext.ARRAY_BUFFER,
+                                Float32Array.create(Object[i].getVertices()),
+                                WebGLRenderingContext.STATIC_DRAW);
+                
+                // create the colorBuffer
+                colorBuffer[i] = glContext.createBuffer();
+                glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, colorBuffer[i]);
+              
+                glContext.bufferData(WebGLRenderingContext.ARRAY_BUFFER,
+                                Float32Array.create(Object[i].getColors()),
+                                WebGLRenderingContext.STATIC_DRAW);
+                
+                // create the indexBuffer
+                indexBuffer[i] = glContext.createBuffer();
+                glContext.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, indexBuffer[i]);
+                
+                glContext.bufferData(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER,
+                                Uint16Array.create(Object[i].getIndices()),
+                                WebGLRenderingContext.STATIC_DRAW);
+                checkErrors();
+                }
+            }
+            
+        }
+        private void initControls() {
                 // Handle keyboard input
                 webGLCanvas.addKeyUpHandler(new KeyUpHandler() {
                         @Override
                         public void onKeyUp(KeyUpEvent event) {
                                 if (event.getNativeKeyCode() == KeyCodes.KEY_UP) {
-                                        translateY += 0.1f;
+                                        
                                         event.stopPropagation();
                                         event.preventDefault();
                                         
                                 }
                                 if (event.getNativeKeyCode() == KeyCodes.KEY_DOWN) {
-                                        translateY -= 0.1f;
+                                       
                                         event.stopPropagation();
                                         event.preventDefault();
                                 }
                                 if (event.getNativeKeyCode() == KeyCodes.KEY_RIGHT) {
-                                        translateX += 0.1f;
+                                      
                                         event.stopPropagation();
                                         event.preventDefault();
                                         
                                 }
                                 if (event.getNativeKeyCode() == KeyCodes.KEY_LEFT) {
-                                        translateX -= 0.1f;
+                                        
                                         event.stopPropagation();
                                         event.preventDefault();
                                 }
                                 if (event.getNativeKeyCode() == KeyCodes.KEY_PAGEUP) {
-                                        translateZ += 0.1f;
+                                       
                                         event.stopPropagation();
                                         event.preventDefault();
                                         
                                 }
                                 if (event.getNativeKeyCode() == KeyCodes.KEY_PAGEDOWN) {
-                                        translateZ -= 0.1f;
+                                       
                                         event.stopPropagation();
                                         event.preventDefault();
                                 }
@@ -178,83 +209,69 @@ public class Scene extends Canvas{
                         }
                 });
                 
-                 webGLCanvas.addMouseUpHandler(new MouseUpHandler(){
-
-                  public void onMouseUp(MouseUpEvent event) {
-         
+                
+                  webGLCanvas.addMouseUpHandler(new MouseUpHandler(){
+                  public void onMouseUp(MouseUpEvent event) {        
                   checkMouse=false;
-                  
-                 //SC.say(" x de la souris " + xMouse + "y de la souris" + yMouse);
-                  //throw new UnsupportedOperationException("Not supported yet.");
                   }
-                     
-                 });
+                     });
+                 
                   webGLCanvas.addMouseMoveHandler(new MouseMoveHandler(){
-
                   public void onMouseMove(MouseMoveEvent event) {
-                  if(checkMouse==true)
+                  if(checkMouse==true )
                   {
-                    translateX+=(event.getClientX()-xMouse)/250;
-                    translateY+=(yMouse-event.getClientY())/250;
-                    xMouse=event.getClientX();
-                    yMouse=event.getClientY();
-                  //throw new UnsupportedOperationException("Not supported yet.");
+                    if(event.isControlKeyDown())
+                    {                 
+                      float add;
+                      add=cam.getTranslateX()+((event.getClientX()-xMouseDrag)/250)*stepOfView;
+                      cam.setTranslateX(add);
+                      add=cam.getTranslateY()+((yMouseDrag-event.getClientY())/250)*stepOfView;
+                      cam.setTranslateY(add);  
+                      xMouseDrag=event.getClientX();
+                      yMouseDrag=event.getClientY(); 
+                      drawObject();
+                   }
+                   else
+                   {    
+                      cam.setAngleX(cam.getAngleX()-event.getClientY()+yMouseRot);
+                      cam.setAngleY(cam.getAngleY()-event.getClientX()+xMouseRot);
+                      xMouseRot=event.getClientX();
+                      yMouseRot=event.getClientY();
+                      drawObject();
                    }
                   }
-                      
-                  });
-              
+                 }
+                });
+                               
                   webGLCanvas.addMouseDownHandler(new MouseDownHandler(){
-
                   public void onMouseDown(MouseDownEvent event) {
-                  xMouse=event.getClientX();
-                  yMouse=event.getClientY();
+                  xMouseDrag=event.getClientX();
+                  yMouseDrag=event.getClientY();
+                  xMouseRot=event.getClientX();
+                  yMouseRot=event.getClientY();
                   checkMouse=true;
-                  //throw new UnsupportedOperationException("Not supported yet.");
-                  }
-                     
+                  }    
                  }); 
+                  
                   webGLCanvas.addMouseOutHandler(new MouseOutHandler(){
-                  public void onMouseOut(com.google.gwt.event.dom.client.MouseOutEvent event)
-                  {
+                  public void onMouseOut(com.google.gwt.event.dom.client.MouseOutEvent event){
                     checkMouse=false;
-                   }
-                              
-                   });
+                   }                
+                  });
                   
                   webGLCanvas.addMouseUpHandler(new MouseUpHandler(){
                   public void onMouseUp(MouseUpEvent event) {
                   checkMouse=false;
-                  
-                 //SC.say(" x de la souris " + xMouse + "y de la souris" + yMouse);
-                  //throw new UnsupportedOperationException("Not supported yet.");
-                  }
-                     
+                  }     
                  });
-        }
-
-        /**
-         * Initialized the params of WebGL.
-         */
-        private void initParams() {
-                glContext.viewport(0, 0, this.getOffsetWidth(), this.getOffsetHeight());
-                
-                // clear with background color
-                glContext.clearColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-                // clear the whole image
-                glContext.clearDepth(1.0f);
-
-                // enable the depth test
-                glContext.enable(WebGLRenderingContext.DEPTH_TEST);
-                glContext.depthFunc(WebGLRenderingContext.LEQUAL);
-                
-                checkErrors();
-        }
-
-        /**
-         * Checks the WebGL Errors and throws an exception if there is an error.
-         */
+                  
+               webGLCanvas.addMouseWheelHandler(new MouseWheelHandler() {
+                public void onMouseWheel(MouseWheelEvent event) {
+                 Camera.getInstance().setTranslateZ((Camera.getInstance().getTranslateZ()-Float.valueOf(event.getDeltaY())));
+                 drawObject(); 
+                }
+                });       
+         }
         private void checkErrors() {
                 int error = glContext.getError();
                 if (error != WebGLRenderingContext.NO_ERROR) {
@@ -263,11 +280,47 @@ public class Scene extends Canvas{
                         throw new RuntimeException(message);
                 }
         }
+        private void drawObject() {
+                // Clear the color buffer and the depth buffer
+            glContext.clear(WebGLRenderingContext.COLOR_BUFFER_BIT | WebGLRenderingContext.DEPTH_BUFFER_BIT);
+            for(int i=0;i<=NUM_OBJECT;i++)
+            {
+                if(Object[i]!=null)
+                {
+                    
+                    glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vertexBuffer[i]);
+                    glContext.vertexAttribPointer(vertexPositionAttribute[i], Object[i].getItemSizeVertex(), WebGLRenderingContext.FLOAT, false, 0, 0);
+                    glContext.enableVertexAttribArray(vertexPositionAttribute[i]);
 
-        /**
-         * Creates the ShaderProgram used by the example to render.
-         */
-        private void initShaders() {
+                    glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, colorBuffer[i]);
+                    glContext.vertexAttribPointer(vertexColorAttribute[i], Object[i].getItemSizeColor(), WebGLRenderingContext.FLOAT, false, 0, 0);
+                    glContext.enableVertexAttribArray(vertexColorAttribute[i]);
+
+                    glContext.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, indexBuffer[i]);
+                    
+                    //camera
+                    translationCameraMatrix=MatrixUtil.createTranslationMatrix(cam.getTranslateX(),cam.getTranslateY(),cam.getTranslateZ());
+                    rotationCameraMatrix=MatrixUtil.createRotationMatrix(cam.getAngleX(),cam.getAngleY(),0);
+     
+                    
+                    //proj
+                    perspectiveMatrix = MatrixUtil.createPerspectiveMatrix(45, 1.0f, 0.1f, 10000);
+                    
+                    //object transf
+                    translationMatrix[i] = MatrixUtil.createTranslationMatrix(Object[i].getTranslateX(),Object[i].getTranslateY(),Object[i].getTranslateZ());
+                    rotationMatrix[i] = MatrixUtil.createRotationMatrix(Object[i].getAngleX(),Object[i].getAngleY(),Object[i].getAngleZ());
+                   
+                    resultingMatrix[i] = perspectiveMatrix.multiply(translationCameraMatrix).multiply(rotationCameraMatrix).multiply(translationMatrix[i]).multiply(rotationMatrix[i]);
+
+                    glContext.uniformMatrix4fv(projectionMatrixUniform, false, resultingMatrix[i].getColumnWiseFlatData());
+                    glContext.drawElements(WebGLRenderingContext.TRIANGLES, Object[i].getNumItemIndex(), WebGLRenderingContext.UNSIGNED_SHORT, 0);
+                   
+                    glContext.flush();
+                    checkErrors();
+                 }
+            }
+        }
+        private void createShaderProgram() {
                 // Create the Shaders
                 WebGLShader fragmentShader = getShader(WebGLRenderingContext.FRAGMENT_SHADER, shaders.INSTANCE.fragmentShader().getText());
                 log("Created fragment shader");
@@ -292,11 +345,6 @@ public class Scene extends Canvas{
                 glContext.attachShader(shaderProgram, fragmentShader);
                 log("fragment shader attached to shader program");
 
-                // Bind vertexPosition to attribute 0
-                glContext.bindAttribLocation(shaderProgram, 0, "vertexPosition");
-                // Bind texPosition to attribute 1
-                glContext.bindAttribLocation(shaderProgram, 1, "texPosition");
-                
                 // Link the Shader Program
                 glContext.linkProgram(shaderProgram);
                 if (!glContext.getProgramParameterb(shaderProgram,
@@ -305,167 +353,51 @@ public class Scene extends Canvas{
                 }
                 log("Shader program linked");
                 
-
                 // Set the ShaderProgram active
                 glContext.useProgram(shaderProgram);
 
-                vertexPositionAttribute = glContext.getAttribLocation(shaderProgram, "vertexPosition");
-                glContext.enableVertexAttribArray(vertexPositionAttribute);
-                
-                textureCoordAttribute = glContext.getAttribLocation(shaderProgram, "texPosition");
-            glContext.enableVertexAttribArray(textureCoordAttribute);
-
-                // get the position of the projectionMatrix uniform.
-                projectionMatrixUniform = glContext.getUniformLocation(shaderProgram,
-                                "projectionMatrix");
-                
-                // get the position of the tex uniform.
-                textureUniform = glContext.getUniformLocation(shaderProgram, "tex");
-                
+                for(int i=0;i<=NUM_OBJECT;i++)
+                {
+                    vertexPositionAttribute[i] = glContext.getAttribLocation(shaderProgram, "vertexPosition");
+                    vertexColorAttribute[i] = glContext.getAttribLocation(shaderProgram, "vertexColor");
+                    projectionMatrixUniform = glContext.getUniformLocation(shaderProgram, "projectionMatrix");
+                }
                 checkErrors();
         }
-        
-        /**
-         * Creates an Shader instance defined by the ShaderType and the source.
-         * 
-         * @param type
-         *            the type of the shader to create
-         * @param source
-         *            the source of the shader
-         * @return the created Shader instance.
-         */
         private WebGLShader getShader(int type, String source) {
                 WebGLShader shader = glContext.createShader(type);
+
                 glContext.shaderSource(shader, source);
                 glContext.compileShader(shader);
-                checkErrors();
 
                 // check if the Shader is successfully compiled
-                if (!glContext.getShaderParameterb(shader, WebGLRenderingContext.COMPILE_STATUS)) {
+                if (!glContext.getShaderParameterb(shader,
+                                WebGLRenderingContext.COMPILE_STATUS)) {
                         throw new RuntimeException(glContext.getShaderInfoLog(shader));
                 }
 
                 return shader;
-
         }
-
-        /**
-         * Initializes the buffers for vertex coordinates, normals and texture
-         * coordinates.
-         */
-        private void initBuffers() {
-                vertexBuffer = glContext.createBuffer();
-                glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vertexBuffer);
-                glContext.bufferData(WebGLRenderingContext.ARRAY_BUFFER,
-                                Float32Array.create(cube.getVertices()),
-                                WebGLRenderingContext.STATIC_DRAW);
-                vertexTextureCoordBuffer = glContext.createBuffer();
-                glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vertexTextureCoordBuffer);
-                glContext.bufferData(WebGLRenderingContext.ARRAY_BUFFER, Float32Array.create(cube.getTexCoords()), WebGLRenderingContext.STATIC_DRAW);
-                checkErrors();
+         
+        public void addObject(Object3D obj, int num){   
+            Object[num]=obj;
+            initBuffers();
+            drawObject();
         }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see com.googlecode.gwtgl.example.client.AbstractGwtGLExample#draw()
-         */
-     
-        // @Override
-        private void draw_object() {
-                //angleX = (angleX + 1) % 360;
-                //angleY = (angleY + 1) % 360;
-                // angleZ=(angleZ+2)%360;
-
-                glContext.clear(WebGLRenderingContext.COLOR_BUFFER_BIT | WebGLRenderingContext.DEPTH_BUFFER_BIT);
-
-                glContext.vertexAttribPointer(vertexPositionAttribute, 3,
-                                WebGLRenderingContext.FLOAT, false, 0, 0);
-
-                // Load the vertex data
-                glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vertexBuffer);
-                glContext.vertexAttribPointer(vertexPositionAttribute, 3, WebGLRenderingContext.FLOAT, false, 0, 0);
-                
-                // Load the texture coordinates data
-                glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vertexTextureCoordBuffer);
-                glContext.vertexAttribPointer(textureCoordAttribute, 2, WebGLRenderingContext.FLOAT, false, 0, 0);
-
-                perspectiveMatrix = MatrixUtil.createPerspectiveMatrix(45, 1.0f, 0.1f, 100);
-                translationMatrix = MatrixUtil.createTranslationMatrix(translateX, translateY, translateZ);
-                rotationMatrix = MatrixUtil.createRotationMatrix(angleX, angleY, angleZ);
-                resultingMatrix = perspectiveMatrix.multiply(translationMatrix).multiply(rotationMatrix);
-
-                glContext.uniformMatrix4fv(projectionMatrixUniform, false, resultingMatrix.getColumnWiseFlatData());
-                
-                // Bind the texture to texture unit 0
-                glContext.activeTexture(WebGLRenderingContext.TEXTURE0);
-                glContext.bindTexture(WebGLRenderingContext.TEXTURE_2D, texture);
-
-                // Point the uniform sampler to texture unit 0
-                glContext.uniform1i(textureUniform, 0);
-                glContext.drawArrays(WebGLRenderingContext.TRIANGLES, 0, 36);
-                glContext.flush();
-                checkErrors();
+        public void refreshBuffer(){
+            initBuffers();
         }
-        /**
-         * Initializes the texture of this example.
-         */
-        private void initTexture() {
-                texture = glContext.createTexture();
-                glContext.bindTexture(WebGLRenderingContext.TEXTURE_2D, texture);
-                final Image img = getImage(shaders.INSTANCE.texture());
-                img.addLoadHandler(new LoadHandler() {
-                        @Override
-                        public void onLoad(LoadEvent event) {
-                                RootPanel.get().remove(img);
-                                GWT.log("texture image loaded", null);
-                                glContext.bindTexture(WebGLRenderingContext.TEXTURE_2D, texture);
-                                glContext.texImage2D(WebGLRenderingContext.TEXTURE_2D, 0, WebGLRenderingContext.RGBA, WebGLRenderingContext.RGBA, WebGLRenderingContext.UNSIGNED_BYTE, img.getElement());
-                               
-                        }
-                });
-                checkErrors();
-                glContext.texParameteri(WebGLRenderingContext.TEXTURE_2D, WebGLRenderingContext.TEXTURE_MAG_FILTER, WebGLRenderingContext.LINEAR);
-                glContext.texParameteri(WebGLRenderingContext.TEXTURE_2D, WebGLRenderingContext.TEXTURE_MIN_FILTER, WebGLRenderingContext.LINEAR);
-                glContext.bindTexture(WebGLRenderingContext.TEXTURE_2D, null);
-                checkErrors();
-                
-                
-
+        public void refreshScreen(){
+            drawObject();
         }
-        
-        /**
-         * Converts ImageResource to Image.
-         * @param imageResource
-         * @return {@link Image} to be used as a texture
-         */
-        public Image getImage(final ImageResource imageResource) {
-                final Image img = new Image();
-                img.setVisible(false);
-                RootPanel.get().add(img);
-
-                img.setUrl(imageResource.getURL());
-        
-                return img;
-        }
-        public void setValueTranslation(float x,float y,float z)
+        public void changeCameraView(double[] boundBox)
         {
-            translateX=x/250;
-            translateY=y/250;
-            translateZ=z;
+            cam.setNormalZ(-((float)(boundBox[5]-boundBox[4])*2));          
+            stepOfView=((float)(boundBox[5]-boundBox[4]))/20;
         }
-        public void setValueRotation(int x, int y, int z)
-        {
-            angleX =x;
-            angleY =y;
-            angleZ =z;
+        public void changeHeighContext(double[] boundBox){
+               for(int i=1;i<5;i++){    
+                if(Object[i]!=null)Object[i].setBoundingBox(boundBox);
+               }
         }
-        public void reDraw()
-        {
-            draw_object();
-        }
-
- 
 }
-
-

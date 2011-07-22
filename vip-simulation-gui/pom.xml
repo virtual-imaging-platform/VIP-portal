@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>fr.insalyon.creatis</groupId>
+        <artifactId>vip</artifactId>
+        <version>0.4</version>
+        <relativePath>..</relativePath>
+    </parent>
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip-simulation-gui</artifactId>
     <packaging>jar</packaging>
-    <version>0.1</version>
+    <version>${vip.simulation-gui.version}</version>
     <name>VIP-Simulation-GUI</name>
     <dependencies>
         
@@ -18,21 +24,21 @@
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-common</artifactId>
-            <version>0.3</version>
+            <version>${vip.common.version}</version>
             <scope>provided</scope>
         </dependency>
         
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-core</artifactId>
-            <version>0.3</version>
+            <version>${vip.core.version}</version>
             <scope>provided</scope>
         </dependency>
         
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-datamanager</artifactId>
-            <version>0.3</version>
+            <version>${vip.datamanager.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -45,6 +51,28 @@
             <groupId>com.googlecode.gwtgl</groupId>
             <artifactId>gwtgl-source</artifactId>
             <version>0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>vtk</groupId>
+            <artifactId>vtk</artifactId>
+            <version>0</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-models</artifactId>
+            <version>${vip.models.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-application</artifactId>
+            <version>${vip.application.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-provenance</artifactId>
+            <version>${vip.provenance.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -103,7 +131,11 @@
                     <include>**/*.png</include>
                 </includes>
             </resource>
+            <resource>
+                <directory>src/resources</directory>
+            </resource>
         </resources>
+        
     </build>
     <repositories>
         <repository>

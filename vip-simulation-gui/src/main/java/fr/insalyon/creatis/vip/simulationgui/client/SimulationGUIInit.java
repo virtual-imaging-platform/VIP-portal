@@ -1,9 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package fr.insalyon.creatis.vip.simulationgui.client;
 
+import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.simulationgui.client.gui.SimulationGUIMenuButton;
 import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
 
 /**
@@ -21,6 +20,8 @@ public class SimulationGUIInit{
     }
     
     private SimulationGUIInit(){
+      if (Context.getInstance().hasGroupAccess(new String[]{"Administrator", "VIP"})) {
         MainToolStrip.getInstance().addMenuButton(new SimulationGUIMenuButton());
+       }
     }
 }

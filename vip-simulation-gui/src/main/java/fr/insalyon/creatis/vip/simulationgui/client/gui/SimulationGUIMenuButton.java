@@ -1,9 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
-package fr.insalyon.creatis.vip.simulationgui.client;
+package fr.insalyon.creatis.vip.simulationgui.client.gui;
 
 
 
@@ -16,7 +12,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
  *
- * @author glatard
+ * @author moulin
  */
 public class SimulationGUIMenuButton extends ToolStripMenuButton {
 
@@ -33,13 +29,7 @@ public class SimulationGUIMenuButton extends ToolStripMenuButton {
             Layout.getInstance().addTab(new SimulationGUITab());
             }
        });
-       MenuItem relaunch= new MenuItem("Ouvrir une simulation existante");
-       relaunch.addClickHandler(new ClickHandler(){
-                public void onClick(MenuItemClickEvent event) {
-             Layout.getInstance().addTab(new SimulationGUITab());
-                }
-       });
-       menu.setItems(launch,relaunch);
+       menu.setItems(launch);
        
        this.setMenu(menu);
     }
