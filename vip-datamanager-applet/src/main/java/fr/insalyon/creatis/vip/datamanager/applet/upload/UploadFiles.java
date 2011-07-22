@@ -62,6 +62,8 @@ public class UploadFiles extends javax.swing.JApplet {
     private String[] colsName = new String[]{"", "Name", "Size", "Modification Date"};
     private int[] colsSize = new int[]{30, 250, 70, 175};
     private DefaultTableModel model;
+    private List<RowSorter.SortKey> sortKeys;
+    private TableRowSorter<TableModel> sorter;
     private String currentDir;
     private String SEPARATOR = "/";
     private String user;
@@ -157,17 +159,17 @@ public class UploadFiles extends javax.swing.JApplet {
             jTable.getColumn(colsName[i]).setCellRenderer(new CellRender());
         }
 
-//        List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-//        sortKeys.add(new RowSorter.SortKey(1, SortOrder.DESCENDING));
-//        sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
+        sortKeys = new ArrayList<RowSorter.SortKey>();
+        sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
 
-        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(model);
-//        sorter.setSortKeys(sortKeys);
+        sorter = new TableRowSorter<TableModel>(model);
+        sorter.setSortKeys(sortKeys);
         jTable.setRowSorter(sorter);
     }
 
     private void loadData(String baseDir) {
 
+        jTable.setRowSorter(null);
         this.currentDir = baseDir;
         jTextField.setText(baseDir);
 
@@ -189,6 +191,9 @@ public class UploadFiles extends javax.swing.JApplet {
 
         }
         model.fireTableDataChanged();
+        sorter = new TableRowSorter<TableModel>(model);
+        sorter.setSortKeys(sortKeys);
+        jTable.setRowSorter(sorter);
     }
 
     /** This method is called from within the init() method to

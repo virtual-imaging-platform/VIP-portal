@@ -128,7 +128,15 @@ public class BrowserLayout extends VLayout {
     public ListGridRecord[] getGridSelection() {
         return grid.getSelection();
     }
-    
+
+    public void mask(String maskText) {
+        modal.show(maskText, true);
+    }
+
+    public void unmask() {
+        modal.hide();
+    }
+
     public void setDataUploadWindow(DataUploadWindow dataUploadWindow) {
         this.dataUploadWindow = dataUploadWindow;
     }
