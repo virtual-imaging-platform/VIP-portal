@@ -56,6 +56,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
+import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -122,7 +123,7 @@ public class InputsStackSection extends SectionStackSection {
 
                         public void onClick(ClickEvent event) {
                             String values = rollOverRecord.getAttribute("values");
-                            LaunchTab launchTab = (LaunchTab) Layout.getInstance().getTab(tabID);
+                            AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().getTab(tabID);
                             launchTab.loadInput(values);
                         }
                     });

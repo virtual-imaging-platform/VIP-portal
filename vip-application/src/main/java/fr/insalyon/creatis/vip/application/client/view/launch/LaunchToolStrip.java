@@ -40,6 +40,7 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 import fr.insalyon.creatis.vip.core.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -55,7 +56,7 @@ public class LaunchToolStrip extends ToolStrip {
     private String applicationClass;
     private SelectItem simulatorItem;
 
-    public LaunchToolStrip(final String applicationClass) {
+    public LaunchToolStrip(final String applicationClass, final String id) {
 
         this.applicationClass = applicationClass;
         this.setWidth100();
@@ -67,8 +68,7 @@ public class LaunchToolStrip extends ToolStrip {
             public void onChanged(ChangedEvent event) {
                 String simulationName = simulatorItem.getValueAsString();
                 if (simulationName != null && !simulationName.isEmpty()) {
-                    LaunchTab launchTab = (LaunchTab) Layout.getInstance().
-                            getTab("launch-" + applicationClass.toLowerCase() + "-tab");
+                    AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().getTab(id);
                     launchTab.createSimulation(simulationName);
                     launchTab.addInputsSection();
                 }

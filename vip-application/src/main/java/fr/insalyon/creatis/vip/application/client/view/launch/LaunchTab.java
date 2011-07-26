@@ -34,62 +34,38 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
-import com.smartgwt.client.types.VisibilityMode;
-import com.smartgwt.client.widgets.layout.SectionStack;
-import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 
 /**
  *
  * @author Rafael Silva
  */
-public class LaunchTab extends Tab {
+public class LaunchTab extends AbstractLaunchTab {
 
-    private SectionStack sectionStack;
     private LaunchStackSection launchSection;
-    private LaunchToolStrip launchToolStrip;
-    private InputsStackSection inputsSection;
 
     public LaunchTab(String applicationClass, String applicationName) {
+
+        super("Launch " + applicationName, applicationClass, false,
+                "launch-" + applicationClass.toLowerCase() + "-tab");
         
-        initTab("Launch " + applicationName, applicationClass, false, 
-                "launch-" + applicationName.toLowerCase() + "-tab");
+        initTab(applicationClass);
         createSimulation(applicationName);
         addInputsSection();
     }
 
     public LaunchTab(String applicationClass) {
-        
-        initTab("Launch " + applicationClass, applicationClass, true, 
+
+        super("Launch " + applicationClass, applicationClass, true,
                 "launch-" + applicationClass.toLowerCase() + "-tab");
+        
+        initTab(applicationClass);
     }
 
-    private void initTab(String title, String applicationClass, boolean showToolStrip, String id) {
-
-        this.setTitle(title);
-        this.setID(id);
-        this.setCanClose(true);
-        this.setAttribute("paneMargin", 0);
-
-        launchToolStrip = new LaunchToolStrip(applicationClass);
-
-        VLayout vLayout = new VLayout();
-        if (showToolStrip) {
-            vLayout.addMember(launchToolStrip);
-        }
-        vLayout.setWidth100();
-        vLayout.setHeight100();
-
-        sectionStack = new SectionStack();
-        sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
-        sectionStack.setAnimateSections(true);
+    private void initTab(String applicationClass) {
 
         launchSection = new LaunchStackSection(applicationClass);
-
         sectionStack.setSections(launchSection);
-        vLayout.addMember(sectionStack);
-
-        this.setPane(vLayout);
     }
 
     public void createSimulation(String simulationName) {
@@ -98,17 +74,6 @@ public class LaunchTab extends Tab {
 
     public void loadInput(String values) {
         launchSection.loadInput(values);
-    }
-
-    public void loadInputsList() {
-        inputsSection.loadData();
-    }
-
-    public void addInputsSection() {
-        if (inputsSection == null) {
-            inputsSection = new InputsStackSection(this.getID());
-            sectionStack.addSection(inputsSection);
-        }
     }
 
     /**

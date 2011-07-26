@@ -46,6 +46,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
+import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.Map;
@@ -113,7 +114,7 @@ public class SaveInputWindow extends Window {
 
                         public void onSuccess(String result) {
                             if (!result.contains("Error:")) {
-                                LaunchTab launchTab = (LaunchTab) Layout.getInstance().
+                                AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().
                                         getTab("launch-" + applicationClass.toLowerCase() + "-tab");
                                 launchTab.loadInputsList();
                                 destroy();
