@@ -51,8 +51,8 @@ import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -144,42 +144,36 @@ public class OperationLayout extends VLayout {
     }
 
     public void loadData() {
-        TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<List<PoolOperation>> callback = new AsyncCallback<List<PoolOperation>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get files list: " + caught.getMessage());
+                SC.warn("Unable to get list of operations: " + caught.getMessage());
             }
 
             public void onSuccess(List<PoolOperation> result) {
 
                 List<OperationRecord> dataList = new ArrayList<OperationRecord>();
-                if (result != null) {
-                    boolean hasActiveOperations = false;
-                    for (PoolOperation o : result) {
-                        if (o.getStatus().equals("Running") || o.getStatus().equals("Queued")) {
-                            hasActiveOperations = true;
-                        }
-                        dataList.add(new OperationRecord(o.getId(), o.getType(),
-                                o.getStatus(), o.getSource(), o.getDest(),
-                                o.getRegistration(), o.getUser()));
+                boolean hasActiveOperations = false;
+                for (PoolOperation o : result) {
+                    if (o.getStatus().equals("Running") || o.getStatus().equals("Queued")) {
+                        hasActiveOperations = true;
                     }
-                    grid.setData(dataList.toArray(new OperationRecord[]{}));
-                    modal.hide();
+                    dataList.add(new OperationRecord(o.getId(), o.getType(),
+                            o.getStatus(), o.getSource(), o.getDest(),
+                            o.getRegistration(), o.getUser()));
+                }
+                grid.setData(dataList.toArray(new OperationRecord[]{}));
+                modal.hide();
 
-                    if (!hasActiveOperations) {
-                        timer.cancel();
-                    }
-
-                } else {
-                    modal.hide();
-                    SC.warn("Unable to get list of operations.");
+                if (!hasActiveOperations) {
+                    timer.cancel();
                 }
             }
         };
         modal.show("Loading operations...", true);
         Context context = Context.getInstance();
-        service.getOperations(context.getUserDN(), context.getProxyFileName(), callback);
+        service.getPoolOperations(context.getUserDN(), context.getProxyFileName(), callback);
     }
 
     public ListGridRecord[] getGridSelection() {

@@ -32,31 +32,24 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client.rpc;
+package fr.insalyon.creatis.vip.datamanager.client.view;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
-import java.util.List;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  *
- * @author Rafael Silva, Tristan Glatard
+ * @author Rafael Silva
  */
-public interface TransferPoolServiceAsync {
+public class DataManagerException extends Exception implements IsSerializable {
 
-    public void getOperationById(String id, String proxy, AsyncCallback<PoolOperation> asyncCallback);
+    public DataManagerException() {
+    }
 
-    public void removeOperationById(String id, String proxy, AsyncCallback<Void> asyncCallback);
-    
-    public void removeOperations(List<String> ids, String proxy, AsyncCallback<Void> asyncCallback);
+    public DataManagerException(String message) {
+        super(message);
+    }
 
-    public void downloadFile(String user, String remoteFile, String userDN, String proxy, AsyncCallback<Void> asyncCallback);
-    
-    public void downloadFiles(String user, List<String> remoteFiles, String packName, String userDN, String proxy, AsyncCallback<Void> asyncCallback);
-    
-    public void downloadFolder(String user, String remoteFolder, String userDN, String proxy, AsyncCallback<Void> asyncCallback);
-    
-    public void uploadFile(String user, String remoteFile, String localFile, String userDN, String proxy, AsyncCallback<Void> asyncCallback);
-    
-    public void clearDeleteOperations(String proxy, AsyncCallback<Void> asyncCallback);
+    public DataManagerException(Throwable thrwbl) {
+        super(thrwbl);
+    }
 }

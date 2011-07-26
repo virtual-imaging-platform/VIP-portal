@@ -59,10 +59,6 @@ public interface TransferPoolService extends RemoteService {
         }
     }
 
-    public List<PoolOperation> getOperations(String proxy);
-    
-    public List<PoolOperation> getOperations(String userDN, String proxy);
-
     public PoolOperation getOperationById(String id, String proxy);
 
     public void removeOperationById(String id, String proxy);

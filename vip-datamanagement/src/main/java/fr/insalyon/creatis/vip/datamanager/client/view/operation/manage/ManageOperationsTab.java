@@ -35,8 +35,6 @@
 package fr.insalyon.creatis.vip.datamanager.client.view.operation.manage;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.DateDisplayFormat;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
@@ -54,8 +52,8 @@ import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationRecord;
 import java.util.ArrayList;
 import java.util.List;
@@ -129,7 +127,7 @@ public class ManageOperationsTab extends Tab {
         ListGridField dateField = FieldUtil.getDateField();
 
         grid.setFields(iconField, statusField, sourceField, destField, userField, dateField);
-        
+
         grid.addCellContextClickHandler(new CellContextClickHandler() {
 
             public void onCellContextClick(CellContextClickEvent event) {
@@ -143,37 +141,31 @@ public class ManageOperationsTab extends Tab {
     }
 
     public void loadData() {
-        
-        TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+
+        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<List<PoolOperation>> callback = new AsyncCallback<List<PoolOperation>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get files list: " + caught.getMessage());
+                SC.warn("Unable to get list of operations: " + caught.getMessage());
             }
 
             public void onSuccess(List<PoolOperation> result) {
 
                 List<OperationRecord> dataList = new ArrayList<OperationRecord>();
-                if (result != null) {
-                    for (PoolOperation o : result) {
-                        dataList.add(new OperationRecord(o.getId(), o.getType(),
-                                o.getStatus(), o.getSource(), o.getDest(),
-                                o.getRegistration(), o.getUser()));
-                    }
-                    grid.setData(dataList.toArray(new OperationRecord[]{}));
-                    modal.hide();
-
-                } else {
-                    modal.hide();
-                    SC.warn("Unable to get list of operations.");
+                for (PoolOperation o : result) {
+                    dataList.add(new OperationRecord(o.getId(), o.getType(),
+                            o.getStatus(), o.getSource(), o.getDest(),
+                            o.getRegistration(), o.getUser()));
                 }
+                grid.setData(dataList.toArray(new OperationRecord[]{}));
+                modal.hide();
             }
         };
         modal.show("Loading operations...", true);
         Context context = Context.getInstance();
-        service.getOperations(context.getProxyFileName(), callback);
+        service.getPoolOperations(context.getProxyFileName(), callback);
     }
-    
+
     public ListGridRecord[] getGridSelection() {
         return grid.getSelection();
     }

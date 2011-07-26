@@ -39,6 +39,8 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
+import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import java.util.List;
 import java.util.Map;
 
@@ -74,8 +76,12 @@ public interface DataManagerService extends RemoteService {
     public void rename(String user, String proxyFileName, String oldPath, String newPath);
 
     public void renameFiles(String user, String proxyFileName, Map<String, String> paths);
-    
+
     public List<DMCachedFile> getCachedFiles(String proxy);
-    
+
     public void deleteCachedFiles(List<String> cachedFiles, String proxy);
+
+    public List<PoolOperation> getPoolOperations(String userDN, String proxy) throws DataManagerException;
+
+    public List<PoolOperation> getPoolOperations(String proxy) throws DataManagerException;
 }

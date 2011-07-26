@@ -38,9 +38,12 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
+import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import java.util.List;
 import java.util.Map;
 
@@ -139,6 +142,28 @@ public class DataManagerServiceImpl extends RemoteServiceServlet implements Data
             business.deleteCachedFiles(proxy, cachedFiles);
             
         } catch (BusinessException ex) {
+        }
+    }
+    
+    public List<PoolOperation> getPoolOperations(String userDN, String proxy) throws DataManagerException {
+        
+        try {
+            TransferPoolBusiness business = new TransferPoolBusiness();
+            return business.getOperations(userDN, proxy);
+            
+        } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
+        }
+    }
+    
+    public List<PoolOperation> getPoolOperations(String proxy) throws DataManagerException {
+        
+        try {
+            TransferPoolBusiness business = new TransferPoolBusiness();
+            return business.getOperations(proxy);
+            
+        } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
         }
     }
 }
