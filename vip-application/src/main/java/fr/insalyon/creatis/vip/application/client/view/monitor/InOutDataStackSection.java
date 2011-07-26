@@ -63,7 +63,6 @@ public class InOutDataStackSection extends SectionStackSection {
     private Tree tree;
     private InOutTreeNode inputs;
     private InOutTreeNode outputs;
-    private InOutTreeNode intermediateOutputs;
 
     public InOutDataStackSection(String simulationID) {
 
@@ -75,7 +74,7 @@ public class InOutDataStackSection extends SectionStackSection {
 
         configureTree();
         modal = new ModalWindow(treeGrid);
-        
+
         loadData();
     }
 
@@ -85,17 +84,16 @@ public class InOutDataStackSection extends SectionStackSection {
         tree.setModelType(TreeModelType.CHILDREN);
         tree.setNameProperty("name");
 
-        InOutTreeNode root = new InOutTreeNode("Root", "Simulation", InOutTreeNode.Icon.Simulation);
+        InOutTreeNode root = new InOutTreeNode("Root", "String", InOutTreeNode.Icon.Simulation);
         tree.setRoot(root);
-        
+
         InOutTreeNode node = new InOutTreeNode("Simulation: " + simulationID, "Simulation", InOutTreeNode.Icon.Simulation);
         tree.add(node, root);
-        
-//        inputs = new InOutTreeNode("Inputs", "Input");
-//        tree.add(inputs, node);
-        intermediateOutputs = new InOutTreeNode("Intermediate Outputs", 
-                "Outputs", InOutTreeNode.Icon.Output);
-        tree.add(intermediateOutputs, node);
+
+        inputs = new InOutTreeNode("Inputs", "Simulation", InOutTreeNode.Icon.Input);
+        tree.add(inputs, node);
+        outputs = new InOutTreeNode("Outputs", "Simulation", InOutTreeNode.Icon.Output);
+        tree.add(outputs, node);
         tree.openFolder(node);
 
         treeGrid = new TreeGrid();
@@ -120,28 +118,29 @@ public class InOutDataStackSection extends SectionStackSection {
 
         this.addItem(treeGrid);
     }
-    
+
     public void loadData() {
-        loadOutputs();
+        loadData(inputs, InOutTreeNode.Icon.Input);
+        loadData(outputs, InOutTreeNode.Icon.Output);
     }
-    
-    private void loadOutputs() {
+
+    private void loadData(final InOutTreeNode parent, final InOutTreeNode.Icon icon) {
+
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         AsyncCallback<List<InOutData>> callback = new AsyncCallback<List<InOutData>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Unable to load outputs.");
+                SC.warn("Unable to load data: " + caught.getMessage());
             }
 
             public void onSuccess(List<InOutData> result) {
-                
+
                 for (InOutData data : result) {
-                    
+
                     InOutTreeNode processor = null;
-                    InOutTreeNode port = null;
                     InOutTreeNode output = null;
-                    
-                    for (TreeNode n : tree.getChildren(intermediateOutputs)) {
+
+                    for (TreeNode n : tree.getChildren(parent)) {
                         InOutTreeNode node = (InOutTreeNode) n;
                         if (node.getName().equals(data.getProcessor())) {
                             processor = node;
@@ -149,26 +148,12 @@ public class InOutDataStackSection extends SectionStackSection {
                         }
                     }
                     if (processor == null) {
-                        processor = addNode(data.getProcessor(), "Processor", intermediateOutputs, InOutTreeNode.Icon.Other);
-                        port = addNode(data.getPort(), "Port", processor, InOutTreeNode.Icon.Other);
-                        addNode(data.getPath(), "Output", port, InOutTreeNode.Icon.Output);
+                        processor = addNode(data.getProcessor(), "String", parent, icon);
+                        addNode(data.getPath(), data.getType(), processor, icon);
                         continue;
                     }
-                    
+
                     for (TreeNode n : tree.getChildren(processor)) {
-                        InOutTreeNode node = (InOutTreeNode) n;
-                        if (node.getName().equals(data.getPort())) {
-                            port = node;
-                            break;
-                        }
-                    }
-                    if (port == null) {
-                        port = addNode(data.getPort(), "Port", processor, InOutTreeNode.Icon.Other);
-                        addNode(data.getPath(), "Output", port, InOutTreeNode.Icon.Output);
-                        continue;
-                    }
-                    
-                    for (TreeNode n : tree.getChildren(port)) {
                         InOutTreeNode node = (InOutTreeNode) n;
                         if (node.getName().equals(data.getPath())) {
                             output = node;
@@ -176,17 +161,21 @@ public class InOutDataStackSection extends SectionStackSection {
                         }
                     }
                     if (output == null) {
-                        addNode(data.getPath(), "Output", port, InOutTreeNode.Icon.Output);
+                        addNode(data.getPath(), data.getType(), processor, icon);
                     }
                 }
             }
         };
-        service.getInOutData(simulationID, callback);
+        if (icon == InOutTreeNode.Icon.Input) {
+            service.getInputData(simulationID, callback);
+        } else {
+            service.getOutputData(simulationID, callback);
+        }
     }
-    
-    private InOutTreeNode addNode(String name, String type, 
+
+    private InOutTreeNode addNode(String name, String type,
             InOutTreeNode parent, InOutTreeNode.Icon icon) {
-        
+
         InOutTreeNode node = new InOutTreeNode(name, type, icon);
         tree.add(node, parent);
         return node;

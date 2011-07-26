@@ -304,12 +304,23 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         }
     }
 
-    public List<InOutData> getInOutData(String simulationID) {
+    public List<InOutData> getOutputData(String simulationID) throws ApplicationException {
         try {
             WorkflowBusiness business = new WorkflowBusiness();
-            return business.getInOutData(simulationID);
+            return business.getOutputData(simulationID);
+            
         } catch (BusinessException ex) {
-            return null;
+            throw new ApplicationException(ex);
+        }
+    }
+    
+    public List<InOutData> getInputData(String simulationID) throws ApplicationException {
+        try {
+            WorkflowBusiness business = new WorkflowBusiness();
+            return business.getInputData(simulationID);
+            
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 }

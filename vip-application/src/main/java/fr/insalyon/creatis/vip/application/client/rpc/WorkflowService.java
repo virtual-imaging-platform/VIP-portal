@@ -101,5 +101,7 @@ public interface WorkflowService extends RemoteService {
 
     public List<String> getStats( List<Workflow> workflowIdList, int type, int binSize);
     
-    public List<InOutData> getInOutData(String simulationID);
+    public List<InOutData> getOutputData(String simulationID) throws ApplicationException;
+    
+    public List<InOutData> getInputData(String simulationID) throws ApplicationException;
 }

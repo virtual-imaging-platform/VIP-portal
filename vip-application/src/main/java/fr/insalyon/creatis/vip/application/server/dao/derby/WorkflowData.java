@@ -229,6 +229,12 @@ public class WorkflowData implements WorkflowDAO {
             stat.setString(1, workflowID);
             stat.execute();
 
+            stat = connection.prepareStatement("DELETE "
+                    + "FROM Inputs WHERE workflow_id=?");
+
+            stat.setString(1, workflowID);
+            stat.execute();
+
         } catch (SQLException ex) {
             throw new DAOException(ex);
         }
@@ -353,15 +359,16 @@ public class WorkflowData implements WorkflowDAO {
     /**
      * 
      * @param simulationID
+     * @param type
      * @return
      * @throws DAOException 
      */
-    public List<InOutData> getInOutData(String simulationID) throws DAOException {
-        
+    public List<InOutData> getInOutData(String simulationID, String type) throws DAOException {
+
         try {
             List<InOutData> data = new ArrayList<InOutData>();
             PreparedStatement stat = connection.prepareStatement(
-                    "SELECT path, processor, port FROM Outputs WHERE workflow_id=?");
+                    "SELECT path, processor, type FROM " + type + " WHERE workflow_id=?");
 
             stat.setString(1, simulationID);
             ResultSet rs = stat.executeQuery();
@@ -371,7 +378,7 @@ public class WorkflowData implements WorkflowDAO {
                     data.add(new InOutData(
                             DataManagerUtil.parseRealDir(rs.getString("path")),
                             rs.getString("processor"),
-                            rs.getString("port")));
+                            rs.getString("type")));
                 } catch (DataManagerException ex) {
                     logger.warn(ex);
                 }

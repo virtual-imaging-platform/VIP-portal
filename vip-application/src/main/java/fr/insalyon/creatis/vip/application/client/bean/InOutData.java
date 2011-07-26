@@ -44,23 +44,23 @@ public class InOutData implements IsSerializable {
 
     private String path;
     private String processor;
-    private String port;
+    private String type;
 
     public InOutData() {
     }
 
-    public InOutData(String path, String processor, String port) {
+    public InOutData(String path, String processor, String type) {
         this.path = path;
         this.processor = processor;
-        this.port = port;
+        this.type = type;
     }
 
     public String getPath() {
         return path;
     }
 
-    public String getPort() {
-        return port;
+    public String getType() {
+        return type;
     }
 
     public String getProcessor() {

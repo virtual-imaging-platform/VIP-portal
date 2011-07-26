@@ -96,12 +96,13 @@ public interface WorkflowDAO {
     public void delete(String workflowID) throws DAOException;
 
     public List<String> getStats(List<Workflow> workflowIdList, int type, int binSize);
-    
+
     /**
      * 
      * @param simulationID
+     * @param type
      * @return
      * @throws DAOException 
      */
-    public List<InOutData> getInOutData(String simulationID) throws DAOException;
+    public List<InOutData> getInOutData(String simulationID, String type) throws DAOException;
 }

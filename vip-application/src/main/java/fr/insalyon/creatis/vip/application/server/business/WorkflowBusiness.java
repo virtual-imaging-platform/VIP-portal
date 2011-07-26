@@ -306,10 +306,19 @@ public class WorkflowBusiness {
         }
     }
     
-    public List<InOutData> getInOutData(String simulationID) throws BusinessException {
+    public List<InOutData> getOutputData(String simulationID) throws BusinessException {
         
         try {
-            return DAOFactory.getDAOFactory().getWorkflowDAO().getInOutData(simulationID);
+            return DAOFactory.getDAOFactory().getWorkflowDAO().getInOutData(simulationID, "Outputs");
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
+    public List<InOutData> getInputData(String simulationID) throws BusinessException {
+        
+        try {
+            return DAOFactory.getDAOFactory().getWorkflowDAO().getInOutData(simulationID, "Inputs");
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

@@ -84,5 +84,7 @@ public interface WorkflowServiceAsync {
 
     public void purgeWorkflow(String workflowID, AsyncCallback<Void> asyncCallback);
 
-    public void getInOutData(String simulationID, AsyncCallback<List<InOutData>> asyncCallback);
+    public void getOutputData(String simulationID, AsyncCallback<List<InOutData>> asyncCallback);
+    
+    public void getInputData(String simulationID, AsyncCallback<List<InOutData>> asyncCallback);
 }

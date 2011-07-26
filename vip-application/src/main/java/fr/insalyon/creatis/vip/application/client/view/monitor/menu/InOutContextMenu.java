@@ -75,15 +75,24 @@ public class InOutContextMenu extends Menu {
         this.setShadowDepth(10);
         this.setWidth(90);
 
-        MenuItem downloadOutputItem = new MenuItem("Download File");
-        downloadOutputItem.setIcon("icon-download.png");
-        downloadOutputItem.addClickHandler(new ClickHandler() {
+        MenuItem downloadFilesItem = new MenuItem("Download Files");
+        downloadFilesItem.setIcon("icon-download.png");
+        downloadFilesItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                downloadOutput();
+                download();
             }
         });
         
+        MenuItem downloadFileItem = new MenuItem("Download File");
+        downloadFileItem.setIcon("icon-download.png");
+        downloadFileItem.addClickHandler(new ClickHandler() {
+
+            public void onClick(MenuItemClickEvent event) {
+                downloadFile(node.getName());
+            }
+        });
+
         MenuItem jumpToItem = new MenuItem("Go to Folder");
         jumpToItem.setIcon("icon-jumpto.png");
         jumpToItem.addClickHandler(new ClickHandler() {
@@ -95,23 +104,17 @@ public class InOutContextMenu extends Menu {
             }
         });
 
-        MenuItem downloadPortItem = new MenuItem("Download Files");
-        downloadPortItem.setIcon("icon-download.png");
-        downloadPortItem.addClickHandler(new ClickHandler() {
-
-            public void onClick(MenuItemClickEvent event) {
-                downloadPort();
+        if (!node.getType().equals("Simulation")) {
+            if (node.getType().equals("URI")) {
+                this.setItems(downloadFileItem, jumpToItem);
+            } else {
+                this.setItems(downloadFilesItem);
             }
-        });
-
-        if (node.getType().equals("Output")) {
-            this.setItems(downloadOutputItem, jumpToItem);
-        } else if (node.getType().equals("Port")) {
-            this.setItems(downloadPortItem);
         }
     }
 
-    private void downloadOutput() {
+    private void downloadFile(String path) {
+        
         TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
@@ -130,28 +133,36 @@ public class InOutContextMenu extends Menu {
         modal.show("Adding file to transfer queue...", true);
         Context context = Context.getInstance();
         service.downloadFile(
-                context.getUser(),
-                node.getName(),
+                context.getUser(), path, 
                 context.getUserDN(), context.getProxyFileName(),
                 callback);
     }
+    
+    private void download() {
 
-    private void downloadPort() {
         List<String> paths = new ArrayList<String>();
         for (TreeNode n : tree.getChildren(node)) {
             InOutTreeNode output = (InOutTreeNode) n;
-            paths.add(output.getName());
+            if (output.getType().equals("URI")) {
+                paths.add(output.getName());
+            }
         }
-        downloadFiles(paths, simulationID + "-" + node.getName());
+
+        if (paths.isEmpty()) {
+            SC.say("There are no data stored on the grid.");
+        } else {
+            downloadFiles(paths, simulationID + "-" + node.getName());
+        }
     }
-    
+
     private void downloadFiles(List<String> paths, String packName) {
+
         TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to download file: " + caught.getMessage());
+                SC.warn("Unable to download files: " + caught.getMessage());
             }
 
             public void onSuccess(Void result) {
