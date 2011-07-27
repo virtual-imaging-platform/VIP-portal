@@ -225,11 +225,25 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         }
     }
 
-    public String addWorkflowInput(String user, SimulationInput workflowInput) {
+    public void addSimulationInput(String user, SimulationInput workflowInput) throws ApplicationException {
+        
         try {
-            return DAOFactory.getDAOFactory().getWorkflowInputDAO().addWorkflowInput(user, workflowInput);
-        } catch (DAOException ex) {
-            return null;
+            WorkflowBusiness business = new WorkflowBusiness();
+            business.addSimulationInput(user, workflowInput);
+            
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+    
+    public void updateSimulationInput(String user, SimulationInput workflowInput) throws ApplicationException {
+        
+        try {
+            WorkflowBusiness business = new WorkflowBusiness();
+            business.updateSimulationInput(user, workflowInput);
+            
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 
@@ -249,11 +263,13 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         }
     }
 
-    public SimulationInput getWorkflowInputByUserAndName(String user, String inputName) {
+    public SimulationInput getInputByNameUserApp(String user, String name, String appName) throws ApplicationException {
         try {
-            return DAOFactory.getDAOFactory().getWorkflowInputDAO().getWorkflowInputByUserAndName(user, inputName);
-        } catch (DAOException ex) {
-            return null;
+            WorkflowBusiness business = new WorkflowBusiness();
+            return business.getInputByUserAndName(user, name, appName);
+            
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 

@@ -38,6 +38,7 @@ import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
+import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowMoteurConfig;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.GwendiaParser;
@@ -319,6 +320,42 @@ public class WorkflowBusiness {
         
         try {
             return DAOFactory.getDAOFactory().getWorkflowDAO().getInOutData(simulationID, "Inputs");
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
+    public void addSimulationInput(String user, SimulationInput workflowInput) 
+            throws BusinessException {
+        
+        try {
+            DAOFactory.getDAOFactory().getWorkflowInputDAO()
+                    .addSimulationInput(user, workflowInput);
+            
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
+    public void updateSimulationInput(String user, SimulationInput workflowInput) 
+            throws BusinessException {
+        
+        try {
+            DAOFactory.getDAOFactory().getWorkflowInputDAO()
+                    .updateSimulationInput(user, workflowInput);
+            
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
+    public SimulationInput getInputByUserAndName(String user, String name, 
+            String appName) throws BusinessException {
+        
+        try {
+            return DAOFactory.getDAOFactory().getWorkflowInputDAO()
+                    .getInputByNameUserApp(user, name, appName);
+            
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

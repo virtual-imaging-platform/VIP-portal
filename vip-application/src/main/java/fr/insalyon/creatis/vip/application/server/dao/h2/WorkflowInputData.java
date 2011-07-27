@@ -59,7 +59,7 @@ public class WorkflowInputData implements WorkflowInputDAO {
         connection = PlatformConnection.getInstance().getConnection();
     }
 
-    public String addWorkflowInput(String user, SimulationInput SimulationInput) throws DAOException {
+    public void addSimulationInput(String user, SimulationInput SimulationInput) throws DAOException {
         try {
             PreparedStatement ps = connection.prepareStatement(
                     "INSERT INTO WorkflowInput(username, application, name, inputs) "
@@ -70,8 +70,6 @@ public class WorkflowInputData implements WorkflowInputDAO {
             ps.setString(3, SimulationInput.getName());
             ps.setString(4, SimulationInput.getInputs());
             ps.execute();
-
-            return "Input values were succesfully saved!";
 
         } catch (SQLException ex) {
             logger.error(ex);
@@ -92,6 +90,24 @@ public class WorkflowInputData implements WorkflowInputDAO {
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
+        }
+    }
+
+    public void updateSimulationInput(String user, SimulationInput SimulationInput) throws DAOException {
+        try {
+            PreparedStatement ps = connection.prepareStatement(
+                    "UPDATE WorkflowInput SET inputs=? "
+                    + "WHERE username=? AND application=? AND name=?");
+
+            ps.setString(1, SimulationInput.getInputs());
+            ps.setString(2, user);
+            ps.setString(3, SimulationInput.getApplication());
+            ps.setString(4, SimulationInput.getName());
+            ps.execute();
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException("Error: an entry named \"" + SimulationInput.getName() + "\" already exists.");
         }
     }
 
@@ -148,15 +164,19 @@ public class WorkflowInputData implements WorkflowInputDAO {
         }
     }
 
-    public SimulationInput getWorkflowInputByUserAndName(String user, String name) throws DAOException {
+    public SimulationInput getInputByNameUserApp(String user, String name,
+            String appName) throws DAOException {
+
         try {
             PreparedStatement stat = connection.prepareStatement("SELECT "
                     + "username, application, name, inputs "
-                    + "FROM WorkflowInput WHERE username=? AND name=? "
+                    + "FROM WorkflowInput "
+                    + "WHERE username=? AND name=? AND application=? "
                     + "ORDER BY name");
 
             stat.setString(1, user);
             stat.setString(2, name);
+            stat.setString(3, appName);
             ResultSet rs = stat.executeQuery();
 
             rs.next();

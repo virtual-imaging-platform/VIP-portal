@@ -93,9 +93,11 @@ public interface WorkflowService extends RemoteService {
     
     public List<SimulationInput> getWorkflowsInputByUserAndAppName(String user, String appName);
 
-    public String addWorkflowInput(String user, SimulationInput workflowInput);
+    public void addSimulationInput(String user, SimulationInput workflowInput) throws ApplicationException;
+    
+    public void updateSimulationInput(String user, SimulationInput workflowInput) throws ApplicationException;
 
-    public SimulationInput getWorkflowInputByUserAndName(String user, String inputName);
+    public SimulationInput getInputByNameUserApp(String user, String inputName, String appName) throws ApplicationException;
 
     public void removeWorkflowInput(String user, String inputName, String application);
 

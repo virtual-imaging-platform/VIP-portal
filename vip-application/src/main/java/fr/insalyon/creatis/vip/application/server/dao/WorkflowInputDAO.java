@@ -45,13 +45,15 @@ import java.util.List;
  */
 public interface WorkflowInputDAO {
 
-    public String addWorkflowInput(String user, SimulationInput workflowInput) throws DAOException;
+    public void addSimulationInput(String user, SimulationInput workflowInput) throws DAOException;
 
     public void removeWorkflowInput(String user, String inputName, String application) throws DAOException;
+    
+    public void updateSimulationInput(String user, SimulationInput SimulationInput) throws DAOException;
 
     public List<SimulationInput> getWorkflowInputByUser(String user) throws DAOException;
     
     public List<SimulationInput> getWorkflowInputByUserAndAppName(String user, String appName) throws DAOException;
 
-    public SimulationInput getWorkflowInputByUserAndName(String user, String name) throws DAOException;
+    public SimulationInput getInputByNameUserApp(String user, String name, String appName) throws DAOException;
 }

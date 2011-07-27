@@ -42,14 +42,12 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchStackSection;
 import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import java.util.HashMap;
 import java.util.List;
@@ -64,11 +62,10 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
     private ModalWindow modal;
     private VLayout formLayout;
     private DynamicForm form;
-    private TextItem simulationNameItem;
 
-    public LaunchStackSection(String applicationClass) {
+    public LaunchStackSection(String applicationClass, String launchTabID) {
 
-        super(applicationClass);
+        super(applicationClass, launchTabID);
 
         formLayout = new VLayout(3);
         formLayout.setWidth100();
@@ -111,7 +108,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
             SC.warn(sb.toString());
         }
     }
-    
+
     /**
      * Sets a value to an input name. The value should be in the following forms:
      * 
@@ -123,11 +120,11 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
      * @param value 
      */
     public void setInputValue(String inputName, String value) {
-        
+
         for (Canvas canvas : formLayout.getMembers()) {
             if (canvas instanceof InputHLayout) {
                 InputHLayout input = (InputHLayout) canvas;
-                if (input.getName().equals(inputName)) { 
+                if (input.getName().equals(inputName)) {
                     input.setValue(value);
                 }
             }
@@ -152,7 +149,9 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
             public void onSuccess(List<String> result) {
 
                 if (result != null) {
-                    
+
+                    formLayout.addMember(getSimulatioNameLayout());
+
                     for (String source : result) {
                         formLayout.addMember(new InputHLayout(source));
                     }
@@ -172,16 +171,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
                         }
                     });
                     buttonsLayout.addMember(launchButton);
-
-                    IButton saveButton = new IButton("Save Inputs");
-                    saveButton.addClickHandler(new ClickHandler() {
-
-                        public void onClick(ClickEvent event) {
-                            new SaveInputWindow(applicationClass, simulationName,
-                                    getParametersMap()).show();
-                        }
-                    });
-                    buttonsLayout.addMember(saveButton);
+                    buttonsLayout.addMember(getSaveInputsButton());
                     modal.hide();
 
                 } else {
@@ -202,7 +192,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
      * @return Result of the validation
      */
     private boolean validate() {
-        boolean valid = true;
+        boolean valid = simulationNameItem.validate();
         for (Canvas canvas : formLayout.getMembers()) {
             if (canvas instanceof InputHLayout) {
                 InputHLayout input = (InputHLayout) canvas;

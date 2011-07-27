@@ -62,7 +62,9 @@ public interface WorkflowServiceAsync {
 
     public void getWorkflowInputs(String fileName, AsyncCallback<String> asyncCallback);
 
-    public void addWorkflowInput(String user, SimulationInput workflowInput, AsyncCallback<String> asyncCallback);
+    public void addSimulationInput(String user, SimulationInput workflowInput, AsyncCallback<Void> asyncCallback);
+    
+    public void updateSimulationInput(String user, SimulationInput workflowInput, AsyncCallback<Void> asyncCallback);
 
     public void closeConnection(String workflowID, AsyncCallback<Void> asyncCallback);
 
@@ -74,7 +76,7 @@ public interface WorkflowServiceAsync {
 
     public void getWorkflowsInputByUserAndAppName(String user, String appName, AsyncCallback<List<SimulationInput>> asyncCallback);
 
-    public void getWorkflowInputByUserAndName(String user, String inputName, AsyncCallback<SimulationInput> asyncCallback);
+    public void getInputByNameUserApp(String user, String inputName, String appName, AsyncCallback<SimulationInput> asyncCallback);
 
     public void removeWorkflowInput(String user, String inputName, String application, AsyncCallback<Void> asyncCallback);
 
