@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -50,7 +50,7 @@ public interface JobServiceAsync {
 
     public void getStatusMap(String workflowID, AsyncCallback<Map<String, Integer>> asyncCallback);
 
-    public void getJobsList(String workflowID, AsyncCallback<List<Job>> asyncCallback);
+    public void getJobsList(String simulationID, AsyncCallback<List<Job>> asyncCallback);
 
     public void getFile(String workflowID, String dir, String fileName, String ext, AsyncCallback<String> asyncCallback);
 

@@ -118,11 +118,18 @@ public class JobData implements JobDAO {
                         + "ON j.id = jm.id ORDER BY j.id");
 
                 while (rs.next()) {
-                    jobsList.add(new Job(rs.getString("id"), rs.getString("status"),
+                    String status = rs.getString("status");
+                    int minorStatus = rs.getInt("ms");
+                    
+                    if (!status.equals("RUNNING")) {
+                        minorStatus = -1;
+                    }
+                    
+                    jobsList.add(new Job(rs.getString("id"), status,
                             rs.getString("command"), rs.getString("file_name"),
                             rs.getInt("exit_code"), rs.getString("node_site"),
                             rs.getString("node_name"), rs.getString("parameters"),
-                            rs.getInt("ms")));
+                            minorStatus));
                 }
 
             } else {

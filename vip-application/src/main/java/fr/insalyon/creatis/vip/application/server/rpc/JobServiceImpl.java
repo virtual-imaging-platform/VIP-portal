@@ -39,9 +39,12 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.bean.Node;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
+import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
+import fr.insalyon.creatis.vip.application.server.business.JobBusiness;
 import fr.insalyon.creatis.vip.application.server.dao.DAOFactory;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import java.io.BufferedReader;
 
 import java.io.FileReader;
@@ -66,11 +69,14 @@ public class JobServiceImpl extends RemoteServiceServlet implements JobService {
         }
     }
 
-    public List<Job> getJobsList(String workflowID) {
+    public List<Job> getJobsList(String simulationID) throws ApplicationException {
+        
         try {
-            return DAOFactory.getDAOFactory().getJobDAO(workflowID).getJobs();
-        } catch (DAOException ex) {
-            return null;
+            JobBusiness business = new JobBusiness();
+            return business.getJobsList(simulationID);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 

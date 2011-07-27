@@ -32,53 +32,26 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
+package fr.insalyon.creatis.vip.application.server.business;
 
-package fr.insalyon.creatis.vip.application.client.rpc;
-
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
-import fr.insalyon.creatis.vip.application.client.bean.Node;
-import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
+import fr.insalyon.creatis.vip.application.server.dao.DAOFactory;
+import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
  * @author Rafael Silva
  */
-public interface JobService extends RemoteService {
-
-    public static final String SERVICE_URI = "/jobservice";
-
-    public static class Util {
-
-        public static JobServiceAsync getInstance() {
-
-            JobServiceAsync instance = (JobServiceAsync) GWT.create(JobService.class);
-            ServiceDefTarget target = (ServiceDefTarget) instance;
-            target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
-            return instance;
+public class JobBusiness {
+    
+    public List<Job> getJobsList(String simulationID) throws BusinessException {
+        
+        try {
+            return DAOFactory.getDAOFactory().getJobDAO(simulationID).getJobs();
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
         }
     }
-
-    public Map<String, Integer> getStatusMap(String workflowID);
-
-    public List<Job> getJobsList(String simulationID) throws ApplicationException;
-
-    public String getFile(String workflowID, String dir, String fileName, String ext);
-
-    public List<String> getExecutionPerNumberOfJobs(String workflowID, int binSize);
-
-    public List<String> getDownloadPerNumberOfJobs(String workflowID, int binSize);
-
-    public List<String> getUploadPerNumberOfJobs(String workflowID, int binSize);
-
-    public List<String> getJobsPertTime(String workflowID);
-
-    public Node getNode(String workflowID, String siteName, String nodeName);
-    
-    public void sendSignal(String workflowID, String jobID, ApplicationConstants.JobStatus status);
 }
