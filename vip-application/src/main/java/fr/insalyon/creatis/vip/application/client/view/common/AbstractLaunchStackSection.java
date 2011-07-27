@@ -34,65 +34,38 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.common;
 
-import com.smartgwt.client.types.VisibilityMode;
-import com.smartgwt.client.widgets.layout.SectionStack;
+import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.tab.Tab;
-import fr.insalyon.creatis.vip.application.client.view.launch.InputsStackSection;
-import fr.insalyon.creatis.vip.application.client.view.launch.LaunchToolStrip;
 
 /**
  *
  * @author Rafael Silva
  */
-public abstract class AbstractLaunchTab extends Tab {
+public abstract class AbstractLaunchStackSection extends SectionStackSection {
 
-    protected SectionStack sectionStack;
-    protected LaunchToolStrip launchToolStrip;
-    protected AbstractLaunchStackSection launchSection;
-    protected InputsStackSection inputsSection;
+    protected String applicationClass;
+    protected String simulationName;
+    protected VLayout layout;
 
-    public AbstractLaunchTab(String title, String applicationClass, 
-            boolean showToolStrip, String id) {
+    public AbstractLaunchStackSection(String applicationClass) {
 
-        this.setTitle(title);
-        this.setCanClose(true);
-        this.setAttribute("paneMargin", 0);
-        this.setID(id);
+        this.applicationClass = applicationClass;
+        this.setShowHeader(false);
 
-        launchToolStrip = new LaunchToolStrip(applicationClass, id);
-
-        VLayout vLayout = new VLayout();
-        if (showToolStrip) {
-            vLayout.addMember(launchToolStrip);
-        }
-        vLayout.setWidth100();
-        vLayout.setHeight100();
-
-        sectionStack = new SectionStack();
-        sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
-        sectionStack.setAnimateSections(true);
-
-        vLayout.addMember(sectionStack);
-        this.setPane(vLayout);
+        layout = new VLayout();
+        layout.setWidth100();
+        layout.setHeight100();
+        layout.setPadding(10);
+        layout.setOverflow(Overflow.AUTO);
     }
 
-    public void createSimulation(String simulationName) {
-        launchSection.load(simulationName);
+    public void load(String simulationName) {
+        this.simulationName = simulationName;
+        loadData();
     }
 
-    public void addInputsSection() {
-        if (inputsSection == null) {
-            inputsSection = new InputsStackSection(this.getID());
-            sectionStack.addSection(inputsSection);
-        }
-    }
-
-    public void loadInputsList() {
-        inputsSection.loadData();
-    }
-
-    public void loadInput(String values) {
-        launchSection.loadInput(values);
-    }
+    public abstract void loadInput(String values);
+    
+    protected abstract void loadData();
 }

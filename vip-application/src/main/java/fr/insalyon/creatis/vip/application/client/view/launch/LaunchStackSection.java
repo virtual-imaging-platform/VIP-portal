@@ -35,7 +35,6 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
@@ -43,12 +42,14 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
-import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
+import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchStackSection;
 import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import java.util.HashMap;
 import java.util.List;
@@ -58,25 +59,16 @@ import java.util.Map;
  *
  * @author Rafael Silva
  */
-public class LaunchStackSection extends SectionStackSection {
+public class LaunchStackSection extends AbstractLaunchStackSection {
 
     private ModalWindow modal;
-    private String applicationClass;
-    private String simulationName;
-    private VLayout layout;
     private VLayout formLayout;
     private DynamicForm form;
+    private TextItem simulationNameItem;
 
     public LaunchStackSection(String applicationClass) {
 
-        this.applicationClass = applicationClass;
-
-        this.setShowHeader(false);
-        layout = new VLayout();
-        layout.setWidth100();
-        layout.setHeight100();
-        layout.setPadding(10);
-        layout.setOverflow(Overflow.AUTO);
+        super(applicationClass);
 
         formLayout = new VLayout(3);
         formLayout.setWidth100();
@@ -85,16 +77,6 @@ public class LaunchStackSection extends SectionStackSection {
 
         modal = new ModalWindow(layout);
         this.addItem(layout);
-    }
-
-    /**
-     * Loads the descriptor file of an application
-     * 
-     * @param simulationName Name of the simulation
-     */
-    public void load(String simulationName) {
-        this.simulationName = simulationName;
-        loadData();
     }
 
     /**
@@ -155,7 +137,7 @@ public class LaunchStackSection extends SectionStackSection {
     /**
      * Loads simulation sources list.
      */
-    private void loadData() {
+    protected void loadData() {
 
         formLayout.removeMembers(formLayout.getMembers());
 
@@ -170,6 +152,7 @@ public class LaunchStackSection extends SectionStackSection {
             public void onSuccess(List<String> result) {
 
                 if (result != null) {
+                    
                     for (String source : result) {
                         formLayout.addMember(new InputHLayout(source));
                     }

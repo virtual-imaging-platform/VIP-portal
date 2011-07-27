@@ -42,8 +42,6 @@ import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
  */
 public class LaunchTab extends AbstractLaunchTab {
 
-    private LaunchStackSection launchSection;
-
     public LaunchTab(String applicationClass, String applicationName) {
 
         super("Launch " + applicationName, applicationClass, false,
@@ -68,14 +66,6 @@ public class LaunchTab extends AbstractLaunchTab {
         sectionStack.setSections(launchSection);
     }
 
-    public void createSimulation(String simulationName) {
-        launchSection.load(simulationName);
-    }
-
-    public void loadInput(String values) {
-        launchSection.loadInput(values);
-    }
-
     /**
      * Sets a value to an input name. The value should be in the following forms:
      * 
@@ -87,6 +77,6 @@ public class LaunchTab extends AbstractLaunchTab {
      * @param value 
      */
     public void setInputValue(String inputName, String value) {
-        launchSection.setInputValue(inputName, value);
+        ((LaunchStackSection) launchSection).setInputValue(inputName, value);
     }
 }
