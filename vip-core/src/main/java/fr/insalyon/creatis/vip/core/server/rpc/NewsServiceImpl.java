@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -56,7 +56,6 @@ public class NewsServiceImpl extends RemoteServiceServlet implements NewsService
             return business.getNews();
 
         } catch (BusinessException ex) {
-            logger.error(ex);
             return null;
         }
     }
@@ -67,7 +66,6 @@ public class NewsServiceImpl extends RemoteServiceServlet implements NewsService
             return business.add(news);
 
         } catch (BusinessException ex) {
-            logger.error(ex);
             return null;
         }
     }
@@ -78,7 +76,6 @@ public class NewsServiceImpl extends RemoteServiceServlet implements NewsService
             return business.update(news);
 
         } catch (BusinessException ex) {
-            logger.error(ex);
             return null;
         }
     }
@@ -89,7 +86,6 @@ public class NewsServiceImpl extends RemoteServiceServlet implements NewsService
             return business.remove(news);
 
         } catch (BusinessException ex) {
-            logger.error(ex);
             return null;
         }
     }

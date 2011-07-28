@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -52,6 +53,7 @@ import java.util.Map;
  */
 public class UserData implements UserDAO {
 
+    private final static Logger logger = Logger.getLogger(UserData.class);
     private Connection connection;
 
     public UserData() throws DAOException {
@@ -75,9 +77,10 @@ public class UserData implements UserDAO {
             addGroupToUser(user.getDistinguishedName(), user.getGroups());
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
             return "Error: a user named \"" + user.getDistinguishedName() + "\" already exists.";
         } catch (DAOException ex) {
+            logger.error(ex);
             return "Error: " + ex.getMessage();
         }
         return "The user was succesfully saved!";
@@ -96,7 +99,7 @@ public class UserData implements UserDAO {
             return "The user was succesfully updated!";
 
         } catch (DAOException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
             return "Error: " + ex.getMessage();
         }
     }
@@ -115,7 +118,7 @@ public class UserData implements UserDAO {
             stat.execute();
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
     }
 
@@ -139,7 +142,7 @@ public class UserData implements UserDAO {
             return users;
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return null;
     }
@@ -167,7 +170,7 @@ public class UserData implements UserDAO {
             return new User(dn, groups);
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return null;
     }
@@ -191,7 +194,7 @@ public class UserData implements UserDAO {
                 ps.execute();
 
             } catch (SQLException ex) {
-                ex.printStackTrace();
+                logger.error(ex);
                 throw new DAOException("Error: a group named \"" + groupName + "\" is already associated with the user.");
             }
         }
@@ -208,8 +211,9 @@ public class UserData implements UserDAO {
                     + "PlatformUsersGroups WHERE userdn=?");
             ps.setString(1, userName);
             ps.execute();
+
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
             throw new DAOException(ex.getMessage());
         }
     }
@@ -228,7 +232,7 @@ public class UserData implements UserDAO {
             }
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return false;
     }

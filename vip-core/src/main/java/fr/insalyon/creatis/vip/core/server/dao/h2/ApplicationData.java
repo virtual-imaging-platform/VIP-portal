@@ -43,6 +43,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -50,6 +51,7 @@ import java.util.List;
  */
 public class ApplicationData implements ApplicationDAO {
 
+    private final static Logger logger = Logger.getLogger(ApplicationData.class);
     private Connection connection;
 
     public ApplicationData() throws DAOException {
@@ -71,9 +73,10 @@ public class ApplicationData implements ApplicationDAO {
             }
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
             return "Error: an application named \"" + workflowDescriptor.getName() + "\" already exists.";
         } catch (DAOException ex) {
+            logger.error(ex);
             return "Error: " + ex.getMessage();
         }
         return "The application was succesfully saved!";
@@ -98,10 +101,10 @@ public class ApplicationData implements ApplicationDAO {
             return "The application was succesfully updated!";
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
             return "Error: " + ex.getMessage();
         } catch (DAOException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
             return "Error: " + ex.getMessage();
         }
     }
@@ -115,7 +118,7 @@ public class ApplicationData implements ApplicationDAO {
             stat.execute();
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
     }
 
@@ -192,7 +195,7 @@ public class ApplicationData implements ApplicationDAO {
             return applications;
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return null;
     }
@@ -225,7 +228,7 @@ public class ApplicationData implements ApplicationDAO {
                     rs.getString("lfn"), classes);
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return null;
     }
@@ -238,7 +241,7 @@ public class ApplicationData implements ApplicationDAO {
             ps.execute();
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
             throw new DAOException("Error: an application named \"" + workflowName + "\" is already associated with classes.");
         }
     }
@@ -249,7 +252,7 @@ public class ApplicationData implements ApplicationDAO {
             ps.setString(1, workflowName);
             ps.execute();
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
             throw new DAOException(ex.getMessage());
         }
     }

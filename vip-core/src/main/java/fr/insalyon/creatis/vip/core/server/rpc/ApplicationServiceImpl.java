@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -55,7 +55,6 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             return DAOFactory.getDAOFactory().getApplicationDAO().add(application);
         } catch (DAOException ex) {
-            logger.error(ex);
             return null;
         }
     }
@@ -64,7 +63,6 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             return DAOFactory.getDAOFactory().getApplicationDAO().update(application);
         } catch (DAOException ex) {
-            logger.error(ex);
             return null;
         }
     }
@@ -73,7 +71,6 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             DAOFactory.getDAOFactory().getApplicationDAO().remove(name);
         } catch (DAOException ex) {
-            logger.error(ex);
         }
     }
     
@@ -81,7 +78,6 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             DAOFactory.getDAOFactory().getApplicationDAO().removeClassFromApplication(applicationClass, applicationName);
         } catch (DAOException ex) {
-            logger.error(ex);
         }
     }
 
@@ -89,7 +85,6 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             return DAOFactory.getDAOFactory().getApplicationDAO().getApplication(name);
         } catch (DAOException ex) {
-            logger.error(ex);
             return null;
         }
     }
@@ -98,7 +93,6 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             return DAOFactory.getDAOFactory().getApplicationDAO().getApplications(applicationClass);
         } catch (DAOException ex) {
-            logger.error(ex);
             return null;
         }
     }
@@ -107,7 +101,6 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             return DAOFactory.getDAOFactory().getClassDAO().add(c);
         } catch (DAOException ex) {
-            logger.error(ex);
             return null;
         }
     }
@@ -116,7 +109,6 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             return DAOFactory.getDAOFactory().getClassDAO().update(c);
         } catch (DAOException ex) {
-            logger.error(ex);
             return null;
         }
     }
@@ -125,7 +117,6 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             DAOFactory.getDAOFactory().getClassDAO().remove(name);
         } catch (DAOException ex) {
-            logger.error(ex);
         }
     }
 
@@ -133,7 +124,6 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             return DAOFactory.getDAOFactory().getClassDAO().getClasses();
         } catch (DAOException ex) {
-            logger.error(ex);
             return null;
         }
     }
@@ -142,7 +132,6 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             return DAOFactory.getDAOFactory().getApplicationDAO().getApplicationsName(applicationClass);
         } catch (DAOException ex) {
-            logger.error(ex);
             return null;
         }
     }
@@ -151,7 +140,6 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
         try {
             return DAOFactory.getDAOFactory().getClassDAO().getClass(className);
         } catch (DAOException ex) {
-            logger.error(ex);
             return null;
         }
     }

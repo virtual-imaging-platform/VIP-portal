@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -69,10 +69,8 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
             return business.loadConfiguration(object);
             
         } catch (DAOException ex) {
-            logger.error(ex);
             return null;
         } catch (BusinessException ex) {
-            logger.error(ex);
             return null;
         }
     }
@@ -83,7 +81,6 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
             return business.addGroup(proxy, groupName);
 
         } catch (BusinessException ex) {
-            logger.error(ex);
             return ex.getMessage();
         }
     }
@@ -94,7 +91,6 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
             return business.updateGroup(proxy, oldName, newName);
             
         } catch (BusinessException ex) {
-            logger.error(ex);
             return ex.getMessage();
         }
     }
@@ -105,7 +101,6 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
             business.removeGroup(proxy, groupName);
 
         } catch (BusinessException ex) {
-            logger.error(ex);
         }
     }
 
@@ -113,7 +108,6 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
         try {
             return DAOFactory.getDAOFactory().getGroupDAO().getGroups();
         } catch (DAOException ex) {
-            logger.error(ex);
             return null;
         }
     }
@@ -122,7 +116,6 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
         try {
             return DAOFactory.getDAOFactory().getUserDAO().add(user);
         } catch (DAOException ex) {
-            logger.error(ex);
             return null;
         }
     }
@@ -131,7 +124,6 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
         try {
             return DAOFactory.getDAOFactory().getUserDAO().update(user);
         } catch (DAOException ex) {
-            logger.error(ex);
             return null;
         }
     }
@@ -140,7 +132,6 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
         try {
             DAOFactory.getDAOFactory().getUserDAO().remove(dn);
         } catch (DAOException ex) {
-            logger.error(ex);
         }
     }
 
@@ -148,7 +139,6 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
         try {
             return DAOFactory.getDAOFactory().getUserDAO().getUsers();
         } catch (DAOException ex) {
-            logger.error(ex);
             return null;
         }
     }
@@ -157,7 +147,6 @@ public class ConfigurationServiceImpl extends RemoteServiceServlet implements Co
         try {
             return DAOFactory.getDAOFactory().getUserDAO().getUser(dn);
         } catch (DAOException ex) {
-            logger.error(ex);
             return null;
         }
     }

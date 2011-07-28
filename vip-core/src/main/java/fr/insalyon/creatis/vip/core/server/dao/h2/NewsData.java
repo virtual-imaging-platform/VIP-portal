@@ -46,6 +46,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -53,6 +54,7 @@ import java.util.List;
  */
 public class NewsData implements NewsDAO {
 
+    private final static Logger logger = Logger.getLogger(NewsData.class);
     private Connection connection;
 
     public NewsData() throws DAOException {
@@ -74,6 +76,7 @@ public class NewsData implements NewsDAO {
             return "The news was succesfully saved!";
 
         } catch (SQLException ex) {
+            logger.error(ex);
             return "Error: an entry named \"" + news.getTitle() + "\" already exists.";
         }
     }
@@ -90,6 +93,7 @@ public class NewsData implements NewsDAO {
             return "The news was succesfully removed!";
             
         } catch (SQLException ex) {
+            logger.error(ex);
             return "Error: unable to delete news.";
         }
     }
@@ -108,6 +112,7 @@ public class NewsData implements NewsDAO {
             return "The news was succesfully updated!";
             
         } catch (SQLException ex) {
+            logger.error(ex);
             return "Error: unable to update news.";
         }
     }
@@ -133,6 +138,7 @@ public class NewsData implements NewsDAO {
             return news;
 
         } catch (SQLException ex) {
+            logger.error(ex);
             throw new DAOException(ex);
         }
     }

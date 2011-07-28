@@ -123,6 +123,7 @@ public class ConfigurationBusiness {
                                 userDN, new HashMap(), "", false, "");
                         
                     } catch (Exception ex) {
+                        logger.error(ex);
                         throw new BusinessException(ex);
                     }
                 } else {
@@ -139,6 +140,7 @@ public class ConfigurationBusiness {
         try {
             uri = new URI(conf.getMoteurServer());
         } catch (URISyntaxException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         }
         
@@ -173,6 +175,7 @@ public class ConfigurationBusiness {
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (VletAgentClientException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -198,6 +201,7 @@ public class ConfigurationBusiness {
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (VletAgentClientException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -224,6 +228,7 @@ public class ConfigurationBusiness {
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (VletAgentClientException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         }
     }

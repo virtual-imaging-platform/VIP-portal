@@ -42,6 +42,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -49,6 +50,7 @@ import java.util.List;
  */
 public class GroupData implements GroupDAO {
 
+    private final static Logger logger = Logger.getLogger(GroupData.class);
     private Connection connection;
 
     public GroupData() throws DAOException {
@@ -65,6 +67,7 @@ public class GroupData implements GroupDAO {
             ps.execute();
 
         } catch (SQLException ex) {
+            logger.error(ex);
             throw new DAOException("Error: a group named \"" + groupName + "\" already exists.");
         }
         return "The group was succesfully saved!";
@@ -79,6 +82,7 @@ public class GroupData implements GroupDAO {
             stat.execute();
 
         } catch (SQLException ex) {
+            logger.error(ex);
             throw new DAOException(ex.getMessage());
         }
     }
@@ -97,6 +101,7 @@ public class GroupData implements GroupDAO {
             return "The group was succesfully updated!";
 
         } catch (SQLException ex) {
+            logger.error(ex);
             throw new DAOException("Error: " + ex.getMessage());
         }
     }
@@ -116,7 +121,7 @@ public class GroupData implements GroupDAO {
             return groups;
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return null;
     }

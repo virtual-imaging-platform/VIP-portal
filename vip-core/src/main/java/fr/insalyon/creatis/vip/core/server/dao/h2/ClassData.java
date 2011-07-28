@@ -43,6 +43,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -50,6 +51,7 @@ import java.util.List;
  */
 public class ClassData implements ClassDAO {
 
+    private final static Logger logger = Logger.getLogger(ClassData.class);
     private Connection connection;
 
     public ClassData() throws DAOException {
@@ -70,9 +72,10 @@ public class ClassData implements ClassDAO {
             return "The class was succesfully saved!";
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
             return "Error: an entry named \"" + c.getName() + "\" already exists.";
         } catch (DAOException ex) {
+            logger.error(ex);
             return "Error: " + ex.getMessage();
         }
     }
@@ -85,7 +88,7 @@ public class ClassData implements ClassDAO {
             return "The class was succesfully updated!";
 
         } catch (DAOException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
             return "Error: " + ex.getMessage();
         }
     }
@@ -99,7 +102,7 @@ public class ClassData implements ClassDAO {
             stat.execute();
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
     }
 
@@ -126,7 +129,7 @@ public class ClassData implements ClassDAO {
             return classes;
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return null;
     }
@@ -149,7 +152,7 @@ public class ClassData implements ClassDAO {
             return new AppClass(className, groups);
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return null;
     }
@@ -165,7 +168,7 @@ public class ClassData implements ClassDAO {
                 ps.execute();
 
             } catch (SQLException ex) {
-                ex.printStackTrace();
+                logger.error(ex);
                 throw new DAOException("a group named \"" + groupName + "\" is already associated with the class.");
             }
         }
@@ -178,7 +181,7 @@ public class ClassData implements ClassDAO {
             ps.setString(1, className);
             ps.execute();
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
             throw new DAOException(ex.getMessage());
         }
     }

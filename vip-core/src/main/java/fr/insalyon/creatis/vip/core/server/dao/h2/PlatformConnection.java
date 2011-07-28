@@ -39,6 +39,7 @@ import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -46,6 +47,7 @@ import java.sql.Statement;
  */
 public class PlatformConnection {
 
+    private final static Logger logger = Logger.getLogger(PlatformConnection.class);
     private static PlatformConnection instance;
     private Connection connection;
 
@@ -71,7 +73,7 @@ public class PlatformConnection {
                     + ")");
 
         } catch (SQLException ex) {
-            System.out.println("Table WorkflowInput already created!");
+            logger.info("Table WorkflowInput already created!");
         }
 
         try {
@@ -83,7 +85,7 @@ public class PlatformConnection {
                     + ")");
 
         } catch (SQLException ex) {
-            System.out.println("Table WorkflowDescriptor already created!");
+            logger.info("Table WorkflowDescriptor already created!");
         }
 
         try {
@@ -94,7 +96,7 @@ public class PlatformConnection {
                     + ")");
 
         } catch (SQLException ex) {
-            System.out.println("Table WorkflowClass already created!");
+            logger.info("Table WorkflowClass already created!");
         }
 
         try {
@@ -110,7 +112,7 @@ public class PlatformConnection {
                     + ")");
 
         } catch (SQLException ex) {
-            System.out.println("Table WorkflowClasses already created!");
+            logger.info("Table WorkflowClasses already created!");
         }
         try {
             Statement stat = connection.createStatement();
@@ -122,7 +124,7 @@ public class PlatformConnection {
             stat.executeUpdate("INSERT INTO PlatformGroups(groupname) VALUES('Administrator')");
 
         } catch (SQLException ex) {
-            System.out.println("Table PlatformGroups already created!");
+            logger.info("Table PlatformGroups already created!");
         }
 
         try {
@@ -133,7 +135,7 @@ public class PlatformConnection {
                     + ")");
 
         } catch (SQLException ex) {
-            System.out.println("Table PlatformUsers already created!");
+            logger.info("Table PlatformUsers already created!");
         }
 
         try {
@@ -150,7 +152,7 @@ public class PlatformConnection {
                     + ")");
 
         } catch (SQLException ex) {
-            System.out.println("Table PlatformUsersGroups already created!");
+            logger.info("Table PlatformUsersGroups already created!");
         }
 
         try {
@@ -163,7 +165,7 @@ public class PlatformConnection {
                     + "'Administrator', 'admin')");
 
         } catch (SQLException ex) {
-            System.out.println("Administrator user already setted!");
+            logger.info("Administrator user already setted!");
         }
 
         try {
@@ -179,7 +181,7 @@ public class PlatformConnection {
                     + ")");
 
         } catch (SQLException ex) {
-            System.out.println("Table PlatformGroupsClasses already created!");
+            logger.info("Table PlatformGroupsClasses already created!");
         }
 
         try {
@@ -193,7 +195,7 @@ public class PlatformConnection {
                     + ")");
 
         } catch (SQLException ex) {
-            System.out.println("Table PlatformNews already created!");
+            logger.info("Table PlatformNews already created!");
         }
 
         //// tissues and physical parameters
@@ -205,7 +207,7 @@ public class PlatformConnection {
                     + "PRIMARY KEY (name)"
                     + ")");
         } catch (SQLException ex) {
-            System.out.println("Table Tissues already created!");
+            logger.info("Table Tissues already created!");
         }
 
         try {
@@ -220,7 +222,7 @@ public class PlatformConnection {
                     + "PRIMARY KEY (physicalPropertyId)"
                     + ")");
         } catch (SQLException ex) {
-            System.out.println("Table PhysicalProperties already created!");
+            logger.info("Table PhysicalProperties already created!");
         }
 
         try {
@@ -232,7 +234,7 @@ public class PlatformConnection {
                     + "PRIMARY KEY (physicalPropertyId)"
                     + ")");
         } catch (SQLException ex) {
-            System.out.println("Table ChemicalBlend already created!");
+            logger.info("Table ChemicalBlend already created!");
         }
 
         try {
@@ -243,7 +245,7 @@ public class PlatformConnection {
                     + "elementName VARCHAR(255),"
                     + " PRIMARY KEY (physicalPropertyId, elementName))");
         } catch (SQLException ex) {
-            System.out.println("Table ChemicalComponent already created!");
+            logger.info("Table ChemicalComponent already created!");
         }
 
 
@@ -256,7 +258,7 @@ public class PlatformConnection {
                     + "PRIMARY KEY (physicalPropertyId, propertyName)"
                     + ")");
         } catch (SQLException ex) {
-            System.out.println("Table MagneticProperties already created!");
+            logger.info("Table MagneticProperties already created!");
         }
 
 
@@ -267,7 +269,7 @@ public class PlatformConnection {
                     + "PRIMARY KEY (propertyName)"
                     + ")");
         } catch (SQLException ex) {
-            System.out.println("Table MagneticPropertyNames already created!");
+            logger.info("Table MagneticPropertyNames already created!");
         }
 
         try {
@@ -279,7 +281,7 @@ public class PlatformConnection {
                     + "PRIMARY KEY (physicalPropertyId)"
                     + ")");
         } catch (SQLException ex) {
-            System.out.println("Table Echogenicities already created!");
+            logger.info("Table Echogenicities already created!");
         }
 
         ////distributions
@@ -291,7 +293,7 @@ public class PlatformConnection {
                     + "PRIMARY KEY (distributionName)"
                     + ")");
         } catch (SQLException ex) {
-            System.out.println("Table Distribution already created!");
+            logger.info("Table Distribution already created!");
         }
 
         try {
@@ -303,7 +305,7 @@ public class PlatformConnection {
                     + "PRIMARY KEY (distributionName,symbol)"
                     + ")");
         } catch (SQLException ex) {
-            System.out.println("Table DistributionParameters already created!");
+            logger.info("Table DistributionParameters already created!");
         }
 
         try {
@@ -314,7 +316,7 @@ public class PlatformConnection {
                     + "PRIMARY KEY (instanceid)"
                     + ")");
         } catch (SQLException ex) {
-            System.out.println("Table DistributionInstance already created!");
+            logger.info("Table DistributionInstance already created!");
         }
 
         try {
@@ -326,7 +328,7 @@ public class PlatformConnection {
                     + "PRIMARY KEY (instanceid,parameterSymbol)"
                     + ")");
         } catch (SQLException ex) {
-            System.out.println("Table DistributionInstanceValues already created!");
+            logger.info("Table DistributionInstanceValues already created!");
         }
 
     }
