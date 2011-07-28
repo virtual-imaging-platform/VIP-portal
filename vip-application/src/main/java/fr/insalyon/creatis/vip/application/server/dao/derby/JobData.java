@@ -71,8 +71,10 @@ public class JobData implements JobDAO {
      * @return Jobs status map
      */
     public Map<String, Integer> getStatusMap() throws DAOException {
+
+        Map<String, Integer> statusMap = new HashMap<String, Integer>();
+        
         try {
-            Map<String, Integer> statusMap = new HashMap<String, Integer>();
             Statement stat = connection.createStatement();
             ResultSet rs = stat.executeQuery("SELECT "
                     + "status, COUNT(id) AS total FROM jobs "
@@ -82,12 +84,13 @@ public class JobData implements JobDAO {
                 statusMap.put(rs.getString("status"), rs.getInt("total"));
             }
 
-            return statusMap;
-
         } catch (SQLException ex) {
-            logger.error(ex);
-            throw new DAOException(ex);
+            if (!ex.getMessage().contains("Table/View 'JOBS' does not exist.")) {
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
         }
+        return statusMap;
     }
 
     /**
@@ -96,9 +99,10 @@ public class JobData implements JobDAO {
      * @return List of jobs
      */
     public List<Job> getJobs() throws DAOException {
-        try {
-            List<Job> jobsList = new ArrayList<Job>();
-
+        
+        List<Job> jobsList = new ArrayList<Job>();
+        
+        try {   
             ResultSet rs = connection.getMetaData().getTables(null, null, "%", null);
             boolean hasMinorStatus = false;
             while (rs.next()) {
@@ -120,11 +124,11 @@ public class JobData implements JobDAO {
                 while (rs.next()) {
                     String status = rs.getString("status");
                     int minorStatus = rs.getInt("ms");
-                    
+
                     if (!status.equals("RUNNING")) {
                         minorStatus = -1;
                     }
-                    
+
                     jobsList.add(new Job(rs.getString("id"), status,
                             rs.getString("command"), rs.getString("file_name"),
                             rs.getInt("exit_code"), rs.getString("node_site"),
@@ -145,12 +149,14 @@ public class JobData implements JobDAO {
                             rs.getString("node_name"), rs.getString("parameters"), -1));
                 }
             }
-            return jobsList;
 
         } catch (SQLException ex) {
-            logger.error(ex);
-            throw new DAOException(ex);
+            if (!ex.getMessage().contains("Table/View 'JOBS' does not exist.")) {
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
         }
+        return jobsList;
     }
 
     /**
