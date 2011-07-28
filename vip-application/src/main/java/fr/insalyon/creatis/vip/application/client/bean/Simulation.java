@@ -41,32 +41,40 @@ import java.util.Date;
  *
  * @author Rafael Silva
  */
-public class Workflow implements IsSerializable {
+public class Simulation implements IsSerializable {
 
+    private String id;
     private String application;
-    private String workflowID;
+    private String simulationName;
     private String userName;
     private Date date;
     private String majorStatus;
     private String minorStatus;
 
-    public Workflow() {
+    public Simulation() {
     }
 
-    public Workflow(String application, String workflowID, String userName, Date date) {
+    public Simulation(String application, String id, String userName, 
+            Date date, String simulationName, String majorStatus) {
+        
         this.application = application;
-        this.workflowID = workflowID;
+        this.id = id;
         this.userName = userName;
         this.date = date;
+        this.simulationName = simulationName;
+        this.majorStatus = majorStatus;
     }
 
-    public Workflow(String application, String workflowID, String userName, Date date, String majorStatus, String minorStatus) {
+    public Simulation(String application, String id, String userName, 
+            Date date, String majorStatus, String minorStatus, String simulationName) {
+        
         this.application = application;
-        this.workflowID = workflowID;
+        this.id = id;
         this.userName = userName;
         this.date = date;
         this.majorStatus = majorStatus;
         this.minorStatus = minorStatus;
+        this.simulationName = simulationName;
     }
 
     public String getApplication() {
@@ -81,8 +89,8 @@ public class Workflow implements IsSerializable {
         return userName;
     }
 
-    public String getWorkflowID() {
-        return workflowID;
+    public String getID() {
+        return id;
     }
 
     public String getMajorStatus() {
@@ -97,8 +105,12 @@ public class Workflow implements IsSerializable {
         return minorStatus;
     }
 
+    public String getSimulationName() {
+        return simulationName;
+    }
+
     @Override
     public String toString() {
-        return application + "\n" + workflowID + "\n" + userName + "\n" + date;
+        return application + "\n" + id + "\n" + userName + "\n" + date;
     }
 }

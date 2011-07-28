@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -35,7 +35,7 @@
 package fr.insalyon.creatis.vip.application.server.dao;
 
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
-import fr.insalyon.creatis.vip.application.client.bean.Workflow;
+import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import java.util.Date;
 import java.util.List;
@@ -45,6 +45,20 @@ import java.util.List;
  * @author Rafael Silva
  */
 public interface WorkflowDAO {
+
+    /**
+     * 
+     * @param workflow
+     * @throws DAOException 
+     */
+    public void add(Simulation workflow) throws DAOException;
+
+    /**
+     * 
+     * @param workflow
+     * @throws DAOException 
+     */
+    public void update(Simulation workflow) throws DAOException;
 
     /**
      * Gets the list of workflows submitted by a user filtered by application
@@ -57,7 +71,7 @@ public interface WorkflowDAO {
      * @param eDate End date
      * @return List of workflows filtered
      */
-    public List<Workflow> getList(String user, String app, String status, Date sDate, Date eDate);
+    public List<Simulation> getList(String user, String app, String status, Date sDate, Date eDate);
 
     /**
      * Gets the list of applications submitted.
@@ -95,7 +109,7 @@ public interface WorkflowDAO {
      */
     public void delete(String workflowID) throws DAOException;
 
-    public List<String> getStats(List<Workflow> workflowIdList, int type, int binSize);
+    public List<String> getStats(List<Simulation> workflowIdList, int type, int binSize);
 
     /**
      * 

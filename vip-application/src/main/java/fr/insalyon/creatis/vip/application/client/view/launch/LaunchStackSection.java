@@ -81,8 +81,9 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
      * 
      * @param values Input values
      */
-    public void loadInput(String values) {
+    public void loadInput(String name, String values) {
 
+        simulationNameItem.setValue(name);
         Map<String, String> valuesMap = new HashMap<String, String>();
 
         for (String input : values.split("<br />")) {
@@ -217,15 +218,14 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
             }
 
             public void onSuccess(String result) {
-                String simulationID = result.substring(result.lastIndexOf("/") + 1, result.lastIndexOf("."));
                 modal.hide();
-                SC.say("Simulation successfully launched with ID: " + simulationID);
+                SC.say("Simulation successfully launched with ID: " + result);
             }
         };
         modal.show("Launching simulation...", true);
         Context context = Context.getInstance();
-        service.launchWorkflow(context.getUser(), getParametersMap(),
-                simulationName, context.getProxyFileName(), callback);
+        service.launchWorkflow(context.getUser(), getParametersMap(), simulationName, 
+                context.getProxyFileName(), simulationNameItem.getValueAsString(), callback);
     }
 
     /**

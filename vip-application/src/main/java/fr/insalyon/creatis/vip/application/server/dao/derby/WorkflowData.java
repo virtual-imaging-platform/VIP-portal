@@ -35,7 +35,7 @@
 package fr.insalyon.creatis.vip.application.server.dao.derby;
 
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
-import fr.insalyon.creatis.vip.application.client.bean.Workflow;
+import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAO;
 import fr.insalyon.creatis.vip.application.server.dao.derby.connection.WorkflowsConnection;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
@@ -79,6 +79,63 @@ public class WorkflowData implements WorkflowDAO {
     }
 
     /**
+     * 
+     * @param workflow
+     * @throws DAOException 
+     */
+    public void add(Simulation workflow) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO "
+                    + "Workflows(id, application, simulation_name, "
+                    + "username, launched, status) "
+                    + "VALUES(?, ?, ?, ?, ?, ?)");
+
+            ps.setString(1, workflow.getID());
+            ps.setString(2, workflow.getApplication());
+            ps.setString(3, workflow.getSimulationName());
+            ps.setString(4, workflow.getUserName());
+            ps.setTimestamp(5, new Timestamp(workflow.getDate().getTime()));
+            ps.setString(6, workflow.getMajorStatus());
+
+            ps.execute();
+
+        } catch (SQLException ex) {
+            if (!ex.getMessage().contains("duplicate key value")) {
+                logger.error(ex);
+                throw new DAOException(ex);
+            } else {
+                update(workflow);
+            }
+
+        }
+    }
+    
+    /**
+     * 
+     * @param workflow
+     * @throws DAOException 
+     */
+    public void update(Simulation workflow) throws DAOException {
+        
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "Workflows "
+                    + "SET application=?, simulation_name=? "
+                    + "WHERE id=?");
+
+            ps.setString(1, workflow.getApplication());
+            ps.setString(2, workflow.getSimulationName());
+            ps.setString(3, workflow.getID());
+
+            ps.executeUpdate();
+
+        } catch (SQLException ex) {
+            throw new DAOException(ex.getMessage());
+        }
+    }
+
+    /**
      * Gets the list of workflows submitted by a user filtered by application
      * name, start date and/or end date.
      *
@@ -89,7 +146,7 @@ public class WorkflowData implements WorkflowDAO {
      * @param eDate End date
      * @return List of workflows filtered
      */
-    public List<Workflow> getList(String user, String app, String status, Date sDate, Date eDate) {
+    public List<Simulation> getList(String user, String app, String status, Date sDate, Date eDate) {
         try {
             String query = "";
             query = parseQuery(user, query, "username=?");
@@ -102,7 +159,8 @@ public class WorkflowData implements WorkflowDAO {
             }
 
             PreparedStatement stat = connection.prepareStatement("SELECT "
-                    + "id, application, username, launched, status, minor_status "
+                    + "id, application, username, launched, status, "
+                    + "minor_status, simulation_name "
                     + "FROM Workflows " + query + " "
                     + "ORDER BY launched DESC");
 
@@ -148,17 +206,18 @@ public class WorkflowData implements WorkflowDAO {
      * @return List of workflows
      * @throws SQLException
      */
-    private List<Workflow> processResultSet(ResultSet rs) throws SQLException {
-        List<Workflow> workflows = new ArrayList<Workflow>();
+    private List<Simulation> processResultSet(ResultSet rs) throws SQLException {
+        List<Simulation> workflows = new ArrayList<Simulation>();
 
         while (rs.next()) {
-            workflows.add(new Workflow(
+            workflows.add(new Simulation(
                     rs.getString("application"),
                     rs.getString("id"),
                     rs.getString("username"),
                     new Date(rs.getTimestamp("launched").getTime()),
                     rs.getString("status"),
-                    rs.getString("minor_status")));
+                    rs.getString("minor_status"),
+                    rs.getString("simulation_name")));
         }
         return workflows;
     }
@@ -253,7 +312,7 @@ public class WorkflowData implements WorkflowDAO {
         }
     }
 
-    public List<String> getStats(List<Workflow> wfIdList, int type, int binSize) {
+    public List<String> getStats(List<Simulation> wfIdList, int type, int binSize) {
 
         List<String> list = new ArrayList<String>();
         int nbJobs = 0;
@@ -267,8 +326,8 @@ public class WorkflowData implements WorkflowDAO {
         List<String> ls;
         try {
             for (int i = 0; i < wfIdList.size(); i++) {
-                JobData jd = new JobData(wfIdList.get(i).getWorkflowID());
-                System.out.println("getStats - wf id is " + wfIdList.get(i).getWorkflowID());
+                JobData jd = new JobData(wfIdList.get(i).getID());
+                System.out.println("getStats - wf id is " + wfIdList.get(i).getID());
                 Statement stat = jd.getConnection().createStatement();
                 //PreparedStatement stat = null;
                 //binSize of 1000000 so that we get only one set of values

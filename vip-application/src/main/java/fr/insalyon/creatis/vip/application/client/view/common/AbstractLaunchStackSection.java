@@ -85,7 +85,7 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
         loadData();
     }
 
-    public abstract void loadInput(String values);
+    public abstract void loadInput(String name, String values);
 
     protected abstract void loadData();
 

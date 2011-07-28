@@ -124,7 +124,7 @@ public class InputsStackSection extends SectionStackSection {
                         public void onClick(ClickEvent event) {
                             String values = rollOverRecord.getAttribute("values");
                             AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().getTab(tabID);
-                            launchTab.loadInput(values);
+                            launchTab.loadInput(rollOverRecord.getAttribute("name"), values);
                         }
                     });
 

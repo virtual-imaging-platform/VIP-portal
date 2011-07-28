@@ -84,7 +84,6 @@ public class InputsToolStrip extends ToolStrip {
     }
 
     public void uploadComplete(String fileName) {
-        SC.say("FILENAME: " + fileName);
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<String> callback = new AsyncCallback<String>() {
 
@@ -95,7 +94,7 @@ public class InputsToolStrip extends ToolStrip {
 
             public void onSuccess(String result) {
                 AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().getTab(tabID);
-                launchTab.loadInput(result);
+                launchTab.loadInput("Simulation", result);
                 modal.hide();
             }
         };

@@ -92,7 +92,7 @@ public abstract class AbstractLaunchTab extends Tab {
         inputsSection.loadData();
     }
 
-    public void loadInput(String values) {
-        launchSection.loadInput(values);
+    public void loadInput(String name, String values) {
+        launchSection.loadInput(name, values);
     }
 }

@@ -36,7 +36,7 @@ package fr.insalyon.creatis.vip.application.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
-import fr.insalyon.creatis.vip.application.client.bean.Workflow;
+import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import java.util.Date;
 import java.util.List;
@@ -52,13 +52,13 @@ public interface WorkflowServiceAsync {
 
     public void getApplicationsAndUsersList(String applicationClass, AsyncCallback<List<String>[]> asyncCallback);
 
-    public void getWorkflows(String user, String application, String status, Date startDate, Date endDate, AsyncCallback<List<Workflow>> asyncCallback);
+    public void getWorkflows(String user, String application, String status, Date startDate, Date endDate, AsyncCallback<List<Simulation>> asyncCallback);
 
     public void getLogs(String baseDir, AsyncCallback<List<String>> asyncCallback);
 
     public void getWorkflowSources(String user, String proxyFileName, String workflowName, AsyncCallback<List<String>> asyncCallback);
 
-    public void launchWorkflow(String user, Map<String, String> parameters, String workflowName, String proxyFileName, AsyncCallback<String> asyncCallback);
+    public void launchWorkflow(String user, Map<String, String> parameters, String workflowName, String proxyFileName, String simulationName, AsyncCallback<String> asyncCallback);
 
     public void getWorkflowInputs(String fileName, AsyncCallback<String> asyncCallback);
 
@@ -82,7 +82,7 @@ public interface WorkflowServiceAsync {
 
     public void getFileURL(String baseDir, String fileName, AsyncCallback<String> asyncCallback);
 
-    public void getStats(List<Workflow> workflowIdList, int type, int binSize, AsyncCallback<List<String>> asyncCallback);
+    public void getStats(List<Simulation> workflowIdList, int type, int binSize, AsyncCallback<List<String>> asyncCallback);
 
     public void purgeWorkflow(String workflowID, AsyncCallback<Void> asyncCallback);
 

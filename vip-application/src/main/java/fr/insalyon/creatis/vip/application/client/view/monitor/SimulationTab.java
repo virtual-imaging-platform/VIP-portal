@@ -63,9 +63,9 @@ public class SimulationTab extends Tab {
     private InOutDataStackSection inoutStackSection;
 //    private ProvenanceStackSection provenanceStackSection;
 
-    public SimulationTab(String simulationID, String status, boolean groupAdmin) {
+    public SimulationTab(String simulationID, String title, String status, boolean groupAdmin) {
         
-        this.setTitle(simulationID);
+        this.setTitle(title);
         this.setID(simulationID + "-tab");
         this.setIcon("icon-simulation-monitor.png");
         this.setCanClose(true);

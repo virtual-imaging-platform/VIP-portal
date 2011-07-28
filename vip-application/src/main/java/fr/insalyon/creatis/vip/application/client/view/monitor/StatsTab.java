@@ -49,7 +49,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import fr.insalyon.creatis.vip.application.client.bean.Workflow;
+import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
@@ -67,7 +67,7 @@ public class StatsTab extends Tab {
     private SelectItem chartsItem;
     private ChartWidget chart;
     private ModalWindow modal;
-    private List<Workflow> simulationsList;
+    private List<Simulation> simulationsList;
 
     public StatsTab() {
 
@@ -214,7 +214,7 @@ public class StatsTab extends Tab {
         return chartData;
     }
 
-    public void setSimulationsList(List<Workflow> simulationsList) {
+    public void setSimulationsList(List<Simulation> simulationsList) {
         this.simulationsList = simulationsList;
     }
 }

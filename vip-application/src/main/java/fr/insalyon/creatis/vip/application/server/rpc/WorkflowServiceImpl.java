@@ -38,7 +38,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.devtools.FileUtils;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
-import fr.insalyon.creatis.vip.application.client.bean.Workflow;
+import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
@@ -72,7 +72,7 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
     private static final Logger logger = Logger.getLogger(WorkflowServiceImpl.class);
 
     @Override
-    public List<Workflow> getWorkflows(String user, String application, String status, Date startDate, Date endDate) {
+    public List<Simulation> getWorkflows(String user, String application, String status, Date startDate, Date endDate) {
         try {
             if (endDate != null) {
                 Calendar c1 = Calendar.getInstance();
@@ -81,22 +81,22 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
                 endDate = c1.getTime();
             }
             WorkflowDAO workflowDAO = DAOFactory.getDAOFactory().getWorkflowDAO();
-            List<Workflow> workflows = workflowDAO.getList(user, application, status, startDate, endDate);
+            List<Simulation> workflows = workflowDAO.getList(user, application, status, startDate, endDate);
             WorkflowBusiness business = new WorkflowBusiness();
 
-            for (Workflow workflow : workflows) {
+            for (Simulation workflow : workflows) {
                 if (workflow.getMajorStatus().equals(ApplicationConstants.WorkflowStatus.Running.name())) {
                     try {
-                        String workflowStatus = business.getStatus(workflow.getWorkflowID());
+                        String workflowStatus = business.getStatus(workflow.getID());
 
                         if (workflowStatus.equals(ApplicationConstants.MoteurStatus.COMPLETE.name())) {
-                            workflowDAO.updateStatus(workflow.getWorkflowID(),
+                            workflowDAO.updateStatus(workflow.getID(),
                                     ApplicationConstants.WorkflowStatus.Completed.name());
                             workflow.setMajorStatus(ApplicationConstants.WorkflowStatus.Completed.name());
 
                         } else if (workflowStatus.equals(ApplicationConstants.MoteurStatus.TERMINATED.name())
                                 || workflowStatus.contains(ApplicationConstants.MoteurStatus.UNKNOWN.name())) {
-                            workflowDAO.updateStatus(workflow.getWorkflowID(),
+                            workflowDAO.updateStatus(workflow.getID(),
                                     ApplicationConstants.WorkflowStatus.Killed.name());
                             workflow.setMajorStatus(ApplicationConstants.WorkflowStatus.Killed.name());
                         }
@@ -189,7 +189,7 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         return list;
     }
 
-    public List<String> getWorkflowSources(String user, String proxyFileName, 
+    public List<String> getWorkflowSources(String user, String proxyFileName,
             String workflowName) throws ApplicationException {
 
         try {
@@ -214,34 +214,36 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
     }
 
     public String launchWorkflow(String user, Map<String, String> parametersMap,
-            String workflowName, String proxyFileName) {
+            String workflowName, String proxyFileName, String simulationName)
+            throws ApplicationException {
 
         try {
             WorkflowBusiness business = new WorkflowBusiness();
-            return business.launch(user, parametersMap, workflowName, proxyFileName);
+            return business.launch(user, parametersMap, workflowName,
+                    proxyFileName, simulationName);
 
-        } catch (BusinessException ex) {
-            return null;
-        }
-    }
-
-    public void addSimulationInput(String user, SimulationInput workflowInput) throws ApplicationException {
-        
-        try {
-            WorkflowBusiness business = new WorkflowBusiness();
-            business.addSimulationInput(user, workflowInput);
-            
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
-    
+
+    public void addSimulationInput(String user, SimulationInput workflowInput) throws ApplicationException {
+
+        try {
+            WorkflowBusiness business = new WorkflowBusiness();
+            business.addSimulationInput(user, workflowInput);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
     public void updateSimulationInput(String user, SimulationInput workflowInput) throws ApplicationException {
-        
+
         try {
             WorkflowBusiness business = new WorkflowBusiness();
             business.updateSimulationInput(user, workflowInput);
-            
+
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
@@ -267,7 +269,7 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         try {
             WorkflowBusiness business = new WorkflowBusiness();
             return business.getInputByUserAndName(user, name, appName);
-            
+
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
@@ -287,7 +289,7 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         }
     }
 
-    public List<String> getStats(List<Workflow> workflowIdList, int type, int binSize) {
+    public List<String> getStats(List<Simulation> workflowIdList, int type, int binSize) {
         try {
             return DAOFactory.getDAOFactory().getWorkflowDAO().getStats(workflowIdList, type, binSize);
         } catch (DAOException ex) {
@@ -324,17 +326,17 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         try {
             WorkflowBusiness business = new WorkflowBusiness();
             return business.getOutputData(simulationID);
-            
+
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
-    
+
     public List<InOutData> getInputData(String simulationID) throws ApplicationException {
         try {
             WorkflowBusiness business = new WorkflowBusiness();
             return business.getInputData(simulationID);
-            
+
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }

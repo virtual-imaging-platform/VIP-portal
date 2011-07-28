@@ -39,6 +39,7 @@ import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
+import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowMoteurConfig;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.GwendiaParser;
@@ -57,6 +58,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import javax.xml.rpc.ServiceException;
@@ -133,11 +135,13 @@ public class WorkflowBusiness {
      * @param parametersMap
      * @param workflowName
      * @param proxyFileName
+     * @param simulationName
      * @return
      * @throws BusinessException
      */
     public String launch(String user, Map<String, String> parametersMap,
-            String workflowName, String proxyFileName) throws BusinessException {
+            String workflowName, String proxyFileName, String simulationName) 
+            throws BusinessException {
 
         try {
             String settings = "GRID=DIRAC\n"
@@ -182,8 +186,12 @@ public class WorkflowBusiness {
             WorkflowMoteurConfig moteur = new WorkflowMoteurConfig(ServerConfiguration.getInstance().getMoteurServer(), workflowPath, parameters);
             moteur.setSettings(settings);
             String ws = moteur.launch(proxyFileName);
-
-            return ws;
+            
+            String workflowID = ws.substring(ws.lastIndexOf("/") + 1, ws.lastIndexOf("."));
+            DAOFactory.getDAOFactory().getWorkflowDAO().add(new Simulation(
+                    workflowName, workflowID, user, new Date(), simulationName, "Running"));
+            
+            return workflowID;
 
         } catch (DataManagerException ex) {
             logger.error(ex);

@@ -39,7 +39,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
-import fr.insalyon.creatis.vip.application.client.bean.Workflow;
+import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import java.util.Date;
@@ -73,7 +73,7 @@ public interface WorkflowService extends RemoteService {
 
     public void purgeWorkflow(String workflowID);
     
-    public List<Workflow> getWorkflows(String user, String application, String status, Date startDate, Date endDate);
+    public List<Simulation> getWorkflows(String user, String application, String status, Date startDate, Date endDate);
 
     public String getFile(String baseDir, String fileName);
 
@@ -87,7 +87,7 @@ public interface WorkflowService extends RemoteService {
 
     public String getWorkflowInputs(String fileName);
 
-    public String launchWorkflow(String user, Map<String, String> parameters, String workflowName, String proxyFileName);
+    public String launchWorkflow(String user, Map<String, String> parameters, String workflowName, String proxyFileName, String simulationName) throws ApplicationException;
 
     public List<SimulationInput> getWorkflowsInputByUser(String user);
     
@@ -101,7 +101,7 @@ public interface WorkflowService extends RemoteService {
 
     public void removeWorkflowInput(String user, String inputName, String application);
 
-    public List<String> getStats( List<Workflow> workflowIdList, int type, int binSize);
+    public List<String> getStats( List<Simulation> workflowIdList, int type, int binSize);
     
     public List<InOutData> getOutputData(String simulationID) throws ApplicationException;
     

@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -52,7 +52,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 public class SimulationsContextMenu extends Menu {
 
     public SimulationsContextMenu(final ModalWindow modal, final String simulationID,
-            final String status, final boolean groupAdmin) {
+            final String title, final String status, final boolean groupAdmin) {
 
         this.setShowShadow(true);
         this.setShadowDepth(10);
@@ -64,7 +64,7 @@ public class SimulationsContextMenu extends Menu {
 
             public void onClick(MenuItemClickEvent event) {
                 Layout.getInstance().addTab(new SimulationTab(simulationID, 
-                        status, groupAdmin));
+                        title, status, groupAdmin));
             }
         });
 

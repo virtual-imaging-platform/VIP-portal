@@ -46,38 +46,47 @@ public class SimulationRecord extends ListGridRecord {
     public SimulationRecord() {
     }
 
-    public SimulationRecord(String application, String status,
-            String simulationId, String user, Date date) {
-        
+    public SimulationRecord(String simulationName, String application,
+            String status, String simulationId, String user, Date date) {
+
         setAttribute("statusIco", "ico_" + status.toLowerCase());
         setAttribute("application", application);
         setAttribute("status", status);
         setAttribute("simulationId", simulationId);
         setAttribute("user", user);
         setAttribute("date", date);
+        if (simulationName == null || simulationName.equals("null") || simulationName.isEmpty()) {
+            setAttribute("simulationName", simulationId);
+        } else {
+            setAttribute("simulationName", simulationName);
+        }
     }
-   
+
     public String getStatusIco() {
         return getAttributeAsString("statusIco");
     }
-    
+
     public String getApplication() {
         return getAttributeAsString("application");
     }
-    
+
     public String getStatus() {
         return getAttributeAsString("status");
     }
-   
+
     public String getSimulationId() {
         return getAttributeAsString("simulationId");
     }
-   
+
     public String getUser() {
         return getAttributeAsString("user");
     }
-   
+
     public String getDate() {
         return getAttributeAsString("date");
+    }
+    
+    public String getSimulationName() {
+        return getAttributeAsString("simulationName");
     }
 }
