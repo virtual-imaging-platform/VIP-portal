@@ -69,7 +69,7 @@ public class InOutDataStackSection extends SectionStackSection {
         this.simulationID = simulationID;
         this.setTitle("In/Output Data");
         this.setCanCollapse(true);
-        this.setExpanded(false);
+        this.setExpanded(true);
         this.setResizeable(true);
 
         configureTree();
