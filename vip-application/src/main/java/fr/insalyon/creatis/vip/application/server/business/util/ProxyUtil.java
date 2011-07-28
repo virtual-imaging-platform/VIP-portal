@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -39,6 +39,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -46,6 +47,7 @@ import java.io.InputStream;
  */
 public class ProxyUtil {
 
+    private static Logger logger = Logger.getLogger(ProxyUtil.class);
     public static final String CHARSET_UTF8 = "UTF-8";
 
     public static String readAsString(String proxyFileName) {
@@ -66,7 +68,7 @@ public class ProxyUtil {
             return new String(data, CHARSET_UTF8);
 
         } catch (IOException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return null;
     }

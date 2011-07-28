@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -94,7 +94,6 @@ public class WorkflowMoteurConfig {
             contentXMLInput.append("\t</d:source>\n");
         }
         contentXMLInput.append("</d:inputdata>\n");
-        System.out.println(contentXMLInput.toString());
     }
 
     /**

@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -40,12 +40,15 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author Rafael Silva
  */
 public class FileUtil {
+    
+    private static Logger logger = Logger.getLogger(FileUtil.class);
 
     public static String read(String fileName) {
         try {
@@ -54,7 +57,7 @@ public class FileUtil {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
             String strLine;
-            StringBuffer content = new StringBuffer();
+            StringBuilder content = new StringBuilder();
 
             while ((strLine = br.readLine()) != null)   {
                 content.append(strLine + "\n");
@@ -64,7 +67,7 @@ public class FileUtil {
             return content.toString();
 
         } catch (IOException ex) {
-            ex.printStackTrace();
+            logger.error(ex);
         }
         return null;
     }
