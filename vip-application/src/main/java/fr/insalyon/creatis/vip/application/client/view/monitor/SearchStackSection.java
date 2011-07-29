@@ -81,6 +81,7 @@ public class SearchStackSection extends SectionStackSection {
         configureForm();
         
         HLayout hLayout = new HLayout(5);
+        hLayout.setMargin(5);
         hLayout.addMember(submitButton);
         hLayout.addMember(resetButton);
         
@@ -95,6 +96,7 @@ public class SearchStackSection extends SectionStackSection {
     private void configureForm() {
 
         form = new DynamicForm();
+        form.setMargin(5);
         form.setWidth(500);
         form.setNumCols(4);
 
@@ -108,7 +110,7 @@ public class SearchStackSection extends SectionStackSection {
         endDateItem = new DateItem("endDateFilter", "End Date");
         endDateItem.setUseTextField(true);
 
-        submitButton = new IButton("Submit");
+        submitButton = new IButton("Search");
         submitButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
