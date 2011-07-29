@@ -144,7 +144,7 @@ public class SimulationsToolStrip extends ToolStrip {
         if (Context.getInstance().isSystemAdmin()) {
             ToolStripButton statsButton = new ToolStripButton();
             statsButton.setIcon("icon-chart.png");
-            statsButton.setTitle("Detailed Stats");
+            statsButton.setTitle("Performance Statistics");
             statsButton.addClickHandler(new ClickHandler() {
 
                 public void onClick(ClickEvent event) {

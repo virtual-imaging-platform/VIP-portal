@@ -71,7 +71,7 @@ public class StatsTab extends Tab {
 
     public StatsTab() {
 
-        this.setTitle("Detailed Stats");
+        this.setTitle("Performance Statistics");
         this.setID("stats-tab");
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);

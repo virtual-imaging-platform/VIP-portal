@@ -85,7 +85,7 @@ public class ChartsStackSection extends SectionStackSection {
 
     public ChartsStackSection(String simulationID) {
         this.simulationID = simulationID;
-        this.setTitle("Detailed Stats");
+        this.setTitle("Performance Statistics");
         this.setCanCollapse(true);
         this.setExpanded(false);
         this.setResizeable(true);
@@ -249,6 +249,8 @@ public class ChartsStackSection extends SectionStackSection {
 
         StackedBarChart stack = new StackedBarChart();
         int max = 0;
+        long cpuTime = 0;
+        long sequentialTime = 0;
 
         for (String values : result) {
             Stack s = new Stack();
@@ -261,6 +263,8 @@ public class ChartsStackSection extends SectionStackSection {
             int output = new Integer(v[5]) >= 0 ? new Integer(v[5]) : 0;
 
             int count = creation + queued + input + execution + output;
+            cpuTime += execution;
+            sequentialTime += input + execution + output;
 
             if (v[0].equals("COMPLETED")) {
                 s.addStackValues(new StackedBarChart.StackValue(creation, "#996633"));
@@ -302,7 +306,15 @@ public class ChartsStackSection extends SectionStackSection {
         if (chart == null) {
             configureChartAndGrid();
         }
-        grid.setData(new PropertyRecord[]{});
+        
+        PropertyRecord[] data = new PropertyRecord[]{
+                new PropertyRecord("Makespan (s)", max + ""),
+                new PropertyRecord("Cumulated CPU time (s)", cpuTime + ""),
+                new PropertyRecord("Speed-up", (sequentialTime / (float) max) + ""),
+                new PropertyRecord("Efficiency", (cpuTime / (float) sequentialTime) + "")
+            };
+        
+        grid.setData(data);
         chart.setChartData(chartData);
     }
 
