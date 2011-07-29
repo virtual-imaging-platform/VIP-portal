@@ -89,7 +89,6 @@ public class SearchStackSection extends SectionStackSection {
         vLayout.addMember(hLayout);
         this.addItem(vLayout);
 
-        simulationItem.setDisabled(true);
         loadData();
     }
 
