@@ -56,6 +56,7 @@ import fr.insalyon.creatis.vip.datamanager.client.view.common.BrowserUtil;
  */
 public class PathSelectionWindow extends Window {
 
+    private static String oldPath = DataManagerConstants.ROOT;
     private BasicBrowserToolStrip toolStrip;
     private ListGrid grid;
     private ModalWindow modal;
@@ -85,7 +86,7 @@ public class PathSelectionWindow extends Window {
         this.addItem(toolStrip);
         this.addItem(grid);
 
-        BrowserUtil.loadData(modal, grid, toolStrip, DataManagerConstants.ROOT, false);
+        BrowserUtil.loadData(modal, grid, toolStrip, oldPath, false);
     }
 
     private void configureGrid() {
@@ -98,6 +99,7 @@ public class PathSelectionWindow extends Window {
                 if (type.contains("folder")) {
                     BrowserUtil.loadData(modal, grid, toolStrip,
                             toolStrip.getPath() + "/" + name, false);
+                    oldPath = toolStrip.getPath() + "/" + name;
                 } else {
                     textItem.setValue(toolStrip.getPath() + "/" + name);
                     destroy();
