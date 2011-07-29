@@ -38,6 +38,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import java.util.List;
 
 /**
@@ -59,19 +60,19 @@ public interface TransferPoolService extends RemoteService {
         }
     }
 
-    public PoolOperation getOperationById(String id, String proxy);
+    public PoolOperation getOperationById(String id, String proxy) throws DataManagerException;
 
-    public void removeOperationById(String id, String proxy);
+    public void removeOperationById(String id, String proxy) throws DataManagerException;
     
-    public void removeOperations(List<String> ids, String proxy);
+    public void removeOperations(List<String> ids, String proxy) throws DataManagerException;
 
-    public void downloadFile(String user, String remoteFile, String userDN, String proxy);
+    public void downloadFile(String user, String remoteFile, String userDN, String proxy) throws DataManagerException;
     
-    public void downloadFiles(String user, List<String> remoteFiles, String packName, String userDN, String proxy);
+    public void downloadFiles(String user, List<String> remoteFiles, String packName, String userDN, String proxy) throws DataManagerException;
     
-    public void downloadFolder(String user, String remoteFolder, String userDN, String proxy);
+    public void downloadFolder(String user, String remoteFolder, String userDN, String proxy) throws DataManagerException;
     
-    public void uploadFile(String user, String remoteFile, String localFile, String userDN, String proxy);
+    public void uploadFile(String user, String remoteFile, String localFile, String userDN, String proxy) throws DataManagerException;
     
-    public void clearDeleteOperations(String proxy);
+    public void clearDeleteOperations(String proxy) throws DataManagerException;
 }

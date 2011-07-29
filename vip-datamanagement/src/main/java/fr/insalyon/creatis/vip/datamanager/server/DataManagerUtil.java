@@ -39,6 +39,7 @@ import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOFactory;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;

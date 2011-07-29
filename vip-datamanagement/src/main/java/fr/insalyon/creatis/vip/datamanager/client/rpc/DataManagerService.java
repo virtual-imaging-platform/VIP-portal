@@ -63,23 +63,23 @@ public interface DataManagerService extends RemoteService {
         }
     }
 
-    public void configureDataManager(String user, String proxyFileName);
+    public void configureDataManager(String user, String proxyFileName) throws DataManagerException;
 
-    public List<Data> listDir(String user, String proxyFileName, String baseDir, boolean refresh);
+    public List<Data> listDir(String user, String proxyFileName, String baseDir, boolean refresh) throws DataManagerException;
 
-    public void delete(String user, String proxyFileName, String path);
+    public void delete(String user, String proxyFileName, String path) throws DataManagerException;
 
-    public void createDir(String user, String proxyFileName, String baseDir, String name);
+    public void createDir(String user, String proxyFileName, String baseDir, String name) throws DataManagerException;
 
-    public void deleteFiles(String user, String proxyFileName, List<String> paths);
+    public void deleteFiles(String user, String proxyFileName, List<String> paths) throws DataManagerException;
 
-    public void rename(String user, String proxyFileName, String oldPath, String newPath);
+    public void rename(String user, String proxyFileName, String oldPath, String newPath) throws DataManagerException;
 
-    public void renameFiles(String user, String proxyFileName, Map<String, String> paths);
+    public void renameFiles(String user, String proxyFileName, Map<String, String> paths) throws DataManagerException;
 
-    public List<DMCachedFile> getCachedFiles(String proxy);
+    public List<DMCachedFile> getCachedFiles(String proxy) throws DataManagerException;
 
-    public void deleteCachedFiles(List<String> cachedFiles, String proxy);
+    public void deleteCachedFiles(List<String> cachedFiles, String proxy) throws DataManagerException;
 
     public List<PoolOperation> getPoolOperations(String userDN, String proxy) throws DataManagerException;
 

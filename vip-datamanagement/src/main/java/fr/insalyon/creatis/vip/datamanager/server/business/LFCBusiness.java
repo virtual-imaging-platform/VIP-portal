@@ -39,7 +39,7 @@ import fr.insalyon.creatis.agent.vlet.common.bean.GridData;
 import fr.insalyon.creatis.devtools.FileUtils;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
-import fr.insalyon.creatis.vip.datamanager.server.DataManagerException;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.util.ArrayList;
 import java.util.List;

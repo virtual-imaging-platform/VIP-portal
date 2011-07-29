@@ -53,95 +53,102 @@ import java.util.Map;
  */
 public class DataManagerServiceImpl extends RemoteServiceServlet implements DataManagerService {
 
-    public void configureDataManager(String user, String proxyFileName) {
+    public void configureDataManager(String user, String proxyFileName) throws DataManagerException {
 
         try {
             DataManagerBusiness business = new DataManagerBusiness();
             business.configureDataManager(user, proxyFileName);
 
         } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
         }
     }
 
     public List<Data> listDir(String user, String proxyFileName, String baseDir, 
-            boolean refresh) {
+            boolean refresh) throws DataManagerException {
         try {
             LFCBusiness business = new LFCBusiness();
             return business.listDir(user, proxyFileName, baseDir, refresh);
             
         } catch (BusinessException ex) {
-            return null;
+            throw new DataManagerException(ex);
         }
     }
 
-    public void delete(String user, String proxyFileName, String path) {
+    public void delete(String user, String proxyFileName, String path) throws DataManagerException {
         
         try {
             LFCBusiness business = new LFCBusiness();
             business.delete(user, proxyFileName, path);
             
         } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
         }
     }
 
-    public void deleteFiles(String user, String proxyFileName, List<String> paths) {
+    public void deleteFiles(String user, String proxyFileName, List<String> paths) throws DataManagerException {
         
         try {
             LFCBusiness business = new LFCBusiness();
             business.deleteFiles(user, proxyFileName, paths);
             
         } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
         }
     }
 
-    public void createDir(String user, String proxyFileName, String baseDir, String name) {
+    public void createDir(String user, String proxyFileName, String baseDir, String name) throws DataManagerException {
         
         try {
             LFCBusiness business = new LFCBusiness();
             business.createDir(user, proxyFileName, baseDir, name);
             
         } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
         }
     }
 
-    public void rename(String user, String proxyFileName, String oldPath, String newPath) {
+    public void rename(String user, String proxyFileName, String oldPath, String newPath) throws DataManagerException {
         
         try {
             LFCBusiness business = new LFCBusiness();
             business.rename(user, proxyFileName, oldPath, newPath);
             
         } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
         }
     }
 
-    public void renameFiles(String user, String proxyFileName, Map<String, String> paths) {
+    public void renameFiles(String user, String proxyFileName, Map<String, String> paths) throws DataManagerException {
 
         try {
             LFCBusiness business = new LFCBusiness();
             business.renameFiles(user, proxyFileName, paths);
             
         } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
         }
     }
     
-    public List<DMCachedFile> getCachedFiles(String proxy) {
+    public List<DMCachedFile> getCachedFiles(String proxy) throws DataManagerException {
         
         try {
             DataManagerBusiness business = new DataManagerBusiness();
             return business.getCachedFiles(proxy);
             
         } catch (BusinessException ex) {
-            return null;
+            throw new DataManagerException(ex);
         }
     }
     
-    public void deleteCachedFiles(List<String> cachedFiles, String proxy) {
+    public void deleteCachedFiles(List<String> cachedFiles, String proxy) throws DataManagerException {
         
         try {
             DataManagerBusiness business = new DataManagerBusiness();
             business.deleteCachedFiles(proxy, cachedFiles);
             
         } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
         }
     }
     

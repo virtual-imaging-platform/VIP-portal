@@ -40,7 +40,7 @@ import fr.cnrs.i3s.neusemstore.provenance.ProvenanceManager;
 import fr.cnrs.i3s.neusemstore.provenance.ProvenanceManagerFactory;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.datamanager.server.DataManagerException;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.provenance.client.bean.ProvenanceData;
 import java.net.URI;

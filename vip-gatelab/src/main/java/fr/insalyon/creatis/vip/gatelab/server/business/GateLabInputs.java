@@ -35,7 +35,7 @@
 package fr.insalyon.creatis.vip.gatelab.server.business;
 
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
-import fr.insalyon.creatis.vip.datamanager.server.DataManagerException;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.util.Map;
 import java.util.HashMap;
