@@ -84,7 +84,7 @@ public class SimulationTab extends Tab {
         jobsStackSection = new JobsStackSection(simulationID);
         chartsStackSection = new ChartsStackSection(simulationID);
         diagramStackSection = new DiagramStackSection(simulationID);
-        inoutStackSection = new InOutDataStackSection(simulationID);
+        inoutStackSection = new InOutDataStackSection(simulationID, title);
 //        provenanceStackSection = new ProvenanceStackSection(simulationID, completed);
 
         sectionStack.setSections(

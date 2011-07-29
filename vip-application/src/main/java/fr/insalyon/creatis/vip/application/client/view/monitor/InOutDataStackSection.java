@@ -58,15 +58,17 @@ import java.util.List;
 public class InOutDataStackSection extends SectionStackSection {
 
     private String simulationID;
+    private String title;
     private ModalWindow modal;
     private TreeGrid treeGrid;
     private Tree tree;
     private InOutTreeNode inputs;
     private InOutTreeNode outputs;
 
-    public InOutDataStackSection(String simulationID) {
+    public InOutDataStackSection(String simulationID, String title) {
 
         this.simulationID = simulationID;
+        this.title = title;
         this.setTitle("In/Output Data");
         this.setCanCollapse(true);
         this.setExpanded(true);
@@ -87,7 +89,7 @@ public class InOutDataStackSection extends SectionStackSection {
         InOutTreeNode root = new InOutTreeNode("Root", "String", InOutTreeNode.Icon.Simulation);
         tree.setRoot(root);
 
-        InOutTreeNode node = new InOutTreeNode("Simulation: " + simulationID, "Simulation", InOutTreeNode.Icon.Simulation);
+        InOutTreeNode node = new InOutTreeNode("Simulation: " + title, "Simulation", InOutTreeNode.Icon.Simulation);
         tree.add(node, root);
 
         inputs = new InOutTreeNode("Inputs", "Simulation", InOutTreeNode.Icon.Input);
