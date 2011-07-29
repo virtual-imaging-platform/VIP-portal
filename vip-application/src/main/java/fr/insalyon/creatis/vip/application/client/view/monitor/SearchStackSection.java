@@ -99,7 +99,7 @@ public class SearchStackSection extends SectionStackSection {
         form.setNumCols(4);
 
         userItem = new SelectItem("userFilter", "User");
-        simulationItem = new SelectItem("simualtionFilter", "Simulation");
+        simulationItem = new SelectItem("simualtionFilter", "Application");
         statusItem = new SelectItem("statusFilter", "Status");
 
         startDateItem = new DateItem("startDateFilter", "Start Date");
