@@ -32,25 +32,35 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client;
+package fr.insalyon.creatis.vip.datamanager.client.view.common;
+
+import com.smartgwt.client.widgets.HTMLPane;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DataManagerApplets {
+public class AppletHTMLPane extends HTMLPane {
 
-    public static String getUploadContents(String user, String userDN,
-            String proxy, String path, boolean unzip, boolean usePool) {
-        return "<html>"
+    public AppletHTMLPane(String title, String code, String archive, int width,
+            int height, String user, String userDN, String proxy, String path,
+            boolean unzip, boolean usePool) {
+
+        this.setWidth100();
+        this.setHeight100();
+        this.setShowEdges(true);
+
+        this.setContents(
+                "<html>"
                 + "<head>"
-                + "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">"
-                + "<title>DataUpload</title>"
+                + "<meta http-equiv=\"Content-Type\" content=\"text/html; "
+                + "charset=UTF-8\">"
+                + "<title>" + title + "</title>"
                 + "</head>"
                 + "<body>"
-                + "<applet width=550 height=320 "
-                + "code=\"fr.insalyon.creatis.vip.datamanager.applet.upload.UploadFiles\" "
-                + "archive=\"applets/vip-datamanager-applet.jar\">"
+                + "<applet width=\"" + width + "\" height=\"" + height + "\" "
+                + "code=\"" + code + "\" "
+                + "archive=\"applets/" + archive + "\">"
                 + "<param name=\"user\" value=\"" + user + "\"/>"
                 + "<param name=\"userdn\" value=\"" + userDN + "\"/>"
                 + "<param name=\"proxy\" value=\"" + proxy + "\"/>"
@@ -59,6 +69,6 @@ public class DataManagerApplets {
                 + "<param name=\"pool\" value=\"" + usePool + "\"/>"
                 + "</applet>"
                 + "</body>"
-                + "</html>";
+                + "</html>");
     }
 }

@@ -34,11 +34,10 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.browser;
 
-import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.Window;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
-import fr.insalyon.creatis.vip.datamanager.client.DataManagerApplets;
+import fr.insalyon.creatis.vip.datamanager.client.view.common.AppletHTMLPane;
 
 /**
  *
@@ -57,17 +56,13 @@ public class DataUploadWindow extends Window {
         this.centerInPage();
         this.setPadding(5);
 
-        HTMLPane htmlPane = new HTMLPane();
-        htmlPane.setWidth100();
-        htmlPane.setHeight100();
-        htmlPane.setShowEdges(true);
-        
-        htmlPane.setContents(DataManagerApplets.getUploadContents(
+        this.addItem(new AppletHTMLPane(
+                "DataUpload", 
+                "fr.insalyon.creatis.vip.datamanager.applet.upload.UploadFiles", 
+                "vip-datamanager-applet.jar", 550, 320, 
                 Context.getInstance().getUser(), 
                 Context.getInstance().getUserDN(), 
-                Context.getInstance().getProxyFileName(), 
+                Context.getInstance().getProxyFileName(),
                 baseDir, true, true));
-
-        this.addItem(htmlPane);
     }
 }
