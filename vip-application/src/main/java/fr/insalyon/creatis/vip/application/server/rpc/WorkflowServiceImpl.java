@@ -42,6 +42,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
+import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.server.business.InputsBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.application.server.dao.DAOFactory;
@@ -189,7 +190,7 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         return list;
     }
 
-    public List<String> getWorkflowSources(String user, String proxyFileName,
+    public List<Source> getWorkflowSources(String user, String proxyFileName,
             String workflowName) throws ApplicationException {
 
         try {

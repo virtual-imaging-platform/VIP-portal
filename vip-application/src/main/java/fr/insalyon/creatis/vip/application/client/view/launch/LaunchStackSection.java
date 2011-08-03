@@ -44,6 +44,7 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchStackSection;
@@ -140,21 +141,21 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
         formLayout.removeMembers(formLayout.getMembers());
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+        final AsyncCallback<List<Source>> callback = new AsyncCallback<List<Source>>() {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Error executing get application sources list: " + caught.getMessage());
             }
 
-            public void onSuccess(List<String> result) {
+            public void onSuccess(List<Source> result) {
 
                 if (result != null) {
 
                     formLayout.addMember(getSimulatioNameLayout());
 
-                    for (String source : result) {
-                        formLayout.addMember(new InputHLayout(source));
+                    for (Source source : result) {
+                        formLayout.addMember(new InputHLayout(source.getName()));
                     }
 
                     HLayout buttonsLayout = new HLayout(5);

@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.server.business.simulation.parser;
 
+import fr.insalyon.creatis.vip.application.client.bean.Source;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -51,8 +52,8 @@ public class GwendiaParser extends AbstractWorkflowParser {
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
         if (localName.equals("source")) {
-            String sourceName = attributes.getValue("name");
-            sources.add(sourceName);
+            Source s = new Source(attributes.getValue("name"),attributes.getValue("user-level"),attributes.getValue("description"));
+            sources.add(s);
             return;
         }
     }

@@ -38,6 +38,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
+import fr.insalyon.creatis.vip.application.client.bean.Source;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +57,7 @@ public interface WorkflowServiceAsync {
 
     public void getLogs(String baseDir, AsyncCallback<List<String>> asyncCallback);
 
-    public void getWorkflowSources(String user, String proxyFileName, String workflowName, AsyncCallback<List<String>> asyncCallback);
+    public void getWorkflowSources(String user, String proxyFileName, String workflowName, AsyncCallback<List<Source>> asyncCallback);
 
     public void launchWorkflow(String user, Map<String, String> parameters, String workflowName, String proxyFileName, String simulationName, AsyncCallback<String> asyncCallback);
 

@@ -42,6 +42,7 @@ import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
+import fr.insalyon.creatis.vip.application.client.bean.Source;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +84,7 @@ public interface WorkflowService extends RemoteService {
     
     public List<String> getLogs(String baseDir);
 
-    public List<String> getWorkflowSources(String user, String proxyFileName, String workflowName) throws ApplicationException;
+    public List<Source> getWorkflowSources(String user, String proxyFileName, String workflowName) throws ApplicationException;
 
     public String getWorkflowInputs(String fileName);
 

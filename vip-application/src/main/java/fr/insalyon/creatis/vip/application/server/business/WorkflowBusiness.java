@@ -40,6 +40,7 @@ import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
+import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowMoteurConfig;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.GwendiaParser;
@@ -82,7 +83,7 @@ public class WorkflowBusiness {
      * @return
      * @throws BusinessException
      */
-    public List<String> getWorkflowSources(String user, String proxyFileName,
+    public List<Source> getWorkflowSources(String user, String proxyFileName,
             String workflowName) throws BusinessException {
 
         try {

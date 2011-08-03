@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.server.business.simulation.parser;
 
+import fr.insalyon.creatis.vip.application.client.bean.Source;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -47,7 +48,7 @@ public class ScuflParser extends AbstractWorkflowParser {
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         if (localName.equals("s:source")) {
             String sourceName = attributes.getValue("name");
-            sources.add(sourceName);
+            sources.add(new Source(sourceName,"",""));
             return;
         }
     }

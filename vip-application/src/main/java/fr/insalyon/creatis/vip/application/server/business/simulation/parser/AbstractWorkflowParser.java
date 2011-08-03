@@ -32,10 +32,10 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-
 package fr.insalyon.creatis.vip.application.server.business.simulation.parser;
 
 import fr.insalyon.creatis.vip.application.server.bean.Descriptor;
+import fr.insalyon.creatis.vip.application.client.bean.Source;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,11 +52,12 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class AbstractWorkflowParser extends DefaultHandler {
 
+
     protected XMLReader reader;
-    protected List<String> sources;
+    protected List<Source> sources;
 
     protected AbstractWorkflowParser() {
-        sources = new ArrayList<String>();
+        sources = new ArrayList<Source>();
     }
 
     public Descriptor parse(String fileName) throws IOException, SAXException {
@@ -66,5 +67,4 @@ public class AbstractWorkflowParser extends DefaultHandler {
 
         return new Descriptor(sources);
     }
-
 }

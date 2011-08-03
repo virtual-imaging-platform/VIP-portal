@@ -35,6 +35,7 @@
 
 package fr.insalyon.creatis.vip.application.server.bean;
 
+import fr.insalyon.creatis.vip.application.client.bean.Source;
 import java.util.List;
 
 /**
@@ -43,13 +44,13 @@ import java.util.List;
  */
 public class Descriptor {
 
-    private List<String> sources;
+    private List<Source> sources;
 
-    public Descriptor(List<String> sources) {
+    public Descriptor(List<Source> sources) {
         this.sources = sources;
     }
 
-    public List<String> getSources() {
+    public List<Source> getSources() {
         return sources;
     }
 }
