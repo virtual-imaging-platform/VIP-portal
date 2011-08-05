@@ -6,14 +6,21 @@ package fr.insalyon.creatis.vip.simulationgui.client.gwtgl;
  * @author moulin
  */
 public class Camera {
+                
                 private int angleX=0;
                 private int angleY=0;
                 private float translateZ =-3;
                 private float normalView =-3;
                 private float translateX=0;
                 private float translateY=0;
+                
+                private float stepOfViewScroll=1f;
+                private float stepOfViewTranslation=1f;
+                private float ladderOfView=1f;
+                
                 private static Camera instance;
-              public static Camera getInstance() {
+                
+                public static Camera getInstance() {
                 if (instance == null) {
                      instance = new Camera();
                 }
@@ -55,27 +62,32 @@ public class Camera {
               
                public void setTranslateX(float x)
                {
-                   translateX=x;
-                   
+                   translateX=translateX+x*ladderOfView*stepOfViewTranslation/250;       
                }
                public void setTranslateY(float y)
-               {
-                   translateY=y;
-                   
+               {                  
+                   translateY=translateY+y*ladderOfView*stepOfViewTranslation/250;
                }
                public void setTranslateZ(float z)
                {
-                   translateZ=z;
-                  
+                   translateZ=translateZ-z*ladderOfView*stepOfViewScroll/25;         
                }
                public void setNormalZ(float z)
                {
-                   normalView=z;
-                   translateZ=z;
+                   ladderOfView=Math.abs(z/5);
+                   normalView=z*2;
+                   translateZ=z*2;
                }
                public void setViewToNormalZ()
                {
                    translateZ=normalView;
                }
-               
+               public void setStepOfViewTranslation(int t)
+               {
+                   stepOfViewTranslation=t;  
+               }
+               public void setStepOfViewScroll(int s)
+               {
+                   stepOfViewScroll=s;
+               }
 }

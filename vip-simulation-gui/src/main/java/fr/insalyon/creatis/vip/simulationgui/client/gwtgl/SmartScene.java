@@ -1,12 +1,19 @@
-/**  
- * Sönke Sothmann, Steffen Schäfer : http://code.google.com/p/gwtgl/
- *
- */
-
 package fr.insalyon.creatis.vip.simulationgui.client.gwtgl;
 
+
+
+
 import static com.google.gwt.core.client.GWT.log;
+
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.MouseMoveEvent;
+import com.google.gwt.event.dom.client.MouseMoveHandler;
+import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseUpHandler;
+import com.google.gwt.event.dom.client.MouseWheelEvent;
+import com.google.gwt.event.dom.client.MouseWheelHandler;
 import com.google.gwt.user.client.Timer;
 import com.googlecode.gwtgl.array.Float32Array;
 import com.googlecode.gwtgl.array.Uint16Array;
@@ -18,12 +25,22 @@ import com.googlecode.gwtgl.binding.WebGLShader;
 import com.googlecode.gwtgl.binding.WebGLUniformLocation;
 import com.smartgwt.client.widgets.Canvas;
 import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3D;
-import fr.insalyon.creatis.vip.simulationgui.client.util.math.FloatMatrix;
+import fr.insalyon.creatis.vip.simulationgui.client.util.math.FloatMatrix4x4;
 import fr.insalyon.creatis.vip.simulationgui.client.util.math.MatrixUtil;
 
+
+
+
+
+
+
+
+
 /**
- *
- * @author moulin
+ * Example that shows a colored triangle created with the GwtGL binding.
+ * 
+ * @author Sönke Sothmann
+ * 
  */
 
 public class SmartScene extends Canvas{
@@ -32,46 +49,66 @@ public class SmartScene extends Canvas{
         
         private int vertexPositionAttribute;
         private int vertexColorAttribute;
+        private int vertexNormalAttribute;
+        private int vertexNormalInvertAttribute;
         
         private WebGLBuffer vertexBuffer;
         private WebGLBuffer indexBuffer;
         private WebGLBuffer colorBuffer;
+        private WebGLBuffer normalBuffer;
+        private WebGLBuffer normalInvertBuffer;
         
         private WebGLUniformLocation projectionMatrixUniform; // matrice de projection de l'object par rapport a la caméra
+        private WebGLUniformLocation projectionNormalUniform;
         private WebGLCanvas webGLCanvas = new WebGLCanvas("500px", "500px");
         private WebGLRenderingContext glContext;
         
-        private FloatMatrix perspectiveMatrix;
-        private FloatMatrix translationMatrix;
-        private FloatMatrix rotationMatrix;
-        private FloatMatrix resultingMatrix;
+        private FloatMatrix4x4 perspectiveMatrix;
+        private FloatMatrix4x4 translationMatrix;
+        private FloatMatrix4x4 rotationMatrix;
+        private FloatMatrix4x4 resultingMatrix;
+        private FloatMatrix4x4 normalMatrix;
         private Data3D object;
+        
+        // lightings
         
         private int angleX;
         private int angleY;
         private int angleZ;
-        private int addx=1;
+        private int addx=0;
         private int addy=1;
         private int addz=0;
-        private int width;
-        private int height;
-        private int refreshTime=18;
+        private int refreshTime=10;
        
        
+        private float translateZ=-4;
+        private int xMouseRot=0;
+        private int yMouseRot=0;
+        boolean checkMouse=false;
+        
         // Minimun of object : camera and model
- 
-        private static SmartScene instance;
+        // vDot = max(dot(transNormal.xyz, lightDir),0.0);
+       
+        
+        //
+        /*
+         * (non-Javadoc)
+         * 
+         * @see com.googlecode.gwtgl.example.client.AbstractGwtGLExample#init()
+         */
+        //@Override
+       
+       /* private static SmartScene instance;
         
         public static SmartScene getInstance(Data3D obj,int width, int height) {
             if (instance == null) {
                 instance = new SmartScene(obj,width,height);
             }
             return instance;
-        } 
-        private SmartScene(Data3D obj, int width, int height){   
+        } */
+        public SmartScene(Data3D obj, int width, int height){   
                 
-               this.width=width;
-               this.height=height;
+
                 object=obj;
                 
                 glContext = webGLCanvas.getGlContext();
@@ -79,26 +116,38 @@ public class SmartScene extends Canvas{
                 
                 this.setWidth(width);
                 this.setHeight(height);
-                this.addChild(webGLCanvas);      
+                this.addChild(webGLCanvas); 
+                 //RootPanel.get("gwtgl").add(webGLCanvas);
                 init();
         }   
         private void init() {
                 createShaderProgram();
                 initParams();
                 initBuffers();
+                initControl();
                 showMatrices();
         }
         private void initParams() {
-                angleX=0;
+                angleX=-20;
                 angleY=0;
-                
-                glContext.viewport(0, 0, width, height);
+                angleZ=0;
+                translateZ=-((float)(object.getBoundingBox()[5]-object.getBoundingBox()[4])*2);
+                //
+                glContext.viewport(0, 0, this.getOffsetWidth(), this.getOffsetHeight());
                 
                 // Set the background color
-                glContext.clearColor(1.0f, 1.0f, 1.0f, 1.0f);
+                glContext.clearColor(0.5f, 1.0f, 1.0f, 1.0f);
                 // Set the clear depth (everything is cleared)
-                glContext.clearDepth(1.0f);
-
+               glContext.clearDepth(1.0f);
+               ////////////////////////////////////////////// 
+                    
+               glContext.enable(WebGLRenderingContext.BLEND);
+                glContext.blendFunc(WebGLRenderingContext.SRC_ALPHA,WebGLRenderingContext.ONE_MINUS_SRC_ALPHA); 
+              //SC.say("blabla + one "+ WebGLRenderingContext.ONE+" blabla + src "+WebGLRenderingContext.SRC_ALPHA);
+                //glContext.disable(WebGLRenderingContext.DEPTH_TEST);
+               // gl.uniform1f(shaderProgram.alphaUniform, parseFloat(document.getElementById("alpha").value));
+                ///////////////////////////////////////////:
+                
                 // Activate depth test and set the depth function
                 glContext.enable(WebGLRenderingContext.DEPTH_TEST);
                 glContext.depthFunc(WebGLRenderingContext.LEQUAL);
@@ -106,7 +155,9 @@ public class SmartScene extends Canvas{
                 checkErrors();
         }
         private void initBuffers() {
-            
+                // create the vertexBuffer
+                // One Triangle with 3 Points à 3 coordinates
+            // refresh the height context to the simulator child !
           
           
                 // create the vertexBuffer
@@ -133,6 +184,14 @@ public class SmartScene extends Canvas{
                 glContext.bufferData(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER,
                                 Uint16Array.create(object.getIndices()),
                                 WebGLRenderingContext.STATIC_DRAW);
+                
+                normalBuffer = glContext.createBuffer();
+                glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, normalBuffer);
+                
+                glContext.bufferData(WebGLRenderingContext.ARRAY_BUFFER,
+                                Float32Array.create(object.getNormals()),
+                                WebGLRenderingContext.STATIC_DRAW);
+                
                 checkErrors();
                 }
             
@@ -161,19 +220,34 @@ public class SmartScene extends Canvas{
                     glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, colorBuffer);
                     glContext.vertexAttribPointer(vertexColorAttribute, object.getItemSizeColor(), WebGLRenderingContext.FLOAT, false, 0, 0);
                     glContext.enableVertexAttribArray(vertexColorAttribute);
-
+                    
+                    glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, normalBuffer);
+                    glContext.vertexAttribPointer(vertexNormalAttribute, 3, WebGLRenderingContext.FLOAT, false, 0, 0);
+                    glContext.enableVertexAttribArray(vertexNormalAttribute);
+                    
+                    
                     glContext.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, indexBuffer);
       
                     //proj
                     perspectiveMatrix = MatrixUtil.createPerspectiveMatrix(45, 1.0f, 0.1f, 1000);
                     
                     //object transf
-                    translationMatrix = MatrixUtil.createTranslationMatrix(0,0,-4);
+                    translationMatrix = MatrixUtil.createTranslationMatrix(0,0,translateZ);
                     rotationMatrix = MatrixUtil.createRotationMatrix(angleX,angleY,angleZ);
                    
                     resultingMatrix = perspectiveMatrix.multiply(translationMatrix).multiply(rotationMatrix);
-
+                    
+                    normalMatrix=rotationMatrix.inverse();
+                    normalMatrix=normalMatrix.transpose();
+          
+                     glContext.uniform3f(glContext.getUniformLocation(shaderProgram, "lightDir"),0f,0f,1f); // on envoie au shader la valeur de cette variable..
+                     glContext.uniform1f(glContext.getUniformLocation(shaderProgram, "uAlpha"), 1f);
+                     glContext.uniformMatrix4fv(projectionNormalUniform, false, normalMatrix.getColumnWiseFlatData());
+                    
                     glContext.uniformMatrix4fv(projectionMatrixUniform, false, resultingMatrix.getColumnWiseFlatData());
+                    
+                     
+                    
                     glContext.drawElements(WebGLRenderingContext.TRIANGLES, object.getNumItemIndex(), WebGLRenderingContext.UNSIGNED_SHORT, 0);
                    
                     glContext.flush();
@@ -182,7 +256,7 @@ public class SmartScene extends Canvas{
             }
         
         private void createShaderProgram() {
-                // Create the Shaders
+                // Create the Shaders 
                 WebGLShader fragmentShader = getShader(WebGLRenderingContext.FRAGMENT_SHADER, shaders.INSTANCE.fragmentShader().getText());
                 log("Created fragment shader");
                 
@@ -214,11 +288,14 @@ public class SmartScene extends Canvas{
                 }
                 log("Shader program linked");
                 
-                // Set the ShaderProgram active
+                // Set the ShaderProgram active 
                 glContext.useProgram(shaderProgram);
                 vertexPositionAttribute = glContext.getAttribLocation(shaderProgram, "vertexPosition");
                 vertexColorAttribute = glContext.getAttribLocation(shaderProgram, "vertexColor");
+                vertexNormalAttribute = glContext.getAttribLocation(shaderProgram, "vNormal");
+                projectionNormalUniform= glContext.getUniformLocation(shaderProgram, "normalMatrix");
                 projectionMatrixUniform = glContext.getUniformLocation(shaderProgram, "projectionMatrix");
+                
                 checkErrors();
         }
         private WebGLShader getShader(int type, String source) {
@@ -262,4 +339,48 @@ public class SmartScene extends Canvas{
             addy=ay;
             addz=az;
         }
+       private void initControl()
+       {
+             webGLCanvas.addMouseUpHandler(new MouseUpHandler(){
+              
+            public void onMouseUp(com.google.gwt.event.dom.client.MouseUpEvent event) {
+               checkMouse=false;
+            }
+             });
+                 
+                  webGLCanvas.addMouseMoveHandler(new MouseMoveHandler(){
+                  public void onMouseMove(MouseMoveEvent event) {
+                  if(checkMouse==true )
+                  {
+  
+                      angleX=angleX-event.getClientY()+yMouseRot;
+                      angleY=angleY-event.getClientX()+xMouseRot;
+                      xMouseRot=event.getClientX();
+                      yMouseRot=event.getClientY();
+                      drawObject();
+                  }
+                 }
+                });
+                               
+                  webGLCanvas.addMouseDownHandler(new MouseDownHandler(){
+                  public void onMouseDown(MouseDownEvent event) {
+                  xMouseRot=event.getClientX();
+                  yMouseRot=event.getClientY();
+                  checkMouse=true;
+                  }    
+                 }); 
+                  
+                  webGLCanvas.addMouseOutHandler(new MouseOutHandler(){
+                  public void onMouseOut(com.google.gwt.event.dom.client.MouseOutEvent event){
+                    checkMouse=false;
+                   }                
+                  });
+                webGLCanvas.addMouseWheelHandler(new MouseWheelHandler() {
+                public void onMouseWheel(MouseWheelEvent event) {
+                 translateZ=translateZ-Float.valueOf(event.getDeltaY());          
+                }
+                });    
+       }
 }
+
+ 

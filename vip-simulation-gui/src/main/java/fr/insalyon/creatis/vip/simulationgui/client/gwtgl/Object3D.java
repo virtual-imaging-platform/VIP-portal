@@ -1,6 +1,7 @@
 
 package fr.insalyon.creatis.vip.simulationgui.client.gwtgl;
 
+import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3D;
 
 
@@ -68,16 +69,21 @@ public class Object3D{
                }
                public float[] getVertices()
                {
-                 return parsor(box.getVertices(),axis.getVertices(),model.getVertices());
+                 return parsor(box.getVertices(),model.getVertices(),axis.getVertices());
                }
                 public float[] getColors()
                {
-                 return parsor(box.getColors(),axis.getColors(),model.getColors());
+                 return parsor(box.getColors(),model.getColors(),axis.getColors());
                }
                public int[] getIndices()
                {
-                 return mapping(box.getIndices(),axis.getIndices(),model.getIndices());
+                 return mapping(box.getIndices(),model.getIndices(),axis.getIndices());
                }
+               public float[] getNormals()
+               {
+                 return parsor(box.getNormals(),model.getNormals(),axis.getNormals());
+               }
+
                public int getItemSizeColor()
                {
                    return 4;
@@ -158,7 +164,12 @@ public class Object3D{
                    if("box".equals(ID))box.setNumItemIndex(i);
                    if("axis".equals(ID))axis.setNumItemIndex(i);
                }
-            
+               public void buildNormals()
+               {
+                  model.buildNormals();
+                  box.buildNormals();
+                  axis.buildNormals();                 
+               }
                public void reconstructor(Data3D DATA)
                {
                   
@@ -211,7 +222,7 @@ public class Object3D{
                     if(V[0]!=null)taille=V[0].length;
                     if(V[1]!=null)taille=taille+V[1].length;
                     if(V[2]!=null)taille=taille+V[2].length;
-                    if(V[0]==null&&V[1]==null&&V[1]==null)tmp=null;
+                    if(V[0]==null&&V[1]==null&&V[2]==null)tmp=null;
                     else tmp= new float[taille];
 
                     int k=0;
@@ -228,6 +239,7 @@ public class Object3D{
                     }
                     return tmp;
                 }
+               
                 protected  int[] mapping(int indic0[],int indic1[],int indic2[])
                 {
                       int[] tmp;
@@ -239,7 +251,7 @@ public class Object3D{
                     if(I[0]!=null)taille=I[0].length;
                     if(I[1]!=null)taille=taille+I[1].length;
                     if(I[2]!=null)taille=taille+I[2].length;
-                   if(I[0]==null&&I[1]==null&&I[1]==null)tmp=null;
+                   if(I[0]==null&&I[1]==null&&I[2]==null)tmp=null;
                    else tmp= new int[taille];
                    int max=0;
                    int  k=0;

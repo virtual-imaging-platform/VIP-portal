@@ -53,11 +53,6 @@
             <version>0.3</version>
         </dependency>
         <dependency>
-            <groupId>vtk</groupId>
-            <artifactId>vtk</artifactId>
-            <version>0</version>
-        </dependency>
-        <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-models</artifactId>
             <version>${vip.models.version}</version>

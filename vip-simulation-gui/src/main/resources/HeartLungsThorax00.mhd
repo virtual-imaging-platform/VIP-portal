@@ -1,0 +1,14 @@
+ObjectType = Image
+NDims = 3
+BinaryData = True
+BinaryDataByteOrderMSB = False
+CompressedData = True
+CompressedDataSize = 770518
+TransformMatrix = 1 0 0 0 1 0 0 0 1
+Offset = -17.1961 42.4372 -20.793
+CenterOfRotation = 0 0 0
+ElementSpacing = 0.819499 0.819499 0.819499
+DimSize = 434 301 444
+AnatomicalOrientation = ???
+ElementType = MET_UCHAR
+ElementDataFile = HeartLungsThorax00.zraw

@@ -31,5 +31,5 @@ public interface VTKController extends RemoteService {
 
 	public Data3D[][] downloadAndUnzipExample(String path);
         public Data3D[][] downloadAndUnzipModel(String url, String proxyFileName ,String user);
-        public List<String> linkerSimulator (String modality);
+      
 }

@@ -1,15 +1,21 @@
 
 package fr.insalyon.creatis.vip.simulationgui.client.gui;
 
+import com.google.gwt.user.client.ui.Widget;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TreeModelType;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Slider;
 import com.smartgwt.client.widgets.events.ValueChangedEvent;
 import com.smartgwt.client.widgets.events.ValueChangedHandler;
+import com.smartgwt.client.widgets.form.ColorPicker;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.events.ColorSelectedEvent;
+import com.smartgwt.client.widgets.form.events.ColorSelectedHandler;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.ColorPickerItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangeHandler;
@@ -18,12 +24,15 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellClickHandler;
+import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
+import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Portlet;
 import com.smartgwt.client.widgets.tree.Tree;
 import com.smartgwt.client.widgets.tree.TreeGrid;
+import com.smartgwt.client.widgets.tree.TreeGridField;
 import com.smartgwt.client.widgets.tree.TreeNode;
 import com.smartgwt.client.widgets.tree.events.NodeClickEvent;
 import com.smartgwt.client.widgets.tree.events.NodeClickHandler;
@@ -115,17 +124,17 @@ public class SimulationGUIControlBoxModel extends Portlet{
           
           
           modAxis=new CheckboxItem("Axis");
-          model= new CheckboxItem("Model");
+          //model= new CheckboxItem("Model");
           modBox=new CheckboxItem("Bounding box");
             
           modBox.setValue(true);
-          model.setValue(true);
+          //model.setValue(true);
           modAxis.setValue(true); 
           
             
           form3.setAutoFocus(false);  
           form3.setNumCols(6);  
-          form3.setFields(modBox,modAxis,model);
+          form3.setFields(modBox,modAxis);
           
           hSlider.setVertical(false);
           hSlider.setMinValue(1f);  
@@ -149,9 +158,7 @@ public class SimulationGUIControlBoxModel extends Portlet{
           elementTree.setData(elementData);  
          
   
-          elementTreeGrid = new TreeGrid();    
-          // elementTreeGrid.setHeight(150);  
-         // elementTreeGrid.setWidth(260);  
+          elementTreeGrid = new TreeGrid();      
           elementTreeGrid.setData(elementTree);  
           elementTreeGrid.setSelectionAppearance(SelectionAppearance.CHECKBOX);  
           elementTreeGrid.setShowSelectedStyle(false);  
@@ -163,8 +170,6 @@ public class SimulationGUIControlBoxModel extends Portlet{
           hLayout2.setWidth100();
           hLayout2.setHeight(400);
           hLayout2.addMember(elementTreeGrid);
-          
-          //treeAndNode();
           
           setControl();
          
@@ -190,48 +195,48 @@ public class SimulationGUIControlBoxModel extends Portlet{
 
             public void onChanged(ChangedEvent event) {
                objectModel.setTranslateX(Float.valueOf(spinnerx.getValueAsString()));
+                Scene.getInstance().refreshScreen();
                refreshLaunchTabValue();
-               Scene.getInstance().refreshScreen();
             }
         });
          spinnery.addChangedHandler(new ChangedHandler(){
 
             public void onChanged(ChangedEvent event) {
                objectModel.setTranslateY(Float.valueOf(spinnery.getValueAsString()));
-               refreshLaunchTabValue();
                Scene.getInstance().refreshScreen();
+               refreshLaunchTabValue();
             }
         });
           spinnerz.addChangedHandler(new ChangedHandler(){
 
             public void onChanged(ChangedEvent event) {
                 objectModel.setTranslateZ(Float.valueOf(spinnerz.getValueAsString()));
-                refreshLaunchTabValue();
                 Scene.getInstance().refreshScreen();
+                refreshLaunchTabValue();              
             }
         });
        spinnerax.addChangedHandler(new ChangedHandler(){
 
             public void onChanged(ChangedEvent event) {
                 objectModel.setAngleX(Integer.valueOf(spinnerax.getValueAsString()));
-                refreshLaunchTabValue();
                 Scene.getInstance().refreshScreen();
+                refreshLaunchTabValue();
             }
         });
          spinneray.addChangedHandler(new ChangedHandler(){
 
             public void onChanged(ChangedEvent event) {
                 objectModel.setAngleY(Integer.valueOf(spinneray.getValueAsString()));
+                 Scene.getInstance().refreshScreen();
                 refreshLaunchTabValue();
-                Scene.getInstance().refreshScreen();
             }
         });
         spinneraz.addChangedHandler(new ChangedHandler(){
 
             public void onChanged(ChangedEvent event){
                 objectModel.setAngleZ(Integer.valueOf(spinneraz.getValueAsString()));
-                refreshLaunchTabValue();
                 Scene.getInstance().refreshScreen();
+                refreshLaunchTabValue();
             }
             
         });
@@ -254,7 +259,7 @@ public class SimulationGUIControlBoxModel extends Portlet{
                 Scene.getInstance().refreshScreen();  
              }
              });
-             model.addChangeHandler(new ChangeHandler() 
+            /* model.addChangeHandler(new ChangeHandler() 
              {
                 public void onChange(ChangeEvent event) {
                 if(model.getValueAsBoolean())objectModel.disable("model");
@@ -262,26 +267,30 @@ public class SimulationGUIControlBoxModel extends Portlet{
                 Scene.getInstance().refreshBuffer();
                 Scene.getInstance().refreshScreen();   
              }
-             });
+             });*/
          
           
                    
      }
-     public float[] getTabValue()
+     public void checkBoxBox()
      {
-         float Tab[] =new float[6];
-         Tab[0]=spinnerx.getAttributeAsFloat(id);
-         Tab[1]=spinnery.getAttributeAsFloat(id);
-         Tab[2]=spinnerz.getAttributeAsFloat(id);
-         Tab[3]=spinnerax.getAttributeAsFloat(id);
-         Tab[4]=spinneray.getAttributeAsFloat(id);
-         Tab[5]=spinneraz.getAttributeAsFloat(id);
-         return Tab;           
+          modBox.setValue(true);
+     }
+     public void uncheckBoxBox()
+     {
+         modBox.setValue(false);
+     }
+     public void checkBoxAxis()
+     {    
+         modAxis.setValue(true); 
+     }
+     public void uncheckBoxAxis()
+     {
+         modAxis.setValue(false); 
      }
      public Object3D getObjectSimulateur()
      {
-       if(enable)return objectModel;
-       else return null;
+        return objectModel;
      }
      public void enableView()
      {
@@ -295,7 +304,7 @@ public class SimulationGUIControlBoxModel extends Portlet{
 
     public void setTreeNode(Data3D[][] DATA)
     { 
-        
+   
        int i=0;
         for(Data3D[]d: DATA)
         {
@@ -312,16 +321,36 @@ public class SimulationGUIControlBoxModel extends Portlet{
                 {
                     elementData[i]= new ElementTreeNode(d1.getType(),"1",d1.getType(),false);
                     s+="/////";
+                    i++;
                 }
-                else elementData[i]= new ElementTreeNode(d1.getID(),d1.getType(),d1.getID(), false);    
-                 s+=" ["+i+"] "+" Type : "+d1.getType()+" name " +d1.getID(); 
-                i++;
+                
+                
            }
         }
-        hLayout2.removeMember(elementTreeGrid);
+        for(Data3D[] d:DATA)
+        {
+          for(Data3D d1 :d)
+           {
+               if(d1.getID().endsWith(".vtp"))
+               {
+                   Canvas canvas= new Canvas();
+                   canvas.setBackgroundColor("red");
+                   
+                   elementData[i]= new ElementTreeNode(d1.getID(),d1.getType(),d1.getID(), false);    
+                   elementData[i].setBackgroundComponent(canvas); 
+                 s+=" ["+i+"] "+" Type : "+d1.getType()+" name " +d1.getID(); 
+                 i++;
+               }
+           }
+        }
         
-        // SC.say(s+" i  : "+i);
-         
+        
+        SC.say(s);
+       /* ColorPickerItem colorPicker = new ColorPickerItem();  
+           colorPicker.setTitle("Color Picker");  
+           colorPicker.setWidth(85);  */
+        hLayout2.removeMember(elementTreeGrid);
+
         elementTree = new Tree();  
         elementTree.setModelType(TreeModelType.PARENT);  
         elementTree.setRootValue("1");
@@ -331,38 +360,56 @@ public class SimulationGUIControlBoxModel extends Portlet{
         elementTree.setOpenProperty("isOpen");  
         elementTree.setData(elementData);  
         
-  
+      
         elementTreeGrid = new TreeGrid();    
-       // elementTreeGrid.setHeight(150);  
-       // elementTreeGrid.setWidth(260);  
         elementTreeGrid.setData(elementTree); 
         elementTreeGrid.setSelectionAppearance(SelectionAppearance.CHECKBOX);  
         elementTreeGrid.setSelectionType(SelectionStyle.SIMPLE);
         elementTreeGrid.setShowSelectedStyle(false); 
         elementTreeGrid.setShowPartialSelection(true);  
         elementTreeGrid.setCascadeSelection(true);  
+        elementTreeGrid.setShowBackgroundComponent(true);
         elementTreeGrid.selectAllRecords();
+        elementTreeGrid.addCellDoubleClickHandler(new CellDoubleClickHandler(){
+        
+            public void onCellDoubleClick(CellDoubleClickEvent event) {
+                //
+               ColorPicker cp= new ColorPicker();
+               cp.show();
+               final String name=event.getRecord().getAttribute("ElementId");
+               
+               cp.addColorSelectedHandler(new ColorSelectedHandler(){
+                    public void onColorSelected(ColorSelectedEvent event) {
+                        if(name.endsWith(".vtp"))objectModel.colorElement(name, event.getColor(), ((float)event.getOpacity())/100);
+                    }
+                });
+
+            }
+        });
         elementTreeGrid.draw();
         elementTreeGrid.addSelectionChangedHandler(new SelectionChangedHandler() {
             public void onSelectionChanged(SelectionEvent event) {
                objectModel.unsetElement(event.getSelection());
             }
-        });
+        }); 
         
         hLayout2.addMember(elementTreeGrid);
+        
     }
     public static class ElementTreeNode extends TreeNode {  
-        public ElementTreeNode(String elementId, String reportsTo, String element, boolean isOpen) {  
+        public ElementTreeNode(String elementId, String reportsTo, String element, boolean isOpen)
+        { 
+           
             setAttribute("ElementId", elementId);  
             setAttribute("ReportsTo", reportsTo);  
             setAttribute("Element", element);   
-            setAttribute("isOpen", isOpen);  
+            setAttribute("isOpen", isOpen);   
         }  
     } 
     private void refreshLaunchTabValue()
      {   
          SimulationGUIControlBox.getInstance("US","").refreshLaunchTabValue();
-         SimulationGUIControlBox.getInstance("MRI(TEST)","").refreshLaunchTabValue();
+         SimulationGUIControlBox.getInstance("MRI","").refreshLaunchTabValue();
          SimulationGUIControlBox.getInstance("CT","").refreshLaunchTabValue();
          SimulationGUIControlBox.getInstance("PET","").refreshLaunchTabValue();
      } 

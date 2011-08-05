@@ -28,10 +28,10 @@ public class VTKControllerImpl extends RemoteServiceServlet implements VTKContro
    
   
 	public Data3D[][] downloadAndUnzipExample(String path){
-           ObjectFactory objFact=ObjectFactory.getInstance();
+         
            
            String [][]entry=new String[3][3];
-           entry[0][0]="[tumor-HeartLungsThorax00.vtp]";
+           entry[0][0]="[right_lung.vtp]";
            entry[0][1]="[internal_thorax.vtp]";
            entry[0][2]="[HeartLungsThorax00.mhd, blabla.zraw]";
                          
@@ -44,8 +44,12 @@ public class VTKControllerImpl extends RemoteServiceServlet implements VTKContro
            entry[2][2]="[HeartLungsThorax00.mhd, blabla.zraw]";
            
            String type[]= new String[]{"external_agent","anatomical","geometrical"};
-           objFact.addPath(path,entry,type);
-           Data3D [][]object=objFact.GetObjectTab();
+           Data3D [][]object=ObjectFactory.buildMulti(path,entry,type);
+            
+          // Data3D object =ObjectFactory.build(path+"/myocardium.vtp");
+          // String s="";
+          // for(int i: object[0][1].getSupIndices())s+=" "+i+" ";
+          // System.out.println(s);
             return object;
 
             // list tous les modeles 
@@ -86,48 +90,6 @@ public class VTKControllerImpl extends RemoteServiceServlet implements VTKContro
        service = new DownloadService(url, proxyFileName, user);   
        return service.getObject();
     }
-    public List<String> linkerSimulator (String modality)
-    {
-       
-       
-        
-        List<String> listString=new ArrayList<String>();
-		try{
-                        boolean test=false;
-			InputStream ips=this.getClass().getResourceAsStream("linker.txt"); 
-			InputStreamReader ipsr=new InputStreamReader(ips);
-			BufferedReader br=new BufferedReader(ipsr);
-                        String ligne;
-			while ((ligne=br.readLine())!=null){
-                              int j=0;
-                                for (int i= 0 ; i < ligne.length() ;i++)
-                                {
-                                  if(ligne.charAt(i)==',')j++;
-                                }                               
-			      StringTokenizer st1dTokenize = new StringTokenizer(ligne);
-                              if(st1dTokenize.nextToken(",").equals(modality))
-                              {                                 
-                                  for(int i=0;i<j;i++)
-                                  {
-                                      listString.add(st1dTokenize.nextToken(","));
-                                      test=true;
-                                  }                                 
-                              }
-                        }
-			br.close();
-                        if(test)return listString;
-                        else return null;
-		}		
-		catch (Exception e){
-			System.out.println(e.toString());
-		}		
-        return null;
-    }
 
-    
-
-   
-
-   
 
 }

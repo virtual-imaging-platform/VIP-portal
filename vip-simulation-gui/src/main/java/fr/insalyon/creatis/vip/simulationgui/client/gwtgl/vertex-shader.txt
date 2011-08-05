@@ -1,10 +1,23 @@
 attribute vec3 vertexPosition;
 attribute vec4 vertexColor;
+attribute vec3 vNormal;
+
 uniform mat4 projectionMatrix;
+uniform mat4 normalMatrix;
+uniform vec3 lightDir;
+
 varying vec4 vColor;
+
+varying float vDot;
 
 void main(void) {
 gl_Position = projectionMatrix * vec4(vertexPosition, 1.0);
 vColor = vertexColor;
+
+
+vec4 transNormal = normalMatrix * vec4(vNormal, 1.0);
+vDot =abs(dot(transNormal.xyz, lightDir));
 }
+
+
 

@@ -21,6 +21,8 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Portlet;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
+import fr.insalyon.creatis.vip.core.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.core.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.Object3D;
@@ -30,6 +32,7 @@ import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.Scene;
 import fr.insalyon.creatis.vip.simulationgui.client.rpc.VTKController;
 import fr.insalyon.creatis.vip.simulationgui.client.rpc.VTKControllerAsync;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -59,8 +62,7 @@ public class SimulationGUIControlBox
      private String id;
      private Object3D simu;
      private CheckboxItem modBox;  
-     private CheckboxItem modAxis;  
-     private CheckboxItem model;  
+     private CheckboxItem modAxis;   
      private CheckboxItem masterCheckbox;  
      private boolean enable=false;
      private String applicationClass;
@@ -87,7 +89,7 @@ public class SimulationGUIControlBox
 
           id=contents;
           simu= new ObjectSimulateur(contents);
-               
+             
           masterCheckbox= new CheckboxItem(id);
           
           portletControl= new Portlet();
@@ -126,14 +128,14 @@ public class SimulationGUIControlBox
           form.setFields(spinnerx,spinnery,spinnerz);
           form2.setFields(spinnerax,spinneray,spinneraz);
         
-          modAxis=new CheckboxItem("Axis");
-          model= new CheckboxItem("Model");
+          modAxis=new CheckboxItem("Axis");      
           modBox=new CheckboxItem("Symbol");  
           modAxis.setValue(true);
-                  
+          
+          
           form3.setAutoFocus(false);  
           form3.setNumCols(6);  
-          form3.setFields(modBox,modAxis,model);
+          form3.setFields(modBox,modAxis);
           
           
           hSlider.setVertical(false);
@@ -176,48 +178,48 @@ public class SimulationGUIControlBox
 
             public void onChanged(ChangedEvent event) {
                simu.setTranslateX(Float.valueOf(spinnerx.getValueAsString()));
-               refreshLaunchTabValue();
                Scene.getInstance().refreshScreen();
+               refreshLaunchTabValue();
             }
         });
          spinnery.addChangedHandler(new ChangedHandler(){
 
             public void onChanged(ChangedEvent event) {
                simu.setTranslateY(Float.valueOf(spinnery.getValueAsString()));
-               refreshLaunchTabValue();
                Scene.getInstance().refreshScreen();
+               refreshLaunchTabValue();
             }
         });
           spinnerz.addChangedHandler(new ChangedHandler(){
 
             public void onChanged(ChangedEvent event) {
                 simu.setTranslateZ(Float.valueOf(spinnerz.getValueAsString()));
-               refreshLaunchTabValue();
                 Scene.getInstance().refreshScreen();
+                refreshLaunchTabValue();
             }
         });
        spinnerax.addChangedHandler(new ChangedHandler(){
 
             public void onChanged(ChangedEvent event) {
                 simu.setAngleX(Integer.valueOf(spinnerax.getValueAsString()));
-                refreshLaunchTabValue();
                 Scene.getInstance().refreshScreen();
+                refreshLaunchTabValue();  
             }
         });
          spinneray.addChangedHandler(new ChangedHandler(){
 
             public void onChanged(ChangedEvent event) {
                 simu.setAngleY(Integer.valueOf(spinneray.getValueAsString()));
-                refreshLaunchTabValue();
                 Scene.getInstance().refreshScreen();
+                refreshLaunchTabValue();
             }
         });
         spinneraz.addChangedHandler(new ChangedHandler(){
 
             public void onChanged(ChangedEvent event){
                 simu.setAngleZ(Integer.valueOf(spinneraz.getValueAsString()));
-               refreshLaunchTabValue();
                 Scene.getInstance().refreshScreen();
+                refreshLaunchTabValue();
             }
             
         });
@@ -227,12 +229,14 @@ public class SimulationGUIControlBox
                 public void onChange(ChangeEvent event) {
                 if(modBox.getValueAsBoolean())
                 {
+                    simu.disable("model");
                     simu.disable("box");
                     Scene.getInstance().refreshBuffer();
                     Scene.getInstance().refreshScreen();
                 }
                 else
                 {
+                    simu.enable("model");
                     simu.enable("box");
                     Scene.getInstance().refreshBuffer();
                     Scene.getInstance().refreshScreen();
@@ -258,7 +262,7 @@ public class SimulationGUIControlBox
                  
              }
              });
-             model.addChangeHandler(new ChangeHandler() 
+            /* model.addChangeHandler(new ChangeHandler() 
              {
                 public void onChange(ChangeEvent event) {
                 if(model.getValueAsBoolean())
@@ -275,7 +279,7 @@ public class SimulationGUIControlBox
                 }
                  
              }
-             });
+             });*/
              simulatorSelectItem.addChangedHandler(new ChangedHandler() {  
               public void onChanged(ChangedEvent event) {
                  Layout.getInstance().removeTab(launchTab);
@@ -310,19 +314,24 @@ public class SimulationGUIControlBox
      }
      public Object3D getObjectSimulateur()
      {
-       if(enable)return simu;
+      if(enable)return simu;
        else return null;
+        
      }
      public void enableView()
      {
       enable=true;
-      Layout.getInstance().addTab(launchTab,false);
-      refreshLaunchTabValue();
+      if(launchTab!=null)
+      {
+          Layout.getInstance().addTab(launchTab,false);
+          refreshLaunchTabValue();
+      }
+      
      }
      public void disableView()
      {
       enable=false;
-       Layout.getInstance().removeTab(launchTab);
+       if(launchTab!=null)Layout.getInstance().removeTab(launchTab);
      }
       public void setControlOnObject(Object3D mod)
      {
@@ -337,9 +346,32 @@ public class SimulationGUIControlBox
          return masterCheckbox;
      }
     private void loadFormSimulator()
-    {
+    {     
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
-         VTKControllerAsync VTK =  VTKController.Util.getInstance();
+            public void onFailure(Throwable caught) {
+                SC.warn("Error executing get workflow descriptors lists\n" + caught.getMessage());
+                 simulatorSelectItem.setValue("No available Workflow");
+                 launchTab=null;
+            }
+
+            public void onSuccess(List<String> result) {
+
+               String dynaStringTab[]= new String [result.size()];
+                for(int i=0;i<result.size();i++)
+                {
+                     dynaStringTab[i]=result.get(i);
+                }
+                simulatorSelectItem.setValueMap(dynaStringTab);
+                simulatorSelectItem.setDefaultToFirstOption(true);
+                launchTab = new LaunchTab(applicationClass,dynaStringTab[0]); //applicationclass a la place de Id si on veut lancé que la classe "simulation"
+                launchTab.setCanClose(false);
+            }
+        };
+        service.getApplicationsName(id, callback);
+       }
+       /*  VTKControllerAsync VTK =  VTKController.Util.getInstance();
          VTK.linkerSimulator(id,new AsyncCallback<List<String>>(){
 							public void onSuccess(List<String> result) 
                                                         {  
@@ -367,6 +399,6 @@ public class SimulationGUIControlBox
 							      SC.say("linker error"); 
                                                         }
          
-						});                                              
-    }
+						});                                          
+    }*/
  }

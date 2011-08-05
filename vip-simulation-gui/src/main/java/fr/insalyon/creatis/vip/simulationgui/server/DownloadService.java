@@ -40,20 +40,21 @@ public class DownloadService {
       String finalPath="null";
       String rdfPath="null";
       String returnPath="null";
-      Data3D object[][];
+      private static Data3D[][] object;
+        
       public DownloadService (String url, String proxyFileName, String user) 
        {   
            
-         zipPath="null";
-         finalPath="null";
-         File fb = new File(System.getenv("HOME")+"/.platform/models"); 
-         fb.mkdirs();
-        try {
-            download(url,proxyFileName,user);
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(DownloadService.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        rebuildObject(finalPath,rdfPath);
+           zipPath="null";
+           finalPath="null";
+           File fb = new File(System.getenv("HOME")+"/.platform/models"); 
+           fb.mkdirs();
+            try {
+                download(url,proxyFileName,user);
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(DownloadService.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            rebuildObject(finalPath,rdfPath);
        }
        public String getPath()
        {
@@ -195,12 +196,12 @@ public class DownloadService {
             returnPath+=" 2 ";
             for(int i=0;i<entry[2].length;i++)returnPath+=entry[2][i]+" "; 
             returnPath+="  objectListSize :     "+index+ " compare to "+it.getObjectLayers().size();
-            System.out.println(returnPath);
+            System.out.println(returnPath); 
             
             
-            ObjectFactory objFact=ObjectFactory.getInstance();
-            objFact.addPath(path,entry,type);
-            object=objFact.GetObjectTab();
+           //ObjectFactoryOld objFact=ObjectFactoryOld.getInstance();
+            object =ObjectFactory.buildMulti(path,entry,type);
+          
       }
 
        

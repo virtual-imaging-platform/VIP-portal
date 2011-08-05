@@ -31,6 +31,7 @@ import com.googlecode.gwtgl.binding.WebGLUniformLocation;
 import com.smartgwt.client.widgets.Canvas;
 
 import fr.insalyon.creatis.vip.simulationgui.client.util.math.FloatMatrix;
+import fr.insalyon.creatis.vip.simulationgui.client.util.math.FloatMatrix4x4;
 import fr.insalyon.creatis.vip.simulationgui.client.util.math.MatrixUtil;
 import fr.insalyon.creatis.vip.simulationgui.client.util.math.Vector3f;
 
@@ -47,32 +48,29 @@ public class Scene extends Canvas {
         
         private int vertexPositionAttribute[]=new int[6];
         private int vertexColorAttribute[]=new int[6];
+         private int vertexNormalAttribute[]=new int[6];
         
         private WebGLBuffer vertexBuffer[]= new WebGLBuffer[6];
-        private WebGLBuffer indexBuffer[]= new WebGLBuffer[6];;
-        private WebGLBuffer colorBuffer[]= new WebGLBuffer[6];;
+        private WebGLBuffer indexBuffer[]= new WebGLBuffer[6];
+        private WebGLBuffer colorBuffer[]= new WebGLBuffer[6];
+        private WebGLBuffer normalBuffer[]= new WebGLBuffer[6];
         
+        private WebGLUniformLocation projectionNormalUniform;
         private WebGLUniformLocation projectionMatrixUniform; //projection matrix
+        
         private WebGLCanvas webGLCanvas = new WebGLCanvas("500px", "500px");
         private WebGLRenderingContext glContext;
         
-        private FloatMatrix perspectiveMatrix;
-        private FloatMatrix translationCameraMatrix;
-        private FloatMatrix rotationCameraMatrix;
-        private FloatMatrix translationMatrix[]= new FloatMatrix[6];
-        private FloatMatrix rotationMatrix[]= new FloatMatrix[6];
-        private FloatMatrix resultingMatrix[]= new FloatMatrix[6];
-        private Object3D Object[]= new Object3D[6];
+        private FloatMatrix4x4 perspectiveMatrix;
+        private FloatMatrix4x4 translationCameraMatrix;
+        private FloatMatrix4x4 rotationCameraMatrix;
+        private FloatMatrix4x4 translationMatrix[]= new FloatMatrix4x4[6];
+        private FloatMatrix4x4 normalMatrix[]=new FloatMatrix4x4[6];
+        private FloatMatrix4x4 rotationMatrix[]= new FloatMatrix4x4[6];
+        private FloatMatrix4x4 resultingMatrix[]= new FloatMatrix4x4[6];
+        private Object3D object[]= new Object3D[6];
         
-        // lighting
-        private Vector3f lightingDirection = new Vector3f(0, -1, -1);
-        private float directionalColorRed = 1.0f;
-        private float directionalColorGreen = 0.1f;
-        private float directionalColorBlue = 0.1f;
-        private float ambientColorRed = 0.5f;
-        private float ambientColorGreen = 0.5f;
-        private float ambientColorBlue = 0.5f;
-        
+
         // For mouse control
         private int xMouseRot=0;
         private int yMouseRot=0;
@@ -80,11 +78,10 @@ public class Scene extends Canvas {
         private float yMouseDrag=0;
         boolean checkMouse=false;
         
-        // Minimun of object : camera and model
+        // Minimun of object : camera and models
         private ObjectModel mod;
         private Camera cam;
         private int NUM_OBJECT=5;
-        private float stepOfView=2.0f;
        
         private static Scene instance;
         
@@ -98,8 +95,8 @@ public class Scene extends Canvas {
                 cam=Camera.getInstance();
                 mod=ObjectModel.getInstance();
                 
-                Object[0]=mod;
-                Object[1]=Object[2]=Object[3]=Object[4]=null;
+                object[4]=mod;
+                object[1]=object[2]=object[3]=object[0]=null;
                 
                 glContext = webGLCanvas.getGlContext();
                 glContext.viewport(0, 0, 500, 500); 
@@ -124,10 +121,20 @@ public class Scene extends Canvas {
                 // Set the clear depth (everything is cleared)
                 glContext.clearDepth(1.0f);
 
+    
+               /////////////////Light and transparency///////////////////// 
+                    
+                glContext.enable(WebGLRenderingContext.BLEND);
+                glContext.blendFunc(WebGLRenderingContext.SRC_ALPHA,WebGLRenderingContext.ONE_MINUS_SRC_ALPHA); 
+              //SC.say("blabla + one "+ WebGLRenderingContext.ONE+" blabla + src "+WebGLRenderingContext.SRC_ALPHA);
+                //glContext.disable(WebGLRenderingContext.DEPTH_TEST);
+               // gl.uniform1f(shaderProgram.alphaUniform, parseFloat(document.getElementById("alpha").value));
+                ///////////////////////////////////////////:
+                
                 // Activate depth test and set the depth function
                 glContext.enable(WebGLRenderingContext.DEPTH_TEST);
                 glContext.depthFunc(WebGLRenderingContext.LEQUAL);
-              
+                glContext.viewport(0, 0, this.getOffsetWidth(), this.getOffsetHeight());
                 checkErrors();
         }
         private void initBuffers() {
@@ -136,7 +143,7 @@ public class Scene extends Canvas {
             changeHeighContext(ObjectModel.getInstance().getBoundingBox());
             for(int i=0;i<=NUM_OBJECT;i++)
             {
-               if(Object[i]!=null)
+               if(object[i]!=null)
                 {
                 // create the vertexBuffer
                 vertexBuffer[i] = glContext.createBuffer();
@@ -144,7 +151,7 @@ public class Scene extends Canvas {
              
                  
                 glContext.bufferData(WebGLRenderingContext.ARRAY_BUFFER,
-                                Float32Array.create(Object[i].getVertices()),
+                                Float32Array.create(object[i].getVertices()),
                                 WebGLRenderingContext.STATIC_DRAW);
                 
                 // create the colorBuffer
@@ -152,7 +159,7 @@ public class Scene extends Canvas {
                 glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, colorBuffer[i]);
               
                 glContext.bufferData(WebGLRenderingContext.ARRAY_BUFFER,
-                                Float32Array.create(Object[i].getColors()),
+                                Float32Array.create(object[i].getColors()),
                                 WebGLRenderingContext.STATIC_DRAW);
                 
                 // create the indexBuffer
@@ -160,8 +167,15 @@ public class Scene extends Canvas {
                 glContext.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, indexBuffer[i]);
                 
                 glContext.bufferData(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER,
-                                Uint16Array.create(Object[i].getIndices()),
+                                Uint16Array.create(object[i].getIndices()),
                                 WebGLRenderingContext.STATIC_DRAW);
+                 normalBuffer[i] = glContext.createBuffer();
+                glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, normalBuffer[i]);
+                
+                glContext.bufferData(WebGLRenderingContext.ARRAY_BUFFER,
+                                Float32Array.create(object[i].getNormals()),
+                                WebGLRenderingContext.STATIC_DRAW);
+
                 checkErrors();
                 }
             }
@@ -221,12 +235,9 @@ public class Scene extends Canvas {
                   if(checkMouse==true )
                   {
                     if(event.isControlKeyDown())
-                    {                 
-                      float add;
-                      add=cam.getTranslateX()+((event.getClientX()-xMouseDrag)/250)*stepOfView;
-                      cam.setTranslateX(add);
-                      add=cam.getTranslateY()+((yMouseDrag-event.getClientY())/250)*stepOfView;
-                      cam.setTranslateY(add);  
+                    {                   
+                      cam.setTranslateX(event.getClientX()-xMouseDrag);
+                      cam.setTranslateY(yMouseDrag-event.getClientY());  
                       xMouseDrag=event.getClientX();
                       yMouseDrag=event.getClientY(); 
                       drawObject();
@@ -267,7 +278,7 @@ public class Scene extends Canvas {
                   
                webGLCanvas.addMouseWheelHandler(new MouseWheelHandler() {
                 public void onMouseWheel(MouseWheelEvent event) {
-                 Camera.getInstance().setTranslateZ((Camera.getInstance().getTranslateZ()-Float.valueOf(event.getDeltaY())));
+                 Camera.getInstance().setTranslateZ(Float.valueOf(event.getDeltaY()));
                  drawObject(); 
                 }
                 });       
@@ -285,18 +296,24 @@ public class Scene extends Canvas {
             glContext.clear(WebGLRenderingContext.COLOR_BUFFER_BIT | WebGLRenderingContext.DEPTH_BUFFER_BIT);
             for(int i=0;i<=NUM_OBJECT;i++)
             {
-                if(Object[i]!=null)
+                if(object[i]!=null)
                 {
                     
                     glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vertexBuffer[i]);
-                    glContext.vertexAttribPointer(vertexPositionAttribute[i], Object[i].getItemSizeVertex(), WebGLRenderingContext.FLOAT, false, 0, 0);
+                    glContext.vertexAttribPointer(vertexPositionAttribute[i], object[i].getItemSizeVertex(), WebGLRenderingContext.FLOAT, false, 0, 0);
                     glContext.enableVertexAttribArray(vertexPositionAttribute[i]);
 
                     glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, colorBuffer[i]);
-                    glContext.vertexAttribPointer(vertexColorAttribute[i], Object[i].getItemSizeColor(), WebGLRenderingContext.FLOAT, false, 0, 0);
+                    glContext.vertexAttribPointer(vertexColorAttribute[i], object[i].getItemSizeColor(), WebGLRenderingContext.FLOAT, false, 0, 0);
                     glContext.enableVertexAttribArray(vertexColorAttribute[i]);
 
                     glContext.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, indexBuffer[i]);
+                    
+                    
+                    glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, normalBuffer[i]);
+                    glContext.vertexAttribPointer(vertexNormalAttribute[i], 3, WebGLRenderingContext.FLOAT, false, 0, 0);
+                    glContext.enableVertexAttribArray(vertexNormalAttribute[i]);
+                    
                     
                     //camera
                     translationCameraMatrix=MatrixUtil.createTranslationMatrix(cam.getTranslateX(),cam.getTranslateY(),cam.getTranslateZ());
@@ -307,13 +324,20 @@ public class Scene extends Canvas {
                     perspectiveMatrix = MatrixUtil.createPerspectiveMatrix(45, 1.0f, 0.1f, 10000);
                     
                     //object transf
-                    translationMatrix[i] = MatrixUtil.createTranslationMatrix(Object[i].getTranslateX(),Object[i].getTranslateY(),Object[i].getTranslateZ());
-                    rotationMatrix[i] = MatrixUtil.createRotationMatrix(Object[i].getAngleX(),Object[i].getAngleY(),Object[i].getAngleZ());
+                    translationMatrix[i] = MatrixUtil.createTranslationMatrix(object[i].getTranslateX(),object[i].getTranslateY(),object[i].getTranslateZ());
+                    rotationMatrix[i] = MatrixUtil.createRotationMatrix(object[i].getAngleX(),object[i].getAngleY(),object[i].getAngleZ());
                    
                     resultingMatrix[i] = perspectiveMatrix.multiply(translationCameraMatrix).multiply(rotationCameraMatrix).multiply(translationMatrix[i]).multiply(rotationMatrix[i]);
-
+                    
+                    
+                    normalMatrix[i]=(rotationCameraMatrix.multiply(rotationMatrix[i])).inverse();
+                    normalMatrix[i]=normalMatrix[i].transpose();
+          
+                     glContext.uniform3f(glContext.getUniformLocation(shaderProgram, "lightDir"),0f,0f,1f); // on envoie au shader la valeur de cette variable..
+                     glContext.uniform1f(glContext.getUniformLocation(shaderProgram, "uAlpha"), 1f);
+                     glContext.uniformMatrix4fv(projectionNormalUniform, false, normalMatrix[i].getColumnWiseFlatData());
                     glContext.uniformMatrix4fv(projectionMatrixUniform, false, resultingMatrix[i].getColumnWiseFlatData());
-                    glContext.drawElements(WebGLRenderingContext.TRIANGLES, Object[i].getNumItemIndex(), WebGLRenderingContext.UNSIGNED_SHORT, 0);
+                    glContext.drawElements(WebGLRenderingContext.TRIANGLES, object[i].getNumItemIndex(), WebGLRenderingContext.UNSIGNED_SHORT, 0);
                    
                     glContext.flush();
                     checkErrors();
@@ -360,7 +384,10 @@ public class Scene extends Canvas {
                 {
                     vertexPositionAttribute[i] = glContext.getAttribLocation(shaderProgram, "vertexPosition");
                     vertexColorAttribute[i] = glContext.getAttribLocation(shaderProgram, "vertexColor");
+                    vertexNormalAttribute[i] = glContext.getAttribLocation(shaderProgram, "vNormal");
                     projectionMatrixUniform = glContext.getUniformLocation(shaderProgram, "projectionMatrix");
+                    projectionNormalUniform= glContext.getUniformLocation(shaderProgram, "normalMatrix");
+            
                 }
                 checkErrors();
         }
@@ -370,7 +397,7 @@ public class Scene extends Canvas {
                 glContext.shaderSource(shader, source);
                 glContext.compileShader(shader);
 
-                // check if the Shader is successfully compiled
+                // check if the Shader is successfully compiled 
                 if (!glContext.getShaderParameterb(shader,
                                 WebGLRenderingContext.COMPILE_STATUS)) {
                         throw new RuntimeException(glContext.getShaderInfoLog(shader));
@@ -380,7 +407,7 @@ public class Scene extends Canvas {
         }
          
         public void addObject(Object3D obj, int num){   
-            Object[num]=obj;
+            object[num]=obj;
             initBuffers();
             drawObject();
         }
@@ -392,12 +419,11 @@ public class Scene extends Canvas {
         }
         public void changeCameraView(double[] boundBox)
         {
-            cam.setNormalZ(-((float)(boundBox[5]-boundBox[4])*2));          
-            stepOfView=((float)(boundBox[5]-boundBox[4]))/20;
+            cam.setNormalZ(-((float)(boundBox[5]-boundBox[4])));          
         }
         public void changeHeighContext(double[] boundBox){
                for(int i=1;i<5;i++){    
-                if(Object[i]!=null)Object[i].setBoundingBox(boundBox);
+                if(object[i]!=null)object[i].setBoundingBox(boundBox);
                }
         }
 }

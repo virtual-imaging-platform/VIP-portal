@@ -19,6 +19,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
 import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3D;
@@ -40,7 +41,7 @@ class SimulationGUITab extends Tab{
    // private final DefineParamsSection defineParamsSection;
     private VTKControllerAsync VTK =  VTKController.Util.getInstance();
     private ModelServiceAsync MAP = ModelService.Util.getInstance();  
-            
+    private ModalWindow modal;  
     private String dynaStringTab[];
     private SelectItem modelBox = new SelectItem("model");
     private Map<String, String> mapNameUri = new HashMap<String, String>();
@@ -64,14 +65,17 @@ class SimulationGUITab extends Tab{
         sectionStack.setSections(defineSceneSection);
         
         toolStrip = new ToolStrip();
-        runButton.setIcon("icon-information.png");  
+        modal = new ModalWindow(toolStrip);
+         runButton.setIcon("icon-information.png");  
         runButton.setActionType(SelectionType.CHECKBOX);
         toolStrip.setWidth100();
-       // toolStrip.addButton(runButton);     
+        toolStrip.setHeight(20);
+        toolStrip.addButton(runButton);     
         toolStrip.addSeparator();  
         toolStrip.addFormItem(modelBox); 
         vLayout.addMember(toolStrip);
         vLayout.addMember(sectionStack);
+          
         this.setPane(vLayout);
         initRPC();
         
@@ -88,8 +92,9 @@ class SimulationGUITab extends Tab{
 							public void onSuccess(Data3D[][] result) 
                                                         {       
                                                                 defineSceneSection.hideModal();
-                                                                ObjectModel.getInstance().addModel(result);
                                                                 SimulationGUIControlBoxModel.getInstance().setTreeNode(result);
+                                                                ObjectModel.getInstance().addModel(result);
+                                                                
 							}
                                                         public void onFailure(Throwable caught) 
                                                         {
@@ -103,9 +108,11 @@ class SimulationGUITab extends Tab{
                           
             }
         });
+         modal.show("Loading list of model from grid", true);
          MAP.listAllModels( new AsyncCallback<List<SimulationObjectModelLight>>(){
                               public void onSuccess(List<SimulationObjectModelLight> result) 
                                                         {     
+                                                            modal.hide();
                                                              dynaStringTab=new String[result.size()];
                                                              int i=0;
                                                              for (SimulationObjectModelLight s : result){	                                                                                                                               
@@ -114,10 +121,13 @@ class SimulationGUITab extends Tab{
                                                              i++;
                                                             }
                                                             modelBox.setValueMap(dynaStringTab);
+                                                            toolStrip.setHeight(10);
 							}
                                                         public void onFailure(Throwable caught) 
                                                         {							    
-                                                            modelBox.setValue("Grid error");
+                                                            modelBox.setValue("Model can't be load");
+                                                            modal.hide();
+                                                            toolStrip.setHeight(10);
                                                         }
          
 	}); 
@@ -145,7 +155,7 @@ class SimulationGUITab extends Tab{
                                                             {
                                                                     // Show the RPC error message to the user
                                                                 defineSceneSection.hideModal();
-                                                                 SC.say("VTK error");
+                                                                 SC.say("Error during the making");
 
                                                             }
 
@@ -171,7 +181,7 @@ class SimulationGUITab extends Tab{
     private void refreshLaunchTabValue()
      {   
          SimulationGUIControlBox.getInstance("US","").refreshLaunchTabValue();
-         SimulationGUIControlBox.getInstance("MRI(TEST)","").refreshLaunchTabValue();
+         SimulationGUIControlBox.getInstance("MRI","").refreshLaunchTabValue();
          SimulationGUIControlBox.getInstance("CT","").refreshLaunchTabValue();
          SimulationGUIControlBox.getInstance("PET","").refreshLaunchTabValue();
      } 

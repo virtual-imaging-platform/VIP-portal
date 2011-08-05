@@ -13,6 +13,6 @@ public interface VTKControllerAsync {
 
         public void downloadAndUnzipExample(String path ,AsyncCallback <Data3D[][]> callback);
         public void downloadAndUnzipModel(String url, String proxyFileName ,String user,AsyncCallback <Data3D[][]> callback);
-        public void linkerSimulator (String modality, AsyncCallback <List <String>> callback);
+    
 
 }

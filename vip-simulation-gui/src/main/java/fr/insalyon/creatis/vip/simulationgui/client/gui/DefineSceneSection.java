@@ -10,6 +10,9 @@ import com.smartgwt.client.types.Side;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.ImgButton;
+import com.smartgwt.client.widgets.Slider;
+import com.smartgwt.client.widgets.events.ValueChangedEvent;
+import com.smartgwt.client.widgets.events.ValueChangedHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
@@ -32,7 +35,7 @@ import java.awt.image.BufferedImage;
 
 class DefineSceneSection extends SectionStackSection {
 
-    private int compteur=0;
+    private int compteur=2;
    
     static public Scene sceneDraw = Scene.getInstance(); 
     
@@ -62,7 +65,11 @@ class DefineSceneSection extends SectionStackSection {
     private HLayout hLayout1 = new HLayout();
     private HLayout hLayout2 = new HLayout();
     private HLayout hLayout3 = new HLayout();
-    private HLayout hLayout4 = new HLayout();
+    private HLayout hLayout4 = new HLayout(); 
+    private HLayout hLayout5 = new HLayout();
+    
+    
+    
     
     private PortalLayout portalLayout1 = new PortalLayout(2);
     private TabSet topTabSet = new TabSet();
@@ -73,9 +80,10 @@ class DefineSceneSection extends SectionStackSection {
   
     private ModalWindow modal;
     
+    private Slider hSlider1 = new Slider("scroll sensitivity"); 
+    private Slider hSlider2 = new Slider("translation sensitivity");
     
-    
-    private String applicationClass="Test";//Simulation
+    private String applicationClass="Simulation";//Simulation
  
     public DefineSceneSection() {
         this.setTitle("Scene");
@@ -90,7 +98,7 @@ class DefineSceneSection extends SectionStackSection {
   
 
         boxUs= SimulationGUIControlBox.getInstance("US",applicationClass);
-        boxMri= SimulationGUIControlBox.getInstance("MRI(TEST)",applicationClass);//MRI
+        boxMri= SimulationGUIControlBox.getInstance("MRI",applicationClass);//MRI
         boxCt= SimulationGUIControlBox.getInstance("CT",applicationClass);
         boxPet= SimulationGUIControlBox.getInstance("PET",applicationClass);
         
@@ -110,7 +118,7 @@ class DefineSceneSection extends SectionStackSection {
         
         topTabSet.addTab(camera);  
         //topTabSet.addTab(tool); 
-        //topTabSet.addTab(mouse);
+        topTabSet.addTab(mouse);
        
         
         form.setFields(checkBoxModel,checkBoxUs);  
@@ -131,9 +139,14 @@ class DefineSceneSection extends SectionStackSection {
        buttonRight.setSrc("icon-xFront.jpg");
        buttonLeft.setSrc("icon-xBack.jpg");
        
-       
-       
-        
+        hSlider1.setVertical(false);
+        hSlider1.setTop(200);  
+        hSlider1.setLeft(100);
+          
+        hSlider2.setVertical(false);   
+        hSlider2.setTop(200);  
+        hSlider2.setLeft(100);
+
         hLayout4.addMember(buttonFront);
         hLayout4.addMember(buttonBack);
         hLayout4.addMember(buttonTop);
@@ -144,6 +157,9 @@ class DefineSceneSection extends SectionStackSection {
         hLayout3.addMember(hLayout4);
         camera.setPane(hLayout3);
         
+        hLayout5.addMember(hSlider1);
+        hLayout5.addMember(hSlider2);
+        mouse.setPane(hLayout5);
         
         vLayout1.addMember(sceneDraw);
         vLayout1.addMember(topTabSet);
@@ -166,7 +182,25 @@ class DefineSceneSection extends SectionStackSection {
     }
     private void initControls()
     {
-         
+             checkBoxPet.addChangeHandler(new ChangeHandler() 
+             {
+                public void onChange(ChangeEvent event) {
+                if(checkBoxPet.getValueAsBoolean())
+                {
+                   boxPet.disableView();
+                   sceneDraw.addObject(boxPet.getObjectSimulateur(), 0);
+                   portalLayout1.removePortlet(boxPet.getControlPortlet());
+                   compteur--;
+                }
+                else
+                {
+                   boxPet.enableView();
+                   sceneDraw.addObject(boxPet.getObjectSimulateur(), 0);
+                   portalLayout1.addPortlet(boxPet.getControlPortlet(), compteur % 2,0);
+                   compteur++;
+                }                 
+             }
+             });
              checkBoxUs.addChangeHandler(new ChangeHandler() {
                 public void onChange(ChangeEvent event) 
                 {
@@ -224,25 +258,7 @@ class DefineSceneSection extends SectionStackSection {
                 }                 
              }
              });
-             checkBoxPet.addChangeHandler(new ChangeHandler() 
-             {
-                public void onChange(ChangeEvent event) {
-                if(checkBoxPet.getValueAsBoolean())
-                {
-                   boxPet.disableView();
-                   sceneDraw.addObject(boxPet.getObjectSimulateur(), 4);
-                   portalLayout1.removePortlet(boxPet.getControlPortlet());
-                   compteur--;
-                }
-                else
-                {
-                   boxPet.enableView();
-                   sceneDraw.addObject(boxPet.getObjectSimulateur(), 4);
-                   portalLayout1.addPortlet(boxPet.getControlPortlet(), compteur % 2,0);
-                   compteur++;
-                }                 
-             }
-             });
+            
              checkBoxModel.addChangeHandler(new ChangeHandler() 
              {
                 public void onChange(ChangeEvent event) {
@@ -318,7 +334,17 @@ class DefineSceneSection extends SectionStackSection {
                Camera.getInstance().setViewToNormalZ();
                Scene.getInstance().refreshScreen();
             }
-        });    
+        }); 
+            hSlider1.addValueChangedHandler(new ValueChangedHandler() {  
+                        public void onValueChanged(ValueChangedEvent event) {  
+                         Camera.getInstance().setStepOfViewScroll(event.getValue());
+                        }  
+         });
+            hSlider2.addValueChangedHandler(new ValueChangedHandler() {  
+                        public void onValueChanged(ValueChangedEvent event) {  
+                             Camera.getInstance().setStepOfViewTranslation(event.getValue());
+                        }  
+         });
     }
     public void hideModal()
     {
