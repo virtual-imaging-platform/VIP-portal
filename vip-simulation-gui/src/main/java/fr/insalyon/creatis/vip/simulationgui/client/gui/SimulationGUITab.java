@@ -47,7 +47,7 @@ class SimulationGUITab extends Tab{
     private Map<String, String> mapNameUri = new HashMap<String, String>();
     private String uri;
     private ToolStripButton runButton = new ToolStripButton("Load example");  
-    static private String modelStorageURL;
+    static private String modelStorageURL="";
     //dans le constructeur, creer les 4 tabs. Les ajouter/enlever du Layout en fonction des cases cochees
     
     public SimulationGUITab() {
