@@ -286,6 +286,7 @@ public class SimulationGUIControlBox
                  launchTab = new LaunchTab(applicationClass, simulatorSelectItem.getValueAsString());
                  launchTab.setCanClose(false);
                  Layout.getInstance().addTab(launchTab, false);
+                 refreshLaunchTabValue();
             }
              });
 
@@ -323,6 +324,7 @@ public class SimulationGUIControlBox
       enable=true;
       if(launchTab!=null)
       {
+          
           Layout.getInstance().addTab(launchTab,false);
           refreshLaunchTabValue();
       }
@@ -331,7 +333,12 @@ public class SimulationGUIControlBox
      public void disableView()
      {
       enable=false;
-       if(launchTab!=null)Layout.getInstance().removeTab(launchTab);
+      if(launchTab!=null)
+      {
+          String s=launchTab.getTitle();
+          Layout.getInstance().removeTab(launchTab);
+          launchTab = new LaunchTab(applicationClass,s.replaceAll("Launch ", ""));
+      }
      }
       public void setControlOnObject(Object3D mod)
      {
@@ -367,6 +374,7 @@ public class SimulationGUIControlBox
                 simulatorSelectItem.setDefaultToFirstOption(true);
                 launchTab = new LaunchTab(applicationClass,dynaStringTab[0]); //applicationclass a la place de Id si on veut lancé que la classe "simulation"
                 launchTab.setCanClose(false);
+                refreshLaunchTabValue();
             }
         };
         service.getApplicationsName(id, callback);
