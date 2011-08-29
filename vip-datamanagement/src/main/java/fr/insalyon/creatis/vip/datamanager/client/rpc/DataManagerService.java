@@ -73,9 +73,9 @@ public interface DataManagerService extends RemoteService {
 
     public void deleteFiles(String user, String proxyFileName, List<String> paths) throws DataManagerException;
 
-    public void rename(String user, String proxyFileName, String oldPath, String newPath) throws DataManagerException;
+    public void rename(String user, String proxyFileName, String oldPath, String newPath, boolean extendPath) throws DataManagerException;
 
-    public void renameFiles(String user, String proxyFileName, Map<String, String> paths) throws DataManagerException;
+    public void renameFiles(String user, String proxyFileName, Map<String, String> paths, boolean extendPath) throws DataManagerException;
 
     public List<DMCachedFile> getCachedFiles(String proxy) throws DataManagerException;
 

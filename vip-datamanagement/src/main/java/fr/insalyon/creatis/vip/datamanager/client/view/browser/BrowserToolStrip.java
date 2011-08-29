@@ -224,7 +224,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                     modal.show("Deleting files/folders...", true);
                     Context context = Context.getInstance();
                     service.renameFiles(context.getUser(), context.getProxyFileName(),
-                            paths, callback);
+                            paths, true, callback);
                 }
             }
         });

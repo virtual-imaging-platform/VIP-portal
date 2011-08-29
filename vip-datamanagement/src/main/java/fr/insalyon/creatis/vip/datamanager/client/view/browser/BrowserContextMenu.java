@@ -163,9 +163,15 @@ public class BrowserContextMenu extends Menu {
         }
     }
 
+    /**
+     * 
+     * @param modal
+     * @param baseDir
+     * @param name 
+     */
     private void delete(final ModalWindow modal, final String baseDir, final String name) {
 
-        if (baseDir.equals(DataManagerConstants.ROOT + "/" + DataManagerConstants.TRASH_HOME)) {
+        if (baseDir.startsWith(DataManagerConstants.ROOT + "/" + DataManagerConstants.TRASH_HOME)) {
             SC.confirm("Do you really want to permanently delete \"" + name + "\"?", new BooleanCallback() {
 
                 public void execute(Boolean value) {
@@ -215,21 +221,35 @@ public class BrowserContextMenu extends Menu {
                         String newPath = DataManagerConstants.ROOT + "/"
                                 + DataManagerConstants.TRASH_HOME + "/" + name;
                         service.rename(context.getUser(), context.getProxyFileName(),
-                                oldPath, newPath, callback);
+                                oldPath, newPath, true, callback);
                     }
                 }
             });
         }
     }
 
-    private void download(final ModalWindow modal, final String baseDir, DataRecord data) {
+    /**
+     * 
+     * @param modal
+     * @param baseDir
+     * @param data 
+     */
+    private void download(final ModalWindow modal, final String baseDir,
+            final DataRecord data) {
+
         if (data.getType().contains("file")) {
             TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                 public void onFailure(Throwable caught) {
                     modal.hide();
-                    SC.warn("Unable to download file: " + caught.getMessage());
+                    if (caught.getMessage().contains("No such file or directory")
+                            || caught.getMessage().contains("Error while performing:LINKSTAT")) {
+                        SC.warn("The file " + baseDir + "/" + data.getName() + " is unavailable.");
+                        BrowserLayout.getInstance().loadData(baseDir, true);
+                    } else {
+                        SC.warn("Unable to download file: " + caught.getMessage());
+                    }
                 }
 
                 public void onSuccess(Void result) {
@@ -252,7 +272,13 @@ public class BrowserContextMenu extends Menu {
 
                 public void onFailure(Throwable caught) {
                     modal.hide();
-                    SC.warn("Unable to download folder: " + caught.getMessage());
+                    if (caught.getMessage().contains("No such file or directory")
+                            || caught.getMessage().contains("Error while performing:LINKSTAT")) {
+                        SC.warn("The folder " + baseDir + "/" + data.getName() + " is unavailable.");
+                        BrowserLayout.getInstance().loadData(baseDir, true);
+                    } else {
+                        SC.warn("Unable to download folder: " + caught.getMessage());
+                    }
                 }
 
                 public void onSuccess(Void result) {
@@ -271,7 +297,13 @@ public class BrowserContextMenu extends Menu {
         }
     }
 
+    /**
+     * 
+     * @param modal
+     * @param baseDir 
+     */
     private void paste(final ModalWindow modal, final String baseDir) {
+
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
@@ -296,7 +328,7 @@ public class BrowserContextMenu extends Menu {
             modal.show("Moving " + oldPath + " to " + newPath + "...", true);
             Context context = Context.getInstance();
             service.rename(context.getUser(), context.getProxyFileName(),
-                    oldPath, newPath, callback);
+                    oldPath, newPath, false, callback);
         } else {
             SC.warn("Unable to move data into the same folder.");
         }

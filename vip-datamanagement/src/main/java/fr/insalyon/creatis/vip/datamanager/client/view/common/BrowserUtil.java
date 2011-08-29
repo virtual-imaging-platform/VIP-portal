@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.datamanager.client.view.common;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -76,6 +77,8 @@ public class BrowserUtil {
         ListGridField icoField = FieldUtil.getIconGridField("icon");
         ListGridField nameField = new ListGridField("name", "Name");
         ListGridField sizeField = new ListGridField("length", "Size", 100);
+        sizeField.setType(ListGridFieldType.INTEGER);
+        sizeField.setCellFormatter(FieldUtil.getSizeCellFormatter());
         ListGridField dateField = new ListGridField("modificationDate", "Modification Date", 160);
 
         grid.setFields(icoField, nameField, sizeField, dateField);
@@ -119,7 +122,7 @@ public class BrowserUtil {
                             }
                             dataList.add(new DataRecord(
                                     d.getType().toLowerCase(), d.getName(),
-                                    d.getLength(), d.getModificationDate(),
+                                    (int) d.getLength(), d.getModificationDate(),
                                     replicas, d.getPermissions()));
                         }
                         toolStrip.setPath(path);

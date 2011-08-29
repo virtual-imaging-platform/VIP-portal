@@ -108,22 +108,24 @@ public class DataManagerServiceImpl extends RemoteServiceServlet implements Data
         }
     }
 
-    public void rename(String user, String proxyFileName, String oldPath, String newPath) throws DataManagerException {
+    public void rename(String user, String proxyFileName, String oldPath, 
+            String newPath, boolean extendPath) throws DataManagerException {
         
         try {
             LFCBusiness business = new LFCBusiness();
-            business.rename(user, proxyFileName, oldPath, newPath);
+            business.rename(user, proxyFileName, oldPath, newPath, extendPath);
             
         } catch (BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
 
-    public void renameFiles(String user, String proxyFileName, Map<String, String> paths) throws DataManagerException {
+    public void renameFiles(String user, String proxyFileName, 
+            Map<String, String> paths, boolean extendPath) throws DataManagerException {
 
         try {
             LFCBusiness business = new LFCBusiness();
-            business.renameFiles(user, proxyFileName, paths);
+            business.renameFiles(user, proxyFileName, paths, extendPath);
             
         } catch (BusinessException ex) {
             throw new DataManagerException(ex);

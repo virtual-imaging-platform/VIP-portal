@@ -46,7 +46,7 @@ public class Data implements IsSerializable {
 
     private String name;
     private String type;
-    private String length;
+    private long length;
     private String modificationDate;
     private List<String> replicas;
     private String permissions;
@@ -55,10 +55,10 @@ public class Data implements IsSerializable {
     }
 
     public Data(String name, String type, String permissions) {
-        this(name, type, "", "", new ArrayList<String>(), permissions);
+        this(name, type, 0, "", new ArrayList<String>(), permissions);
     }
 
-    public Data(String name, String type, String length, String modificationDate,
+    public Data(String name, String type, long length, String modificationDate,
             List<String> replicas, String permissions) {
         this.name = name;
         this.type = type;
@@ -76,7 +76,7 @@ public class Data implements IsSerializable {
         return type;
     }
 
-    public String getLength() {
+    public long getLength() {
         return length;
     }
 

@@ -36,12 +36,13 @@ package fr.insalyon.creatis.vip.datamanager.server.business;
 
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.agent.vlet.common.bean.GridData;
-import fr.insalyon.creatis.devtools.FileUtils;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
@@ -70,10 +71,9 @@ public class LFCBusiness {
                             data.getType().name(), data.getPermissions()));
 
                 } else {
-                    String size = FileUtils.parseFileSize(data.getLength());
                     dataList.add(new Data(data.getName(), data.getType().name(),
-                            size, data.getModificationDate(), data.getReplicas(),
-                            data.getPermissions()));
+                            data.getLength(), data.getModificationDate(),
+                            data.getReplicas(), data.getPermissions()));
                 }
             }
             return dataList;
@@ -136,27 +136,77 @@ public class LFCBusiness {
         }
     }
 
-    public void rename(String user, String proxyFileName, String oldPath, String newPath) throws BusinessException {
+    /**
+     * 
+     * @param user
+     * @param proxyFileName
+     * @param oldPath
+     * @param newPath
+     * @param extendPath
+     * @throws BusinessException 
+     */
+    public void rename(String user, String proxyFileName, String oldPath,
+            String newPath, boolean extendPath) throws BusinessException {
 
         try {
             DataManagerUtil.getVletAgentClient(proxyFileName).rename(
                     DataManagerUtil.parseBaseDir(user, oldPath),
                     DataManagerUtil.parseBaseDir(user, newPath));
 
-        } catch (DataManagerException ex) {
-            logger.error(ex);
-            throw new BusinessException(ex);
         } catch (VletAgentClientException ex) {
+            if (ex.getMessage().contains("Can not rename/move") && extendPath) {
+                SimpleDateFormat sdf =
+                        new SimpleDateFormat("-yyyy.MM.dd-HH.mm.ss");
+                String newExtPath = newPath + sdf.format(new Date());
+                rename(user, proxyFileName, oldPath, newExtPath, false);
+
+            } else {
+                logger.error(ex);
+                throw new BusinessException(ex);
+            }
+        } catch (DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
     }
 
-    public void renameFiles(String user, String proxyFileName, Map<String, String> paths) throws BusinessException {
+    /**
+     * 
+     * @param user
+     * @param proxyFileName
+     * @param paths
+     * @param extendPath
+     * @throws BusinessException 
+     */
+    public void renameFiles(String user, String proxyFileName,
+            Map<String, String> paths, boolean extendPath) throws BusinessException {
 
         for (String oldPath : paths.keySet()) {
             String newPath = paths.get(oldPath);
-            rename(user, proxyFileName, oldPath, newPath);
+            rename(user, proxyFileName, oldPath, newPath, extendPath);
+        }
+    }
+
+    /**
+     * 
+     * @param user
+     * @param proxyFileName
+     * @param path
+     * @return
+     * @throws BusinessException 
+     */
+    public long getModificationDate(String user, String proxyFileName,
+            String path) throws BusinessException {
+        try {
+            return DataManagerUtil.getVletAgentClient(proxyFileName).
+                    getModificationDate(DataManagerUtil.parseBaseDir(user, path));
+
+        } catch (VletAgentClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        } catch (DataManagerException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
         }
     }
 }

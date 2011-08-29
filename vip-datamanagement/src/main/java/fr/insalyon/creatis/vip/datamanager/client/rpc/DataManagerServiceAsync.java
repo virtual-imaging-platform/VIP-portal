@@ -57,9 +57,9 @@ public interface DataManagerServiceAsync {
 
     public void deleteFiles(String user, String proxyFileName, List<String> paths, AsyncCallback<Void> asyncCallback);
 
-    public void rename(String user, String proxyFileName, String oldPath, String newPath, AsyncCallback<Void> asyncCallback);
+    public void rename(String user, String proxyFileName, String oldPath, String newPath, boolean extendPath, AsyncCallback<Void> asyncCallback);
 
-    public void renameFiles(String user, String proxyFileName, Map<String, String> paths, AsyncCallback<Void> asyncCallback);
+    public void renameFiles(String user, String proxyFileName, Map<String, String> paths, boolean extendPath, AsyncCallback<Void> asyncCallback);
     
     public void getCachedFiles(String proxy, AsyncCallback<List<DMCachedFile>> asyncCallback);
     

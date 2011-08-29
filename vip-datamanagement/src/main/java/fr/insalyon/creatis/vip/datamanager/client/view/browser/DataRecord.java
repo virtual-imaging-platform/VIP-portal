@@ -46,10 +46,10 @@ public class DataRecord extends ListGridRecord {
     }
 
     public DataRecord(String type, String name) {
-        this(type, name, "", "", "", "");
+        this(type, name, 0, "", "", "");
     }
 
-    public DataRecord(String type, String name, String length, String date,
+    public DataRecord(String type, String name, int length, String date,
             String replicas, String permissions) {
         if (name.equals("Trash")) {
             setAttribute("icon", "icon-trash");

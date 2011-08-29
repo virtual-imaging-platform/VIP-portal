@@ -100,7 +100,8 @@ public class RenameWindow extends Window {
                     modal.show("Renaming " + baseDir + "/" + name + "...", true);
                     Context context = Context.getInstance();
                     service.rename(context.getUser(), context.getProxyFileName(),
-                            baseDir + "/" + name, nameItem.getValueAsString(), callback);
+                            baseDir + "/" + name, nameItem.getValueAsString(), 
+                            false, callback);
                     destroy();
                 }
             }
