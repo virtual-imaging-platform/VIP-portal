@@ -34,13 +34,5 @@ public interface shaders extends ClientBundle {
         @Source(value = { "vertex-shader.txt" })
         TextResource vertexShader();
 
-        /**
-         * The texture to use in the example.
-         * 
-         * @return the image to use as texture.
-         */
-        @Source(value = { "gravattexture.png" })
-        ImageResource texture();
-
 }
 

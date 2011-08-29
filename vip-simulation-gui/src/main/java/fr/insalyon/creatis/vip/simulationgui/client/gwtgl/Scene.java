@@ -422,7 +422,7 @@ public class Scene extends Canvas {
             cam.setNormalZ(-((float)(boundBox[5]-boundBox[4])));          
         }
         public void changeHeighContext(double[] boundBox){
-               for(int i=1;i<5;i++){    
+               for(int i=0;i<4;i++){    
                 if(object[i]!=null)object[i].setBoundingBox(boundBox);
                }
         }

@@ -488,7 +488,7 @@ public class ObjectModel extends Object3D  {
                     Scene.getInstance().changeCameraView(DATA[0][0].getBoundingBox());
                     Scene.getInstance().refreshScreen();
                     SimulationGUIControlBoxModel.getInstance().uncheckBoxBox();
-                  //  SC.say("load succes, number of vertex : " +model.getNumItemIndex()+" [x min : "+model.getBoundingBox()[0]+"mm x max : "+model.getBoundingBox()[1]+"mm] [y min : "+model.getBoundingBox()[2]+"mm y max : "+model.getBoundingBox()[3]+"mm] [z min : "+model.getBoundingBox()[4]+"mm z max : "+model.getBoundingBox()[5]+"mm]");
+                    SC.say("Load succes ! </br> This is an example of model for the simulation gui.</br> You can open the model and the simulator controller with the check box on the top right.</br>In the model controller you have a tree of layout, in each layout you can enable/disable an object or change the color of this object with a double-click on his name");
      
                 }
                 public void addModel(Data3D DATA)
@@ -502,7 +502,7 @@ public class ObjectModel extends Object3D  {
                     Scene.getInstance().changeCameraView(DATA.getBoundingBox());
                     Scene.getInstance().refreshScreen();
                     SimulationGUIControlBoxModel.getInstance().uncheckBoxBox();
-                   // SC.say("load succes, number of vertex : " +model.getNumItemIndex()+" [x min : "+model.getBoundingBox()[0]+"mm x max : "+model.getBoundingBox()[1]+"mm] [y min : "+model.getBoundingBox()[2]+"mm y max : "+model.getBoundingBox()[3]+"mm] [z min : "+model.getBoundingBox()[4]+"mm z max : "+model.getBoundingBox()[5]+"mm]");
+                    SC.say("load succes, number of vertex : " +model.getNumItemIndex()+" [x min : "+model.getBoundingBox()[0]+"mm x max : "+model.getBoundingBox()[1]+"mm] [y min : "+model.getBoundingBox()[2]+"mm y max : "+model.getBoundingBox()[3]+"mm] [z min : "+model.getBoundingBox()[4]+"mm z max : "+model.getBoundingBox()[5]+"mm]");
      
                 }     
                 public void buildNormalsMultiModel()
@@ -602,19 +602,7 @@ public class ObjectModel extends Object3D  {
                           colors[i+3]=alpha;
                        }                                   
                        object.setColors(colors);
-                       /*
-                       float[]tmp=null;
-                       for(int j=0;j<multiModel.length;j++)
-                       {
-                       for(int i=0;i<multiModel[j].length;i++)
-                       {
-                            if(multiModel[j][i].isEnable()){
-                            tmp=parsor(tmp,multiModel[j][i].getColors(),null);                       
-                            }
-                       }
-                       }
-                       model.setColors(tmp);
-                       */
+                  
                        reconstructor();
                        Scene.getInstance().refreshBuffer();
                        Scene.getInstance().refreshScreen();
@@ -678,7 +666,7 @@ public class ObjectModel extends Object3D  {
                            }
                        
                     }
-                    SC.say(""+s);
+                    //SC.say(""+s);
                     tmp.setNumItemIndex(num);
                     tmp.setIndices(ind); 
                     tmp.setColors(c);

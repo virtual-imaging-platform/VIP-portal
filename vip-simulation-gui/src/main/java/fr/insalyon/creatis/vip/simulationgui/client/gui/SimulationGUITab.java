@@ -8,9 +8,13 @@ import com.smartgwt.client.types.SelectionType;
 import com.smartgwt.client.types.VisibilityMode;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.events.HoverEvent;
+import com.smartgwt.client.widgets.events.HoverHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangeHandler;
+import com.smartgwt.client.widgets.form.fields.events.ItemHoverEvent;
+import com.smartgwt.client.widgets.form.fields.events.ItemHoverHandler;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
@@ -43,10 +47,10 @@ class SimulationGUITab extends Tab{
     private ModelServiceAsync MAP = ModelService.Util.getInstance();  
     private ModalWindow modal;  
     private String dynaStringTab[];
-    private SelectItem modelBox = new SelectItem("model");
+    private SelectItem modelSelectItem = new SelectItem("model");
     private Map<String, String> mapNameUri = new HashMap<String, String>();
     private String uri;
-    private ToolStripButton runButton = new ToolStripButton("Load example");  
+    private ToolStripButton exampleButton = new ToolStripButton("Load example");  
     static private String modelStorageURL="";
     //dans le constructeur, creer les 4 tabs. Les ajouter/enlever du Layout en fonction des cases cochees
     
@@ -66,23 +70,24 @@ class SimulationGUITab extends Tab{
         
         toolStrip = new ToolStrip();
         modal = new ModalWindow(toolStrip);
-         runButton.setIcon("icon-information.png");  
-        runButton.setActionType(SelectionType.CHECKBOX);
+        exampleButton.setIcon("icon-information.png");  
+        exampleButton.setActionType(SelectionType.CHECKBOX);
         toolStrip.setWidth100();
         toolStrip.setHeight(20);
-        toolStrip.addButton(runButton);     
+        toolStrip.addButton(exampleButton);     
         toolStrip.addSeparator();  
-        toolStrip.addFormItem(modelBox); 
+        toolStrip.addFormItem(modelSelectItem); 
         vLayout.addMember(toolStrip);
         vLayout.addMember(sectionStack);
-          
+        
         this.setPane(vLayout);
+        initControl();
         initRPC();
         
     }
    private void initRPC()
    {
-         runButton.addClickHandler( new ClickHandler(){           
+         exampleButton.addClickHandler( new ClickHandler(){           
             public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
             defineSceneSection.showModal("Object making");
             String path= "/home/moulin/NetBeansProjects/Portal/vip-simulation-gui/src/main/resources";
@@ -120,19 +125,19 @@ class SimulationGUITab extends Tab{
                                                              mapNameUri.put(s.getModelName(),s.getURI()); 
                                                              i++;
                                                             }
-                                                            modelBox.setValueMap(dynaStringTab);
+                                                            modelSelectItem.setValueMap(dynaStringTab);
                                                             toolStrip.setHeight(10);
 							}
                                                         public void onFailure(Throwable caught) 
                                                         {							    
-                                                            modelBox.setValue("Model can't be load");
+                                                            modelSelectItem.setValue("Model can't be load");
                                                             modal.hide();
                                                             toolStrip.setHeight(10);
                                                         }
          
 	}); 
          
-         modelBox.addChangeHandler(new ChangeHandler() {  
+         modelSelectItem.addChangeHandler(new ChangeHandler() {  
             public void onChange(ChangeEvent event) {  
                 String selectedItem = (String) event.getValue();  
                 uri=mapNameUri.get(selectedItem);            
@@ -166,13 +171,31 @@ class SimulationGUITab extends Tab{
                                                         {
                                                             defineSceneSection.hideModal();
 							    SC.say("url error");
-                                                            modelBox.setValue("Grid error");
+                                                            modelSelectItem.setValue("Grid error");
                                                         }
          
 	       }); 
             }  
         });
          
+   }
+   private void initControl()
+   {
+       ////////////Hover///////////
+       exampleButton.setCanHover(Boolean.TRUE);
+        exampleButton.addHoverHandler(new HoverHandler(){
+
+            public void onHover(HoverEvent event) {
+                String prompt = "Show a standard model";  
+                exampleButton.setPrompt(prompt);
+            }
+        });  
+             modelSelectItem.addItemHoverHandler(new ItemHoverHandler() {  
+               public void onItemHover(ItemHoverEvent event) {  
+                String prompt = "Selects the model to be displayed from the grid";  
+                modelSelectItem.setPrompt(prompt);  
+            }  
+             });  
    }
    static public String getModelStorage()
    {

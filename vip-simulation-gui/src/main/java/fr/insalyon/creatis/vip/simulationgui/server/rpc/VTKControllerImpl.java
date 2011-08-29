@@ -31,19 +31,28 @@ public class VTKControllerImpl extends RemoteServiceServlet implements VTKContro
          
            
            String [][]entry=new String[3][3];
-           entry[0][0]="[right_lung.vtp]";
+           
+           entry[0][0]="[external_thorax.vtp]";
            entry[0][1]="[internal_thorax.vtp]";
            entry[0][2]="[HeartLungsThorax00.mhd, blabla.zraw]";
-                         
+           
+           entry[1]=new String[5];
            entry[1][0]="[spine.vtp]";
-           entry[1][1]="[aorta.vtp]";
-           entry[1][2]="[HeartLungsThorax00.mhd, blabla.zraw]";
+           entry[1][1]="[spinal_cord.vtp]";
+           entry[1][2]="[right_lung.vtp]";
+           entry[1][3]="[left_lung.vtp]";           
+           entry[1][4]="[HeartLungsThorax00.mhd, blabla.zraw]";
            
+           entry[2]=new String[7];
            entry[2][0]="[myocardium.vtp]";
-           entry[2][1]="[external_thorax.vtp]";
-           entry[2][2]="[HeartLungsThorax00.mhd, blabla.zraw]";
+           entry[2][1]="[aorta.vtp]";
+           entry[2][2]="[left_ventricle.vtp]";
+           entry[2][3]="[right_ventricle.vtp]";
+           entry[2][4]="[right_auricle.vtp]";
+           entry[2][5]="[left_auricle.vtp]";
+           entry[2][6]="[HeartLungsThorax00.mhd, blabla.zraw]";
            
-           String type[]= new String[]{"external_agent","anatomical","geometrical"};
+           String type[]= new String[]{"anatomical1","anatomical2","anatomical3"};
            Data3D [][]object=ObjectFactory.buildMulti(path,entry,type);
             
           // Data3D object =ObjectFactory.build(path+"/myocardium.vtp");

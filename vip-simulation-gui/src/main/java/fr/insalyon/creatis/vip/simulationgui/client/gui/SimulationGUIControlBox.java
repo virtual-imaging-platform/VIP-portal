@@ -8,6 +8,8 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Slider;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.events.HoverEvent;
+import com.smartgwt.client.widgets.events.HoverHandler;
 import com.smartgwt.client.widgets.events.ValueChangedEvent;
 import com.smartgwt.client.widgets.events.ValueChangedHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -18,6 +20,8 @@ import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangeHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
+import com.smartgwt.client.widgets.form.fields.events.ItemHoverEvent;
+import com.smartgwt.client.widgets.form.fields.events.ItemHoverHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Portlet;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
@@ -162,6 +166,9 @@ public class SimulationGUIControlBox
             
           loadFormSimulator();
           setControl();
+          
+          
+         
      }
      private void setControl()
      {
@@ -262,24 +269,7 @@ public class SimulationGUIControlBox
                  
              }
              });
-            /* model.addChangeHandler(new ChangeHandler() 
-             {
-                public void onChange(ChangeEvent event) {
-                if(model.getValueAsBoolean())
-                {
-                    simu.disable("model");
-                    Scene.getInstance().refreshBuffer();
-                    Scene.getInstance().refreshScreen();
-                }
-                else
-                {
-                    simu.enable("model");
-                   Scene.getInstance().refreshBuffer();
-                   Scene.getInstance().refreshScreen();
-                }
-                 
-             }
-             });*/
+        
              simulatorSelectItem.addChangedHandler(new ChangedHandler() {  
               public void onChanged(ChangedEvent event) {
                  Layout.getInstance().removeTab(launchTab);
@@ -289,6 +279,70 @@ public class SimulationGUIControlBox
                  refreshLaunchTabValue();
             }
              });
+             
+             //////////////////////////// Hover ///////////////////////
+              simulatorSelectItem.addItemHoverHandler(new ItemHoverHandler() {  
+               public void onItemHover(ItemHoverEvent event) {  
+                String prompt = "Change the version of simulator";  
+                simulatorSelectItem.setPrompt(prompt);  
+            }  
+             }); 
+             
+               spinnerx.addItemHoverHandler(new ItemHoverHandler() {  
+               public void onItemHover(ItemHoverEvent event) {  
+                String prompt = "Translate the following object to this value in millimeter";  
+                spinnerx.setPrompt(prompt);  
+            }  
+             }); 
+               spinnery.addItemHoverHandler(new ItemHoverHandler() {  
+               public void onItemHover(ItemHoverEvent event) {  
+                String prompt = "Translate the following object to this value in millimeter"; 
+                spinnery.setPrompt(prompt);  
+            }  
+             }); 
+               spinnerz.addItemHoverHandler(new ItemHoverHandler() {  
+               public void onItemHover(ItemHoverEvent event) {  
+                String prompt = "Translate the following object to this value in millimeter";  
+                spinnerz.setPrompt(prompt);  
+            }  
+             }); 
+              spinnerax.addItemHoverHandler(new ItemHoverHandler() {  
+               public void onItemHover(ItemHoverEvent event) {  
+                String prompt = "Rotate the following object to this value in degree with XYZ convention";
+                spinnerx.setPrompt(prompt);  
+            }  
+             }); 
+               spinneray.addItemHoverHandler(new ItemHoverHandler() {  
+               public void onItemHover(ItemHoverEvent event) {  
+                String prompt = "Rotate the following object to this value in degree with XYZ convention";  
+                spinnery.setPrompt(prompt);  
+            }  
+             }); 
+               spinneraz.addItemHoverHandler(new ItemHoverHandler() {  
+               public void onItemHover(ItemHoverEvent event) {  
+                String prompt = "Rotate the following object to this value in degree with XYZ convention";  
+                spinnerz.setPrompt(prompt);  
+            }  
+             }); 
+                  modAxis.addItemHoverHandler(new ItemHoverHandler() {  
+               public void onItemHover(ItemHoverEvent event) {  
+                String prompt = "Show/hide the axis for the following object";  
+                spinnerz.setPrompt(prompt);  
+            }  
+             }); 
+                 modBox.addItemHoverHandler(new ItemHoverHandler() {  
+               public void onItemHover(ItemHoverEvent event) {  
+                String prompt = "Show/hide the symbol for the following object";  
+                spinnerz.setPrompt(prompt);  
+            }  
+             }); 
+                 hSlider.setCanHover(Boolean.TRUE);
+             hSlider.addHoverHandler(new HoverHandler(){
+            public void onHover(HoverEvent event) {
+                String prompt = "Set the step for translation spinners";  
+                hSlider.setPrompt(prompt);
+            }
+        });  
 
      }
      public void refreshLaunchTabValue()
@@ -379,34 +433,4 @@ public class SimulationGUIControlBox
         };
         service.getApplicationsName(id, callback);
        }
-       /*  VTKControllerAsync VTK =  VTKController.Util.getInstance();
-         VTK.linkerSimulator(id,new AsyncCallback<List<String>>(){
-							public void onSuccess(List<String> result) 
-                                                        {  
-                                                            if(result!=null)
-                                                            {
-                                                                
-                                                                String dynaStringTab[]= new String [result.size()];
-                                                                for(int i=0;i<result.size();i++)
-                                                                {
-                                                                            dynaStringTab[i]=result.get(i);
-                                                                }                                                         
-                                                                simulatorSelectItem.setValueMap(dynaStringTab);
-                                                                simulatorSelectItem.setDefaultToFirstOption(true);
-                                                                launchTab = new LaunchTab(applicationClass,dynaStringTab[0]);
-                                                                launchTab.setCanClose(false);
-                                                            }
-                                                            else 
-                                                            {
-                                                                simulatorSelectItem.setValue("No available Workflow");
-                                                                launchTab=null;
-                                                            }
-							}
-                                                        public void onFailure(Throwable caught) 
-                                                        {								
-							      SC.say("linker error"); 
-                                                        }
-         
-						});                                          
-    }*/
  }

@@ -11,12 +11,15 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.Slider;
+import com.smartgwt.client.widgets.events.HoverEvent;
+import com.smartgwt.client.widgets.events.HoverHandler;
 import com.smartgwt.client.widgets.events.ValueChangedEvent;
 import com.smartgwt.client.widgets.events.ValueChangedHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangeHandler;
+import com.smartgwt.client.widgets.form.fields.events.ItemHoverHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -345,6 +348,70 @@ class DefineSceneSection extends SectionStackSection {
                              Camera.getInstance().setStepOfViewTranslation(event.getValue());
                         }  
          });
+            ///////////////////Hover ///////////////////////:
+          
+            buttonFront.setCanHover(Boolean.TRUE);
+            buttonFront.addHoverHandler(new HoverHandler(){
+            public void onHover(HoverEvent event) {
+                String prompt = "Preset of camera";  
+                 buttonFront.setPrompt(prompt);
+            }
+            });
+             buttonBack.setCanHover(Boolean.TRUE);
+            buttonBack.addHoverHandler(new HoverHandler(){
+            public void onHover(HoverEvent event) {
+                String prompt = "Preset of camera";  
+                 buttonBack.setPrompt(prompt);
+            }
+            });
+             buttonTop.setCanHover(Boolean.TRUE);
+            buttonTop.addHoverHandler(new HoverHandler(){
+            public void onHover(HoverEvent event) {
+                String prompt = "Preset of camera";  
+                 buttonTop.setPrompt(prompt);
+            }
+            });
+             buttonBottom.setCanHover(Boolean.TRUE);
+            buttonBottom.addHoverHandler(new HoverHandler(){
+            public void onHover(HoverEvent event) {
+                String prompt = "Preset of camera";  
+                 buttonBottom.setPrompt(prompt);
+            }
+            });
+             buttonLeft.setCanHover(Boolean.TRUE);
+            buttonLeft.addHoverHandler(new HoverHandler(){
+            public void onHover(HoverEvent event) {
+                String prompt = "Preset of camera";  
+                 buttonLeft.setPrompt(prompt);
+            }
+            });
+             buttonRight.setCanHover(Boolean.TRUE);
+            buttonRight.addHoverHandler(new HoverHandler(){
+            public void onHover(HoverEvent event) {
+                String prompt = "Preset of camera";  
+                 buttonRight.setPrompt(prompt);
+            }
+            });
+               hSlider1.setCanHover(Boolean.TRUE);
+            hSlider1.addHoverHandler(new HoverHandler(){
+            public void onHover(HoverEvent event) {
+                String prompt = "Set the sensitivity for the mouse scroll";  
+                 hSlider1.setPrompt(prompt);
+            }
+            });
+             hSlider2.setCanHover(Boolean.TRUE);
+            hSlider2.addHoverHandler(new HoverHandler(){
+            public void onHover(HoverEvent event) {
+                String prompt = "Set the sensitivity for the mouse translation (CTRL+click to translate)";  
+                 hSlider2.setPrompt(prompt);
+            }
+            });
+            
+            
+            
+            
+            
+            
     }
     public void hideModal()
     {

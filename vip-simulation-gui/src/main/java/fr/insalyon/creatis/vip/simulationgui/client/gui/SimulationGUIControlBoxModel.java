@@ -8,6 +8,8 @@ import com.smartgwt.client.types.TreeModelType;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Slider;
+import com.smartgwt.client.widgets.events.HoverEvent;
+import com.smartgwt.client.widgets.events.HoverHandler;
 import com.smartgwt.client.widgets.events.ValueChangedEvent;
 import com.smartgwt.client.widgets.events.ValueChangedHandler;
 import com.smartgwt.client.widgets.form.ColorPicker;
@@ -21,6 +23,8 @@ import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangeHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
+import com.smartgwt.client.widgets.form.fields.events.ItemHoverEvent;
+import com.smartgwt.client.widgets.form.fields.events.ItemHoverHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellClickHandler;
@@ -63,8 +67,7 @@ public class SimulationGUIControlBoxModel extends Portlet{
      private String id;
      private ObjectModel objectModel;
      private CheckboxItem modBox;  
-     private CheckboxItem modAxis;  
-     private CheckboxItem model;  
+     private CheckboxItem modAxis;   
      private boolean enable=false;
      private TreeNode[] elementData;
      private Tree elementTree;
@@ -124,7 +127,6 @@ public class SimulationGUIControlBoxModel extends Portlet{
           
           
           modAxis=new CheckboxItem("Axis");
-          //model= new CheckboxItem("Model");
           modBox=new CheckboxItem("Bounding box");
             
           modBox.setValue(true);
@@ -259,16 +261,64 @@ public class SimulationGUIControlBoxModel extends Portlet{
                 Scene.getInstance().refreshScreen();  
              }
              });
-            /* model.addChangeHandler(new ChangeHandler() 
-             {
-                public void onChange(ChangeEvent event) {
-                if(model.getValueAsBoolean())objectModel.disable("model");
-                else objectModel.enable("model");
-                Scene.getInstance().refreshBuffer();
-                Scene.getInstance().refreshScreen();   
-             }
-             });*/
-         
+             //////////////////////////// Hover ///////////////////////
+      
+             
+               spinnerx.addItemHoverHandler(new ItemHoverHandler() {  
+               public void onItemHover(ItemHoverEvent event) {  
+                String prompt = "Translate the model to this value in millimeter";  
+                spinnerx.setPrompt(prompt);  
+            }  
+             }); 
+               spinnery.addItemHoverHandler(new ItemHoverHandler() {  
+               public void onItemHover(ItemHoverEvent event) {  
+                String prompt = "Translate the model to this value in millimeter"; 
+                spinnery.setPrompt(prompt);  
+            }  
+             }); 
+               spinnerz.addItemHoverHandler(new ItemHoverHandler() {  
+               public void onItemHover(ItemHoverEvent event) {  
+                String prompt = "Translate the model to this value in millimeter";  
+                spinnerz.setPrompt(prompt);  
+            }  
+             }); 
+              spinnerax.addItemHoverHandler(new ItemHoverHandler() {  
+               public void onItemHover(ItemHoverEvent event) {  
+                String prompt = "Rotate the model to this value in degree with XYZ convention";
+                spinnerx.setPrompt(prompt);  
+            }  
+             }); 
+               spinneray.addItemHoverHandler(new ItemHoverHandler() {  
+               public void onItemHover(ItemHoverEvent event) {  
+                String prompt = "Rotate the model to this value in degree with XYZ convention";  
+                spinnery.setPrompt(prompt);  
+            }  
+             }); 
+               spinneraz.addItemHoverHandler(new ItemHoverHandler() {  
+               public void onItemHover(ItemHoverEvent event) {  
+                String prompt = "Rotate the model to this value in degree with XYZ convention";  
+                spinnerz.setPrompt(prompt);  
+            }  
+             }); 
+                  modAxis.addItemHoverHandler(new ItemHoverHandler() {  
+               public void onItemHover(ItemHoverEvent event) {  
+                String prompt = "Show/hide the axis for the model";  
+                spinnerz.setPrompt(prompt);  
+            }  
+             }); 
+                 modBox.addItemHoverHandler(new ItemHoverHandler() {  
+               public void onItemHover(ItemHoverEvent event) {  
+                String prompt = "Show/hide the bouding box for the model";  
+                spinnerz.setPrompt(prompt);  
+            }  
+             }); 
+                 hSlider.setCanHover(Boolean.TRUE);
+             hSlider.addHoverHandler(new HoverHandler(){
+            public void onHover(HoverEvent event) {
+                String prompt = "Set the step for translation spinners";  
+                hSlider.setPrompt(prompt);
+            }
+        });  
           
                    
      }
