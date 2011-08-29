@@ -69,10 +69,16 @@ public interface WorkflowService extends RemoteService {
     public void closeConnection(String workflowID);
 
     public void killWorkflow(String workflowID);
+    
+    public void killWorkflows(List<String> simulationIDs) throws ApplicationException;
 
     public void cleanWorkflow(String workflowID, String userDN, String proxyFileName);
+    
+    public void cleanWorkflows(List<String> simulationIDs, String userDN, String proxyFileName) throws ApplicationException;
 
     public void purgeWorkflow(String workflowID);
+    
+    public void purgeWorkflows(List<String> simulationIDs) throws ApplicationException;
     
     public List<Simulation> getWorkflows(String user, String application, String status, Date startDate, Date endDate);
 

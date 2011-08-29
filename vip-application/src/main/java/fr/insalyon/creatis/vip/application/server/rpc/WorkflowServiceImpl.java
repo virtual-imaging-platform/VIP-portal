@@ -342,4 +342,67 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
             throw new ApplicationException(ex);
         }
     }
+
+    public void killWorkflows(List<String> simulationIDs) throws ApplicationException {
+
+        StringBuilder sb = new StringBuilder();
+        for (String simulationID : simulationIDs) {
+            try {
+                WorkflowBusiness business = new WorkflowBusiness();
+                business.kill(simulationID);
+            } catch (BusinessException ex) {
+                if (sb.length() > 0) {
+                    sb.append(", ");
+                }
+                sb.append(simulationID);
+            }
+        }
+
+        if (sb.length() > 0) {
+            throw new ApplicationException("Unable to kill the following "
+                    + "simulations: " + sb.toString());
+        }
+    }
+
+    public void cleanWorkflows(List<String> simulationIDs, String userDN, String proxyFileName) throws ApplicationException {
+
+        StringBuilder sb = new StringBuilder();
+        for (String simulationID : simulationIDs) {
+            try {
+                WorkflowBusiness business = new WorkflowBusiness();
+                business.clean(simulationID, userDN, proxyFileName);
+            } catch (BusinessException ex) {
+                if (sb.length() > 0) {
+                    sb.append(", ");
+                }
+                sb.append(simulationID);
+            }
+        }
+
+        if (sb.length() > 0) {
+            throw new ApplicationException("Unable to clean the following "
+                    + "simulations: " + sb.toString());
+        }
+    }
+
+    public void purgeWorkflows(List<String> simulationIDs) throws ApplicationException {
+
+        StringBuilder sb = new StringBuilder();
+        for (String simulationID : simulationIDs) {
+            try {
+                WorkflowBusiness business = new WorkflowBusiness();
+                business.purge(simulationID);
+            } catch (BusinessException ex) {
+                if (sb.length() > 0) {
+                    sb.append(", ");
+                }
+                sb.append(simulationID);
+            }
+        }
+
+        if (sb.length() > 0) {
+            throw new ApplicationException("Unable to purge the following "
+                    + "simulations: " + sb.toString());
+        }
+    }
 }

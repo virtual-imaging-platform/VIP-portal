@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -41,10 +42,14 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
+import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.SimulationRecord;
 import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -165,15 +170,34 @@ public class SimulationsToolStrip extends ToolStrip {
      * 
      */
     private void killSimulations() {
+
         SimulationsTab simulationsTab = (SimulationsTab) Layout.getInstance().getTab(tabID);
         ListGridRecord[] records = simulationsTab.getGridSelection();
+        List<String> simulationIDs = new ArrayList<String>();
 
         for (ListGridRecord record : records) {
             SimulationRecord data = (SimulationRecord) record;
             if (data.getStatus().equals("Running")) {
-                SimulationActionsUtil.killSimulation(modal, data.getSimulationId());
+                simulationIDs.add(data.getSimulationId());
             }
         }
+
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Error executing kill simulations: \n" + caught.getMessage());
+            }
+
+            public void onSuccess(Void result) {
+                modal.hide();
+                SimulationsTab simulationsTab = (SimulationsTab) Layout.getInstance().getTab(tabID);
+                simulationsTab.loadData();
+            }
+        };
+        service.killWorkflows(simulationIDs, callback);
+        modal.show("Sending killing signal to selected simulations...", true);
     }
 
     /**
@@ -181,15 +205,36 @@ public class SimulationsToolStrip extends ToolStrip {
      * 
      */
     private void cleanSimulations() {
+
         SimulationsTab simulationsTab = (SimulationsTab) Layout.getInstance().getTab(tabID);
         ListGridRecord[] records = simulationsTab.getGridSelection();
+        List<String> simulationIDs = new ArrayList<String>();
 
         for (ListGridRecord record : records) {
             SimulationRecord data = (SimulationRecord) record;
             if (data.getStatus().equals("Completed") || data.getStatus().equals("Killed")) {
-                SimulationActionsUtil.cleanSimulation(modal, data.getSimulationId());
+                simulationIDs.add(data.getSimulationId());
             }
         }
+
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Error executing clean simulations: \n" + caught.getMessage());
+            }
+
+            public void onSuccess(Void result) {
+                modal.hide();
+                SimulationsTab simulationsTab = (SimulationsTab) Layout.getInstance().getTab(tabID);
+                simulationsTab.loadData();
+            }
+        };
+        Context context = Context.getInstance();
+        service.cleanWorkflows(simulationIDs, context.getUserDN(),
+                context.getProxyFileName(), callback);
+        modal.show("Cleaning selected simulations...", true);
     }
 
     /**
@@ -197,14 +242,33 @@ public class SimulationsToolStrip extends ToolStrip {
      * 
      */
     private void purgeSimulations() {
+
         SimulationsTab simulationsTab = (SimulationsTab) Layout.getInstance().getTab(tabID);
         ListGridRecord[] records = simulationsTab.getGridSelection();
+        List<String> simulationIDs = new ArrayList<String>();
 
         for (ListGridRecord record : records) {
             SimulationRecord data = (SimulationRecord) record;
             if (data.getStatus().equals("Cleaned")) {
-                SimulationActionsUtil.purgeSimulation(modal, data.getSimulationId());
+                simulationIDs.add(data.getSimulationId());
             }
         }
+
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Error executing purge simulations: \n" + caught.getMessage());
+            }
+
+            public void onSuccess(Void result) {
+                modal.hide();
+                SimulationsTab simulationsTab = (SimulationsTab) Layout.getInstance().getTab(tabID);
+                simulationsTab.loadData();
+            }
+        };
+        service.purgeWorkflows(simulationIDs, callback);
+        modal.show("Purging selected simulations...", true);
     }
 }
