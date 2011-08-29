@@ -8,11 +8,11 @@
     <name>VIP</name>
     
     <properties>
-        <vip.common.version>0.4</vip.common.version>
+        <vip.common.version>0.4.1</vip.common.version>
         <vip.core.version>0.5</vip.core.version>
-        <vip.application.version>0.4</vip.application.version>
+        <vip.application.version>0.4.1</vip.application.version>
         <vip.datamanager.version>0.5</vip.datamanager.version>
-        <vip.datamanager-applet.version>0.1</vip.datamanager-applet.version>
+        <vip.datamanager-applet.version>0.1.1</vip.datamanager-applet.version>
         <vip.portal.version>0.5</vip.portal.version>
         <vip.gatelab.version>0.3.2</vip.gatelab.version>
         <vip.simulation-gui.version>0.2</vip.simulation-gui.version>
@@ -53,7 +53,7 @@
         <module>vip-core</module>
         <module>vip-application</module>
         <module>vip-datamanagement</module>
-       <module>vip-datamanager-applet</module>
+        <module>vip-datamanager-applet</module>
         <module>vip-gatelab</module>
         <module>vip-portal</module>
         <module>vip-simulation-gui</module>
