@@ -44,6 +44,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
+import org.apache.commons.io.FileUtils;
 
 /**
  *
@@ -52,8 +53,8 @@ import java.util.List;
 public class UploadFilesBusiness {
 
     public String uploadFiles(List<String> dataList, String user, String userdn,
-            String proxy, String path, boolean unzip, boolean usePool, 
-            String codebase) throws BusinessException {
+            String proxy, String path, boolean unzip, boolean usePool,
+            String codebase, boolean deleteDataList) throws BusinessException {
 
         try {
             File fileToUpload = null;
@@ -123,7 +124,13 @@ public class UploadFilesBusiness {
             if (!single) {
                 fileToUpload.delete();
             }
-            
+
+            if (deleteDataList) {
+                for (String data : dataList) {
+                    FileUtils.deleteQuietly(new File(data));
+                }
+            }
+
             return fileToUpload.getName();
 
         } catch (IOException ex) {

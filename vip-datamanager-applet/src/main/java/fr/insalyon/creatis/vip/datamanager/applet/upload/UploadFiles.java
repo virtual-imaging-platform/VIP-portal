@@ -321,7 +321,7 @@ private void jButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 
             UploadFilesBusiness business = new UploadFilesBusiness();
             String fileName = business.uploadFiles(dataList, user, userdn, proxy,
-                    path, unzip, usePool, getCodeBase().toString());
+                    path, unzip, usePool, getCodeBase().toString(), false);
 
             JSObject win = JSObject.getWindow(this);
             win.call("uploadComplete", new String[]{fileName});
