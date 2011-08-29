@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.common.client.view;
 
+import com.google.gwt.i18n.client.NumberFormat;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DateDisplayFormat;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -42,7 +43,9 @@ import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
+import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
  *
@@ -117,5 +120,40 @@ public class FieldUtil {
         });
 
         return textItem;
+    }
+
+    /**
+     * Gets a CellFormatter to parse file sizes.
+     * 
+     * @return 
+     */
+    public static CellFormatter getSizeCellFormatter() {
+
+        return new CellFormatter() {
+
+            public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+
+                if (value == null) {
+                    return null;
+                }
+
+                long length = ((Number) value).longValue();
+                String size = length + " B";
+                NumberFormat nf = NumberFormat.getFormat("#.##");
+                if (length / 1024 > 0) {
+                    if (length / (1024 * 1024) > 0) {
+                        if (length / (1024 * 1024 * 1024) > 0) {
+                            size = nf.format(length / (double) (1024 * 1024 * 1024)) + " GB";
+                        } else {
+                            size = nf.format(length / (double) (1024 * 1024)) + " MB";
+                        }
+                    } else {
+                        size = nf.format(length / (double) 1024) + " KB";
+                    }
+                }
+
+                return size;
+            }
+        };
     }
 }
