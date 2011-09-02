@@ -62,28 +62,32 @@ public class DataManagerInit {
 
     private DataManagerInit() {
 
-        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-            public void onFailure(Throwable caught) {
-                SC.warn("Error executing configure File Transfer: " + caught.getMessage());
-                BrowserLayout.getInstance().unmask();
-                BrowserLayout.getInstance().mask("Error Configuring File Transfer.");
-            }
-
-            public void onSuccess(Void result) {
-                BrowserLayout.getInstance().unmask();
-            }
-        };
         Context context = Context.getInstance();
-        service.configureDataManager(context.getUser(), context.getProxyFileName(), callback);
+        if (!context.getUser().equals("Anonymous")) {
+            
+            DataManagerServiceAsync service = DataManagerService.Util.getInstance();
+            AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
-        if (context.isSystemAdmin()) {
-            SystemMenuButton.getInstance().getMenu().addItem(new DataManagerMenuItem());
-        }
-        if (context.hasValidProxy()) {
-            Layout.getInstance().addMainSection(DataManagerSection.getInstance());
-            BrowserLayout.getInstance().mask("Configuring File Transfer...");
+                public void onFailure(Throwable caught) {
+                    SC.warn("Error executing configure File Transfer: " + caught.getMessage());
+                    BrowserLayout.getInstance().unmask();
+                    BrowserLayout.getInstance().mask("Error Configuring File Transfer.");
+                }
+
+                public void onSuccess(Void result) {
+                    BrowserLayout.getInstance().unmask();
+                }
+            };
+
+            service.configureDataManager(context.getUser(), context.getProxyFileName(), callback);
+
+            if (context.isSystemAdmin()) {
+                SystemMenuButton.getInstance().getMenu().addItem(new DataManagerMenuItem());
+            }
+            if (context.hasValidProxy()) {
+                Layout.getInstance().addMainSection(DataManagerSection.getInstance());
+                BrowserLayout.getInstance().mask("Configuring File Transfer...");
+            }
         }
     }
 }
