@@ -14,7 +14,7 @@
     <version>${vip.portal.version}</version>
     <properties>
         <runTarget>index.html</runTarget>
-        <netbeans.hint.deploy.server>Tomcat70</netbeans.hint.deploy.server>
+        <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
     </properties>
     <url>http://maven.apache.org</url>
     <dependencies>
