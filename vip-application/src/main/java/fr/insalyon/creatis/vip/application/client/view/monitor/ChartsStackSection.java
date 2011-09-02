@@ -310,10 +310,10 @@ public class ChartsStackSection extends SectionStackSection {
         PropertyRecord[] data = new PropertyRecord[]{
                 new PropertyRecord("Makespan (s)", max + ""),
                 new PropertyRecord("Cumulated CPU time (s)", cpuTime + ""),
-                new PropertyRecord("Speed-up", (sequentialTime / (float) max) + ""),
+                new PropertyRecord("Speed-up", (cpuTime / (float) max) + ""),
                 new PropertyRecord("Efficiency", (cpuTime / (float) sequentialTime) + "")
             };
-        
+               
         grid.setData(data);
         chart.setChartData(chartData);
     }
