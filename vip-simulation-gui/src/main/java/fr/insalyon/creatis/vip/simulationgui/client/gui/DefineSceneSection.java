@@ -7,7 +7,6 @@ package fr.insalyon.creatis.vip.simulationgui.client.gui;
 
 import com.smartgwt.client.widgets.tab.Tab;  
 import com.smartgwt.client.types.Side;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.Slider;
@@ -19,7 +18,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangeHandler;
-import com.smartgwt.client.widgets.form.fields.events.ItemHoverHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -28,8 +26,6 @@ import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.Camera;
 import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.Scene;
 import com.smartgwt.client.widgets.tab.TabSet;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 
 /**
  *
