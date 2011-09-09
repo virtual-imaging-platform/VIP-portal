@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.datamanager.client.view.common;
 
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -58,6 +59,11 @@ public class BasicBrowserToolStrip extends ToolStrip {
         this.modal = modal;
         this.toolStrip = this;
         this.setWidth100();
+        
+        Label titleLabel = new Label("&nbsp;&nbsp;Platform Files");
+        titleLabel.setWidth(75);
+        this.addMember(titleLabel);
+        this.addSeparator();
 
         pathItem = new SelectItem("path");
         pathItem.setShowTitle(false);

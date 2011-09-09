@@ -63,13 +63,13 @@ public class PathSelectionWindow extends Window {
     private TextItem textItem;
     private Menu contextMenu;
     private String name;
-
+   
     public PathSelectionWindow(TextItem textItem) {
 
         this.textItem = textItem;
 
         this.setTitle("Path Selection");
-        this.setWidth(550);
+        this.setWidth(600);
         this.setHeight(350);
         this.setShowMinimizeButton(false);
         this.setIsModal(true);
@@ -86,6 +86,10 @@ public class PathSelectionWindow extends Window {
         this.addItem(toolStrip);
         this.addItem(grid);
 
+        String path = textItem.getValueAsString();
+        if (path != null && !path.isEmpty() && path.startsWith(DataManagerConstants.ROOT)) {
+            oldPath = path.substring(0, path.lastIndexOf("/"));
+        }
         BrowserUtil.loadData(modal, grid, toolStrip, oldPath, false);
     }
 
