@@ -49,7 +49,7 @@ public class GateLabSimulationsTab extends SimulationsTab {
         
         super("gate", isGroupAdmin);
         grid.getField("application").setHidden(true);
-        
+        /*
         rowMouseDownHandler.removeHandler();
         grid.addRowMouseDownHandler(new RowMouseDownHandler() {
 
@@ -62,5 +62,7 @@ public class GateLabSimulationsTab extends SimulationsTab {
                 }
             }
         });
+         * 
+         */
     }
 }

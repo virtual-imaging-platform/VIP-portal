@@ -35,12 +35,13 @@
 package fr.insalyon.creatis.vip.gatelab.client.view;
 
 import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabSimulationsTab;
+import fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
-import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
+//import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
@@ -62,7 +63,7 @@ public class GateLabMenuButton extends ToolStripMenuButton {
         launchItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new LaunchTab("GATE"));
+                Layout.getInstance().addTab(new GateLabLaunchTab());
             }
         });
         
