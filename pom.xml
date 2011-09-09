@@ -13,8 +13,9 @@
         <vip.application.version>0.4.2</vip.application.version>
         <vip.datamanager.version>0.5</vip.datamanager.version>
         <vip.datamanager-applet.version>0.1.1</vip.datamanager-applet.version>
+        <vip.gatelab-applet.version>0.1</vip.gatelab-applet.version>
         <vip.portal.version>0.5</vip.portal.version>
-        <vip.gatelab.version>0.3.2</vip.gatelab.version>
+        <vip.gatelab.version>0.4</vip.gatelab.version>
         <vip.simulation-gui.version>0.2</vip.simulation-gui.version>
         <vip.models.version>0.1</vip.models.version>
         <vip.provenance.version>0.1</vip.provenance.version>
@@ -91,4 +92,17 @@
         <developerConnection>scm:svn:https://svn.creatis.insa-lyon.fr/svn/vip/Portal</developerConnection>
         <url>http://vip.creatis.insa-lyon.fr:9002/projects/vip</url>
     </scm>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.0.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
