@@ -89,6 +89,8 @@ public interface WorkflowService extends RemoteService {
     public List<String>[] getApplicationsAndUsersList(String applicationClass);
     
     public List<String> getLogs(String baseDir);
+    
+    public void deleteLogData(String path) throws ApplicationException;
 
     public List<Source> getWorkflowSources(String user, String proxyFileName, String workflowName) throws ApplicationException;
 

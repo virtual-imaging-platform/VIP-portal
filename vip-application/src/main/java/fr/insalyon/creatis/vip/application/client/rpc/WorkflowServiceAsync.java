@@ -57,6 +57,8 @@ public interface WorkflowServiceAsync {
 
     public void getLogs(String baseDir, AsyncCallback<List<String>> asyncCallback);
 
+    public void deleteLogData(String path, AsyncCallback<Void> asyncCallback);
+
     public void getWorkflowSources(String user, String proxyFileName, String workflowName, AsyncCallback<List<Source>> asyncCallback);
 
     public void launchWorkflow(String user, Map<String, String> parameters, String workflowName, String proxyFileName, String simulationName, AsyncCallback<String> asyncCallback);
@@ -64,17 +66,17 @@ public interface WorkflowServiceAsync {
     public void getWorkflowInputs(String fileName, AsyncCallback<String> asyncCallback);
 
     public void addSimulationInput(String user, SimulationInput workflowInput, AsyncCallback<Void> asyncCallback);
-    
+
     public void updateSimulationInput(String user, SimulationInput workflowInput, AsyncCallback<Void> asyncCallback);
 
     public void closeConnection(String workflowID, AsyncCallback<Void> asyncCallback);
 
     public void killWorkflow(String workflowID, AsyncCallback<Void> asyncCallback);
-    
+
     public void killWorkflows(List<String> simulationIDs, AsyncCallback<Void> asyncCallback);
 
     public void cleanWorkflow(String workflowID, String userDN, String proxyFileName, AsyncCallback<Void> asyncCallback);
-    
+
     public void cleanWorkflows(List<String> simulationIDs, String userDN, String proxyFileName, AsyncCallback<Void> asyncCallback);
 
     public void getWorkflowsInputByUser(String user, AsyncCallback<List<SimulationInput>> asyncCallback);
@@ -90,10 +92,10 @@ public interface WorkflowServiceAsync {
     public void getStats(List<Simulation> workflowIdList, int type, int binSize, AsyncCallback<List<String>> asyncCallback);
 
     public void purgeWorkflow(String workflowID, AsyncCallback<Void> asyncCallback);
-    
+
     public void purgeWorkflows(List<String> simulationIDs, AsyncCallback<Void> asyncCallback);
 
     public void getOutputData(String simulationID, AsyncCallback<List<InOutData>> asyncCallback);
-    
+
     public void getInputData(String simulationID, AsyncCallback<List<InOutData>> asyncCallback);
 }

@@ -74,7 +74,7 @@ import org.xml.sax.SAXException;
 public class WorkflowBusiness {
 
     private static final Logger logger = Logger.getLogger(WorkflowBusiness.class);
-    
+
     /**
      * 
      * @param user
@@ -141,7 +141,7 @@ public class WorkflowBusiness {
      * @throws BusinessException
      */
     public String launch(String user, Map<String, String> parametersMap,
-            String workflowName, String proxyFileName, String simulationName) 
+            String workflowName, String proxyFileName, String simulationName)
             throws BusinessException {
 
         try {
@@ -187,11 +187,11 @@ public class WorkflowBusiness {
             WorkflowMoteurConfig moteur = new WorkflowMoteurConfig(ServerConfiguration.getInstance().getMoteurServer(), workflowPath, parameters);
             moteur.setSettings(settings);
             String ws = moteur.launch(proxyFileName);
-            
+
             String workflowID = ws.substring(ws.lastIndexOf("/") + 1, ws.lastIndexOf("."));
             DAOFactory.getDAOFactory().getWorkflowDAO().add(new Simulation(
                     workflowName, workflowID, user, new Date(), simulationName, "Running"));
-            
+
             return workflowID;
 
         } catch (DataManagerException ex) {
@@ -315,57 +315,72 @@ public class WorkflowBusiness {
             throw new BusinessException(ex);
         }
     }
-    
+
     public List<InOutData> getOutputData(String simulationID) throws BusinessException {
-        
+
         try {
             return DAOFactory.getDAOFactory().getWorkflowDAO().getInOutData(simulationID, "Outputs");
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
-    
+
     public List<InOutData> getInputData(String simulationID) throws BusinessException {
-        
+
         try {
             return DAOFactory.getDAOFactory().getWorkflowDAO().getInOutData(simulationID, "Inputs");
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
-    
-    public void addSimulationInput(String user, SimulationInput workflowInput) 
+
+    public void addSimulationInput(String user, SimulationInput workflowInput)
             throws BusinessException {
-        
+
         try {
-            DAOFactory.getDAOFactory().getWorkflowInputDAO()
-                    .addSimulationInput(user, workflowInput);
-            
+            DAOFactory.getDAOFactory().getWorkflowInputDAO().addSimulationInput(user, workflowInput);
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
-    
-    public void updateSimulationInput(String user, SimulationInput workflowInput) 
+
+    public void updateSimulationInput(String user, SimulationInput workflowInput)
             throws BusinessException {
-        
+
         try {
-            DAOFactory.getDAOFactory().getWorkflowInputDAO()
-                    .updateSimulationInput(user, workflowInput);
-            
+            DAOFactory.getDAOFactory().getWorkflowInputDAO().updateSimulationInput(user, workflowInput);
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
-    
-    public SimulationInput getInputByUserAndName(String user, String name, 
+
+    public SimulationInput getInputByUserAndName(String user, String name,
             String appName) throws BusinessException {
-        
+
         try {
-            return DAOFactory.getDAOFactory().getWorkflowInputDAO()
-                    .getInputByNameUserApp(user, name, appName);
-            
+            return DAOFactory.getDAOFactory().getWorkflowInputDAO().getInputByNameUserApp(user, name, appName);
+
         } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    public void deleteLogData(String path) throws BusinessException {
+
+        try {
+            File file = new File(ServerConfiguration.getInstance().getWorkflowsPath() + "/" + path);
+            if (file.isDirectory()) {
+                FileUtils.deleteDirectory(file);
+            } else {
+                if (!file.delete()) {
+                    logger.error("Unable to delete data: " + path);
+                    throw new BusinessException("Unable to delete data: " + path);
+                }
+            }
+        } catch (Exception ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         }
     }

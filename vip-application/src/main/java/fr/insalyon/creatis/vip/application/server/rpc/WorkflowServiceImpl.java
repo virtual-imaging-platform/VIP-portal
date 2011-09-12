@@ -190,6 +190,17 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         return list;
     }
 
+    public void deleteLogData(String path) throws ApplicationException {
+
+        try {
+            WorkflowBusiness business = new WorkflowBusiness();
+            business.deleteLogData(path);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
     public List<Source> getWorkflowSources(String user, String proxyFileName,
             String workflowName) throws ApplicationException {
 

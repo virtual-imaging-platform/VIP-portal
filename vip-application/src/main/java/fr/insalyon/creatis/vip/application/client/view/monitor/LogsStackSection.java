@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -48,8 +48,6 @@ import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.RowMouseDownEvent;
-import com.smartgwt.client.widgets.grid.events.RowMouseDownHandler;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -59,6 +57,7 @@ import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.menu.LogsContextMenu;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.FileOrFolderRecord;
 import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
+import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import java.util.List;
 
 /**
@@ -67,12 +66,14 @@ import java.util.List;
  */
 public class LogsStackSection extends SectionStackSection {
 
+    protected ModalWindow modal;
     private String simulationID;
     private ListGrid grid;
     private ToolStrip toolStrip;
     private SelectItem pathItem;
 
     public LogsStackSection(String simulationID) {
+
         this.simulationID = simulationID;
         this.setTitle("Logs");
         this.setCanCollapse(true);
@@ -81,6 +82,7 @@ public class LogsStackSection extends SectionStackSection {
 
         configureToolStrip();
         configureGrid();
+        modal = new ModalWindow(grid);
 
         VLayout vLayout = new VLayout();
         vLayout.setHeight100();
@@ -131,12 +133,6 @@ public class LogsStackSection extends SectionStackSection {
                 showContextMenu(event.getRecord());
             }
         });
-        grid.addRowMouseDownHandler(new RowMouseDownHandler() {
-
-            public void onRowMouseDown(RowMouseDownEvent event) {
-                showContextMenu(event.getRecord());
-            }
-        });
     }
 
     private void configureToolStrip() {
@@ -151,6 +147,7 @@ public class LogsStackSection extends SectionStackSection {
 
         ToolStripButton folderUpButton = new ToolStripButton();
         folderUpButton.setIcon("icon-folderup.png");
+        folderUpButton.setTooltip("Folder Up");
         folderUpButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
@@ -164,6 +161,7 @@ public class LogsStackSection extends SectionStackSection {
 
         ToolStripButton refreshButton = new ToolStripButton();
         refreshButton.setIcon("icon-refresh.png");
+        refreshButton.setTooltip("Refresh");
         refreshButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
@@ -171,14 +169,26 @@ public class LogsStackSection extends SectionStackSection {
             }
         });
         toolStrip.addButton(refreshButton);
+        
+        ToolStripButton homeButton = new ToolStripButton();
+        homeButton.setIcon("icon-home.png");
+        homeButton.setTooltip("Home");
+        homeButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                loadData("/" + simulationID);
+            }
+        });
+        toolStrip.addButton(homeButton);
     }
 
-    private void loadData(final String baseDir) {
+    public void loadData(final String baseDir) {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
             public void onFailure(Throwable caught) {
+                modal.hide();
                 SC.warn("Error executing get logs dir: " + caught.getMessage());
             }
 
@@ -195,25 +205,29 @@ public class LogsStackSection extends SectionStackSection {
                 }
                 pathItem.setValue(baseDir);
                 grid.setData(data);
+                modal.hide();
             }
         };
+        modal.show("Loading Logs Data...", true);
         service.getLogs(baseDir, callback);
     }
 
     private void showContextMenu(ListGridRecord record) {
-        
+
         String type = record.getAttributeAsString("icon");
-        if (type.contains("file")) {
-        
-            String fileName = record.getAttributeAsString("name");
-            String folder = record.getAttributeAsString("baseDir");
-            
-            if (folder.equals("/" + simulationID)) {
-                folder = "./";
-            } else {
-                folder = folder.replace("/" + simulationID + "", "");
-            }
-            new LogsContextMenu(simulationID, fileName, folder).showContextMenu();
+        String dataName = record.getAttributeAsString("name");
+        String folder = record.getAttributeAsString("baseDir");
+
+        if (folder.equals("/" + simulationID)) {
+            folder = "./";
+        } else {
+            folder = folder.replace("/" + simulationID + "", "");
         }
+        new LogsContextMenu(this, simulationID, dataName,
+                folder, type.contains("file")).showContextMenu();
+    }
+
+    public ModalWindow getModal() {
+        return modal;
     }
 }
