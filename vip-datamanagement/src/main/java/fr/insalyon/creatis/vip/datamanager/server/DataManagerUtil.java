@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.datamanager.server;
 
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
+import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOFactory;
@@ -178,6 +179,19 @@ public class DataManagerUtil {
     public static VletAgentClient getVletAgentClient(String proxyFileName) {
 
         return new VletAgentClient(
+                ServerConfiguration.getInstance().getVletagentHost(),
+                ServerConfiguration.getInstance().getVletagentPort(),
+                proxyFileName);
+    }
+    
+    /**
+     * 
+     * @param proxyFileName
+     * @return 
+     */
+    public static VletAgentPoolClient getVletAgentPoolClient(String proxyFileName) {
+
+        return new VletAgentPoolClient(
                 ServerConfiguration.getInstance().getVletagentHost(),
                 ServerConfiguration.getInstance().getVletagentPort(),
                 proxyFileName);

@@ -115,15 +115,12 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
             LFCBusiness business = new LFCBusiness();
             business.getModificationDate(user, proxy, remoteFile);
 
-            VletAgentPoolClient client = new VletAgentPoolClient(
-                    serverConfiguration.getVletagentHost(),
-                    serverConfiguration.getVletagentPort(),
-                    proxy);
+            VletAgentPoolClient poolClient = DataManagerUtil.getVletAgentPoolClient(proxy);
             String remotePath = DataManagerUtil.parseBaseDir(user, remoteFile);
             String localDirPath = serverConfiguration.getDataManagerPath()
                     + "/downloads" + FilenameUtils.getFullPath(remotePath);
 
-            client.downloadFile(remotePath, localDirPath, userDN);
+            poolClient.downloadFile(remotePath, localDirPath, userDN);
 
         } catch (BusinessException ex) {
             logger.error(ex);
@@ -141,10 +138,10 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
             String userDN, String proxy) throws DataManagerException {
 
         try {
-            VletAgentPoolClient client = new VletAgentPoolClient(
-                    serverConfiguration.getVletagentHost(),
-                    serverConfiguration.getVletagentPort(),
-                    proxy);
+            LFCBusiness business = new LFCBusiness();
+            business.getModificationDate(user, proxy, remoteFiles);
+
+            VletAgentPoolClient poolClient = DataManagerUtil.getVletAgentPoolClient(proxy);
 
             List<String> remotePaths = new ArrayList<String>();
             for (String remoteFile : remoteFiles) {
@@ -153,8 +150,11 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
             String localDirPath = serverConfiguration.getDataManagerPath()
                     + "/downloads/" + packName;
 
-            client.downloadFiles(remotePaths.toArray(new String[]{}), localDirPath, userDN);
+            poolClient.downloadFiles(remotePaths.toArray(new String[]{}), localDirPath, userDN);
 
+        } catch (BusinessException ex) {
+            logger.error(ex);
+            throw new DataManagerException(ex);
         } catch (DataManagerException ex) {
             logger.error(ex);
             throw ex;
@@ -171,14 +171,12 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
             LFCBusiness business = new LFCBusiness();
             business.getModificationDate(user, proxy, remoteFolder);
 
-            VletAgentPoolClient client = new VletAgentPoolClient(
-                    serverConfiguration.getVletagentHost(),
-                    serverConfiguration.getVletagentPort(),
-                    proxy);
+            VletAgentPoolClient poolClient = DataManagerUtil.getVletAgentPoolClient(proxy);
+
             String remotePath = DataManagerUtil.parseBaseDir(user, remoteFolder);
             String localDirPath = serverConfiguration.getDataManagerPath()
                     + "/downloads" + remotePath;
-            client.downloadFolder(remotePath, localDirPath, userDN);
+            poolClient.downloadFolder(remotePath, localDirPath, userDN);
 
         } catch (BusinessException ex) {
             logger.error(ex);
@@ -196,15 +194,12 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
             String userDN, String proxy) throws DataManagerException {
 
         try {
-            VletAgentPoolClient client = new VletAgentPoolClient(
-                    serverConfiguration.getVletagentHost(),
-                    serverConfiguration.getVletagentPort(),
-                    proxy);
+            VletAgentPoolClient poolClient = DataManagerUtil.getVletAgentPoolClient(proxy);
 
             String localPath = "file://" + serverConfiguration.getDataManagerPath()
                     + "/uploads/" + localFile;
             String remotePath = DataManagerUtil.parseBaseDir(user, remoteFile);
-            client.uploadFile(localPath, remotePath, userDN);
+            poolClient.uploadFile(localPath, remotePath, userDN);
 
         } catch (DataManagerException ex) {
             logger.error(ex);
@@ -218,12 +213,9 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
     public void clearDeleteOperations(String proxy) throws DataManagerException {
 
         try {
-            VletAgentPoolClient client = new VletAgentPoolClient(
-                    serverConfiguration.getVletagentHost(),
-                    serverConfiguration.getVletagentPort(),
-                    proxy);
+            VletAgentPoolClient poolClient = DataManagerUtil.getVletAgentPoolClient(proxy);
 
-            client.clearDeleteOperations();
+            poolClient.clearDeleteOperations();
 
         } catch (VletAgentClientException ex) {
             logger.error(ex);

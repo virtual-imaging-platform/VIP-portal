@@ -209,4 +209,32 @@ public class LFCBusiness {
             throw new BusinessException(ex);
         }
     }
+
+    /**
+     * 
+     * @param user
+     * @param proxyFileName
+     * @param paths
+     * @return
+     * @throws BusinessException 
+     */
+    public List<Long> getModificationDate(String user, String proxyFileName,
+            List<String> paths) throws BusinessException {
+        try {
+            List<String> parsedPaths = new ArrayList<String>();
+            for (String path : paths) {
+                parsedPaths.add(DataManagerUtil.parseBaseDir(user, path));
+            }
+            
+            return DataManagerUtil.getVletAgentClient(proxyFileName).
+                    getModificationDate(parsedPaths);
+
+        } catch (VletAgentClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        } catch (DataManagerException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
 }
