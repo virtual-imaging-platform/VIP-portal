@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,7 +32,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.system.application.classes;
+package fr.insalyon.creatis.vip.application.client.view.system.application.application;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
@@ -52,9 +52,9 @@ import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.core.client.bean.AppClass;
-import fr.insalyon.creatis.vip.core.client.rpc.ApplicationService;
-import fr.insalyon.creatis.vip.core.client.rpc.ApplicationServiceAsync;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,15 +63,17 @@ import java.util.List;
  *
  * @author Rafael Silva
  */
-public class ClassesStackSection extends SectionStackSection {
+public class ApplicationsStackSection extends SectionStackSection {
 
+    private String applicationClass;
     private ListGrid grid;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
 
-    public ClassesStackSection() {
+    public ApplicationsStackSection(String applicationClass) {
 
-        this.setTitle("Classes");
+        this.applicationClass = applicationClass;
+        this.setTitle("Applications");
         this.setCanCollapse(true);
         this.setExpanded(true);
         this.setResizeable(true);
@@ -106,7 +108,8 @@ public class ClassesStackSection extends SectionStackSection {
 
                         public void onClick(ClickEvent event) {
                             edit(rollOverRecord.getAttribute("name"),
-                                    rollOverRecord.getAttribute("groups"));
+                                    rollOverRecord.getAttribute("lfn"),
+                                    rollOverRecord.getAttribute("classes"));
                         }
                     });
                     ImgButton deleteImg = getImgButton("icon-delete.png", "Delete");
@@ -114,12 +117,16 @@ public class ClassesStackSection extends SectionStackSection {
 
                         public void onClick(ClickEvent event) {
                             final String name = rollOverRecord.getAttribute("name");
-                            SC.confirm("Do you really want to remove the user \""
+                            SC.confirm("Do you really want to remove the application \""
                                     + name + "\"?", new BooleanCallback() {
 
                                 public void execute(Boolean value) {
                                     if (value != null && value) {
-                                        remove(name);
+                                        if (applicationClass == null) {
+                                            remove(name);
+                                        } else {
+                                            remove(applicationClass, name);
+                                        }
                                     }
                                 }
                             });
@@ -151,8 +158,8 @@ public class ClassesStackSection extends SectionStackSection {
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
 
-        ListGridField nameField = new ListGridField("name", "Class Name");
-        ListGridField groupsField = new ListGridField("groups", "Groups");
+        ListGridField nameField = new ListGridField("name", "Application Name");
+        ListGridField groupsField = new ListGridField("classes", "Classes");
 
         grid.setFields(nameField, groupsField);
         grid.setSortField("name");
@@ -161,38 +168,37 @@ public class ClassesStackSection extends SectionStackSection {
 
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 edit(event.getRecord().getAttribute("name"),
-                        event.getRecord().getAttribute("groups"));
+                        event.getRecord().getAttribute("lfn"),
+                        event.getRecord().getAttribute("classes"));
             }
         });
     }
 
     public void loadData() {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
-        final AsyncCallback<List<AppClass>> callback = new AsyncCallback<List<AppClass>>() {
+        final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get classes list\n" + caught.getMessage());
+                SC.warn("Error executing get applications list\n" + caught.getMessage());
             }
 
-            public void onSuccess(List<AppClass> result) {
-                List<ClassRecord> dataList = new ArrayList<ClassRecord>();
+            public void onSuccess(List<Application> result) {
+                List<ApplicationRecord> dataList = new ArrayList<ApplicationRecord>();
 
-                for (AppClass c : result) {
+                for (Application a : result) {
                     StringBuilder sb = new StringBuilder();
-                    for (String group : c.getGroups()) {
-                        if (!group.equals("Administrator")) {
-                            if (sb.length() > 0) {
-                                sb.append(", ");
-                            }
-                            sb.append(group);
+                    for (String className : a.getApplicationClasses()) {
+                        if (sb.length() > 0) {
+                            sb.append(", ");
                         }
+                        sb.append(className);
                     }
-                    dataList.add(new ClassRecord(c.getName(), sb.toString()));
+                    dataList.add(new ApplicationRecord(a.getName(), a.getLfn(), sb.toString()));
                 }
-                grid.setData(dataList.toArray(new ClassRecord[]{}));
+                grid.setData(dataList.toArray(new ApplicationRecord[]{}));
             }
         };
-        service.getClasses(callback);
+        service.getApplications(applicationClass, callback);
     }
 
     private void remove(String name) {
@@ -201,20 +207,42 @@ public class ClassesStackSection extends SectionStackSection {
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing remove class\n" + caught.getMessage());
+                SC.warn("Error executing remove application\n" + caught.getMessage());
             }
 
             public void onSuccess(Void result) {
-                SC.say("The class was successfully removed!");
+                SC.say("The application was successfully removed!");
                 loadData();
             }
         };
-        service.removeClass(name, callback);
+        service.remove(name, callback);
     }
 
-    private void edit(String name, String groups) {
-        ManageClassesTab classTab = (ManageClassesTab) Layout.getInstance().
-                getTab("manage-classes-tab");
-        classTab.setClass(name, groups);
+    /**
+     * Removes the current class from the application.
+     * 
+     * @param application Application object
+     */
+    private void remove(String applicationClass, String applicationName) {
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            public void onFailure(Throwable caught) {
+                SC.warn("Error executing remove application\n" + caught.getMessage());
+            }
+
+            public void onSuccess(Void result) {
+                SC.say("The application was successfully removed!");
+                loadData();
+            }
+        };
+        service.removeClassFromApplication(applicationClass, applicationName, callback);
+    }
+
+    private void edit(String name, String lfn, String classes) {
+        ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
+                getTab("manage-apps-tab");
+        appsTab.setApplication(name, lfn, classes);
     }
 }

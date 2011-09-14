@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,7 +32,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.system.application.classes;
+package fr.insalyon.creatis.vip.application.client.view.system.application.application;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.MultipleAppearance;
@@ -46,11 +46,10 @@ import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.core.client.bean.AppClass;
-import fr.insalyon.creatis.vip.core.client.rpc.ApplicationService;
-import fr.insalyon.creatis.vip.core.client.rpc.ApplicationServiceAsync;
-import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
-import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,16 +59,19 @@ import java.util.List;
  *
  * @author Rafael Silva
  */
-public class EditClassStackSection extends SectionStackSection {
+public class EditApplicationStackSection extends SectionStackSection {
 
-    private boolean newClass = true;
+    private String applicationClass;
+    private boolean newApplication = true;
     private DynamicForm form;
     private TextItem nameItem;
-    private SelectItem groupsPickList;
+    private TextItem lfnItem;
+    private SelectItem classesPickList;
 
-    public EditClassStackSection() {
+    public EditApplicationStackSection(String applicationClass) {
 
-        this.setTitle("Add Class");
+        this.applicationClass = applicationClass;
+        this.setTitle("Add Application");
         this.setCanCollapse(true);
         this.setExpanded(true);
         this.setResizeable(true);
@@ -91,14 +93,18 @@ public class EditClassStackSection extends SectionStackSection {
         form.setWidth(500);
 
         nameItem = new TextItem("name", "Name");
-        nameItem.setWidth(350);
+        nameItem.setWidth(450);
         nameItem.setRequired(true);
 
-        groupsPickList = new SelectItem();
-        groupsPickList.setTitle("Groups");
-        groupsPickList.setMultiple(true);
-        groupsPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
-        groupsPickList.setWidth(350);
+        lfnItem = new TextItem("lfn", "LFN");
+        lfnItem.setWidth(450);
+        lfnItem.setRequired(true);
+
+        classesPickList = new SelectItem();
+        classesPickList.setTitle("Classes");
+        classesPickList.setMultiple(true);
+        classesPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
+        classesPickList.setWidth(450);
 
         ButtonItem saveItem = new ButtonItem("Save");
         saveItem.setWidth(50);
@@ -107,106 +113,116 @@ public class EditClassStackSection extends SectionStackSection {
             public void onClick(ClickEvent event) {
                 if (form.validate()) {
                     List<String> values = new ArrayList<String>();
-                    values.addAll(Arrays.asList(groupsPickList.getValues()));
-                    values.add("Administrator");
-                    
-                    save(new AppClass(nameItem.getValueAsString(), 
-                            values));
+                    values.addAll(Arrays.asList(classesPickList.getValues()));
+
+                    save(new Application(nameItem.getValueAsString(),
+                            lfnItem.getValueAsString(), values));
                 }
             }
         });
 
-        form.setFields(nameItem, groupsPickList, saveItem);
+        form.setFields(nameItem, lfnItem, classesPickList, saveItem);
     }
 
     /**
-     * Sets a class to edit or creates a blank form.
+     * Sets an application to edit or creates a blank form.
      * 
      * @param name Class name
+     * @param lfn Application LFN
      * @param groups Class groups
      */
-    public void setClass(String name, String groups) {
+    public void setApplication(String name, String lfn, String classes) {
         if (name != null) {
-            this.setTitle("Editing Class: " + name);
+            this.setTitle("Editing Application: " + name);
             this.nameItem.setValue(name);
             this.nameItem.setDisabled(true);
-            this.groupsPickList.setValues(groups.split(", "));
-            this.newClass = false;
+            this.lfnItem.setValue(lfn);
+            this.classesPickList.setValues(classes.split(", "));
+            this.newApplication = false;
         } else {
-            this.setTitle("Add Class");
+            this.setTitle("Add Application");
             this.nameItem.setValue("");
             this.nameItem.setDisabled(false);
-            this.groupsPickList.setValues(new String[]{});
-            this.newClass = true;
+            this.lfnItem.setValue("");
+            if (applicationClass == null) {
+                this.classesPickList.setValues(new String[]{});
+            } else {
+                this.classesPickList.setValues(new String[]{applicationClass});
+            }
+            this.newApplication = true;
         }
     }
 
-    private void save(AppClass appClass) {
+    private void save(Application app) {
 
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
 
-        if (newClass) {
+        if (newApplication) {
             final AsyncCallback<String> callback = new AsyncCallback<String>() {
 
                 public void onFailure(Throwable caught) {
-                    SC.warn("Error executing add class\n" + caught.getMessage());
+                    SC.warn("Error executing add application\n" + caught.getMessage());
                 }
 
                 public void onSuccess(String result) {
                     if (!result.contains("Error: ")) {
-                        ManageClassesTab classTab = (ManageClassesTab) Layout.getInstance().
-                                getTab("manage-classes-tab");
-                        classTab.loadClasses();
-                        setClass(null, null);
+                        ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
+                                getTab("manage-apps-tab");
+                        appsTab.loadApplications();
+                        setApplication(null, null, null);
                     }
                     SC.say(result);
                 }
             };
-            service.addClass(appClass, callback);
+            service.add(app, callback);
 
         } else {
             final AsyncCallback<String> callback = new AsyncCallback<String>() {
 
                 public void onFailure(Throwable caught) {
-                    SC.warn("Error executing update class\n" + caught.getMessage());
+                    SC.warn("Error executing update application\n" + caught.getMessage());
                 }
 
                 public void onSuccess(String result) {
                     if (!result.contains("Error: ")) {
-                        ManageClassesTab classTab = (ManageClassesTab) Layout.getInstance().
-                                getTab("manage-classes-tab");
-                        classTab.loadClasses();
-                        setClass(null, null);
+                        ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
+                                getTab("manage-apps-tab");
+                        appsTab.loadApplications();
+                        setApplication(null, null, null);
                     }
                     SC.say(result);
                 }
             };
-            service.updateClass(appClass, callback);
+            service.update(app, callback);
         }
     }
 
     /**
-     * Loads groups list
+     * Loads classes list
      */
     private void loadData() {
-        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        final AsyncCallback<List<AppClass>> callback = new AsyncCallback<List<AppClass>>() {
 
             public void onFailure(Throwable caught) {
                 SC.warn("Error executing get groups list\n" + caught.getMessage());
             }
 
-            public void onSuccess(List<String> result) {
+            public void onSuccess(List<AppClass> result) {
 
                 List<String> dataList = new ArrayList<String>();
-                for (String g : result) {
-                    if (!g.equals("Administrator")) {
-                        dataList.add(g);
-                    }
+                for (AppClass c : result) {
+                    dataList.add(c.getName());
                 }
-                groupsPickList.setValueMap(dataList.toArray(new String[]{}));
+                classesPickList.setValueMap(dataList.toArray(new String[]{}));
+                if (applicationClass != null) {
+                    classesPickList.setValues(new String[]{applicationClass});
+                    classesPickList.setDisabled(true);
+                } else {
+                    classesPickList.setDisabled(false);
+                }
             }
         };
-        service.getGroups(callback);
+        service.getClasses(callback);
     }
 }

@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,21 +32,54 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.system.application.classes;
+package fr.insalyon.creatis.vip.application.client.view.system.application.classes;
 
-import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.types.VisibilityMode;
+import com.smartgwt.client.widgets.layout.SectionStack;
+import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.tab.Tab;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
 
 /**
  *
  * @author Rafael Silva
  */
-public class ClassRecord extends ListGridRecord {
+public class ManageClassesTab extends Tab {
 
-    public ClassRecord() {
+    private ToolStrip toolStrip;
+    private ClassesStackSection classesStackSection;
+    private EditClassStackSection editStackSection;
+
+    public ManageClassesTab() {
+
+        this.setTitle("Manage Classes");
+        this.setID("manage-classes-tab");
+        this.setCanClose(true);
+
+        VLayout vLayout = new VLayout();
+
+        toolStrip = new ManageClassesToolStrip();
+        vLayout.addMember(toolStrip);
+
+        SectionStack sectionStack = new SectionStack();
+        sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
+        sectionStack.setAnimateSections(true);
+        sectionStack.setCanResizeSections(true);
+
+        classesStackSection = new ClassesStackSection();
+        editStackSection = new EditClassStackSection();
+
+        sectionStack.setSections(classesStackSection, editStackSection);
+        vLayout.addMember(sectionStack);
+
+        this.setPane(vLayout);
     }
 
-    public ClassRecord(String name, String groups) {
-        setAttribute("name", name);
-        setAttribute("groups", groups);
+    public void loadClasses() {
+        classesStackSection.loadData();
+    }
+
+    public void setClass(String name, String groups) {
+        editStackSection.setClass(name, groups);
     }
 }

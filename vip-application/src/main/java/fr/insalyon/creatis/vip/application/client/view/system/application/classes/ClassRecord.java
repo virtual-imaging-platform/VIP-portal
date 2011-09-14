@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,7 +32,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.system.application.application;
+package fr.insalyon.creatis.vip.application.client.view.system.application.classes;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
@@ -40,11 +40,13 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  *
  * @author Rafael Silva
  */
-public class ApplicationRecord extends ListGridRecord {
+public class ClassRecord extends ListGridRecord {
 
-    public ApplicationRecord(String name, String lfn, String classes) {
+    public ClassRecord() {
+    }
+
+    public ClassRecord(String name, String groups) {
         setAttribute("name", name);
-        setAttribute("lfn", lfn);
-        setAttribute("classes", classes);
+        setAttribute("groups", groups);
     }
 }

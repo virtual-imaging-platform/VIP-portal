@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,54 +32,19 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.system.application.application;
+package fr.insalyon.creatis.vip.application.client.view.system.application.application;
 
-import com.smartgwt.client.types.VisibilityMode;
-import com.smartgwt.client.widgets.layout.SectionStack;
-import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
  *
  * @author Rafael Silva
  */
-public class ManageApplicationsTab extends Tab {
+public class ApplicationRecord extends ListGridRecord {
 
-    private ToolStrip toolStrip;
-    private ApplicationsStackSection appsStackSection;
-    private EditApplicationStackSection editStackSection;
-
-    public ManageApplicationsTab(String applicationClass) {
-
-        this.setTitle("Manage Applications");
-        this.setID("manage-apps-tab");
-        this.setCanClose(true);
-
-        VLayout vLayout = new VLayout();
-
-        toolStrip = new ManageApplicationsToolStrip();
-        vLayout.addMember(toolStrip);
-
-        SectionStack sectionStack = new SectionStack();
-        sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
-        sectionStack.setAnimateSections(true);
-        sectionStack.setCanResizeSections(true);
-
-        appsStackSection = new ApplicationsStackSection(applicationClass);
-        editStackSection = new EditApplicationStackSection(applicationClass);
-
-        sectionStack.setSections(appsStackSection, editStackSection);
-        vLayout.addMember(sectionStack);
-
-        this.setPane(vLayout);
-    }
-    
-    public void loadApplications() {
-        appsStackSection.loadData();
-    }
-
-    public void setApplication(String name, String lfn, String classes) {
-        editStackSection.setApplication(name, lfn, classes);
+    public ApplicationRecord(String name, String lfn, String classes) {
+        setAttribute("name", name);
+        setAttribute("lfn", lfn);
+        setAttribute("classes", classes);
     }
 }

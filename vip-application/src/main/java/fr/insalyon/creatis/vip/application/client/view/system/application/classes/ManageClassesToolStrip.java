@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,7 +32,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.system.application.application;
+package fr.insalyon.creatis.vip.application.client.view.system.application.classes;
 
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -44,20 +44,20 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
  *
  * @author Rafael Silva
  */
-public class ManageApplicationsToolStrip extends ToolStrip {
+public class ManageClassesToolStrip extends ToolStrip {
 
-    public ManageApplicationsToolStrip() {
-        
+    public ManageClassesToolStrip() {
+
         this.setWidth100();
 
-        ToolStripButton addButton = new ToolStripButton("Add Application");
+        ToolStripButton addButton = new ToolStripButton("Add Class");
         addButton.setIcon("icon-add.png");
         addButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
-                        getTab("manage-apps-tab");
-                appsTab.setApplication(null, null, null);
+                ManageClassesTab classTab = (ManageClassesTab) Layout.getInstance().
+                        getTab("manage-classes-tab");
+                classTab.setClass(null, null);
             }
         });
         this.addButton(addButton);
@@ -67,9 +67,9 @@ public class ManageApplicationsToolStrip extends ToolStrip {
         refreshButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
-                        getTab("manage-apps-tab");
-                appsTab.loadApplications();
+                ManageClassesTab classTab = (ManageClassesTab) Layout.getInstance().
+                        getTab("manage-classes-tab");
+                classTab.loadClasses();
             }
         });
         this.addButton(refreshButton);
