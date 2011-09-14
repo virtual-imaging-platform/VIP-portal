@@ -35,8 +35,6 @@
 package fr.insalyon.creatis.vip.core.server.dao;
 
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.h2.ApplicationData;
-import fr.insalyon.creatis.vip.core.server.dao.h2.ClassData;
 import fr.insalyon.creatis.vip.core.server.dao.h2.GroupData;
 import fr.insalyon.creatis.vip.core.server.dao.h2.NewsData;
 import fr.insalyon.creatis.vip.core.server.dao.h2.UserData;
@@ -58,16 +56,6 @@ public class H2DAOFactory extends DAOFactory {
     }
 
     private H2DAOFactory() {
-    }
-
-    @Override
-    public ApplicationDAO getApplicationDAO() throws DAOException {
-        return new ApplicationData();
-    }
-
-    @Override
-    public ClassDAO getClassDAO() throws DAOException {
-        return new ClassData();
     }
 
     @Override

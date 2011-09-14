@@ -220,7 +220,8 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
 
             public void onSuccess(String result) {
                 modal.hide();
-                SC.say("Simulation successfully launched with ID: " + result);
+                SC.say("Simulation '" + simulationNameItem.getValueAsString() 
+                        + "' successfully launched.");
             }
         };
         modal.show("Launching simulation...", true);

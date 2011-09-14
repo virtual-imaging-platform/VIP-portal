@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,33 +32,42 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.bean;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+package fr.insalyon.creatis.vip.application.client.rpc;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
 import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class AppClass implements IsSerializable {
+public interface ApplicationServiceAsync {
 
-    private String name;
-    private List<String> groups;
+    public void getApplications(String applicationClass, AsyncCallback<List<Application>> asyncCallback);
+    
+    public void getApplication(String name, AsyncCallback<Application> asyncCallback);
 
-    public AppClass() {
-    }
+    public void add(Application workflowDescriptor, AsyncCallback<String> asyncCallback);
 
-    public AppClass(String name, List<String> groups) {
-        this.name = name;
-        this.groups = groups;
-    }
+    public void update(Application workflowDescriptor, AsyncCallback<String> asyncCallback);
 
-    public List<String> getGroups() {
-        return groups;
-    }
+    public void remove(String name, AsyncCallback<Void> asyncCallback);
+    
+    public void removeClassFromApplication(String applicationClass, String applicationName, AsyncCallback<Void> asyncCallback);
 
-    public String getName() {
-        return name;
-    }
+    public void removeClass(String name, AsyncCallback<Void> asyncCallback);
+
+    public void getClasses(AsyncCallback<List<AppClass>> asyncCallback);
+
+    public void getApplicationsName(String applicationClass, AsyncCallback<List<String>> asyncCallback);
+
+    public void addClass(AppClass c, AsyncCallback<String> asyncCallback);
+
+    public void updateClass(AppClass c, AsyncCallback<String> asyncCallback);
+
+    public void getClass(String className, AsyncCallback<AppClass> asyncCallback);
+
 }

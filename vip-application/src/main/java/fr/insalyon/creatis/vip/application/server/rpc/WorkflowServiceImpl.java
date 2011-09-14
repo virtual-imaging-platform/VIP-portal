@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.application.server.rpc;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.devtools.FileUtils;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
@@ -45,12 +46,12 @@ import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.server.business.InputsBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.application.server.dao.DAOFactory;
 import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAO;
 import fr.insalyon.creatis.vip.application.server.dao.derby.connection.JobsConnection;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.client.bean.Application;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import java.io.BufferedReader;
@@ -152,6 +153,7 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
     public List<String>[] getApplicationsAndUsersList(String applicationClass) {
         try {
             fr.insalyon.creatis.vip.core.server.dao.DAOFactory daoFactory = fr.insalyon.creatis.vip.core.server.dao.DAOFactory.getDAOFactory();
+            ApplicationDAOFactory appDaoFactory = ApplicationDAOFactory.getDAOFactory();
 
             List<String> users = new ArrayList<String>();
             for (User user : daoFactory.getUserDAO().getUsers()) {
@@ -159,7 +161,7 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
             }
 
             List<String> apps = new ArrayList<String>();
-            for (Application app : daoFactory.getApplicationDAO().getApplications(applicationClass)) {
+            for (Application app : appDaoFactory.getApplicationDAO().getApplications(applicationClass)) {
                 apps.add(app.getName());
             }
 

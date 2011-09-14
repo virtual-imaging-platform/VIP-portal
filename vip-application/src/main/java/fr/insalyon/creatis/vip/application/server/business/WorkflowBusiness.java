@@ -34,9 +34,9 @@
  */
 package fr.insalyon.creatis.vip.application.server.business;
 
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
@@ -45,18 +45,17 @@ import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterS
 import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowMoteurConfig;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.GwendiaParser;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.ScuflParser;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.application.server.dao.DAOFactory;
 import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAO;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.client.bean.Application;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -87,21 +86,13 @@ public class WorkflowBusiness {
             String workflowName) throws BusinessException {
 
         try {
-            Application wd = fr.insalyon.creatis.vip.core.server.dao.DAOFactory.getDAOFactory().getApplicationDAO().getApplication(workflowName);
+            Application wd = ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getApplication(workflowName);
+            String path = DataManagerUtil.parseBaseDir(user, wd.getLfn());
 
-            ServerConfiguration conf = ServerConfiguration.getInstance();
-            URI uri = new URI("lfn://" + conf.getDataManagerLFCHost()
-                    + ":" + conf.getDataManagerLFCPort()
-                    + DataManagerUtil.parseBaseDir(user, wd.getLfn()));
-
-            VletAgentClient client = new VletAgentClient(
-                    ServerConfiguration.getInstance().getVletagentHost(),
-                    ServerConfiguration.getInstance().getVletagentPort(),
-                    proxyFileName);
-
-            String workflowPath = client.getRemoteFile(uri.getPath(),
+            DataManagerBusiness dmBusiness = new DataManagerBusiness();
+            String workflowPath = dmBusiness.getRemoteFile(proxyFileName, path,
                     System.getenv("HOME") + "/.platform/workflows/"
-                    + uri.getPath().substring(0, uri.getPath().lastIndexOf("/")));
+                    + path.substring(0, path.lastIndexOf("/")));
 
             if (workflowPath.endsWith(".gwendia")) {
                 return new GwendiaParser().parse(workflowPath).getSources();
@@ -112,16 +103,10 @@ public class WorkflowBusiness {
         } catch (DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
-        } catch (URISyntaxException ex) {
-            logger.error(ex);
-            throw new BusinessException(ex);
         } catch (IOException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         } catch (SAXException ex) {
-            logger.error(ex);
-            throw new BusinessException(ex);
-        } catch (VletAgentClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         } catch (DAOException ex) {
@@ -179,12 +164,17 @@ public class WorkflowBusiness {
                 parameters.add(ps);
             }
 
-            Application wd = fr.insalyon.creatis.vip.core.server.dao.DAOFactory.getDAOFactory().getApplicationDAO().getApplication(workflowName);
-
+            Application wd = ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getApplication(workflowName);
             String path = DataManagerUtil.parseBaseDir(user, wd.getLfn());
-            String workflowPath = System.getenv("HOME") + "/.platform/workflows/" + path;
+            
+            DataManagerBusiness dmBusiness = new DataManagerBusiness();
+            String workflowPath = dmBusiness.getRemoteFile(proxyFileName, path, System.getenv("HOME") + "/.platform/workflows/" 
+                    + path.substring(0, path.lastIndexOf("/")));
 
-            WorkflowMoteurConfig moteur = new WorkflowMoteurConfig(ServerConfiguration.getInstance().getMoteurServer(), workflowPath, parameters);
+            WorkflowMoteurConfig moteur = new WorkflowMoteurConfig(
+                    ServerConfiguration.getInstance().getMoteurServer(), 
+                    workflowPath, parameters);
+            
             moteur.setSettings(settings);
             String ws = moteur.launch(proxyFileName);
 

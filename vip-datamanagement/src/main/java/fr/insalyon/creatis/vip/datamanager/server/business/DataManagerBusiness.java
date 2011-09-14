@@ -42,6 +42,7 @@ import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -135,6 +136,28 @@ public class DataManagerBusiness {
             for (String path : cachedFiles) {
                 client.deleteCachedFile(path);
             }
+        } catch (VletAgentClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+    
+    /**
+     * 
+     * @param proxy
+     * @param remoteFile
+     * @param localDir
+     * @return
+     * @throws BusinessException 
+     */
+    public String getRemoteFile(String proxy, String remoteFile, String localDir) 
+            throws BusinessException {
+        
+        try {
+            VletAgentClient client = DataManagerUtil.getVletAgentClient(proxy);
+
+            return client.getRemoteFile(remoteFile, localDir);
+            
         } catch (VletAgentClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);

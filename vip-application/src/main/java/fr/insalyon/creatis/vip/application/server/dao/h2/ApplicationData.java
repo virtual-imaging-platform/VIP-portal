@@ -32,11 +32,12 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.dao.h2;
+package fr.insalyon.creatis.vip.application.server.dao.h2;
 
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.client.bean.Application;
-import fr.insalyon.creatis.vip.core.server.dao.ApplicationDAO;
+import fr.insalyon.creatis.vip.core.server.dao.h2.PlatformConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

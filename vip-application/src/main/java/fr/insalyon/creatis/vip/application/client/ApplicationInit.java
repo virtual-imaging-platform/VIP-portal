@@ -42,15 +42,17 @@ import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.events.CloseClickHandler;
 import com.smartgwt.client.widgets.tab.events.TabCloseClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationMenu;
 import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.core.client.bean.AppClass;
-import fr.insalyon.creatis.vip.core.client.rpc.ApplicationService;
-import fr.insalyon.creatis.vip.core.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationMenuButton;
+import fr.insalyon.creatis.vip.application.client.view.ApplicationMenuItem;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationTab;
 import fr.insalyon.creatis.vip.core.client.view.layout.CenterTabSet;
 import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
+import fr.insalyon.creatis.vip.core.client.view.system.SystemMenuButton;
 import java.util.List;
 
 /**
@@ -82,6 +84,11 @@ public class ApplicationInit {
                 }
             }
         });
+
+        Context context = Context.getInstance();
+        if (context.isSystemAdmin()) {
+            SystemMenuButton.getInstance().getMenu().addItem(new ApplicationMenuItem());
+        }
 
         // Load application menus
         loadApplicationMenus();

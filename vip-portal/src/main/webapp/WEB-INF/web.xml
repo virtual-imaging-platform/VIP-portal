@@ -45,14 +45,6 @@
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/configurationservice</url-pattern>
     </servlet-mapping>
     <servlet>
-        <servlet-name>ApplicationService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.core.server.rpc.ApplicationServiceImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ApplicationService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/applicationservice</url-pattern>
-    </servlet-mapping>
-    <servlet>
         <servlet-name>NewsService</servlet-name>
         <servlet-class>fr.insalyon.creatis.vip.core.server.rpc.NewsServiceImpl</servlet-class>
     </servlet>
@@ -117,6 +109,14 @@
     <!-- End Data Manager Module -->
     
     <!-- Application Module -->
+    <servlet>
+        <servlet-name>ApplicationService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.application.server.rpc.ApplicationServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ApplicationService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/applicationservice</url-pattern>
+    </servlet-mapping>
     <servlet>
         <servlet-name>WorkflowService</servlet-name>
         <servlet-class>fr.insalyon.creatis.vip.application.server.rpc.WorkflowServiceImpl</servlet-class>

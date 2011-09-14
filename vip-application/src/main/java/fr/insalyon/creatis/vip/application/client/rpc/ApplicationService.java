@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,42 +32,55 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
+package fr.insalyon.creatis.vip.application.client.rpc;
 
-package fr.insalyon.creatis.vip.core.client.rpc;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.core.client.bean.AppClass;
-import fr.insalyon.creatis.vip.core.client.bean.Application;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
 import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public interface ApplicationServiceAsync {
+public interface ApplicationService extends RemoteService {
 
-    public void getApplications(String applicationClass, AsyncCallback<List<Application>> asyncCallback);
+    public static final String SERVICE_URI = "/applicationservice";
+
+    public static class Util {
+
+        public static ApplicationServiceAsync getInstance() {
+
+            ApplicationServiceAsync instance = (ApplicationServiceAsync) GWT.create(ApplicationService.class);
+            ServiceDefTarget target = (ServiceDefTarget) instance;
+            target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
+            return instance;
+        }
+    }
+
+    public List<Application> getApplications(String applicationClass);
     
-    public void getApplication(String name, AsyncCallback<Application> asyncCallback);
+    public List<String> getApplicationsName(String applicationClass);
 
-    public void add(Application workflowDescriptor, AsyncCallback<String> asyncCallback);
+    public Application getApplication(String name);
 
-    public void update(Application workflowDescriptor, AsyncCallback<String> asyncCallback);
+    public String add(Application application);
 
-    public void remove(String name, AsyncCallback<Void> asyncCallback);
+    public String update(Application application);
+
+    public void remove(String name);
     
-    public void removeClassFromApplication(String applicationClass, String applicationName, AsyncCallback<Void> asyncCallback);
+    public void removeClassFromApplication(String applicationClass, String applicationName);
 
-    public void removeClass(String name, AsyncCallback<Void> asyncCallback);
+    public String addClass(AppClass c);
 
-    public void getClasses(AsyncCallback<List<AppClass>> asyncCallback);
+    public String updateClass(AppClass c);
 
-    public void getApplicationsName(String applicationClass, AsyncCallback<List<String>> asyncCallback);
+    public void removeClass(String className);
 
-    public void addClass(AppClass c, AsyncCallback<String> asyncCallback);
+    public List<AppClass> getClasses();
 
-    public void updateClass(AppClass c, AsyncCallback<String> asyncCallback);
-
-    public void getClass(String className, AsyncCallback<AppClass> asyncCallback);
-
+    public AppClass getClass(String className);
 }

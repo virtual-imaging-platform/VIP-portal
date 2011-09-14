@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,39 +32,38 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.bean;
+package fr.insalyon.creatis.vip.application.server.dao;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-import java.util.List;
+import fr.insalyon.creatis.vip.application.server.dao.h2.ApplicationData;
+import fr.insalyon.creatis.vip.application.server.dao.h2.ClassData;
+import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 
 /**
  *
  * @author Rafael Silva
  */
-public class Application implements IsSerializable {
+public class H2DAOFactory extends ApplicationDAOFactory {
 
-    private String name;
-    private String lfn;
-    private List<String> applicationClasses;
+    private static ApplicationDAOFactory instance;
 
-    public Application() {
+    // Singleton
+    protected static ApplicationDAOFactory getInstance() {
+        if (instance == null) {
+            instance = new H2DAOFactory();
+        }
+        return instance;
     }
 
-    public Application(String name, String lfn, List<String> applicationClasses) {
-        this.name = name;
-        this.lfn = lfn;
-        this.applicationClasses = applicationClasses;
+    private H2DAOFactory() {
     }
 
-    public String getLfn() {
-        return lfn;
+    @Override
+    public ApplicationDAO getApplicationDAO() throws DAOException {
+        return new ApplicationData();
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public List<String> getApplicationClasses() {
-        return applicationClasses;
+    @Override
+    public ClassDAO getClassDAO() throws DAOException {
+        return new ClassData();
     }
 }

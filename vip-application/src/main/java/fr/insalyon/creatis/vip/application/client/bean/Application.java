@@ -32,29 +32,39 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.dao;
+package fr.insalyon.creatis.vip.application.client.bean;
 
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.client.bean.Application;
+import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public interface ApplicationDAO {
+public class Application implements IsSerializable {
 
-    public String add(Application workflowDescriptor);
+    private String name;
+    private String lfn;
+    private List<String> applicationClasses;
 
-    public String update(Application workflowDescriptor);
+    public Application() {
+    }
 
-    public void remove(String name);
-    
-    public void removeClassFromApplication(String applicationClass, String name) throws DAOException;
+    public Application(String name, String lfn, List<String> applicationClasses) {
+        this.name = name;
+        this.lfn = lfn;
+        this.applicationClasses = applicationClasses;
+    }
 
-    public List<Application> getApplications(String applicationClass) throws DAOException;
-    
-    public List<String> getApplicationsName(String applicationClass);
+    public String getLfn() {
+        return lfn;
+    }
 
-    public Application getApplication(String name);
+    public String getName() {
+        return name;
+    }
+
+    public List<String> getApplicationClasses() {
+        return applicationClasses;
+    }
 }

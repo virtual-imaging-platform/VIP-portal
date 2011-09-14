@@ -32,53 +32,22 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.rpc;
+package fr.insalyon.creatis.vip.application.server.dao;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import fr.insalyon.creatis.vip.core.client.bean.AppClass;
-import fr.insalyon.creatis.vip.core.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public interface ApplicationService extends RemoteService {
+public interface ClassDAO {
 
-    public static final String SERVICE_URI = "/applicationservice";
+    public String add(AppClass c);
 
-    public static class Util {
+    public String update(AppClass c);
 
-        public static ApplicationServiceAsync getInstance() {
-
-            ApplicationServiceAsync instance = (ApplicationServiceAsync) GWT.create(ApplicationService.class);
-            ServiceDefTarget target = (ServiceDefTarget) instance;
-            target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
-            return instance;
-        }
-    }
-
-    public List<Application> getApplications(String applicationClass);
-    
-    public List<String> getApplicationsName(String applicationClass);
-
-    public Application getApplication(String name);
-
-    public String add(Application application);
-
-    public String update(Application application);
-
-    public void remove(String name);
-    
-    public void removeClassFromApplication(String applicationClass, String applicationName);
-
-    public String addClass(AppClass c);
-
-    public String updateClass(AppClass c);
-
-    public void removeClass(String className);
+    public void remove(String className);
 
     public List<AppClass> getClasses();
 

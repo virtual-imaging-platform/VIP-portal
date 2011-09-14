@@ -41,8 +41,8 @@ import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationsTab;
+import fr.insalyon.creatis.vip.application.client.view.system.application.application.ManageApplicationsTab;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.system.application.application.ManageApplicationsTab;
 
 /**
  *

@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,24 +32,29 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.dao;
+package fr.insalyon.creatis.vip.application.server.dao;
 
-import fr.insalyon.creatis.vip.core.client.bean.AppClass;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public interface ClassDAO {
+public interface ApplicationDAO {
 
-    public String add(AppClass c);
+    public String add(Application workflowDescriptor);
 
-    public String update(AppClass c);
+    public String update(Application workflowDescriptor);
 
-    public void remove(String className);
+    public void remove(String name);
+    
+    public void removeClassFromApplication(String applicationClass, String name) throws DAOException;
 
-    public List<AppClass> getClasses();
+    public List<Application> getApplications(String applicationClass) throws DAOException;
+    
+    public List<String> getApplicationsName(String applicationClass);
 
-    public AppClass getClass(String className);
+    public Application getApplication(String name);
 }

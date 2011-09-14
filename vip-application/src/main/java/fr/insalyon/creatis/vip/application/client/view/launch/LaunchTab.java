@@ -44,9 +44,8 @@ public class LaunchTab extends AbstractLaunchTab {
 
     public LaunchTab(String applicationClass, String applicationName) {
 
-        super("Launch " + applicationName, applicationClass, false,
-                "launch-" + applicationName.toLowerCase() + "-tab");
-        
+        super("Launch " + applicationName, applicationClass, false, applicationName);
+
         initTab(applicationClass);
         createSimulation(applicationName);
         addInputsSection();
@@ -54,9 +53,8 @@ public class LaunchTab extends AbstractLaunchTab {
 
     public LaunchTab(String applicationClass) {
 
-        super("Launch " + applicationClass, applicationClass, true,
-                "launch-" + applicationClass.toLowerCase() + "-tab");
-        
+        super("Launch " + applicationClass, applicationClass, true, applicationClass);
+
         initTab(applicationClass);
     }
 

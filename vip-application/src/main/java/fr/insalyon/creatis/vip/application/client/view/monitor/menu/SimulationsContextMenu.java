@@ -57,12 +57,14 @@ public class SimulationsContextMenu extends Menu {
 
     private ModalWindow modal;
     private String simulationID;
+    private String title;
     
     public SimulationsContextMenu(ModalWindow modal, final String simulationID,
             final String title, final String status, final boolean groupAdmin) {
         
         this.modal = modal;
         this.simulationID = simulationID;
+        this.title = title;
 
         this.setShowShadow(true);
         this.setShadowDepth(10);
@@ -84,7 +86,7 @@ public class SimulationsContextMenu extends Menu {
 
             public void onClick(MenuItemClickEvent event) {
                 SC.confirm("Do you really want to kill this simulation ("
-                        + simulationID + ")?", new BooleanCallback() {
+                        + title + ")?", new BooleanCallback() {
 
                     public void execute(Boolean value) {
                         if (value != null && value) {
@@ -101,7 +103,7 @@ public class SimulationsContextMenu extends Menu {
 
             public void onClick(MenuItemClickEvent event) {
                 SC.confirm("Do you really want to clean this simulation ("
-                        + simulationID + ")?", new BooleanCallback() {
+                        + title + ")?", new BooleanCallback() {
 
                     public void execute(Boolean value) {
                         if (value != null && value) {
@@ -119,7 +121,7 @@ public class SimulationsContextMenu extends Menu {
 
             public void onClick(MenuItemClickEvent event) {
                 SC.confirm("Do you really want to purge this simulation ("
-                        + simulationID + ")?", new BooleanCallback() {
+                        + title + ")?", new BooleanCallback() {
 
                     public void execute(Boolean value) {
                         if (value != null && value) {
@@ -159,7 +161,7 @@ public class SimulationsContextMenu extends Menu {
             }
         };
         service.killWorkflow(simulationID, callback);
-        modal.show("Sending killing signal to " + simulationID + "...", true);
+        modal.show("Sending killing signal to " + title + "...", true);
     }
     
     /**
@@ -183,7 +185,7 @@ public class SimulationsContextMenu extends Menu {
         Context context = Context.getInstance();
         service.cleanWorkflow(simulationID, context.getUserDN(), 
                 context.getProxyFileName(), callback);
-        modal.show("Cleaning simulation " + simulationID + "...", true);
+        modal.show("Cleaning simulation " + title + "...", true);
     }
     
     /**
@@ -205,6 +207,6 @@ public class SimulationsContextMenu extends Menu {
             }
         };
         service.purgeWorkflow(simulationID, callback);
-        modal.show("Purging simulation " + simulationID + "...", true);
+        modal.show("Purging simulation " + title + "...", true);
     }
 }

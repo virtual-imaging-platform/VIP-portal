@@ -32,14 +32,14 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.rpc;
+package fr.insalyon.creatis.vip.application.server.rpc;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.common.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.client.bean.AppClass;
-import fr.insalyon.creatis.vip.core.client.bean.Application;
-import fr.insalyon.creatis.vip.core.client.rpc.ApplicationService;
-import fr.insalyon.creatis.vip.core.server.dao.DAOFactory;
 import java.util.List;
 import org.apache.log4j.Logger;
 
@@ -53,7 +53,7 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
     
     public String add(Application application) {
         try {
-            return DAOFactory.getDAOFactory().getApplicationDAO().add(application);
+            return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().add(application);
         } catch (DAOException ex) {
             return null;
         }
@@ -61,7 +61,7 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
 
     public String update(Application application) {
         try {
-            return DAOFactory.getDAOFactory().getApplicationDAO().update(application);
+            return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().update(application);
         } catch (DAOException ex) {
             return null;
         }
@@ -69,21 +69,21 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
 
     public void remove(String name) {
         try {
-            DAOFactory.getDAOFactory().getApplicationDAO().remove(name);
+            ApplicationDAOFactory.getDAOFactory().getApplicationDAO().remove(name);
         } catch (DAOException ex) {
         }
     }
     
     public void removeClassFromApplication(String applicationClass, String applicationName) {
         try {
-            DAOFactory.getDAOFactory().getApplicationDAO().removeClassFromApplication(applicationClass, applicationName);
+            ApplicationDAOFactory.getDAOFactory().getApplicationDAO().removeClassFromApplication(applicationClass, applicationName);
         } catch (DAOException ex) {
         }
     }
 
     public Application getApplication(String name) {
         try {
-            return DAOFactory.getDAOFactory().getApplicationDAO().getApplication(name);
+            return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getApplication(name);
         } catch (DAOException ex) {
             return null;
         }
@@ -91,7 +91,7 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
     
     public List<Application> getApplications(String applicationClass) {
         try {
-            return DAOFactory.getDAOFactory().getApplicationDAO().getApplications(applicationClass);
+            return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getApplications(applicationClass);
         } catch (DAOException ex) {
             return null;
         }
@@ -99,7 +99,7 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
 
     public String addClass(AppClass c) {
         try {
-            return DAOFactory.getDAOFactory().getClassDAO().add(c);
+            return ApplicationDAOFactory.getDAOFactory().getClassDAO().add(c);
         } catch (DAOException ex) {
             return null;
         }
@@ -107,7 +107,7 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
 
     public String updateClass(AppClass c) {
         try {
-            return DAOFactory.getDAOFactory().getClassDAO().update(c);
+            return ApplicationDAOFactory.getDAOFactory().getClassDAO().update(c);
         } catch (DAOException ex) {
             return null;
         }
@@ -115,14 +115,14 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
 
     public void removeClass(String name) {
         try {
-            DAOFactory.getDAOFactory().getClassDAO().remove(name);
+            ApplicationDAOFactory.getDAOFactory().getClassDAO().remove(name);
         } catch (DAOException ex) {
         }
     }
 
     public List<AppClass> getClasses() {
         try {
-            return DAOFactory.getDAOFactory().getClassDAO().getClasses();
+            return ApplicationDAOFactory.getDAOFactory().getClassDAO().getClasses();
         } catch (DAOException ex) {
             return null;
         }
@@ -130,7 +130,7 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
 
     public List<String> getApplicationsName(String applicationClass) {
         try {
-            return DAOFactory.getDAOFactory().getApplicationDAO().getApplicationsName(applicationClass);
+            return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getApplicationsName(applicationClass);
         } catch (DAOException ex) {
             return null;
         }
@@ -138,7 +138,7 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
 
     public AppClass getClass(String className) {
         try {
-            return DAOFactory.getDAOFactory().getClassDAO().getClass(className);
+            return ApplicationDAOFactory.getDAOFactory().getClassDAO().getClass(className);
         } catch (DAOException ex) {
             return null;
         }

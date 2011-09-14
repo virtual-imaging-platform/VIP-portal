@@ -32,32 +32,49 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.dao;
+package fr.insalyon.creatis.vip.application.client.view;
 
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import com.smartgwt.client.widgets.menu.Menu;
+import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.events.ClickHandler;
+import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+import fr.insalyon.creatis.vip.application.client.view.system.application.application.ManageApplicationsTab;
+import fr.insalyon.creatis.vip.application.client.view.system.application.classes.ManageClassesTab;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
  *
  * @author Rafael Silva
  */
-public abstract class DAOFactory {
+public class ApplicationMenuItem extends MenuItem {
 
-    public static final int H2 = 1;
-    public static int factory = H2;
+    public ApplicationMenuItem() {
+        
+        this.setTitle("Applications");
+        this.setIcon("icon-application.png");
+        
+        // Application
+        Menu menu = new Menu();
+        MenuItem manageApps = new MenuItem("Manage Applications");
+        manageApps.setIcon("icon-application-manage.png");
+        manageApps.addClickHandler(new ClickHandler() {
 
-    public static DAOFactory getDAOFactory() {
+            public void onClick(MenuItemClickEvent event) {
+                Layout.getInstance().addTab(new ManageApplicationsTab(null));
+            }
+        });
+        
+        MenuItem manageClasses = new MenuItem("Manage Classes");
+        manageClasses.setIcon("icon-class.png");
+        manageClasses.addClickHandler(new ClickHandler() {
 
-        switch (factory) {
-            case H2:
-                return H2DAOFactory.getInstance();
-            default:
-                return null;
-        }
+            public void onClick(MenuItemClickEvent event) {
+                Layout.getInstance().addTab(new ManageClassesTab());
+            }
+        });
+        
+        menu.setItems(manageApps, manageClasses);
+        
+        this.setSubmenu(menu);
     }
-
-    public abstract GroupDAO getGroupDAO() throws DAOException;
-
-    public abstract UserDAO getUserDAO() throws DAOException;
-
-    public abstract NewsDAO getNewsDAO() throws DAOException;
 }

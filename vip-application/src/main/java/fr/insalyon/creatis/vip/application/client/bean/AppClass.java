@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.rafaelsilva.com
+ * http://www.creatis.insa-lyon.fr/~silva
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,32 +32,33 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.dao;
+package fr.insalyon.creatis.vip.application.client.bean;
 
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import com.google.gwt.user.client.rpc.IsSerializable;
+import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public abstract class DAOFactory {
+public class AppClass implements IsSerializable {
 
-    public static final int H2 = 1;
-    public static int factory = H2;
+    private String name;
+    private List<String> groups;
 
-    public static DAOFactory getDAOFactory() {
-
-        switch (factory) {
-            case H2:
-                return H2DAOFactory.getInstance();
-            default:
-                return null;
-        }
+    public AppClass() {
     }
 
-    public abstract GroupDAO getGroupDAO() throws DAOException;
+    public AppClass(String name, List<String> groups) {
+        this.name = name;
+        this.groups = groups;
+    }
 
-    public abstract UserDAO getUserDAO() throws DAOException;
+    public List<String> getGroups() {
+        return groups;
+    }
 
-    public abstract NewsDAO getNewsDAO() throws DAOException;
+    public String getName() {
+        return name;
+    }
 }

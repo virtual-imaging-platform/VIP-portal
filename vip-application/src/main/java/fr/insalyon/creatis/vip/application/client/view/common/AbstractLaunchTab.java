@@ -52,15 +52,15 @@ public abstract class AbstractLaunchTab extends Tab {
     protected AbstractLaunchStackSection launchSection;
     protected InputsStackSection inputsSection;
 
-    public AbstractLaunchTab(String title, String applicationClass, 
+    public AbstractLaunchTab(String title, String applicationClass,
             boolean showToolStrip, String id) {
 
         this.setTitle(title);
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
-        this.setID(id);
+        this.setID("launch-" + id.toLowerCase() + "-tab");
 
-        launchToolStrip = new LaunchToolStrip(applicationClass, id);
+        launchToolStrip = new LaunchToolStrip(applicationClass, this.getID());
 
         VLayout vLayout = new VLayout();
         if (showToolStrip) {
