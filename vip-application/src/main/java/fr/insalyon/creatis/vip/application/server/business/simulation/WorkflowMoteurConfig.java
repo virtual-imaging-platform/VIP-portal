@@ -35,22 +35,16 @@
 package fr.insalyon.creatis.vip.application.server.business.simulation;
 
 import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
-import fr.insalyon.creatis.vip.application.server.business.util.ProxyUtil;
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
-import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.List;
 import javax.xml.rpc.ServiceException;
-import localhost.moteur_service_wsdl.Moteur_ServiceLocator;
-import org.apache.axis.EngineConfiguration;
-import org.apache.axis.configuration.FileProvider;
 
 /**
  *
  * @author Rafael Silva
  * @author kboulebiar
  */
-public class WorkflowMoteurConfig {
+public abstract class WorkflowMoteurConfig {
 
     // content of the xml file that describe the workflow (read on a file) */
     String contentXMLworkflow;
@@ -62,21 +56,23 @@ public class WorkflowMoteurConfig {
     String _settings = "";
 
     /**
-     * 
+     *
      * @param URIaddrWS URI Adress of the web service
      */
     public WorkflowMoteurConfig(String URIaddrWS) {
         addressWS = URIaddrWS;
     }
+
+    public WorkflowMoteurConfig() {
+    }
+
     /**
      * 
      * @param URIaddrWS URI Adress of the web service
      * @param workflowPath Path of the xml worflow descriptor file
      * @param parameters List of parameters
      */
-    public WorkflowMoteurConfig(String URIaddrWS, String workflowPath, List<ParameterSweep> parameters) {
-
-        addressWS = URIaddrWS;
+    public WorkflowMoteurConfig(String workflowPath, List<ParameterSweep> parameters) {
 
         //read the workflow config file
         contentXMLworkflow = FileUtil.read(workflowPath);
@@ -96,72 +92,11 @@ public class WorkflowMoteurConfig {
         contentXMLInput.append("</d:inputdata>\n");
     }
 
-    /**
-     *  Call the WS that is going to run the workflow and return the HTTP
-     *  link that can be used to monitor the workflow status.
-     * @return the HTTP link that shows the workflow current status
-     * @throws ServiceException
-     * @throws RemoteException
-     * @throws VlException
-     */
-    public String launch(String proxyFileName) throws RemoteException, ServiceException {
-        
-        System.setProperty("javax.net.ssl.trustStore", ServerConfiguration.getInstance().getTruststoreFile());
-        System.setProperty("javax.net.ssl.trustStorePassword", ServerConfiguration.getInstance().getTruststorePass());
-        System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+    public abstract String launch(String proxyFileName, String userDN) throws RemoteException, ServiceException;
 
-        // String settings = "This is going to contain settings...";
-        // Get Proxy from current User's context
-        String strProxy = ProxyUtil.readAsString(proxyFileName);
+    public abstract void kill(String workflowID) throws RemoteException, ServiceException;
 
-        //configure WS with the specific wsdd file (fix pb of conflict with grid service)
-        String resourcename = "moteur-client-config.wsdd";
-        InputStream is = this.getClass().getClassLoader().getResourceAsStream(resourcename);
-        EngineConfiguration engineConfig = new FileProvider(is);
-        Moteur_ServiceLocator wfS = new Moteur_ServiceLocator(addressWS, engineConfig);
-
-        return wfS.getmoteur_service().workflowSubmit(contentXMLworkflow, contentXMLInput.toString(), strProxy, _settings);
-    }
-
-    /**
-     * 
-     * @param workflowID
-     * @throws RemoteException
-     * @throws ServiceException
-     */
-    public void kill(String workflowID) throws RemoteException, ServiceException {
-
-        System.setProperty("javax.net.ssl.trustStore", ServerConfiguration.getInstance().getTruststoreFile());
-        System.setProperty("javax.net.ssl.trustStorePassword", ServerConfiguration.getInstance().getTruststorePass());
-        System.setProperty("javax.net.ssl.trustStoreType", "JKS");
-
-        String resourcename = "moteur-client-config.wsdd";
-        InputStream is = this.getClass().getClassLoader().getResourceAsStream(resourcename);
-        EngineConfiguration engineConfig = new FileProvider(is);
-        Moteur_ServiceLocator wfS = new Moteur_ServiceLocator(addressWS, engineConfig);
-
-        wfS.getmoteur_service().killWorkflow(workflowID);
-    }
-    
-    /**
-     * 
-     * @param workflowID
-     * @throws RemoteException
-     * @throws ServiceException
-     */
-    public String getStatus(String workflowID) throws RemoteException, ServiceException {
-
-        System.setProperty("javax.net.ssl.trustStore", ServerConfiguration.getInstance().getTruststoreFile());
-        System.setProperty("javax.net.ssl.trustStorePassword", ServerConfiguration.getInstance().getTruststorePass());
-        System.setProperty("javax.net.ssl.trustStoreType", "JKS");
-
-        String resourcename = "moteur-client-config.wsdd";
-        InputStream is = this.getClass().getClassLoader().getResourceAsStream(resourcename);
-        EngineConfiguration engineConfig = new FileProvider(is);
-        Moteur_ServiceLocator wfS = new Moteur_ServiceLocator(addressWS, engineConfig);
-
-        return wfS.getmoteur_service().getWorkflowStatus(workflowID);
-    }
+    public abstract String getStatus(String workflowID) throws RemoteException, ServiceException;
 
     public String getContentXMLworkflow() {
         return contentXMLworkflow;
@@ -177,14 +112,6 @@ public class WorkflowMoteurConfig {
 
     public void setContentXMLInput(String contentXMLInput) {
         this.contentXMLInput = new StringBuffer(contentXMLInput);
-    }
-
-    public String getAddressWS() {
-        return addressWS;
-    }
-
-    public void setAddressWS(String addressWS) {
-        this.addressWS = addressWS;
     }
 
     public String getSettings() {
