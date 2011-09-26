@@ -51,8 +51,9 @@
         <dependency>
             <groupId>fr.cnrs.i3s</groupId>
             <artifactId>NeuSemStore-simulation-objects</artifactId>
-            <version>0.0.7</version>
+            <version>0.0.9</version>
         </dependency>
+
     </dependencies>
     <build>
         <plugins>
