@@ -63,9 +63,9 @@ class ModelDisplayTab extends Tab {
     protected VLayout layout;
     protected SimulationObjectModel model = null;
 
-    public ModelDisplayTab(final String uri) {
+    public ModelDisplayTab(final String uri, String title) {
 
-        this.setTitle("Model");
+        this.setTitle(title);
         this.setID(uri);
         this.setCanClose(true);
 

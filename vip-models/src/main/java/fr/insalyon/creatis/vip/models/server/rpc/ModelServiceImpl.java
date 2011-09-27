@@ -158,28 +158,145 @@ public class ModelServiceImpl extends RemoteServiceServlet implements ModelServi
         SimulationObjectModelFactory.deleteAllModelsInTheTripleStore();
     }
 
-    public List<SimulationObjectModelLight> searchModels(String query) {
-        boolean[] scope = new boolean[]{true, true, true, true, true};
+    public List<SimulationObjectModelLight> searchModels(String query, String[] types, String[] time) {
+
+//        System.out.println("Model part: " + query + " ; types: ");
+//        for (int i = 0; i < types.length; i++) {
+//            System.out.print(types[i].toString());
+//        }
+//        System.out.print(" time: ");
+//        for (int i = 0; i < time.length; i++) {
+//            System.out.print(time[i].toString());
+//        }
+//        System.out.println("");
+
+        boolean anat = false;
+        for (int i = 0; i < types.length; i++) {
+            if (types[i].toLowerCase().equals("anatomical")) {
+                anat = true;
+            }
+        }
+
+        boolean path = false;
+        for (int i = 0; i < types.length; i++) {
+            if (types[i].toLowerCase().equals("pathological")) {
+                path = true;
+            }
+        }
+
+        boolean foreign = false;
+        for (int i = 0; i < types.length; i++) {
+            if (types[i].toLowerCase().equals("foreign object")) {
+                foreign = true;
+            }
+        }
+
+        boolean external = false;
+        for (int i = 0; i < types.length; i++) {
+            if (types[i].toLowerCase().equals("external agent")) {
+                external = true;
+            }
+        }
+
+        boolean longi = false;
+        for (int i = 0; i < time.length; i++) {
+            if (time[i].toLowerCase().equals("longitudinal follow-up")) {
+                longi = true;
+            }
+        }
+
+        boolean move = false;
+        for (int i = 0; i < time.length; i++) {
+            if (time[i].toLowerCase().equals("movement")) {
+                move = true;
+            }
+        }
+
+        boolean geom = false;
+        for (int i = 0; i < types.length; i++) {
+            if (types[i].toLowerCase().equals("geometrical")) {
+                geom = true;
+            }
+        }
         ArrayList<SimulationObjectModelLight> result = new ArrayList<SimulationObjectModelLight>();
 
         List<SimulationObjectModelLight> somls = listAllModels();
         for (SimulationObjectModelLight soml : somls) {
             SimulationObjectModel som = SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(soml.getURI());
-            for (Timepoint t : som.getTimepoints()) {
-                for (Instant it : t.getInstants()) {
-                    for (ObjectLayer ol : it.getObjectLayers()) {
-                        for (ObjectLayerPart olp : ol.getLayerParts()) {
-                            if (matches(olp.getReferredObject().getObjectName().replace("_", " ") + " (" + olp.getFormat() + ": ", query)) {
-                                if (!result.contains(soml)) {
-                                    result.add(soml);
+
+//            System.out.println("looking at SOML " + soml.getModelName());
+//
+//            if (soml.isLongitudinal()) {
+//                System.out.println("SOML is longitudinal");
+//            }
+//            if (soml.isMoving()) {
+//                System.out.println("SOML is moving");
+//            }
+//
+//            if (soml.getSemanticAxes()[0]) {
+//                System.out.println("SOML is anatomical");
+//            }
+//
+//            if (soml.getSemanticAxes()[1]) {
+//                System.out.println("SOML is pathological");
+//            }
+//            if (soml.getSemanticAxes()[2]) {
+//                System.out.println("SOML is geometricaal");
+//            }
+//            if (soml.getSemanticAxes()[3]) {
+//                System.out.println("SOML is foreign");
+//            }
+//
+//            if (soml.getSemanticAxes()[4]) {
+//                System.out.println("SOML is external");
+//            }
+
+            if ((soml.isLongitudinal() || !longi)) {
+
+                if (soml.isMoving() || !move) {
+                    if (soml.getSemanticAxes()[0] || !anat) {
+                        if (soml.getSemanticAxes()[1] || !path) {
+                            if (soml.getSemanticAxes()[3] || !foreign) {
+                                if (soml.getSemanticAxes()[2] || !geom) {
+                                    if (soml.getSemanticAxes()[4] || !external) {
+
+                                        for (Timepoint t : som.getTimepoints()) {
+                                            for (Instant it : t.getInstants()) {
+                                                for (ObjectLayer ol : it.getObjectLayers()) {
+                                                    for (ObjectLayerPart olp : ol.getLayerParts()) {
+                                                        if (matches(olp.getReferredObject().getObjectName().replace("_", " ") + " (" + olp.getFormat() + ": ", query)) {
+                                                            if (!result.contains(soml)) {
+                                                                result.add(soml);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                    } else {
+                                       // System.out.println("Don't include " + soml.getModelName() + " because it has no exernal agent");
+                                    }
+                                } else {
+                                   // System.out.println("Don't include " + soml.getModelName() + " because it has no geometrical object");
                                 }
+                            } else {
+                               // System.out.println("Don't include " + soml.getModelName() + " because it has no foreign body");
                             }
+                        } else {
+                           // System.out.println("Don't include " + soml.getModelName() + " because it's has not pathology");
                         }
+                    } else {
+                       // System.out.println("Don't include " + soml.getModelName() + " because it has no anatomy");
                     }
+                } else {
+                    //System.out.println("Don't include " + soml.getModelName() + " because it's not moving");
                 }
+
+            } else {
+               // System.out.println("Don't include " + soml.getModelName() + " because it's not longitudinal");
             }
         }
-
         return result;
     }
 

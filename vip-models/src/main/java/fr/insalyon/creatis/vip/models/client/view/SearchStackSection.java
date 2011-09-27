@@ -5,11 +5,13 @@
 package fr.insalyon.creatis.vip.models.client.view;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
@@ -32,7 +34,9 @@ public class SearchStackSection extends SectionStackSection {
     private DynamicForm form;
     private TextItem queryItem;
     protected ModalWindow modal;
-
+    private SelectItem typesPickList;
+    private SelectItem timePickList;
+ 
     public SearchStackSection(String tabID) {
 
         this.tabID = tabID;
@@ -63,6 +67,22 @@ public class SearchStackSection extends SectionStackSection {
         form.setWidth(500);
         form.setNumCols(4);
 
+        typesPickList = new SelectItem();
+        typesPickList.setTitle("Model layers");
+        typesPickList.setMultiple(true);
+        typesPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
+        typesPickList.setWidth(350);
+        String[] values = {"Geometrical", "Anatomical","Pathological","Foreign object","External agent"};
+        typesPickList.setValueMap(values);
+        
+        timePickList = new SelectItem();
+        timePickList.setTitle("Time");
+        timePickList.setMultiple(true);
+        timePickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
+        timePickList.setWidth(350);
+        String[] values1 = {"Longitudinal follow-up","Movement"};
+        timePickList.setValueMap(values1);
+        
         submitButton = new IButton("Search");
         submitButton.addClickHandler(new ClickHandler() {
 
@@ -82,9 +102,11 @@ public class SearchStackSection extends SectionStackSection {
                     }
                 };
                 modal.show("Searching Models...", true);
-                ms.searchModels(queryItem.getEnteredValue(), callback);
+
+                
+                ms.searchModels(queryItem.getEnteredValue(), typesPickList.getValues(),timePickList.getValues(),callback);
             }
         });
-        form.setFields(queryItem);
+        form.setFields(queryItem,typesPickList,timePickList);
     }
 }

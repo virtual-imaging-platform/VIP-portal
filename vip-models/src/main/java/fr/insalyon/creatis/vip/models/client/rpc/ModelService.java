@@ -80,5 +80,5 @@ public interface ModelService extends RemoteService {
 
     public void deleteAllModelsInTheTripleStore();
     
-    public List<SimulationObjectModelLight> searchModels(String query);
+    public List<SimulationObjectModelLight> searchModels(String query, String[] types, String[] time);
 }

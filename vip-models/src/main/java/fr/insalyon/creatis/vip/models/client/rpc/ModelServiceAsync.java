@@ -65,5 +65,5 @@ public interface ModelServiceAsync {
 
     public void deleteAllModelsInTheTripleStore(AsyncCallback<Void> asyncCallback);
     
-    public void searchModels(String query, AsyncCallback<List<SimulationObjectModelLight>> asyncCallback);
+    public void searchModels(String query, String[] types, String[] time, AsyncCallback<List<SimulationObjectModelLight>> asyncCallback);
 }

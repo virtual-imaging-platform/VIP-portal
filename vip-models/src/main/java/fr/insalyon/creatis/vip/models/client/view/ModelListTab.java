@@ -99,6 +99,7 @@ public class ModelListTab extends Tab {
 
             public void onClick(ClickEvent event) {
                 ModelListTab modelsTab = (ModelListTab) Layout.getInstance().getTab("model-browse-tab");
+                searchSection.setExpanded(false);
                 modelsTab.loadModels();
             }
         });
@@ -204,8 +205,8 @@ public class ModelListTab extends Tab {
         grid.setShowRowNumbers(true);
         grid.setShowEmptyMessage(true);
         // grid.setSelectionType(SelectionStyle.SIMPLE);
-        grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
-        grid.setEmptyMessage("<br>No data available.");
+      //  grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
+        grid.setEmptyMessage("<br>No result.");
 
         //    ListGridField statusIcoField = FieldUtil.getIconGridField("statusIco");
         ListGridField modelNameField = new ListGridField("name", "Name");
@@ -231,7 +232,7 @@ public class ModelListTab extends Tab {
         rowMouseDownHandler = grid.addRowMouseDownHandler(new RowMouseDownHandler() {
 
             public void onRowMouseDown(RowMouseDownEvent event) {
-                Layout.getInstance().addTab(new ModelDisplayTab(event.getRecord().getAttribute("uri")));
+                Layout.getInstance().addTab(new ModelDisplayTab(event.getRecord().getAttribute("uri"),event.getRecord().getAttribute("name")));
             }
         });
     }
