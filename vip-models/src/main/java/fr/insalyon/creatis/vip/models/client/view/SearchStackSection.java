@@ -36,7 +36,7 @@ public class SearchStackSection extends SectionStackSection {
     public SearchStackSection(String tabID) {
 
         this.tabID = tabID;
-        queryItem = new TextItem("query", "Query");
+        queryItem = new TextItem("query", "Model part");
         queryItem.setWidth(350);
         queryItem.setRequired(true);
 
