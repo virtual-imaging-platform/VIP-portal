@@ -64,4 +64,6 @@ public interface ModelServiceAsync {
     public void removeObjectModelFromTripleStore(String uri, AsyncCallback<Void> asyncCallback);
 
     public void deleteAllModelsInTheTripleStore(AsyncCallback<Void> asyncCallback);
+    
+    public void searchModels(String query, AsyncCallback<List<SimulationObjectModelLight>> asyncCallback);
 }

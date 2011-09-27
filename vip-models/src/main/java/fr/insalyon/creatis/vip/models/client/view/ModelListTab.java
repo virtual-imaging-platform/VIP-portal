@@ -36,17 +36,24 @@ package fr.insalyon.creatis.vip.models.client.view;
 
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.data.DataSource;
+import com.smartgwt.client.data.fields.DataSourceTextField;
 import com.smartgwt.client.types.SelectionAppearance;
+import com.smartgwt.client.types.VisibilityMode;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.validator.RegExpValidator;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.RowMouseDownEvent;
 import com.smartgwt.client.widgets.grid.events.RowMouseDownHandler;
+import com.smartgwt.client.widgets.layout.SectionStack;
+import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -69,10 +76,11 @@ public class ModelListTab extends Tab {
     protected ModalWindow modal;
     protected HandlerRegistration rowContextClickHandler;
     protected HandlerRegistration rowMouseDownHandler;
+    private SearchStackSection searchSection;
 
     public ModelListTab() {
 
-        this.setTitle("List models");
+        this.setTitle("Model repository");
         this.setID("model-browse-tab");
         this.setCanClose(true);
 
@@ -138,12 +146,42 @@ public class ModelListTab extends Tab {
                 });
             }
         });
-        toolStrip.addButton(deleteButton);
+        //disable model deletion for now
+        //toolStrip.addButton(deleteButton);
+
+
+
+        //Search
+
+
+        searchSection = new SearchStackSection(this.getID());
+        SectionStackSection gridSection = new SectionStackSection();
+
+        gridSection.setCanCollapse(false);
+        gridSection.setShowHeader(false);
+        gridSection.addItem(grid);
+
+        SectionStack sectionStack = new SectionStack();
+        sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
+        sectionStack.setAnimateSections(true);
+
+        sectionStack.setSections(gridSection, searchSection);
+
+        ToolStripButton searchButton = new ToolStripButton();
+        searchButton.setIcon("icon-search.png");
+        searchButton.setTitle("Search");
+        searchButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                searchSection.setExpanded(true);
+            }
+        });
+        toolStrip.addButton(searchButton);
 
         loadModels();
 
         layout.addMember(toolStrip);
-        layout.addMember(grid);
+        layout.addMember(sectionStack);
 
         //this will be triggered from the context menu
         //TODO: call model.storageURL when Germain implements it
@@ -208,50 +246,54 @@ public class ModelListTab extends Tab {
             }
 
             public void onSuccess(List<SimulationObjectModelLight> result) {
-                List<SimulationObjectModelLightRecord> dataList = new ArrayList<SimulationObjectModelLightRecord>();
-                for (SimulationObjectModelLight s : result) {
-                    String type = "";
-                    boolean[] saxes = s.getSemanticAxes();
-                    boolean init = false;
-                    if (saxes[0]) {
-                        type += "anatomical";
-                        init = true;
-                    }
-                    if (saxes[1]) {
-                        if (init) {
-                            type += ", ";
-                        }
-                        init = true;
-                        type += "pathological";
-                    }
-                    if (saxes[2]) {
-                        if (init) {
-                            type += ", ";
-                        }
-                        init = true;
-                        type += "geometrical";
-                    }
-                    if (saxes[3]) {
-                        if (init) {
-                            type += ", ";
-                        }
-                        init = true;
-                        type += "foreign object";
-                    }
-                    if (saxes[4]) {
-                        if (init) {
-                            type += ", ";
-                        }
-                        init = true;
-                        type += "external agent";
-                    }
-                    dataList.add(new SimulationObjectModelLightRecord(s.getModelName(), type, "" + s.isLongitudinal(), "" + s.isMoving(), s.getURI()));
-                }
-                grid.setData(dataList.toArray(new SimulationObjectModelLightRecord[]{}));
+                setModelList(result);
                 modal.hide();
             }
         };
         ms.listAllModels(callback);
         modal.show("Loading Models...", true);
+    }
+
+    public void setModelList(List<SimulationObjectModelLight> result) {
+        List<SimulationObjectModelLightRecord> dataList = new ArrayList<SimulationObjectModelLightRecord>();
+        for (SimulationObjectModelLight s : result) {
+            String type = "";
+            boolean[] saxes = s.getSemanticAxes();
+            boolean init = false;
+            if (saxes[0]) {
+                type += "anatomical";
+                init = true;
+            }
+            if (saxes[1]) {
+                if (init) {
+                    type += ", ";
+                }
+                init = true;
+                type += "pathological";
+            }
+            if (saxes[2]) {
+                if (init) {
+                    type += ", ";
+                }
+                init = true;
+                type += "geometrical";
+            }
+            if (saxes[3]) {
+                if (init) {
+                    type += ", ";
+                }
+                init = true;
+                type += "foreign object";
+            }
+            if (saxes[4]) {
+                if (init) {
+                    type += ", ";
+                }
+                init = true;
+                type += "external agent";
+            }
+            dataList.add(new SimulationObjectModelLightRecord(s.getModelName(), type, "" + s.isLongitudinal(), "" + s.isMoving(), s.getURI()));
+        }
+        grid.setData(dataList.toArray(new SimulationObjectModelLightRecord[]{}));
     }
 }

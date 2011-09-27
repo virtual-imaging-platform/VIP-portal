@@ -109,7 +109,7 @@ class ModelImportTab extends Tab {
                         SC.warn("No annotation file found in zip file");
                     } else {
                         modal.show("Uploading " + zipFile, true);
-                        final String lfn = uploadModel(zipFile);
+                        final String lfn = uploadModel(zipFile,"uri");
                         modal.show("Committing annotations to the Triple Store", true);
                         //commit rdf annotations
                         ModelServiceAsync ms = ModelService.Util.getInstance();
@@ -295,7 +295,7 @@ class ModelImportTab extends Tab {
         }
     }
 
-    private String uploadModel(String file) {
+    private String uploadModel(String file,String URI) {
         //uploading zip file
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
@@ -312,10 +312,11 @@ class ModelImportTab extends Tab {
         TransferPoolServiceAsync tps = new TransferPoolService.Util().getInstance();
         String lfn = ModelConstants.MODEL_HOME;
         //TODO: check if this exists
-        tps.uploadFile(Context.getInstance().getUser(), lfn, file, 
+        String name = URI+"-"+file;
+        tps.uploadFile(Context.getInstance().getUser(), lfn, name, 
                 Context.getInstance().getUserDN(), 
                 Context.getInstance().getProxyFileName(), callback);
 
-        return lfn + "/" + file;
+        return lfn + "/" + name;
     }
 }

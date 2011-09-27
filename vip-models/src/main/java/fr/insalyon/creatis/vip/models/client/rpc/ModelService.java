@@ -79,4 +79,6 @@ public interface ModelService extends RemoteService {
     public void removeObjectModelFromTripleStore(String uri);
 
     public void deleteAllModelsInTheTripleStore();
+    
+    public List<SimulationObjectModelLight> searchModels(String query);
 }

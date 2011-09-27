@@ -37,10 +37,16 @@ package fr.insalyon.creatis.vip.models.server.rpc;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectModelFactory;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectModelQueryer;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectSearcher;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Instant;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectLayer;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectLayerPart;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectMatch;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
 import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Timepoint;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -150,5 +156,34 @@ public class ModelServiceImpl extends RemoteServiceServlet implements ModelServi
 
     public void deleteAllModelsInTheTripleStore() {
         SimulationObjectModelFactory.deleteAllModelsInTheTripleStore();
+    }
+
+    public List<SimulationObjectModelLight> searchModels(String query) {
+        boolean[] scope = new boolean[]{true, true, true, true, true};
+        ArrayList<SimulationObjectModelLight> result = new ArrayList<SimulationObjectModelLight>();
+
+        List<SimulationObjectModelLight> somls = listAllModels();
+        for (SimulationObjectModelLight soml : somls) {
+            SimulationObjectModel som = SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(soml.getURI());
+            for (Timepoint t : som.getTimepoints()) {
+                for (Instant it : t.getInstants()) {
+                    for (ObjectLayer ol : it.getObjectLayers()) {
+                        for (ObjectLayerPart olp : ol.getLayerParts()) {
+                            if (matches(olp.getReferredObject().getObjectName().replace("_", " ") + " (" + olp.getFormat() + ": ", query)) {
+                                if (!result.contains(soml)) {
+                                    result.add(soml);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private boolean matches(String target, String query) {
+        return ((target.toLowerCase().indexOf(query.toLowerCase()) != -1) || (query.toLowerCase().indexOf(target.toLowerCase()) != -1));
     }
 }
