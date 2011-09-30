@@ -34,8 +34,10 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server.rpc;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
@@ -46,131 +48,209 @@ import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import java.util.List;
 import java.util.Map;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DataManagerServiceImpl extends RemoteServiceServlet implements DataManagerService {
+public class DataManagerServiceImpl extends AbstractRemoteServiceServlet implements DataManagerService {
 
-    public void configureDataManager(String user, String proxyFileName) throws DataManagerException {
+    private static final Logger logger = Logger.getLogger(DataManagerServiceImpl.class);
+    private DataManagerBusiness dataManagerBusiness;
+    private LFCBusiness lfcBusiness;
+    private TransferPoolBusiness transferPoolBusiness;
+
+    public DataManagerServiceImpl() {
+
+        dataManagerBusiness = new DataManagerBusiness();
+        lfcBusiness = new LFCBusiness();
+        transferPoolBusiness = new TransferPoolBusiness();
+    }
+
+    public List<Data> listDir(String baseDir, boolean refresh) throws DataManagerException {
 
         try {
-            DataManagerBusiness business = new DataManagerBusiness();
-            business.configureDataManager(user, proxyFileName);
+            return lfcBusiness.listDir(getSessionUser().getFullName(), baseDir, refresh);
 
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
         } catch (BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
 
-    public List<Data> listDir(String user, String proxyFileName, String baseDir, 
-            boolean refresh) throws DataManagerException {
+    public void delete(String path) throws DataManagerException {
+
         try {
-            LFCBusiness business = new LFCBusiness();
-            return business.listDir(user, proxyFileName, baseDir, refresh);
-            
+            trace(logger, "Deleting: " + path);
+            lfcBusiness.delete(getSessionUser().getFullName(), path);
+
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
         } catch (BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
 
-    public void delete(String user, String proxyFileName, String path) throws DataManagerException {
-        
+    public void delete(List<String> paths) throws DataManagerException {
+
         try {
-            LFCBusiness business = new LFCBusiness();
-            business.delete(user, proxyFileName, path);
-            
+            trace(logger, "Deleting: " + paths);
+            lfcBusiness.delete(getSessionUser().getFullName(), paths);
+
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
         } catch (BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
 
-    public void deleteFiles(String user, String proxyFileName, List<String> paths) throws DataManagerException {
-        
+    public void createDir(String baseDir, String name) throws DataManagerException {
+
         try {
-            LFCBusiness business = new LFCBusiness();
-            business.deleteFiles(user, proxyFileName, paths);
-            
+            trace(logger, "Creating folder: " + baseDir + "/" + name);
+            lfcBusiness.createDir(getSessionUser().getFullName(), baseDir, name);
+
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
         } catch (BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
 
-    public void createDir(String user, String proxyFileName, String baseDir, String name) throws DataManagerException {
-        
+    public void rename(String oldPath, String newPath, boolean extendPath)
+            throws DataManagerException {
+
         try {
-            LFCBusiness business = new LFCBusiness();
-            business.createDir(user, proxyFileName, baseDir, name);
-            
+            trace(logger, "Renaming '" + oldPath + "' to '" + newPath + "'");
+            lfcBusiness.rename(getSessionUser().getFullName(), oldPath, newPath, extendPath);
+
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
         } catch (BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
 
-    public void rename(String user, String proxyFileName, String oldPath, 
-            String newPath, boolean extendPath) throws DataManagerException {
-        
+    public void rename(Map<String, String> paths, boolean extendPath)
+            throws DataManagerException {
+
         try {
-            LFCBusiness business = new LFCBusiness();
-            business.rename(user, proxyFileName, oldPath, newPath, extendPath);
-            
+            lfcBusiness.rename(getSessionUser().getFullName(), paths, extendPath);
+
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
         } catch (BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
 
-    public void renameFiles(String user, String proxyFileName, 
-            Map<String, String> paths, boolean extendPath) throws DataManagerException {
+    public List<DMCachedFile> getCachedFiles() throws DataManagerException {
 
         try {
-            LFCBusiness business = new LFCBusiness();
-            business.renameFiles(user, proxyFileName, paths, extendPath);
-            
+            authenticateSystemAdministrator(logger);
+            return dataManagerBusiness.getCachedFiles();
+
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
         } catch (BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
-    
-    public List<DMCachedFile> getCachedFiles(String proxy) throws DataManagerException {
-        
+
+    public void deleteCachedFiles(List<String> cachedFiles) throws DataManagerException {
+
         try {
-            DataManagerBusiness business = new DataManagerBusiness();
-            return business.getCachedFiles(proxy);
-            
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Removing files: " + cachedFiles);
+            dataManagerBusiness.deleteCachedFiles(cachedFiles);
+
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
         } catch (BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
-    
-    public void deleteCachedFiles(List<String> cachedFiles, String proxy) throws DataManagerException {
-        
+
+    public List<PoolOperation> getPoolOperationsByUser() throws DataManagerException {
+
         try {
-            DataManagerBusiness business = new DataManagerBusiness();
-            business.deleteCachedFiles(proxy, cachedFiles);
-            
+            return transferPoolBusiness.getOperations(getSessionUser().getEmail());
+
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
         } catch (BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
-    
-    public List<PoolOperation> getPoolOperations(String userDN, String proxy) throws DataManagerException {
-        
+
+    public List<PoolOperation> getPoolOperations() throws DataManagerException {
+
         try {
-            TransferPoolBusiness business = new TransferPoolBusiness();
-            return business.getOperations(userDN, proxy);
-            
+            authenticateSystemAdministrator(logger);
+            return transferPoolBusiness.getOperations();
+
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
         } catch (BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
-    
-    public List<PoolOperation> getPoolOperations(String proxy) throws DataManagerException {
-        
+
+    public void removeOperations(List<String> ids) throws DataManagerException {
+
         try {
-            TransferPoolBusiness business = new TransferPoolBusiness();
-            return business.getOperations(proxy);
-            
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Removing operations: " + ids);
+            transferPoolBusiness.removeOperations(ids);
+
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
+        }
+    }
+
+    public void removeOperationById(String id) throws DataManagerException {
+
+        try {
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Removing operation: " + id);
+            transferPoolBusiness.removeOperationById(id);
+
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
+        }
+    }
+
+    public void downloadFile(String remoteFile) throws DataManagerException {
+
+        try {
+            trace(logger, "Adding file to transfer queue: " + remoteFile);
+            User user = getSessionUser();
+            transferPoolBusiness.downloadFile(user.getFullName(),
+                    user.getEmail(), remoteFile);
+
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
+        }
+    }
+
+    public void downloadFolder(String remoteFolder) throws DataManagerException {
+
+        try {
+            trace(logger, "Adding folder to transfer queue: " + remoteFolder);
+            User user = getSessionUser();
+            transferPoolBusiness.downloadFolder(user.getFullName(),
+                    user.getEmail(), remoteFolder);
+
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
         } catch (BusinessException ex) {
             throw new DataManagerException(ex);
         }

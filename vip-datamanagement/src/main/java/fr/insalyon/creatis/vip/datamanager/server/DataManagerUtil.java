@@ -36,9 +36,9 @@ package fr.insalyon.creatis.vip.datamanager.server;
 
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.DAOFactory;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import java.io.File;
@@ -61,11 +61,11 @@ public class DataManagerUtil {
     public static String parseBaseDir(String user, String baseDir) throws DataManagerException {
 
         baseDir = parsePath(baseDir, DataManagerConstants.USERS_HOME,
-                ServerConfiguration.getInstance().getDataManagerUsersHome()
+                Server.getInstance().getDataManagerUsersHome()
                 + "/" + user.replaceAll(" ", "_").toLowerCase());
 
         baseDir = parsePath(baseDir, DataManagerConstants.TRASH_HOME,
-                ServerConfiguration.getInstance().getDataManagerUsersHome()
+                Server.getInstance().getDataManagerUsersHome()
                 + "/" + user.replaceAll(" ", "_").toLowerCase()
                 + "_" + DataManagerConstants.TRASH_HOME);
 
@@ -73,15 +73,15 @@ public class DataManagerUtil {
                 "/grid/biomed");
 
         try {
-            for (String groupName : DAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
+            for (String groupName : CoreDAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
                 String folderName = groupName.replaceAll(" ", "_");
 
                 baseDir = parsePath(baseDir, groupName + DataManagerConstants.GROUP_APPEND,
-                        ServerConfiguration.getInstance().getDataManagerGroupsHome()
+                        Server.getInstance().getDataManagerGroupsHome()
                         + "/" + folderName);
 
                 baseDir = parsePath(baseDir, groupName,
-                        ServerConfiguration.getInstance().getDataManagerGroupsHome()
+                        Server.getInstance().getDataManagerGroupsHome()
                         + "/" + folderName);
             }
         } catch (DAOException ex) {
@@ -121,8 +121,8 @@ public class DataManagerUtil {
             }
         }
 
-        if (baseDir.contains(ServerConfiguration.getInstance().getDataManagerUsersHome())) {
-            baseDir = baseDir.replace(ServerConfiguration.getInstance().getDataManagerUsersHome() + "/", "");
+        if (baseDir.contains(Server.getInstance().getDataManagerUsersHome())) {
+            baseDir = baseDir.replace(Server.getInstance().getDataManagerUsersHome() + "/", "");
             if (baseDir.indexOf("/") != -1) {
                 baseDir = baseDir.substring(baseDir.indexOf("/"), baseDir.length());
             } else {
@@ -133,9 +133,9 @@ public class DataManagerUtil {
         }
 
         try {
-            for (String groupName : DAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
+            for (String groupName : CoreDAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
                 baseDir = baseDir.replace(
-                        ServerConfiguration.getInstance().getDataManagerGroupsHome()
+                        Server.getInstance().getDataManagerGroupsHome()
                         + "/" + groupName.replaceAll(" ", "_"),
                         DataManagerConstants.ROOT + "/" + groupName
                         + DataManagerConstants.GROUP_APPEND);
@@ -157,7 +157,7 @@ public class DataManagerUtil {
      */
     public static String getUploadRootDirectory(boolean local) {
 
-        String rootDirectory = ServerConfiguration.getInstance().getDataManagerPath()
+        String rootDirectory = Server.getInstance().getDataManagerPath()
                 + "/uploads/";
 
         if (!local) {
@@ -169,31 +169,5 @@ public class DataManagerUtil {
             dir.mkdirs();
         }
         return rootDirectory;
-    }
-
-    /**
-     * 
-     * @param proxyFileName
-     * @return 
-     */
-    public static VletAgentClient getVletAgentClient(String proxyFileName) {
-
-        return new VletAgentClient(
-                ServerConfiguration.getInstance().getVletagentHost(),
-                ServerConfiguration.getInstance().getVletagentPort(),
-                proxyFileName);
-    }
-    
-    /**
-     * 
-     * @param proxyFileName
-     * @return 
-     */
-    public static VletAgentPoolClient getVletAgentPoolClient(String proxyFileName) {
-
-        return new VletAgentPoolClient(
-                ServerConfiguration.getInstance().getVletagentHost(),
-                ServerConfiguration.getInstance().getVletagentPort(),
-                proxyFileName);
     }
 }

@@ -40,7 +40,8 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.AddFolderWindow;
 
@@ -72,7 +73,7 @@ public class BasicBrowserToolStrip extends ToolStrip {
         this.addFormItem(pathItem);
 
         ToolStripButton folderUpButton = new ToolStripButton();
-        folderUpButton.setIcon("icon-folderup.png");
+        folderUpButton.setIcon(DataManagerConstants.ICON_FOLDER_UP);
         folderUpButton.setPrompt("Folder up");
         folderUpButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
 
@@ -87,7 +88,7 @@ public class BasicBrowserToolStrip extends ToolStrip {
         this.addButton(folderUpButton);
         
         ToolStripButton refreshButton = new ToolStripButton();
-        refreshButton.setIcon("icon-refresh.png");
+        refreshButton.setIcon(CoreConstants.ICON_REFRESH);
         refreshButton.setPrompt("Refresh");
         refreshButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
 
@@ -98,7 +99,7 @@ public class BasicBrowserToolStrip extends ToolStrip {
         this.addButton(refreshButton);
         
         ToolStripButton homeButton = new ToolStripButton();
-        homeButton.setIcon("icon-home.png");
+        homeButton.setIcon(CoreConstants.ICON_HOME);
         homeButton.setPrompt("Home");
         homeButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
 
@@ -109,7 +110,7 @@ public class BasicBrowserToolStrip extends ToolStrip {
         this.addButton(homeButton);
         
         ToolStripButton addFolderButton = new ToolStripButton();
-        addFolderButton.setIcon("icon-addfolder.png");
+        addFolderButton.setIcon(DataManagerConstants.ICON_FOLDER_ADD);
         addFolderButton.setPrompt("Create Folder");
         addFolderButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
 

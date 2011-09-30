@@ -42,14 +42,13 @@ import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerContext;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 
 /**
@@ -57,15 +56,16 @@ import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout
  * @author Rafael Silva
  */
 public class BrowserContextMenu extends Menu {
-
-    public BrowserContextMenu(final ModalWindow modal, final String baseDir, final DataRecord data) {
+    
+    public BrowserContextMenu(final ModalWindow modal, final String baseDir, 
+            final DataRecord data) {
 
         this.setShowShadow(true);
         this.setShadowDepth(10);
         this.setWidth(90);
 
         MenuItem uploadItem = new MenuItem("Upload");
-        uploadItem.setIcon("icon-upload.png");
+        uploadItem.setIcon(DataManagerConstants.ICON_UPLOAD);
         uploadItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -80,7 +80,7 @@ public class BrowserContextMenu extends Menu {
         });
 
         MenuItem downloadItem = new MenuItem("Download");
-        downloadItem.setIcon("icon-download.png");
+        downloadItem.setIcon(DataManagerConstants.ICON_DOWNLOAD);
         downloadItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -89,7 +89,7 @@ public class BrowserContextMenu extends Menu {
         });
 
         MenuItem cutItem = new MenuItem("Cut");
-        cutItem.setIcon("icon-cut.png");
+        cutItem.setIcon(DataManagerConstants.ICON_CUT);
         cutItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -102,7 +102,7 @@ public class BrowserContextMenu extends Menu {
         });
 
         MenuItem pasteItem = new MenuItem("Paste");
-        pasteItem.setIcon("icon-paste.png");
+        pasteItem.setIcon(DataManagerConstants.ICON_PASTE);
         pasteItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -115,7 +115,7 @@ public class BrowserContextMenu extends Menu {
         });
 
         MenuItem renameItem = new MenuItem("Rename");
-        renameItem.setIcon("icon-edit.png");
+        renameItem.setIcon(CoreConstants.ICON_EDIT);
         renameItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -128,7 +128,7 @@ public class BrowserContextMenu extends Menu {
         });
 
         MenuItem deleteItem = new MenuItem("Delete");
-        deleteItem.setIcon("icon-delete.png");
+        deleteItem.setIcon(CoreConstants.ICON_DELETE);
         deleteItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -181,7 +181,7 @@ public class BrowserContextMenu extends Menu {
 
                             public void onFailure(Throwable caught) {
                                 modal.hide();
-                                SC.warn("Error executing delete files/folders: " + caught.getMessage());
+                                SC.warn("Unable to delete file/folder:<br />" + caught.getMessage());
                             }
 
                             public void onSuccess(Void result) {
@@ -190,9 +190,7 @@ public class BrowserContextMenu extends Menu {
                             }
                         };
                         modal.show("Deleting " + name + "...", true);
-                        Context context = Context.getInstance();
-                        service.delete(context.getUser(), context.getProxyFileName(),
-                                baseDir + "/" + name, callback);
+                        service.delete(baseDir + "/" + name, callback);
                     }
                 }
             });
@@ -207,7 +205,7 @@ public class BrowserContextMenu extends Menu {
 
                             public void onFailure(Throwable caught) {
                                 modal.hide();
-                                SC.warn("Error executing delete files/folders: " + caught.getMessage());
+                                SC.warn("Unable to delete file/folder:<br />" + caught.getMessage());
                             }
 
                             public void onSuccess(Void result) {
@@ -216,12 +214,10 @@ public class BrowserContextMenu extends Menu {
                             }
                         };
                         modal.show("Deleting " + name + "...", true);
-                        Context context = Context.getInstance();
-                        String oldPath = baseDir + "/" + name;
-                        String newPath = DataManagerConstants.ROOT + "/"
-                                + DataManagerConstants.TRASH_HOME + "/" + name;
-                        service.rename(context.getUser(), context.getProxyFileName(),
-                                oldPath, newPath, true, callback);
+                        service.rename(baseDir + "/" + name,
+                                DataManagerConstants.ROOT + "/"
+                                + DataManagerConstants.TRASH_HOME + "/" + name,
+                                true, callback);
                     }
                 }
             });
@@ -238,7 +234,7 @@ public class BrowserContextMenu extends Menu {
             final DataRecord data) {
 
         if (data.getType().contains("file")) {
-            TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+            DataManagerServiceAsync service = DataManagerService.Util.getInstance();
             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                 public void onFailure(Throwable caught) {
@@ -248,7 +244,7 @@ public class BrowserContextMenu extends Menu {
                         SC.warn("The file " + baseDir + "/" + data.getName() + " is unavailable.");
                         BrowserLayout.getInstance().loadData(baseDir, true);
                     } else {
-                        SC.warn("Unable to download file: " + caught.getMessage());
+                        SC.warn("Unable to download file:<br />" + caught.getMessage());
                     }
                 }
 
@@ -259,15 +255,10 @@ public class BrowserContextMenu extends Menu {
                 }
             };
             modal.show("Adding file to transfer queue...", true);
-            Context context = Context.getInstance();
-            service.downloadFile(
-                    context.getUser(),
-                    baseDir + "/" + data.getName(),
-                    context.getUserDN(), context.getProxyFileName(),
-                    callback);
+            service.downloadFile(baseDir + "/" + data.getName(), callback);
 
         } else {
-            TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+            DataManagerServiceAsync service = DataManagerService.Util.getInstance();
             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                 public void onFailure(Throwable caught) {
@@ -277,7 +268,7 @@ public class BrowserContextMenu extends Menu {
                         SC.warn("The folder " + baseDir + "/" + data.getName() + " is unavailable.");
                         BrowserLayout.getInstance().loadData(baseDir, true);
                     } else {
-                        SC.warn("Unable to download folder: " + caught.getMessage());
+                        SC.warn("Unable to download folder:<br />" + caught.getMessage());
                     }
                 }
 
@@ -288,12 +279,7 @@ public class BrowserContextMenu extends Menu {
                 }
             };
             modal.show("Adding folder to transfer queue...", true);
-            Context context = Context.getInstance();
-            service.downloadFolder(
-                    context.getUser(),
-                    baseDir + "/" + data.getName(),
-                    context.getUserDN(), context.getProxyFileName(),
-                    callback);
+            service.downloadFolder(baseDir + "/" + data.getName(), callback);
         }
     }
 
@@ -309,12 +295,12 @@ public class BrowserContextMenu extends Menu {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Error executing paste command: " + caught.getMessage());
+                SC.warn("Unable to paste file/folder:<br />" + caught.getMessage());
             }
 
             public void onSuccess(Void result) {
-                DataManagerContext.getInstance().resetCutAction();
                 modal.hide();
+                DataManagerContext.getInstance().resetCutAction();
                 BrowserLayout.getInstance().loadData(baseDir, true);
             }
         };
@@ -325,10 +311,8 @@ public class BrowserContextMenu extends Menu {
                     + DataManagerContext.getInstance().getCutName();
             String newPath = baseDir + "/" + DataManagerContext.getInstance().getCutName();
 
-            modal.show("Moving " + oldPath + " to " + newPath + "...", true);
-            Context context = Context.getInstance();
-            service.rename(context.getUser(), context.getProxyFileName(),
-                    oldPath, newPath, false, callback);
+            modal.show("Moving " + oldPath + " to<br />" + newPath + "...", true);
+            service.rename(oldPath, newPath, false, callback);
         } else {
             SC.warn("Unable to move data into the same folder.");
         }

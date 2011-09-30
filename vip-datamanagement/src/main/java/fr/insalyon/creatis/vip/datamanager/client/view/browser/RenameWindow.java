@@ -43,8 +43,7 @@ import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 
@@ -56,9 +55,10 @@ public class RenameWindow extends Window {
 
     private DynamicForm form;
     private TextItem nameItem;
-    
-    public RenameWindow(final ModalWindow modal, final String baseDir, final String name) {
-        
+
+    public RenameWindow(final ModalWindow modal, final String baseDir, 
+            final String name) {
+
         this.setTitle("Renaming: " + baseDir + "/" + name);
         this.setWidth(350);
         this.setHeight(110);
@@ -72,12 +72,12 @@ public class RenameWindow extends Window {
         form.setWidth100();
         form.setPadding(5);
         form.setLayoutAlign(VerticalAlignment.BOTTOM);
-        
+
         nameItem = new TextItem("name", "Name");
         nameItem.setRequired(true);
         nameItem.setWidth(200);
         nameItem.setValue(name);
-        
+
         ButtonItem renameButton = new ButtonItem("renameButton", "Rename");
         renameButton.setWidth(60);
         renameButton.addClickHandler(new ClickHandler() {
@@ -89,7 +89,7 @@ public class RenameWindow extends Window {
 
                         public void onFailure(Throwable caught) {
                             modal.hide();
-                            SC.warn("Error executing renaming: " + caught.getMessage());
+                            SC.warn("Unable to rename:<br />" + caught.getMessage());
                         }
 
                         public void onSuccess(Void result) {
@@ -98,9 +98,8 @@ public class RenameWindow extends Window {
                         }
                     };
                     modal.show("Renaming " + baseDir + "/" + name + "...", true);
-                    Context context = Context.getInstance();
-                    service.rename(context.getUser(), context.getProxyFileName(),
-                            baseDir + "/" + name, nameItem.getValueAsString(), 
+                    service.rename(baseDir + "/" + name,
+                            nameItem.getValueAsString(),
                             false, callback);
                     destroy();
                 }

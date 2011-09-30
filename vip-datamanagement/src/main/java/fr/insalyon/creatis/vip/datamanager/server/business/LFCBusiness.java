@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.datamanager.server.business;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.agent.vlet.common.bean.GridData;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
@@ -55,14 +56,11 @@ public class LFCBusiness {
 
     private static final Logger logger = Logger.getLogger(LFCBusiness.class);
 
-    public List<Data> listDir(String user, String proxyFileName, String baseDir,
-            boolean refresh) throws BusinessException {
+    public List<Data> listDir(String user, String baseDir, boolean refresh) throws BusinessException {
 
         try {
-
-            List<GridData> list = DataManagerUtil.getVletAgentClient(
-                    proxyFileName).getFolderData(DataManagerUtil.parseBaseDir(
-                    user, baseDir), refresh);
+            List<GridData> list = CoreUtil.getVletAgentClient().getFolderData(
+                    DataManagerUtil.parseBaseDir(user, baseDir), refresh);
 
             List<Data> dataList = new ArrayList<Data>();
             for (GridData data : list) {
@@ -87,10 +85,16 @@ public class LFCBusiness {
         }
     }
 
-    public void delete(String user, String proxyFileName, String path) throws BusinessException {
+    /**
+     * 
+     * @param user
+     * @param path
+     * @throws BusinessException 
+     */
+    public void delete(String user, String path) throws BusinessException {
 
         try {
-            DataManagerUtil.getVletAgentClient(proxyFileName).delete(
+            CoreUtil.getVletAgentClient().delete(
                     DataManagerUtil.parseBaseDir(user, path));
 
         } catch (DataManagerException ex) {
@@ -102,9 +106,15 @@ public class LFCBusiness {
         }
     }
 
-    public void deleteFiles(String user, String proxyFileName, List<String> paths) throws BusinessException {
-        try {
+    /**
+     * 
+     * @param user
+     * @param paths
+     * @throws BusinessException 
+     */
+    public void delete(String user, List<String> paths) throws BusinessException {
 
+        try {
             List<String> parsedPaths = new ArrayList<String>();
             for (String path : paths) {
                 try {
@@ -113,7 +123,7 @@ public class LFCBusiness {
                     logger.error(ex);
                 }
             }
-            DataManagerUtil.getVletAgentClient(proxyFileName).deleteFiles(parsedPaths);
+            CoreUtil.getVletAgentClient().delete(parsedPaths);
 
         } catch (VletAgentClientException ex) {
             logger.error(ex);
@@ -121,10 +131,17 @@ public class LFCBusiness {
         }
     }
 
-    public void createDir(String user, String proxyFileName, String baseDir, String name) throws BusinessException {
+    /**
+     * 
+     * @param user
+     * @param baseDir
+     * @param name
+     * @throws BusinessException 
+     */
+    public void createDir(String user, String baseDir, String name) throws BusinessException {
 
         try {
-            DataManagerUtil.getVletAgentClient(proxyFileName).createDirectory(
+            CoreUtil.getVletAgentClient().createDirectory(
                     DataManagerUtil.parseBaseDir(user, baseDir), name);
 
         } catch (DataManagerException ex) {
@@ -139,17 +156,16 @@ public class LFCBusiness {
     /**
      * 
      * @param user
-     * @param proxyFileName
      * @param oldPath
      * @param newPath
      * @param extendPath
      * @throws BusinessException 
      */
-    public void rename(String user, String proxyFileName, String oldPath,
-            String newPath, boolean extendPath) throws BusinessException {
+    public void rename(String user, String oldPath, String newPath,
+            boolean extendPath) throws BusinessException {
 
         try {
-            DataManagerUtil.getVletAgentClient(proxyFileName).rename(
+            CoreUtil.getVletAgentClient().rename(
                     DataManagerUtil.parseBaseDir(user, oldPath),
                     DataManagerUtil.parseBaseDir(user, newPath));
 
@@ -158,7 +174,7 @@ public class LFCBusiness {
                 SimpleDateFormat sdf =
                         new SimpleDateFormat("-yyyy.MM.dd-HH.mm.ss");
                 String newExtPath = newPath + sdf.format(new Date());
-                rename(user, proxyFileName, oldPath, newExtPath, false);
+                rename(user, oldPath, newExtPath, false);
 
             } else {
                 logger.error(ex);
@@ -173,32 +189,29 @@ public class LFCBusiness {
     /**
      * 
      * @param user
-     * @param proxyFileName
      * @param paths
      * @param extendPath
      * @throws BusinessException 
      */
-    public void renameFiles(String user, String proxyFileName,
-            Map<String, String> paths, boolean extendPath) throws BusinessException {
+    public void rename(String user, Map<String, String> paths,
+            boolean extendPath) throws BusinessException {
 
         for (String oldPath : paths.keySet()) {
             String newPath = paths.get(oldPath);
-            rename(user, proxyFileName, oldPath, newPath, extendPath);
+            rename(user, oldPath, newPath, extendPath);
         }
     }
 
     /**
      * 
      * @param user
-     * @param proxyFileName
      * @param path
      * @return
      * @throws BusinessException 
      */
-    public long getModificationDate(String user, String proxyFileName,
-            String path) throws BusinessException {
+    public long getModificationDate(String user, String path) throws BusinessException {
         try {
-            return DataManagerUtil.getVletAgentClient(proxyFileName).
+            return CoreUtil.getVletAgentClient().
                     getModificationDate(DataManagerUtil.parseBaseDir(user, path));
 
         } catch (VletAgentClientException ex) {
@@ -213,21 +226,19 @@ public class LFCBusiness {
     /**
      * 
      * @param user
-     * @param proxyFileName
      * @param paths
      * @return
      * @throws BusinessException 
      */
-    public List<Long> getModificationDate(String user, String proxyFileName,
-            List<String> paths) throws BusinessException {
+    public List<Long> getModificationDate(String user, List<String> paths) 
+            throws BusinessException {
         try {
             List<String> parsedPaths = new ArrayList<String>();
             for (String path : paths) {
                 parsedPaths.add(DataManagerUtil.parseBaseDir(user, path));
             }
-            
-            return DataManagerUtil.getVletAgentClient(proxyFileName).
-                    getModificationDate(parsedPaths);
+
+            return CoreUtil.getVletAgentClient().getModificationDate(parsedPaths);
 
         } catch (VletAgentClientException ex) {
             logger.error(ex);

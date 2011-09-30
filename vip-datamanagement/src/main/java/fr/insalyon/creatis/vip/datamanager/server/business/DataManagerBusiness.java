@@ -38,10 +38,10 @@ import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.agent.vlet.common.bean.CachedFile;
 import fr.insalyon.creatis.devtools.FileUtils;
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.io.File;
 import java.util.ArrayList;
@@ -55,40 +55,6 @@ import org.apache.log4j.Logger;
 public class DataManagerBusiness {
 
     private final static Logger logger = Logger.getLogger(DataManagerBusiness.class);
-    private ServerConfiguration serverConfiguration = ServerConfiguration.getInstance();
-
-    public void configureDataManager(String user, String proxyFileName) throws BusinessException {
-
-        VletAgentClient client = new VletAgentClient(
-                ServerConfiguration.getInstance().getVletagentHost(),
-                ServerConfiguration.getInstance().getVletagentPort(),
-                proxyFileName);
-
-        String errorMessage = "ERROR: File/Directory exists or "
-                + "Directory is not empty";
-
-        try {
-            client.createDirectory(ServerConfiguration.getInstance().getDataManagerUsersHome(),
-                    user.replaceAll(" ", "_").toLowerCase());
-
-        } catch (VletAgentClientException ex) {
-            if (!ex.getMessage().contains(errorMessage)) {
-                logger.error(ex);
-                throw new BusinessException(ex);
-            }
-        }
-        try {
-            client.createDirectory(ServerConfiguration.getInstance().getDataManagerUsersHome(),
-                    user.replace(" ", "_").toLowerCase()
-                    + "_" + DataManagerConstants.TRASH_HOME);
-
-        } catch (VletAgentClientException ex) {
-            if (!ex.getMessage().contains(errorMessage)) {
-                logger.error(ex);
-                throw new BusinessException(ex);
-            }
-        }
-    }
 
     public void deleteLocalFile(String fileName) throws BusinessException {
 
@@ -100,13 +66,10 @@ public class DataManagerBusiness {
         }
     }
 
-    public List<DMCachedFile> getCachedFiles(String proxy) throws BusinessException {
+    public List<DMCachedFile> getCachedFiles() throws BusinessException {
 
         try {
-            VletAgentClient client = new VletAgentClient(
-                    serverConfiguration.getVletagentHost(),
-                    serverConfiguration.getVletagentPort(),
-                    proxy);
+            VletAgentClient client = CoreUtil.getVletAgentClient();
 
             List<CachedFile> cachedFilesList = client.getCachedFiles();
             List<DMCachedFile> dmCachedFiles = new ArrayList<DMCachedFile>();
@@ -125,13 +88,10 @@ public class DataManagerBusiness {
         }
     }
 
-    public void deleteCachedFiles(String proxy, List<String> cachedFiles) throws BusinessException {
+    public void deleteCachedFiles(List<String> cachedFiles) throws BusinessException {
 
         try {
-            VletAgentClient client = new VletAgentClient(
-                    serverConfiguration.getVletagentHost(),
-                    serverConfiguration.getVletagentPort(),
-                    proxy);
+            VletAgentClient client = CoreUtil.getVletAgentClient();
 
             for (String path : cachedFiles) {
                 client.deleteCachedFile(path);
@@ -141,23 +101,25 @@ public class DataManagerBusiness {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
      * 
-     * @param proxy
+     * @param user
      * @param remoteFile
      * @param localDir
      * @return
      * @throws BusinessException 
      */
-    public String getRemoteFile(String proxy, String remoteFile, String localDir) 
+    public String getRemoteFile(String user, String remoteFile, String localDir)
             throws BusinessException {
-        
-        try {
-            VletAgentClient client = DataManagerUtil.getVletAgentClient(proxy);
 
-            return client.getRemoteFile(remoteFile, localDir);
+        try {
+            return CoreUtil.getVletAgentClient().getRemoteFile(
+                    DataManagerUtil.parseBaseDir(user, remoteFile), localDir);
             
+        } catch (DataManagerException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
         } catch (VletAgentClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);

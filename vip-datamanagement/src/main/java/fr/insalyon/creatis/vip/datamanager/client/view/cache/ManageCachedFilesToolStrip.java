@@ -42,8 +42,8 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
@@ -62,18 +62,18 @@ public class ManageCachedFilesToolStrip extends ToolStrip {
         this.setWidth100();
 
         ToolStripButton refreshButton = new ToolStripButton("Refresh");
-        refreshButton.setIcon("icon-refresh.png");
+        refreshButton.setIcon(CoreConstants.ICON_REFRESH);
         refreshButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                ManageCachedFilesTab tab = (ManageCachedFilesTab) Layout.getInstance().getTab(DataManagerConstants.MANAGE_CACHED_FILES_TAB);
+                ManageCachedFilesTab tab = (ManageCachedFilesTab) Layout.getInstance().getTab(DataManagerConstants.TAB_MANAGE_CACHED_FILES);
                 tab.loadData();
             }
         });
         this.addButton(refreshButton);
 
         ToolStripButton deleteSelectedFiles = new ToolStripButton("Delete Selected Files");
-        deleteSelectedFiles.setIcon("icon-delete.png");
+        deleteSelectedFiles.setIcon(CoreConstants.ICON_DELETE);
         deleteSelectedFiles.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
@@ -81,7 +81,7 @@ public class ManageCachedFilesToolStrip extends ToolStrip {
 
                     public void execute(Boolean value) {
                         if (value != null && value) {
-                            final ManageCachedFilesTab tab = (ManageCachedFilesTab) Layout.getInstance().getTab(DataManagerConstants.MANAGE_CACHED_FILES_TAB);
+                            final ManageCachedFilesTab tab = (ManageCachedFilesTab) Layout.getInstance().getTab(DataManagerConstants.TAB_MANAGE_CACHED_FILES);
                             List<String> paths = new ArrayList<String>();
 
                             for (ListGridRecord record : tab.getGridSelection()) {
@@ -94,7 +94,7 @@ public class ManageCachedFilesToolStrip extends ToolStrip {
 
                                 public void onFailure(Throwable caught) {
                                     modal.hide();
-                                    SC.warn("Error deleting files: " + caught.getMessage());
+                                    SC.warn("Error deleting files:<br />" + caught.getMessage());
                                 }
 
                                 public void onSuccess(Void result) {
@@ -103,9 +103,7 @@ public class ManageCachedFilesToolStrip extends ToolStrip {
                                 }
                             };
                             modal.show("Deleting files...", true);
-                            Context context = Context.getInstance();
-                            service.deleteCachedFiles(paths, 
-                                    context.getProxyFileName(), callback);
+                            service.deleteCachedFiles(paths, callback);
                         }
                     }
                 });

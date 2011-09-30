@@ -52,8 +52,8 @@ public class OperationRecord extends ListGridRecord {
         if (type.equals("Download_Files")) {
             type = "Download";
         }
-        setAttribute("typeIcon", "icon-" + type.toLowerCase());
-        setAttribute("statusIcon", "icon-" + status.toLowerCase());
+        setAttribute("typeIcon", "datamanager/icon-" + type.toLowerCase());
+        setAttribute("statusIcon", "datamanager/operation/icon-" + status.toLowerCase());
         setAttribute("operationId", id);
         setAttribute("type", type);
         setAttribute("status", status);

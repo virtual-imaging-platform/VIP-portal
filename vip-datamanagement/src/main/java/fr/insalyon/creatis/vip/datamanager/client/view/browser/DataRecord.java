@@ -52,9 +52,9 @@ public class DataRecord extends ListGridRecord {
     public DataRecord(String type, String name, int length, String date,
             String replicas, String permissions) {
         if (name.equals("Trash")) {
-            setAttribute("icon", "icon-trash");
+            setAttribute("icon", "datamanager/icon-trash");
         } else {
-            setAttribute("icon", "icon-" + type);
+            setAttribute("icon", "datamanager/icon-" + type);
         }
         setAttribute("name", name);
         setAttribute("length", length);

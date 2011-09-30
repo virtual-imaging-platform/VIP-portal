@@ -40,6 +40,7 @@ import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -47,9 +48,8 @@ import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
@@ -69,10 +69,9 @@ public class ManageCachedFilesTab extends Tab {
 
     public ManageCachedFilesTab() {
 
-        this.setTitle("Manage Cached Files");
-        this.setID(DataManagerConstants.MANAGE_CACHED_FILES_TAB);
+        this.setTitle(Canvas.imgHTML(DataManagerConstants.ICON_CACHE) + " " + DataManagerConstants.APP_CACHED_FILES);
+        this.setID(DataManagerConstants.TAB_MANAGE_CACHED_FILES);
         this.setCanClose(true);
-        this.setIcon("icon-datamanager-cache.png");
 
         configureGrid();
         modal = new ModalWindow(grid);
@@ -109,14 +108,14 @@ public class ManageCachedFilesTab extends Tab {
         ListGridField lastUsageField = FieldUtil.getDateField();
 
         grid.setFields(pathField, sizeField, frequencyField, lastUsageField);
-        
+
         grid.addCellContextClickHandler(new CellContextClickHandler() {
 
             public void onCellContextClick(CellContextClickEvent event) {
                 event.cancel();
                 if (event.getColNum() != 0) {
                     ListGridRecord record = event.getRecord();
-                    new ManageCachedFilesContextMenu(modal, 
+                    new ManageCachedFilesContextMenu(modal,
                             (CachedFileRecord) record).showContextMenu();
                 }
             }
@@ -124,38 +123,30 @@ public class ManageCachedFilesTab extends Tab {
     }
 
     public void loadData() {
-        
+
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<List<DMCachedFile>> callback = new AsyncCallback<List<DMCachedFile>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get files list: " + caught.getMessage());
+                SC.warn("Unable to get operations list:<br />" + caught.getMessage());
             }
 
             public void onSuccess(List<DMCachedFile> result) {
-
                 List<CachedFileRecord> dataList = new ArrayList<CachedFileRecord>();
-                if (result != null) {
-                    for (DMCachedFile cf : result) {
-                        dataList.add(new CachedFileRecord(cf.getPath(), 
-                                cf.getName(), cf.getSize(), cf.getFrequency(),
-                                cf.getLastUsage()));
-                    }
-                    grid.setData(dataList.toArray(new CachedFileRecord[]{}));
-                    modal.hide();
-
-                } else {
-                    modal.hide();
-                    SC.warn("Unable to get list of cached files.");
+                for (DMCachedFile cf : result) {
+                    dataList.add(new CachedFileRecord(cf.getPath(),
+                            cf.getName(), cf.getSize(), cf.getFrequency(),
+                            cf.getLastUsage()));
                 }
+                grid.setData(dataList.toArray(new CachedFileRecord[]{}));
+                modal.hide();
             }
         };
         modal.show("Loading cached files...", true);
-        Context context = Context.getInstance();
-        service.getCachedFiles(context.getProxyFileName(), callback);
+        service.getCachedFiles(callback);
     }
-    
+
     public ListGridRecord[] getGridSelection() {
-        return grid.getSelection();
+        return grid.getSelectedRecords();
     }
 }

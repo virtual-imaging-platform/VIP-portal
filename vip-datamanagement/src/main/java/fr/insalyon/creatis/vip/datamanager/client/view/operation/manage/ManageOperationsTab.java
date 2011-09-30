@@ -39,6 +39,7 @@ import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.grid.HoverCustomizer;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -47,9 +48,8 @@ import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
@@ -70,10 +70,9 @@ public class ManageOperationsTab extends Tab {
 
     public ManageOperationsTab() {
 
-        this.setTitle("Manage Operations");
-        this.setID(DataManagerConstants.MANAGE_OPERATIONS_TAB);
+        this.setTitle(Canvas.imgHTML(DataManagerConstants.ICON_OPERATION) + " " + DataManagerConstants.APP_OPERATIONS);
+        this.setID(DataManagerConstants.TAB_MANAGE_OPERATIONS);
         this.setCanClose(true);
-        this.setIcon("icon-datamanger-op.png");
 
         configureGrid();
         modal = new ModalWindow(grid);
@@ -162,11 +161,10 @@ public class ManageOperationsTab extends Tab {
             }
         };
         modal.show("Loading operations...", true);
-        Context context = Context.getInstance();
-        service.getPoolOperations(context.getProxyFileName(), callback);
+        service.getPoolOperations(callback);
     }
 
     public ListGridRecord[] getGridSelection() {
-        return grid.getSelection();
+        return grid.getSelectedRecords();
     }
 }

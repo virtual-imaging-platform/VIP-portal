@@ -38,7 +38,9 @@ import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
 import fr.insalyon.creatis.devtools.zip.UnZipper;
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.io.File;
@@ -61,8 +63,8 @@ public class UploadFilesServiceImpl extends HttpServlet {
     private static Logger logger = Logger.getLogger(UploadFilesServiceImpl.class);
     private VletAgentClient client;
     private VletAgentPoolClient poolClient;
-    private String user;
-    private String userdn;
+    private String userName;
+    private String email;
     private String path;
     private boolean usePool;
 
@@ -76,86 +78,83 @@ public class UploadFilesServiceImpl extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse response)
             throws ServletException, IOException {
 
-        boolean overwrite = true;
-        user = req.getHeader("user");
-        userdn = req.getHeader("userdn");
-        String proxy = req.getHeader("proxy");
-        path = req.getHeader("path");
-        String fileName = req.getHeader("fileName");
-        boolean single = Boolean.valueOf(req.getHeader("single"));
-        boolean unzip = Boolean.valueOf(req.getHeader("unzip"));
-        this.usePool = Boolean.valueOf(req.getHeader("pool"));
+        User user = (User) req.getSession().getAttribute(CoreConstants.SESSION_USER);
+        if (user != null) {
 
-        boolean local = path.equals("local") ? true : false;
-        String rootDirectory = DataManagerUtil.getUploadRootDirectory(local);
+            boolean overwrite = true;
+            userName = user.getFullName();
+            email = user.getEmail();
+            path = req.getHeader("path");
+            String fileName = req.getHeader("fileName");
+            boolean single = Boolean.valueOf(req.getHeader("single"));
+            boolean unzip = Boolean.valueOf(req.getHeader("unzip"));
+            this.usePool = Boolean.valueOf(req.getHeader("pool"));
 
-        File uploadedFile = new File(rootDirectory + fileName);
-        if (uploadedFile.exists() && overwrite) {
-            uploadedFile.delete();
-        }
+            boolean local = path.equals("local") ? true : false;
+            String rootDirectory = DataManagerUtil.getUploadRootDirectory(local);
 
-        FileOutputStream fos = new FileOutputStream(uploadedFile);
-        InputStream is = req.getInputStream();
-
-        try {
-            byte[] buffer = new byte[4096];
-            while (true) {
-                int bytes = is.read(buffer);
-                if (bytes < 0) {
-                    break;
-                }
-                fos.write(buffer, 0, bytes);
+            File uploadedFile = new File(rootDirectory + fileName);
+            if (uploadedFile.exists() && overwrite) {
+                uploadedFile.delete();
             }
-            fos.flush();
-        } finally {
-            is.close();
-            fos.close();
-        }
 
-        if (!local) {
+            FileOutputStream fos = new FileOutputStream(uploadedFile);
+            InputStream is = req.getInputStream();
+
             try {
-                if (usePool) {
-                    poolClient = new VletAgentPoolClient(
-                            ServerConfiguration.getInstance().getVletagentHost(),
-                            ServerConfiguration.getInstance().getVletagentPort(),
-                            proxy);
-                } else {
-                    client = new VletAgentClient(
-                            ServerConfiguration.getInstance().getVletagentHost(),
-                            ServerConfiguration.getInstance().getVletagentPort(),
-                            proxy);
+                byte[] buffer = new byte[4096];
+                while (true) {
+                    int bytes = is.read(buffer);
+                    if (bytes < 0) {
+                        break;
+                    }
+                    fos.write(buffer, 0, bytes);
                 }
-
-                if (single || !unzip) {
-                    uploadFile(uploadedFile.getAbsolutePath(), path);
-
-                } else {
-                    UnZipper.unzip(uploadedFile.getAbsolutePath());
-                    String dir = uploadedFile.getParent();
-                    uploadedFile.delete();
-                    processDir(dir, path);
-                }
-            } catch (DataManagerException ex) {
-                logger.error(ex);
-            } catch (VletAgentClientException ex) {
-                logger.error(ex);
+                fos.flush();
+            } finally {
+                is.close();
+                fos.close();
             }
-        }
 
-        response.setContentType("text/html");
-        response.setHeader("Pragma", "No-cache");
-        response.setDateHeader("Expires", 0);
-        response.setHeader("Cache-Control", "no-cache");
-        PrintWriter out = response.getWriter();
-        out.println("<html>");
-        out.println("<body>");
-        out.println("<script type=\"text/javascript\">");
-        out.println("if (parent.uploadComplete) parent.uploadComplete('"
-                + fileName + "');");
-        out.println("</script>");
-        out.println("</body>");
-        out.println("</html>");
-        out.flush();
+            if (!local) {
+                try {
+                    if (usePool) {
+                        poolClient = CoreUtil.getVletAgentPoolClient();
+                    } else {
+                        client = CoreUtil.getVletAgentClient();
+                    }
+
+                    if (single || !unzip) {
+                        uploadFile(uploadedFile.getAbsolutePath(), path);
+
+                    } else {
+                        UnZipper.unzip(uploadedFile.getAbsolutePath());
+                        String dir = uploadedFile.getParent();
+                        uploadedFile.delete();
+                        processDir(dir, path);
+                    }
+                } catch (DataManagerException ex) {
+                    logger.error(ex);
+                } catch (VletAgentClientException ex) {
+                    logger.error(ex);
+                }
+            }
+
+            response.setContentType("text/html");
+            response.setHeader("Pragma", "No-cache");
+            response.setDateHeader("Expires", 0);
+            response.setHeader("Cache-Control", "no-cache");
+            PrintWriter out = response.getWriter();
+            out.println("<html>");
+            out.println("<body>");
+            out.println("<script type=\"text/javascript\">");
+            out.println("if (parent.uploadComplete) parent.uploadComplete('"
+                    + fileName + "');");
+            out.println("</script>");
+            out.println("</body>");
+            out.println("</html>");
+            out.flush();
+        }
     }
 
     private void processDir(String dir, String baseDir)
@@ -174,11 +173,12 @@ public class UploadFilesServiceImpl extends HttpServlet {
     private void uploadFile(String fileName, String dir)
             throws VletAgentClientException, DataManagerException {
 
+        logger.info("(" + email + ") Uploading '" + fileName + "' to '" + dir + "'.");
         if (usePool) {
             poolClient.uploadFile(fileName,
-                    DataManagerUtil.parseBaseDir(user, dir), userdn);
+                    DataManagerUtil.parseBaseDir(userName, dir), email);
         } else {
-            client.uploadFile(fileName, DataManagerUtil.parseBaseDir(user, dir));
+            client.uploadFile(fileName, DataManagerUtil.parseBaseDir(userName, dir));
         }
     }
 }

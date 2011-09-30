@@ -62,17 +62,9 @@ public interface TransferPoolService extends RemoteService {
 
     public PoolOperation getOperationById(String id, String proxy) throws DataManagerException;
 
-    public void removeOperationById(String id, String proxy) throws DataManagerException;
-    
-    public void removeOperations(List<String> ids, String proxy) throws DataManagerException;
-
-    public void downloadFile(String user, String remoteFile, String userDN, String proxy) throws DataManagerException;
-    
     public void downloadFiles(String user, List<String> remoteFiles, String packName, String userDN, String proxy) throws DataManagerException;
-    
-    public void downloadFolder(String user, String remoteFolder, String userDN, String proxy) throws DataManagerException;
-    
+
     public void uploadFile(String user, String remoteFile, String localFile, String userDN, String proxy) throws DataManagerException;
-    
+
     public void clearDeleteOperations(String proxy) throws DataManagerException;
 }

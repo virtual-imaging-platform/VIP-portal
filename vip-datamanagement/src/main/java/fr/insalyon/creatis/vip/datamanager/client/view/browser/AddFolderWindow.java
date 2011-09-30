@@ -45,8 +45,7 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.BasicBrowserToolStrip;
@@ -92,7 +91,7 @@ public class AddFolderWindow extends Window {
 
                         public void onFailure(Throwable caught) {
                             modal.hide();
-                            SC.warn("Error executing create dir: " + caught.getMessage());
+                            SC.warn("Unable to create dir:<br />" + caught.getMessage());
                         }
 
                         public void onSuccess(Void result) {
@@ -101,9 +100,7 @@ public class AddFolderWindow extends Window {
                         }
                     };
                     modal.show("Creating folder...", true);
-                    Context context = Context.getInstance();
-                    service.createDir(context.getUser(), context.getProxyFileName(),
-                            baseDir, nameItem.getValueAsString(), callback);
+                    service.createDir(baseDir, nameItem.getValueAsString(), callback);
                     destroy();
                 }
             }

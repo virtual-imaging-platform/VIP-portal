@@ -37,8 +37,9 @@ package fr.insalyon.creatis.vip.datamanager.server.business;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
 import fr.insalyon.creatis.agent.vlet.common.bean.Operation;
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
@@ -54,44 +55,46 @@ import org.apache.log4j.Logger;
 public class TransferPoolBusiness {
 
     private static Logger logger = Logger.getLogger(TransferPoolBusiness.class);
-    private ServerConfiguration serverConfiguration = ServerConfiguration.getInstance();
-    
+    private Server serverConfiguration = Server.getInstance();
+    private LFCBusiness lfcBusiness;
+
+    public TransferPoolBusiness() {
+
+        lfcBusiness = new LFCBusiness();
+    }
+
     /**
      * 
-     * @param userDN
-     * @param proxy
+     * @param email
      * @return
      * @throws BusinessException 
      */
-    public List<PoolOperation> getOperations(String userDN, String proxy) throws BusinessException {
+    public List<PoolOperation> getOperations(String email) throws BusinessException {
 
         try {
-            VletAgentPoolClient client = new VletAgentPoolClient(
-                    serverConfiguration.getVletagentHost(),
-                    serverConfiguration.getVletagentPort(),
-                    proxy);
+            VletAgentPoolClient client = CoreUtil.getVletAgentPoolClient();
 
-            List<Operation> operationsList = client.getOperationsListByUser(userDN);
+            List<Operation> operationsList = client.getOperationsListByUser(email);
             List<PoolOperation> poolOperations = new ArrayList<PoolOperation>();
 
             for (Operation op : operationsList) {
                 if (op.getType() != Operation.Type.Delete) {
                     String source = "";
                     String dest = "";
-                    
+
                     if (op.getType() == Operation.Type.Download) {
                         source = DataManagerUtil.parseRealDir(op.getSource());
                         dest = "Platform";
-                        
+
                     } else if (op.getType() == Operation.Type.Download_Files) {
                         source = FilenameUtils.getBaseName(op.getDest());
                         dest = "Platform";
-                        
+
                     } else {
                         source = FilenameUtils.getName(op.getSource());
                         dest = DataManagerUtil.parseRealDir(op.getDest());
                     }
-                    
+
                     poolOperations.add(new PoolOperation(op.getId(),
                             op.getRegistration(), source, dest,
                             op.getType().name(), op.getStatus().name(), op.getUser()));
@@ -107,20 +110,16 @@ public class TransferPoolBusiness {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
      * 
-     * @param proxy
      * @return
      * @throws BusinessException 
      */
-    public List<PoolOperation> getOperations(String proxy) throws BusinessException {
+    public List<PoolOperation> getOperations() throws BusinessException {
 
         try {
-            VletAgentPoolClient client = new VletAgentPoolClient(
-                    serverConfiguration.getVletagentHost(),
-                    serverConfiguration.getVletagentPort(),
-                    proxy);
+            VletAgentPoolClient client = CoreUtil.getVletAgentPoolClient();
 
             List<Operation> operationsList = client.getAllOperations();
             List<PoolOperation> poolOperations = new ArrayList<PoolOperation>();
@@ -137,14 +136,105 @@ public class TransferPoolBusiness {
                     source = FilenameUtils.getName(op.getSource());
                     dest = DataManagerUtil.parseRealDir(op.getDest());
                 }
-                String user = op.getUser().substring(op.getUser().lastIndexOf("CN=") 
-                        + 3, op.getUser().length());
                 poolOperations.add(new PoolOperation(op.getId(),
                         op.getRegistration(), source, dest,
-                        op.getType().name(), op.getStatus().name(), user));
+                        op.getType().name(), op.getStatus().name(), op.getUser()));
             }
 
             return poolOperations;
+
+        } catch (DataManagerException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        } catch (VletAgentClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param ids
+     * @throws BusinessException 
+     */
+    public void removeOperations(List<String> ids) throws BusinessException {
+
+        try {
+            VletAgentPoolClient client = CoreUtil.getVletAgentPoolClient();
+
+            for (String id : ids) {
+                client.removeOperationById(id);
+            }
+
+        } catch (VletAgentClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param id
+     * @throws BusinessException 
+     */
+    public void removeOperationById(String id) throws BusinessException {
+
+        try {
+            VletAgentPoolClient client = CoreUtil.getVletAgentPoolClient();
+            client.removeOperationById(id);
+
+        } catch (VletAgentClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param userName
+     * @param email
+     * @param remoteFile
+     * @throws BusinessException 
+     */
+    public void downloadFile(String userName, String email, String remoteFile) throws BusinessException {
+
+        try {
+            lfcBusiness.getModificationDate(userName, remoteFile);
+            VletAgentPoolClient poolClient = CoreUtil.getVletAgentPoolClient();
+
+            String remotePath = DataManagerUtil.parseBaseDir(userName, remoteFile);
+            String localDirPath = serverConfiguration.getDataManagerPath()
+                    + "/downloads" + FilenameUtils.getFullPath(remotePath);
+
+            poolClient.downloadFile(remotePath, localDirPath, email);
+
+        } catch (DataManagerException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        } catch (VletAgentClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param userName
+     * @param email
+     * @param remoteFolder
+     * @throws BusinessException 
+     */
+    public void downloadFolder(String userName, String email,
+            String remoteFolder) throws BusinessException {
+
+        try {
+            lfcBusiness.getModificationDate(userName, remoteFolder);
+            VletAgentPoolClient poolClient = CoreUtil.getVletAgentPoolClient();
+
+            String remotePath = DataManagerUtil.parseBaseDir(userName, remoteFolder);
+            String localDirPath = serverConfiguration.getDataManagerPath()
+                    + "/downloads" + remotePath;
+            poolClient.downloadFolder(remotePath, localDirPath, email);
 
         } catch (DataManagerException ex) {
             logger.error(ex);

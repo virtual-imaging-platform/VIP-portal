@@ -34,60 +34,37 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
-import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.Module;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.system.SystemMenuButton;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerMenuItem;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerParser;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
+import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DataManagerInit {
+public class DataManagerModule extends Module {
 
-    private static DataManagerInit instance;
-
-    public static DataManagerInit getInstance() {
-        if (instance == null) {
-            instance = new DataManagerInit();
-        }
-        return instance;
+    public static DataManagerSection dataManagerSection;
+    
+    public DataManagerModule() {
+        CoreModule.systemExecutor.addParser(new DataManagerParser());
     }
 
-    private DataManagerInit() {
+    @Override
+    public void load() {
+        
+        dataManagerSection = new DataManagerSection();
+        Layout.getInstance().addMainSection(dataManagerSection);
+    }
 
-        Context context = Context.getInstance();
-        if (!context.getUser().equals("Anonymous")) {
-            
-            DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-            AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-                public void onFailure(Throwable caught) {
-                    SC.warn("Error executing configure File Transfer: " + caught.getMessage());
-                    BrowserLayout.getInstance().unmask();
-                    BrowserLayout.getInstance().mask("Error Configuring File Transfer.");
-                }
-
-                public void onSuccess(Void result) {
-                    BrowserLayout.getInstance().unmask();
-                }
-            };
-
-            service.configureDataManager(context.getUser(), context.getProxyFileName(), callback);
-
-            if (context.isSystemAdmin()) {
-                SystemMenuButton.getInstance().getMenu().addItem(new DataManagerMenuItem());
-            }
-            if (context.hasValidProxy()) {
-                Layout.getInstance().addMainSection(DataManagerSection.getInstance());
-                BrowserLayout.getInstance().mask("Configuring File Transfer...");
-            }
-        }
+    @Override
+    public void terminate() {
+        Layout.getInstance().removeMainSection(DataManagerConstants.SECTION_FILE_TRANSFER);
+        BrowserLayout.terminate();
+        OperationLayout.terminate();
     }
 }

@@ -47,25 +47,31 @@ import java.util.Map;
  */
 public interface DataManagerServiceAsync {
 
-    public void configureDataManager(String user, String proxyFileName, AsyncCallback<Void> asyncCallback);
+    public void listDir(String baseDir, boolean refresh, AsyncCallback<List<Data>> asyncCallback);
 
-    public void listDir(String user, String proxyFileName, String baseDir, boolean refresh, AsyncCallback<List<Data>> asyncCallback);
+    public void delete(String path, AsyncCallback<Void> asyncCallback);
 
-    public void delete(String user, String proxyFileName, String path, AsyncCallback<Void> asyncCallback);
+    public void delete(List<String> paths, AsyncCallback<Void> asyncCallback);
 
-    public void createDir(String user, String proxyFileName, String baseDir, String name, AsyncCallback<Void> asyncCallback);
+    public void createDir(String baseDir, String name, AsyncCallback<Void> asyncCallback);
 
-    public void deleteFiles(String user, String proxyFileName, List<String> paths, AsyncCallback<Void> asyncCallback);
+    public void rename(String oldPath, String newPath, boolean extendPath, AsyncCallback<Void> asyncCallback);
 
-    public void rename(String user, String proxyFileName, String oldPath, String newPath, boolean extendPath, AsyncCallback<Void> asyncCallback);
+    public void rename(Map<String, String> paths, boolean extendPath, AsyncCallback<Void> asyncCallback);
 
-    public void renameFiles(String user, String proxyFileName, Map<String, String> paths, boolean extendPath, AsyncCallback<Void> asyncCallback);
-    
-    public void getCachedFiles(String proxy, AsyncCallback<List<DMCachedFile>> asyncCallback);
-    
-    public void deleteCachedFiles(List<String> cachedFiles, String proxy, AsyncCallback<Void> asyncCallback);
-    
-    public void getPoolOperations(String userDN, String proxy, AsyncCallback<List<PoolOperation>> asyncCallback);
-    
-    public void getPoolOperations(String proxy, AsyncCallback<List<PoolOperation>> asyncCallback);
+    public void getCachedFiles(AsyncCallback<List<DMCachedFile>> asyncCallback);
+
+    public void deleteCachedFiles(List<String> cachedFiles, AsyncCallback<Void> asyncCallback);
+
+    public void getPoolOperationsByUser(AsyncCallback<List<PoolOperation>> asyncCallback);
+
+    public void getPoolOperations(AsyncCallback<List<PoolOperation>> asyncCallback);
+
+    public void removeOperations(List<String> ids, AsyncCallback<Void> asyncCallback);
+
+    public void removeOperationById(String id, AsyncCallback<Void> asyncCallback);
+
+    public void downloadFile(String remoteFile, AsyncCallback<Void> asyncCallback);
+
+    public void downloadFolder(String remoteFolder, AsyncCallback<Void> asyncCallback);
 }

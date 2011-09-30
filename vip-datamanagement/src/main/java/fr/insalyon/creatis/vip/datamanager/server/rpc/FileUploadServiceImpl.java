@@ -35,7 +35,9 @@
 package fr.insalyon.creatis.vip.datamanager.server.rpc;
 
 import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.io.File;
 import java.io.IOException;
@@ -65,7 +67,9 @@ public class FileUploadServiceImpl extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        if (ServletFileUpload.isMultipartContent(request)) {
+        User user = (User) request.getSession().getAttribute(CoreConstants.SESSION_USER);
+        if (user != null && ServletFileUpload.isMultipartContent(request)) {
+
             FileItemFactory factory = new DiskFileItemFactory();
             ServletFileUpload upload = new ServletFileUpload(factory);
             try {
@@ -73,22 +77,13 @@ public class FileUploadServiceImpl extends HttpServlet {
                 Iterator iter = items.iterator();
                 String fileName = null;
                 FileItem fileItem = null;
-                String userdn = null;
-                String user = null;
-                String proxy = null;
                 String path = null;
                 String target = "uploadComplete";
 
                 while (iter.hasNext()) {
                     FileItem item = (FileItem) iter.next();
 
-                    if (item.getFieldName().equals("userdn")) {
-                        userdn = item.getString();
-                    } else if (item.getFieldName().equals("user")) {
-                        user = item.getString();
-                    } else if (item.getFieldName().equals("proxy")) {
-                        proxy = item.getString();
-                    } else if (item.getFieldName().equals("path")) {
+                    if (item.getFieldName().equals("path")) {
                         path = item.getString();
                     } else if (item.getFieldName().equals("file")) {
                         fileName = item.getName();
@@ -110,14 +105,11 @@ public class FileUploadServiceImpl extends HttpServlet {
 
                         if (!local) {
                             // Vlet Agent Pool Client
-                            VletAgentPoolClient client = new VletAgentPoolClient(
-                                    ServerConfiguration.getInstance().getVletagentHost(),
-                                    ServerConfiguration.getInstance().getVletagentPort(),
-                                    proxy);
+                            VletAgentPoolClient client = CoreUtil.getVletAgentPoolClient();
                             client.uploadFile(
                                     uploadedFile.getAbsolutePath(),
-                                    DataManagerUtil.parseBaseDir(user, path),
-                                    userdn);
+                                    DataManagerUtil.parseBaseDir(user.getFullName(), path),
+                                    user.getEmail());
                         }
                     } catch (Exception ex) {
                         logger.error(ex);

@@ -20,13 +20,6 @@
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-common</artifactId>
-            <version>${vip.common.version}</version>
-            <scope>provided</scope>
-        </dependency>
         
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
@@ -35,13 +28,6 @@
             <scope>provided</scope>
         </dependency>
         
-        <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-datamanager-applet</artifactId>
-            <version>${vip.datamanager-applet.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>

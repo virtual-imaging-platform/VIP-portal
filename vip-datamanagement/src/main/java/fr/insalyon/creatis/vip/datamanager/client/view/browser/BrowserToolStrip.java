@@ -42,14 +42,13 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.BasicBrowserToolStrip;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 import java.util.ArrayList;
@@ -63,16 +62,13 @@ import java.util.Map;
  */
 public class BrowserToolStrip extends BasicBrowserToolStrip {
 
-    private BasicBrowserToolStrip toolStrip;
-
     public BrowserToolStrip(final ModalWindow modal, final ListGrid grid) {
 
         super(modal, grid);
-        this.toolStrip = this;
-
+        
         this.addSeparator();
         ToolStripButton uploadButton = new ToolStripButton();
-        uploadButton.setIcon("icon-upload.png");
+        uploadButton.setIcon(DataManagerConstants.ICON_UPLOAD);
         uploadButton.setPrompt("Upload");
         uploadButton.addClickHandler(new ClickHandler() {
 
@@ -80,6 +76,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                 String path = pathItem.getValueAsString();
                 if (path.equals(DataManagerConstants.ROOT)) {
                     SC.warn("You cannot upload a file in the root folder.");
+
                 } else {
                     DataUploadWindow window = new DataUploadWindow(modal, path);
                     BrowserLayout.getInstance().setDataUploadWindow(window);
@@ -90,7 +87,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         this.addButton(uploadButton);
 
         ToolStripButton downloadButton = new ToolStripButton();
-        downloadButton.setIcon("icon-download.png");
+        downloadButton.setIcon(DataManagerConstants.ICON_DOWNLOAD);
         downloadButton.setPrompt("Download Selected Files");
         downloadButton.addClickHandler(new ClickHandler() {
 
@@ -101,7 +98,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         this.addButton(downloadButton);
 
         ToolStripButton deleteButton = new ToolStripButton();
-        deleteButton.setIcon("icon-delete.png");
+        deleteButton.setIcon(CoreConstants.ICON_DELETE);
         deleteButton.setPrompt("Delete Selected Files/Folders");
         deleteButton.addClickHandler(new ClickHandler() {
 
@@ -118,7 +115,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
         this.addSeparator();
         ToolStripButton trashButton = new ToolStripButton();
-        trashButton.setIcon("icon-trash.png");
+        trashButton.setIcon(DataManagerConstants.ICON_TRASH);
         trashButton.setPrompt("Trash");
         trashButton.addClickHandler(new ClickHandler() {
 
@@ -130,7 +127,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         this.addButton(trashButton);
 
         ToolStripButton emptyTrashButton = new ToolStripButton();
-        emptyTrashButton.setIcon("icon-trash-empty.png");
+        emptyTrashButton.setIcon(DataManagerConstants.ICON_EMPTY_TRASH);
         emptyTrashButton.setPrompt("Empty Trash");
         emptyTrashButton.addClickHandler(new ClickHandler() {
 
@@ -146,13 +143,14 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
         for (ListGridRecord record : records) {
             DataRecord data = (DataRecord) record;
+
             if (data.getType().contains("file")) {
-                TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+                DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                 AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                     public void onFailure(Throwable caught) {
                         modal.hide();
-                        SC.warn("Unable to download file: " + caught.getMessage());
+                        SC.warn("Unable to download file:<br />" + caught.getMessage());
                     }
 
                     public void onSuccess(Void result) {
@@ -161,15 +159,13 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                         OperationLayout.getInstance().activateAutoRefresh();
                     }
                 };
-                modal.show("Adding files to transfer queue...", true);
-                Context context = Context.getInstance();
+                modal.show("Adding file to transfer queue...", true);
                 service.downloadFile(
-                        context.getUser(),
                         pathItem.getValueAsString() + "/" + data.getName(),
-                        context.getUserDN(), context.getProxyFileName(),
                         callback);
+
             } else {
-                TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+                DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                 AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                     public void onFailure(Throwable caught) {
@@ -184,17 +180,15 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                     }
                 };
                 modal.show("Adding folder to transfer queue...", true);
-                Context context = Context.getInstance();
                 service.downloadFolder(
-                        context.getUser(),
                         pathItem.getValueAsString() + "/" + data.getName(),
-                        context.getUserDN(), context.getProxyFileName(),
                         callback);
             }
         }
     }
 
     private void delete() {
+        
         ListGridRecord[] records = BrowserLayout.getInstance().getGridSelection();
         final Map<String, String> paths = new HashMap<String, String>();
 
@@ -213,7 +207,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
                         public void onFailure(Throwable caught) {
                             modal.hide();
-                            SC.warn("Error executing delete files/folders: " + caught.getMessage());
+                            SC.warn("Unable to delete files/folders:<br />" + caught.getMessage());
                         }
 
                         public void onSuccess(Void result) {
@@ -222,9 +216,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                         }
                     };
                     modal.show("Deleting files/folders...", true);
-                    Context context = Context.getInstance();
-                    service.renameFiles(context.getUser(), context.getProxyFileName(),
-                            paths, true, callback);
+                    service.rename(paths, true, callback);
                 }
             }
         });
@@ -235,12 +227,13 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
             public void execute(Boolean value) {
                 if (value != null && value) {
+
                     final DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                     AsyncCallback<List<Data>> callback = new AsyncCallback<List<Data>>() {
 
                         public void onFailure(Throwable caught) {
                             modal.hide();
-                            SC.warn("Error executing delete files/folders: " + caught.getMessage());
+                            SC.warn("Unable to delete files/folders:<br />" + caught.getMessage());
                         }
 
                         public void onSuccess(List<Data> result) {
@@ -251,6 +244,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                                         + DataManagerConstants.TRASH_HOME
                                         + "/" + data.getName());
                             }
+
                             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                                 public void onFailure(Throwable caught) {
@@ -265,16 +259,12 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                                             + DataManagerConstants.TRASH_HOME, true);
                                 }
                             };
-                            Context context = Context.getInstance();
-                            service.deleteFiles(context.getUser(), context.getProxyFileName(),
-                                    paths, callback);
+                            service.delete(paths, callback);
                         }
                     };
                     modal.show("Emptying Trash...", true);
-                    Context context = Context.getInstance();
-                    service.listDir(context.getUser(), context.getProxyFileName(),
-                            DataManagerConstants.ROOT + "/" + DataManagerConstants.TRASH_HOME,
-                            true, callback);
+                    service.listDir(DataManagerConstants.ROOT + "/"
+                            + DataManagerConstants.TRASH_HOME, true, callback);
                 }
             }
         });

@@ -42,12 +42,12 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationRecord;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,19 +63,19 @@ public class ManageOperationsToolStrip extends ToolStrip {
         this.setWidth100();
 
         ToolStripButton refreshButton = new ToolStripButton("Refresh");
-        refreshButton.setIcon("icon-refresh.png");
+        refreshButton.setIcon(CoreConstants.ICON_REFRESH);
         refreshButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
                 ManageOperationsTab tab = (ManageOperationsTab) Layout.getInstance()
-                        .getTab(DataManagerConstants.MANAGE_OPERATIONS_TAB);
+                        .getTab(DataManagerConstants.TAB_MANAGE_OPERATIONS);
                 tab.loadData();
             }
         });
         this.addButton(refreshButton);
 
         ToolStripButton clearSelectedOperations = new ToolStripButton("Clear Selected Operations");
-        clearSelectedOperations.setIcon("icon-clear.png");
+        clearSelectedOperations.setIcon(CoreConstants.ICON_CLEAR);
         clearSelectedOperations.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
@@ -84,7 +84,7 @@ public class ManageOperationsToolStrip extends ToolStrip {
                     public void execute(Boolean value) {
                         if (value != null && value) {
                             final ManageOperationsTab tab = (ManageOperationsTab) Layout.getInstance()
-                                    .getTab(DataManagerConstants.MANAGE_OPERATIONS_TAB);
+                                    .getTab(DataManagerConstants.TAB_MANAGE_OPERATIONS);
                             List<String> ids = new ArrayList<String>();
                             
                             for (ListGridRecord record : tab.getGridSelection()) {
@@ -94,12 +94,12 @@ public class ManageOperationsToolStrip extends ToolStrip {
                                 }
                             }
                             
-                            TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+                            DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                                 public void onFailure(Throwable caught) {
                                     modal.hide();
-                                    SC.warn("Error clearing operations: " + caught.getMessage());
+                                    SC.warn("Unable to clear operations:<br />" + caught.getMessage());
                                 }
 
                                 public void onSuccess(Void result) {
@@ -108,8 +108,7 @@ public class ManageOperationsToolStrip extends ToolStrip {
                                 }
                             };
                             modal.show("Clearing operations...", true);
-                            Context context = Context.getInstance();
-                            service.removeOperations(ids, context.getProxyFileName(), callback);
+                            service.removeOperations(ids, callback);
                         }
                     }
                 });

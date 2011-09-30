@@ -47,9 +47,8 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
@@ -73,6 +72,11 @@ public class OperationLayout extends VLayout {
             instance = new OperationLayout();
         }
         return instance;
+    }
+
+    public static void terminate() {
+
+        instance = null;
     }
 
     private OperationLayout() {
@@ -99,6 +103,7 @@ public class OperationLayout extends VLayout {
     }
 
     private void configureGrid() {
+
         grid = new ListGrid();
         grid.setWidth100();
         grid.setHeight100();
@@ -144,11 +149,12 @@ public class OperationLayout extends VLayout {
     }
 
     public void loadData() {
+
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<List<PoolOperation>> callback = new AsyncCallback<List<PoolOperation>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Unable to get list of operations: " + caught.getMessage());
+                SC.warn("Unable to get list of operations:<br />" + caught.getMessage());
             }
 
             public void onSuccess(List<PoolOperation> result) {
@@ -172,12 +178,11 @@ public class OperationLayout extends VLayout {
             }
         };
         modal.show("Loading operations...", true);
-        Context context = Context.getInstance();
-        service.getPoolOperations(context.getUserDN(), context.getProxyFileName(), callback);
+        service.getPoolOperationsByUser(callback);
     }
 
     public ListGridRecord[] getGridSelection() {
-        return grid.getSelection();
+        return grid.getSelectedRecords();
     }
 
     public void activateAutoRefresh() {

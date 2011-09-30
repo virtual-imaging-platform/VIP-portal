@@ -37,7 +37,8 @@ package fr.insalyon.creatis.vip.datamanager.server.rpc;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
 import fr.insalyon.creatis.agent.vlet.common.bean.Operation;
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
+import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -64,16 +65,12 @@ public class FileDownloadServiceImpl extends HttpServlet {
             throws ServletException, IOException {
 
         String operationId = req.getParameter("operationid");
-        String proxy = req.getParameter("proxy");
 
-        if (operationId != null && proxy != null && !operationId.isEmpty() && !proxy.isEmpty()) {
+        if (operationId != null && !operationId.isEmpty()) {
 
             try {
-                ServerConfiguration serverConfiguration = ServerConfiguration.getInstance();
-                VletAgentPoolClient client = new VletAgentPoolClient(
-                        serverConfiguration.getVletagentHost(),
-                        serverConfiguration.getVletagentPort(),
-                        proxy);
+                Server serverConfiguration = Server.getInstance();
+                VletAgentPoolClient client = CoreUtil.getVletAgentPoolClient();
                 Operation operation = client.getOperationById(operationId);
 
                 File file = new File(operation.getDest());

@@ -46,7 +46,7 @@ import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 
@@ -67,6 +67,11 @@ public class BrowserLayout extends VLayout {
             instance = new BrowserLayout();
         }
         return instance;
+    }
+    
+    public static void terminate() {
+        
+        instance = null;
     }
 
     private BrowserLayout() {
@@ -95,6 +100,7 @@ public class BrowserLayout extends VLayout {
     }
 
     private void configureGrid() {
+
         grid.setSelectionType(SelectionStyle.SIMPLE);
         grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
 
@@ -115,7 +121,8 @@ public class BrowserLayout extends VLayout {
                 event.cancel();
                 if (event.getColNum() != 0) {
                     DataRecord data = (DataRecord) event.getRecord();
-                    new BrowserContextMenu(modal, toolStrip.getPath(), data).showContextMenu();
+                    new BrowserContextMenu(modal,
+                            toolStrip.getPath(), data).showContextMenu();
                 }
             }
         });
@@ -126,7 +133,7 @@ public class BrowserLayout extends VLayout {
     }
 
     public ListGridRecord[] getGridSelection() {
-        return grid.getSelection();
+        return grid.getSelectedRecords();
     }
 
     public void mask(String maskText) {

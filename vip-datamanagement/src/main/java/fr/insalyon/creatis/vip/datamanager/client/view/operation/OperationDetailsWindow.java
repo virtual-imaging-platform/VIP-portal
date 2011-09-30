@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -34,8 +34,8 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.operation;
 
-import fr.insalyon.creatis.vip.common.client.view.property.AbstractPropertyWindow;
-import fr.insalyon.creatis.vip.common.client.view.property.PropertyRecord;
+import fr.insalyon.creatis.vip.core.client.view.property.AbstractPropertyWindow;
+import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
 
 /**
  *

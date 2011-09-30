@@ -63,25 +63,31 @@ public interface DataManagerService extends RemoteService {
         }
     }
 
-    public void configureDataManager(String user, String proxyFileName) throws DataManagerException;
+    public List<Data> listDir(String baseDir, boolean refresh) throws DataManagerException;
 
-    public List<Data> listDir(String user, String proxyFileName, String baseDir, boolean refresh) throws DataManagerException;
+    public void delete(String path) throws DataManagerException;
 
-    public void delete(String user, String proxyFileName, String path) throws DataManagerException;
+    public void delete(List<String> paths) throws DataManagerException;
 
-    public void createDir(String user, String proxyFileName, String baseDir, String name) throws DataManagerException;
+    public void createDir(String baseDir, String name) throws DataManagerException;
 
-    public void deleteFiles(String user, String proxyFileName, List<String> paths) throws DataManagerException;
+    public void rename(String oldPath, String newPath, boolean extendPath) throws DataManagerException;
 
-    public void rename(String user, String proxyFileName, String oldPath, String newPath, boolean extendPath) throws DataManagerException;
+    public void rename(Map<String, String> paths, boolean extendPath) throws DataManagerException;
 
-    public void renameFiles(String user, String proxyFileName, Map<String, String> paths, boolean extendPath) throws DataManagerException;
+    public List<DMCachedFile> getCachedFiles() throws DataManagerException;
 
-    public List<DMCachedFile> getCachedFiles(String proxy) throws DataManagerException;
+    public void deleteCachedFiles(List<String> cachedFiles) throws DataManagerException;
 
-    public void deleteCachedFiles(List<String> cachedFiles, String proxy) throws DataManagerException;
+    public List<PoolOperation> getPoolOperationsByUser() throws DataManagerException;
 
-    public List<PoolOperation> getPoolOperations(String userDN, String proxy) throws DataManagerException;
+    public List<PoolOperation> getPoolOperations() throws DataManagerException;
 
-    public List<PoolOperation> getPoolOperations(String proxy) throws DataManagerException;
+    public void removeOperations(List<String> ids) throws DataManagerException;
+
+    public void removeOperationById(String id) throws DataManagerException;
+
+    public void downloadFile(String remoteFile) throws DataManagerException;
+
+    public void downloadFolder(String remoteFolder) throws DataManagerException;
 }

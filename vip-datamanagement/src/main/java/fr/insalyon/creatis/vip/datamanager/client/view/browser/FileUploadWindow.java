@@ -44,8 +44,7 @@ import com.smartgwt.client.widgets.form.fields.HiddenItem;
 import com.smartgwt.client.widgets.form.fields.UploadItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 
 /**
  *
@@ -78,12 +77,6 @@ public class FileUploadWindow extends Window {
         fileItem.setWidth(300);
         fileItem.setRequired(true);
         
-        HiddenItem userItem = new HiddenItem("user");
-        userItem.setValue(Context.getInstance().getUser());
-        HiddenItem userdnItem = new HiddenItem("userdn");
-        userdnItem.setValue(Context.getInstance().getUserDN());
-        HiddenItem proxyItem = new HiddenItem("proxy");
-        proxyItem.setValue(Context.getInstance().getProxyFileName());
         HiddenItem pathItem = new HiddenItem("path");
         pathItem.setValue(baseDir);
         HiddenItem targetItem = new HiddenItem("target");
@@ -101,8 +94,7 @@ public class FileUploadWindow extends Window {
             }
         });
         
-        form.setItems(fileItem, userItem, userdnItem, proxyItem, 
-                pathItem, targetItem, uploadButton);
+        form.setItems(fileItem, pathItem, targetItem, uploadButton);
         
         this.addItem(form);
     }

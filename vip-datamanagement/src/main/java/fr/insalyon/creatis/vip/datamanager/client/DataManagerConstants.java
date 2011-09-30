@@ -40,12 +40,36 @@ package fr.insalyon.creatis.vip.datamanager.client;
  */
 public class DataManagerConstants {
 
+    // Tabs
+    public final static String TAB_MANAGE_OPERATIONS = "manage-operations-tab";
+    public final static String TAB_MANAGE_CACHED_FILES = "manage-cached-files-tab";
+    // Sections
+    public final static String SECTION_FILE_TRANSFER = "file-transfer-section";
+    // Layouts
+    public final static String LAYOUT_BROWSER = "browser-layout";
+    public final static String LAYOUT_OPERATION = "operation-layout";
+    // Icons
+    private static final String IMG_FOLDER = "datamanager/";
+    public static final String ICON_CACHE = IMG_FOLDER + "icon-cache.png";
+    public static final String ICON_CUT = IMG_FOLDER + "icon-cut.png";
+    public static final String ICON_DOWNLOAD = IMG_FOLDER + "icon-download.png";
+    public static final String ICON_EMPTY_TRASH = IMG_FOLDER + "icon-trash-empty.png";
+    public static final String ICON_OPERATION = IMG_FOLDER + "icon-operation.png";
+    public static final String ICON_FOLDER_UP = IMG_FOLDER + "icon-folderup.png";
+    public static final String ICON_FOLDER_ADD = IMG_FOLDER + "icon-addfolder.png";
+    public static final String ICON_PASTE = IMG_FOLDER + "icon-paste.png";
+    public static final String ICON_TRASH = IMG_FOLDER + "icon-trash.png";
+    public static final String ICON_UPLOAD = IMG_FOLDER + "icon-upload.png";
+    // Application Names
+    public final static String APP_OPERATIONS = "Operations";
+    public final static String APP_CACHED_FILES = "Cached Files";
+    // Application Images
+    public static final String APP_IMG_OPERATIONS = IMG_FOLDER + "app-operation.png";
+    public static final String APP_IMG_CACHED_FILES = IMG_FOLDER + "app-cache.png";
+    // Configuration Constants
     public final static String ROOT = "/vip";
     public final static String USERS_HOME = "Home";
     public final static String TRASH_HOME = "Trash";
     public final static String BIOMED_HOME = "Biomed";
     public final static String GROUP_APPEND = " (group)";
-    // Tab Identifications
-    public final static String MANAGE_OPERATIONS_TAB = "manage-operations-tab";
-    public final static String MANAGE_CACHED_FILES_TAB = "manage-cached-files-tab";
 }

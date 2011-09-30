@@ -34,11 +34,9 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view;
 
-import com.smartgwt.client.widgets.menu.Menu;
-import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.ClickHandler;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.cache.ManageCachedFilesTab;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.manage.ManageOperationsTab;
 
@@ -46,35 +44,27 @@ import fr.insalyon.creatis.vip.datamanager.client.view.operation.manage.ManageOp
  *
  * @author Rafael Silva
  */
-public class DataManagerMenuItem extends MenuItem {
+public class DataManagerParser extends ApplicationParser {
 
-    public DataManagerMenuItem() {
-        
-        this.setTitle("File Transfer");
-        this.setIcon("icon-datamanager.png");
-        
-        // Operations
-        Menu menu = new Menu();
-        
-        MenuItem manageOperations = new MenuItem("Manage Operations");
-        manageOperations.setIcon("icon-datamanager-op.png");
-        manageOperations.addClickHandler(new ClickHandler() {
+    @Override
+    public void loadApplications() {
 
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new ManageOperationsTab());
-            }
-        });
-        
-        MenuItem manageCachedFiles = new MenuItem("Manage Cached Files");
-        manageCachedFiles.setIcon("icon-datamanager-cache.png");
-        manageCachedFiles.addClickHandler(new ClickHandler() {
+        addApplication(DataManagerConstants.APP_OPERATIONS, DataManagerConstants.APP_IMG_OPERATIONS);
+        addApplication(DataManagerConstants.APP_CACHED_FILES, DataManagerConstants.APP_IMG_CACHED_FILES);
+    }
 
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new ManageCachedFilesTab());
-            }
-        });
-        
-        menu.setItems(manageOperations, manageCachedFiles);
-        this.setSubmenu(menu);
+    @Override
+    public boolean parse(String applicationName) {
+
+        if (applicationName.equals(DataManagerConstants.APP_OPERATIONS)) {
+            Layout.getInstance().addTab(new ManageOperationsTab());
+            return true;
+
+        } else if (applicationName.equals(DataManagerConstants.APP_CACHED_FILES)) {
+            Layout.getInstance().addTab(new ManageCachedFilesTab());
+            return true;
+
+        }
+        return false;
     }
 }

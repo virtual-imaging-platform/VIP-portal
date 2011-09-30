@@ -41,8 +41,8 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
@@ -63,7 +63,7 @@ public class ManageCachedFilesContextMenu extends Menu {
         this.setWidth(90);
 
         MenuItem deleteItem = new MenuItem("Delete File");
-        deleteItem.setIcon("icon-delete.png");
+        deleteItem.setIcon(CoreConstants.ICON_DELETE);
         deleteItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -76,22 +76,20 @@ public class ManageCachedFilesContextMenu extends Menu {
 
                                 public void onFailure(Throwable caught) {
                                     modal.hide();
-                                    SC.warn("Error executing delete file: " + caught.getMessage());
+                                    SC.warn("Error executing delete file:<br />" + caught.getMessage());
                                 }
 
                                 public void onSuccess(Void result) {
                                     modal.hide();
                                     ManageCachedFilesTab tab = (ManageCachedFilesTab) Layout.getInstance()
-                                            .getTab(DataManagerConstants.MANAGE_CACHED_FILES_TAB);
+                                            .getTab(DataManagerConstants.TAB_MANAGE_CACHED_FILES);
                                     tab.loadData();
                                 }
                             };
                             modal.show("Deleting file...", true);
-                            Context context = Context.getInstance();
                             List<String> pathsList = new ArrayList<String>();
                             pathsList.add(cachedFile.getPath());
-                            service.deleteCachedFiles(pathsList, 
-                                    context.getProxyFileName(), callback);
+                            service.deleteCachedFiles(pathsList, callback);
                         }
                     }
                 });

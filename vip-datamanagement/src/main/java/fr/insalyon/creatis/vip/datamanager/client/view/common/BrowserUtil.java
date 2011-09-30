@@ -40,12 +40,12 @@ import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
@@ -101,70 +101,66 @@ public class BrowserUtil {
             final BasicBrowserToolStrip toolStrip, final String path, boolean refresh) {
 
         if (!path.equals(DataManagerConstants.ROOT)) {
+            
             DataManagerServiceAsync service = DataManagerService.Util.getInstance();
             AsyncCallback<List<Data>> callback = new AsyncCallback<List<Data>>() {
 
                 public void onFailure(Throwable caught) {
                     modal.hide();
-                    SC.warn("Error executing get files list: " + caught.getMessage());
+                    SC.warn("Unable to get list of files:<br />" + caught.getMessage());
                 }
 
                 public void onSuccess(List<Data> result) {
-                    if (result != null) {
-                        List<DataRecord> dataList = new ArrayList<DataRecord>();
-                        for (Data d : result) {
-                            String replicas = "";
-                            for (String replica : d.getReplicas()) {
-                                if (!replicas.isEmpty()) {
-                                    replicas += ", ";
-                                }
-                                replicas += replica;
+                    List<DataRecord> dataList = new ArrayList<DataRecord>();
+                    for (Data data : result) {
+                        String replicas = "";
+                        for (String replica : data.getReplicas()) {
+                            if (!replicas.isEmpty()) {
+                                replicas += ", ";
                             }
-                            dataList.add(new DataRecord(
-                                    d.getType().toLowerCase(), d.getName(),
-                                    (int) d.getLength(), d.getModificationDate(),
-                                    replicas, d.getPermissions()));
+                            replicas += replica;
                         }
-                        toolStrip.setPath(path);
-                        grid.setData(dataList.toArray(new DataRecord[]{}));
-                        modal.hide();
-
-                    } else {
-                        modal.hide();
-                        SC.warn("Unable to get list of files.");
+                        dataList.add(new DataRecord(
+                                data.getType().toLowerCase(),
+                                data.getName(),
+                                (int) data.getLength(),
+                                data.getModificationDate(),
+                                replicas,
+                                data.getPermissions()));
                     }
+                    toolStrip.setPath(path);
+                    grid.setData(dataList.toArray(new DataRecord[]{}));
+                    modal.hide();
                 }
             };
             modal.show("Loading folder " + path + "...", true);
-            Context context = Context.getInstance();
-            service.listDir(context.getUser(), context.getProxyFileName(), path, refresh, callback);
+            service.listDir(path, refresh, callback);
 
         } else {
 
             ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-            AsyncCallback<User> callback = new AsyncCallback<User>() {
+            AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
                 public void onFailure(Throwable caught) {
                     modal.hide();
                     SC.warn("Error executing get files list: " + caught.getMessage());
                 }
 
-                public void onSuccess(User result) {
+                public void onSuccess(List<String> result) {
                     toolStrip.setPath(path);
 
                     List<DataRecord> records = new ArrayList<DataRecord>();
                     records.add(new DataRecord("folder", DataManagerConstants.USERS_HOME));
+                    records.add(new DataRecord("folder", DataManagerConstants.TRASH_HOME));
 
-                    for (String groupName : result.getGroups().keySet()) {
-                        if (!groupName.equals("Administrator")) {
+                    for (String groupName : result) {
+                        if (!groupName.equals(CoreConstants.GROUP_ADMIN)) {
                             records.add(new DataRecord("folder", groupName 
                                     + DataManagerConstants.GROUP_APPEND));
                         }
-                    }
+                    }                  
 
-                    records.add(new DataRecord("folder", DataManagerConstants.TRASH_HOME));
-
-                    if (Context.getInstance().isSystemAdmin()) {
+                    if (CoreModule.user.isSystemAdministrator()) {
                         records.add(new DataRecord("folder", DataManagerConstants.BIOMED_HOME));
                     }
 
@@ -173,7 +169,7 @@ public class BrowserUtil {
                 }
             };
             modal.show("Loading " + DataManagerConstants.ROOT + "...", true);
-            service.getUser(Context.getInstance().getUserDN(), callback);
+            service.getUserGroups(callback);
         }
     }
 }

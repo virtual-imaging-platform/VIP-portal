@@ -45,10 +45,11 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,7 +70,7 @@ public class OperationToolStrip extends ToolStrip {
         this.addSeparator();
 
         ToolStripButton refreshButton = new ToolStripButton();
-        refreshButton.setIcon("icon-refresh.png");
+        refreshButton.setIcon(CoreConstants.ICON_REFRESH);
         refreshButton.setPrompt("Refresh");
         refreshButton.addClickHandler(new ClickHandler() {
 
@@ -80,7 +81,7 @@ public class OperationToolStrip extends ToolStrip {
         this.addButton(refreshButton);
 
         ToolStripButton downloadButton = new ToolStripButton();
-        downloadButton.setIcon("icon-download.png");
+        downloadButton.setIcon(DataManagerConstants.ICON_DOWNLOAD);
         downloadButton.setPrompt("Download Selected Files");
         downloadButton.addClickHandler(new ClickHandler() {
 
@@ -94,9 +95,7 @@ public class OperationToolStrip extends ToolStrip {
                         Window.open(
                                 GWT.getModuleBaseURL()
                                 + "/filedownloadservice?operationid="
-                                + op.getId()
-                                + "&proxy="
-                                + Context.getInstance().getProxyFileName(),
+                                + op.getId(),
                                 "", "");
                     }
                 }
@@ -106,7 +105,7 @@ public class OperationToolStrip extends ToolStrip {
 
         this.addSeparator();
         ToolStripButton clearButton = new ToolStripButton();
-        clearButton.setIcon("icon-clear.png");
+        clearButton.setIcon(CoreConstants.ICON_CLEAR);
         clearButton.setPrompt("Clear Selected Operations");
         clearButton.addClickHandler(new ClickHandler() {
 
@@ -123,12 +122,12 @@ public class OperationToolStrip extends ToolStrip {
                                 }
                             }
 
-                            TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+                            DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                                 public void onFailure(Throwable caught) {
                                     modal.hide();
-                                    SC.warn("Error executing clear operations: " + caught.getMessage());
+                                    SC.warn("Unable to clear operations:<br />" + caught.getMessage());
                                 }
 
                                 public void onSuccess(Void result) {
@@ -137,8 +136,7 @@ public class OperationToolStrip extends ToolStrip {
                                 }
                             };
                             modal.show("Clearing operations...", true);
-                            Context context = Context.getInstance();
-                            service.removeOperations(ids, context.getProxyFileName(), callback);
+                            service.removeOperations(ids, callback);
                         }
                     }
                 });

@@ -41,12 +41,12 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationRecord;
 
 /**
@@ -62,7 +62,7 @@ public class ManageOperationsContextMenu extends Menu {
         this.setWidth(90);
 
         MenuItem clearItem = new MenuItem("Clear Operation");
-        clearItem.setIcon("icon-clear.png");
+        clearItem.setIcon(CoreConstants.ICON_CLEAR);
         clearItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -70,7 +70,7 @@ public class ManageOperationsContextMenu extends Menu {
 
                     public void execute(Boolean value) {
                         if (value != null && value) {
-                            TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+                            DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                                 public void onFailure(Throwable caught) {
@@ -80,15 +80,12 @@ public class ManageOperationsContextMenu extends Menu {
 
                                 public void onSuccess(Void result) {
                                     modal.hide();
-                                    ManageOperationsTab tab = (ManageOperationsTab) Layout.getInstance()
-                                            .getTab(DataManagerConstants.MANAGE_OPERATIONS_TAB);
+                                    ManageOperationsTab tab = (ManageOperationsTab) Layout.getInstance().getTab(DataManagerConstants.TAB_MANAGE_OPERATIONS);
                                     tab.loadData();
                                 }
                             };
                             modal.show("Clearing operation...", true);
-                            Context context = Context.getInstance();
-                            service.removeOperationById(operation.getId(),
-                                    context.getProxyFileName(), callback);
+                            service.removeOperationById(operation.getId(), callback);
                         }
                     }
                 });

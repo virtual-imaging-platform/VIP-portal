@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.datamanager.client.view;
 
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 
@@ -44,27 +45,18 @@ import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout
  * @author Rafael Silva
  */
 public class DataManagerSection extends SectionStackSection {
-
-    private static DataManagerSection instance = null;
     
-    public static DataManagerSection getInstance() {
-        if(instance == null){
-            instance = new DataManagerSection();
-        }
-        return instance;
-            
-    }
-
-    private DataManagerSection() {
+    public DataManagerSection() {
 
         this.setTitle("File Transfer");
         this.setCanCollapse(true);
         this.setExpanded(false);
         this.setResizeable(true);
+        this.setID(DataManagerConstants.SECTION_FILE_TRANSFER);
         
         HLayout hLayout = new HLayout();
         hLayout.setHeight100();
-        
+                
         hLayout.addMember(BrowserLayout.getInstance());
         hLayout.addMember(OperationLayout.getInstance());
         

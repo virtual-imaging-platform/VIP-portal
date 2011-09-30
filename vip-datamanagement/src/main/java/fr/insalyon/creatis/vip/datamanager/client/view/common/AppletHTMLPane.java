@@ -43,8 +43,8 @@ import com.smartgwt.client.widgets.HTMLPane;
 public class AppletHTMLPane extends HTMLPane {
 
     public AppletHTMLPane(String title, String code, String archive, int width,
-            int height, String user, String userDN, String proxy, String path,
-            boolean unzip, boolean usePool) {
+            int height, String path, boolean unzip, 
+            boolean usePool) {
 
         this.setWidth100();
         this.setHeight100();
@@ -61,9 +61,6 @@ public class AppletHTMLPane extends HTMLPane {
                 + "<applet width=\"" + width + "\" height=\"" + height + "\" "
                 + "code=\"" + code + "\" "
                 + "archive=\"applets/" + archive + "\">"
-                + "<param name=\"user\" value=\"" + user + "\"/>"
-                + "<param name=\"userdn\" value=\"" + userDN + "\"/>"
-                + "<param name=\"proxy\" value=\"" + proxy + "\"/>"
                 + "<param name=\"path\" value=\"" + path + "\"/>"
                 + "<param name=\"unzip\" value=\"" + unzip + "\"/>"
                 + "<param name=\"pool\" value=\"" + usePool + "\"/>"
