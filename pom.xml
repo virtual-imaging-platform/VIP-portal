@@ -10,9 +10,10 @@
     <properties>
         <vip.common.version>0.5</vip.common.version>
         <vip.core.version>0.5</vip.core.version>
-        <vip.application.version>0.4.3</vip.application.version>
+        <vip.docs.version>0.5</vip.docs.version>
+        <vip.application.version>0.5</vip.application.version>
         <vip.datamanager.version>0.5</vip.datamanager.version>
-        <vip.datamanager-applet.version>0.1.3</vip.datamanager-applet.version>
+        <vip.datamanager-applet.version>0.2</vip.datamanager-applet.version>
         <vip.gatelab-applet.version>0.1</vip.gatelab-applet.version>
         <vip.portal.version>0.5</vip.portal.version>
         <vip.gatelab.version>0.4</vip.gatelab.version>
@@ -52,6 +53,7 @@
     <modules>
         <module>vip-common</module>
         <module>vip-core</module>
+        <module>vip-docs</module>
         <module>vip-application</module>
         <module>vip-datamanagement</module>
         <module>vip-gatelab</module>
@@ -92,6 +94,7 @@
         <developerConnection>scm:svn:https://svn.creatis.insa-lyon.fr/svn/vip/Portal</developerConnection>
         <url>http://vip.creatis.insa-lyon.fr:9002/projects/vip</url>
     </scm>
+    
     <build>
         <plugins>
             <plugin>
