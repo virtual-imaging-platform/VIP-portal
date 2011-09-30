@@ -32,52 +32,83 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.monitor;
+package fr.insalyon.creatis.vip.application.client.view.common;
 
 import com.google.gwt.user.client.Timer;
 import com.smartgwt.client.types.Side;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
 import com.smartgwt.client.widgets.tab.events.TabDeselectedEvent;
 import com.smartgwt.client.widgets.tab.events.TabDeselectedHandler;
 import com.smartgwt.client.widgets.tab.events.TabSelectedEvent;
 import com.smartgwt.client.widgets.tab.events.TabSelectedHandler;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
-import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
 
 /**
  *
  * @author Rafael Silva
  */
-public class SimulationTab extends AbstractSimulationTab {
+public abstract class AbstractSimulationTab extends Tab {
 
-    private GeneralTab generalTab;
-    private SummaryTab summaryTab;
-    private ChartsTab chartsTab;
-    private LogsTab logsTab;
+    protected TabSet tabSet;
+    protected boolean completed;
+    private Timer timer;
 
-    public SimulationTab(String simulationID, String simulationName, SimulationStatus status) {
-        
-        super(simulationID, simulationName, status);
+    public AbstractSimulationTab(String simulationID, String simulationName, SimulationStatus status) {
 
-        generalTab = new GeneralTab(simulationID, simulationName);
-        summaryTab = new SummaryTab(simulationID, completed);
-        chartsTab = new ChartsTab(simulationID);
+        this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_APPLICATION) + " " + simulationName);
+        this.setID(simulationID + "-tab");
+        this.setCanClose(true);
 
-        tabSet.addTab(generalTab);
-        tabSet.addTab(summaryTab);
-        tabSet.addTab(chartsTab);
-        
-        if (CoreModule.user.isSystemAdministrator()) {
-            logsTab = new LogsTab(simulationID);
-            tabSet.addTab(logsTab);
+        this.completed = status == SimulationStatus.Running ? false : true;
+
+        VLayout vLayout = new VLayout();
+        tabSet = new TabSet();
+        tabSet.setTabBarPosition(Side.LEFT);
+        tabSet.setWidth100();
+        tabSet.setHeight100();
+
+        vLayout.addMember(tabSet);
+
+        this.setPane(vLayout);
+
+        if (!completed) {
+            timer = new Timer() {
+
+                public void run() {
+                    updateData();
+                }
+            };
+            timer.scheduleRepeating(30000);
         }
+
+        this.addTabDeselectedHandler(new TabDeselectedHandler() {
+
+            public void onTabDeselected(TabDeselectedEvent event) {
+                if (!completed) {
+                    timer.cancel();
+                }
+            }
+        });
+        this.addTabSelectedHandler(new TabSelectedHandler() {
+
+            public void onTabSelected(TabSelectedEvent event) {
+                if (!completed) {
+                    updateData();
+                    timer.scheduleRepeating(30000);
+                }
+            }
+        });
     }
 
-    protected void updateData() {
-
-        summaryTab.loadData();
-        generalTab.loadData();
+    protected abstract void updateData();
+    
+    public void destroy() {
+        if (!completed) {
+            timer.cancel();
+        }
     }
 }
