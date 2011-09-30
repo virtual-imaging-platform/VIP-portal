@@ -4,7 +4,7 @@
     
     <context-param>
         <param-name>db.url</param-name>
-        <param-value>jdbc:h2:tcp://localhost/~/.platform/db/vip.db;AUTO_RECONNECT=TRUE</param-value>
+        <param-value>jdbc:h2:tcp://localhost/~/.vip/db/vip.db;AUTO_RECONNECT=TRUE</param-value>
     </context-param>
     <context-param>
         <param-name>db.user</param-name>
@@ -178,6 +178,7 @@
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/vtkcontroller</url-pattern>
     </servlet-mapping>
     <!-- End Models Module -->
+    
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
@@ -186,7 +187,7 @@
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
     
-    <security-constraint>
+<!--    <security-constraint>
         <web-resource-collection>
             <web-resource-name>site</web-resource-name>
             <description>Only HTTPS Access</description>
@@ -203,5 +204,5 @@
     <login-config>
         <auth-method>CLIENT-CERT</auth-method>
         <realm-name>Client Cert Users-only Area</realm-name>
-    </login-config>
+    </login-config>-->
 </web-app>

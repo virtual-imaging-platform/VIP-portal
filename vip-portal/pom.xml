@@ -29,14 +29,14 @@
         <!-- VIP MODULES -->
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-common</artifactId>
-            <version>${vip.common.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-core</artifactId>
             <version>${vip.core.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-docs</artifactId>
+            <version>${vip.docs.version}</version>
         </dependency>
 
         <dependency>
@@ -57,11 +57,11 @@
             <version>${vip.gatelab-applet.version}</version>
         </dependency>
 
-        <dependency>
+<!--        <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-provenance</artifactId>
             <version>${vip.provenance.version}</version>
-        </dependency>
+        </dependency>-->
         
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
@@ -69,23 +69,23 @@
             <version>${vip.application.version}</version>
         </dependency>
         
-        <dependency>
+<!--        <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-gatelab</artifactId>
             <version>${vip.gatelab.version}</version>
-        </dependency>
+        </dependency>-->
         
-        <dependency>
+<!--        <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-simulation-gui</artifactId>
             <version>${vip.simulation-gui.version}</version>
-        </dependency>
+        </dependency>-->
         
-        <dependency>
+<!--        <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-models</artifactId>
             <version>${vip.models.version}</version>
-        </dependency>
+        </dependency>-->
         
       <!--dependency>
             <groupId>fr.insalyon.creatis</groupId>

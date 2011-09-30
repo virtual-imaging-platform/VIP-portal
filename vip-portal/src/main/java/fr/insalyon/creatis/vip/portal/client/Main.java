@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -37,16 +37,16 @@ package fr.insalyon.creatis.vip.portal.client;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
-import fr.insalyon.creatis.vip.application.client.ApplicationInit;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.core.client.bean.Configuration;
+import fr.insalyon.creatis.vip.application.client.ApplicationModule;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.ModulesInit;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.datamanager.client.DataManagerInit;
-import fr.insalyon.creatis.vip.gatelab.client.GateLabInit;
-import fr.insalyon.creatis.vip.models.client.ModelInit;
-import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIInit;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
+import fr.insalyon.creatis.vip.docs.client.DocsModule;
 
 /**
  *
@@ -55,32 +55,29 @@ import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIInit;
 public class Main implements EntryPoint {
 
     public void onModuleLoad() {
+        
+        // Modules
+        ModulesInit modulesInit = ModulesInit.getInstance();
+        modulesInit.add(new CoreModule());
+        modulesInit.add(new DataManagerModule());
+        modulesInit.add(new ApplicationModule());
+        modulesInit.add(new DocsModule());
+        // End-Modules
+
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<Configuration> callback = new AsyncCallback<Configuration>() {
+        final AsyncCallback<User> callback = new AsyncCallback<User>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get user\n" + caught.getMessage());
+                Layout.getInstance().getModal().hide();
+                SC.warn("Error while configuring VIP:<br />" + caught.getMessage());
             }
 
-            public void onSuccess(Configuration result) {
-                Context context = Context.getInstance();
-                context.setAuthentication(result.getAuthentication());
-                context.setMoteurServerHost(result.getMoteurServerHost());
-                context.setLfcHost(result.getLfcHost());
-                context.setLfcPort(result.getLfcPort());
-                
-                // Modules Initialization
-                DataManagerInit.getInstance();
-                GateLabInit.getInstance();
-                SimulationGUIInit.getInstance();
-                ModelInit.getInstance();
-//                PhysicalPropertiesInit.getInstance();
-                ApplicationInit.getInstance();
-                // End Modules Initialization
-
-                Layout.getInstance();
+            public void onSuccess(User user) {
+                Layout.getInstance().getModal().hide();
+                Layout.getInstance().authenticate(user);
             }
         };
-        service.loadConfiguration(callback);
+        Layout.getInstance().getModal().show("Loading VIP " + CoreConstants.VERSION, true);
+        service.configure(callback);
     }
 }
