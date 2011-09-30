@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -34,8 +34,8 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao.derby.connection;
 
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -49,9 +49,9 @@ public class WorkflowsConnection {
 
     private static WorkflowsConnection instance;
     private final String DRIVER = "org.apache.derby.jdbc.ClientDriver";
-    private final String DBURL = "jdbc:derby://" 
-            + ServerConfiguration.getInstance().getWorkflowsHost() + ":"
-            + ServerConfiguration.getInstance().getWorkflowsPort() + "/";
+    private final String DBURL = "jdbc:derby://"
+            + Server.getInstance().getWorkflowsHost() + ":"
+            + Server.getInstance().getWorkflowsPort() + "/";
     private Connection connection;
 
     public synchronized static WorkflowsConnection getInstance() throws DAOException {
@@ -64,13 +64,13 @@ public class WorkflowsConnection {
     private WorkflowsConnection() throws DAOException {
         try {
             Class.forName(DRIVER);
-            connection = DriverManager.getConnection(DBURL + ServerConfiguration.getInstance().getWorkflowsDB() + ";create=true");
+            connection = DriverManager.getConnection(DBURL + Server.getInstance().getWorkflowsDB() + ";create=true");
             connection.setAutoCommit(true);
             createTables();
 
         } catch (SQLException ex) {
             try {
-                connection = DriverManager.getConnection(DBURL + ServerConfiguration.getInstance().getWorkflowsDB());
+                connection = DriverManager.getConnection(DBURL + Server.getInstance().getWorkflowsDB());
                 connection.setAutoCommit(true);
 
             } catch (SQLException ex1) {

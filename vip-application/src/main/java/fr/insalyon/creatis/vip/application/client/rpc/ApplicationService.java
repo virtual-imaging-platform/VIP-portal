@@ -39,6 +39,7 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import java.util.List;
 
 /**
@@ -60,27 +61,25 @@ public interface ApplicationService extends RemoteService {
         }
     }
 
-    public List<Application> getApplications(String applicationClass);
-    
-    public List<String> getApplicationsName(String applicationClass);
+    public List<Application> getApplications() throws ApplicationException;
 
-    public Application getApplication(String name);
+    public Application getApplication(String name) throws ApplicationException;
 
-    public String add(Application application);
+    public void add(Application application) throws ApplicationException;
 
-    public String update(Application application);
+    public void update(Application application) throws ApplicationException;
 
-    public void remove(String name);
-    
-    public void removeClassFromApplication(String applicationClass, String applicationName);
+    public void remove(String name) throws ApplicationException;
 
-    public String addClass(AppClass c);
+    public void addClass(AppClass c) throws ApplicationException;
 
-    public String updateClass(AppClass c);
+    public void updateClass(AppClass c) throws ApplicationException;
 
-    public void removeClass(String className);
+    public void removeClass(String className) throws ApplicationException;
 
-    public List<AppClass> getClasses();
+    public List<AppClass> getClasses() throws ApplicationException;
 
-    public AppClass getClass(String className);
+    public AppClass getClass(String className) throws ApplicationException;
+
+    public List<String>[] getApplicationsAndUsers() throws ApplicationException;
 }

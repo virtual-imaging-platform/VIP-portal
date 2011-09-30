@@ -32,24 +32,48 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.server.business;
+package fr.insalyon.creatis.vip.application.client.view.system.application;
 
-import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputParser;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
  *
  * @author Rafael Silva
  */
-public class InputsBusiness {
+public class ManageApplicationsToolStrip extends ToolStrip {
 
-    public String getWorkflowInputs(String fileName) throws BusinessException {
+    public ManageApplicationsToolStrip() {
+        
+        this.setWidth100();
 
-        fileName = DataManagerUtil.getUploadRootDirectory(true) + fileName;
-        String inputs = new InputParser().parse(fileName);
-        new DataManagerBusiness().deleteLocalFile(fileName);
-        return inputs;
+        ToolStripButton addButton = new ToolStripButton("Add Application");
+        addButton.setIcon(CoreConstants.ICON_ADD);
+        addButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
+                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
+                appsTab.setApplication(null, null, null);
+            }
+        });
+        this.addButton(addButton);
+
+        ToolStripButton refreshButton = new ToolStripButton("Refresh");
+        refreshButton.setIcon(CoreConstants.ICON_REFRESH);
+        refreshButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
+                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
+                appsTab.loadApplications();
+            }
+        });
+        this.addButton(refreshButton);
     }
 }

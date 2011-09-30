@@ -20,13 +20,6 @@
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-common</artifactId>
-            <version>${vip.common.version}</version>
-            <scope>provided</scope>
-        </dependency>
         
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
@@ -81,20 +74,20 @@
         
         <dependency>
             <groupId>fr.cnrs.i3s</groupId>
-            <artifactId>moteur2</artifactId>
-            <version>0.9.13</version>
+            <artifactId>moteur2-client</artifactId>
+            <version>0.9.14</version>
         </dependency>
         
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-
         <dependency>
             <groupId>commons-discovery</groupId>
             <artifactId>commons-discovery</artifactId>
             <version>0.4</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>fr.insa-lyon.creatis</groupId>
+            <artifactId>Shiwa-Pool-Client</artifactId>
+            <version>0.3</version>
         </dependency>
 
     </dependencies>
@@ -156,8 +149,8 @@
     </build>
     <repositories>
         <repository>
-            <id>neurolog-releases</id>
-            <name>NeuroLOG Releases Repository</name>
+            <id>Unice-releases</id>
+            <name>Unice Releases Repository</name>
             <url>http://nyx.unice.fr:9007/nexus/content/repositories/releases</url>
         </repository>
     </repositories>

@@ -38,6 +38,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -48,23 +49,26 @@ import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
-import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.menu.LogsContextMenu;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.FileOrFolderRecord;
-import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class LogsStackSection extends SectionStackSection {
+public class LogsTab extends Tab {
 
     protected ModalWindow modal;
     private String simulationID;
@@ -72,13 +76,12 @@ public class LogsStackSection extends SectionStackSection {
     private ToolStrip toolStrip;
     private SelectItem pathItem;
 
-    public LogsStackSection(String simulationID) {
+    public LogsTab(String simulationID) {
 
         this.simulationID = simulationID;
-        this.setTitle("Logs");
-        this.setCanCollapse(true);
-        this.setExpanded(false);
-        this.setResizeable(true);
+        
+        this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_LOG));
+        this.setPrompt("Logs");
 
         configureToolStrip();
         configureGrid();
@@ -90,7 +93,7 @@ public class LogsStackSection extends SectionStackSection {
         vLayout.addMember(toolStrip);
         vLayout.addMember(grid);
 
-        this.addItem(vLayout);
+        this.setPane(vLayout);
 
         loadData("/" + simulationID);
     }
@@ -136,6 +139,7 @@ public class LogsStackSection extends SectionStackSection {
     }
 
     private void configureToolStrip() {
+        
         toolStrip = new ToolStrip();
         toolStrip.setWidth100();
 
@@ -146,7 +150,7 @@ public class LogsStackSection extends SectionStackSection {
         toolStrip.addFormItem(pathItem);
 
         ToolStripButton folderUpButton = new ToolStripButton();
-        folderUpButton.setIcon("icon-folderup.png");
+        folderUpButton.setIcon(DataManagerConstants.ICON_FOLDER_UP);
         folderUpButton.setTooltip("Folder Up");
         folderUpButton.addClickHandler(new ClickHandler() {
 
@@ -160,7 +164,7 @@ public class LogsStackSection extends SectionStackSection {
         toolStrip.addButton(folderUpButton);
 
         ToolStripButton refreshButton = new ToolStripButton();
-        refreshButton.setIcon("icon-refresh.png");
+        refreshButton.setIcon(CoreConstants.ICON_REFRESH);
         refreshButton.setTooltip("Refresh");
         refreshButton.addClickHandler(new ClickHandler() {
 
@@ -171,7 +175,7 @@ public class LogsStackSection extends SectionStackSection {
         toolStrip.addButton(refreshButton);
         
         ToolStripButton homeButton = new ToolStripButton();
-        homeButton.setIcon("icon-home.png");
+        homeButton.setIcon(CoreConstants.ICON_HOME);
         homeButton.setTooltip("Home");
         homeButton.addClickHandler(new ClickHandler() {
 
@@ -189,7 +193,7 @@ public class LogsStackSection extends SectionStackSection {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Error executing get logs dir: " + caught.getMessage());
+                SC.warn("Unable to get logs:<br />" + caught.getMessage());
             }
 
             public void onSuccess(List<String> result) {

@@ -44,7 +44,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.FileUploadWindow;
 
@@ -59,14 +59,14 @@ public class InputsToolStrip extends ToolStrip {
     
     public InputsToolStrip(final ModalWindow modal, String tabID) {
 
-        this.tabID = tabID;
         this.modal = modal;
+        this.tabID = tabID;
         
         initComplete(this);
         this.setWidth100();
 
         ToolStripButton loadButton = new ToolStripButton();
-        loadButton.setIcon("icon-file.png");
+        loadButton.setIcon("datamanager/icon-file.png");
         loadButton.setTitle("Load From File");
         loadButton.addClickHandler(new ClickHandler() {
 
@@ -84,21 +84,23 @@ public class InputsToolStrip extends ToolStrip {
     }
 
     public void uploadComplete(String fileName) {
+        
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<String> callback = new AsyncCallback<String>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing load simulation inputs\n" + caught.getMessage());
+                SC.warn("Unable to load simulation inputs:<br />" + caught.getMessage());
                 modal.hide();
             }
 
             public void onSuccess(String result) {
-                AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().getTab(tabID);
-                launchTab.loadInput("Simulation", result);
                 modal.hide();
+                AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().getTab(tabID);
+                launchTab.loadInput("Simulation", result);                
             }
         };
-        service.getWorkflowInputs(fileName, callback);
+        modal.show("Loading input file...", true);
+        service.loadSimulationInput(fileName, callback);
     }
 
     private native void initComplete(InputsToolStrip upload) /*-{

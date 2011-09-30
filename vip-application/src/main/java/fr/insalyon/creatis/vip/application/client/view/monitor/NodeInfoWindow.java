@@ -39,8 +39,8 @@ import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.application.client.bean.Node;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
-import fr.insalyon.creatis.vip.common.client.view.property.AbstractPropertyWindow;
-import fr.insalyon.creatis.vip.common.client.view.property.PropertyRecord;
+import fr.insalyon.creatis.vip.core.client.view.property.AbstractPropertyWindow;
+import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
 
 /**
  *

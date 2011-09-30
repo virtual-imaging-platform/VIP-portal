@@ -50,6 +50,7 @@ public class SimulationInput implements IsSerializable {
     }
 
     public SimulationInput(String application, String name, String inputs) {
+        
         this.application = application;
         this.name = name;
         this.inputs = inputs;

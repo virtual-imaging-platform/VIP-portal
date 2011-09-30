@@ -49,51 +49,51 @@ import java.util.Map;
  */
 public interface WorkflowServiceAsync {
 
+    public void getApplicationSources(String applicationName, AsyncCallback<List<Source>> asyncCallback);
+
+    public void launchSimulation(Map<String, String> parameters, String applicationName, String simulationName, AsyncCallback<Void> asyncCallback);
+
+    public void getInputByNameUserApp(String inputName, String appName, AsyncCallback<SimulationInput> asyncCallback);
+
+    public void addSimulationInput(SimulationInput simulationInput, AsyncCallback<Void> asyncCallback);
+
+    public void updateSimulationInput(SimulationInput simulationInput, AsyncCallback<Void> asyncCallback);
+
+    public void loadSimulationInput(String fileName, AsyncCallback<String> asyncCallback);
+
+    public void removeSimulationInput(String inputName, String applicationName, AsyncCallback<Void> asyncCallback);
+
+    public void getSimulationInputByUser(AsyncCallback<List<SimulationInput>> asyncCallback);
+
+    public void killSimulations(List<String> simulationIDs, AsyncCallback<Void> asyncCallback);
+
+    public void cleanSimulations(List<String> simulationIDs, AsyncCallback<Void> asyncCallback);
+
+    public void purgeSimulations(List<String> simulationIDs, AsyncCallback<Void> asyncCallback);
+
+    public void killWorkflow(String simulationID, AsyncCallback<Void> asyncCallback);
+
+    public void cleanWorkflow(String simulationID, AsyncCallback<Void> asyncCallback);
+
+    public void purgeWorkflow(String simulationID, AsyncCallback<Void> asyncCallback);
+
+    public void getSimulations(String user, String application, String status, Date startDate, Date endDate, AsyncCallback<List<Simulation>> asyncCallback);
+    
+    public void getSimulation(String simulationID, AsyncCallback<Simulation> asyncCallback);
+
     public void getFile(String baseDir, String fileName, AsyncCallback<String> asyncCallback);
-
-    public void getApplicationsAndUsersList(String applicationClass, AsyncCallback<List<String>[]> asyncCallback);
-
-    public void getWorkflows(String user, String application, String status, Date startDate, Date endDate, AsyncCallback<List<Simulation>> asyncCallback);
 
     public void getLogs(String baseDir, AsyncCallback<List<String>> asyncCallback);
 
     public void deleteLogData(String path, AsyncCallback<Void> asyncCallback);
 
-    public void getWorkflowSources(String user, String proxyFileName, String workflowName, AsyncCallback<List<Source>> asyncCallback);
-
-    public void launchWorkflow(String user, Map<String, String> parameters, String workflowName, String proxyFileName, String simulationName, AsyncCallback<String> asyncCallback);
-
-    public void getWorkflowInputs(String fileName, AsyncCallback<String> asyncCallback);
-
-    public void addSimulationInput(String user, SimulationInput workflowInput, AsyncCallback<Void> asyncCallback);
-
-    public void updateSimulationInput(String user, SimulationInput workflowInput, AsyncCallback<Void> asyncCallback);
-
     public void closeConnection(String workflowID, AsyncCallback<Void> asyncCallback);
 
-    public void killWorkflow(String workflowID, AsyncCallback<Void> asyncCallback);
-
-    public void killWorkflows(List<String> simulationIDs, AsyncCallback<Void> asyncCallback);
-
-    public void cleanWorkflow(String workflowID, String userDN, String proxyFileName, AsyncCallback<Void> asyncCallback);
-
-    public void cleanWorkflows(List<String> simulationIDs, String userDN, String proxyFileName, AsyncCallback<Void> asyncCallback);
-
-    public void getWorkflowsInputByUser(String user, AsyncCallback<List<SimulationInput>> asyncCallback);
-
     public void getWorkflowsInputByUserAndAppName(String user, String appName, AsyncCallback<List<SimulationInput>> asyncCallback);
-
-    public void getInputByNameUserApp(String user, String inputName, String appName, AsyncCallback<SimulationInput> asyncCallback);
-
-    public void removeWorkflowInput(String user, String inputName, String application, AsyncCallback<Void> asyncCallback);
 
     public void getFileURL(String baseDir, String fileName, AsyncCallback<String> asyncCallback);
 
     public void getStats(List<Simulation> workflowIdList, int type, int binSize, AsyncCallback<List<String>> asyncCallback);
-
-    public void purgeWorkflow(String workflowID, AsyncCallback<Void> asyncCallback);
-
-    public void purgeWorkflows(List<String> simulationIDs, AsyncCallback<Void> asyncCallback);
 
     public void getOutputData(String simulationID, AsyncCallback<List<InOutData>> asyncCallback);
 

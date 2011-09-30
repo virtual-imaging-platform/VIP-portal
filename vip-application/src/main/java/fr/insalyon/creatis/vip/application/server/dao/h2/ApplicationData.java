@@ -36,7 +36,10 @@ package fr.insalyon.creatis.vip.application.server.dao.h2;
 
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
+import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.h2.PlatformConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -44,6 +47,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
@@ -59,107 +63,110 @@ public class ApplicationData implements ApplicationDAO {
         connection = PlatformConnection.getInstance().getConnection();
     }
 
-    public String add(Application workflowDescriptor) {
+    public void add(Application application) throws DAOException {
+
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO WorkflowDescriptor(name, lfn) "
+                    "INSERT INTO VIPApplications(name, lfn) "
                     + "VALUES (?, ?)");
 
-            ps.setString(1, workflowDescriptor.getName());
-            ps.setString(2, workflowDescriptor.getLfn());
+            ps.setString(1, application.getName());
+            ps.setString(2, application.getLfn());
             ps.execute();
 
-            for (String className : workflowDescriptor.getApplicationClasses()) {
-                addClassToWorkflow(workflowDescriptor.getName(), className);
+            for (String className : application.getApplicationClasses()) {
+                addClassToApplication(application.getName(), className);
             }
 
         } catch (SQLException ex) {
-            logger.error(ex);
-            return "Error: an application named \"" + workflowDescriptor.getName() + "\" already exists.";
-        } catch (DAOException ex) {
-            logger.error(ex);
-            return "Error: " + ex.getMessage();
+            if (ex.getMessage().contains("Unique index or primary key violation")) {
+                logger.error("An application named \"" + application.getName() + "\" already exists.");
+                throw new DAOException("An application named \"" + application.getName() + "\" already exists.");
+            } else {
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
         }
-        return "The application was succesfully saved!";
     }
 
-    public String update(Application workflowDescriptor) {
+    public void update(Application application) throws DAOException {
+
         try {
             PreparedStatement stat = connection.prepareStatement("UPDATE "
-                    + "WorkflowDescriptor "
+                    + "VIPApplications "
                     + "SET lfn=? "
                     + "WHERE name=?");
 
-            stat.setString(1, workflowDescriptor.getLfn());
-            stat.setString(2, workflowDescriptor.getName());
+            stat.setString(1, application.getLfn());
+            stat.setString(2, application.getName());
             stat.executeUpdate();
 
-            removeAllClassesFromWorkflow(workflowDescriptor.getName());
-            for (String className : workflowDescriptor.getApplicationClasses()) {
-                addClassToWorkflow(workflowDescriptor.getName(), className);
+            removeAllClassesFromApplication(application.getName());
+            for (String className : application.getApplicationClasses()) {
+                addClassToApplication(application.getName(), className);
             }
-
-            return "The application was succesfully updated!";
 
         } catch (SQLException ex) {
             logger.error(ex);
-            return "Error: " + ex.getMessage();
-        } catch (DAOException ex) {
-            logger.error(ex);
-            return "Error: " + ex.getMessage();
+            throw new DAOException(ex);
         }
     }
 
-    public void remove(String name) {
+    public void remove(String name) throws DAOException {
+
         try {
             PreparedStatement stat = connection.prepareStatement("DELETE "
-                    + "FROM WorkflowDescriptor WHERE name=?");
+                    + "FROM VIPApplications WHERE name=?");
 
             stat.setString(1, name);
             stat.execute();
 
         } catch (SQLException ex) {
             logger.error(ex);
-        }
-    }
-
-    public void removeClassFromApplication(String applicationClass, String name) throws DAOException {
-        try {
-            PreparedStatement ps = connection.prepareStatement("DELETE "
-                    + "FROM WorkflowClasses WHERE class=? AND workflow=?");
-            ps.setString(1, applicationClass);
-            ps.setString(2, name);
-            ps.execute();
-            
-        } catch (SQLException ex) {
             throw new DAOException(ex);
         }
     }
 
-    public List<Application> getApplications(String applicationClass) throws DAOException {
+    public void remove(String email, String name) throws DAOException {
+
         try {
 
-            List<Application> applications = new ArrayList<Application>();
+            Map<String, ROLE> groups = CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUserGroups(email);
+            // TODO
+            PreparedStatement ps = connection.prepareStatement("DELETE "
+                    + "FROM WorkflowClasses WHERE class=? AND workflow=?");
+
+            ps.setString(1, email);
+            ps.setString(2, name);
+            ps.execute();
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    public List<Application> getApplications() throws DAOException {
+
+        try {
             PreparedStatement stat = null;
-            if (applicationClass == null) {
-                stat = connection.prepareStatement("SELECT name, lfn FROM "
-                        + "WorkflowDescriptor ORDER BY name");
-            } else {
-                stat = connection.prepareStatement("SELECT name, lfn FROM "
-                        + "WorkflowDescriptor wd, WorkflowClasses wc "
-                        + "WHERE (wc.workflow=wd.name AND class=?)");
-                stat.setString(1, applicationClass);
-            }
+            stat = connection.prepareStatement("SELECT name, lfn FROM "
+                    + "VIPApplications ORDER BY name");
 
             ResultSet rs = stat.executeQuery();
+            List<Application> applications = new ArrayList<Application>();
+
             while (rs.next()) {
+
                 String name = rs.getString("name");
                 PreparedStatement stat2 = connection.prepareStatement("SELECT "
-                        + "class FROM WorkflowClasses WHERE workflow=?");
+                        + "class FROM VIPApplicationClasses WHERE application=?");
+
                 stat2.setString(1, name);
 
-                List<String> classes = new ArrayList<String>();
                 ResultSet rs2 = stat2.executeQuery();
+                List<String> classes = new ArrayList<String>();
+
                 while (rs2.next()) {
                     classes.add(rs2.getString("class"));
                 }
@@ -170,6 +177,80 @@ public class ApplicationData implements ApplicationDAO {
             return applications;
 
         } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    public List<Application> getApplications(String email, boolean validGroup) throws DAOException {
+
+        try {
+
+            List<String> classes = ApplicationDAOFactory.getDAOFactory().getClassDAO().getUserClasses(email, validGroup);
+            List<Application> applications = new ArrayList<Application>();
+
+            if (!classes.isEmpty()) {
+                StringBuilder sb = new StringBuilder();
+
+                for (String c : classes) {
+                    if (sb.length() > 0) {
+                        sb.append(" OR ");
+                    }
+                    sb.append("appc.class = '" + c + "'");
+                }
+
+                String clause = sb.length() > 0 ? " AND (" + sb.toString() + ")" : "";
+
+
+                PreparedStatement stat = connection.prepareStatement("SELECT "
+                        + "name, lfn FROM "
+                        + "VIPApplications app, VIPApplicationClasses appc "
+                        + "WHERE app.name = appc.application " + clause);
+
+                ResultSet rs = stat.executeQuery();
+                while (rs.next()) {
+                    String name = rs.getString("name");
+                    applications.add(new Application(name, rs.getString("lfn")));
+                }
+            }
+            return applications;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    public Application getApplication(String applicationName) throws DAOException {
+
+        try {
+            PreparedStatement stat = connection.prepareStatement("SELECT "
+                    + "class "
+                    + "FROM VIPApplicationClasses "
+                    + "WHERE application=?");
+
+            stat.setString(1, applicationName);
+            ResultSet rs = stat.executeQuery();
+            List<String> classes = new ArrayList<String>();
+
+            while (rs.next()) {
+                classes.add(rs.getString("class"));
+            }
+
+            stat = connection.prepareStatement("SELECT "
+                    + "name, lfn "
+                    + "FROM VIPApplications "
+                    + "WHERE name=?");
+
+            stat.setString(1, applicationName);
+            rs = stat.executeQuery();
+            rs.next();
+
+            return new Application(rs.getString("name"),
+                    rs.getString("lfn"), classes);
+
+        } catch (SQLException ex) {
+            logger.error(ex);
             throw new DAOException(ex);
         }
     }
@@ -201,60 +282,40 @@ public class ApplicationData implements ApplicationDAO {
         return null;
     }
 
-    public Application getApplication(String name) {
+    private void addClassToApplication(String applicationName, String className) throws DAOException {
+
         try {
-            List<String> classes = new ArrayList<String>();
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO "
+                    + "VIPApplicationClasses(application, class) "
+                    + "VALUES(?, ?)");
 
-            PreparedStatement stat = connection.prepareStatement("SELECT "
-                    + "class "
-                    + "FROM WorkflowClasses "
-                    + "WHERE workflow=?");
-            stat.setString(1, name);
-            ResultSet rs = stat.executeQuery();
-
-            while (rs.next()) {
-                classes.add(rs.getString("class"));
-            }
-
-            stat = connection.prepareStatement("SELECT "
-                    + "name, lfn "
-                    + "FROM WorkflowDescriptor "
-                    + "WHERE name=?");
-
-            stat.setString(1, name);
-            rs = stat.executeQuery();
-            rs.next();
-
-            return new Application(rs.getString("name"),
-                    rs.getString("lfn"), classes);
-
-        } catch (SQLException ex) {
-            logger.error(ex);
-        }
-        return null;
-    }
-
-    private void addClassToWorkflow(String workflowName, String className) throws DAOException {
-        try {
-            PreparedStatement ps = connection.prepareStatement("INSERT INTO WorkflowClasses(workflow, class) " + "VALUES(?, ?)");
-            ps.setString(1, workflowName);
+            ps.setString(1, applicationName);
             ps.setString(2, className);
             ps.execute();
 
         } catch (SQLException ex) {
-            logger.error(ex);
-            throw new DAOException("Error: an application named \"" + workflowName + "\" is already associated with classes.");
+            if (ex.getMessage().contains("Unique index or primary key violation")) {
+                logger.error("An application named \"" + applicationName + "\" is already associated with clas \"" + className + "\".");
+                throw new DAOException("An application named \"" + applicationName + "\" is already associated with clas \"" + className + "\".");
+            } else {
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
         }
     }
 
-    private void removeAllClassesFromWorkflow(String workflowName) throws DAOException {
+    private void removeAllClassesFromApplication(String workflowName) throws DAOException {
+
         try {
-            PreparedStatement ps = connection.prepareStatement("DELETE FROM WorkflowClasses WHERE workflow=?");
+            PreparedStatement ps = connection.prepareStatement("DELETE FROM "
+                    + "VIPApplicationClasses WHERE application=?");
+
             ps.setString(1, workflowName);
             ps.execute();
+
         } catch (SQLException ex) {
             logger.error(ex);
-            throw new DAOException(ex.getMessage());
+            throw new DAOException(ex);
         }
     }
 }

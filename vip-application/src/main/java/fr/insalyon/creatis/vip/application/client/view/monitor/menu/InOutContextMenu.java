@@ -43,11 +43,10 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.tree.Tree;
 import com.smartgwt.client.widgets.tree.TreeNode;
 import fr.insalyon.creatis.vip.application.client.view.monitor.InOutTreeNode;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 import java.util.ArrayList;
@@ -100,7 +99,7 @@ public class InOutContextMenu extends Menu {
             public void onClick(MenuItemClickEvent event) {
                 String folder = node.getName().substring(0, node.getName().lastIndexOf("/"));
                 BrowserLayout.getInstance().loadData(folder, false);
-                DataManagerSection.getInstance().expand();
+                DataManagerModule.dataManagerSection.expand();
             }
         });
 
@@ -127,15 +126,15 @@ public class InOutContextMenu extends Menu {
                 modal.hide();
                 OperationLayout.getInstance().loadData();
                 OperationLayout.getInstance().activateAutoRefresh();
-                DataManagerSection.getInstance().expand();
+                DataManagerModule.dataManagerSection.expand();
             }
         };
         modal.show("Adding file to transfer queue...", true);
-        Context context = Context.getInstance();
-        service.downloadFile(
-                context.getUser(), path, 
-                context.getUserDN(), context.getProxyFileName(),
-                callback);
+//        Context context = Context.getInstance();
+//        service.downloadFile(
+//                context.getUser(), path, 
+//                context.getUserDN(), context.getProxyFileName(),
+//                callback);
     }
     
     private void download() {
@@ -169,15 +168,15 @@ public class InOutContextMenu extends Menu {
                 modal.hide();
                 OperationLayout.getInstance().loadData();
                 OperationLayout.getInstance().activateAutoRefresh();
-                DataManagerSection.getInstance().expand();
+                DataManagerModule.dataManagerSection.expand();
             }
         };
         modal.show("Adding files to transfer queue...", true);
-        Context context = Context.getInstance();
-        service.downloadFiles(
-                context.getUser(),
-                paths, packName,
-                context.getUserDN(), context.getProxyFileName(),
-                callback);
+//        Context context = Context.getInstance();
+//        service.downloadFiles(
+//                context.getUser(),
+//                paths, packName,
+//                context.getUserDN(), context.getProxyFileName(),
+//                callback);
     }
 }

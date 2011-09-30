@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.application.client.view.monitor;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -45,9 +46,12 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
-import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
-import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -59,8 +63,7 @@ import java.util.List;
  */
 public class SearchStackSection extends SectionStackSection {
 
-    private String tabID;
-    private boolean groupAdmin;
+    private ModalWindow modal;
     private DynamicForm form;
     private SelectItem userItem;
     private SelectItem simulationItem;
@@ -70,24 +73,23 @@ public class SearchStackSection extends SectionStackSection {
     private IButton submitButton;
     private IButton resetButton;
 
-    public SearchStackSection(String tabID, boolean groupAdmin) {
+    public SearchStackSection() {
 
-        this.tabID = tabID;
-        this.groupAdmin = groupAdmin;
-        
-        this.setTitle("Search");
+        this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_SEARCH) + " Search");
         this.setExpanded(false);
 
         configureForm();
-        
+
         HLayout hLayout = new HLayout(5);
         hLayout.setMargin(5);
         hLayout.addMember(submitButton);
         hLayout.addMember(resetButton);
-        
+
         VLayout vLayout = new VLayout(5);
         vLayout.addMember(form);
         vLayout.addMember(hLayout);
+
+        modal = new ModalWindow(vLayout);
         this.addItem(vLayout);
 
         loadData();
@@ -115,17 +117,15 @@ public class SearchStackSection extends SectionStackSection {
 
             public void onClick(ClickEvent event) {
 
-                SimulationsTab simulationsTab = (SimulationsTab) Layout.getInstance().getTab(tabID);
-                
-                if (Context.getInstance().isSystemAdmin() || groupAdmin) {
+                SimulationsTab simulationsTab = (SimulationsTab) Layout.getInstance().getTab(ApplicationConstants.TAB_MONITOR);
+
+                if (CoreModule.user.isSystemAdministrator()) { //TODO: || groupAdmin) {
                     String userText = userItem.getValueAsString();
                     simulationsTab.setUser(userText == null || userText.isEmpty() || userText.equals("All") ? null : userText);
                 }
 
-                if (!simulationItem.isDisabled()) {
-                    String simuText = simulationItem.getValueAsString();
-                    simulationsTab.setApp(simuText == null || simuText.isEmpty() || simuText.equals("All") ? null : simuText);
-                }
+                String simuText = simulationItem.getValueAsString();
+                simulationsTab.setApp(simuText == null || simuText.isEmpty() || simuText.equals("All") ? null : simuText);
 
                 String statusText = statusItem.getValueAsString();
                 simulationsTab.setStatus(statusText == null || statusText.isEmpty() || statusText.equals("All") ? null : statusText);
@@ -152,24 +152,27 @@ public class SearchStackSection extends SectionStackSection {
             }
         });
 
-        if (Context.getInstance().isSystemAdmin() || groupAdmin) {
+//        if (CoreModule.user.isSystemAdministrator()) { //TODO: || groupAdmin) {
             form.setFields(userItem, startDateItem, simulationItem,
                     endDateItem, statusItem);
-        } else {
-            form.setFields(simulationItem, startDateItem,
-                    statusItem, endDateItem);
-        }
+//        } else {
+//            form.setFields(simulationItem, startDateItem,
+//                    statusItem, endDateItem);
+//        }
     }
 
     private void loadData() {
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<List<String>[]> callback = new AsyncCallback<List<String>[]>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get users and applications lists\n" + caught.getMessage());
+                modal.hide();
+                SC.warn("Unable to get users and applications lists:<br />" + caught.getMessage());
             }
 
             public void onSuccess(List<String>[] result) {
+                modal.hide();
                 LinkedHashMap<String, String> usersMap = new LinkedHashMap<String, String>();
                 usersMap.put("All", "All");
                 for (String s : result[0]) {
@@ -188,16 +191,17 @@ public class SearchStackSection extends SectionStackSection {
 
                 LinkedHashMap<String, String> statusMap = new LinkedHashMap<String, String>();
                 statusMap.put("All", "All");
-                statusMap.put("Completed", "Completed");
-                statusMap.put("Running", "Running");
-                statusMap.put("Killed", "Killed");
-                if (Context.getInstance().isSystemAdmin()) {
-                    statusMap.put("Cleaned", "Cleaned");
+                statusMap.put(SimulationStatus.Completed.name(), SimulationStatus.Completed.name());
+                statusMap.put(SimulationStatus.Running.name(), SimulationStatus.Running.name());
+                statusMap.put(SimulationStatus.Killed.name(), SimulationStatus.Killed.name());
+                if (CoreModule.user.isSystemAdministrator()) {
+                    statusMap.put(SimulationStatus.Cleaned.name(), SimulationStatus.Cleaned.name());
                 }
                 statusItem.setValueMap(statusMap);
                 statusItem.setValue("All");
             }
         };
-        service.getApplicationsAndUsersList(null, callback);
+        modal.show("Loading search form data...", true);
+        service.getApplicationsAndUsers(callback);
     }
 }

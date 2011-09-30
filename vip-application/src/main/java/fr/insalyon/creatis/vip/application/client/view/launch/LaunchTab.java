@@ -42,26 +42,14 @@ import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
  */
 public class LaunchTab extends AbstractLaunchTab {
 
-    public LaunchTab(String applicationClass, String applicationName) {
+    public LaunchTab(String applicationName) {
 
-        super("Launch " + applicationName, applicationClass, false, applicationName);
-
-        initTab(applicationClass);
-        createSimulation(applicationName);
-        addInputsSection();
-    }
-
-    public LaunchTab(String applicationClass) {
-
-        super("Launch " + applicationClass, applicationClass, true, applicationClass);
-
-        initTab(applicationClass);
-    }
-
-    private void initTab(String applicationClass) {
-
-        launchSection = new LaunchStackSection(applicationClass, this.getID());
+        super(applicationName);
+        
+        launchSection = new LaunchStackSection(applicationName);
         sectionStack.setSections(launchSection);
+        
+        addInputsSection();
     }
 
     /**

@@ -52,7 +52,7 @@ import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import java.util.LinkedHashMap;
 import java.util.List;
 

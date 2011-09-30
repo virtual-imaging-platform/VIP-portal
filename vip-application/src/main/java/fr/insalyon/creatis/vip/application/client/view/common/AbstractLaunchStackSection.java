@@ -47,12 +47,13 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import java.util.Map;
 
 /**
@@ -61,28 +62,25 @@ import java.util.Map;
  */
 public abstract class AbstractLaunchStackSection extends SectionStackSection {
 
-    protected String applicationClass;
-    protected String launchTabID;
-    protected String simulationName;
+    protected ModalWindow modal;
+    protected String applicationName;
     protected TextItem simulationNameItem;
-    protected VLayout layout;
+    protected VLayout vLayout;
 
-    public AbstractLaunchStackSection(String applicationClass, String launchTabID) {
+    public AbstractLaunchStackSection(String applicationName) {
 
-        this.applicationClass = applicationClass;
-        this.launchTabID = launchTabID;
+        this.applicationName = applicationName;
         this.setShowHeader(false);
 
-        layout = new VLayout();
-        layout.setWidth100();
-        layout.setHeight100();
-        layout.setPadding(10);
-        layout.setOverflow(Overflow.AUTO);
-    }
+        vLayout = new VLayout();
+        vLayout.setWidth100();
+        vLayout.setHeight100();
+        vLayout.setPadding(10);
+        vLayout.setOverflow(Overflow.AUTO);
 
-    public void load(String simulationName) {
-        this.simulationName = simulationName;
-        loadData();
+        modal = new ModalWindow(vLayout);
+
+        this.addItem(vLayout);
     }
 
     public abstract void loadInput(String name, String values);
@@ -129,14 +127,16 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
         final AsyncCallback<SimulationInput> callback = new AsyncCallback<SimulationInput>() {
 
             public void onFailure(Throwable caught) {
+                modal.hide();
                 if (!caught.getMessage().contains("No data is available")) {
-                    SC.warn("Unable to perform save operation: " + caught.getMessage());
+                    SC.warn("Unable to verify simulation name:<br />" + caught.getMessage());
                 } else {
                     saveInputs(false);
                 }
             }
 
             public void onSuccess(SimulationInput result) {
+                modal.hide();
                 SC.ask("A simulation entitled \"" + simulationNameItem.getValueAsString() + "\" "
                         + "already exists. <br />Do you want to ovewrite the input data?", new BooleanCallback() {
 
@@ -148,8 +148,9 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
                 });
             }
         };
-        service.getInputByNameUserApp(Context.getInstance().getUserDN(),
-                simulationNameItem.getValueAsString(), simulationName, callback);
+        modal.show("Verifying simulation name...", true);
+        service.getInputByNameUserApp(simulationNameItem.getValueAsString(),
+                applicationName, callback);
     }
 
     private void saveInputs(boolean update) {
@@ -158,24 +159,24 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error while saving simulation inputs: " + caught.getMessage());
+                modal.hide();
+                SC.warn("Unable to save simulation inputs:<br />" + caught.getMessage());
             }
 
             public void onSuccess(Void result) {
                 AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().
-                        getTab(launchTabID);
+                        getTab(ApplicationConstants.getLaunchTabID(applicationName));
                 launchTab.loadInputsList();
+                modal.hide();
                 SC.say("Input values were succesfully saved!");
             }
         };
-        
+        modal.show("Saving inputs...", true);
         if (update) {
-            service.updateSimulationInput(Context.getInstance().getUserDN(),
-                    getSimulationInput(), callback);
+            service.updateSimulationInput(getSimulationInput(), callback);
 
         } else {
-            service.addSimulationInput(Context.getInstance().getUserDN(),
-                    getSimulationInput(), callback);
+            service.addSimulationInput(getSimulationInput(), callback);
         }
     }
 
@@ -195,7 +196,7 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
             sb.append("--");
         }
 
-        return new SimulationInput(simulationName,
+        return new SimulationInput(applicationName,
                 simulationNameItem.getValueAsString(), sb.toString());
     }
 }

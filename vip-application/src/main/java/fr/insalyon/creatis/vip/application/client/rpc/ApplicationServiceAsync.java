@@ -32,7 +32,6 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-
 package fr.insalyon.creatis.vip.application.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -46,28 +45,25 @@ import java.util.List;
  */
 public interface ApplicationServiceAsync {
 
-    public void getApplications(String applicationClass, AsyncCallback<List<Application>> asyncCallback);
-    
+    public void getApplications(AsyncCallback<List<Application>> asyncCallback);
+
     public void getApplication(String name, AsyncCallback<Application> asyncCallback);
 
-    public void add(Application workflowDescriptor, AsyncCallback<String> asyncCallback);
+    public void add(Application workflowDescriptor, AsyncCallback<Void> asyncCallback);
 
-    public void update(Application workflowDescriptor, AsyncCallback<String> asyncCallback);
+    public void update(Application workflowDescriptor, AsyncCallback<Void> asyncCallback);
 
     public void remove(String name, AsyncCallback<Void> asyncCallback);
-    
-    public void removeClassFromApplication(String applicationClass, String applicationName, AsyncCallback<Void> asyncCallback);
 
     public void removeClass(String name, AsyncCallback<Void> asyncCallback);
 
     public void getClasses(AsyncCallback<List<AppClass>> asyncCallback);
 
-    public void getApplicationsName(String applicationClass, AsyncCallback<List<String>> asyncCallback);
+    public void addClass(AppClass c, AsyncCallback<Void> asyncCallback);
 
-    public void addClass(AppClass c, AsyncCallback<String> asyncCallback);
-
-    public void updateClass(AppClass c, AsyncCallback<String> asyncCallback);
+    public void updateClass(AppClass c, AsyncCallback<Void> asyncCallback);
 
     public void getClass(String className, AsyncCallback<AppClass> asyncCallback);
 
+    public void getApplicationsAndUsers(AsyncCallback<List<String>[]> asyncCallback);
 }

@@ -64,21 +64,21 @@ public interface JobService extends RemoteService {
         }
     }
 
-    public Map<String, Integer> getStatusMap(String workflowID);
+    public Map<String, Integer> getStatusMap(String simulationID) throws ApplicationException ;
 
     public List<Job> getJobsList(String simulationID) throws ApplicationException;
 
-    public String getFile(String workflowID, String dir, String fileName, String ext);
+    public String readFile(String simulationID, String dir, String fileName, String ext) throws ApplicationException ;
 
-    public List<String> getExecutionPerNumberOfJobs(String workflowID, int binSize);
+    public List<String> getExecutionPerNumberOfJobs(String simulationID, int binSize) throws ApplicationException ;
 
-    public List<String> getDownloadPerNumberOfJobs(String workflowID, int binSize);
+    public List<String> getDownloadPerNumberOfJobs(String simulationID, int binSize) throws ApplicationException ;
 
-    public List<String> getUploadPerNumberOfJobs(String workflowID, int binSize);
+    public List<String> getUploadPerNumberOfJobs(String simulationID, int binSize) throws ApplicationException ;
 
-    public List<String> getJobsPertTime(String workflowID);
+    public List<String> getJobsPertTime(String simulationID) throws ApplicationException ;
 
-    public Node getNode(String workflowID, String siteName, String nodeName);
+    public Node getNode(String simulationID, String siteName, String nodeName) throws ApplicationException ;
     
-    public void sendSignal(String workflowID, String jobID, ApplicationConstants.JobStatus status);
+    public void sendSignal(String simulationID, String jobID, ApplicationConstants.JobStatus status) throws ApplicationException ;
 }

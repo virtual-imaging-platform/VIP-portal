@@ -36,7 +36,7 @@ package fr.insalyon.creatis.vip.application.server.dao;
 
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.util.Date;
 import java.util.List;
 
@@ -61,8 +61,16 @@ public interface WorkflowDAO {
     public void update(Simulation workflow) throws DAOException;
 
     /**
+     * 
+     * @param workflowID
+     * @return
+     * @throws DAOException 
+     */
+    public Simulation get(String workflowID) throws DAOException;
+    
+    /**
      * Gets the list of workflows submitted by a user filtered by application
-     * name, start date and/or end date.
+     * name, status, start date and/or end date.
      * 
      * @param user User name
      * @param app Application name
@@ -71,21 +79,34 @@ public interface WorkflowDAO {
      * @param eDate End date
      * @return List of workflows filtered
      */
-    public List<Simulation> getList(String user, String app, String status, Date sDate, Date eDate);
+    public List<Simulation> getList(String user, String app, String status, Date sDate, Date eDate) throws DAOException;
+    
+    /**
+     * Gets the list of workflows submitted by a list of users filtered by 
+     * application name, status, start date and/or end date.
+     * 
+     * @param user List of users
+     * @param app Application name
+     * @param status Application status
+     * @param sDate Start date
+     * @param eDate End date
+     * @return List of workflows filtered
+     */
+    public List<Simulation> getList(List<String> users, String app, String status, Date sDate, Date eDate) throws DAOException;
 
     /**
      * Gets the list of applications submitted.
      *
      * @return List of applications
      */
-    public List<String> getApplications();
+    public List<String> getApplications() throws DAOException;
 
     /**
      * 
      * @param workflowID
      * @param status
      */
-    public void updateStatus(String workflowID, String status);
+    public void updateStatus(String workflowID, String status) throws DAOException;
 
     /**
      *
@@ -109,7 +130,7 @@ public interface WorkflowDAO {
      */
     public void delete(String workflowID) throws DAOException;
 
-    public List<String> getStats(List<Simulation> workflowIdList, int type, int binSize);
+    public List<String> getStats(List<Simulation> workflowIdList, int type, int binSize) throws DAOException;
 
     /**
      * 

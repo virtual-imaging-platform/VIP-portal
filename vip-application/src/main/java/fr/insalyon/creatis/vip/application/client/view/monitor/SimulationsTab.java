@@ -40,6 +40,7 @@ import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.VisibilityMode;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -52,15 +53,16 @@ import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.menu.SimulationsContextMenu;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.SimulationRecord;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -82,24 +84,11 @@ public class SimulationsTab extends Tab {
     protected HandlerRegistration rowContextClickHandler;
     private SectionStackSection searchSection;
     private List<Simulation> simulationsList;
-    private boolean groupAdmin;
 
-    public SimulationsTab(String application, boolean groupAdmin) {
-        this.app = application;
-        this.groupAdmin = groupAdmin;
-        this.setID(application + "-simulations-tab");
-        configure();
-    }
-
-    public SimulationsTab(boolean groupAdmin) {
-        this.groupAdmin = groupAdmin;
-        this.setID("simulations-tab");
-        configure();
-    }
-
-    private void configure() {
-
-        this.setTitle("Simulations");
+    public SimulationsTab() {
+        
+        this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_MONITOR) + " Simulations");
+        this.setID(ApplicationConstants.TAB_MONITOR);
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
 
@@ -107,7 +96,7 @@ public class SimulationsTab extends Tab {
         modal = new ModalWindow(grid);
 
         VLayout vLayout = new VLayout();
-        vLayout.addMember(new SimulationsToolStrip(modal, this.getID()));
+        vLayout.addMember(new SimulationsToolStrip(modal));
 
         SectionStack sectionStack = new SectionStack();
         sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
@@ -118,21 +107,18 @@ public class SimulationsTab extends Tab {
         gridSection.setShowHeader(false);
         gridSection.addItem(grid);
 
-        searchSection = new SearchStackSection(this.getID(), groupAdmin);
+        searchSection = new SearchStackSection();
 
         sectionStack.setSections(gridSection, searchSection);
         vLayout.addMember(sectionStack);
 
         this.setPane(vLayout);
 
-        if (!Context.getInstance().isSystemAdmin() && !groupAdmin) {
-            this.user = Context.getInstance().getUser();
-        }
-
         loadData();
     }
 
     private void configureGrid() {
+        
         grid = new ListGrid();
         grid.setWidth100();
         grid.setHeight100();
@@ -158,10 +144,12 @@ public class SimulationsTab extends Tab {
             public void onRowContextClick(RowContextClickEvent event) {
                 event.cancel();
                 String simulationId = event.getRecord().getAttribute("simulationId");
-                String status = event.getRecord().getAttribute("status");
                 String title = event.getRecord().getAttribute("simulationName");
-                new SimulationsContextMenu(modal, simulationId, title, status,
-                        groupAdmin).showContextMenu();
+                SimulationStatus status = SimulationStatus.valueOf(
+                        event.getRecord().getAttribute("status"));
+                
+                new SimulationsContextMenu(modal, simulationId, title, 
+                        status).showContextMenu();
             }
         });
         rowMouseDownHandler = grid.addRowMouseDownHandler(new RowMouseDownHandler() {
@@ -169,10 +157,12 @@ public class SimulationsTab extends Tab {
             public void onRowMouseDown(RowMouseDownEvent event) {
                 if (event.getColNum() != 1) {
                     String simulationID = event.getRecord().getAttribute("simulationId");
-                    String status = event.getRecord().getAttribute("status");
                     String title = event.getRecord().getAttribute("simulationName");
+                    SimulationStatus status = SimulationStatus.valueOf(
+                        event.getRecord().getAttribute("status"));
+                    
                     Layout.getInstance().addTab(new SimulationTab(simulationID,
-                            title, status, groupAdmin));
+                            title, status));
                 }
             }
         });
@@ -184,24 +174,24 @@ public class SimulationsTab extends Tab {
         final AsyncCallback<List<Simulation>> callback = new AsyncCallback<List<Simulation>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get workflow list\n" + caught.getMessage());
+                SC.warn("Unable to get simulations list:<br />" + caught.getMessage());
             }
 
             public void onSuccess(List<Simulation> result) {
 
                 List<SimulationRecord> dataList = new ArrayList<SimulationRecord>();
 
-                for (Simulation w : result) {
-                    if (!w.getMajorStatus().equals(ApplicationConstants.WorkflowStatus.Cleaned.name())
-                            || Context.getInstance().isSystemAdmin()) {
+                for (Simulation sim : result) {
+                    if (!sim.getMajorStatus().equals(SimulationStatus.Cleaned.name())
+                            || CoreModule.user.isSystemAdministrator()) {
 
-                        dataList.add(new SimulationRecord(w.getSimulationName(),
-                                w.getApplication(), w.getMajorStatus(), w.getID(),
-                                w.getUserName(), w.getDate()));
+                        dataList.add(new SimulationRecord(sim.getSimulationName(),
+                                sim.getApplication(), sim.getMajorStatus(), sim.getID(),
+                                sim.getUserName(), sim.getDate()));
                     }
                 }
                 grid.setData(dataList.toArray(new SimulationRecord[]{}));
-                StatsTab statsTab = (StatsTab) Layout.getInstance().getTab("stats-tab");
+                StatsTab statsTab = (StatsTab) Layout.getInstance().getTab(ApplicationConstants.TAB_STATS);
                 if (statsTab != null) {
                     statsTab.setSimulationsList(result);
                 }
@@ -210,12 +200,12 @@ public class SimulationsTab extends Tab {
             }
         };
         modal.show("Loading Simulations...", true);
-        service.getWorkflows(user, app, status, startDate, endDate, callback);
-        Layout.getInstance().setActiveCenterTab(this.getID());
+        service.getSimulations(user, app, status, startDate, endDate, callback);
+        Layout.getInstance().setActiveCenterTab(ApplicationConstants.TAB_MONITOR);
     }
 
     public ListGridRecord[] getGridSelection() {
-        return grid.getSelection();
+        return grid.getSelectedRecords();
     }
 
     public void expandSearchSection() {

@@ -34,26 +34,26 @@
  */
 package fr.insalyon.creatis.vip.application.server.rpc;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.devtools.FileUtils;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
-import fr.insalyon.creatis.vip.application.server.business.InputsBusiness;
+import fr.insalyon.creatis.vip.application.server.business.InputBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
-import fr.insalyon.creatis.vip.application.server.dao.DAOFactory;
+import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAOFactory;
 import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAO;
 import fr.insalyon.creatis.vip.application.server.dao.derby.connection.JobsConnection;
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -69,47 +69,380 @@ import org.apache.log4j.Logger;
  *
  * @author Rafael Silva
  */
-public class WorkflowServiceImpl extends RemoteServiceServlet implements WorkflowService {
+public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements WorkflowService {
 
     private static final Logger logger = Logger.getLogger(WorkflowServiceImpl.class);
+    private WorkflowBusiness workflowBusiness;
+    private InputBusiness inputBusiness;
 
-    @Override
-    public List<Simulation> getWorkflows(String user, String application, String status, Date startDate, Date endDate) {
+    public WorkflowServiceImpl() {
+
+        workflowBusiness = new WorkflowBusiness();
+        inputBusiness = new InputBusiness();
+    }
+
+    /**
+     * 
+     * @param applicationName
+     * @return
+     * @throws ApplicationException 
+     */
+    public List<Source> getApplicationSources(String applicationName) throws ApplicationException {
+
         try {
-            if (endDate != null) {
-                Calendar c1 = Calendar.getInstance();
-                c1.setTime(endDate);
-                c1.add(Calendar.DATE, 1);
-                endDate = c1.getTime();
-            }
-            WorkflowDAO workflowDAO = DAOFactory.getDAOFactory().getWorkflowDAO();
-            List<Simulation> workflows = workflowDAO.getList(user, application, status, startDate, endDate);
-            WorkflowBusiness business = new WorkflowBusiness();
+            return workflowBusiness.getApplicationSources(
+                    getSessionUser().getFullName(), applicationName);
 
-            for (Simulation workflow : workflows) {
-                if (workflow.getMajorStatus().equals(ApplicationConstants.WorkflowStatus.Running.name())) {
-                    try {
-                        String workflowStatus = business.getStatus(workflow.getID());
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
 
-                        if (workflowStatus.equals(ApplicationConstants.MoteurStatus.COMPLETE.name())) {
-                            workflowDAO.updateStatus(workflow.getID(),
-                                    ApplicationConstants.WorkflowStatus.Completed.name());
-                            workflow.setMajorStatus(ApplicationConstants.WorkflowStatus.Completed.name());
+    /**
+     * 
+     * @param parametersMap
+     * @param applicationName
+     * @param simulationName
+     * @throws ApplicationException 
+     */
+    public void launchSimulation(Map<String, String> parametersMap,
+            String applicationName, String simulationName) throws ApplicationException {
 
-                        } else if (workflowStatus.equals(ApplicationConstants.MoteurStatus.TERMINATED.name())
-                                || workflowStatus.contains(ApplicationConstants.MoteurStatus.UNKNOWN.name())) {
-                            workflowDAO.updateStatus(workflow.getID(),
-                                    ApplicationConstants.WorkflowStatus.Killed.name());
-                            workflow.setMajorStatus(ApplicationConstants.WorkflowStatus.Killed.name());
-                        }
-                    } catch (BusinessException ex) {
+        try {
+            trace(logger, "Launching simulation '" + simulationName + "' (" + applicationName + ").");
+            String workflowID = workflowBusiness.launch(getSessionUser().getFullName(),
+                    parametersMap, applicationName, simulationName);
+
+            trace(logger, "Simulation '" + simulationName + "' launched with ID '" + workflowID + "'.");
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param name
+     * @param appName
+     * @return
+     * @throws ApplicationException 
+     */
+    public SimulationInput getInputByNameUserApp(String name, String appName)
+            throws ApplicationException {
+
+        try {
+            return inputBusiness.getInputByUserAndName(
+                    getSessionUser().getEmail(), name, appName);
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param simulationInput
+     * @throws ApplicationException 
+     */
+    public void addSimulationInput(SimulationInput simulationInput)
+            throws ApplicationException {
+
+        try {
+            inputBusiness.addSimulationInput(getSessionUser().getEmail(),
+                    simulationInput);
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param simulationInput
+     * @throws ApplicationException 
+     */
+    public void updateSimulationInput(SimulationInput simulationInput)
+            throws ApplicationException {
+
+        try {
+            inputBusiness.updateSimulationInput(getSessionUser().getEmail(),
+                    simulationInput);
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param fileName
+     * @return 
+     */
+    public String loadSimulationInput(String fileName) throws ApplicationException {
+
+        try {
+            return inputBusiness.loadSimulationInput(fileName);
+
+        } catch (BusinessException ex) {
+            logger.error(ex);
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param inputName
+     * @param applicationName
+     * @throws ApplicationException 
+     */
+    public void removeSimulationInput(String inputName, String applicationName)
+            throws ApplicationException {
+
+        try {
+            inputBusiness.removeSimulationInput(getSessionUser().getEmail(),
+                    inputName, applicationName);
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @return
+     * @throws ApplicationException 
+     */
+    public List<SimulationInput> getSimulationInputByUser() throws ApplicationException {
+
+        try {
+            return inputBusiness.getSimulationInputByUser(getSessionUser().getEmail());
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param simulationIDs
+     * @throws ApplicationException 
+     */
+    public void killSimulations(List<String> simulationIDs) throws ApplicationException {
+
+        try {
+            trace(logger, "Killing simulations: " + simulationIDs);
+            StringBuilder sb = new StringBuilder();
+            for (String simulationID : simulationIDs) {
+                try {
+                    workflowBusiness.kill(simulationID);
+
+                } catch (BusinessException ex) {
+                    if (sb.length() > 0) {
+                        sb.append(", ");
                     }
+                    sb.append(simulationID);
                 }
             }
-            return workflows;
 
-        } catch (DAOException ex) {
-            return null;
+            if (sb.length() > 0) {
+                logger.error("Unable to kill the following "
+                        + "simulations: " + sb.toString());
+                throw new ApplicationException("Unable to kill the following "
+                        + "simulations: " + sb.toString());
+            }
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param simulationIDs
+     * @throws ApplicationException 
+     */
+    public void cleanSimulations(List<String> simulationIDs) throws ApplicationException {
+
+        try {
+            trace(logger, "Cleaning simulations: " + simulationIDs);
+            StringBuilder sb = new StringBuilder();
+            for (String simulationID : simulationIDs) {
+                try {
+                    workflowBusiness.clean(simulationID, getSessionUser().getEmail());
+
+                } catch (BusinessException ex) {
+                    if (sb.length() > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append(simulationID);
+                } catch (CoreException ex) {
+                    throw new ApplicationException(ex);
+                }
+            }
+
+            if (sb.length() > 0) {
+                logger.error("Unable to clean the following "
+                        + "simulations: " + sb.toString());
+                throw new ApplicationException("Unable to clean the following "
+                        + "simulations: " + sb.toString());
+            }
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param simulationIDs
+     * @throws ApplicationException 
+     */
+    public void purgeSimulations(List<String> simulationIDs) throws ApplicationException {
+
+        try {
+            trace(logger, "Purging simulations: " + simulationIDs);
+            StringBuilder sb = new StringBuilder();
+            for (String simulationID : simulationIDs) {
+                try {
+                    workflowBusiness.purge(simulationID);
+                } catch (BusinessException ex) {
+                    if (sb.length() > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append(simulationID);
+                }
+            }
+
+            if (sb.length() > 0) {
+                logger.error("Unable to purge the following "
+                        + "simulations: " + sb.toString());
+                throw new ApplicationException("Unable to purge the following "
+                        + "simulations: " + sb.toString());
+            }
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param simulationID
+     * @throws ApplicationException 
+     */
+    public void killWorkflow(String simulationID) throws ApplicationException {
+
+        try {
+            trace(logger, "Killing simulation '" + simulationID + "'.");
+            workflowBusiness.kill(simulationID);
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param simulationID
+     * @throws ApplicationException 
+     */
+    public void cleanWorkflow(String simulationID) throws ApplicationException {
+
+        try {
+            trace(logger, "Cleaning simulation '" + simulationID + "'.");
+            workflowBusiness.clean(simulationID, getSessionUser().getEmail());
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param simulationID
+     * @throws ApplicationException 
+     */
+    public void purgeWorkflow(String simulationID) throws ApplicationException {
+
+        try {
+            trace(logger, "Purging simulation '" + simulationID + "'.");
+            workflowBusiness.purge(simulationID);
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param userName
+     * @param application
+     * @param status
+     * @param startDate
+     * @param endDate
+     * @return
+     * @throws ApplicationException 
+     */
+    public List<Simulation> getSimulations(String userName, String application,
+            String status, Date startDate, Date endDate) throws ApplicationException {
+
+        try {
+            User user = getSessionUser();
+            if (configurationBusiness.isSystemAdministrator(user.getEmail())) {
+                return workflowBusiness.getSimulations(userName, application,
+                        status, startDate, endDate);
+
+            } else {
+
+                if (userName != null) {
+                    return workflowBusiness.getSimulations(userName,
+                            application, status, startDate, endDate);
+
+                } else {
+                    List<String> users = configurationBusiness.getUserNames(user.getEmail(), true);
+                    
+                    return workflowBusiness.getSimulations(users,
+                            application, status, startDate, endDate);
+                }
+            }
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param simulationID
+     * @return
+     * @throws ApplicationException 
+     */
+    public Simulation getSimulation(String simulationID) throws ApplicationException {
+
+        try {
+            return workflowBusiness.getSimulation(simulationID);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 
@@ -117,7 +450,7 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
     public String getFile(String baseDir, String fileName) {
         try {
             FileReader fr = new FileReader(
-                    ServerConfiguration.getInstance().getWorkflowsPath() + "/"
+                    Server.getInstance().getWorkflowsPath() + "/"
                     + baseDir + "/" + fileName);
 
             BufferedReader br = new BufferedReader(fr);
@@ -142,7 +475,7 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
 
     @Override
     public String getFileURL(String baseDir, String fileName) {
-        ServerConfiguration configuration = ServerConfiguration.getInstance();
+        Server configuration = Server.getInstance();
         return "https://" + configuration.getApacheHost() + ":"
                 + configuration.getApacheSSLPort()
                 + "/workflows"
@@ -150,33 +483,10 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
     }
 
     @Override
-    public List<String>[] getApplicationsAndUsersList(String applicationClass) {
-        try {
-            fr.insalyon.creatis.vip.core.server.dao.DAOFactory daoFactory = fr.insalyon.creatis.vip.core.server.dao.DAOFactory.getDAOFactory();
-            ApplicationDAOFactory appDaoFactory = ApplicationDAOFactory.getDAOFactory();
-
-            List<String> users = new ArrayList<String>();
-            for (User user : daoFactory.getUserDAO().getUsers()) {
-                users.add(user.getCanonicalName());
-            }
-
-            List<String> apps = new ArrayList<String>();
-            for (Application app : appDaoFactory.getApplicationDAO().getApplications(applicationClass)) {
-                apps.add(app.getName());
-            }
-
-            return new List[]{users, apps};
-
-        } catch (DAOException ex) {
-            return null;
-        }
-    }
-
-    @Override
     public List<String> getLogs(String baseDir) {
         List<String> list = new ArrayList<String>();
 
-        File folder = new File(ServerConfiguration.getInstance().getWorkflowsPath()
+        File folder = new File(Server.getInstance().getWorkflowsPath()
                 + "/" + baseDir);
 
         for (File f : folder.listFiles()) {
@@ -203,137 +513,28 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
         }
     }
 
-    public List<Source> getWorkflowSources(String user, String proxyFileName,
-            String workflowName) throws ApplicationException {
-
-        try {
-            WorkflowBusiness business = new WorkflowBusiness();
-            return business.getWorkflowSources(user, proxyFileName, workflowName);
-
-        } catch (BusinessException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    public String getWorkflowInputs(String fileName) {
-
-        try {
-            InputsBusiness business = new InputsBusiness();
-            return business.getWorkflowInputs(fileName);
-
-        } catch (BusinessException ex) {
-            logger.error(ex);
-            return null;
-        }
-    }
-
-    public String launchWorkflow(String user, Map<String, String> parametersMap,
-            String workflowName, String proxyFileName, String simulationName)
-            throws ApplicationException {
-
-        try {
-            WorkflowBusiness business = new WorkflowBusiness();
-            return business.launch(user, parametersMap, workflowName,
-                    proxyFileName, simulationName);
-
-        } catch (BusinessException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    public void addSimulationInput(String user, SimulationInput workflowInput) throws ApplicationException {
-
-        try {
-            WorkflowBusiness business = new WorkflowBusiness();
-            business.addSimulationInput(user, workflowInput);
-
-        } catch (BusinessException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    public void updateSimulationInput(String user, SimulationInput workflowInput) throws ApplicationException {
-
-        try {
-            WorkflowBusiness business = new WorkflowBusiness();
-            business.updateSimulationInput(user, workflowInput);
-
-        } catch (BusinessException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    public List<SimulationInput> getWorkflowsInputByUser(String user) {
-        try {
-            return DAOFactory.getDAOFactory().getWorkflowInputDAO().getWorkflowInputByUser(user);
-        } catch (DAOException ex) {
-            return null;
-        }
-    }
-
     public List<SimulationInput> getWorkflowsInputByUserAndAppName(String user, String appName) {
         try {
-            return DAOFactory.getDAOFactory().getWorkflowInputDAO().getWorkflowInputByUserAndAppName(user, appName);
+            return ApplicationDAOFactory.getDAOFactory().getApplicationInputDAO().getWorkflowInputByUserAndAppName(user, appName);
         } catch (DAOException ex) {
             return null;
-        }
-    }
-
-    public SimulationInput getInputByNameUserApp(String user, String name, String appName) throws ApplicationException {
-        try {
-            WorkflowBusiness business = new WorkflowBusiness();
-            return business.getInputByUserAndName(user, name, appName);
-
-        } catch (BusinessException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    public void removeWorkflowInput(String user, String inputName, String application) {
-        try {
-            DAOFactory.getDAOFactory().getWorkflowInputDAO().removeWorkflowInput(user, inputName, application);
-        } catch (DAOException ex) {
         }
     }
 
     public void closeConnection(String workflowID) {
         try {
-            JobsConnection.getInstance().close(ServerConfiguration.getInstance().getWorkflowsPath() + "/" + workflowID + "/jobs.db");
+            JobsConnection.getInstance().close(Server.getInstance().getWorkflowsPath() + "/" + workflowID + "/jobs.db");
         } catch (DAOException ex) {
         }
     }
 
     public List<String> getStats(List<Simulation> workflowIdList, int type, int binSize) {
         try {
-            return DAOFactory.getDAOFactory().getWorkflowDAO().getStats(workflowIdList, type, binSize);
+            return WorkflowDAOFactory.getDAOFactory().getWorkflowDAO().getStats(workflowIdList, type, binSize);
         } catch (DAOException ex) {
             return null;
         }
 
-    }
-
-    public void killWorkflow(String workflowID) {
-        try {
-            WorkflowBusiness business = new WorkflowBusiness();
-            business.kill(workflowID);
-        } catch (BusinessException ex) {
-        }
-    }
-
-    public void cleanWorkflow(String workflowID, String userDN, String proxyFileName) {
-        try {
-            WorkflowBusiness business = new WorkflowBusiness();
-            business.clean(workflowID, userDN, proxyFileName);
-        } catch (BusinessException ex) {
-        }
-    }
-
-    public void purgeWorkflow(String workflowID) {
-        try {
-            WorkflowBusiness business = new WorkflowBusiness();
-            business.purge(workflowID);
-        } catch (BusinessException ex) {
-        }
     }
 
     public List<InOutData> getOutputData(String simulationID) throws ApplicationException {
@@ -353,69 +554,6 @@ public class WorkflowServiceImpl extends RemoteServiceServlet implements Workflo
 
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
-        }
-    }
-
-    public void killWorkflows(List<String> simulationIDs) throws ApplicationException {
-
-        StringBuilder sb = new StringBuilder();
-        for (String simulationID : simulationIDs) {
-            try {
-                WorkflowBusiness business = new WorkflowBusiness();
-                business.kill(simulationID);
-            } catch (BusinessException ex) {
-                if (sb.length() > 0) {
-                    sb.append(", ");
-                }
-                sb.append(simulationID);
-            }
-        }
-
-        if (sb.length() > 0) {
-            throw new ApplicationException("Unable to kill the following "
-                    + "simulations: " + sb.toString());
-        }
-    }
-
-    public void cleanWorkflows(List<String> simulationIDs, String userDN, String proxyFileName) throws ApplicationException {
-
-        StringBuilder sb = new StringBuilder();
-        for (String simulationID : simulationIDs) {
-            try {
-                WorkflowBusiness business = new WorkflowBusiness();
-                business.clean(simulationID, userDN, proxyFileName);
-            } catch (BusinessException ex) {
-                if (sb.length() > 0) {
-                    sb.append(", ");
-                }
-                sb.append(simulationID);
-            }
-        }
-
-        if (sb.length() > 0) {
-            throw new ApplicationException("Unable to clean the following "
-                    + "simulations: " + sb.toString());
-        }
-    }
-
-    public void purgeWorkflows(List<String> simulationIDs) throws ApplicationException {
-
-        StringBuilder sb = new StringBuilder();
-        for (String simulationID : simulationIDs) {
-            try {
-                WorkflowBusiness business = new WorkflowBusiness();
-                business.purge(simulationID);
-            } catch (BusinessException ex) {
-                if (sb.length() > 0) {
-                    sb.append(", ");
-                }
-                sb.append(simulationID);
-            }
-        }
-
-        if (sb.length() > 0) {
-            throw new ApplicationException("Unable to purge the following "
-                    + "simulations: " + sb.toString());
         }
     }
 }

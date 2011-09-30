@@ -34,21 +34,15 @@
  */
 package fr.insalyon.creatis.vip.application.server.rpc;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.bean.Node;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.JobBusiness;
-import fr.insalyon.creatis.vip.application.server.dao.DAOFactory;
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import java.io.BufferedReader;
-
-import java.io.FileReader;
-import java.io.IOException;
+import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
@@ -57,97 +51,176 @@ import org.apache.log4j.Logger;
  *
  * @author Rafael Silva
  */
-public class JobServiceImpl extends RemoteServiceServlet implements JobService {
+public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobService {
 
     private static Logger logger = Logger.getLogger(JobServiceImpl.class);
-    
-    public Map<String, Integer> getStatusMap(String workflowID) {
-        try {
-            return DAOFactory.getDAOFactory().getJobDAO(workflowID).getStatusMap();
-        } catch (DAOException ex) {
-            return null;
-        }
+    private JobBusiness jobBusiness;
+
+    public JobServiceImpl() {
+
+        jobBusiness = new JobBusiness();
     }
 
-    public List<Job> getJobsList(String simulationID) throws ApplicationException {
-        
+    /**
+     * 
+     * @param simulationID
+     * @return
+     * @throws ApplicationException 
+     */
+    public Map<String, Integer> getStatusMap(String simulationID) throws ApplicationException {
+
         try {
-            JobBusiness business = new JobBusiness();
-            return business.getJobsList(simulationID);
+            return jobBusiness.getStatusMap(simulationID);
 
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
 
-    public String getFile(String workflowID, String dir, String fileName, String ext) {
+    /**
+     * 
+     * @param simulationID
+     * @return
+     * @throws ApplicationException 
+     */
+    public List<Job> getJobsList(String simulationID) throws ApplicationException {
+
         try {
-            fileName += ext;
-            FileReader fr = new FileReader(ServerConfiguration.getInstance().getWorkflowsPath() + "/" + workflowID + "/" + dir + "/" + fileName);
-            BufferedReader br = new BufferedReader(fr);
+            return jobBusiness.getJobsList(simulationID);
 
-            String strLine;
-            StringBuilder sb = new StringBuilder();
-
-            while ((strLine = br.readLine()) != null) {
-                sb.append(strLine);
-                sb.append("\n");
-            }
-
-            br.close();
-            fr.close();
-            return sb.toString();
-
-        } catch (IOException ex) {
-            logger.error(ex);
-            return null;
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 
-    public List<String> getExecutionPerNumberOfJobs(String workflowID, int binSize) {
+    /**
+     * 
+     * @param simulationID
+     * @param folder
+     * @param fileName
+     * @param extension
+     * @return
+     * @throws ApplicationException 
+     */
+    public String readFile(String simulationID, String folder, String fileName,
+            String extension) throws ApplicationException {
+
         try {
-            return DAOFactory.getDAOFactory().getJobDAO(workflowID).getExecutionPerNumberOfJobs(binSize);
-        } catch (DAOException ex) {
-            return null;
+            return jobBusiness.readFile(simulationID, folder, fileName, extension);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 
-    public List<String> getDownloadPerNumberOfJobs(String workflowID, int binSize) {
+    /**
+     * 
+     * @param simulationID
+     * @param binSize
+     * @return
+     * @throws ApplicationException 
+     */
+    public List<String> getExecutionPerNumberOfJobs(String simulationID,
+            int binSize) throws ApplicationException {
+
         try {
-            return DAOFactory.getDAOFactory().getJobDAO(workflowID).getDownloadPerNumberOfJobs(binSize);
-        } catch (DAOException ex) {
-            return null;
+            return jobBusiness.getExecutionPerNumberOfJobs(simulationID, binSize);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 
-    public List<String> getUploadPerNumberOfJobs(String workflowID, int binSize) {
+    /**
+     * 
+     * @param simulationID
+     * @param binSize
+     * @return
+     * @throws ApplicationException 
+     */
+    public List<String> getDownloadPerNumberOfJobs(String simulationID,
+            int binSize) throws ApplicationException {
+
         try {
-            return DAOFactory.getDAOFactory().getJobDAO(workflowID).getUploadPerNumberOfJobs(binSize);
-        } catch (DAOException ex) {
-            return null;
+            return jobBusiness.getDownloadPerNumberOfJobs(simulationID, binSize);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 
-    public List<String> getJobsPertTime(String workflowID) {
+    /**
+     * 
+     * @param simulationID
+     * @param binSize
+     * @return
+     * @throws ApplicationException 
+     */
+    public List<String> getUploadPerNumberOfJobs(String simulationID,
+            int binSize) throws ApplicationException {
+
         try {
-            return DAOFactory.getDAOFactory().getJobDAO(workflowID).getJobsPerTime();
-        } catch (DAOException ex) {
-            return null;
+            return jobBusiness.getUploadPerNumberOfJobs(simulationID, binSize);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 
-    public Node getNode(String workflowID, String siteName, String nodeName) {
+    /**
+     * 
+     * @param simulationID
+     * @return
+     * @throws ApplicationException 
+     */
+    public List<String> getJobsPertTime(String simulationID) throws ApplicationException {
+
         try {
-            return DAOFactory.getDAOFactory().getNodeDAO(workflowID).getNode(siteName, nodeName);
-        } catch (DAOException ex) {
-            return null;
+            return jobBusiness.getJobsPertTime(simulationID);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
-    
-    public void sendSignal(String workflowID, String jobID, ApplicationConstants.JobStatus status) {
+
+    /**
+     * 
+     * @param simulationID
+     * @param siteName
+     * @param nodeName
+     * @return
+     * @throws ApplicationException 
+     */
+    public Node getNode(String simulationID, String siteName, String nodeName)
+            throws ApplicationException {
+
         try {
-            DAOFactory.getDAOFactory().getJobDAO(workflowID).sendSignal(jobID, status);
-        } catch (DAOException ex) {
+            return jobBusiness.getNode(simulationID, siteName, nodeName);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param simulationID
+     * @param jobID
+     * @param status
+     * @throws ApplicationException 
+     */
+    public void sendSignal(String simulationID, String jobID, JobStatus status)
+            throws ApplicationException {
+
+        try {
+            trace(logger, "Sending '" + status.name() + "' signal to '" + jobID
+                    + "' (" + simulationID + ").");
+            jobBusiness.sendSignal(simulationID, jobID, status);
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 }

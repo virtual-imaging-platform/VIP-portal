@@ -32,49 +32,77 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view;
+package fr.insalyon.creatis.vip.application.server.business;
 
-import com.smartgwt.client.widgets.menu.Menu;
-import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.ClickHandler;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
-import fr.insalyon.creatis.vip.application.client.view.system.application.application.ManageApplicationsTab;
-import fr.insalyon.creatis.vip.application.client.view.system.application.classes.ManageClassesTab;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class ApplicationMenuItem extends MenuItem {
-
-    public ApplicationMenuItem() {
+public class ClassBusiness {
+    
+    /**
+     * 
+     * @return
+     * @throws BusinessException 
+     */
+    public List<AppClass> getClasses() throws BusinessException {
         
-        this.setTitle("Applications");
-        this.setIcon("icon-application.png");
+        try {
+            return ApplicationDAOFactory.getDAOFactory().getClassDAO().getClasses();
+            
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
+    /**
+     * 
+     * @param c
+     * @throws BusinessException 
+     */
+    public void addClass(AppClass c) throws BusinessException {
         
-        // Application
-        Menu menu = new Menu();
-        MenuItem manageApps = new MenuItem("Manage Applications");
-        manageApps.setIcon("icon-application-manage.png");
-        manageApps.addClickHandler(new ClickHandler() {
-
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new ManageApplicationsTab(null));
-            }
-        });
+        try {
+            ApplicationDAOFactory.getDAOFactory().getClassDAO().add(c);
+            
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
+    /**
+     * 
+     * @param c
+     * @throws BusinessException 
+     */
+    public void updateClass(AppClass c) throws BusinessException {
         
-        MenuItem manageClasses = new MenuItem("Manage Classes");
-        manageClasses.setIcon("icon-class.png");
-        manageClasses.addClickHandler(new ClickHandler() {
-
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new ManageClassesTab());
-            }
-        });
+        try {
+            ApplicationDAOFactory.getDAOFactory().getClassDAO().update(c);
+            
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
+    /**
+     * 
+     * @param name
+     * @throws BusinessException 
+     */
+    public void removeClass(String name) throws BusinessException {
         
-        menu.setItems(manageApps, manageClasses);
+        try {
+            ApplicationDAOFactory.getDAOFactory().getClassDAO().remove(name);
         
-        this.setSubmenu(menu);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
     }
 }

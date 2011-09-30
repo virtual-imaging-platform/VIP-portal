@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.application.server.dao;
 
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.util.List;
 
 /**
@@ -43,13 +44,15 @@ import java.util.List;
  */
 public interface ClassDAO {
 
-    public String add(AppClass c);
+    public void add(AppClass c) throws DAOException;
 
-    public String update(AppClass c);
+    public void update(AppClass c) throws DAOException;
 
-    public void remove(String className);
+    public void remove(String className) throws DAOException;
 
-    public List<AppClass> getClasses();
+    public List<AppClass> getClasses() throws DAOException;
 
-    public AppClass getClass(String className);
+    public AppClass getClass(String className) throws DAOException;
+    
+    public List<String> getUserClasses(String email, boolean validAdmin) throws DAOException;
 }

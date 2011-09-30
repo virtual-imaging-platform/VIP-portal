@@ -35,7 +35,7 @@
 package fr.insalyon.creatis.vip.application.server.dao;
 
 import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.util.List;
 
 /**
@@ -44,17 +44,19 @@ import java.util.List;
  */
 public interface ApplicationDAO {
 
-    public String add(Application workflowDescriptor);
+    public void add(Application workflowDescriptor) throws DAOException;
 
-    public String update(Application workflowDescriptor);
+    public void update(Application workflowDescriptor) throws DAOException;
 
-    public void remove(String name);
+    public void remove(String name) throws DAOException;
     
-    public void removeClassFromApplication(String applicationClass, String name) throws DAOException;
+    public void remove(String email, String name) throws DAOException;
 
-    public List<Application> getApplications(String applicationClass) throws DAOException;
+    public List<Application> getApplications() throws DAOException;
     
-    public List<String> getApplicationsName(String applicationClass);
+    public List<Application> getApplications(String email, boolean validGroup) throws DAOException;
+    
+    public List<String> getApplicationsName(String applicationClass) throws DAOException;
 
-    public Application getApplication(String name);
+    public Application getApplication(String name) throws DAOException;
 }

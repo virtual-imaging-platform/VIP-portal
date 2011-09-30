@@ -37,19 +37,18 @@ package fr.insalyon.creatis.vip.application.server.dao;
 import fr.insalyon.creatis.vip.application.server.dao.derby.JobData;
 import fr.insalyon.creatis.vip.application.server.dao.derby.NodeData;
 import fr.insalyon.creatis.vip.application.server.dao.derby.WorkflowData;
-import fr.insalyon.creatis.vip.application.server.dao.h2.WorkflowInputData;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DerbyDAOFactory extends DAOFactory {
+public class DerbyDAOFactory extends WorkflowDAOFactory {
 
-    private static DAOFactory instance;
+    private static WorkflowDAOFactory instance;
 
     // Singleton
-    protected static DAOFactory getInstance() {
+    protected static WorkflowDAOFactory getInstance() {
         if (instance == null) {
             instance = new DerbyDAOFactory();
         }
@@ -62,11 +61,6 @@ public class DerbyDAOFactory extends DAOFactory {
     @Override
     public WorkflowDAO getWorkflowDAO() throws DAOException {
         return WorkflowData.getInstance();
-    }
-
-    @Override
-    public WorkflowInputDAO getWorkflowInputDAO() throws DAOException {
-        return new WorkflowInputData();
     }
 
     @Override

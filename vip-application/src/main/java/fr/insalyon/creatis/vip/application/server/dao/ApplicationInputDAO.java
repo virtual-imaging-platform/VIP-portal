@@ -32,19 +32,28 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view;
 
-import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
+package fr.insalyon.creatis.vip.application.server.dao;
+
+import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class ApplicationMenuButton extends ToolStripMenuButton {
+public interface ApplicationInputDAO {
 
-    public ApplicationMenuButton(final String applicationClass, final boolean isGroupAdmin) {
-        
-        this.setTitle(applicationClass);
-        this.setMenu(new ApplicationMenu(applicationClass, isGroupAdmin));
-    }
+    public void addSimulationInput(String email, SimulationInput workflowInput) throws DAOException;
+
+    public void removeSimulationInput(String email, String inputName, String application) throws DAOException;
+    
+    public void updateSimulationInput(String email, SimulationInput SimulationInput) throws DAOException;
+
+    public List<SimulationInput> getSimulationInputByUser(String user) throws DAOException;
+    
+    public List<SimulationInput> getWorkflowInputByUserAndAppName(String user, String appName) throws DAOException;
+
+    public SimulationInput getInputByNameUserApp(String email, String name, String appName) throws DAOException;
 }

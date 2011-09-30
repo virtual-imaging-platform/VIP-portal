@@ -34,7 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao;
 
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 
 /**
  *
@@ -58,4 +58,6 @@ public abstract class ApplicationDAOFactory {
     public abstract ApplicationDAO getApplicationDAO() throws DAOException;
 
     public abstract ClassDAO getClassDAO() throws DAOException;
+    
+    public abstract ApplicationInputDAO getApplicationInputDAO() throws DAOException;
 }

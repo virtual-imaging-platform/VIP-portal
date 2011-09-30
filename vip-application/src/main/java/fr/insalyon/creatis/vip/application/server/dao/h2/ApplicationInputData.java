@@ -35,8 +35,8 @@
 package fr.insalyon.creatis.vip.application.server.dao.h2;
 
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
-import fr.insalyon.creatis.vip.application.server.dao.WorkflowInputDAO;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationInputDAO;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.h2.PlatformConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -50,39 +50,62 @@ import org.apache.log4j.Logger;
  *
  * @author Rafael Silva
  */
-public class WorkflowInputData implements WorkflowInputDAO {
+public class ApplicationInputData implements ApplicationInputDAO {
 
-    private static final Logger logger = Logger.getLogger(WorkflowInputData.class);
+    private static final Logger logger = Logger.getLogger(ApplicationInputData.class);
     private Connection connection;
 
-    public WorkflowInputData() throws DAOException {
+    public ApplicationInputData() throws DAOException {
+        
         connection = PlatformConnection.getInstance().getConnection();
     }
 
-    public void addSimulationInput(String user, SimulationInput SimulationInput) throws DAOException {
+    /**
+     * 
+     * @param email
+     * @param SimulationInput
+     * @throws DAOException 
+     */
+    public void addSimulationInput(String email, SimulationInput SimulationInput) 
+            throws DAOException {
+        
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO WorkflowInput(username, application, name, inputs) "
+                    "INSERT INTO VIPAppInputs(email, application, name, inputs) "
                     + "VALUES (?, ?, ?, ?)");
 
-            ps.setString(1, user);
+            ps.setString(1, email);
             ps.setString(2, SimulationInput.getApplication());
             ps.setString(3, SimulationInput.getName());
             ps.setString(4, SimulationInput.getInputs());
             ps.execute();
 
         } catch (SQLException ex) {
-            logger.error(ex);
-            throw new DAOException("Error: an entry named \"" + SimulationInput.getName() + "\" already exists.");
+            if (ex.getMessage().contains("Unique index or primary key violation")) {
+                logger.error("An input named \"" + SimulationInput.getName() + "\" already exists.");
+                throw new DAOException("An input named \"" + SimulationInput.getName() + "\" already exists.");
+            } else {
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
         }
     }
 
-    public void removeWorkflowInput(String user, String inputName, String application) throws DAOException {
+    /**
+     * 
+     * @param email
+     * @param inputName
+     * @param application
+     * @throws DAOException 
+     */
+    public void removeSimulationInput(String email, String inputName, 
+            String application) throws DAOException {
+        
         try {
             PreparedStatement stat = connection.prepareStatement("DELETE "
-                    + "FROM WorkflowInput WHERE username=? AND name=? AND application=?");
+                    + "FROM VIPAppInputs WHERE email=? AND name=? AND application=?");
 
-            stat.setString(1, user);
+            stat.setString(1, email);
             stat.setString(2, inputName);
             stat.setString(3, application);
             stat.execute();
@@ -93,34 +116,45 @@ public class WorkflowInputData implements WorkflowInputDAO {
         }
     }
 
-    public void updateSimulationInput(String user, SimulationInput SimulationInput) throws DAOException {
+    /**
+     * 
+     * @param email
+     * @param SimulationInput
+     * @throws DAOException 
+     */
+    public void updateSimulationInput(String email, SimulationInput SimulationInput) 
+            throws DAOException {
+        
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "UPDATE WorkflowInput SET inputs=? "
-                    + "WHERE username=? AND application=? AND name=?");
+                    "UPDATE VIPAppInputs SET inputs=? "
+                    + "WHERE email=? AND application=? AND name=?");
 
             ps.setString(1, SimulationInput.getInputs());
-            ps.setString(2, user);
+            ps.setString(2, email);
             ps.setString(3, SimulationInput.getApplication());
             ps.setString(4, SimulationInput.getName());
             ps.execute();
 
         } catch (SQLException ex) {
             logger.error(ex);
-            throw new DAOException("Error: an entry named \"" + SimulationInput.getName() + "\" already exists.");
+            throw new DAOException(ex);
         }
     }
 
-    public List<SimulationInput> getWorkflowInputByUser(String user) throws DAOException {
+    public List<SimulationInput> getSimulationInputByUser(String email) 
+            throws DAOException {
+        
         try {
-            List<SimulationInput> inputs = new ArrayList<SimulationInput>();
+            
             PreparedStatement stat = connection.prepareStatement("SELECT "
                     + "application, name, inputs "
-                    + "FROM WorkflowInput WHERE username=? "
+                    + "FROM VIPAppInputs WHERE email=? "
                     + "ORDER BY application, name");
 
-            stat.setString(1, user);
+            stat.setString(1, email);
             ResultSet rs = stat.executeQuery();
+            List<SimulationInput> inputs = new ArrayList<SimulationInput>();
 
             while (rs.next()) {
                 inputs.add(new SimulationInput(
@@ -164,17 +198,25 @@ public class WorkflowInputData implements WorkflowInputDAO {
         }
     }
 
-    public SimulationInput getInputByNameUserApp(String user, String name,
+    /**
+     * 
+     * @param email
+     * @param name
+     * @param appName
+     * @return
+     * @throws DAOException 
+     */
+    public SimulationInput getInputByNameUserApp(String email, String name,
             String appName) throws DAOException {
 
         try {
             PreparedStatement stat = connection.prepareStatement("SELECT "
-                    + "username, application, name, inputs "
-                    + "FROM WorkflowInput "
-                    + "WHERE username=? AND name=? AND application=? "
+                    + "email, application, name, inputs "
+                    + "FROM VIPAppInputs "
+                    + "WHERE email = ? AND name = ? AND application = ? "
                     + "ORDER BY name");
 
-            stat.setString(1, user);
+            stat.setString(1, email);
             stat.setString(2, name);
             stat.setString(3, appName);
             ResultSet rs = stat.executeQuery();

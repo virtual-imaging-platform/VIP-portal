@@ -45,110 +45,185 @@ import com.rednels.ofcgwt.client.model.axis.XAxis;
 import com.rednels.ofcgwt.client.model.axis.YAxis;
 import com.rednels.ofcgwt.client.model.elements.HorizontalBarChart;
 import com.rednels.ofcgwt.client.model.elements.PieChart;
+import com.smartgwt.client.types.ExpansionMode;
+import com.smartgwt.client.types.GroupStartOpen;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
+import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
+import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
+import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
-import com.smartgwt.client.widgets.layout.SectionStackSection;
+import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
+import fr.insalyon.creatis.vip.application.client.view.monitor.menu.JobsContextMenu;
+import fr.insalyon.creatis.vip.application.client.view.monitor.record.JobRecord;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.SummaryRecord;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
  *
  * @author Rafael Silva
  */
-public class SummaryStackSection extends SectionStackSection {
+public class SummaryTab extends Tab {
 
+    private ModalWindow summaryModal;
+    private ModalWindow detailModal;
     private String simulationID;
     private boolean completed;
-    private String[] states = {"Error", "Completed", "Running", "Queued", 
+    private String[] states = {"Error", "Completed", "Running", "Queued",
         "Successfully_Submitted", "Cancelled", "Stalled"};
     private ChartWidget chart;
-    private ListGrid grid;
+    private ListGrid summaryGrid;
+    private ListGrid detailGrid;
 
-    public SummaryStackSection(String simulationID, boolean completed) {
+    public SummaryTab(String simulationID, boolean completed) {
 
         this.simulationID = simulationID;
         this.completed = completed;
 
-        this.setTitle("Jobs Summary");
-        this.setCanCollapse(true);
-        this.setExpanded(true);
-        this.setResizeable(true);
+        this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_SUMMARY));
+        this.setPrompt("Jobs Summary");
 
         configureChart();
-        configureGrid();
+        configureSummaryGrid();
+        configureDetailGrid();
 
-        HLayout hLayout = new HLayout(10);
-        hLayout.setMargin(10);
-        hLayout.setHeight100();
-        hLayout.setOverflow(Overflow.AUTO);
-        hLayout.addMember(chart);
-        hLayout.addMember(grid);
+        VLayout vLayout = new VLayout(10);
+        vLayout.setWidth100();
+        vLayout.setHeight100();
 
-        this.addItem(hLayout);
+        HLayout summaryLayout = new HLayout(10);
+        summaryLayout.setPadding(10);
+        summaryLayout.setHeight(330);
+        summaryLayout.setWidth100();
+        summaryLayout.setOverflow(Overflow.AUTO);
+        summaryLayout.addMember(chart);
+        summaryLayout.addMember(summaryGrid);
+
+        summaryModal = new ModalWindow(summaryLayout);
+        vLayout.addMember(summaryLayout);
+        
+        detailModal = new ModalWindow(detailGrid);
+        vLayout.addMember(detailGrid);
+
+        this.setPane(vLayout);
         loadData();
     }
 
     private void configureChart() {
+        
         chart = new ChartWidget();
-        chart.setSize("550", "350");
+        chart.setSize("550", "300");
         chart.setChartData(new ChartData());
     }
 
-    private void configureGrid() {
-        grid = new ListGrid();
-        grid.setWidth(300);
-        grid.setHeight(180);
-        grid.setShowAllRecords(true);
-        grid.setShowEmptyMessage(true);
-        grid.setEmptyMessage("<br>No data available.");
+    private void configureSummaryGrid() {
+
+        summaryGrid = new ListGrid();
+        summaryGrid.setWidth(300);
+        summaryGrid.setHeight(180);
+        summaryGrid.setShowAllRecords(true);
+        summaryGrid.setShowEmptyMessage(true);
+        summaryGrid.setEmptyMessage("<br>No data available.");
 
         ListGridField statesField = new ListGridField("states", "State");
         ListGridField jobsField = new ListGridField("jobs", "Number of Jobs");
 
-        grid.setFields(statesField, jobsField);
+        summaryGrid.setFields(statesField, jobsField);
     }
 
+    private void configureDetailGrid() {
+        
+        detailGrid = new ListGrid();
+        detailGrid.setWidth100();
+        detailGrid.setHeight100();
+        detailGrid.setShowAllRecords(false);
+        detailGrid.setShowRowNumbers(true);
+        detailGrid.setShowEmptyMessage(true);
+        detailGrid.setEmptyMessage("<br>No data available.");
+        detailGrid.setCanExpandRecords(true);
+        detailGrid.setExpansionMode(ExpansionMode.DETAIL_FIELD);
+
+        ListGridField jobIDField = new ListGridField("jobID", "Job ID");
+        ListGridField statusField = new ListGridField("status", "Status");
+        ListGridField minorField = new ListGridField("minorStatus", "Minor Status");
+        ListGridField commandField = new ListGridField("command", "Command");
+        commandField.setHidden(true);
+
+        detailGrid.setFields(jobIDField, statusField, minorField, commandField);
+
+        detailGrid.setGroupStartOpen(GroupStartOpen.ALL);
+        detailGrid.setGroupByField("command");
+        detailGrid.setDetailField("parameters");
+
+        detailGrid.addRowContextClickHandler(new RowContextClickHandler() {
+
+            public void onRowContextClick(RowContextClickEvent event) {
+                event.cancel();
+                JobRecord job = (JobRecord) event.getRecord();
+                new JobsContextMenu(detailModal, simulationID, job).showContextMenu();
+            }
+        });
+        detailGrid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
+
+            public void onCellDoubleClick(CellDoubleClickEvent event) {
+                detailGrid.expandRecord(event.getRecord());
+            }
+        });
+    }
+    
     public void loadData() {
+        
+        loadSummaryData();
+        loadDetailData();
+    }
+    
+    private void loadSummaryData() {
 
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<Map<String, Integer>> callback = new AsyncCallback<Map<String, Integer>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get workflow list\n" + caught.getMessage());
+                summaryModal.hide();
+                SC.warn("Unable to get summary data:<br />" + caught.getMessage());
             }
 
             public void onSuccess(Map<String, Integer> result) {
+                SummaryRecord[] data = new SummaryRecord[states.length];
+                int maxValue = 0;
 
-                if (result != null && result.size() > 0) {
-                    SummaryRecord[] data = new SummaryRecord[states.length];
-                    int maxValue = 0;
-
-                    int j = 0;
-                    for (int i = states.length - 1; i >= 0; i--) {
-                        int value = 0;
-                        if (result.containsKey(states[i].toUpperCase())) {
-                            value = result.get(states[i].toUpperCase());
-                            if (value > maxValue) {
-                                maxValue = value;
-                            }
+                int j = 0;
+                for (int i = states.length - 1; i >= 0; i--) {
+                    int value = 0;
+                    if (result.containsKey(states[i].toUpperCase())) {
+                        value = result.get(states[i].toUpperCase());
+                        if (value > maxValue) {
+                            maxValue = value;
                         }
-                        data[j] = new SummaryRecord(states[i], value);
-                        j++;
                     }
-                    grid.setData(data);
-                    
-                    if (completed) {
-                        chart.setChartData(getPieChartData(data));
-                    } else {
-                        chart.setChartData(getBarChartGlassData(data, maxValue));
-                    }
+                    data[j] = new SummaryRecord(states[i], value);
+                    j++;
                 }
+                summaryGrid.setData(data);
+
+                if (completed) {
+                    chart.setChartData(getPieChartData(data));
+                } else {
+                    chart.setChartData(getBarChartGlassData(data, maxValue));
+                }
+                summaryModal.hide();
             }
 
             private ChartData getBarChartGlassData(SummaryRecord[] data, int maxValue) {
@@ -184,7 +259,7 @@ public class SummaryStackSection extends SectionStackSection {
 
                 return chartData;
             }
-            
+
             private ChartData getPieChartData(SummaryRecord[] data) {
                 ChartData chartData = new ChartData();
                 chartData.setBackgroundColour("#ffffff");
@@ -196,17 +271,44 @@ public class SummaryStackSection extends SectionStackSection {
                 pie.setNoLabels(true);
                 pie.setTooltip("#label# #val# jobs<br>#percent#");
                 pie.setGradientFill(true);
-                pie.setColours("#008000", "#cc0033","#FEA101", "#669999");
+                pie.setColours("#008000", "#cc0033", "#FEA101", "#669999");
                 pie.addSlices(new PieChart.Slice(new Integer(data[5].getJobs()), "Completed"));
                 pie.addSlices(new PieChart.Slice(new Integer(data[6].getJobs()), "Error"));
                 pie.addSlices(new PieChart.Slice(new Integer(data[1].getJobs()), "Cancelled"));
                 pie.addSlices(new PieChart.Slice(new Integer(data[0].getJobs()), "Stalled"));
-                
+
                 chartData.addElements(pie);
                 pie.setAnimateOnShow(false);
                 return chartData;
             }
         };
+        summaryModal.show("Loading data...", true);
         service.getStatusMap(simulationID, callback);
+    }
+    
+    private void loadDetailData() {
+
+        JobServiceAsync service = JobService.Util.getInstance();
+        final AsyncCallback<List<Job>> callback = new AsyncCallback<List<Job>>() {
+
+            public void onFailure(Throwable caught) {
+                detailModal.hide();
+                SC.warn("Unable to get list of jobs:<br />" + caught.getMessage());
+            }
+
+            public void onSuccess(List<Job> result) {
+                List<JobRecord> dataList = new ArrayList<JobRecord>();
+                for (Job j : result) {
+                    dataList.add(new JobRecord(j.getId(), j.getStatus(),
+                            j.getCommand(), j.getFileName(), j.getExitCode(),
+                            j.getSiteName(), j.getNodeName(), j.getParameters(),
+                            j.getMinorStatus()));
+                }
+                detailGrid.setData(dataList.toArray(new JobRecord[]{}));
+                detailModal.hide();
+            }
+        };
+        detailModal.show("Loading data...", true);
+        service.getJobsList(simulationID, callback);
     }
 }

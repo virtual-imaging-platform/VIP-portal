@@ -32,22 +32,38 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.launch;
+package fr.insalyon.creatis.vip.application.client.view;
 
-import com.smartgwt.client.widgets.grid.ListGridRecord;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.view.system.application.ManageApplicationsTab;
+import fr.insalyon.creatis.vip.application.client.view.system.classes.ManageClassesTab;
+import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
  *
  * @author Rafael Silva
  */
-public class InputRecord extends ListGridRecord {
+public class ApplicationSystemParser extends ApplicationParser {
 
-    public InputRecord() {
+    @Override
+    public void loadApplications() {
+        
+        addApplication(ApplicationConstants.APP_APPLICATION, ApplicationConstants.APP_IMG_APPLICATION);
+        addApplication(ApplicationConstants.APP_CLASSES, ApplicationConstants.APP_IMG_CLASSES);
     }
 
-    public InputRecord(String application, String name, String values) {
-        setAttribute("application", application);
-        setAttribute("name", name);
-        setAttribute("values", values);
+    @Override
+    public boolean parse(String applicationName) {
+
+        if (applicationName.equals(ApplicationConstants.APP_APPLICATION)) {
+            Layout.getInstance().addTab(new ManageApplicationsTab());
+            return true;
+        
+        } else if (applicationName.equals(ApplicationConstants.APP_CLASSES)) {
+            Layout.getInstance().addTab(new ManageClassesTab());
+            return true;
+        }
+        return false;
     }
 }

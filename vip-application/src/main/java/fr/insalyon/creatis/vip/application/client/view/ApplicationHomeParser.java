@@ -32,72 +32,67 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.launch;
+package fr.insalyon.creatis.vip.application.client.view;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
-import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
+import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationsTab;
+import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
+import fr.insalyon.creatis.vip.core.client.view.application.ApplicationTileRecord;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class LaunchToolStrip extends ToolStrip {
+public class ApplicationHomeParser extends ApplicationParser {
 
-    private String applicationClass;
-    private SelectItem simulatorItem;
+    private List<String> applicationNames;
 
-    public LaunchToolStrip(final String applicationClass, final String tabID) {
+    @Override
+    public void loadApplications() {
 
-        this.applicationClass = applicationClass;
-        this.setWidth100();
-
-        simulatorItem = new SelectItem(applicationClass);
-        simulatorItem.setWidth(300);
-        simulatorItem.addChangedHandler(new ChangedHandler() {
-
-            public void onChanged(ChangedEvent event) {
-                String simulationName = simulatorItem.getValueAsString();
-                if (simulationName != null && !simulationName.isEmpty()) {
-                    AbstractLaunchTab launchTab = 
-                            (AbstractLaunchTab) Layout.getInstance().getTab(tabID);
-                    launchTab.createSimulation(simulationName);
-                    launchTab.addInputsSection();
-                }
-            }
-        });
-        this.addFormItem(simulatorItem);
-        
-        loadData();
-    }
-
-    private void loadData() {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
-        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+        final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get workflow descriptors lists\n" + caught.getMessage());
+                SC.say("Unable to load applications:<br />" + caught.getMessage());
             }
 
-            public void onSuccess(List<String> result) {
+            public void onSuccess(List<Application> result) {
 
-                LinkedHashMap<String, String> appsMap = new LinkedHashMap<String, String>();
+                List<ApplicationTileRecord> list = new ArrayList<ApplicationTileRecord>();
+                applicationNames = new ArrayList<String>();
+                addApplication(ApplicationConstants.APP_MONITOR,
+                        ApplicationConstants.APP_IMG_MONITOR);
 
-                for (String s : result) {
-                    appsMap.put(s, s);
+                for (Application app : result) {
+                    addApplication(app.getName(), ApplicationConstants.APP_IMG_APPLICATION);
+                    applicationNames.add(app.getName());
                 }
-                simulatorItem.setValueMap(appsMap);
             }
         };
-        service.getApplicationsName(applicationClass, callback);
+        service.getApplications(callback);
+    }
+
+    @Override
+    public boolean parse(String applicationName) {
+
+        if (applicationNames.contains(applicationName)) {
+            Layout.getInstance().addTab(new LaunchTab(applicationName));
+            return true;
+
+        } else if (applicationName.equals(ApplicationConstants.APP_MONITOR)) {
+            Layout.getInstance().addTab(new SimulationsTab());
+            return true;
+        }
+        return false;
     }
 }

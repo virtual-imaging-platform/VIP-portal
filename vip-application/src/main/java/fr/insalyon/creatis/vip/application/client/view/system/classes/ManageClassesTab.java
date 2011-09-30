@@ -32,41 +32,56 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.monitor;
+package fr.insalyon.creatis.vip.application.client.view.system.classes;
 
-import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.layout.SectionStackSection;
-import fr.insalyon.creatis.vip.common.client.view.Context;
+import com.smartgwt.client.types.VisibilityMode;
+import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.layout.SectionStack;
+import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.tab.Tab;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DiagramStackSection extends SectionStackSection {
+public class ManageClassesTab extends Tab {
 
-    private String simulationID;
-    private HTMLPane htmlPane;
-    
-    public DiagramStackSection(String simulationID) {
-        this.simulationID = simulationID;
-        this.setTitle("Simulation Diagram");
-        this.setCanCollapse(true);
-        this.setExpanded(false);
-        this.setResizeable(true);
-        
-        htmlPane = new HTMLPane();
-        htmlPane.setWidth100();
-        htmlPane.setHeight100();
-        htmlPane.setPadding(10);
-        htmlPane.setOverflow(Overflow.AUTO);
-        loadImage();
-               
-        this.addItem(htmlPane);
+    private ToolStrip toolStrip;
+    private ClassesStackSection classesStackSection;
+    private EditClassStackSection editStackSection;
+
+    public ManageClassesTab() {
+
+        this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_CLASSES) + " " + ApplicationConstants.APP_CLASSES);
+        this.setID(ApplicationConstants.TAB_MANAGE_CLASSES);
+        this.setCanClose(true);
+
+        VLayout vLayout = new VLayout();
+
+        toolStrip = new ManageClassesToolStrip();
+        vLayout.addMember(toolStrip);
+
+        SectionStack sectionStack = new SectionStack();
+        sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
+        sectionStack.setAnimateSections(true);
+        sectionStack.setCanResizeSections(true);
+
+        classesStackSection = new ClassesStackSection();
+        editStackSection = new EditClassStackSection();
+
+        sectionStack.setSections(classesStackSection, editStackSection);
+        vLayout.addMember(sectionStack);
+
+        this.setPane(vLayout);
     }
-    
-    public void loadImage() {
-        htmlPane.setContents("<img src=\"" + Context.getInstance().getMoteurServerHost() 
-                + "/workflows/" + simulationID + "/html/workflow-image.png\" />");
+
+    public void loadClasses() {
+        classesStackSection.loadData();
+    }
+
+    public void setClass(String name, String groups) {
+        editStackSection.setClass(name, groups);
     }
 }

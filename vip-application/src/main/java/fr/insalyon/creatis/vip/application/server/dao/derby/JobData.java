@@ -38,8 +38,8 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.server.dao.JobDAO;
 import fr.insalyon.creatis.vip.application.server.dao.derby.connection.JobsConnection;
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -62,13 +62,14 @@ public class JobData implements JobDAO {
 
     public JobData(String workflowID) throws DAOException {
         connection = JobsConnection.getInstance().connect(
-                ServerConfiguration.getInstance().getWorkflowsPath() + "/" + workflowID + "/jobs.db");
+                Server.getInstance().getWorkflowsPath() + "/" + workflowID + "/jobs.db");
     }
 
     /**
      * Gets a map with the status of the jobs.
      * 
      * @return Jobs status map
+     * @throws DAOException 
      */
     public Map<String, Integer> getStatusMap() throws DAOException {
 
@@ -97,6 +98,7 @@ public class JobData implements JobDAO {
      * Gets a list of all jobs.
      * 
      * @return List of jobs
+     * @throws DAOException 
      */
     public List<Job> getJobs() throws DAOException {
         
@@ -163,8 +165,10 @@ public class JobData implements JobDAO {
      * 
      * @param binSize
      * @return
+     * @throws DAOException 
      */
-    public List<String> getExecutionPerNumberOfJobs(int binSize) {
+    public List<String> getExecutionPerNumberOfJobs(int binSize) throws DAOException {
+        
         try {
             List<String> list = new ArrayList<String>();
             Statement stat = connection.createStatement();
@@ -188,16 +192,18 @@ public class JobData implements JobDAO {
 
         } catch (SQLException ex) {
             logger.error(ex);
+            throw new DAOException(ex);
         }
-        return null;
     }
 
     /**
      * 
      * @param binSize
      * @return
+     * @throws DAOException 
      */
-    public List<String> getDownloadPerNumberOfJobs(int binSize) {
+    public List<String> getDownloadPerNumberOfJobs(int binSize) throws DAOException {
+        
         try {
             List<String> list = new ArrayList<String>();
             Statement stat = connection.createStatement();
@@ -221,16 +227,18 @@ public class JobData implements JobDAO {
 
         } catch (SQLException ex) {
             logger.error(ex);
+            throw new DAOException(ex);
         }
-        return null;
     }
 
     /**
      * 
      * @param binSize
      * @return
+     * @throws DAOException 
      */
-    public List<String> getUploadPerNumberOfJobs(int binSize) {
+    public List<String> getUploadPerNumberOfJobs(int binSize) throws DAOException {
+        
         try {
             List<String> list = new ArrayList<String>();
             Statement stat = connection.createStatement();
@@ -253,11 +261,17 @@ public class JobData implements JobDAO {
 
         } catch (SQLException ex) {
             logger.error(ex);
+            throw new DAOException(ex);
         }
-        return null;
     }
 
-    public List<String> getJobsPerTime() {
+    /**
+     * 
+     * @return
+     * @throws DAOException 
+     */
+    public List<String> getJobsPerTime() throws DAOException {
+        
         try {
             List<String> list = new ArrayList<String>();
             Statement stat = connection.createStatement();
@@ -284,11 +298,13 @@ public class JobData implements JobDAO {
 
         } catch (SQLException ex) {
             logger.error(ex);
+            throw new DAOException(ex);
         }
-        return null;
     }
 
-    public void sendSignal(String jobID, ApplicationConstants.JobStatus status) throws DAOException {
+    public void sendSignal(String jobID, ApplicationConstants.JobStatus status) 
+            throws DAOException {
+        
         try {
             PreparedStatement ps = connection.prepareStatement(
                     "UPDATE Jobs SET status = ? WHERE id = ?");

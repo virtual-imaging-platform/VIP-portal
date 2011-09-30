@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -46,6 +46,9 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 
 /**
  *
@@ -53,6 +56,7 @@ import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
  */
 public class FileViewerWindow extends Window {
 
+    private ModalWindow modal;
     private ToolStrip toolStrip;
     private HTMLPane pane;
     private String simulationID;
@@ -71,6 +75,7 @@ public class FileViewerWindow extends Window {
         this.setTitle(title);
         this.setCanDragReposition(true);
         this.setCanDragResize(true);
+        this.setShowMaximizeButton(true);
         this.setWidth(700);
         this.setHeight(450);
         this.centerInPage();
@@ -79,6 +84,8 @@ public class FileViewerWindow extends Window {
         pane.setPadding(10);
         pane.setOverflow(Overflow.AUTO);
         pane.setStyleName("defaultBorder");
+        
+        modal = new ModalWindow(pane);
 
         configureToolStrip();
 
@@ -89,21 +96,25 @@ public class FileViewerWindow extends Window {
     }
 
     private void loadFile() {
+        
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<String> callback = new AsyncCallback<String>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get file: " + caught.getMessage());
+                modal.hide();
+                SC.warn("Unable to get file:<br />" + caught.getMessage());
             }
 
             public void onSuccess(String result) {
+                modal.hide();
                 pane.setContents(result
                         .replaceAll("<", "&lt;")
                         .replaceAll(">", "&gt;")
                         .replaceAll("\n", "<br />"));
             }
         };
-        service.getFile(simulationID, folder, fileName, extension, callback);
+        modal.show("Loading file '" + fileName + extension + "'...", true);
+        service.readFile(simulationID, folder, fileName, extension, callback);
     }
 
     private void configureToolStrip() {
@@ -112,7 +123,7 @@ public class FileViewerWindow extends Window {
         toolStrip.setWidth100();
 
         ToolStripButton refreshButton = new ToolStripButton();
-        refreshButton.setIcon("icon-refresh.png");
+        refreshButton.setIcon(CoreConstants.ICON_REFRESH);
         refreshButton.setTitle("Refresh");
         refreshButton.addClickHandler(new ClickHandler() {
 
@@ -123,7 +134,7 @@ public class FileViewerWindow extends Window {
         toolStrip.addButton(refreshButton);
 
         ToolStripButton downloadButton = new ToolStripButton();
-        downloadButton.setIcon("icon-download.png");
+        downloadButton.setIcon(DataManagerConstants.ICON_DOWNLOAD);
         downloadButton.setTitle("Download");
         downloadButton.addClickHandler(new ClickHandler() {
 

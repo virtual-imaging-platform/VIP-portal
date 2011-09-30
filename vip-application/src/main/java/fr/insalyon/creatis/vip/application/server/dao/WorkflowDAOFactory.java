@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,42 +32,32 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.monitor;
+package fr.insalyon.creatis.vip.application.server.dao;
 
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.toolbar.ToolStrip;
-import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
-import java.util.Date;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 
 /**
  *
  * @author Rafael Silva
  */
-public class SimulationToolStrip extends ToolStrip {
+public abstract class WorkflowDAOFactory {
 
-    private Label lastUpdated;
+    public static final int DERBY = 1;
+    public static int factory = DERBY;
 
-    public SimulationToolStrip(String simulationID) {
-        this.setWidth100();
-        this.setPadding(2);
+    public static WorkflowDAOFactory getDAOFactory() {
 
-        ToolStripMenuButton logsButton = new LogsMenuButton(simulationID);
-        this.addMenuButton(logsButton);
-
-        configure();
-    }
-    
-    protected void configure() {
-        this.addFill();
-        lastUpdated = new Label();
-        lastUpdated.setWidth(300);
-        lastUpdated.setAlign(Alignment.RIGHT);
-        this.updateDate();
-        this.addMember(lastUpdated);
+        switch (factory) {
+            case DERBY:
+                return DerbyDAOFactory.getInstance();
+            default:
+                return null;
+        }
     }
 
-    public void updateDate() {
-        this.lastUpdated.setContents("Last updated on " + new Date());
-    }
+    public abstract WorkflowDAO getWorkflowDAO() throws DAOException;
+
+    public abstract JobDAO getJobDAO(String workflowID) throws DAOException;
+
+    public abstract NodeDAO getNodeDAO(String workflowID) throws DAOException;
 }

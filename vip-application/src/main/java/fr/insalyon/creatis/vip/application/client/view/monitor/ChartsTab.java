@@ -50,6 +50,7 @@ import com.rednels.ofcgwt.client.model.elements.StackedBarChart;
 import com.rednels.ofcgwt.client.model.elements.StackedBarChart.Stack;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -60,11 +61,13 @@ import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
-import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
-import fr.insalyon.creatis.vip.common.client.view.property.PropertyRecord;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -73,8 +76,9 @@ import java.util.List;
  *
  * @author Rafael Silva
  */
-public class ChartsStackSection extends SectionStackSection {
+public class ChartsTab extends Tab {
 
+    private ModalWindow modal;
     private String simulationID;
     private DynamicForm form;
     private SelectItem chartsItem;
@@ -83,25 +87,27 @@ public class ChartsStackSection extends SectionStackSection {
     private ChartWidget chart;
     private ListGrid grid;
 
-    public ChartsStackSection(String simulationID) {
+    public ChartsTab(String simulationID) {
+        
         this.simulationID = simulationID;
-        this.setTitle("Performance Statistics");
-        this.setCanCollapse(true);
-        this.setExpanded(false);
-        this.setResizeable(true);
+        this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_CHART));
+        this.setPrompt("Performance Statistics");
 
         configureForm();
 
         vLayout = new VLayout(15);
         vLayout.setHeight100();
         vLayout.setOverflow(Overflow.AUTO);
-        vLayout.setMargin(5);
+        vLayout.setPadding(10);
         vLayout.addMember(form);
+        
+        modal = new ModalWindow(vLayout);
 
-        this.addItem(vLayout);
+        this.setPane(vLayout);
     }
 
     private void configureForm() {
+        
         form = new DynamicForm();
         form.setWidth(500);
         form.setNumCols(5);
@@ -144,6 +150,7 @@ public class ChartsStackSection extends SectionStackSection {
     }
 
     private void generateChart() {
+        
         int value = new Integer(chartsItem.getValueAsString());
         int binSize = 100;
         if (binItem.getValueAsString() != null && !binItem.getValueAsString().equals("")) {
@@ -172,13 +179,16 @@ public class ChartsStackSection extends SectionStackSection {
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get chart data\n" + caught.getMessage());
+                modal.hide();
+                SC.warn("Unable to get chart data:<br />" + caught.getMessage());
             }
 
             public void onSuccess(List<String> result) {
                 buildStackChart(result);
+                modal.hide();
             }
         };
+        modal.show("Building chart...", true);
         service.getJobsPertTime(simulationID, callback);
     }
 
@@ -192,13 +202,16 @@ public class ChartsStackSection extends SectionStackSection {
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get chart data\n" + caught.getMessage());
+                modal.hide();
+                SC.warn("Unable to get chart data:<br />" + caught.getMessage());
             }
 
             public void onSuccess(List<String> result) {
+                modal.hide();
                 buildBarChartAndGrid(result, "Execution Time (sec)", "#00aa00", binSize);
             }
         };
+        modal.show("Building chart...", true);
         service.getExecutionPerNumberOfJobs(simulationID, binSize, callback);
     }
 
@@ -212,13 +225,16 @@ public class ChartsStackSection extends SectionStackSection {
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get chart data\n" + caught.getMessage());
+                modal.hide();
+                SC.warn("Unable to get chart data:<br />" + caught.getMessage());
             }
 
             public void onSuccess(List<String> result) {
+                modal.hide();
                 buildBarChartAndGrid(result, "Download Time (sec)", "#6699CC", binSize);
             }
         };
+        modal.show("Building chart...", true);
         service.getDownloadPerNumberOfJobs(simulationID, binSize, callback);
     }
 
@@ -232,13 +248,16 @@ public class ChartsStackSection extends SectionStackSection {
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get chart data\n" + caught.getMessage());
+                modal.hide();
+                SC.warn("Unable to get chart data:<br />" + caught.getMessage());
             }
 
             public void onSuccess(List<String> result) {
+                modal.hide();
                 buildBarChartAndGrid(result, "Upload Time (sec)", "#CC9966", binSize);
             }
         };
+        modal.show("Building chart...", true);
         service.getUploadPerNumberOfJobs(simulationID, binSize, callback);
     }
 
@@ -427,6 +446,7 @@ public class ChartsStackSection extends SectionStackSection {
     }
 
     private void configureChartAndGrid() {
+        
         chart = new ChartWidget();
         chart.setSize("700", "370");
 

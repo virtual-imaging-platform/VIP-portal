@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.application.client.view.monitor;
 
 import com.smartgwt.client.widgets.tree.TreeNode;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 
 /**
  *
@@ -52,14 +53,15 @@ public class InOutTreeNode extends TreeNode {
     }
     
     private void setIcon(Icon icon) {
+        
         if (icon == Icon.Input) {
-            setIcon("icon-tree-input.png");
+            setIcon(ApplicationConstants.ICON_TREE_INPUT);
         } else if (icon == Icon.Output) {
-            setIcon("icon-tree-output.png");
+            setIcon(ApplicationConstants.ICON_TREE_OUTPUT);
         } else if (icon == Icon.Simulation) {
-            setIcon("icon-tree-simulation.png");
+            setIcon(ApplicationConstants.ICON_TREE_SIMULATION);
         } else if (icon == Icon.Other) {
-            setIcon("icon-tree-service.png");
+            setIcon(ApplicationConstants.ICON_TREE_SERVICE);
         }
     }
     

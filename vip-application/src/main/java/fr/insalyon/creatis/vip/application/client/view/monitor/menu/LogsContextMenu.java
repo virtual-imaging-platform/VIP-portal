@@ -43,10 +43,13 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.FileViewerWindow;
-import fr.insalyon.creatis.vip.application.client.view.monitor.LogsStackSection;
+import fr.insalyon.creatis.vip.application.client.view.monitor.LogsTab;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 
 /**
  *
@@ -54,10 +57,10 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.LogsStackSection;
  */
 public class LogsContextMenu extends Menu {
 
-    private LogsStackSection section;
+    private LogsTab section;
     private String baseDir;
 
-    public LogsContextMenu(LogsStackSection section, final String simulationID,
+    public LogsContextMenu(LogsTab section, final String simulationID,
             final String dataName, final String folder, boolean isFile) {
 
         this.section = section;
@@ -67,6 +70,7 @@ public class LogsContextMenu extends Menu {
         this.setWidth(90);
 
         MenuItem viewItem = new MenuItem("View File");
+        viewItem.setIcon(ApplicationConstants.ICON_PREVIEW);
         viewItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -76,7 +80,7 @@ public class LogsContextMenu extends Menu {
         });
 
         MenuItem downloadItem = new MenuItem("Download File");
-        downloadItem.setIcon("icon-download.png");
+        downloadItem.setIcon(DataManagerConstants.ICON_DOWNLOAD);
         downloadItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -88,7 +92,7 @@ public class LogsContextMenu extends Menu {
         });
 
         MenuItem deleteItem = new MenuItem("Delete");
-        deleteItem.setIcon("icon-delete.png");
+        deleteItem.setIcon(CoreConstants.ICON_DELETE);
         deleteItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -112,12 +116,13 @@ public class LogsContextMenu extends Menu {
     }
 
     private void delete(String path) {
+        
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {
                 section.getModal().hide();
-                SC.warn("Error executing delete: " + caught.getMessage());
+                SC.warn("Unable to delete:<br />" + caught.getMessage());
             }
 
             public void onSuccess(Void result) {

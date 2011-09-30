@@ -34,8 +34,8 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao.derby.connection;
 
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -51,8 +51,8 @@ public class JobsConnection {
     private static JobsConnection instance;
     private final String DRIVER = "org.apache.derby.jdbc.ClientDriver";
     private final String DBURL = "jdbc:derby://"
-            + ServerConfiguration.getInstance().getWorkflowsHost() + ":"
-            + ServerConfiguration.getInstance().getWorkflowsPort() + "/";
+            + Server.getInstance().getWorkflowsHost() + ":"
+            + Server.getInstance().getWorkflowsPort() + "/";
     private Map<String, Connection> connections = new HashMap<String, Connection>();
     private Map<String, Integer> usersConnections = new HashMap<String, Integer>();
 

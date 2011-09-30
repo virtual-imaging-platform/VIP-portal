@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,34 +32,46 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.server.dao;
+package fr.insalyon.creatis.vip.application.client;
 
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import com.smartgwt.client.widgets.tab.Tab;
+import com.smartgwt.client.widgets.tab.events.CloseClickHandler;
+import com.smartgwt.client.widgets.tab.events.TabCloseClickEvent;
+import fr.insalyon.creatis.vip.application.client.view.ApplicationHomeParser;
+import fr.insalyon.creatis.vip.application.client.view.ApplicationSystemParser;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationTab;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.Module;
+import fr.insalyon.creatis.vip.core.client.view.layout.CenterTabSet;
 
 /**
  *
  * @author Rafael Silva
  */
-public abstract class DAOFactory {
+public class ApplicationModule extends Module {
 
-    public static final int DERBY = 1;
-    public static int factory = DERBY;
-
-    public static DAOFactory getDAOFactory() {
-
-        switch (factory) {
-            case DERBY:
-                return DerbyDAOFactory.getInstance();
-            default:
-                return null;
-        }
+    public ApplicationModule() {
+        
+        CoreModule.systemExecutor.addParser(new ApplicationSystemParser());
+        CoreModule.homeExecutor.addParser(new ApplicationHomeParser());
     }
 
-    public abstract WorkflowDAO getWorkflowDAO() throws DAOException;
+    @Override
+    public void load() {
+        
+        // Simulation close tab
+        CenterTabSet.getInstance().addCloseClickHandler(new CloseClickHandler() {
 
-    public abstract WorkflowInputDAO getWorkflowInputDAO() throws DAOException;
+            public void onCloseClick(TabCloseClickEvent event) {
+                Tab tab = event.getTab();
+                if (tab instanceof SimulationTab) {
+                    ((SimulationTab) tab).destroy();
+                }
+            }
+        });
+    }
 
-    public abstract JobDAO getJobDAO(String workflowID) throws DAOException;
-
-    public abstract NodeDAO getNodeDAO(String workflowID) throws DAOException;
+    @Override
+    public void terminate() {
+    }
 }

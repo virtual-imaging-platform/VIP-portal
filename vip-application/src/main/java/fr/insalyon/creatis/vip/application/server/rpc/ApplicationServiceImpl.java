@@ -34,12 +34,18 @@
  */
 package fr.insalyon.creatis.vip.application.server.rpc;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
+import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import java.util.List;
 import org.apache.log4j.Logger;
 
@@ -47,37 +53,63 @@ import org.apache.log4j.Logger;
  *
  * @author Rafael Silva
  */
-public class ApplicationServiceImpl extends RemoteServiceServlet implements ApplicationService {
+public class ApplicationServiceImpl extends AbstractRemoteServiceServlet implements ApplicationService {
 
     private static Logger logger = Logger.getLogger(ApplicationServiceImpl.class);
-    
-    public String add(Application application) {
+    private ClassBusiness classBusiness;
+    private ApplicationBusiness applicationBusiness;
+
+    public ApplicationServiceImpl() {
+        classBusiness = new ClassBusiness();
+        applicationBusiness = new ApplicationBusiness();
+    }
+
+    public void add(Application application) throws ApplicationException {
+
         try {
-            return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().add(application);
-        } catch (DAOException ex) {
-            return null;
+            trace(logger, "Adding application '" + application.getName() + "'.");
+            applicationBusiness.add(application);
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 
-    public String update(Application application) {
+    public void update(Application application) throws ApplicationException {
+
         try {
-            return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().update(application);
-        } catch (DAOException ex) {
-            return null;
+            User user = getSessionUser();
+            trace(logger, "Updating application '" + application.getName() + "'.");
+
+            if (configurationBusiness.isSystemAdministrator(user.getEmail())) {
+                applicationBusiness.update(application);
+
+            } else {
+            }
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 
-    public void remove(String name) {
+    public void remove(String name) throws ApplicationException {
+
         try {
-            ApplicationDAOFactory.getDAOFactory().getApplicationDAO().remove(name);
-        } catch (DAOException ex) {
-        }
-    }
-    
-    public void removeClassFromApplication(String applicationClass, String applicationName) {
-        try {
-            ApplicationDAOFactory.getDAOFactory().getApplicationDAO().removeClassFromApplication(applicationClass, applicationName);
-        } catch (DAOException ex) {
+            User user = getSessionUser();
+            if (configurationBusiness.isSystemAdministrator(user.getEmail())) {
+                trace(logger, "Removing application '" + name + "'.");
+                applicationBusiness.remove(name);
+
+            } else {
+                applicationBusiness.remove(user.getEmail(), name);
+            }
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 
@@ -88,51 +120,96 @@ public class ApplicationServiceImpl extends RemoteServiceServlet implements Appl
             return null;
         }
     }
-    
-    public List<Application> getApplications(String applicationClass) {
+
+    public List<Application> getApplications() throws ApplicationException {
+
         try {
-            return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getApplications(applicationClass);
-        } catch (DAOException ex) {
-            return null;
+            User user = getSessionUser();
+            if (configurationBusiness.isSystemAdministrator(user.getEmail())) {
+                return applicationBusiness.getApplications();
+
+            } else {
+                return applicationBusiness.getApplications(user.getEmail(), true);
+            }
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 
-    public String addClass(AppClass c) {
+    public void addClass(AppClass c) throws ApplicationException {
+
         try {
-            return ApplicationDAOFactory.getDAOFactory().getClassDAO().add(c);
-        } catch (DAOException ex) {
-            return null;
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Adding class '" + c.getName() + "'.");
+            classBusiness.addClass(c);
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 
-    public String updateClass(AppClass c) {
+    public void updateClass(AppClass c) throws ApplicationException {
         try {
-            return ApplicationDAOFactory.getDAOFactory().getClassDAO().update(c);
-        } catch (DAOException ex) {
-            return null;
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Updating class '" + c.getName() + "'.");
+            classBusiness.updateClass(c);
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 
-    public void removeClass(String name) {
+    public void removeClass(String name) throws ApplicationException {
+
         try {
-            ApplicationDAOFactory.getDAOFactory().getClassDAO().remove(name);
-        } catch (DAOException ex) {
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Removing class '" + name + "'.");
+            classBusiness.removeClass(name);
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 
-    public List<AppClass> getClasses() {
+    public List<AppClass> getClasses() throws ApplicationException {
+
         try {
-            return ApplicationDAOFactory.getDAOFactory().getClassDAO().getClasses();
-        } catch (DAOException ex) {
-            return null;
+            authenticateSystemAdministrator(logger);
+            return classBusiness.getClasses();
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 
-    public List<String> getApplicationsName(String applicationClass) {
+    public List<String>[] getApplicationsAndUsers() throws ApplicationException {
+        
         try {
-            return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getApplicationsName(applicationClass);
-        } catch (DAOException ex) {
-            return null;
+            User user = getSessionUser();
+            if (configurationBusiness.isSystemAdministrator(user.getEmail())) {
+                
+                return new List[]{configurationBusiness.getUserNames(user.getEmail(), false), 
+                    applicationBusiness.getApplicationNames()};
+                
+            } else {
+                
+                return new List[]{configurationBusiness.getUserNames(user.getEmail(), true),
+                    applicationBusiness.getApplicationNames(user.getEmail())};                
+            }
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 

@@ -32,7 +32,6 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-
 package fr.insalyon.creatis.vip.application.client.rpc;
 
 import com.google.gwt.core.client.GWT;
@@ -66,53 +65,53 @@ public interface WorkflowService extends RemoteService {
         }
     }
 
+    public List<Source> getApplicationSources(String applicationName) throws ApplicationException;
+
+    public void launchSimulation(Map<String, String> parameters, String applicationName, String simulationName) throws ApplicationException;
+
+    public SimulationInput getInputByNameUserApp(String inputName, String appName) throws ApplicationException;
+
+    public void addSimulationInput(SimulationInput simulationInput) throws ApplicationException;
+
+    public void updateSimulationInput(SimulationInput simulationInput) throws ApplicationException;
+
+    public String loadSimulationInput(String fileName) throws ApplicationException;
+
+    public void removeSimulationInput(String inputName, String applicationName) throws ApplicationException;
+
+    public List<SimulationInput> getSimulationInputByUser() throws ApplicationException;
+
+    public void killSimulations(List<String> simulationIDs) throws ApplicationException;
+
+    public void cleanSimulations(List<String> simulationIDs) throws ApplicationException;
+
+    public void purgeSimulations(List<String> simulationIDs) throws ApplicationException;
+
+    public void killWorkflow(String simulationID) throws ApplicationException;
+
+    public void cleanWorkflow(String simulationID) throws ApplicationException;
+
+    public void purgeWorkflow(String simulationID) throws ApplicationException;
+
+    public List<Simulation> getSimulations(String user, String application, String status, Date startDate, Date endDate) throws ApplicationException;
+    
+    public Simulation getSimulation(String simulationID) throws ApplicationException;
+
     public void closeConnection(String workflowID);
-
-    public void killWorkflow(String workflowID);
-    
-    public void killWorkflows(List<String> simulationIDs) throws ApplicationException;
-
-    public void cleanWorkflow(String workflowID, String userDN, String proxyFileName);
-    
-    public void cleanWorkflows(List<String> simulationIDs, String userDN, String proxyFileName) throws ApplicationException;
-
-    public void purgeWorkflow(String workflowID);
-    
-    public void purgeWorkflows(List<String> simulationIDs) throws ApplicationException;
-    
-    public List<Simulation> getWorkflows(String user, String application, String status, Date startDate, Date endDate);
 
     public String getFile(String baseDir, String fileName);
 
     public String getFileURL(String baseDir, String fileName);
 
-    public List<String>[] getApplicationsAndUsersList(String applicationClass);
-    
     public List<String> getLogs(String baseDir);
-    
+
     public void deleteLogData(String path) throws ApplicationException;
 
-    public List<Source> getWorkflowSources(String user, String proxyFileName, String workflowName) throws ApplicationException;
-
-    public String getWorkflowInputs(String fileName);
-
-    public String launchWorkflow(String user, Map<String, String> parameters, String workflowName, String proxyFileName, String simulationName) throws ApplicationException;
-
-    public List<SimulationInput> getWorkflowsInputByUser(String user);
-    
     public List<SimulationInput> getWorkflowsInputByUserAndAppName(String user, String appName);
 
-    public void addSimulationInput(String user, SimulationInput workflowInput) throws ApplicationException;
-    
-    public void updateSimulationInput(String user, SimulationInput workflowInput) throws ApplicationException;
+    public List<String> getStats(List<Simulation> workflowIdList, int type, int binSize);
 
-    public SimulationInput getInputByNameUserApp(String user, String inputName, String appName) throws ApplicationException;
-
-    public void removeWorkflowInput(String user, String inputName, String application);
-
-    public List<String> getStats( List<Simulation> workflowIdList, int type, int binSize);
-    
     public List<InOutData> getOutputData(String simulationID) throws ApplicationException;
-    
+
     public List<InOutData> getInputData(String simulationID) throws ApplicationException;
 }

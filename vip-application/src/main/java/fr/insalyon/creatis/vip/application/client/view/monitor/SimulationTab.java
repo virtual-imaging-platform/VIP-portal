@@ -35,16 +35,18 @@
 package fr.insalyon.creatis.vip.application.client.view.monitor;
 
 import com.google.gwt.user.client.Timer;
-import com.smartgwt.client.types.VisibilityMode;
-import com.smartgwt.client.widgets.layout.SectionStack;
+import com.smartgwt.client.types.Side;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+import com.smartgwt.client.widgets.tab.TabSet;
 import com.smartgwt.client.widgets.tab.events.TabDeselectedEvent;
 import com.smartgwt.client.widgets.tab.events.TabDeselectedHandler;
 import com.smartgwt.client.widgets.tab.events.TabSelectedEvent;
 import com.smartgwt.client.widgets.tab.events.TabSelectedHandler;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.provenance.client.view.application.ProvenanceStackSection;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 
 /**
  *
@@ -54,53 +56,40 @@ public class SimulationTab extends Tab {
 
     private boolean completed;
     private Timer timer;
-    private SimulationToolStrip simulationToolStrip;
-    private SummaryStackSection summaryStackSection;
-    private JobsStackSection jobsStackSection;
-    private ChartsStackSection chartsStackSection;
-    private DiagramStackSection diagramStackSection;
-    private LogsStackSection logsStackSection;
-    private InOutDataStackSection inoutStackSection;
-//    private ProvenanceStackSection provenanceStackSection;
+    private GeneralTab generalTab;
+    private SummaryTab summaryTab;
+    private ChartsTab chartsTab;
+    private LogsTab logsTab;
 
-    public SimulationTab(String simulationID, String title, String status, boolean groupAdmin) {
-        
-        this.setTitle(title);
+    public SimulationTab(String simulationID, String simulationName, SimulationStatus status) {
+
+        this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_APPLICATION) + " " + simulationName);
         this.setID(simulationID + "-tab");
-        this.setIcon("icon-simulation-monitor.png");
         this.setCanClose(true);
 
+        this.completed = status == SimulationStatus.Running ? false : true;
+
         VLayout vLayout = new VLayout();
-        simulationToolStrip = new SimulationToolStrip(simulationID);
-        vLayout.addMember(simulationToolStrip);
+        TabSet tabSet = new TabSet();
+        tabSet.setTabBarPosition(Side.LEFT);
+        tabSet.setWidth100();
+        tabSet.setHeight100();
 
-        SectionStack sectionStack = new SectionStack();
-        sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
-        sectionStack.setAnimateSections(true);
-        sectionStack.setCanResizeSections(true);
+        generalTab = new GeneralTab(simulationID, simulationName);
+        summaryTab = new SummaryTab(simulationID, completed);
+        chartsTab = new ChartsTab(simulationID);
+        
 
-        this.completed = status.equals("Running") ? false : true;
-        summaryStackSection = new SummaryStackSection(simulationID, completed);
-        jobsStackSection = new JobsStackSection(simulationID);
-        chartsStackSection = new ChartsStackSection(simulationID);
-        diagramStackSection = new DiagramStackSection(simulationID);
-        inoutStackSection = new InOutDataStackSection(simulationID, title);
-//        provenanceStackSection = new ProvenanceStackSection(simulationID, completed);
-
-        sectionStack.setSections(
-//                provenanceStackSection,
-                inoutStackSection,
-                summaryStackSection,
-                jobsStackSection,
-                chartsStackSection,
-                diagramStackSection);
-
-        if (Context.getInstance().isSystemAdmin() || groupAdmin) {
-            logsStackSection = new LogsStackSection(simulationID);
-            sectionStack.addSection(logsStackSection);
+        tabSet.addTab(generalTab);
+        tabSet.addTab(summaryTab);
+        tabSet.addTab(chartsTab);
+        
+        if (CoreModule.user.isSystemAdministrator()) {
+            logsTab = new LogsTab(simulationID);
+            tabSet.addTab(logsTab);
         }
 
-        vLayout.addMember(sectionStack);
+        vLayout.addMember(tabSet);
 
         this.setPane(vLayout);
 
@@ -134,11 +123,9 @@ public class SimulationTab extends Tab {
     }
 
     private void updateData() {
-        inoutStackSection.loadData();
-        summaryStackSection.loadData();
-        jobsStackSection.loadData();
-        diagramStackSection.loadImage();
-        simulationToolStrip.updateDate();
+
+        summaryTab.loadData();
+        generalTab.loadData();
     }
 
     public void destroy() {

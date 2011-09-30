@@ -32,11 +32,10 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.launch;
+package fr.insalyon.creatis.vip.application.client.view.system.classes;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ExpansionMode;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
@@ -53,10 +52,10 @@ import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
-import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
-import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
-import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -67,32 +66,27 @@ import java.util.List;
  *
  * @author Rafael Silva
  */
-public class InputsStackSection extends SectionStackSection {
+public class ClassesStackSection extends SectionStackSection {
 
     private ModalWindow modal;
-    private String tabID;
-    private InputsToolStrip toolStrip;
     private ListGrid grid;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
 
-    public InputsStackSection(String tabID) {
+    public ClassesStackSection() {
 
-        this.tabID = tabID;
-        this.setTitle("Inputs");
+        this.setTitle("Classes");
         this.setCanCollapse(true);
-        this.setExpanded(false);
+        this.setExpanded(true);
         this.setResizeable(true);
 
         configureGrid();
         modal = new ModalWindow(grid);
-        toolStrip = new InputsToolStrip(modal, tabID);
 
         VLayout vLayout = new VLayout();
         vLayout.setMaxHeight(400);
         vLayout.setHeight100();
         vLayout.setOverflow(Overflow.AUTO);
-        vLayout.addMember(toolStrip);
         vLayout.addMember(grid);
 
         this.addItem(vLayout);
@@ -101,13 +95,6 @@ public class InputsStackSection extends SectionStackSection {
 
     private void configureGrid() {
         grid = new ListGrid() {
-
-            @Override
-            protected Canvas getExpansionComponent(ListGridRecord record) {
-                Canvas canvas = super.getExpansionComponent(record);
-                canvas.setMargin(5);
-                return canvas;
-            }
 
             @Override
             protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
@@ -119,33 +106,30 @@ public class InputsStackSection extends SectionStackSection {
                     rollOverCanvas.setWidth(50);
                     rollOverCanvas.setHeight(22);
 
-                    ImgButton loadImg = getImgButton("icon-load.png", "Load Input");
+                    ImgButton loadImg = getImgButton(CoreConstants.ICON_EDIT, "Edit");
                     loadImg.addClickHandler(new ClickHandler() {
 
                         public void onClick(ClickEvent event) {
-                            String values = rollOverRecord.getAttribute("values");
-                            AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().getTab(tabID);
-                            launchTab.loadInput(rollOverRecord.getAttribute("name"), values);
+                            edit(rollOverRecord.getAttribute("name"),
+                                    rollOverRecord.getAttribute("groups"));
                         }
                     });
-
                     ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
                     deleteImg.addClickHandler(new ClickHandler() {
 
                         public void onClick(ClickEvent event) {
                             final String name = rollOverRecord.getAttribute("name");
-                            final String applicationName = rollOverRecord.getAttribute("application");
-                            SC.confirm("Do you really want to remove the entry \"" + name + "\"?", new BooleanCallback() {
+                            SC.confirm("Do you really want to remove the user \""
+                                    + name + "\"?", new BooleanCallback() {
 
                                 public void execute(Boolean value) {
                                     if (value != null && value) {
-                                        remove(name, applicationName);
+                                        remove(name);
                                     }
                                 }
                             });
                         }
                     });
-
                     rollOverCanvas.addMember(loadImg);
                     rollOverCanvas.addMember(deleteImg);
                 }
@@ -164,90 +148,84 @@ public class InputsStackSection extends SectionStackSection {
                 return button;
             }
         };
-
         grid.setWidth100();
         grid.setHeight100();
-        grid.setCanExpandRecords(true);
-        grid.setExpansionMode(ExpansionMode.DETAIL_FIELD);
         grid.setShowRollOverCanvas(true);
         grid.setShowAllRecords(false);
         grid.setShowEmptyMessage(true);
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
 
-        ListGridField applicationField = new ListGridField("application", "Application");
-        ListGridField nameField = new ListGridField("name", "Name");
+        ListGridField nameField = new ListGridField("name", "Class Name");
+        ListGridField groupsField = new ListGridField("groups", "Groups");
 
-        grid.setFields(applicationField, nameField);
-        grid.setDetailField("values");
-        grid.setSortField("application");
+        grid.setFields(nameField, groupsField);
+        grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 
             public void onCellDoubleClick(CellDoubleClickEvent event) {
-                grid.expandRecord(event.getRecord());
+                edit(event.getRecord().getAttribute("name"),
+                        event.getRecord().getAttribute("groups"));
             }
         });
     }
 
     public void loadData() {
-        
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        AsyncCallback<List<SimulationInput>> callback = new AsyncCallback<List<SimulationInput>>() {
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        final AsyncCallback<List<AppClass>> callback = new AsyncCallback<List<AppClass>>() {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to get simulations inputs:<br />" + caught.getMessage());
+                SC.warn("Unable to get list of classes:<br />" + caught.getMessage());
             }
 
-            public void onSuccess(List<SimulationInput> result) {
-                modal.hide();
-                List<InputRecord> dataList = new ArrayList<InputRecord>();
+            public void onSuccess(List<AppClass> result) {
+                List<ClassRecord> dataList = new ArrayList<ClassRecord>();
 
-                for (SimulationInput wi : result) {
-                    String[] inputs = wi.getInputs().split("--");
-                    StringBuilder values = new StringBuilder();
-
-                    int i = 0;
-                    for (String in : inputs) {
-
-                        if (!in.contains("##")) {
-                            in = in.replace("=", " = ");
-                        } else {
-                            in = in.replace("=", " = Start: ");
+                for (AppClass c : result) {
+                    StringBuilder sb = new StringBuilder();
+                    for (String group : c.getGroups()) {
+                        if (!group.equals(CoreConstants.GROUP_ADMIN)) {
+                            if (sb.length() > 0) {
+                                sb.append(", ");
+                            }
+                            sb.append(group);
                         }
-                        in = in.replace("@@", "; ");
-                        in = in.replaceFirst("##", " - Stop: ");
-                        in = in.replaceFirst("##", " - Step: ");
-                        values.append(in);
-                        values.append("<br />");
                     }
-                    dataList.add(new InputRecord(wi.getApplication(),
-                            wi.getName(), values.toString()));
+                    dataList.add(new ClassRecord(c.getName(), sb.toString()));
                 }
-                grid.setData(dataList.toArray(new InputRecord[]{}));
+                grid.setData(dataList.toArray(new ClassRecord[]{}));
+                modal.hide();
             }
         };
-        modal.show("Loading inputs...", true);
-        service.getSimulationInputByUser(callback);
+        modal.show("Loading classes...", true);
+        service.getClasses(callback);
     }
 
-    private void remove(String name, String applicationName) {
+    private void remove(String name) {
 
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to remove simulation input:<br />" + caught.getMessage());
+                SC.warn("Unable to remove class:<br />" + caught.getMessage());
             }
 
-            public void onSuccess(Void v) {
+            public void onSuccess(Void result) {
                 modal.hide();
+                SC.say("The class was successfully removed!");
                 loadData();
             }
         };
-        modal.show("Removing simulation input...", true);
-        service.removeSimulationInput(name, applicationName, callback);
+        modal.show("Removing class '" + name + "'...", true);
+        service.removeClass(name, callback);
+    }
+
+    private void edit(String name, String groups) {
+        ManageClassesTab classTab = (ManageClassesTab) Layout.getInstance().
+                getTab(ApplicationConstants.TAB_MANAGE_CLASSES);
+        classTab.setClass(name, groups);
     }
 }

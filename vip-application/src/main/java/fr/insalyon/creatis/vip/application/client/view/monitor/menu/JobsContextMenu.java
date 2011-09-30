@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -43,12 +43,13 @@ import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.FileViewerWindow;
 import fr.insalyon.creatis.vip.application.client.view.monitor.NodeInfoWindow;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.JobRecord;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 
 /**
  *
@@ -151,8 +152,8 @@ public class JobsContextMenu extends Menu {
 
         MenuItemSeparator separator = new MenuItemSeparator();
 
-        if (job.getStatus().equals("ERROR")
-                || job.getStatus().equals("COMPLETED")) {
+        JobStatus status = JobStatus.valueOf(job.getStatus());
+        if (status == JobStatus.ERROR || status == JobStatus.COMPLETED) {
 
             this.setItems(appOutputItem, appErrorItem, separator,
                     outputItem, errorItem, separator, scriptItem,

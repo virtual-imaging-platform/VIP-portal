@@ -36,7 +36,8 @@ package fr.insalyon.creatis.vip.application.server.dao.h2;
 
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.server.dao.ClassDAO;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.h2.PlatformConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -59,10 +60,11 @@ public class ClassData implements ClassDAO {
         connection = PlatformConnection.getInstance().getConnection();
     }
 
-    public String add(AppClass c) {
+    public void add(AppClass c) throws DAOException {
+
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO WorkflowClass(name) "
+                    "INSERT INTO VIPClasses(name) "
                     + "VALUES (?)");
 
             ps.setString(1, c.getName());
@@ -70,58 +72,60 @@ public class ClassData implements ClassDAO {
 
             addGroupsToClass(c.getName(), c.getGroups());
 
-            return "The class was succesfully saved!";
-
         } catch (SQLException ex) {
-            logger.error(ex);
-            return "Error: an entry named \"" + c.getName() + "\" already exists.";
-        } catch (DAOException ex) {
-            logger.error(ex);
-            return "Error: " + ex.getMessage();
+            if (ex.getMessage().contains("Unique index or primary key violation")) {
+                logger.error("A class named \"" + c.getName() + "\" already exists.");
+                throw new DAOException("A class named \"" + c.getName() + "\" already exists.");
+            } else {
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
         }
     }
 
-    public String update(AppClass c) {
+    public void update(AppClass c) throws DAOException {
+
         try {
             removeGroupsFromClass(c.getName());
             addGroupsToClass(c.getName(), c.getGroups());
 
-            return "The class was succesfully updated!";
-
         } catch (DAOException ex) {
             logger.error(ex);
-            return "Error: " + ex.getMessage();
+            throw new DAOException(ex);
         }
     }
 
-    public void remove(String className) {
+    public void remove(String className) throws DAOException {
+
         try {
             PreparedStatement stat = connection.prepareStatement("DELETE "
-                    + "FROM WorkflowClass WHERE name=?");
+                    + "FROM VIPClasses WHERE name=?");
 
             stat.setString(1, className);
             stat.execute();
 
         } catch (SQLException ex) {
             logger.error(ex);
+            throw new DAOException(ex);
         }
     }
 
-    public List<AppClass> getClasses() {
+    public List<AppClass> getClasses() throws DAOException {
+
         try {
             List<AppClass> classes = new ArrayList<AppClass>();
             PreparedStatement stat = connection.prepareStatement(
-                    "SELECT name FROM WorkflowClass  ORDER BY name");
+                    "SELECT name FROM VIPClasses  ORDER BY name");
 
             ResultSet rs = stat.executeQuery();
             while (rs.next()) {
                 List<String> groups = new ArrayList<String>();
                 PreparedStatement s = connection.prepareStatement(
-                        "SELECT groupname FROM PlatformGroupsClasses " +
-                        "WHERE classname=? ORDER BY groupname");
+                        "SELECT groupname FROM VIPGroupsClasses "
+                        + "WHERE classname=? ORDER BY groupname");
                 s.setString(1, rs.getString("name"));
                 ResultSet r = s.executeQuery();
-                
+
                 while (r.next()) {
                     groups.add(r.getString("groupname"));
                 }
@@ -131,18 +135,20 @@ public class ClassData implements ClassDAO {
 
         } catch (SQLException ex) {
             logger.error(ex);
+            throw new DAOException(ex);
         }
-        return null;
     }
 
-    public AppClass getClass(String className) {
+    public AppClass getClass(String className) throws DAOException {
+
         try {
             List<String> groups = new ArrayList<String>();
 
             PreparedStatement stat = connection.prepareStatement("SELECT "
                     + "groupname "
-                    + "FROM PlatformGroupsClasses "
+                    + "FROM VIPGroupsClasses "
                     + "WHERE classname=?");
+
             stat.setString(1, className);
             ResultSet rs = stat.executeQuery();
 
@@ -154,33 +160,71 @@ public class ClassData implements ClassDAO {
 
         } catch (SQLException ex) {
             logger.error(ex);
+            throw new DAOException(ex);
         }
-        return null;
+    }
+
+    public List<String> getUserClasses(String email, boolean validAdmin) throws DAOException {
+
+        try {
+            String clause = validAdmin ? " AND ug.role = ?" : "";
+            
+            PreparedStatement ps = connection.prepareStatement("SELECT DISTINCT classname "
+                    + "FROM VIPGroupsClasses gc, VIPUsersGroups ug "
+                    + "WHERE ug.groupname = gc.groupname AND ug.email = ?" + clause);
+
+            ps.setString(1, email);
+            if (validAdmin) {
+                ps.setString(2, ROLE.Admin.name());
+            }
+            ResultSet rs = ps.executeQuery();
+
+            List<String> classes = new ArrayList<String>();
+
+            while (rs.next()) {
+                classes.add(rs.getString("classname"));
+            }
+
+            return classes;
+
+        } catch (SQLException ex) {
+            throw new DAOException(ex);
+        }
     }
 
     private void addGroupsToClass(String className, List<String> groups) throws DAOException {
+
         for (String groupName : groups) {
             try {
                 PreparedStatement ps = connection.prepareStatement("INSERT INTO "
-                        + "PlatformGroupsClasses(classname, groupname) "
+                        + "VIPGroupsClasses(classname, groupname) "
                         + "VALUES(?, ?)");
+
                 ps.setString(1, className);
                 ps.setString(2, groupName);
                 ps.execute();
 
             } catch (SQLException ex) {
-                logger.error(ex);
-                throw new DAOException("a group named \"" + groupName + "\" is already associated with the class.");
+                if (ex.getMessage().contains("Unique index or primary key violation")) {
+                    logger.error("a group named \"" + groupName + "\" is already associated with the class.");
+                    throw new DAOException("a group named \"" + groupName + "\" is already associated with the class.");
+                } else {
+                    logger.error(ex);
+                    throw new DAOException(ex);
+                }
             }
         }
     }
 
     private void removeGroupsFromClass(String className) throws DAOException {
+
         try {
             PreparedStatement ps = connection.prepareStatement("DELETE FROM "
-                    + "PlatformGroupsClasses WHERE className=?");
+                    + "VIPGroupsClasses WHERE className=?");
+
             ps.setString(1, className);
             ps.execute();
+
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex.getMessage());

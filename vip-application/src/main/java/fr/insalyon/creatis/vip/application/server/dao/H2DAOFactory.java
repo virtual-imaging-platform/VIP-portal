@@ -35,8 +35,11 @@
 package fr.insalyon.creatis.vip.application.server.dao;
 
 import fr.insalyon.creatis.vip.application.server.dao.h2.ApplicationData;
+import fr.insalyon.creatis.vip.application.server.dao.h2.ApplicationInputData;
 import fr.insalyon.creatis.vip.application.server.dao.h2.ClassData;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.h2.PlatformConnection;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -44,6 +47,7 @@ import fr.insalyon.creatis.vip.common.server.dao.DAOException;
  */
 public class H2DAOFactory extends ApplicationDAOFactory {
 
+    private final static Logger logger = Logger.getLogger(H2DAOFactory.class);
     private static ApplicationDAOFactory instance;
 
     // Singleton
@@ -55,6 +59,52 @@ public class H2DAOFactory extends ApplicationDAOFactory {
     }
 
     private H2DAOFactory() {
+
+        try {
+            logger.info("Configuring VIP Application database.");
+
+            PlatformConnection.getInstance().createTable("VIPClasses",
+                    "name VARCHAR(255), "
+                    + "PRIMARY KEY (name)");
+
+            PlatformConnection.getInstance().createTable("VIPGroupsClasses",
+                    "classname VARCHAR(255), "
+                    + "groupname VARCHAR(255), "
+                    + "PRIMARY KEY (classname, groupname), "
+                    + "FOREIGN KEY (classname) REFERENCES VIPClasses(name) "
+                    + "ON DELETE CASCADE ON UPDATE RESTRICT, "
+                    + "FOREIGN KEY (groupname) REFERENCES VIPGroups(groupname) "
+                    + "ON DELETE CASCADE ON UPDATE RESTRICT");
+
+            PlatformConnection.getInstance().createTable("VIPApplications",
+                    "name VARCHAR(255), "
+                    + "lfn VARCHAR(255), "
+                    + "PRIMARY KEY (name)");
+
+            PlatformConnection.getInstance().createTable("VIPApplicationClasses",
+                    "class VARCHAR(255), "
+                    + "application VARCHAR(255), "
+                    + "PRIMARY KEY (class, application), "
+                    + "FOREIGN KEY (class) REFERENCES VIPClasses(name) "
+                    + "ON DELETE CASCADE ON UPDATE RESTRICT, "
+                    + "FOREIGN KEY (application) REFERENCES VIPApplications(name) "
+                    + "ON DELETE CASCADE ON UPDATE RESTRICT");
+
+            PlatformConnection.getInstance().createTable("VIPAppInputs",
+                    "email VARCHAR(255), "
+                    + "application VARCHAR(255), "
+                    + "name VARCHAR(255), "
+                    + "inputs VARCHAR(32000), "
+                    + "PRIMARY KEY (email, application, name), "
+                    + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
+                    + "ON DELETE CASCADE ON UPDATE RESTRICT, "
+                    + "FOREIGN KEY (application) REFERENCES VIPApplications(name) "
+                    + "ON DELETE CASCADE ON UPDATE RESTRICT");
+
+
+        } catch (DAOException ex) {
+            logger.error(ex);
+        }
     }
 
     @Override
@@ -65,5 +115,10 @@ public class H2DAOFactory extends ApplicationDAOFactory {
     @Override
     public ClassDAO getClassDAO() throws DAOException {
         return new ClassData();
+    }
+
+    @Override
+    public ApplicationInputDAO getApplicationInputDAO() throws DAOException {
+        return new ApplicationInputData();
     }
 }

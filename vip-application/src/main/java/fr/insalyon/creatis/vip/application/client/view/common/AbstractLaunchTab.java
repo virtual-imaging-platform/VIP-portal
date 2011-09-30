@@ -35,11 +35,12 @@
 package fr.insalyon.creatis.vip.application.client.view.common;
 
 import com.smartgwt.client.types.VisibilityMode;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.view.launch.InputsStackSection;
-import fr.insalyon.creatis.vip.application.client.view.launch.LaunchToolStrip;
 
 /**
  *
@@ -48,24 +49,18 @@ import fr.insalyon.creatis.vip.application.client.view.launch.LaunchToolStrip;
 public abstract class AbstractLaunchTab extends Tab {
 
     protected SectionStack sectionStack;
-    protected LaunchToolStrip launchToolStrip;
     protected AbstractLaunchStackSection launchSection;
     protected InputsStackSection inputsSection;
 
-    public AbstractLaunchTab(String title, String applicationClass,
-            boolean showToolStrip, String id) {
+    public AbstractLaunchTab(String applicationName) {
 
-        this.setTitle(title);
+        this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_APPLICATION) + " "
+                + applicationName);
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
-        this.setID("launch-" + id.toLowerCase() + "-tab");
-
-        launchToolStrip = new LaunchToolStrip(applicationClass, this.getID());
+        this.setID(ApplicationConstants.getLaunchTabID(applicationName));
 
         VLayout vLayout = new VLayout();
-        if (showToolStrip) {
-            vLayout.addMember(launchToolStrip);
-        }
         vLayout.setWidth100();
         vLayout.setHeight100();
 
@@ -76,16 +71,10 @@ public abstract class AbstractLaunchTab extends Tab {
         vLayout.addMember(sectionStack);
         this.setPane(vLayout);
     }
-
-    public void createSimulation(String simulationName) {
-        launchSection.load(simulationName);
-    }
-
-    public void addInputsSection() {
-        if (inputsSection == null) {
-            inputsSection = new InputsStackSection(this.getID());
-            sectionStack.addSection(inputsSection);
-        }
+    
+    protected void addInputsSection() {
+        inputsSection = new InputsStackSection(this.getID());
+        sectionStack.addSection(inputsSection);
     }
 
     public void loadInputsList() {

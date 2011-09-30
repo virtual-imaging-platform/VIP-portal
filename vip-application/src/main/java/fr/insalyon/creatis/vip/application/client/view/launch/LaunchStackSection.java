@@ -41,15 +41,12 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchStackSection;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,21 +57,18 @@ import java.util.Map;
  */
 public class LaunchStackSection extends AbstractLaunchStackSection {
 
-    private ModalWindow modal;
     private VLayout formLayout;
-    private DynamicForm form;
 
-    public LaunchStackSection(String applicationClass, String launchTabID) {
+    public LaunchStackSection(String applicationName) {
 
-        super(applicationClass, launchTabID);
+        super(applicationName);
 
         formLayout = new VLayout(3);
         formLayout.setWidth100();
         formLayout.setAutoHeight();
-        layout.addMember(formLayout);
+        vLayout.addMember(formLayout);
 
-        modal = new ModalWindow(layout);
-        this.addItem(layout);
+        loadData();
     }
 
     /**
@@ -102,7 +96,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
                     input.setValue(value);
                 } else {
                     sb.append("Could not find value for parameter \""
-                            + input.getName() + "\"<br />");
+                            + input.getName() + "\".<br />");
                 }
             }
         }
@@ -145,47 +139,37 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Error executing get application sources list: " + caught.getMessage());
+                SC.warn("Unable to download application source file:<br />" + caught.getMessage());
             }
 
             public void onSuccess(List<Source> result) {
+                formLayout.addMember(getSimulatioNameLayout());
 
-                if (result != null) {
-
-                    formLayout.addMember(getSimulatioNameLayout());
-
-                    for (Source source : result) {
-                        formLayout.addMember(new InputHLayout(source.getName()));
-                    }
-
-                    HLayout buttonsLayout = new HLayout(5);
-                    buttonsLayout.setAlign(VerticalAlignment.CENTER);
-                    buttonsLayout.setMargin(20);
-                    formLayout.addMember(buttonsLayout);
-
-                    IButton launchButton = new IButton("Launch");
-                    launchButton.addClickHandler(new ClickHandler() {
-
-                        public void onClick(ClickEvent event) {
-                            if (validate()) {
-                                launch();
-                            }
-                        }
-                    });
-                    buttonsLayout.addMember(launchButton);
-                    buttonsLayout.addMember(getSaveInputsButton());
-                    modal.hide();
-
-                } else {
-                    modal.hide();
-                    SC.warn("Unable to download application source file.");
+                for (Source source : result) {
+                    formLayout.addMember(new InputHLayout(source.getName()));
                 }
+
+                HLayout buttonsLayout = new HLayout(5);
+                buttonsLayout.setAlign(VerticalAlignment.CENTER);
+                buttonsLayout.setMargin(20);
+                formLayout.addMember(buttonsLayout);
+
+                IButton launchButton = new IButton("Launch");
+                launchButton.addClickHandler(new ClickHandler() {
+
+                    public void onClick(ClickEvent event) {
+                        if (validate()) {
+                            launch();
+                        }
+                    }
+                });
+                buttonsLayout.addMember(launchButton);
+                buttonsLayout.addMember(getSaveInputsButton());
+                modal.hide();
             }
         };
-        modal.show("Loading Launch Panel...", true);
-        Context context = Context.getInstance();
-        service.getWorkflowSources(context.getUser(),
-                context.getProxyFileName(), simulationName, callback);
+        modal.show("Loading launch panel...", true);
+        service.getApplicationSources(applicationName, callback);
     }
 
     /**
@@ -194,6 +178,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
      * @return Result of the validation
      */
     private boolean validate() {
+        
         boolean valid = simulationNameItem.validate();
         for (Canvas canvas : formLayout.getMembers()) {
             if (canvas instanceof InputHLayout) {
@@ -210,24 +195,25 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
      * Launches a simulation.
      */
     private void launch() {
+        
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        final AsyncCallback<String> callback = new AsyncCallback<String>() {
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Error while launching simulation: " + caught.getMessage());
+                SC.warn("Unable to launch the simulation:<br />" + caught.getMessage());
             }
 
-            public void onSuccess(String result) {
+            public void onSuccess(Void result) {
                 modal.hide();
-                SC.say("Simulation '" + simulationNameItem.getValueAsString() 
+                SC.say("Simulation '" + simulationNameItem.getValueAsString()
                         + "' successfully launched.");
             }
         };
-        modal.show("Launching simulation...", true);
-        Context context = Context.getInstance();
-        service.launchWorkflow(context.getUser(), getParametersMap(), simulationName, 
-                context.getProxyFileName(), simulationNameItem.getValueAsString(), callback);
+        modal.show("Launching simulation '" + simulationNameItem.getValueAsString() 
+                + "'...", true);
+        service.launchSimulation(getParametersMap(), applicationName, 
+                simulationNameItem.getValueAsString(), callback);
     }
 
     /**
@@ -247,37 +233,5 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
         }
 
         return paramsMap;
-    }
-
-    public String getApplicationClass() {
-        return applicationClass;
-    }
-
-    public void setApplicationClass(String applicationClass) {
-        this.applicationClass = applicationClass;
-    }
-
-    public DynamicForm getForm() {
-        return form;
-    }
-
-    public void setForm(DynamicForm form) {
-        this.form = form;
-    }
-
-    public ModalWindow getModal() {
-        return modal;
-    }
-
-    public void setModal(ModalWindow modal) {
-        this.modal = modal;
-    }
-
-    public String getSimulationName() {
-        return simulationName;
-    }
-
-    public void setSimulationName(String simulationName) {
-        this.simulationName = simulationName;
     }
 }

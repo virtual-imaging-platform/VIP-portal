@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -34,9 +34,9 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.util.List;
 import java.util.Map;
 
@@ -48,20 +48,15 @@ public interface JobDAO {
 
     public Map<String, Integer> getStatusMap() throws DAOException;
 
-    /**
-     * Gets a list of all jobs.
-     * 
-     * @return List of jobs
-     */
     public List<Job> getJobs() throws DAOException;
 
-    public List<String> getExecutionPerNumberOfJobs(int binSize);
+    public List<String> getExecutionPerNumberOfJobs(int binSize) throws DAOException;
 
-    public List<String> getDownloadPerNumberOfJobs(int binSize);
+    public List<String> getDownloadPerNumberOfJobs(int binSize) throws DAOException;
 
-    public List<String> getUploadPerNumberOfJobs(int binSize);
+    public List<String> getUploadPerNumberOfJobs(int binSize) throws DAOException;
 
-    public List<String> getJobsPerTime();
+    public List<String> getJobsPerTime() throws DAOException;
     
-    public void sendSignal(String jobID, ApplicationConstants.JobStatus status) throws DAOException;
+    public void sendSignal(String jobID, JobStatus status) throws DAOException;
 }

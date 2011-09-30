@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -37,12 +37,13 @@ package fr.insalyon.creatis.vip.application.server.dao.derby;
 import fr.insalyon.creatis.vip.application.client.bean.Node;
 import fr.insalyon.creatis.vip.application.server.dao.NodeDAO;
 import fr.insalyon.creatis.vip.application.server.dao.derby.connection.JobsConnection;
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -50,11 +51,12 @@ import java.sql.SQLException;
  */
 public class NodeData implements NodeDAO {
 
+    private static Logger logger = Logger.getLogger(NodeData.class);
     private Connection connection;
 
     public NodeData(String workflowID) throws DAOException {
         connection = JobsConnection.getInstance().connect(
-                ServerConfiguration.getInstance().getWorkflowsPath() + "/" + workflowID + "/jobs.db");
+                Server.getInstance().getWorkflowsPath() + "/" + workflowID + "/jobs.db");
     }
 
     /**
@@ -62,8 +64,10 @@ public class NodeData implements NodeDAO {
      * @param siteID
      * @param nodeName
      * @return
+     * @throws DAOException 
      */
     public Node getNode(String siteID, String nodeName) throws DAOException {
+        
         try {
             PreparedStatement stat = connection.prepareStatement("SELECT "
                     + "site, node_name, ncpus, cpu_model_name, cpu_mhz, "
@@ -82,6 +86,7 @@ public class NodeData implements NodeDAO {
                     rs.getDouble("cpu_bogomips"), rs.getInt("mem_total"));
 
         } catch (SQLException ex) {
+            logger.error(ex);
             throw new DAOException(ex);
         }
     }

@@ -32,28 +32,22 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
+package fr.insalyon.creatis.vip.application.client.view.system.classes;
 
-package fr.insalyon.creatis.vip.application.server.dao;
-
-import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
-import java.util.List;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
  *
  * @author Rafael Silva
  */
-public interface WorkflowInputDAO {
+public class ClassRecord extends ListGridRecord {
 
-    public void addSimulationInput(String user, SimulationInput workflowInput) throws DAOException;
+    public ClassRecord() {
+    }
 
-    public void removeWorkflowInput(String user, String inputName, String application) throws DAOException;
-    
-    public void updateSimulationInput(String user, SimulationInput SimulationInput) throws DAOException;
-
-    public List<SimulationInput> getWorkflowInputByUser(String user) throws DAOException;
-    
-    public List<SimulationInput> getWorkflowInputByUserAndAppName(String user, String appName) throws DAOException;
-
-    public SimulationInput getInputByNameUserApp(String user, String name, String appName) throws DAOException;
+    public ClassRecord(String name, String groups) {
+        
+        setAttribute("name", name);
+        setAttribute("groups", groups);
+    }
 }

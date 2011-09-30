@@ -41,12 +41,14 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationsTab;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
@@ -60,7 +62,7 @@ public class SimulationsContextMenu extends Menu {
     private String title;
     
     public SimulationsContextMenu(ModalWindow modal, final String simulationID,
-            final String title, final String status, final boolean groupAdmin) {
+            final String title, final SimulationStatus status) {
         
         this.modal = modal;
         this.simulationID = simulationID;
@@ -71,17 +73,17 @@ public class SimulationsContextMenu extends Menu {
         this.setWidth(90);
 
         MenuItem viewItem = new MenuItem("View Simulation");
-        viewItem.setIcon("icon-simulation-view.png");
+        viewItem.setIcon(ApplicationConstants.ICON_SIMULATION_VIEW);
         viewItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
                 Layout.getInstance().addTab(new SimulationTab(simulationID, 
-                        title, status, groupAdmin));
+                        title, status));
             }
         });
 
         MenuItem killItem = new MenuItem("Kill Simulation");
-        killItem.setIcon("icon-kill.png");
+        killItem.setIcon(ApplicationConstants.ICON_KILL);
         killItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -98,7 +100,7 @@ public class SimulationsContextMenu extends Menu {
         });
 
         MenuItem cleanItem = new MenuItem("Clean Simulation");
-        cleanItem.setIcon("icon-clean.png");
+        cleanItem.setIcon(ApplicationConstants.ICON_CLEAN);
         cleanItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -116,7 +118,7 @@ public class SimulationsContextMenu extends Menu {
         });
 
         MenuItem purgeItem = new MenuItem("Purge Simulation");
-        purgeItem.setIcon("icon-clear.png");
+        purgeItem.setIcon(CoreConstants.ICON_CLEAR);
         purgeItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -133,11 +135,11 @@ public class SimulationsContextMenu extends Menu {
             }
         });
 
-        if (status.equals("Running")) {
+        if (status == SimulationStatus.Running) {
             this.setItems(viewItem, killItem);
-        } else if (status.equals("Completed") || status.equals("Killed")) {
+        } else if (status == SimulationStatus.Completed || status == SimulationStatus.Killed) {
             this.setItems(viewItem, cleanItem);
-        } else if (status.equals("Cleaned")) {
+        } else if (status == SimulationStatus.Cleaned) {
             this.setItems(viewItem, purgeItem);
         }
     }
@@ -146,18 +148,18 @@ public class SimulationsContextMenu extends Menu {
      * Sends a request to kill the simulation
      */
     private void killSimulation() {
+        
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Error executing kill simulation\n" + caught.getMessage());
+                SC.warn("Unable to kill simulation:<br />" + caught.getMessage());
             }
 
             public void onSuccess(Void result) {
                 modal.hide();
-                SimulationsTab simulationsTab = (SimulationsTab) Layout.getInstance().getTab("simulations-tab");
-                simulationsTab.loadData();
+                getSimulationsTab().loadData();
             }
         };
         service.killWorkflow(simulationID, callback);
@@ -168,23 +170,21 @@ public class SimulationsContextMenu extends Menu {
      * Sends a request to clean the simulation
      */
     private void cleanSimulation() {
+        
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Error executing clean simulation\n" + caught.getMessage());
+                SC.warn("Unable to clean simulation:<br />" + caught.getMessage());
             }
 
             public void onSuccess(Void result) {
                 modal.hide();
-                SimulationsTab simulationsTab = (SimulationsTab) Layout.getInstance().getTab("simulations-tab");
-                simulationsTab.loadData();
+                getSimulationsTab().loadData();
             }
         };
-        Context context = Context.getInstance();
-        service.cleanWorkflow(simulationID, context.getUserDN(), 
-                context.getProxyFileName(), callback);
+        service.cleanWorkflow(simulationID, callback);
         modal.show("Cleaning simulation " + title + "...", true);
     }
     
@@ -192,21 +192,25 @@ public class SimulationsContextMenu extends Menu {
      * Sends a request to purge the simulation
      */
     private void purgeSimulation() {
+        
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Error executing purge simulation\n" + caught.getMessage());
+                SC.warn("Unable to purge simulation:<br />" + caught.getMessage());
             }
 
             public void onSuccess(Void result) {
                 modal.hide();
-                SimulationsTab simulationsTab = (SimulationsTab) Layout.getInstance().getTab("simulations-tab");
-                simulationsTab.loadData();
+                getSimulationsTab().loadData();
             }
         };
         service.purgeWorkflow(simulationID, callback);
         modal.show("Purging simulation " + title + "...", true);
+    }
+    
+    private SimulationsTab getSimulationsTab() {
+        return (SimulationsTab) Layout.getInstance().getTab(ApplicationConstants.TAB_MONITOR);
     }
 }

@@ -38,7 +38,7 @@ import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAO;
 import fr.insalyon.creatis.vip.application.server.dao.derby.connection.WorkflowsConnection;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.sql.Connection;
@@ -110,14 +110,14 @@ public class WorkflowData implements WorkflowDAO {
 
         }
     }
-    
+
     /**
      * 
      * @param workflow
      * @throws DAOException 
      */
     public void update(Simulation workflow) throws DAOException {
-        
+
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
                     + "Workflows "
@@ -131,13 +131,49 @@ public class WorkflowData implements WorkflowDAO {
             ps.executeUpdate();
 
         } catch (SQLException ex) {
+            logger.error(ex);
             throw new DAOException(ex.getMessage());
         }
     }
 
     /**
+     * 
+     * @param workflowID
+     * @return
+     * @throws DAOException 
+     */
+    public Simulation get(String workflowID) throws DAOException {
+
+        try {
+
+            PreparedStatement stat = connection.prepareStatement("SELECT "
+                    + "id, application, username, launched, status, "
+                    + "minor_status, simulation_name "
+                    + "FROM Workflows WHERE id = ?");
+
+            stat.setString(1, workflowID);
+
+            ResultSet rs = stat.executeQuery();
+            rs.next();
+
+            return new Simulation(
+                    rs.getString("application"),
+                    rs.getString("id"),
+                    rs.getString("username"),
+                    new Date(rs.getTimestamp("launched").getTime()),
+                    rs.getString("status"),
+                    rs.getString("minor_status"),
+                    rs.getString("simulation_name"));
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    /**
      * Gets the list of workflows submitted by a user filtered by application
-     * name, start date and/or end date.
+     * name, status, start date and/or end date.
      *
      * @param user User name
      * @param app Application name
@@ -146,7 +182,9 @@ public class WorkflowData implements WorkflowDAO {
      * @param eDate End date
      * @return List of workflows filtered
      */
-    public List<Simulation> getList(String user, String app, String status, Date sDate, Date eDate) {
+    public List<Simulation> getList(String user, String app, String status,
+            Date sDate, Date eDate) throws DAOException {
+
         try {
             String query = "";
             query = parseQuery(user, query, "username=?");
@@ -185,8 +223,74 @@ public class WorkflowData implements WorkflowDAO {
 
         } catch (SQLException ex) {
             logger.error(ex);
+            throw new DAOException(ex);
         }
-        return null;
+    }
+
+    /**
+     * Gets the list of workflows submitted by a list of users filtered by 
+     * application name, status, start date and/or end date.
+     *
+     * @param user List of users
+     * @param app Application name
+     * @param status Application status
+     * @param sDate Start date
+     * @param eDate End date
+     * @return List of workflows filtered
+     */
+    public List<Simulation> getList(List<String> users, String app, String status,
+            Date sDate, Date eDate) throws DAOException {
+
+        try {
+
+            StringBuilder sb = new StringBuilder();
+            if (!users.isEmpty()) {
+                sb.append("(");
+                for (String userName : users) {
+                    if (sb.length() > 1) {
+                        sb.append(" OR ");
+                    }
+                    sb.append("username = '" + userName + "'");
+                }
+                sb.append(")");
+            }
+
+            String query = "";
+            query = parseQuery(sb.toString(), query, sb.toString());
+            query = parseQuery(app, query, "application LIKE ?");
+            query = parseQuery(status, query, "status=?");
+            query = parseQuery(sDate, query, "launched>=?");
+            query = parseQuery(eDate, query, "launched<=?");
+            if (!query.equals("")) {
+                query = "WHERE " + query;
+            }
+
+            PreparedStatement stat = connection.prepareStatement("SELECT "
+                    + "id, application, username, launched, status, "
+                    + "minor_status, simulation_name "
+                    + "FROM Workflows " + query + " "
+                    + "ORDER BY launched DESC");
+
+            int index = 1;
+            if (app != null && !app.equals("")) {
+                stat.setString(index++, "%" + app + "%");
+            }
+            if (status != null && !status.equals("")) {
+                stat.setString(index++, status);
+            }
+            if (sDate != null) {
+                stat.setTimestamp(index++, new Timestamp(sDate.getTime()));
+            }
+            if (eDate != null) {
+                stat.setTimestamp(index++, new Timestamp(eDate.getTime()));
+            }
+
+            return processResultSet(stat.executeQuery());
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
     }
 
     private String parseQuery(Object value, String query, String argument) {
@@ -227,7 +331,7 @@ public class WorkflowData implements WorkflowDAO {
      *
      * @return List of applications
      */
-    public List<String> getApplications() {
+    public List<String> getApplications() throws DAOException {
         try {
             List<String> users = new ArrayList<String>();
             Statement stat = connection.createStatement();
@@ -242,11 +346,11 @@ public class WorkflowData implements WorkflowDAO {
 
         } catch (SQLException ex) {
             logger.error(ex);
+            throw new DAOException(ex);
         }
-        return null;
     }
 
-    public void updateStatus(String workflowID, String status) {
+    public void updateStatus(String workflowID, String status) throws DAOException {
         try {
             PreparedStatement stat = connection.prepareStatement("UPDATE "
                     + "Workflows SET status=? WHERE id=?");
@@ -257,11 +361,11 @@ public class WorkflowData implements WorkflowDAO {
 
         } catch (SQLException ex) {
             logger.error(ex);
+            throw new DAOException(ex);
         }
     }
 
     public List<String> getOutputs(String workflowID) throws DAOException {
-        List<String> outputs = new ArrayList<String>();
 
         try {
             PreparedStatement stat = connection.prepareStatement(
@@ -269,15 +373,18 @@ public class WorkflowData implements WorkflowDAO {
 
             stat.setString(1, workflowID);
             ResultSet rs = stat.executeQuery();
+            List<String> outputs = new ArrayList<String>();
 
             while (rs.next()) {
                 outputs.add(rs.getString("path"));
             }
 
+            return outputs;
+
         } catch (SQLException ex) {
+            logger.error(ex);
             throw new DAOException(ex);
         }
-        return outputs;
     }
 
     public void cleanWorkflow(String workflowID) throws DAOException {
@@ -295,6 +402,7 @@ public class WorkflowData implements WorkflowDAO {
             stat.execute();
 
         } catch (SQLException ex) {
+            logger.error(ex);
             throw new DAOException(ex);
         }
     }
@@ -308,11 +416,12 @@ public class WorkflowData implements WorkflowDAO {
             stat.execute();
 
         } catch (SQLException ex) {
+            logger.error(ex);
             throw new DAOException(ex);
         }
     }
 
-    public List<String> getStats(List<Simulation> wfIdList, int type, int binSize) {
+    public List<String> getStats(List<Simulation> wfIdList, int type, int binSize) throws DAOException {
 
         List<String> list = new ArrayList<String>();
         int nbJobs = 0;
@@ -409,10 +518,13 @@ public class WorkflowData implements WorkflowDAO {
 
                     logger.info("No type defined for stats, using default execution stats");
             }
+
+            return list;
+
         } catch (Exception ex) {
             logger.error(ex);
+            throw new DAOException(ex);
         }
-        return list;
     }
 
     /**

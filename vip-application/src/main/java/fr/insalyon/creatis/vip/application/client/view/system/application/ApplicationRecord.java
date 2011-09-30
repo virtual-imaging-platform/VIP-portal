@@ -32,7 +32,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.launch;
+package fr.insalyon.creatis.vip.application.client.view.system.application;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
@@ -40,14 +40,12 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  *
  * @author Rafael Silva
  */
-public class InputRecord extends ListGridRecord {
+public class ApplicationRecord extends ListGridRecord {
 
-    public InputRecord() {
-    }
-
-    public InputRecord(String application, String name, String values) {
-        setAttribute("application", application);
+    public ApplicationRecord(String name, String lfn, String classes) {
+        
         setAttribute("name", name);
-        setAttribute("values", values);
+        setAttribute("lfn", lfn);
+        setAttribute("classes", classes);
     }
 }

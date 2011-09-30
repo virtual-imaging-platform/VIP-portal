@@ -32,37 +32,56 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
+package fr.insalyon.creatis.vip.application.client.view.system.application;
 
-package fr.insalyon.creatis.vip.application.client.rpc;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.VisibilityMode;
+import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.layout.SectionStack;
+import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.tab.Tab;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.Job;
-import fr.insalyon.creatis.vip.application.client.bean.Node;
-import java.util.List;
-import java.util.Map;
 
 /**
  *
  * @author Rafael Silva
  */
-public interface JobServiceAsync {
+public class ManageApplicationsTab extends Tab {
 
-    public void getStatusMap(String simulationID, AsyncCallback<Map<String, Integer>> asyncCallback);
+    private ToolStrip toolStrip;
+    private ApplicationsStackSection appsStackSection;
+    private EditApplicationStackSection editStackSection;
 
-    public void getJobsList(String simulationID, AsyncCallback<List<Job>> asyncCallback);
+    public ManageApplicationsTab() {
 
-    public void readFile(String simulationID, String dir, String fileName, String ext, AsyncCallback<String> asyncCallback);
+        this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_APPLICATION) + " " + ApplicationConstants.APP_APPLICATION);
+        this.setID(ApplicationConstants.TAB_MANAGE_APPLICATION);
+        this.setCanClose(true);
 
-    public void getExecutionPerNumberOfJobs(String simulationID, int binSize, AsyncCallback<List<String>> asyncCallback);
+        VLayout vLayout = new VLayout();
 
-    public void getDownloadPerNumberOfJobs(String simulationID, int binSize, AsyncCallback<List<String>> asyncCallback);
+        toolStrip = new ManageApplicationsToolStrip();
+        vLayout.addMember(toolStrip);
 
-    public void getUploadPerNumberOfJobs(String simulationID, int binSize, AsyncCallback<List<String>> asyncCallback);
+        SectionStack sectionStack = new SectionStack();
+        sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
+        sectionStack.setAnimateSections(true);
+        sectionStack.setCanResizeSections(true);
 
-    public void getJobsPertTime(String simulationID, AsyncCallback<List<String>> asyncCallback);
+        appsStackSection = new ApplicationsStackSection();
+        editStackSection = new EditApplicationStackSection();
 
-    public void getNode(String simulationID, String siteName, String nodeName, AsyncCallback<Node> asyncCallback);
+        sectionStack.setSections(appsStackSection, editStackSection);
+        vLayout.addMember(sectionStack);
+
+        this.setPane(vLayout);
+    }
     
-    public void sendSignal(String simulationID, String jobID, ApplicationConstants.JobStatus status, AsyncCallback<Void> asyncCallback);
+    public void loadApplications() {
+        appsStackSection.loadData();
+    }
+
+    public void setApplication(String name, String lfn, String classes) {
+        editStackSection.setApplication(name, lfn, classes);
+    }
 }
