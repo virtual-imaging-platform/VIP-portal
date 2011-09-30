@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,31 +32,51 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.main;
+package fr.insalyon.creatis.vip.core.client;
 
-import com.smartgwt.client.types.ContentsType;
-import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.application.ApplicationExecutor;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
+import fr.insalyon.creatis.vip.core.client.view.system.SystemParser;
+import fr.insalyon.creatis.vip.core.client.view.system.SystemTab;
+import fr.insalyon.creatis.vip.core.client.view.user.UserMenuButton;
+import fr.insalyon.creatis.vip.core.client.view.main.HomeParser;
+import fr.insalyon.creatis.vip.core.client.view.main.HomeTab;
 
 /**
  *
  * @author Rafael Silva
  */
-public class GalleryTab extends Tab {
+public class CoreModule extends Module {
 
-    public GalleryTab() {
+    public static User user;
+    public static ApplicationExecutor systemExecutor;
+    public static ApplicationExecutor homeExecutor;
+
+    public CoreModule() {
         
-        this.setTitle("Gallery");
-        this.setID("gallery-tab");
-        this.setCanClose(true);
+        systemExecutor = new ApplicationExecutor();
+        systemExecutor.addParser(new SystemParser());
         
-        HTMLPane pane = new HTMLPane();
-        pane.setOverflow(Overflow.AUTO);
-        pane.setStyleName("defaultBorder");
-        pane.setContentsURL("gallery/index.html");
-        pane.setContentsType(ContentsType.PAGE);
-        
-        this.setPane(pane);
+        homeExecutor = new ApplicationExecutor();
+        homeExecutor.addParser(new HomeParser());
+    }
+
+    @Override
+    public void load() {
+
+        // Configure User's toolstrip        
+        MainToolStrip.getInstance().addMenuButton(new UserMenuButton(user));
+
+        // Tabs
+        if (user.isSystemAdministrator()) {
+            Layout.getInstance().addTab(new SystemTab());
+        }
+        Layout.getInstance().addTab(new HomeTab());
+    }
+
+    @Override
+    public void terminate() {
     }
 }

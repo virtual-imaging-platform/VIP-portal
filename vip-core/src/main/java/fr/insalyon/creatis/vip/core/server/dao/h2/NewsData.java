@@ -34,8 +34,8 @@
  */
 package fr.insalyon.creatis.vip.core.server.dao.h2;
 
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.client.bean.News;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.NewsDAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -61,10 +61,10 @@ public class NewsData implements NewsDAO {
         connection = PlatformConnection.getInstance().getConnection();
     }
 
-    public String add(News news) {
+    public void add(News news) throws DAOException {
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO PlatformNews(title, message, posted, owner) "
+                    "INSERT INTO VIPNews(title, message, posted, owner) "
                     + "VALUES (?, ?, ?, ?)");
 
             ps.setString(1, news.getTitle());
@@ -73,54 +73,54 @@ public class NewsData implements NewsDAO {
             ps.setString(4, news.getAuthor());
             ps.execute();
 
-            return "The news was succesfully saved!";
-
         } catch (SQLException ex) {
-            logger.error(ex);
-            return "Error: an entry named \"" + news.getTitle() + "\" already exists.";
+            if (ex.getMessage().contains("Unique index or primary key violation")) {
+                logger.error("There is an existing news with this title: " + news.getTitle());
+                throw new DAOException("There is an existing news with this title.");
+            } else {
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
         }
     }
 
-    public String remove(News news) {
+    public void remove(News news) throws DAOException {
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "DELETE FROM PlatformNews WHERE title = ? AND owner = ?");
+                    "DELETE FROM VIPNews WHERE title = ? AND owner = ?");
+
             ps.setString(1, news.getTitle());
             ps.setString(2, news.getAuthor());
-            
+
             ps.executeUpdate();
-            
-            return "The news was succesfully removed!";
-            
+
         } catch (SQLException ex) {
             logger.error(ex);
-            return "Error: unable to delete news.";
+            throw new DAOException(ex);
         }
     }
-    
-    public String update(News news) {
+
+    public void update(News news) throws DAOException {
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "UPDATE PlatformNews SET message = ? "
+                    "UPDATE VIPNews SET message = ? "
                     + "WHERE title = ? AND owner = ?");
             ps.setString(1, news.getMessage());
             ps.setString(2, news.getTitle());
             ps.setString(3, news.getAuthor());
-            
+
             ps.executeUpdate();
-            
-            return "The news was succesfully updated!";
-            
+
         } catch (SQLException ex) {
             logger.error(ex);
-            return "Error: unable to update news.";
+            throw new DAOException(ex);
         }
     }
 
     public List<News> getNews() throws DAOException {
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "SELECT title, message, posted, owner FROM PlatformNews "
+                    "SELECT title, message, posted, owner FROM VIPNews "
                     + "ORDER BY posted DESC");
             ResultSet rs = ps.executeQuery();
 

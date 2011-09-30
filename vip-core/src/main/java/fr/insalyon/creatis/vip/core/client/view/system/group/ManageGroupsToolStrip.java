@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,31 +32,47 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.main;
+package fr.insalyon.creatis.vip.core.client.view.system.group;
 
-import com.smartgwt.client.types.ContentsType;
-import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.tab.Tab;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DocumentationTab extends Tab {
+public class ManageGroupsToolStrip extends ToolStrip {
 
-    public DocumentationTab() {
+    public ManageGroupsToolStrip() {
         
-        this.setTitle("Documentation");
-        this.setID("documentation-tab");
-        this.setCanClose(true);
-        
-        HTMLPane pane = new HTMLPane();
-        pane.setOverflow(Overflow.AUTO);
-        pane.setStyleName("defaultBorder");
-        pane.setContentsURL("documentation/index.html");
-        pane.setContentsType(ContentsType.PAGE);
-        
-        this.setPane(pane);
+        this.setWidth100();
+
+        ToolStripButton addButton = new ToolStripButton("Add Group");
+        addButton.setIcon(CoreConstants.ICON_ADD);
+        addButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                ManageGroupsTab groupTab = (ManageGroupsTab) Layout.getInstance().
+                        getTab(CoreConstants.TAB_MANAGE_GROUPS);
+                groupTab.setGroup(null);
+            }
+        });
+        this.addButton(addButton);
+
+        ToolStripButton refreshButton = new ToolStripButton("Refresh");
+        refreshButton.setIcon(CoreConstants.ICON_REFRESH);
+        refreshButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                ManageGroupsTab usersTab = (ManageGroupsTab) Layout.getInstance().
+                        getTab(CoreConstants.TAB_MANAGE_GROUPS);
+                usersTab.loadGroups();
+            }
+        });
+        this.addButton(refreshButton);
     }
 }

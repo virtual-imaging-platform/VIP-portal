@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,47 +32,23 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.bean;
+package fr.insalyon.creatis.vip.core.server.dao;
 
-import fr.insalyon.creatis.vip.common.client.bean.Authentication;
-import com.google.gwt.user.client.rpc.IsSerializable;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author Rafael Silva
  */
-public class Configuration implements IsSerializable {
+public interface UsersGroupsDAO {
 
-    private Authentication authentication;
-    private String moteurServerHost;
-    private String lfcHost;
-    private int lfcPort;
+    public void add(String email, String groupname, CoreConstants.ROLE role) throws DAOException;
 
-    public Configuration() {
-    }
-
-    public Configuration(Authentication authentication, String moteurServerHost, 
-            String lfcHost, int lfcPort) {
-        
-        this.authentication = authentication;
-        this.moteurServerHost = moteurServerHost;
-        this.lfcHost = lfcHost;
-        this.lfcPort = lfcPort;
-    }
-
-    public Authentication getAuthentication() {
-        return authentication;
-    }
-
-    public String getMoteurServerHost() {
-        return moteurServerHost;
-    }
-
-    public String getLfcHost() {
-        return lfcHost;
-    }
-
-    public int getLfcPort() {
-        return lfcPort;
-    }
+    public Map<String, CoreConstants.ROLE> getUserGroups(String email) throws DAOException;
+    
+    public void setUserGroups(String email, Map<String, CoreConstants.ROLE> groups) throws DAOException;
+    
+    public List<String> getUsersFromGroups(List<String> groups) throws DAOException;
 }

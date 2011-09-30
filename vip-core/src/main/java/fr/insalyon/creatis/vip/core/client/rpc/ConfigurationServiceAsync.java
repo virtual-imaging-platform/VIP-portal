@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -35,9 +35,10 @@
 package fr.insalyon.creatis.vip.core.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.core.client.bean.Configuration;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -45,23 +46,39 @@ import java.util.List;
  */
 public interface ConfigurationServiceAsync {
 
-    public void addGroup(String proxy, String groupName, AsyncCallback<String> asyncCallback);
+    public void configure(AsyncCallback<User> asyncCallback);
 
-    public void removeGroup(String proxy, String groupName, AsyncCallback<Void> asyncCallback);
+    public void signup(User user, AsyncCallback<Void> asyncCallback);
+
+    public void signin(String email, String password, AsyncCallback<User> asyncCallback);
+
+    public void signout(AsyncCallback<Void> asyncCallback);
+
+    public void activate(String email, String code, AsyncCallback<User> asyncCallback);
+
+    public void sendActivationCode(String email, AsyncCallback<Void> asyncCallback);
+
+    public void addGroup(String groupName, AsyncCallback<Void> asyncCallback);
+
+    public void removeGroup(String groupName, AsyncCallback<Void> asyncCallback);
 
     public void getGroups(AsyncCallback<List<String>> asyncCallback);
 
-    public void updateGroup(String proxy, String oldName, String newName, AsyncCallback<String> asyncCallback);
+    public void updateGroup(String oldName, String newName, AsyncCallback<Void> asyncCallback);
 
-    public void getUser(String dn, AsyncCallback<User> asyncCallback);
+    public void removeUser(String email, AsyncCallback<Void> asyncCallback);
 
-    public void removeUser(String dn, AsyncCallback<Void> asyncCallback);
+    public void getUserGroups(String email, AsyncCallback<Map<String, CoreConstants.ROLE>> asyncCallback);
+    
+    public void getUserGroups(AsyncCallback<List<String>> asyncCallback);
+
+    public void setUserGroups(String email, Map<String, CoreConstants.ROLE> groups, AsyncCallback<Void> asyncCallback);
 
     public void getUsers(AsyncCallback<List<User>> asyncCallback);
-
-    public void addUser(User user, AsyncCallback<String> asyncCallback);
-
-    public void updateUser(User user, AsyncCallback<String> asyncCallback);
-
-    public void loadConfiguration(AsyncCallback<Configuration> asyncCallback);
+    
+    public void getUserData(AsyncCallback<User> asyncCallback);
+    
+    public void updateUser(User user, AsyncCallback<Void> asyncCallback);
+    
+    public void updateUserPassword(String currentPassword, String newPassword, AsyncCallback<Void> asyncCallback);
 }

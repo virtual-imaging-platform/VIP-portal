@@ -15,19 +15,45 @@
     <dependencies>
         
         <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>2.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>com.google.gwt</groupId>
+            <artifactId>gwt-servlet</artifactId>
+            <version>2.2.0</version>
+            <scope>runtime</scope>
+        </dependency>
 
         <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-common</artifactId>
-            <version>${vip.common.version}</version>
-            <scope>provided</scope>
+            <groupId>com.google.gwt</groupId>
+            <artifactId>gwt-user</artifactId>
+            <version>2.2.0</version>
         </dependency>
-               
+
+        <dependency>
+            <groupId>com.smartgwt</groupId>
+            <artifactId>smartgwt</artifactId>
+            <version>2.5</version>
+        </dependency>
+
         <dependency>
             <groupId>bouncycastle</groupId>
             <artifactId>bcprov-jdk16</artifactId>
@@ -39,7 +65,37 @@
             <artifactId>mail</artifactId>
             <version>1.4.4</version>
         </dependency>
+        
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vlet-agent-client</artifactId>
+            <version>0.9</version>
+        </dependency>
 
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>devtools</artifactId>
+            <version>0.1</version>
+        </dependency>
+                
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.3.157</version>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.16</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+            <version>1.6</version>
+        </dependency>
+        
     </dependencies>
     <build>
         <plugins>
@@ -100,4 +156,13 @@
             </resource>
         </resources>
     </build>
+    
+    <repositories>
+        <repository>
+            <id>JBoss</id>
+            <name>JBoss Repsitory</name>
+            <layout>default</layout>
+            <url>https://repository.jboss.org/nexus/content/groups/public</url>
+        </repository>
+    </repositories>
 </project>

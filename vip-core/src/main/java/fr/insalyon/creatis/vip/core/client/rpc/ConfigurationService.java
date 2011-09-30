@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -37,9 +37,11 @@ package fr.insalyon.creatis.vip.core.client.rpc;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import fr.insalyon.creatis.vip.core.client.bean.Configuration;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -60,23 +62,39 @@ public interface ConfigurationService extends RemoteService {
         }
     }
 
-    public Configuration loadConfiguration();
+    public User configure() throws CoreException;
 
-    public String addGroup(String proxy, String groupName);
+    public void signup(User user) throws CoreException;
 
-    public String updateGroup(String proxy, String oldName, String newName);
+    public User signin(String email, String password) throws CoreException;
 
-    public void removeGroup(String proxy, String groupName);
+    public void signout() throws CoreException;
 
-    public List<String> getGroups();
+    public User activate(String email, String code) throws CoreException;
 
-    public String addUser(User user);
+    public void sendActivationCode(String email) throws CoreException;
 
-    public String updateUser(User user);
+    public List<User> getUsers() throws CoreException;
 
-    public void removeUser(String dn);
+    public void addGroup(String groupName) throws CoreException;
 
-    public List<User> getUsers();
+    public void updateGroup(String oldName, String newName) throws CoreException;
+
+    public void removeGroup(String groupName) throws CoreException;
+
+    public List<String> getGroups() throws CoreException;
+
+    public void removeUser(String email) throws CoreException;
+
+    public Map<String, CoreConstants.ROLE> getUserGroups(String email) throws CoreException;
     
-    public User getUser(String dn);
+    public List<String> getUserGroups() throws CoreException;
+
+    public void setUserGroups(String email, Map<String, CoreConstants.ROLE> groups) throws CoreException;
+    
+    public User getUserData() throws CoreException;
+    
+    public void updateUser(User user) throws CoreException;
+    
+    public void updateUserPassword(String currentPassword, String newPassword) throws CoreException;
 }

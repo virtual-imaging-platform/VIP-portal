@@ -35,45 +35,10 @@
  * Copyright 2007 The Board of Trustees of the University of Illinois.
  * All rights reserved.
  *
- * --
- * Developed by:
- *
- *   MyProxy Team
- *   National Center for Supercomputing Applications
- *   University of Illinois
- *   http://myproxy.ncsa.uiuc.edu/
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal with the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- *   Redistributions of source code must retain the above copyright
- *   notice, this list of conditions and the following disclaimers.
- *
- *   Redistributions in binary form must reproduce the above copyright
- *   notice, this list of conditions and the following disclaimers in the
- *   documentation and/or other materials provided with the distribution.
- *
- *   Neither the names of the National Center for Supercomputing
- *   Applications, the University of Illinois, nor the names of its
- *   contributors may be used to endorse or promote products derived from
- *   this Software without specific prior written permission.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- * IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR
- * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
  */
 package fr.insalyon.creatis.vip.core.server.business.proxy;
 
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -90,13 +55,11 @@ import java.net.InetAddress;
 import java.net.ProtocolException;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
-import java.security.KeyStore;
+import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.CertPath;
 import java.security.cert.CertPathValidator;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -112,21 +75,20 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.security.auth.login.FailedLoginException;
-import javax.security.auth.x500.X500Principal;
+import org.apache.log4j.Logger;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DEROutputStream;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
-import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.util.encoders.Base64;
 
 /**
@@ -135,6 +97,7 @@ import org.bouncycastle.util.encoders.Base64;
  */
 public class MyProxyClient {
 
+    private final static Logger logger = Logger.getLogger(MyProxyClient.class);
     private SSLSocket socket;
     private BufferedInputStream socketIn;
     private BufferedOutputStream socketOut;
@@ -145,7 +108,7 @@ public class MyProxyClient {
     private final String GETCOMMAND = "COMMAND=0";
     private final String USERNAME = "USERNAME=";
     private final String PASSPHRASE = "PASSPHRASE=";
-    private final String LIFETIME = "LIFETIME=31536000";
+    private final String LIFETIME = "LIFETIME=864000"; // 10 days
     private final String RESPONSE = "RESPONSE=";
     private final String ERROR = "ERROR=";
 
@@ -163,11 +126,10 @@ public class MyProxyClient {
      * @return Proxy file name
      * @throws BusinessException
      */
-    public Proxy getProxy(String userCN, String userDN) throws BusinessException {
+    public Proxy getProxy() throws BusinessException {
 
         try {
-            String proxyFileName = ServerConfiguration.getInstance().getProxiesDir()
-                    + "x509up_" + userCN.toLowerCase().replace(" ", "_");
+            String proxyFileName = Server.getInstance().getServerProxy();
 
             if (new File(proxyFileName).exists()) {
 
@@ -180,7 +142,7 @@ public class MyProxyClient {
                     X509Certificate certificate = (X509Certificate) cf.generateCertificate(is);
                     Calendar currentDate = Calendar.getInstance();
                     currentDate.setTime(new Date());
-                    currentDate.add(Calendar.DAY_OF_MONTH, 1);
+                    currentDate.add(Calendar.DAY_OF_MONTH, 4);
                     try {
                         certificate.checkValidity(currentDate.getTime());
                         if (endDate != null && certificate.getNotAfter().getTime() < endDate.getTime()) {
@@ -198,45 +160,34 @@ public class MyProxyClient {
                 }
             }
             connect();
-            logon(userDN);
-            getCredentials(userCN);
+            logon();
+            getCredentials();
             Date endDate = saveCredentials(proxyFileName);
             disconnect();
 
             return new Proxy(proxyFileName, endDate);
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error(ex);
             try {
                 disconnect();
             } catch (IOException ex1) {
+                logger.error(ex);
                 throw new BusinessException(ex1.getMessage());
             }
             throw new BusinessException(ex.getMessage());
         }
     }
 
-    /**
-     * Connects to the MyProxy server at the desired host and port. Requires
-     * host authentication via SSL. The host's certificate subject must
-     * match the requested hostname. If CA certificates are found in the
-     * standard GSI locations, they will be used to verify the server's
-     * certificate. If trust roots are requested and no CA certificates are
-     * found, the server's certificate will still be accepted.
-     */
     private void connect() throws Exception {
 
         SSLContext sc = SSLContext.getInstance("SSL");
-        KeyManager[] keyManagers = createKeyManagers(
-                ServerConfiguration.getInstance().getKeystoreFile(),
-                ServerConfiguration.getInstance().getKeystorePass());
-
-        sc.init(keyManagers, new TrustManager[]{new MyTrustManager()}, new SecureRandom());
+        sc.init(new KeyManager[]{}, new TrustManager[]{new MyTrustManager()}, new SecureRandom());
         SSLSocketFactory sf = sc.getSocketFactory();
 
         this.socket = (SSLSocket) sf.createSocket(
-                ServerConfiguration.getInstance().getMyProxyHost(),
-                ServerConfiguration.getInstance().getMyProxyPort());
+                Server.getInstance().getMyProxyHost(),
+                Server.getInstance().getMyProxyPort());
 
         this.socket.setEnabledProtocols(new String[]{"SSLv3"});
         this.socket.startHandshake();
@@ -247,7 +198,7 @@ public class MyProxyClient {
     /**
      * Logs on to the MyProxy server by issuing the MyProxy GET command.
      */
-    private void logon(String userDN) throws Exception {
+    private void logon() throws Exception {
 
         this.socketOut.write('0');
         this.socketOut.flush();
@@ -255,9 +206,9 @@ public class MyProxyClient {
         this.socketOut.write('\n');
         this.socketOut.write(GETCOMMAND.getBytes());
         this.socketOut.write('\n');
-        this.socketOut.write((USERNAME + userDN).getBytes());
+        this.socketOut.write((USERNAME + Server.getInstance().getMyProxyUser()).getBytes());
         this.socketOut.write('\n');
-        this.socketOut.write(PASSPHRASE.getBytes());
+        this.socketOut.write((PASSPHRASE + Server.getInstance().getMyProxyPass()).getBytes());
         this.socketOut.write('\n');
         this.socketOut.write(LIFETIME.getBytes());
         this.socketOut.write('\n');
@@ -301,30 +252,22 @@ public class MyProxyClient {
     /**
      * Retrieves credentials from the MyProxy server.
      */
-    private void getCredentials(String userCN) throws Exception {
+    private void getCredentials() throws Exception {
 
-        InputStream inputStream = new FileInputStream(
-                ServerConfiguration.getInstance().getKeystoreFile());
-        KeyStore keyStore = KeyStore.getInstance("JKS");
-        keyStore.load(inputStream, ServerConfiguration.getInstance().getKeystorePass().toCharArray());
+        KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
+        keyPair = keyGenerator.generateKeyPair();
 
-        PrivateKey key = (PrivateKey) keyStore.getKey("1",
-                ServerConfiguration.getInstance().getKeystorePass().toCharArray());
-        Certificate cert = keyStore.getCertificate("1");
-        PublicKey publicKey = cert.getPublicKey();
-
-        keyPair = new KeyPair(publicKey, (PrivateKey) key);
-
-        PKCS10CertificationRequest pkcs10 = new PKCS10CertificationRequest(
-                "SHA1withRSA",
-                new X509Principal(new X500Principal("CN=" + userCN).getEncoded()),
+        PKCS10CertificationRequest cert = new PKCS10CertificationRequest(
+                "MD5WITHRSA",
+                new X509Name("CN=irrelevant"),
                 keyPair.getPublic(),
                 null,
                 keyPair.getPrivate(),
-                "SunRsaSign");
+                "BC");
 
-        this.socketOut.write(pkcs10.getEncoded());
-        this.socketOut.flush();
+        socketOut.write(cert.getEncoded());
+        socketOut.write(0x00);
+        socketOut.flush();
 
         int numCertificates = this.socketIn.read();
         if (numCertificates == -1) {
@@ -415,20 +358,6 @@ public class MyProxyClient {
         der.writeObject(derKey);
         printB64(bout.toByteArray(), out);
         out.println("-----END RSA PRIVATE KEY-----");
-    }
-
-    private KeyManager[] createKeyManagers(String keyStoreFileName, String keyStorePassword) throws Exception {
-
-        InputStream inputStream = new FileInputStream(keyStoreFileName);
-        KeyStore keyStore = KeyStore.getInstance("JKS");
-        keyStore.load(inputStream, keyStorePassword.toCharArray());
-
-        KeyManagerFactory keyManagerFactory =
-                KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        keyManagerFactory.init(keyStore, keyStorePassword.toCharArray());
-        KeyManager[] managers = keyManagerFactory.getKeyManagers();
-
-        return managers;
     }
 
     private String readLine(InputStream is) throws IOException {
@@ -542,7 +471,7 @@ public class MyProxyClient {
                             + subject);
                 }
             }
-            String myHostname = ServerConfiguration.getInstance().getMyProxyHost();
+            String myHostname = Server.getInstance().getMyProxyHost();
             if (myHostname.equals("localhost")) {
                 try {
                     myHostname = InetAddress.getLocalHost().getHostName();
@@ -554,7 +483,7 @@ public class MyProxyClient {
                 throw new CertificateException(
                         "Server certificate subject CN (" + CN
                         + ") does not match server hostname ("
-                        + ServerConfiguration.getInstance().getMyProxyHost()
+                        + Server.getInstance().getMyProxyHost()
                         + ").");
             }
         }
@@ -575,12 +504,8 @@ public class MyProxyClient {
                 certData = certData.substring(index);
                 ByteArrayInputStream inputStream = new ByteArrayInputStream(
                         certData.getBytes());
-                try {
-                    X509Certificate cert = (X509Certificate) certFactory.generateCertificate(inputStream);
-                    c.add(cert);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                X509Certificate cert = (X509Certificate) certFactory.generateCertificate(inputStream);
+                c.add(cert);
             }
         }
         if (c.isEmpty()) {

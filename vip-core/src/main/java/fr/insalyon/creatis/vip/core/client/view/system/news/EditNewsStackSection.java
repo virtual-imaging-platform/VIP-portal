@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -45,10 +45,11 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.core.client.bean.News;
 import fr.insalyon.creatis.vip.core.client.rpc.NewsService;
 import fr.insalyon.creatis.vip.core.client.rpc.NewsServiceAsync;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
@@ -57,6 +58,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
  */
 public class EditNewsStackSection extends SectionStackSection {
 
+    private ModalWindow modal;
     private boolean newNews = true;
     private VLayout vLayout;
     private DynamicForm form;
@@ -76,14 +78,17 @@ public class EditNewsStackSection extends SectionStackSection {
         vLayout.setMargin(5);
         configureForm();
 
+        modal = new ModalWindow(vLayout);
+
         this.addItem(vLayout);
     }
 
     private void configureForm() {
+
         form = new DynamicForm();
         form.setWidth(500);
 
-        titleItem = new TextItem("name", "Name");
+        titleItem = new TextItem("name", "Title");
         titleItem.setWidth(350);
         titleItem.setRequired(true);
 
@@ -95,7 +100,7 @@ public class EditNewsStackSection extends SectionStackSection {
         richTextEditor.setOverflow(Overflow.HIDDEN);
         richTextEditor.setCanDragResize(true);
         richTextEditor.setShowEdges(true);
-        richTextEditor.setControlGroups("fontControls", "formatControls", 
+        richTextEditor.setControlGroups("fontControls", "formatControls",
                 "styleControls", "editControls", "colorControls", "insertControls");
         vLayout.addMember(richTextEditor);
 
@@ -108,7 +113,7 @@ public class EditNewsStackSection extends SectionStackSection {
                     String title = titleItem.getValueAsString();
                     String message = richTextEditor.getValue();
 
-                    save(new News(title, message, null, Context.getInstance().getUser()));
+                    save(new News(title, message));
                 }
             }
         });
@@ -120,41 +125,41 @@ public class EditNewsStackSection extends SectionStackSection {
         NewsServiceAsync service = NewsService.Util.getInstance();
 
         if (newNews) {
-            final AsyncCallback<String> callback = new AsyncCallback<String>() {
+            final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                 public void onFailure(Throwable caught) {
-                    SC.warn("Error executing add news\n" + caught.getMessage());
+                    modal.hide();
+                    SC.warn("Unable to add news:<br />" + caught.getMessage());
                 }
 
-                public void onSuccess(String result) {
-                    if (!result.contains("Error: ")) {
-                        ManageNewsTab newsTab = (ManageNewsTab) Layout.getInstance().
-                                getTab("manage-news-tab");
-                        newsTab.loadNews();
-                        setNews(null);
-                    }
-                    SC.say(result);
+                public void onSuccess(Void result) {
+                    modal.hide();
+                    ManageNewsTab newsTab = (ManageNewsTab) Layout.getInstance().
+                            getTab(CoreConstants.TAB_MANAGE_NEWS);
+                    newsTab.loadNews();
+                    setNews(null);
                 }
             };
+            modal.show("Adding news...", true);
             service.add(news, callback);
 
         } else {
-            final AsyncCallback<String> callback = new AsyncCallback<String>() {
+            final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                 public void onFailure(Throwable caught) {
-                    SC.warn("Error executing update news\n" + caught.getMessage());
+                    modal.hide();
+                    SC.warn("Unable to update news:<br />" + caught.getMessage());
                 }
 
-                public void onSuccess(String result) {
-                    if (!result.contains("Error: ")) {
-                        ManageNewsTab newsTab = (ManageNewsTab) Layout.getInstance().
-                                getTab("manage-news-tab");
-                        newsTab.loadNews();
-                        setNews(null);
-                    }
-                    SC.say(result);
+                public void onSuccess(Void result) {
+                    modal.hide();
+                    ManageNewsTab newsTab = (ManageNewsTab) Layout.getInstance().
+                            getTab(CoreConstants.TAB_MANAGE_NEWS);
+                    newsTab.loadNews();
+                    setNews(null);
                 }
             };
+            modal.show("Updating news...", true);
             service.update(news, callback);
         }
     }

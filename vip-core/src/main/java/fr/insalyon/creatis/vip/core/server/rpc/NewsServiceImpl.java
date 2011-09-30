@@ -34,9 +34,9 @@
  */
 package fr.insalyon.creatis.vip.core.server.rpc;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.vip.core.client.bean.News;
 import fr.insalyon.creatis.vip.core.client.rpc.NewsService;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.NewsBusiness;
 import java.util.List;
@@ -46,47 +46,59 @@ import org.apache.log4j.Logger;
  *
  * @author Rafael Silva
  */
-public class NewsServiceImpl extends RemoteServiceServlet implements NewsService {
+public class NewsServiceImpl extends AbstractRemoteServiceServlet implements NewsService {
 
     private static Logger logger = Logger.getLogger(NewsServiceImpl.class);
-    
-    public List<News> getNews() {
+    private NewsBusiness newsBusiness;
+
+    public NewsServiceImpl() {
+        newsBusiness = new NewsBusiness();
+    }
+
+    public List<News> getNews() throws CoreException {
+
         try {
-            NewsBusiness business = new NewsBusiness();
-            return business.getNews();
+            return newsBusiness.getNews();
 
         } catch (BusinessException ex) {
-            return null;
+            throw new CoreException(ex);
         }
     }
 
-    public String add(News news) {
+    public void add(News news) throws CoreException {
+
         try {
-            NewsBusiness business = new NewsBusiness();
-            return business.add(news);
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Adding news '" + news.getTitle() + "'.");
+            news.setAuthor(getSessionUser().getFullName());
+            newsBusiness.add(news);
 
         } catch (BusinessException ex) {
-            return null;
+            throw new CoreException(ex);
         }
     }
 
-    public String update(News news) {
+    public void update(News news) throws CoreException {
+
         try {
-            NewsBusiness business = new NewsBusiness();
-            return business.update(news);
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Updating news '" + news.getTitle() + "'.");
+            newsBusiness.update(news);
 
         } catch (BusinessException ex) {
-            return null;
+            throw new CoreException(ex);
         }
     }
 
-    public String remove(News news) {
+    public void remove(News news) throws CoreException {
+
         try {
-            NewsBusiness business = new NewsBusiness();
-            return business.remove(news);
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Removing news '" + news.getTitle() + "'.");
+            newsBusiness.remove(news);
 
         } catch (BusinessException ex) {
-            return null;
+            throw new CoreException(ex);
         }
     }
 }

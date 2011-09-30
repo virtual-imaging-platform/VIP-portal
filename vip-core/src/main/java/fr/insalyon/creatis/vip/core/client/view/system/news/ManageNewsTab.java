@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -35,11 +35,13 @@
 package fr.insalyon.creatis.vip.core.client.view.system.news;
 
 import com.smartgwt.client.types.VisibilityMode;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import fr.insalyon.creatis.vip.core.client.bean.News;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 
 /**
  *
@@ -53,8 +55,8 @@ public class ManageNewsTab extends Tab {
 
     public ManageNewsTab() {
 
-        this.setTitle("Manage News");
-        this.setID("manage-news-tab");
+        this.setTitle(Canvas.imgHTML(CoreConstants.ICON_MAIL) + " " + CoreConstants.APP_NEWS);
+        this.setID(CoreConstants.TAB_MANAGE_NEWS);
         this.setCanClose(true);
 
         VLayout vLayout = new VLayout();

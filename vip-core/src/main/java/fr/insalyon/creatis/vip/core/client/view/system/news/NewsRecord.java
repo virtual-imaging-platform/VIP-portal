@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -43,6 +43,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 public class NewsRecord extends ListGridRecord {
 
     public NewsRecord(String title, String message, String posted, String author) {
+        
         setAttribute("title", title);
         setAttribute("message", message);
         setAttribute("posted", posted);

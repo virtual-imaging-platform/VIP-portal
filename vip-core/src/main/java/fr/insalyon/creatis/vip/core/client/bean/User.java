@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -35,7 +35,6 @@
 package fr.insalyon.creatis.vip.core.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
-import java.util.Map;
 
 /**
  *
@@ -43,49 +42,104 @@ import java.util.Map;
  */
 public class User implements IsSerializable {
 
-    private String distinguishedName;
-    private String canonicalName;
-    private String organizationUnit;
-    private Map<String, String> groups;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String institution;
+    private String phone;
+    private String password;
+    private boolean confirmed;
+    private String code;
+    private String folder;
+    private boolean systemAdministrator;
 
     public User() {
     }
 
-    public User(String distinguishedName) {
-        this.distinguishedName = distinguishedName;
-        parseDistinguisedName();
+    public User(String firstName, String lastName, String email, String institution,
+            String phone) {
+
+        this(firstName, lastName, email, institution, "", phone, false, "", "");
+    }
+    
+    public User(String firstName, String lastName, String email, String institution,
+            String password, String phone) {
+
+        this(firstName, lastName, email, institution, password, phone, false, "", "");
     }
 
-    public User(String distinguishedName, Map<String, String> groups) {
-        this.distinguishedName = distinguishedName;
-        this.groups = groups;
-        parseDistinguisedName();
+    public User(String firstName, String lastName, String email, String institution,
+            String password, String phone, boolean confirmed, String code,
+            String folder) {
+
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.institution = institution;
+        this.password = password;
+        this.phone = phone;
+        this.confirmed = confirmed;
+        this.code = code;
+        this.folder = folder;
     }
 
-    private void parseDistinguisedName() {
-        String dnSplitted[] = distinguishedName.split("[,/]");
-        for (String s : dnSplitted) {
-            if (s.contains("CN=")) {
-                this.canonicalName = s.substring(s.indexOf("=") + 1);
-            } else if (s.contains("OU=")) {
-                this.organizationUnit = s.substring(s.indexOf("=") + 1);
-            }
-        }
+    public boolean isConfirmed() {
+        return confirmed;
     }
 
-    public String getDistinguishedName() {
-        return distinguishedName;
+    public String getCode() {
+        return code;
     }
 
-    public Map<String, String> getGroups() {
-        return groups;
+    public String getEmail() {
+        return email;
     }
 
-    public String getCanonicalName() {
-        return canonicalName;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public String getOrganizationUnit() {
-        return organizationUnit;
+    public String getFolder() {
+        return folder;
+    }
+
+    public String getInstitution() {
+        return institution;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public void setFolder(String folder) {
+        this.folder = folder;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
+
+    public void setSystemAdministrator(boolean systemAdministrator) {
+        this.systemAdministrator = systemAdministrator;
+    }
+
+    public boolean isSystemAdministrator() {
+        return systemAdministrator;
     }
 }

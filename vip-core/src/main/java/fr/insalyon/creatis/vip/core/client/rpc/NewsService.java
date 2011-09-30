@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -38,6 +38,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.core.client.bean.News;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import java.util.List;
 
 /**
@@ -59,11 +60,11 @@ public interface NewsService extends RemoteService {
         }
     }
 
-    public List<News> getNews();
+    public List<News> getNews() throws CoreException;
     
-    public String add(News news);
+    public void add(News news) throws CoreException;
 
-    public String update(News news);
+    public void update(News news) throws CoreException;
 
-    public String remove(News news);
+    public void remove(News news) throws CoreException;
 }

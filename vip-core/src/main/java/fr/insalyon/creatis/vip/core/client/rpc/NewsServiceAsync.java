@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -47,9 +47,9 @@ public interface NewsServiceAsync {
 
     public void getNews(AsyncCallback<List<News>> asyncCallback);
     
-    public void add(News news, AsyncCallback<String> asyncCallback);
+    public void add(News news, AsyncCallback<Void> asyncCallback);
 
-    public void update(News news, AsyncCallback<String> asyncCallback);
+    public void update(News news, AsyncCallback<Void> asyncCallback);
 
-    public void remove(News news, AsyncCallback<String> asyncCallback);
+    public void remove(News news, AsyncCallback<Void> asyncCallback);
 }

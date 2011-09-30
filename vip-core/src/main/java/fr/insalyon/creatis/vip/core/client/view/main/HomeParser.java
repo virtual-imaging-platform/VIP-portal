@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -34,38 +34,36 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.main;
 
-import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.layout.VStack;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.user.AccountTab;
+import fr.insalyon.creatis.vip.core.client.view.user.MailTab;
 
 /**
  *
  * @author Rafael Silva
  */
-public class PortalColumn extends VStack {
+public class HomeParser extends ApplicationParser {
 
-    public PortalColumn() {
+    @Override
+    public void loadApplications() {
 
-        // leave some space between portlets  
-        this.setMembersMargin(6);
+        addApplication(CoreConstants.APP_ACCOUNT, CoreConstants.APP_IMG_ACCOUNT);
+        addApplication(CoreConstants.APP_MAIL, CoreConstants.APP_IMG_MAIL);
+    }
 
-        // enable predefined component animation  
-        this.setAnimateMembers(true);
-        this.setAnimateMemberTime(300);
+    @Override
+    public boolean parse(String applicationName) {
 
-        // enable drop handling  
-        this.setCanAcceptDrop(true);
-
-        // change appearance of drag placeholder and drop indicator  
-        this.setDropLineThickness(4);
-
-        Canvas dropLineProperties = new Canvas();
-        dropLineProperties.setBackgroundColor("#99CCFF");
-        this.setDropLineProperties(dropLineProperties);
-
-        this.setShowDragPlaceHolder(true);
-
-        Canvas placeHolderProperties = new Canvas();
-        placeHolderProperties.setBorder("2px solid #99CCFF");
-        this.setPlaceHolderProperties(placeHolderProperties);
+        if (applicationName.equals(CoreConstants.APP_ACCOUNT)) {
+            Layout.getInstance().addTab(new AccountTab());
+            return true;
+        
+        } else if (applicationName.equals(CoreConstants.APP_MAIL)) {
+            Layout.getInstance().addTab(new MailTab());
+            return true;
+        }
+        return false;
     }
 }

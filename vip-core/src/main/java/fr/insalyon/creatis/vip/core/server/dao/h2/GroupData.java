@@ -34,7 +34,7 @@
  */
 package fr.insalyon.creatis.vip.core.server.dao.h2;
 
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -57,40 +57,48 @@ public class GroupData implements GroupDAO {
         connection = PlatformConnection.getInstance().getConnection();
     }
 
-    public String add(String groupName) throws DAOException {
+    /**
+     * 
+     * @param groupName
+     * @throws DAOException 
+     */
+    public void add(String groupName) throws DAOException {
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO PlatformGroups(groupname) "
-                    + "VALUES (?)");
+                    "INSERT INTO VIPGroups(groupname) VALUES(?)");
 
             ps.setString(1, groupName);
             ps.execute();
 
         } catch (SQLException ex) {
-            logger.error(ex);
-            throw new DAOException("Error: a group named \"" + groupName + "\" already exists.");
+            if (ex.getMessage().contains("Unique index or primary key violation")) {
+                logger.error("A group named \"" + groupName + "\" already exists.");
+                throw new DAOException("A group named \"" + groupName + "\" already exists.");
+            } else {
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
         }
-        return "The group was succesfully saved!";
     }
 
     public void remove(String groupName) throws DAOException {
         try {
             PreparedStatement stat = connection.prepareStatement("DELETE "
-                    + "FROM PlatformGroups WHERE groupname=?");
+                    + "FROM VIPGroups WHERE groupname=?");
 
             stat.setString(1, groupName);
             stat.execute();
 
         } catch (SQLException ex) {
             logger.error(ex);
-            throw new DAOException(ex.getMessage());
+            throw new DAOException(ex);
         }
     }
 
-    public String update(String oldName, String newName) throws DAOException {
+    public void update(String oldName, String newName) throws DAOException {
         try {
             PreparedStatement stat = connection.prepareStatement("UPDATE "
-                    + "PlatformGroups "
+                    + "VIPGroups "
                     + "SET groupname=? "
                     + "WHERE groupname=?");
 
@@ -98,21 +106,19 @@ public class GroupData implements GroupDAO {
             stat.setString(2, oldName);
             stat.executeUpdate();
 
-            return "The group was succesfully updated!";
-
         } catch (SQLException ex) {
             logger.error(ex);
-            throw new DAOException("Error: " + ex.getMessage());
+            throw new DAOException(ex);
         }
     }
 
-    public List<String> getGroups() {
+    public List<String> getGroups() throws DAOException {
         try {
 
             List<String> groups = new ArrayList<String>();
             PreparedStatement stat = null;
             stat = connection.prepareStatement("SELECT groupname FROM "
-                    + "PlatformGroups ORDER BY groupname");
+                    + "VIPGroups ORDER BY groupname");
 
             ResultSet rs = stat.executeQuery();
             while (rs.next()) {
@@ -122,7 +128,7 @@ public class GroupData implements GroupDAO {
 
         } catch (SQLException ex) {
             logger.error(ex);
+            throw new DAOException(ex);
         }
-        return null;
     }
 }

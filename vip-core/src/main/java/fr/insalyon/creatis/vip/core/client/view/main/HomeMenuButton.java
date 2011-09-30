@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -35,11 +35,7 @@
 package fr.insalyon.creatis.vip.core.client.view.main;
 
 import com.smartgwt.client.widgets.menu.Menu;
-import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.ClickHandler;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
  *
@@ -53,38 +49,7 @@ public class HomeMenuButton extends ToolStripMenuButton {
         Menu menu = new Menu();
         menu.setShowShadow(true);
         menu.setShadowDepth(3);
-        
-        // Home
-        MenuItem homeItem = new MenuItem("Home");
-        homeItem.setIcon("icon-home.png");
-        homeItem.addClickHandler(new ClickHandler() {
-
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().setActiveCenterTab("home-tab");
-            }
-        });
-        
-        // Documentation
-        MenuItem documentationItem = new MenuItem("Documentation");
-        documentationItem.setIcon("icon-information.png");
-        documentationItem.addClickHandler(new ClickHandler() {
-
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new DocumentationTab());
-            }
-        });
-
-        //Gallery
-        MenuItem galleryItem = new MenuItem("Gallery");
-        galleryItem.setIcon("icon-gallery.png");
-        galleryItem.addClickHandler(new ClickHandler() {
-
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new GalleryTab());
-            }
-        });
-        
-        menu.setItems(homeItem, documentationItem, galleryItem);
+                
         this.setMenu(menu);
     }
 }

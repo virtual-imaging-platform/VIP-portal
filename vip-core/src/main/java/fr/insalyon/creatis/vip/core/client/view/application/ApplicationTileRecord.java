@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,59 +32,30 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.main;
+package fr.insalyon.creatis.vip.core.client.view.application;
 
-import com.smartgwt.client.widgets.layout.HLayout;
-import fr.insalyon.creatis.vip.core.client.view.portlet.Portlet;
+import com.smartgwt.client.widgets.tile.TileRecord;
 
 /**
  *
  * @author Rafael Silva
  */
-public class PortalLayout extends HLayout {
+public class ApplicationTileRecord extends TileRecord {
 
-    public PortalLayout(int numColumns) {
-        
-        this.setMembersMargin(6);
-        for (int i = 0; i < numColumns; i++) {
-            this.addMember(new PortalColumn());
-        }
+    public ApplicationTileRecord() {
     }
 
-    /**
-     * 
-     * @param portlet
-     * @param columnNum
-     * @return 
-     */
-    public PortalColumn addPortlet(Portlet portlet, int columnNum) {
-        
-        PortalColumn column = (PortalColumn) getMember(columnNum);
-        column.addMember(portlet);
-        
-        return column;
+    public ApplicationTileRecord(String name, String icon) {
+
+        setAttribute("commonName", name);
+        setAttribute("picture", icon);
     }
-    
-    /**
-     * 
-     * @param portlet
-     * @return 
-     */
-    public PortalColumn addPortlet(Portlet portlet) {
-        
-        // find the column with the fewest portlets  
-        int fewestPortlets = Integer.MAX_VALUE;
-        PortalColumn fewestPortletsColumn = null;
-        
-        for (int i = 0; i < getMembers().length; i++) {
-            int numPortlets = ((PortalColumn) getMember(i)).getMembers().length;
-            if (numPortlets < fewestPortlets) {
-                fewestPortlets = numPortlets;
-                fewestPortletsColumn = (PortalColumn) getMember(i);
-            }
-        }
-        
-        fewestPortletsColumn.addMember(portlet);
-        return fewestPortletsColumn;
+
+    public String getName() {
+        return getAttributeAsString("commonName");
+    }
+
+    public String getIcon() {
+        return getAttributeAsString("picture");
     }
 }

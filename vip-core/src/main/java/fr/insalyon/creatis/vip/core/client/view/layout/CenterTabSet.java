@@ -3,7 +3,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -37,7 +37,6 @@ package fr.insalyon.creatis.vip.core.client.view.layout;
 
 import com.smartgwt.client.types.Side;
 import com.smartgwt.client.widgets.tab.TabSet;
-import fr.insalyon.creatis.vip.core.client.view.main.HomeTab;
 
 /**
  *
@@ -59,6 +58,5 @@ public class CenterTabSet extends TabSet {
         this.setTabBarPosition(Side.TOP);
         this.setWidth100();
         this.setHeight100();
-        this.addTab(new HomeTab());
    }
 }

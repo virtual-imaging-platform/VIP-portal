@@ -38,7 +38,7 @@ package fr.insalyon.creatis.vip.core.client.view.layout.toolstrip;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
-import fr.insalyon.creatis.vip.common.client.view.Context;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 
 /**
  *
@@ -47,17 +47,12 @@ import fr.insalyon.creatis.vip.common.client.view.Context;
 public class BottomToolStrip extends ToolStrip {
 
     public BottomToolStrip() {
+        
         this.setWidth100();
         this.setPadding(2);
-        
-        Context context = Context.getInstance();
-        Label authLabel = new Label("Authenticated as: " + context.getUser() 
-                + " / " + context.getOrganization());
-        authLabel.setWidth(300);
-        this.addMember(authLabel);
-        
+                
         this.addFill();
-        Label version = new Label("v0.5");
+        Label version = new Label(CoreConstants.VERSION);
         version.setAlign(Alignment.RIGHT);
         this.addMember(version);
     }

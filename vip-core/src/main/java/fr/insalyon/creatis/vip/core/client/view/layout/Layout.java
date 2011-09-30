@@ -34,13 +34,22 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.layout;
 
+import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.BottomToolStrip;
+import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.VisibilityMode;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.BottomToolStrip;
-import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
+import fr.insalyon.creatis.vip.core.client.ModulesInit;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.auth.ActivationTab;
+import fr.insalyon.creatis.vip.core.client.view.auth.SignInTab;
 
 /**
  *
@@ -49,8 +58,10 @@ import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
 public class Layout {
 
     private static Layout instance;
+    private VLayout vLayout;
     private CenterTabSet centerTabSet;
     private SectionStack mainSectionStack;
+    private ModalWindow modal;
 
     public static Layout getInstance() {
         if (instance == null) {
@@ -61,7 +72,7 @@ public class Layout {
 
     private Layout() {
 
-        VLayout vLayout = new VLayout();
+        vLayout = new VLayout();
         vLayout.setWidth100();
         vLayout.setHeight100();
 
@@ -84,7 +95,57 @@ public class Layout {
         vLayout.addMember(mainSectionStack);
         vLayout.addMember(new BottomToolStrip());
 
+        modal = new ModalWindow(vLayout);
+
         vLayout.draw();
+    }
+
+    public ModalWindow getModal() {
+        return modal;
+    }
+
+    /**
+     * Authenticates a user.
+     * 
+     */
+    public void authenticate(User user) {
+
+        if (user != null) {
+
+            if (user.isConfirmed()) {
+                ModulesInit.getInstance().initializeModules(user);
+
+            } else {
+                addTab(new ActivationTab(user));
+            }
+        } else {
+            addTab(new SignInTab());
+        }
+    }
+
+    /**
+     * Signs out.
+     * 
+     */
+    public void signout() {
+
+        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            public void onFailure(Throwable caught) {
+                SC.warn("Error while signing out:<br />" + caught.getMessage());
+            }
+
+            public void onSuccess(Void result) {
+                for (Tab tab : centerTabSet.getTabs()) {
+                    centerTabSet.removeTab(tab);
+                }
+                MainToolStrip.getInstance().reset();
+                authenticate(null);
+                ModulesInit.getInstance().finalizeModules();
+            }
+        };
+        service.signout(callback);
     }
 
     public void addTab(Tab tab) {
@@ -111,11 +172,21 @@ public class Layout {
     public void addMainSection(SectionStackSection section) {
         mainSectionStack.addSection(section);
     }
+    
+    public void removeMainSection(String sectionID) {
+        mainSectionStack.removeSection(sectionID);
+    }
+
+    public void removeTab(String id) {
+        Tab tab = getTab(id);
+        if (tab != null) {
+            removeTab(tab);
+        }
+    }
 
     public void removeTab(Tab tab) {
         if (centerTabSet.getTab(tab.getID()) != null) {
             centerTabSet.removeTab(tab);
         }
-
     }
 }

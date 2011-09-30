@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -54,6 +54,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.bean.News;
 import fr.insalyon.creatis.vip.core.client.rpc.NewsService;
 import fr.insalyon.creatis.vip.core.client.rpc.NewsServiceAsync;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +66,7 @@ import java.util.List;
  */
 public class NewsStackSection extends SectionStackSection {
 
+    private ModalWindow modal;
     private ListGrid grid;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
@@ -82,12 +85,15 @@ public class NewsStackSection extends SectionStackSection {
         vLayout.setHeight100();
         vLayout.setOverflow(Overflow.AUTO);
         vLayout.addMember(grid);
+        
+        modal = new ModalWindow(grid);
 
         this.addItem(vLayout);
         loadData();
     }
 
     private void configureGrid() {
+        
         grid = new ListGrid() {
 
             @Override
@@ -100,7 +106,7 @@ public class NewsStackSection extends SectionStackSection {
                     rollOverCanvas.setWidth(50);
                     rollOverCanvas.setHeight(22);
 
-                    ImgButton loadImg = getImgButton("icon-edit.png", "Edit");
+                    ImgButton loadImg = getImgButton(CoreConstants.ICON_EDIT, "Edit");
                     loadImg.addClickHandler(new ClickHandler() {
 
                         public void onClick(ClickEvent event) {
@@ -110,7 +116,7 @@ public class NewsStackSection extends SectionStackSection {
                                     rollOverRecord.getAttribute("author")));
                         }
                     });
-                    ImgButton deleteImg = getImgButton("icon-delete.png", "Delete");
+                    ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
                     deleteImg.addClickHandler(new ClickHandler() {
 
                         public void onClick(ClickEvent event) {
@@ -174,10 +180,12 @@ public class NewsStackSection extends SectionStackSection {
         final AsyncCallback<List<News>> callback = new AsyncCallback<List<News>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get news list\n" + caught.getMessage());
+                modal.hide();
+                SC.warn("Unable to get news list:<br />" + caught.getMessage());
             }
 
             public void onSuccess(List<News> result) {
+                modal.hide();
                 List<NewsRecord> dataList = new ArrayList<NewsRecord>();
 
                 for (News n : result) {
@@ -187,28 +195,32 @@ public class NewsStackSection extends SectionStackSection {
                 grid.setData(dataList.toArray(new NewsRecord[]{}));
             }
         };
+        modal.show("Loading news...", true);
         service.getNews(callback);
     }
 
     private void remove(News news) {
 
         NewsServiceAsync service = NewsService.Util.getInstance();
-        final AsyncCallback<String> callback = new AsyncCallback<String>() {
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing remove class\n" + caught.getMessage());
+                modal.hide();
+                SC.warn("Unable to delete news:<br />" + caught.getMessage());
             }
 
-            public void onSuccess(String result) {
-                SC.say(result);
+            public void onSuccess(Void result) {
+                modal.hide();
+                SC.say("News successfully deleted.");
                 loadData();
             }
         };
+        modal.show("Deleting news...", true);
         service.remove(news, callback);
     }
 
     private void edit(News news) {
-        ManageNewsTab newsTab = (ManageNewsTab) Layout.getInstance().getTab("manage-news-tab");
+        ManageNewsTab newsTab = (ManageNewsTab) Layout.getInstance().getTab(CoreConstants.TAB_MANAGE_NEWS);
         newsTab.setNews(news);
     }
 }

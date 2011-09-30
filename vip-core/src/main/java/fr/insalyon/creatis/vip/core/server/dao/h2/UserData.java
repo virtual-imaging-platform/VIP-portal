@@ -34,17 +34,15 @@
  */
 package fr.insalyon.creatis.vip.core.server.dao.h2;
 
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
@@ -61,90 +59,175 @@ public class UserData implements UserDAO {
     }
 
     /**
+     * Adds a user
      * 
      * @param user
+     * @param code
      * @return
      */
-    public String add(User user) {
+    public void add(User user) throws DAOException {
+
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO PlatformUsers(dn) "
-                    + "VALUES (?)");
+                    "INSERT INTO VIPUsers("
+                    + "email, pass, first_name, last_name, institution, phone, "
+                    + "code, confirmed, folder) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-            ps.setString(1, user.getDistinguishedName());
+            ps.setString(1, user.getEmail());
+            ps.setString(2, user.getPassword());
+            ps.setString(3, user.getFirstName());
+            ps.setString(4, user.getLastName());
+            ps.setString(5, user.getInstitution());
+            ps.setString(6, user.getPhone());
+            ps.setString(7, user.getCode());
+            ps.setBoolean(8, user.isConfirmed());
+            ps.setString(9, user.getFolder());
             ps.execute();
 
-            addGroupToUser(user.getDistinguishedName(), user.getGroups());
+        } catch (SQLException ex) {
+            if (ex.getMessage().contains("Unique index or primary key violation")) {
+                logger.error("There is an existing account associated with the email: " + user.getEmail());
+                throw new DAOException("There is an existing account associated with this email.");
+            } else {
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param email
+     * @param password
+     * @return
+     * @throws DAOException 
+     */
+    public boolean authenticate(String email, String password) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "pass FROM VIPUsers WHERE email=?");
+
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String pass = rs.getString("pass");
+                if (pass.equals(password)) {
+                    return true;
+                }
+            }
+            return false;
 
         } catch (SQLException ex) {
             logger.error(ex);
-            return "Error: a user named \"" + user.getDistinguishedName() + "\" already exists.";
-        } catch (DAOException ex) {
-            logger.error(ex);
-            return "Error: " + ex.getMessage();
-        }
-        return "The user was succesfully saved!";
-    }
-
-    /**
-     * 
-     * @param user
-     * @return
-     */
-    public String update(User user) {
-        try {
-            removeGroupsFromUser(user.getDistinguishedName());
-            addGroupToUser(user.getDistinguishedName(), user.getGroups());
-
-            return "The user was succesfully updated!";
-
-        } catch (DAOException ex) {
-            logger.error(ex);
-            return "Error: " + ex.getMessage();
+            throw new DAOException(ex);
         }
     }
 
     /**
      * 
-     * @param dn
+     * @param email
+     * @param code
      * @return
+     * @throws DAOException 
      */
-    public void remove(String dn) {
-        try {
-            PreparedStatement stat = connection.prepareStatement("DELETE "
-                    + "FROM PlatformUsers WHERE dn=?");
+    public boolean activate(String email, String code) throws DAOException {
 
-            stat.setString(1, dn);
-            stat.execute();
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "code FROM VIPUsers WHERE email=?");
+
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String c = rs.getString("code");
+                if (c.equals(code)) {
+
+                    ps = connection.prepareStatement("UPDATE VIPUsers SET "
+                            + "confirmed=? WHERE email=?");
+
+                    ps.setBoolean(1, true);
+                    ps.setString(2, email);
+                    ps.executeUpdate();
+
+                    return true;
+                }
+            }
+            return false;
 
         } catch (SQLException ex) {
             logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param email
+     * @return
+     * @throws DAOException 
+     */
+    public User getUser(String email) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "email, first_name, last_name, institution, phone, "
+                    + "code, confirmed, folder "
+                    + "FROM VIPUsers "
+                    + "WHERE email=?");
+
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return new User(
+                        rs.getString("first_name"), rs.getString("last_name"),
+                        rs.getString("email"), rs.getString("institution"),
+                        "", rs.getString("phone"), rs.getBoolean("confirmed"),
+                        rs.getString("code"), rs.getString("folder"));
+            }
+
+            logger.error("There is no user registered with the e-mail: " + email);
+            throw new DAOException("There is no user registered with the e-mail: " + email);
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
         }
     }
 
     /**
      * 
      * @return
+     * @throws DAOException 
      */
-    public List<User> getUsers() {
-        try {
+    public List<User> getUsers() throws DAOException {
 
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "email, first_name, last_name, institution, phone, "
+                    + "code, confirmed, folder "
+                    + "FROM VIPUsers ORDER BY first_name, last_name");
+
+            ResultSet rs = ps.executeQuery();
             List<User> users = new ArrayList<User>();
-            PreparedStatement stat = connection.prepareStatement("SELECT "
-                    + "dn FROM "
-                    + "PlatformUsers ORDER BY dn");
 
-            ResultSet rs = stat.executeQuery();
             while (rs.next()) {
-//                users.add(new User(rs.getString("dn")));
-                users.add(getUser(rs.getString("dn")));
+                users.add(new User(
+                        rs.getString("first_name"), rs.getString("last_name"),
+                        rs.getString("email"), rs.getString("institution"),
+                        "", rs.getString("phone"), rs.getBoolean("confirmed"),
+                        rs.getString("code"), rs.getString("folder")));
             }
             return users;
 
         } catch (SQLException ex) {
             logger.error(ex);
+            throw new DAOException(ex);
         }
-        return null;
     }
 
     /**
@@ -152,80 +235,28 @@ public class UserData implements UserDAO {
      * @param dn
      * @return
      */
-    public User getUser(String dn) {
+    public void remove(String email) throws DAOException {
         try {
-            Map<String, String> groups = new HashMap<String, String>();
+            PreparedStatement ps = connection.prepareStatement("DELETE "
+                    + "FROM VIPUsers WHERE email=?");
 
-            PreparedStatement stat = connection.prepareStatement("SELECT "
-                    + "groupname, role "
-                    + "FROM PlatformUsersGroups "
-                    + "WHERE userdn=?");
-            stat.setString(1, dn);
-            ResultSet rs = stat.executeQuery();
-
-            while (rs.next()) {
-                groups.put(rs.getString("groupname"), rs.getString("role"));
-            }
-
-            return new User(dn, groups);
-
-        } catch (SQLException ex) {
-            logger.error(ex);
-        }
-        return null;
-    }
-
-    /**
-     * 
-     * @param userName
-     * @param groupName
-     * @param role
-     * @throws DAOException
-     */
-    private void addGroupToUser(String userName, Map<String, String> groups) throws DAOException {
-        for (String groupName : groups.keySet()) {
-            try {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO "
-                        + "PlatformUsersGroups(userdn, groupname, role) "
-                        + "VALUES(?, ?, ?)");
-                ps.setString(1, userName);
-                ps.setString(2, groupName);
-                ps.setString(3, groups.get(groupName));
-                ps.execute();
-
-            } catch (SQLException ex) {
-                logger.error(ex);
-                throw new DAOException("Error: a group named \"" + groupName + "\" is already associated with the user.");
-            }
-        }
-    }
-
-    /**
-     * 
-     * @param userName
-     * @throws DAOException
-     */
-    private void removeGroupsFromUser(String userName) throws DAOException {
-        try {
-            PreparedStatement ps = connection.prepareStatement("DELETE FROM "
-                    + "PlatformUsersGroups WHERE userdn=?");
-            ps.setString(1, userName);
+            ps.setString(1, email);
             ps.execute();
 
         } catch (SQLException ex) {
             logger.error(ex);
-            throw new DAOException(ex.getMessage());
+            throw new DAOException(ex);
         }
     }
 
     public boolean exists(String dn) {
         try {
-            PreparedStatement stat = connection.prepareStatement("SELECT "
+            PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "dn "
                     + "FROM PlatformUsers "
                     + "WHERE dn=?");
-            stat.setString(1, dn);
-            ResultSet rs = stat.executeQuery();
+            ps.setString(1, dn);
+            ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
                 return true;
@@ -235,5 +266,64 @@ public class UserData implements UserDAO {
             logger.error(ex);
         }
         return false;
+    }
+
+    /**
+     * 
+     * @param user
+     * @throws DAOException 
+     */
+    public void update(User user) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "VIPUsers SET "
+                    + "first_name = ?, last_name = ?, institution = ?, "
+                    + "phone = ?, folder = ? "
+                    + "WHERE email=?");
+
+            ps.setString(1, user.getFirstName());
+            ps.setString(2, user.getLastName());
+            ps.setString(3, user.getInstitution());
+            ps.setString(4, user.getPhone());
+            ps.setString(5, user.getFolder());
+            ps.setString(6, user.getEmail());
+            
+            ps.executeUpdate();
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param email
+     * @param currentPassword
+     * @param newPassword
+     * @throws DAOException 
+     */
+    public void updatePassword(String email, String currentPassword, 
+            String newPassword) throws DAOException {
+        
+        if (authenticate(email, currentPassword)) {
+            try {
+                PreparedStatement ps = connection.prepareStatement("UPDATE "
+                        + "VIPUsers SET pass = ? WHERE email = ?");
+                
+                ps.setString(1, newPassword);
+                ps.setString(2, email);
+                
+                ps.executeUpdate();
+                
+            } catch (SQLException ex) {
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
+        } else {
+            logger.error("The current password mismatch for '" + email +"'.");
+            throw new DAOException("The current password mismatch.");
+        }
     }
 }

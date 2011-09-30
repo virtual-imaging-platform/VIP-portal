@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,7 +32,6 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-
 package fr.insalyon.creatis.vip.core.server.dao;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -44,15 +43,21 @@ import java.util.List;
  */
 public interface UserDAO {
 
-    public String add(User user);
+    public void add(User user) throws DAOException;
+    
+    public void update(User user) throws DAOException;
 
-    public String update(User user);
+    public boolean authenticate(String email, String password) throws DAOException;
 
-    public void remove(String dn);
+    public boolean activate(String email, String code) throws DAOException;
 
-    public List<User> getUsers();
+    public User getUser(String email) throws DAOException;
 
-    public User getUser(String dn);
+    public List<User> getUsers() throws DAOException;
+
+    public void remove(String email) throws DAOException;
+    
+    public void updatePassword(String email, String currentPassword, String newPassword) throws DAOException;
 
     public boolean exists(String dn);
 }

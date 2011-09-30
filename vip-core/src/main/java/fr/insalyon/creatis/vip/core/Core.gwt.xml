@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 1.7.0//EN" "http://google-web-toolkit.googlecode.com/svn/tags/1.7.0/distro-source/core/src/gwt-module.dtd">
 <module>
-    <inherits name='fr.insalyon.creatis.vip.common.Common'/>
+    <inherits name="com.google.gwt.user.User" />
+    <inherits name="com.smartgwt.SmartGwt"/>
+    <inherits name="com.google.gwt.core.Core" />
+    <inherits name="com.google.gwt.user.History" />
+    <inherits name="com.google.gwt.i18n.I18N" />
+    <inherits name='com.google.gwt.user.theme.standard.Standard' />
 
     <!-- Servlets -->
     <servlet class="fr.insalyon.creatis.vip.portal.server.rpc.ConfigurationServiceImpl" path="/configurationservice"/>
-    <servlet class="fr.insalyon.creatis.vip.portal.server.rpc.ApplicationServiceImpl" path="/applicationservice"/>
     <servlet class="fr.insalyon.creatis.vip.portal.server.rpc.NewsServiceImpl" path="/newsservice"/>
 </module>

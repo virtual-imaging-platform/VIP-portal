@@ -40,8 +40,8 @@ import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.system.configuration.group.ManageGroupsTab;
-import fr.insalyon.creatis.vip.core.client.view.system.configuration.user.ManageUsersTab;
+import fr.insalyon.creatis.vip.core.client.view.system.group.ManageGroupsTab;
+import fr.insalyon.creatis.vip.core.client.view.system.user.ManageUsersTab;
 import fr.insalyon.creatis.vip.core.client.view.system.news.ManageNewsTab;
 
 /**

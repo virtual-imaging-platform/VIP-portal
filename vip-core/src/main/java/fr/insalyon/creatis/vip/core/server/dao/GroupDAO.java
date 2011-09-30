@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -35,7 +35,6 @@
 
 package fr.insalyon.creatis.vip.core.server.dao;
 
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import java.util.List;
 
 /**
@@ -44,11 +43,11 @@ import java.util.List;
  */
 public interface GroupDAO {
 
-    public String add(String groupName) throws DAOException;
+    public void add(String groupName) throws DAOException;
 
     public void remove(String groupName) throws DAOException;
 
-    public String update(String oldName, String newName) throws DAOException;
+    public void update(String oldName, String newName) throws DAOException;
 
-    public List<String> getGroups();
+    public List<String> getGroups() throws DAOException;
 }

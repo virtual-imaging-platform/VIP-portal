@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -34,10 +34,9 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.layout.toolstrip;
 
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
-import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.core.client.view.main.HomeMenuButton;
-import fr.insalyon.creatis.vip.core.client.view.system.SystemMenuButton;
 
 /**
  *
@@ -55,14 +54,20 @@ public class MainToolStrip extends ToolStrip {
     }
 
     private MainToolStrip() {
-        
+
         this.setWidth100();
-
-        this.addMenuButton(new HomeMenuButton());
+        this.setPadding(2);
+        
+        this.addMember(new HomeMenuButton());
         this.addSeparator();
+    }
 
-        if (Context.getInstance().isSystemAdmin()) {
-            this.addMenuButton(SystemMenuButton.getInstance());
+    public void reset() {
+
+        for (Canvas canva : getMembers()) {
+            this.removeMember(canva);
         }
+        this.addMember(new HomeMenuButton());
+        this.addSeparator();
     }
 }

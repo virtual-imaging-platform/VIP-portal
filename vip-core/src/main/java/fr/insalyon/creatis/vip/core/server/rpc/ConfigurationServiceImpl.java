@@ -34,120 +34,345 @@
  */
 package fr.insalyon.creatis.vip.core.server.rpc;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.client.bean.Configuration;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.dao.DAOFactory;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.h2.PlatformConnection;
 import java.sql.Connection;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
  *
  * @author Rafael Silva
  */
-public class ConfigurationServiceImpl extends RemoteServiceServlet implements ConfigurationService {
+public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet implements ConfigurationService {
 
     private static Logger logger = Logger.getLogger(ConfigurationServiceImpl.class);
-    
-    public Configuration loadConfiguration() {
+
+    public ConfigurationServiceImpl() {
+        super();
+        configurationBusiness = new ConfigurationBusiness();
+    }
+
+    /**
+     * 
+     * @throws CoreException 
+     */
+    public User configure() throws CoreException {
 
         try {
+            logger.info("Initializing VIP configuration.");
             PlatformConnection.getInstance().setConnection(
                     (Connection) getServletContext().getAttribute("connection"));
             PlatformConnection.getInstance().createTables();
+
+            configurationBusiness.configure();
+            logger.info("VIP successfully configured.");
+
+            User user = (User) getSession().getAttribute(CoreConstants.SESSION_USER);
+            if (user != null) {
+                user.setSystemAdministrator(configurationBusiness.isSystemAdministrator(user.getEmail()));
+            }
+            return user;
+
+        } catch (DAOException ex) {
+            throw new CoreException(ex);
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param user
+     * @throws CoreException 
+     */
+    public void signup(User user) throws CoreException {
+
+        try {
+            logger.info("Sign up request from '" + user.getEmail() + "'.");
+            configurationBusiness.signup(user);
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param email
+     * @param password
+     * @throws CoreException 
+     * @return
+     */
+    public User signin(String email, String password) throws CoreException {
+
+        try {
+            logger.info("Authenticating '" + email + "'.");
+            User user = configurationBusiness.signin(email, password);
+            user.setSystemAdministrator(configurationBusiness.isSystemAdministrator(user.getEmail()));
+
+            getSession().setAttribute(CoreConstants.SESSION_USER, user);
+
+            return user;
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @throws CoreException 
+     */
+    public void signout() throws CoreException {
+
+        getSession().removeAttribute(CoreConstants.SESSION_USER);
+    }
+
+    /**
+     * 
+     * @param email
+     * @param code
+     * @return
+     * @throws CoreException 
+     */
+    public User activate(String email, String code) throws CoreException {
+
+        try {
+            logger.info("Activating '" + email + "'.");
+            User user = configurationBusiness.activate(email, code);
+
+            getSession().setAttribute(CoreConstants.SESSION_USER, user);
+
+            return user;
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param email
+     * @throws CoreException 
+     */
+    public void sendActivationCode(String email) throws CoreException {
+
+        try {
+            logger.info("Sending activation code to: " + email + ".");
+            configurationBusiness.sendActivationCode(email);
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    /**
+     * Get list of users.
+     * 
+     * @return 
+     */
+    public List<User> getUsers() throws CoreException {
+
+        try {
+            authenticateSystemAdministrator(logger);
+            return configurationBusiness.getUsers();
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param groupName
+     * @throws CoreException 
+     */
+    public void addGroup(String groupName) throws CoreException {
+
+        try {
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Adding group '" + groupName + "'.");
+            configurationBusiness.addGroup(groupName);
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param oldName
+     * @param newName
+     * @throws CoreException 
+     */
+    public void updateGroup(String oldName, String newName) throws CoreException {
+        try {
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Updating group '" + oldName + "' to '" + newName + "'.");
+            configurationBusiness.updateGroup(oldName, newName);
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param groupName
+     * @throws CoreException 
+     */
+    public void removeGroup(String groupName) throws CoreException {
+        try {
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Removing group '" + groupName + "'.");
+            configurationBusiness.removeGroup(groupName);
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @return
+     * @throws CoreException 
+     */
+    public List<String> getGroups() throws CoreException {
+        try {
+            authenticateSystemAdministrator(logger);
+            return configurationBusiness.getGroups();
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param email
+     * @throws CoreException 
+     */
+    public void removeUser(String email) throws CoreException {
+
+        try {
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Removing user '" + email + "'.");
+            configurationBusiness.removeUser(email);
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param email
+     * @return
+     * @throws CoreException 
+     */
+    public Map<String, CoreConstants.ROLE> getUserGroups(String email) throws CoreException {
+
+        try {
+            if (email != null) {
+                authenticateSystemAdministrator(logger);
+                return configurationBusiness.getUserGroups(email);
+                
+            } else {
+                return configurationBusiness.getUserGroups(getSessionUser().getEmail());
+            }
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+    
+    /**
+     * 
+     * @return
+     * @throws CoreException 
+     */
+    public List<String> getUserGroups() throws CoreException {
+       
+        try {
+            return configurationBusiness.getUserGroupsName(getSessionUser().getEmail());
             
-            HttpServletRequest request = this.getThreadLocalRequest();
-            Object object = request.getAttribute("javax.servlet.request.X509Certificate");
-            ConfigurationBusiness business = new ConfigurationBusiness();
-            return business.loadConfiguration(object);
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param email
+     * @param groups
+     * @throws CoreException 
+     */
+    public void setUserGroups(String email, Map<String, CoreConstants.ROLE> groups) throws CoreException {
+
+        try {
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Defining groups to '" + email + "'.");
+            configurationBusiness.setUserGroups(email, groups);
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @return
+     * @throws CoreException 
+     */
+    public User getUserData() throws CoreException {
+        
+        try {
+            return configurationBusiness.getUserData(getSessionUser().getEmail());
             
-        } catch (DAOException ex) {
-            return null;
         } catch (BusinessException ex) {
-            return null;
+            throw new CoreException(ex);
         }
     }
 
-    public String addGroup(String proxy, String groupName) {
+    /**
+     * 
+     * @param user
+     * @throws CoreException 
+     */
+    public void updateUser(User user) throws CoreException {
+        
         try {
-            ConfigurationBusiness business = new ConfigurationBusiness();
-            return business.addGroup(proxy, groupName);
-
-        } catch (BusinessException ex) {
-            return ex.getMessage();
-        }
-    }
-
-    public String updateGroup(String proxy, String oldName, String newName) {
-        try {
-            ConfigurationBusiness business = new ConfigurationBusiness();
-            return business.updateGroup(proxy, oldName, newName);
+            trace(logger, "Updating user data '" + user.getEmail() + "'.");
+            configurationBusiness.updateUser(user);
             
         } catch (BusinessException ex) {
-            return ex.getMessage();
+            throw new CoreException(ex);
         }
     }
 
-    public void removeGroup(String proxy, String groupName) {
+    /**
+     * 
+     * @param currentPassword
+     * @param newPassword
+     * @throws CoreException 
+     */
+    public void updateUserPassword(String currentPassword, String newPassword) 
+            throws CoreException {
+        
         try {
-            ConfigurationBusiness business = new ConfigurationBusiness();
-            business.removeGroup(proxy, groupName);
-
+            trace(logger, "Updating user password.");
+            configurationBusiness.updateUserPassword(getSessionUser().getEmail(), 
+                    currentPassword, newPassword);
+            
         } catch (BusinessException ex) {
-        }
-    }
-
-    public List<String> getGroups() {
-        try {
-            return DAOFactory.getDAOFactory().getGroupDAO().getGroups();
-        } catch (DAOException ex) {
-            return null;
-        }
-    }
-
-    public String addUser(User user) {
-        try {
-            return DAOFactory.getDAOFactory().getUserDAO().add(user);
-        } catch (DAOException ex) {
-            return null;
-        }
-    }
-
-    public String updateUser(User user) {
-        try {
-            return DAOFactory.getDAOFactory().getUserDAO().update(user);
-        } catch (DAOException ex) {
-            return null;
-        }
-    }
-
-    public void removeUser(String dn) {
-        try {
-            DAOFactory.getDAOFactory().getUserDAO().remove(dn);
-        } catch (DAOException ex) {
-        }
-    }
-
-    public List<User> getUsers() {
-        try {
-            return DAOFactory.getDAOFactory().getUserDAO().getUsers();
-        } catch (DAOException ex) {
-            return null;
-        }
-    }
-
-    public User getUser(String dn) {
-        try {
-            return DAOFactory.getDAOFactory().getUserDAO().getUser(dn);
-        } catch (DAOException ex) {
-            return null;
+            throw new CoreException(ex);
         }
     }
 }

@@ -32,32 +32,28 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.dao;
+package fr.insalyon.creatis.vip.core.client.view.system.user;
 
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
  *
  * @author Rafael Silva
  */
-public abstract class DAOFactory {
+public class UserRecord extends ListGridRecord {
 
-    public static final int H2 = 1;
-    public static int factory = H2;
-
-    public static DAOFactory getDAOFactory() {
-
-        switch (factory) {
-            case H2:
-                return H2DAOFactory.getInstance();
-            default:
-                return null;
-        }
+    public UserRecord() {
     }
 
-    public abstract GroupDAO getGroupDAO() throws DAOException;
+    public UserRecord(String firstName, String lastName, String email,
+            String institution, String phone, boolean confirmed, String folder) {
 
-    public abstract UserDAO getUserDAO() throws DAOException;
-
-    public abstract NewsDAO getNewsDAO() throws DAOException;
+        setAttribute("firstName", firstName);
+        setAttribute("lastName", lastName);
+        setAttribute("email", email);
+        setAttribute("institution", institution);
+        setAttribute("phone", phone);
+        setAttribute("confirmed", confirmed);
+        setAttribute("folder", folder);
+    }
 }

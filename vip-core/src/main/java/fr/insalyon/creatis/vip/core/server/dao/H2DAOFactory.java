@@ -34,21 +34,21 @@
  */
 package fr.insalyon.creatis.vip.core.server.dao;
 
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.h2.GroupData;
 import fr.insalyon.creatis.vip.core.server.dao.h2.NewsData;
 import fr.insalyon.creatis.vip.core.server.dao.h2.UserData;
+import fr.insalyon.creatis.vip.core.server.dao.h2.UsersGroupsData;
 
 /**
  *
  * @author Rafael Silva
  */
-public class H2DAOFactory extends DAOFactory {
+public class H2DAOFactory extends CoreDAOFactory {
 
-    private static DAOFactory instance;
+    private static CoreDAOFactory instance;
 
     // Singleton
-    protected static DAOFactory getInstance() {
+    protected static CoreDAOFactory getInstance() {
         if (instance == null) {
             instance = new H2DAOFactory();
         }
@@ -59,15 +59,20 @@ public class H2DAOFactory extends DAOFactory {
     }
 
     @Override
+    public UserDAO getUserDAO() throws DAOException {
+        return new UserData();
+    }
+
+    @Override
     public GroupDAO getGroupDAO() throws DAOException {
         return new GroupData();
     }
 
     @Override
-    public UserDAO getUserDAO() throws DAOException {
-        return new UserData();
+    public UsersGroupsDAO getUsersGroupsDAO() throws DAOException {
+        return new UsersGroupsData();
     }
-    
+
     @Override
     public NewsDAO getNewsDAO() throws DAOException {
         return new NewsData();

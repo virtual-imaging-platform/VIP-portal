@@ -34,11 +34,15 @@
  */
 package fr.insalyon.creatis.vip.core.server.dao.h2;
 
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.UUID;
 import org.apache.log4j.Logger;
 
 /**
@@ -49,6 +53,7 @@ public class PlatformConnection {
 
     private final static Logger logger = Logger.getLogger(PlatformConnection.class);
     private static PlatformConnection instance;
+    private boolean firstExecution;
     private Connection connection;
 
     public synchronized static PlatformConnection getInstance() throws DAOException {
@@ -59,278 +64,154 @@ public class PlatformConnection {
     }
 
     private PlatformConnection() throws DAOException {
+        firstExecution = true;
     }
 
     public void createTables() {
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("CREATE TABLE WorkflowInput ("
-                    + "username VARCHAR(255), "
-                    + "application VARCHAR(100), "
-                    + "name VARCHAR(255), "
-                    + "inputs VARCHAR(32000), "
-                    + "PRIMARY KEY (username, name, application)"
-                    + ")");
 
-        } catch (SQLException ex) {
-            logger.info("Table WorkflowInput already created!");
-        }
+        if (firstExecution) {
+            logger.info("Configuring VIP database.");
 
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("CREATE TABLE WorkflowDescriptor ("
-                    + "name VARCHAR(255), "
-                    + "lfn VARCHAR(255), "
-                    + "PRIMARY KEY (name)"
-                    + ")");
+            if (createTable("VIPUsers",
+                    "email VARCHAR(255), "
+                    + "pass VARCHAR(40), "
+                    + "first_name VARCHAR(255), "
+                    + "last_name VARCHAR(255), "
+                    + "institution VARCHAR(255), "
+                    + "phone VARCHAR(255), "
+                    + "code VARCHAR(40), "
+                    + "confirmed BOOLEAN, "
+                    + "folder VARCHAR(100), "
+                    + "PRIMARY KEY(email)")) {
 
-        } catch (SQLException ex) {
-            logger.info("Table WorkflowDescriptor already created!");
-        }
+                Server server = Server.getInstance();
+                String folder = server.getAdminFirstName().toLowerCase() + "_"
+                        + server.getAdminLastName().toLowerCase();
 
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("CREATE TABLE WorkflowClass ("
-                    + "name VARCHAR(255), "
-                    + "PRIMARY KEY (name)"
-                    + ")");
+                try {
+                    CoreDAOFactory.getDAOFactory().getUserDAO().add(
+                            new User(server.getAdminFirstName(),
+                            server.getAdminLastName(),
+                            server.getAdminEmail(),
+                            server.getAdminInstitution(),
+                            server.getAdminPassword(),
+                            server.getAdminPhone(), true,
+                            UUID.randomUUID().toString(), folder));
 
-        } catch (SQLException ex) {
-            logger.info("Table WorkflowClass already created!");
-        }
+                } catch (DAOException ex) {
+                    logger.error(ex);
+                }
+            }
 
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("CREATE TABLE WorkflowClasses ("
-                    + "class VARCHAR(255), "
-                    + "workflow VARCHAR(255), "
-                    + "PRIMARY KEY (class, workflow), "
-                    + "FOREIGN KEY (class) REFERENCES WorkflowClass(name) "
-                    + "ON DELETE CASCADE ON UPDATE RESTRICT, "
-                    + "FOREIGN KEY (workflow) REFERENCES WorkflowDescriptor(name) "
-                    + "ON DELETE CASCADE ON UPDATE RESTRICT"
-                    + ")");
+            if (createTable("VIPGroups",
+                    "groupname VARCHAR(50), "
+                    + "PRIMARY KEY(groupname)")) {
 
-        } catch (SQLException ex) {
-            logger.info("Table WorkflowClasses already created!");
-        }
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("CREATE TABLE PlatformGroups ("
-                    + "groupname VARCHAR(255), "
-                    + "PRIMARY KEY (groupname) "
-                    + ")");
+                try {
+                    CoreDAOFactory.getDAOFactory().getGroupDAO().add(
+                            CoreConstants.GROUP_ADMIN);
+                    CoreDAOFactory.getDAOFactory().getGroupDAO().add(
+                            CoreConstants.GROUP_GUEST);
+                } catch (DAOException ex) {
+                    logger.error(ex);
+                }
+            }
 
-            stat.executeUpdate("INSERT INTO PlatformGroups(groupname) VALUES('Administrator')");
-
-        } catch (SQLException ex) {
-            logger.info("Table PlatformGroups already created!");
-        }
-
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("CREATE TABLE PlatformUsers ("
-                    + "dn VARCHAR(255), "
-                    + "PRIMARY KEY (dn) "
-                    + ")");
-
-        } catch (SQLException ex) {
-            logger.info("Table PlatformUsers already created!");
-        }
-
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("CREATE TABLE PlatformUsersGroups ("
-                    + "userdn VARCHAR(255), "
-                    + "groupname VARCHAR(255), "
+            if (createTable("VIPUsersGroups",
+                    "email VARCHAR(255), "
+                    + "groupname VARCHAR(100), "
                     + "role VARCHAR(30), "
-                    + "PRIMARY KEY (userdn, groupname), "
-                    + "FOREIGN KEY (userdn) REFERENCES PlatformUsers(dn) "
+                    + "PRIMARY KEY (email, groupname), "
+                    + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
                     + "ON DELETE CASCADE ON UPDATE RESTRICT, "
-                    + "FOREIGN KEY (groupname) REFERENCES PlatformGroups(groupname) "
-                    + "ON DELETE CASCADE ON UPDATE RESTRICT"
-                    + ")");
+                    + "FOREIGN KEY (groupname) REFERENCES VIPGroups(groupname) "
+                    + "ON DELETE CASCADE ON UPDATE RESTRICT")) {
 
-        } catch (SQLException ex) {
-            logger.info("Table PlatformUsersGroups already created!");
-        }
+                try {
+                    CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().add(
+                            Server.getInstance().getAdminEmail(),
+                            CoreConstants.GROUP_ADMIN, CoreConstants.ROLE.Admin);
+                } catch (DAOException ex) {
+                    logger.error(ex);
+                }
+            }
 
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("INSERT INTO PlatformUsers (dn) "
-                    + "VALUES('" + ServerConfiguration.getInstance().getAdminDN() + "')");
-
-            stat.executeUpdate("INSERT INTO PlatformUsersGroups (userdn, groupname, role) "
-                    + "VALUES('" + ServerConfiguration.getInstance().getAdminDN() + "', "
-                    + "'Administrator', 'admin')");
-
-        } catch (SQLException ex) {
-            logger.info("Administrator user already setted!");
-        }
-
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("CREATE TABLE PlatformGroupsClasses ("
-                    + "classname VARCHAR(255), "
-                    + "groupname VARCHAR(255), "
-                    + "PRIMARY KEY (classname, groupname), "
-                    + "FOREIGN KEY (classname) REFERENCES WorkflowClass(name) "
-                    + "ON DELETE CASCADE ON UPDATE RESTRICT, "
-                    + "FOREIGN KEY (groupname) REFERENCES PlatformGroups(groupname) "
-                    + "ON DELETE CASCADE ON UPDATE RESTRICT"
-                    + ")");
-
-        } catch (SQLException ex) {
-            logger.info("Table PlatformGroupsClasses already created!");
-        }
-
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("CREATE TABLE PlatformNews ("
-                    + "title VARCHAR(255), "
+            createTable("VIPNews",
+                    "title VARCHAR(255), "
                     + "message CLOB, "
                     + "posted TIMESTAMP, "
                     + "owner VARCHAR(255), "
-                    + "PRIMARY KEY (title, owner)"
-                    + ")");
+                    + "PRIMARY KEY (title, owner)");
 
-        } catch (SQLException ex) {
-            logger.info("Table PlatformNews already created!");
+
+            firstExecution = false;
         }
 
         //// tissues and physical parameters
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("CREATE TABLE Tissues ("
-                    + "name VARCHAR(255), "
-                    + "ontologyId INT,"
-                    + "PRIMARY KEY (name)"
-                    + ")");
-        } catch (SQLException ex) {
-            logger.info("Table Tissues already created!");
-        }
-
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("CREATE TABLE PhysicalProperties ("
-                    + "tissueName VARCHAR(255),"
-                    + "physicalPropertyId INT, "
-                    + "author VARCHAR(255),"
-                    + "comment VARCHAR(255),"
-                    + "type VARCHAR(255),"
-                    + "date DATE,"
-                    + "PRIMARY KEY (physicalPropertyId)"
-                    + ")");
-        } catch (SQLException ex) {
-            logger.info("Table PhysicalProperties already created!");
-        }
-
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("CREATE TABLE ChemicalBlend ("
-                    + "physicalPropertyId INT,"
-                    + "density DOUBLE,"
-                    + "phase VARCHAR(255),"
-                    + "PRIMARY KEY (physicalPropertyId)"
-                    + ")");
-        } catch (SQLException ex) {
-            logger.info("Table ChemicalBlend already created!");
-        }
-
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("CREATE TABLE ChemicalComponents ("
-                    + "physicalPropertyId INT,"
-                    + "massPercentage DOUBLE,"
-                    + "elementName VARCHAR(255),"
-                    + " PRIMARY KEY (physicalPropertyId, elementName))");
-        } catch (SQLException ex) {
-            logger.info("Table ChemicalComponent already created!");
-        }
-
-
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("CREATE TABLE MagneticProperties ("
-                    + "physicalPropertyId INT,"
-                    + "propertyName VARCHAR(255),"
-                    + "distInstancId INT,"
-                    + "PRIMARY KEY (physicalPropertyId, propertyName)"
-                    + ")");
-        } catch (SQLException ex) {
-            logger.info("Table MagneticProperties already created!");
-        }
-
-
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("CREATE TABLE MagneticPropertyNames ("
-                    + "propertyName VARCHAR(255),"
-                    + "PRIMARY KEY (propertyName)"
-                    + ")");
-        } catch (SQLException ex) {
-            logger.info("Table MagneticPropertyNames already created!");
-        }
-
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("CREATE TABLE Echogenicities ("
-                    + "physicalPropertyId INT,"
-                    + "spatDistInstanceId INT,"
-                    + "ampDistInstanceId INT,"
-                    + "PRIMARY KEY (physicalPropertyId)"
-                    + ")");
-        } catch (SQLException ex) {
-            logger.info("Table Echogenicities already created!");
-        }
-
-        ////distributions
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("CREATE TABLE Distribution ("
-                    + "distributionName VARCHAR(255),"
-                    + "expression VARCHAR(255),"
-                    + "PRIMARY KEY (distributionName)"
-                    + ")");
-        } catch (SQLException ex) {
-            logger.info("Table Distribution already created!");
-        }
-
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("CREATE TABLE DistributionParameters ("
-                    + "distributionName VARCHAR(255),"
-                    + "parameterName VARCHAR(255),"
-                    + "symbol VARCHAR(255),"
-                    + "PRIMARY KEY (distributionName,symbol)"
-                    + ")");
-        } catch (SQLException ex) {
-            logger.info("Table DistributionParameters already created!");
-        }
-
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("CREATE TABLE DistributionInstance ("
-                    + "instanceid INT,"
-                    + "distName VARCHAR(255),"
-                    + "PRIMARY KEY (instanceid)"
-                    + ")");
-        } catch (SQLException ex) {
-            logger.info("Table DistributionInstance already created!");
-        }
-
-        try {
-            Statement stat = connection.createStatement();
-            stat.executeUpdate("CREATE TABLE DistributionInstanceValues ("
-                    + "instanceid INT,"
-                    + "parameterSymbol VARCHAR(255),"
-                    + "value DOUBLE,"
-                    + "PRIMARY KEY (instanceid,parameterSymbol)"
-                    + ")");
-        } catch (SQLException ex) {
-            logger.info("Table DistributionInstanceValues already created!");
-        }
-
+//        createTable("Tissues",
+//                "name VARCHAR(255), "
+//                + "ontologyId INT,"
+//                + "PRIMARY KEY (name)");
+//
+//        createTable("PhysicalProperties",
+//                "tissueName VARCHAR(255),"
+//                + "physicalPropertyId INT, "
+//                + "author VARCHAR(255),"
+//                + "comment VARCHAR(255),"
+//                + "type VARCHAR(255),"
+//                + "date DATE,"
+//                + "PRIMARY KEY (physicalPropertyId)");
+//
+//        createTable("ChemicalBlend",
+//                "physicalPropertyId INT,"
+//                + "density DOUBLE,"
+//                + "phase VARCHAR(255),"
+//                + "PRIMARY KEY (physicalPropertyId)");
+//
+//        createTable("ChemicalComponents",
+//                "physicalPropertyId INT,"
+//                + "massPercentage DOUBLE,"
+//                + "elementName VARCHAR(255),"
+//                + " PRIMARY KEY (physicalPropertyId, elementName)");
+//
+//        createTable("MagneticProperties",
+//                "physicalPropertyId INT,"
+//                + "propertyName VARCHAR(255),"
+//                + "distInstancId INT,"
+//                + "PRIMARY KEY (physicalPropertyId, propertyName)");
+//
+//        createTable("MagneticPropertyNames",
+//                "propertyName VARCHAR(255),"
+//                + "PRIMARY KEY (propertyName)");
+//
+//        createTable("Echogenicities",
+//                "physicalPropertyId INT,"
+//                + "spatDistInstanceId INT,"
+//                + "ampDistInstanceId INT,"
+//                + "PRIMARY KEY (physicalPropertyId)");
+//
+//        ////distributions
+//        createTable("Distribution",
+//                "distributionName VARCHAR(255),"
+//                + "expression VARCHAR(255),"
+//                + "PRIMARY KEY (distributionName)");
+//
+//        createTable("DistributionParameters",
+//                "distributionName VARCHAR(255),"
+//                + "parameterName VARCHAR(255),"
+//                + "symbol VARCHAR(255),"
+//                + "PRIMARY KEY (distributionName,symbol)");
+//
+//        createTable("DistributionInstance",
+//                "instanceid INT,"
+//                + "distName VARCHAR(255),"
+//                + "PRIMARY KEY (instanceid)");
+//
+//        createTable("DistributionInstanceValues",
+//                "instanceid INT,"
+//                + "parameterSymbol VARCHAR(255),"
+//                + "value DOUBLE,"
+//                + "PRIMARY KEY (instanceid,parameterSymbol)");
     }
 
     public Connection getConnection() {
@@ -339,5 +220,30 @@ public class PlatformConnection {
 
     public void setConnection(Connection connection) {
         this.connection = connection;
+    }
+
+    /**
+     * Creates a table in the platform database.
+     * 
+     * @param name Table name
+     * @param columnsDefinition SQL syntax to define columns
+     * @return
+     */
+    public boolean createTable(String name, String columnsDefinition) {
+
+        try {
+            Statement stat = connection.createStatement();
+            stat.executeUpdate("CREATE TABLE " + name + " ("
+                    + columnsDefinition + ")");
+
+            logger.info("Table " + name + " successfully created.");
+            return true;
+
+        } catch (SQLException ex) {
+            if (!ex.getMessage().contains("already exists")) {
+                logger.error(ex);
+            }
+            return false;
+        }
     }
 }
