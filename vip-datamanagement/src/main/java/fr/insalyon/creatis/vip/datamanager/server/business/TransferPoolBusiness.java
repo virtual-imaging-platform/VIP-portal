@@ -244,4 +244,32 @@ public class TransferPoolBusiness {
             throw new BusinessException(ex);
         }
     }
+
+    /**
+     * 
+     * @param userName
+     * @param email
+     * @param localFile
+     * @param remoteFile
+     * @throws BusinessException 
+     */
+    public void uploadFile(String userName, String email, String localFile, 
+            String remoteFile) throws BusinessException {
+
+        try {
+            VletAgentPoolClient poolClient = CoreUtil.getVletAgentPoolClient();
+
+            String localPath = "file://" + serverConfiguration.getDataManagerPath()
+                    + "/uploads/" + localFile;
+            String remotePath = DataManagerUtil.parseBaseDir(userName, remoteFile);
+            poolClient.uploadFile(localPath, remotePath, email);
+
+        } catch (DataManagerException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        } catch (VletAgentClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
 }

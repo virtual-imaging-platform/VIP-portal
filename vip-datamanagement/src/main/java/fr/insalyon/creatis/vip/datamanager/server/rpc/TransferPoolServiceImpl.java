@@ -104,26 +104,6 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
         }
     }
 
-    public void uploadFile(String user, String remoteFile, String localFile,
-            String userDN, String proxy) throws DataManagerException {
-
-        try {
-            VletAgentPoolClient poolClient = CoreUtil.getVletAgentPoolClient();
-
-            String localPath = "file://" + serverConfiguration.getDataManagerPath()
-                    + "/uploads/" + localFile;
-            String remotePath = DataManagerUtil.parseBaseDir(user, remoteFile);
-            poolClient.uploadFile(localPath, remotePath, userDN);
-
-        } catch (DataManagerException ex) {
-            logger.error(ex);
-            throw ex;
-        } catch (VletAgentClientException ex) {
-            logger.error(ex);
-            throw new DataManagerException(ex);
-        }
-    }
-
     public void clearDeleteOperations(String proxy) throws DataManagerException {
 
         try {

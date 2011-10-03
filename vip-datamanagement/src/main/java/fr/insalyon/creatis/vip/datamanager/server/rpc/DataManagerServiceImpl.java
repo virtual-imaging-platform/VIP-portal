@@ -255,4 +255,19 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             throw new DataManagerException(ex);
         }
     }
+
+    public void uploadFile(String localFile, String remoteFile) throws DataManagerException {
+
+        try {
+            trace(logger, "Uploading file '" + localFile + "' to '" + remoteFile + "'.");
+            User user = getSessionUser();
+            transferPoolBusiness.uploadFile(user.getFullName(), 
+                    user.getEmail(), localFile, remoteFile);
+            
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
+        }
+    }
 }
