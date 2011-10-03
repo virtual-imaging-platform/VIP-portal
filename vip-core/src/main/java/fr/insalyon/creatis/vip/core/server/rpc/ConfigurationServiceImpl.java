@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.core.server.rpc;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
@@ -117,8 +118,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             logger.info("Authenticating '" + email + "'.");
             User user = configurationBusiness.signin(email, password);
             user.setSystemAdministrator(configurationBusiness.isSystemAdministrator(user.getEmail()));
-
+            
+            Map<String, ROLE> groups = configurationBusiness.getUserGroups(email);
+            
             getSession().setAttribute(CoreConstants.SESSION_USER, user);
+            getSession().setAttribute(CoreConstants.SESSION_GROUPS, groups);
 
             return user;
 
@@ -301,7 +305,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public List<String> getUserGroups() throws CoreException {
        
         try {
-            return configurationBusiness.getUserGroupsName(getSessionUser().getEmail());
+            return configurationBusiness.getUserGroupsName(getSessionUserGroups());
             
         } catch (BusinessException ex) {
             throw new CoreException(ex);

@@ -37,9 +37,11 @@ package fr.insalyon.creatis.vip.core.server.rpc;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
@@ -53,11 +55,13 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
     protected ConfigurationBusiness configurationBusiness;
 
     public AbstractRemoteServiceServlet() {
+        
         configurationBusiness = new ConfigurationBusiness();
     }
 
     @Override
     protected void checkPermutationStrongName() throws SecurityException {
+        
         // Content-Type text/x-gwt-rpc; charset=utf-8
         // X-GWT-Permutation F1AEC601C5D8E4490E7096AB58EB
         HttpServletRequest req = this.getThreadLocalRequest();
@@ -66,27 +70,66 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
         }
     }
 
+    /**
+     * 
+     * @return 
+     */
     protected HttpSession getSession() {
+        
         return this.getThreadLocalRequest().getSession();
     }
 
+    /**
+     * 
+     * @return
+     * @throws CoreException 
+     */
     protected User getSessionUser() throws CoreException {
+        
         User user = (User) getSession().getAttribute(CoreConstants.SESSION_USER);
         if (user != null) {
             return user;
         }
         throw new CoreException("User not logged in.");
     }
+    
+    /**
+     * 
+     * @return
+     * @throws CoreException 
+     */
+    protected Map<String, ROLE> getSessionUserGroups() throws CoreException {
+        
+        Map<String, ROLE> groups = (Map<String, ROLE>) getSession().getAttribute(CoreConstants.SESSION_GROUPS);
+        if (groups != null) {
+            return groups;
+        }
+        throw new CoreException("User has no groups defined.");
+    }
 
+    /**
+     * 
+     * @param logger
+     * @throws CoreException
+     * @throws BusinessException 
+     */
     protected void authenticateSystemAdministrator(Logger logger) throws CoreException, BusinessException {
+        
         User user = getSessionUser();
-        if (!configurationBusiness.isSystemAdministrator(user.getEmail())) {
+        if (!user.isSystemAdministrator()) {
             logger.error("The user has no administrator rights: " + user.getEmail());
             throw new CoreException("The user has no administrator rights.");
         }
     }
 
+    /**
+     * 
+     * @param logger
+     * @param message
+     * @throws CoreException 
+     */
     protected void trace(Logger logger, String message) throws CoreException {
+        
         logger.info("(" + getSessionUser().getEmail() + ") " + message);
     }
 }

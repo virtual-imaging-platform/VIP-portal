@@ -461,18 +461,13 @@ public class ConfigurationBusiness {
 
     /**
      * 
-     * @param email
+     * @param groups
      * @return
      * @throws BusinessException 
      */
-    public List<String> getUserGroupsName(String email) throws BusinessException {
+    public List<String> getUserGroupsName(Map<String, CoreConstants.ROLE> groups) throws BusinessException {
 
-        try {
-            return new ArrayList<String>(CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUserGroups(email).keySet());
-
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
+        return new ArrayList<String>(groups.keySet());
     }
 
     /**

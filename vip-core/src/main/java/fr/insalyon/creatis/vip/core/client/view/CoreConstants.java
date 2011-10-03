@@ -84,7 +84,7 @@ public class CoreConstants {
     public static final String APP_IMG_USER = IMG_FOLDER + "system/app-user.png";
     // Session Attributes
     public static final String SESSION_USER = "vip-user";
-    public static final String SESSION_ADMIN = "vip-administrator";
+    public static final String SESSION_GROUPS = "vip-groups";
     // Roles and Groups
     public static final String GROUP_ADMIN = "Administrator";
     public static final String GROUP_GUEST = "Guest";
