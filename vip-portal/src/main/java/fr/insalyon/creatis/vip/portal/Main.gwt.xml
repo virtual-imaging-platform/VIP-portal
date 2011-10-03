@@ -10,7 +10,7 @@
     <inherits name="fr.insalyon.creatis.vip.datamanager.DataManager" />
 <!--    <inherits name="fr.insalyon.creatis.vip.provenance.Provenance" />-->
     <inherits name="fr.insalyon.creatis.vip.application.Application" />
-<!--    <inherits name="fr.insalyon.creatis.vip.gatelab.GateLab" />-->
+    <inherits name="fr.insalyon.creatis.vip.gatelab.GateLab" />
 <!--    <inherits name="fr.insalyon.creatis.vip.simulationgui.SimulationGUI" />-->
 <!--    <inherits name="fr.insalyon.creatis.vip.models.Models" />-->
     <!-- Specify the app entry point class.-->
