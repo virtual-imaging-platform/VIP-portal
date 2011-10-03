@@ -20,13 +20,6 @@
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-common</artifactId>
-            <version>${vip.common.version}</version>
-            <scope>provided</scope>
-        </dependency>
         
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
@@ -46,13 +39,6 @@
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-application</artifactId>
             <version>${vip.application.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-provenance</artifactId>
-            <version>${vip.provenance.version}</version>
             <scope>provided</scope>
         </dependency>
 
