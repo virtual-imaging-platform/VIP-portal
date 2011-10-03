@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,53 +32,28 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.models.client.view;
+package fr.insalyon.creatis.vip.models.client;
 
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.toolbar.ToolStripButton;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.Module;
+import fr.insalyon.creatis.vip.models.client.view.ModelParser;
 
 /**
  *
- * @author Tristan Glatard
+ * @author Rafael Silva
  */
-public class ModelButton extends ToolStripButton {
+public class ModelModule extends Module {
 
-    public ModelButton() {
-        
-        this.setTitle("Models");
-        this.addClickHandler(new ClickHandler() {
+    public ModelModule() {
 
-            public void onClick(ClickEvent event) {
-                Layout.getInstance().addTab(new ModelListTab());
-            }
-        });
+        CoreModule.homeExecutor.addParser(new ModelParser());
+    }
 
-//        Menu menu = new Menu();
-//        menu.setShowShadow(true);
-//        menu.setShadowDepth(3);
-//
-//        MenuItem imp = new MenuItem("Upload");
-//        imp.setIcon("icon-add.png");
-//        imp.addClickHandler(new ClickHandler(){
-//
-//            public void onClick(MenuItemClickEvent event) {
-//                Layout.getInstance().addTab(new ModelImportTab());
-//            }
-//        });
-//
-//        MenuItem browse = new MenuItem("List");
-//        browse.setIcon("icon-list.png");
-//        browse.addClickHandler(new ClickHandler(){
-//
-//            public void onClick(MenuItemClickEvent event) {
-//                Layout.getInstance().addTab(new ModelListTab());
-//            }
-//        });
-//        browse.setEnabled(true);
-//        
-//        menu.setItems(imp,browse);
-//        this.setMenu(menu);
+    @Override
+    public void load() {
+    }
+
+    @Override
+    public void terminate() {
     }
 }

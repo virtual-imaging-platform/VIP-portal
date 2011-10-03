@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -46,7 +46,6 @@ import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.HiddenItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
-import fr.insalyon.creatis.vip.common.client.view.Context;
 
 /**
  *
@@ -78,12 +77,6 @@ public class FileUploadWindow extends Window {
         fileItem.setWidth(300);
         fileItem.setRequired(true);
 
-        HiddenItem userItem = new HiddenItem("user");
-        userItem.setValue(Context.getInstance().getUser());
-        HiddenItem userdnItem = new HiddenItem("userdn");
-        userdnItem.setValue(Context.getInstance().getUserDN());
-        HiddenItem proxyItem = new HiddenItem("proxy");
-        proxyItem.setValue(Context.getInstance().getProxyFileName());
         HiddenItem pathItem = new HiddenItem("path");
         pathItem.setValue(baseDir);
 
@@ -105,8 +98,7 @@ public class FileUploadWindow extends Window {
                 //ModelImportTab.getInstance().addFile(fileItem.getValueAsString());
             }
         });
-        form.setItems(fileItem, userItem, userdnItem, proxyItem,
-                pathItem, uploadButton);
+        form.setItems(fileItem, pathItem, uploadButton);
 
         this.addItem(form);
     }

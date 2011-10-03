@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -36,16 +36,12 @@ package fr.insalyon.creatis.vip.models.client.view;
 
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.data.DataSource;
-import com.smartgwt.client.data.fields.DataSourceTextField;
-import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.VisibilityMode;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.validator.RegExpValidator;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
@@ -59,8 +55,11 @@ import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.models.client.ModelConstants;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 import java.util.ArrayList;
@@ -72,16 +71,16 @@ import java.util.List;
  */
 public class ModelListTab extends Tab {
 
-    protected ListGrid grid;
-    protected ModalWindow modal;
-    protected HandlerRegistration rowContextClickHandler;
-    protected HandlerRegistration rowMouseDownHandler;
+    private ListGrid grid;
+    private ModalWindow modal;
+    private HandlerRegistration rowContextClickHandler;
+    private HandlerRegistration rowMouseDownHandler;
     private SearchStackSection searchSection;
 
     public ModelListTab() {
 
-        this.setTitle("Model repository");
-        this.setID("model-browse-tab");
+        this.setTitle(Canvas.imgHTML(ModelConstants.ICON_MODEL) + " " + ModelConstants.APP_MODEL);
+        this.setID(ModelConstants.TAB_MODEL_BROWSER);
         this.setCanClose(true);
 
         configureGrid();
@@ -93,20 +92,19 @@ public class ModelListTab extends Tab {
         toolStrip.setWidth100();
 
         ToolStripButton refreshButton = new ToolStripButton();
-        refreshButton.setIcon("icon-refresh.png");
+        refreshButton.setIcon(CoreConstants.ICON_REFRESH);
         refreshButton.setTitle("Refresh");
         refreshButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                ModelListTab modelsTab = (ModelListTab) Layout.getInstance().getTab("model-browse-tab");
                 searchSection.setExpanded(false);
-                modelsTab.loadModels();
+                loadModels();
             }
         });
         toolStrip.addButton(refreshButton);
 
         ToolStripButton addButton = new ToolStripButton();
-        addButton.setIcon("icon-add.png");
+        addButton.setIcon(CoreConstants.ICON_ADD);
         addButton.setTitle("Upload");
         addButton.addClickHandler(new ClickHandler() {
 
@@ -117,12 +115,12 @@ public class ModelListTab extends Tab {
         toolStrip.addButton(addButton);
 
         ToolStripButton deleteButton = new ToolStripButton();
-        deleteButton.setIcon("icon-clear.png");
+        deleteButton.setIcon(CoreConstants.ICON_CLEAR);
         deleteButton.setTitle("Delete all");
         deleteButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                SC.confirm("Do you really want to delete all the models? zip files will not be removed.", new BooleanCallback() {
+                SC.confirm("Do you really want to delete all the models? Zip files will not be removed.", new BooleanCallback() {
 
                     public void execute(Boolean value) {
 
@@ -135,8 +133,7 @@ public class ModelListTab extends Tab {
 
                                 public void onSuccess(Void result) {
                                     SC.say("All models were deleted");
-                                    ModelListTab modelsTab = (ModelListTab) Layout.getInstance().getTab("model-browse-tab");
-                                    modelsTab.loadModels();
+                                    loadModels();
                                 }
                             };
 
@@ -150,11 +147,7 @@ public class ModelListTab extends Tab {
         //disable model deletion for now
         //toolStrip.addButton(deleteButton);
 
-
-
         //Search
-
-
         searchSection = new SearchStackSection(this.getID());
         SectionStackSection gridSection = new SectionStackSection();
 
@@ -169,7 +162,7 @@ public class ModelListTab extends Tab {
         sectionStack.setSections(gridSection, searchSection);
 
         ToolStripButton searchButton = new ToolStripButton();
-        searchButton.setIcon("icon-search.png");
+        searchButton.setIcon(ApplicationConstants.ICON_SEARCH);
         searchButton.setTitle("Search");
         searchButton.addClickHandler(new ClickHandler() {
 
@@ -190,7 +183,6 @@ public class ModelListTab extends Tab {
         //  downloadModel(lfnModel) ;
 
         this.setPane(layout);
-
     }
 
     public void resetTab() {
@@ -198,6 +190,7 @@ public class ModelListTab extends Tab {
     }
 
     private void configureGrid() {
+
         grid = new ListGrid();
         grid.setWidth100();
         grid.setHeight100();
@@ -205,7 +198,7 @@ public class ModelListTab extends Tab {
         grid.setShowRowNumbers(true);
         grid.setShowEmptyMessage(true);
         // grid.setSelectionType(SelectionStyle.SIMPLE);
-      //  grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
+        //  grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
         grid.setEmptyMessage("<br>No result.");
 
         //    ListGridField statusIcoField = FieldUtil.getIconGridField("statusIco");
@@ -232,7 +225,7 @@ public class ModelListTab extends Tab {
         rowMouseDownHandler = grid.addRowMouseDownHandler(new RowMouseDownHandler() {
 
             public void onRowMouseDown(RowMouseDownEvent event) {
-                Layout.getInstance().addTab(new ModelDisplayTab(event.getRecord().getAttribute("uri"),event.getRecord().getAttribute("name")));
+                Layout.getInstance().addTab(new ModelDisplayTab(event.getRecord().getAttribute("uri"), event.getRecord().getAttribute("name")));
             }
         });
     }

@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,30 +32,24 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.models.client;
+package fr.insalyon.creatis.vip.models.client.view;
 
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.models.client.view.ModelButton;
-import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  *
  * @author Rafael Silva
  */
-public class ModelInit {
+public class ModelException extends Exception implements IsSerializable {
 
-    private static ModelInit instance;
-
-    public static ModelInit getInstance() {
-        if (instance == null) {
-            instance = new ModelInit();
-        }
-        return instance;
+    public ModelException() {
     }
 
-    private ModelInit() {
-        if (Context.getInstance().hasGroupAccess(new String[]{"Administrator", "VIP"})) {
-            MainToolStrip.getInstance().addButton(new ModelButton());
-        }
+    public ModelException(String string) {
+        super(string);
+    }
+
+    public ModelException(Throwable thrwbl) {
+        super(thrwbl);
     }
 }

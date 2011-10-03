@@ -20,14 +20,7 @@
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-common</artifactId>
-            <version>${vip.common.version}</version>
-            <scope>provided</scope>
-        </dependency> 
-        
+       
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-core</artifactId>
@@ -48,10 +41,11 @@
             <version>${vip.application.version}</version>
             <scope>provided</scope>
         </dependency>
+        
         <dependency>
             <groupId>fr.cnrs.i3s</groupId>
             <artifactId>NeuSemStore-simulation-objects</artifactId>
-            <version>0.0.9</version>
+            <version>0.1.0-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
@@ -111,16 +105,26 @@
             </resource>
         </resources>
     </build>
+    
     <repositories>
-        <repository>
-            <id>neurolog-thirdparty</id>
-            <name>NeuroLOG Third-party Repository</name>
-            <url>http://nyx.unice.fr:9007/nexus/content/repositories/thirdparty</url>
-        </repository>
+        
         <repository>
             <id>neurolog-releases</id>
             <name>NeuroLOG Releases Repository</name>
             <url>http://nyx.unice.fr:9007/nexus/content/repositories/releases</url>
         </repository>
+        
+        <repository>
+            <id>neurolog-snapshots</id>
+            <name>NeuroLOG Releases Repository</name>
+            <url>http://nyx.unice.fr:9007/nexus/content/repositories/snapshots</url>
+        </repository>
+        
+        <repository>
+            <id>neurolog-thirdparty</id>
+            <name>NeuroLOG Third-party Repository</name>
+            <url>http://nyx.unice.fr:9007/nexus/content/repositories/thirdparty</url>
+        </repository>
+        
     </repositories>
 </project>

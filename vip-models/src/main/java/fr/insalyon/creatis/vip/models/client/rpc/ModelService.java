@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -39,11 +39,12 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
+import fr.insalyon.creatis.vip.models.client.view.ModelException;
 import java.util.List;
 
 /**
  *
- * @author Tristan Glatard
+ * @author Tristan Glatard, Rafael Silva
  */
 public interface ModelService extends RemoteService {
 
@@ -60,25 +61,25 @@ public interface ModelService extends RemoteService {
         }
     }
 
-    public List<String> getFiles(String modelZipFile);
+    public List<String> getFiles(String modelZipFile) throws ModelException;
 
-    public SimulationObjectModel createModel(String modelName);
+    public SimulationObjectModel createModel(String modelName) throws ModelException;
 
-    public List<SimulationObjectModelLight> listAllModels();
+    public List<SimulationObjectModelLight> listAllModels() throws ModelException;
 
-    public SimulationObjectModel getADAM();
+    public SimulationObjectModel getADAM() throws ModelException;
 
-    public SimulationObjectModel rebuildObjectModelFromTripleStore(String uri);
+    public SimulationObjectModel rebuildObjectModelFromTripleStore(String uri) throws ModelException;
 
-    public SimulationObjectModel rebuildObjectModelFromAnnotationFile(String fileName);
+    public SimulationObjectModel rebuildObjectModelFromAnnotationFile(String fileName) throws ModelException;
 
-    public void completeModel(SimulationObjectModel som);
+    public void completeModel(SimulationObjectModel som) throws ModelException;
 
-    public SimulationObjectModel setStorageUrl(SimulationObjectModel som, String url);
+    public SimulationObjectModel setStorageUrl(SimulationObjectModel som, String url) throws ModelException;
 
-    public void removeObjectModelFromTripleStore(String uri);
+    public void removeObjectModelFromTripleStore(String uri) throws ModelException;
 
-    public void deleteAllModelsInTheTripleStore();
+    public void deleteAllModelsInTheTripleStore() throws ModelException;
     
-    public List<SimulationObjectModelLight> searchModels(String query, String[] types, String[] time);
+    public List<SimulationObjectModelLight> searchModels(String query, String[] types, String[] time) throws ModelException;
 }

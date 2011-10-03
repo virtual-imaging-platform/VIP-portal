@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -45,10 +45,11 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
@@ -87,7 +88,7 @@ class ModelDisplayTab extends Tab {
                     model = result;
 
                     Button download = new Button("Download");
-                    download.setIcon("icon-download.png");
+                    download.setIcon(DataManagerConstants.ICON_DOWNLOAD);
                     download.addClickHandler(new ClickHandler() {
 
                         public void onClick(ClickEvent event) {
@@ -118,7 +119,8 @@ class ModelDisplayTab extends Tab {
     }
 
     private void downloadModel(final String lfnModel) {
-        TransferPoolServiceAsync tps = new TransferPoolService.Util().getInstance();
+        
+        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {
@@ -127,12 +129,9 @@ class ModelDisplayTab extends Tab {
 
             public void onSuccess(Void result) {
                 SC.say("Model file download is in progress.");
-                DataManagerSection.getInstance().setExpanded(true);
-
+                ((DataManagerSection) Layout.getInstance().getMainSection(DataManagerConstants.SECTION_FILE_TRANSFER)).expand();
             }
         };
-        tps.downloadFile(Context.getInstance().getUser(), lfnModel,
-                Context.getInstance().getUserDN(),
-                Context.getInstance().getProxyFileName(), callback);
+        service.downloadFile(lfnModel, callback);
     }
 }

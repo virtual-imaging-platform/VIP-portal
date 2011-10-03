@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -55,13 +55,13 @@ import com.smartgwt.client.widgets.tree.events.LeafClickHandler;
 import com.smartgwt.client.widgets.tree.events.LeafContextClickEvent;
 import com.smartgwt.client.widgets.tree.events.LeafContextClickHandler;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
-import fr.insalyon.creatis.vip.common.client.view.Context;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
@@ -86,7 +86,7 @@ class ModelImportTab extends Tab {
     public ModelImportTab() {
 
         this.setTitle("Import model");
-        this.setID("model-import-tab");
+        this.setID(ModelConstants.TAB_MODEL_IMPORT);
         this.setCanClose(true);
         initComplete(this);
 
@@ -96,67 +96,68 @@ class ModelImportTab extends Tab {
         label = new Label();
 
         Button upload = new Button("Upload model");
-        upload.setIcon("icon-upload.png");
+        upload.setIcon(DataManagerConstants.ICON_UPLOAD);
         upload.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
 
-
                 if (zipFile == null) {
                     SC.warn("No zip file");
-                } else {
-                    if (rdfFile == null) {
-                        SC.warn("No annotation file found in zip file");
-                    } else {
-                        modal.show("Uploading " + zipFile, true);
-                        final String lfn = uploadModel(zipFile,"uri");
-                        modal.show("Committing annotations to the Triple Store", true);
-                        //commit rdf annotations
-                        ModelServiceAsync ms = ModelService.Util.getInstance();
-                        AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
+                    return;
+                }
+
+                if (rdfFile == null) {
+                    SC.warn("No annotation file found in zip file");
+                    return;
+                }
+
+                modal.show("Uploading " + zipFile, true);
+                final String lfn = uploadModel(zipFile, "uri");
+                modal.show("Committing annotations to the Triple Store", true);
+                //commit rdf annotations
+                ModelServiceAsync ms = ModelService.Util.getInstance();
+                AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
+
+                    public void onFailure(Throwable caught) {
+                        modal.hide();
+                        SC.warn("Cannot build simulation object model from annotations");
+                    }
+
+                    public void onSuccess(SimulationObjectModel result) {
+                        ModelServiceAsync ssu = ModelService.Util.getInstance();
+                        AsyncCallback<SimulationObjectModel> cbssu = new AsyncCallback<SimulationObjectModel>() {
 
                             public void onFailure(Throwable caught) {
-                                modal.hide();
-                                SC.warn("Cannot build simulation object model from annotations");
+                                SC.warn("Cannot set the model storage URL");
                             }
 
                             public void onSuccess(SimulationObjectModel result) {
-                                ModelServiceAsync ssu = ModelService.Util.getInstance();
-                                AsyncCallback<SimulationObjectModel> cbssu = new AsyncCallback<SimulationObjectModel>() {
+                                ModelServiceAsync mms = ModelService.Util.getInstance();
+                                AsyncCallback<Void> callback1 = new AsyncCallback<Void>() {
 
                                     public void onFailure(Throwable caught) {
-                                        SC.warn("Cannot set the model storage URL");
+                                        modal.hide();
+                                        SC.warn("Cannot commit model to the Triple Store");
                                     }
 
-                                    public void onSuccess(SimulationObjectModel result) {
-                                        ModelServiceAsync mms = ModelService.Util.getInstance();
-                                        AsyncCallback<Void> callback1 = new AsyncCallback<Void>() {
-
-                                            public void onFailure(Throwable caught) {
-                                                modal.hide();
-                                                SC.warn("Cannot commit model to the Triple Store");
-                                            }
-
-                                            public void onSuccess(Void result) {
-                                                modal.hide();
-                                                SC.say("Model successfully comitted to the Triple Store");
-                                                ModelListTab modelsTab = (ModelListTab) Layout.getInstance().getTab("model-browse-tab");
-                                                if (modelsTab != null) {
-                                                    modelsTab.loadModels();
-                                                }
-                                                OperationLayout.getInstance().loadData();
-                                                OperationLayout.getInstance().activateAutoRefresh();
-                                            }
-                                        };
-                                        mms.completeModel(result, callback1);
+                                    public void onSuccess(Void result) {
+                                        modal.hide();
+                                        SC.say("Model successfully comitted to the Triple Store");
+                                        ModelListTab modelsTab = (ModelListTab) Layout.getInstance().getTab("model-browse-tab");
+                                        if (modelsTab != null) {
+                                            modelsTab.loadModels();
+                                        }
+                                        OperationLayout.getInstance().loadData();
+                                        OperationLayout.getInstance().activateAutoRefresh();
                                     }
                                 };
-                                ssu.setStorageUrl(result, lfn, cbssu);
+                                mms.completeModel(result, callback1);
                             }
                         };
-                        ms.rebuildObjectModelFromAnnotationFile(rdfFile, callback);
+                        ssu.setStorageUrl(result, lfn, cbssu);
                     }
-                }
+                };
+                ms.rebuildObjectModelFromAnnotationFile(rdfFile, callback);
             }
         });
 
@@ -295,7 +296,8 @@ class ModelImportTab extends Tab {
         }
     }
 
-    private String uploadModel(String file,String URI) {
+    private String uploadModel(String file, String URI) {
+
         //uploading zip file
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
@@ -305,17 +307,15 @@ class ModelImportTab extends Tab {
 
             public void onSuccess(Void result) {
                 SC.say("Added zip file to the upload pool");
-                DataManagerSection.getInstance().setExpanded(true);
+                ((DataManagerSection) Layout.getInstance().getMainSection(DataManagerConstants.SECTION_FILE_TRANSFER)).expand();
                 BrowserLayout.getInstance().loadData(ModelConstants.MODEL_HOME, true);
             }
         };
-        TransferPoolServiceAsync tps = new TransferPoolService.Util().getInstance();
+        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         String lfn = ModelConstants.MODEL_HOME;
         //TODO: check if this exists
-        String name = URI+"-"+file;
-        tps.uploadFile(Context.getInstance().getUser(), lfn, name, 
-                Context.getInstance().getUserDN(), 
-                Context.getInstance().getProxyFileName(), callback);
+        String name = URI + "-" + file;
+        service.uploadFile(name, lfn, callback);
 
         return lfn + "/" + name;
     }

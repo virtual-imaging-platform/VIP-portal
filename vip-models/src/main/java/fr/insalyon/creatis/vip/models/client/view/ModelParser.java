@@ -34,42 +34,32 @@
  */
 package fr.insalyon.creatis.vip.models.client.view;
 
-import com.smartgwt.client.widgets.grid.ListGridRecord;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.models.client.ModelConstants;
 
 /**
  *
- * @author Tristan Glatard
+ * @author Rafael Silva
  */
-public class SimulationObjectModelLightRecord extends ListGridRecord {
+public class ModelParser extends ApplicationParser {
 
-    public SimulationObjectModelLightRecord() {
+    @Override
+    public void loadApplications() {
+
+        if (CoreModule.user.isSystemAdministrator()) {
+            addApplication(ModelConstants.APP_MODEL, ModelConstants.APP_IMG_MODEL);
+        }
     }
 
-    public SimulationObjectModelLightRecord(String name, String types, String longitudinal, String movement, String URI) {
-        setName(name);
-        setTypes(types);
-        setLongitudinal(longitudinal);
-        setMovement(movement);
-        setURI(URI);
-    }
+    @Override
+    public boolean parse(String applicationName) {
 
-    private void setName(String name) {
-        setAttribute("name", name);
-    }
-
-    private void setTypes(String types) {
-        setAttribute("types", types);
-    }
-
-    private void setLongitudinal(String longitudinal) {
-        setAttribute("longitudinal", longitudinal);
-    }
-
-    private void setMovement(String movement) {
-        setAttribute("movement", movement);
-    }
-
-    private void setURI(String URI) {
-        setAttribute("uri", URI);
+        if (applicationName.equals(ModelConstants.APP_MODEL)) {
+            Layout.getInstance().addTab(new ModelListTab());
+            return true;
+        }
+        return false;
     }
 }

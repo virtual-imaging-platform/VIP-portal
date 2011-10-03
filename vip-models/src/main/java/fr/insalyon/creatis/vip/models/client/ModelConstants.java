@@ -42,5 +42,16 @@ import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
  */
 public class ModelConstants {
 
+    // Tabs
+    public static final String TAB_MODEL_BROWSER = "model-browse-tab";
+    public static final String TAB_MODEL_IMPORT = "model-import-tab";
+    // Icons
+    private static final String IMG_FOLDER = "model/";
+    public static final String ICON_MODEL = IMG_FOLDER + "icon-model.png";
+    // Application Names
+    public final static String APP_MODEL = "Models";
+    // Application Images
+    public static final String APP_IMG_MODEL = IMG_FOLDER + "app-model.png";
+    // Configuration Constants
     public final static String MODEL_HOME = DataManagerConstants.ROOT + "/VIP/Models";
 }
