@@ -18,7 +18,7 @@
         <vip.portal.version>0.5</vip.portal.version>
         <vip.gatelab.version>0.4</vip.gatelab.version>
         <vip.simulation-gui.version>0.2.1</vip.simulation-gui.version>
-        <vip.models.version>0.1</vip.models.version>
+        <vip.models.version>0.2</vip.models.version>
         <vip.provenance.version>0.1</vip.provenance.version>
         <vip.physical-properties.version>0.1</vip.physical-properties.version>
     </properties>
