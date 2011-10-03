@@ -81,7 +81,8 @@ public class GateLabGeneralTab extends Tab {
         simulationToolStrip=new GateLabSimulationToolStrip(simulationID, completed);
 
         VLayout vLayout = new VLayout();
-        vLayout.setHeight(100);
+        vLayout.setWidth100();
+        vLayout.setHeight100();
         vLayout.setOverflow(Overflow.AUTO);
         vLayout.addMember(simulationToolStrip);
 
@@ -98,7 +99,7 @@ public class GateLabGeneralTab extends Tab {
 
         grid = new ListGrid();
         grid.setWidth100();
-        grid.setHeight(150);
+        grid.setHeight(200);
         grid.setShowAllRecords(true);
         grid.setShowEmptyMessage(true);
         grid.setEmptyMessage("<br>No data available.");

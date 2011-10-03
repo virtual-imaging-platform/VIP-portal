@@ -7,11 +7,7 @@ package fr.insalyon.creatis.vip.gatelab.client.view.launch;
 
 //import com.smartgwt.client.widgets.grid.events.RowMouseDownEvent;
 //import com.smartgwt.client.widgets.grid.events.RowMouseDownHandler;
-import com.smartgwt.client.types.VisibilityMode;
-import com.smartgwt.client.widgets.layout.SectionStack;
-import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
-import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
 //import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**

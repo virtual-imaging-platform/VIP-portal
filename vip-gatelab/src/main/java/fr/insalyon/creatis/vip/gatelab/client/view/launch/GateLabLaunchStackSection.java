@@ -59,7 +59,7 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
         advInputsLayout = new VLayout(3);
         begInputsLayout = new VLayout(3);
         loadMac = new IButton("Load Main MacFile");
-        //modal = new ModalWindow(layout);
+        modal = new ModalWindow(vLayout);
 
         baseDir = "/vip/Home/myGateSimus/inputs";
 
@@ -281,7 +281,7 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
                 }
             }
         };
-        //modal.show("Loading Launch Panel...", true);
+        modal.show("Loading Launch Panel...", true);
         service.getApplicationSources(applicationName, callback);
     }
 
