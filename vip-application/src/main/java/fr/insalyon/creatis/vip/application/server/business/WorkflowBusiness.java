@@ -126,8 +126,9 @@ public class WorkflowBusiness {
      * @return
      * @throws BusinessException 
      */
-    public String launch(String user, Map<String, String> parametersMap,
-            String applicationName, String simulationName) throws BusinessException {
+    public String launch(String user, List<String> groups, boolean validParameters,
+            Map<String, String> parametersMap, String applicationName,
+            String simulationName) throws BusinessException {
 
         try {
             String settings = "GRID=DIRAC\n"
@@ -156,10 +157,18 @@ public class WorkflowBusiness {
                 } else if (valuesStr.contains("@@")) {
                     String[] values = valuesStr.split("@@");
                     for (String v : values) {
-                        ps.addValue(DataManagerUtil.parseBaseDir(user, v.trim()));
+                        String parsedPath = DataManagerUtil.parseBaseDir(user, v.trim());
+                        if (validParameters) {
+                            checkFolderACL(user, groups, parsedPath);
+                        }
+                        ps.addValue(parsedPath);
                     }
                 } else {
-                    ps.addValue(DataManagerUtil.parseBaseDir(user, valuesStr.trim()));
+                    String parsedPath = DataManagerUtil.parseBaseDir(user, valuesStr.trim());
+                    if (validParameters) {
+                        checkFolderACL(user, groups, parsedPath);
+                    }
+                    ps.addValue(parsedPath);
                 }
                 parameters.add(ps);
             }
@@ -490,7 +499,7 @@ public class WorkflowBusiness {
             File file = new File(Server.getInstance().getWorkflowsPath() + "/" + path);
             if (file.isDirectory()) {
                 FileUtils.deleteDirectory(file);
-                
+
             } else {
                 if (!file.delete()) {
                     logger.error("Unable to delete data: " + path);
@@ -509,6 +518,30 @@ public class WorkflowBusiness {
             return true;
         } else {
             return false;
+        }
+    }
+
+    private void checkFolderACL(String user, List<String> groups, String path)
+            throws BusinessException {
+
+        if (path.startsWith(Server.getInstance().getDataManagerUsersHome())) {
+            
+            path = path.replace(Server.getInstance().getDataManagerUsersHome() + "/", "");
+            if (!path.startsWith(user.replaceAll(" ", "_").toLowerCase())) {
+                logger.error("User '" + user + "' tried to access data from another user: " + path + "");
+                throw new BusinessException("Access denied to another user's home.");
+            }
+            
+        } else if (path.startsWith(Server.getInstance().getDataManagerGroupsHome())) {
+            
+            path = path.replace(Server.getInstance().getDataManagerGroupsHome() + "/", "");
+            if (path.indexOf("/") != -1) {
+                path = path.substring(0, path.indexOf("/"));
+            }
+            if (!groups.contains(path)) {
+                logger.error("User '" + user + "' tried to access data from a non-autorized group: " + path + "");
+                throw new BusinessException("Access denied to group '" + path + "'.");
+            }
         }
     }
 }

@@ -35,7 +35,6 @@
 package fr.insalyon.creatis.vip.application.server.rpc;
 
 import fr.insalyon.creatis.devtools.FileUtils;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
@@ -46,7 +45,6 @@ import fr.insalyon.creatis.vip.application.server.business.InputBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAOFactory;
-import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAO;
 import fr.insalyon.creatis.vip.application.server.dao.derby.connection.JobsConnection;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
@@ -59,7 +57,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -112,8 +109,11 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
         try {
             trace(logger, "Launching simulation '" + simulationName + "' (" + applicationName + ").");
-            String workflowID = workflowBusiness.launch(getSessionUser().getFullName(),
-                    parametersMap, applicationName, simulationName);
+            User user = getSessionUser();
+            String workflowID = workflowBusiness.launch(user.getFullName(),
+                    new ArrayList<String>(getSessionUserGroups().keySet()),
+                    !user.isSystemAdministrator(), parametersMap, applicationName,
+                    simulationName);
 
             trace(logger, "Simulation '" + simulationName + "' launched with ID '" + workflowID + "'.");
 
@@ -417,7 +417,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
                 } else {
                     List<String> users = configurationBusiness.getUserNames(user.getEmail(), true);
-                    
+
                     return workflowBusiness.getSimulations(users,
                             application, status, startDate, endDate);
                 }
