@@ -38,12 +38,14 @@ package fr.insalyon.creatis.vip.gatelab.client.view.monitor;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
@@ -73,7 +75,8 @@ public class GateLabGeneralTab extends Tab {
         this.simulationID = simulationID;
         this.status = status;
         this.date = date;
-        this.setTitle("General Information");
+        this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_GENERAL));
+        this.setPrompt("General Information");
 
         simulationToolStrip=new GateLabSimulationToolStrip(simulationID, completed);
 
@@ -95,7 +98,7 @@ public class GateLabGeneralTab extends Tab {
 
         grid = new ListGrid();
         grid.setWidth100();
-        grid.setHeight100();
+        grid.setHeight(150);
         grid.setShowAllRecords(true);
         grid.setShowEmptyMessage(true);
         grid.setEmptyMessage("<br>No data available.");

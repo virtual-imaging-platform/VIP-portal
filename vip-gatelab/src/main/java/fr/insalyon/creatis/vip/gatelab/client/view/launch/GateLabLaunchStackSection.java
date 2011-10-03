@@ -68,6 +68,7 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
         configureForm();
 
         //this.addItem(layout);
+        loadData();
 
 
     }

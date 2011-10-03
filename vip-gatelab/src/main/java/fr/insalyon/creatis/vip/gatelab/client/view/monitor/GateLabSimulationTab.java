@@ -53,8 +53,8 @@ public class GateLabSimulationTab extends AbstractSimulationTab {
         summaryTab=new SummaryTab (simulationID, completed);
         generalTab = new GateLabGeneralTab(simulationID, status, date, completed);
 
-        tabSet.addTab(summaryTab);
         tabSet.addTab(generalTab);
+        tabSet.addTab(summaryTab);
     }
 
     protected void updateData() {
