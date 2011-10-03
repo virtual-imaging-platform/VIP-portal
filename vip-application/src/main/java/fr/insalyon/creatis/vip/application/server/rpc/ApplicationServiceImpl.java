@@ -60,6 +60,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     private ApplicationBusiness applicationBusiness;
 
     public ApplicationServiceImpl() {
+        
         classBusiness = new ClassBusiness();
         applicationBusiness = new ApplicationBusiness();
     }
@@ -114,8 +115,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     public Application getApplication(String name) {
+        
         try {
             return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getApplication(name);
+            
         } catch (DAOException ex) {
             return null;
         }
@@ -125,7 +128,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
 
         try {
             User user = getSessionUser();
-            if (configurationBusiness.isSystemAdministrator(user.getEmail())) {
+            if (user.isSystemAdministrator()) {
                 return applicationBusiness.getApplications();
 
             } else {

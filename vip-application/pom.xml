@@ -35,12 +35,12 @@
             <scope>provided</scope>
         </dependency>
         
-        <dependency>
+<!--        <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-provenance</artifactId>
             <version>${vip.provenance.version}</version>
             <scope>provided</scope>
-        </dependency>
+        </dependency>-->
                         
         <dependency>
             <groupId>com.rednels.ofcgwt</groupId>

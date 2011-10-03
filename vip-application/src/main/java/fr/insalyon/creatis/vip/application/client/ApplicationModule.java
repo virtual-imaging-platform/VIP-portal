@@ -43,6 +43,8 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Module;
 import fr.insalyon.creatis.vip.core.client.view.layout.CenterTabSet;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -50,7 +52,11 @@ import fr.insalyon.creatis.vip.core.client.view.layout.CenterTabSet;
  */
 public class ApplicationModule extends Module {
 
+    public static List<String> specialGroups;
+    
     public ApplicationModule() {
+        
+        specialGroups = new ArrayList<String>();
         
         CoreModule.systemExecutor.addParser(new ApplicationSystemParser());
         CoreModule.homeExecutor.addParser(new ApplicationHomeParser());

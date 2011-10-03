@@ -101,7 +101,7 @@ public class GeneralTab extends Tab {
         configureGeneralGrid();
         generalModal = new ModalWindow(generalGrid);
         leftLayout.addMember(generalGrid);
-        
+
         leftLayout.addMember(new LogsWindow(simulationID));
 
         // Right column
@@ -138,7 +138,7 @@ public class GeneralTab extends Tab {
                 if (getFieldName(colNum).equals("value")) {
                     PropertyRecord propertyRecord = (PropertyRecord) record;
                     SimulationStatus status = SimulationStatus.valueOf(propertyRecord.getValue());
-                    
+
                     if (status == SimulationStatus.Running) {
                         return "font-weight:bold; color:#009900;";
 
