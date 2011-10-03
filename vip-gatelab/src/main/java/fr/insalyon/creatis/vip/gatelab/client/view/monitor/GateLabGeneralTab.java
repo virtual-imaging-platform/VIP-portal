@@ -34,7 +34,6 @@
  */
 package fr.insalyon.creatis.vip.gatelab.client.view.monitor;
 
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
@@ -78,7 +77,7 @@ public class GateLabGeneralTab extends Tab {
         this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_GENERAL));
         this.setPrompt("General Information");
 
-        simulationToolStrip=new GateLabSimulationToolStrip(simulationID, completed);
+        simulationToolStrip = new GateLabSimulationToolStrip(simulationID, completed);
 
         VLayout vLayout = new VLayout();
         vLayout.setWidth100();
@@ -99,7 +98,7 @@ public class GateLabGeneralTab extends Tab {
 
         grid = new ListGrid();
         grid.setWidth100();
-        grid.setHeight(200);
+        grid.setHeight(210);
         grid.setShowAllRecords(true);
         grid.setShowEmptyMessage(true);
         grid.setEmptyMessage("<br>No data available.");
@@ -118,15 +117,15 @@ public class GateLabGeneralTab extends Tab {
                 new GeneralInformationContextMenu(simulationID, prop, modal).showContextMenu();
             }
         });
-/*
+        /*
         grid.addCellClickHandler(new CellClickHandler() {
-
-            public void onCellClick(CellClickEvent event) {
-                if (event.getRowNum() == 6 || event.getRowNum() == 7) {
-                    String path = event.getRecord().getAttributeAsString("value");
-                    BrowserLayout.getInstance().loadData(path, false);
-                }
-            }
+        
+        public void onCellClick(CellClickEvent event) {
+        if (event.getRowNum() == 6 || event.getRowNum() == 7) {
+        String path = event.getRecord().getAttributeAsString("value");
+        BrowserLayout.getInstance().loadData(path, false);
+        }
+        }
         });
  * 
  */
@@ -181,6 +180,5 @@ public class GateLabGeneralTab extends Tab {
             }
         };
         serviceOut.getOutputData(simulationID, callbackOut);
-
     }
 }

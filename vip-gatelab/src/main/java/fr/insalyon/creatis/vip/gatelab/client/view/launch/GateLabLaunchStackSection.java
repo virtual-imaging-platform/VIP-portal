@@ -1,6 +1,36 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/* Copyright CNRS-CREATIS
+ *
+ * Rafael Silva
+ * rafael.silva@creatis.insa-lyon.fr
+ * http://www.rafaelsilva.com
+ *
+ * This software is a grid-enabled data-driven workflow manager and editor.
+ *
+ * This software is governed by the CeCILL  license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * "http://www.cecill.info".
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
  */
 package fr.insalyon.creatis.vip.gatelab.client.view.launch;
 
@@ -11,10 +41,7 @@ import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.grid.ListGrid;
-import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
@@ -35,7 +62,6 @@ import java.util.Map;
  */
 public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
 
-    private ModalWindow modal;
     private VLayout nameLayout;
     private VLayout inputsLayout;
     private VLayout begInputsLayout;
@@ -69,18 +95,16 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
 
         //this.addItem(layout);
         loadData();
-
-
     }
 
     public void uploadMacComplete(String inputTgz, String simuType, String nbPart) {
 
-            //this.layout.removeChild(myApplet);
-             if (loadMacWindow != null) {
+        //this.layout.removeChild(myApplet);
+        if (loadMacWindow != null) {
             loadMacWindow.destroy();
             loadMacWindow = null;
-           
-             modal.hide();
+
+            modal.hide();
             //SC.say("File name is " + inputTgz + " simu type " + simuType);
             //add info to the map and launch button
 
@@ -121,19 +145,19 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
             public void onClick(ClickEvent event) {
                 //set the correct path for upload
 
-        
+
                 loadMacWindow = new LoadMacWindow(modal, baseDir);
                 loadMacWindow.show();
 
                 /*
                 myApplet = new AppletHTMLPane(
-                        "DataUpload",
-                        "fr.insalyon.creatis.vip.gatelab.applet.loadmac.LoadMac",
-                        "vip-gatelab-applet.jar", 800, 450,
-                        Context.getInstance().getUser(),
-                        Context.getInstance().getUserDN(),
-                        Context.getInstance().getProxyFileName(),
-                        baseDir, false, false);
+                "DataUpload",
+                "fr.insalyon.creatis.vip.gatelab.applet.loadmac.LoadMac",
+                "vip-gatelab-applet.jar", 800, 450,
+                Context.getInstance().getUser(),
+                Context.getInstance().getUserDN(),
+                Context.getInstance().getProxyFileName(),
+                baseDir, false, false);
                 layout.addChild(myApplet);
                  *
                  */
@@ -149,7 +173,6 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
 
         vLayout.addMember(nameLayout);
         vLayout.addMember(inputsLayout);
-
     }
 
     public void loadNameLayout() {
@@ -244,9 +267,9 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
                         }
                         /*
                         if (ul.compareToIgnoreCase("advanced") == 0) {
-                            advInputsLayout.addMember(new GateLabInput(source.getName(), ul));
+                        advInputsLayout.addMember(new GateLabInput(source.getName(), ul));
                         } else {
-                            begInputsLayout.addMember(new GateLabInput(source.getName(), ul));
+                        begInputsLayout.addMember(new GateLabInput(source.getName(), ul));
                         }
                          *
                          */
@@ -254,7 +277,6 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
                         //inputsListGrid.se
 
                     }
-
 
                     HLayout buttonsLayout = new HLayout(5);
                     buttonsLayout.setAlign(VerticalAlignment.CENTER);
@@ -267,7 +289,7 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
                         public void onClick(ClickEvent event) {
                             if (validate()) {
                                 launch();
-                            }else{
+                            } else {
                                 SC.warn("Cannot launch. Some inputs are not valid.");
                             }
                         }
@@ -293,7 +315,7 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
     private boolean validate() {
         boolean valid = simulationNameItem.validate();
         for (GateLabInput input : getGateLabInputs()) {
-            if (!input.validate()) { 
+            if (!input.validate()) {
                 valid = false;
             }
 
@@ -313,9 +335,9 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
                 SC.warn("Error while launching simulation: " + caught.getMessage());
             }
 
-           public void onSuccess(Void result) {
+            public void onSuccess(Void result) {
                 modal.hide();
-                SC.say("Simulation " + simulationNameItem.getValueAsString()+ "successefully lauched");
+                SC.say("Simulation " + simulationNameItem.getValueAsString() + "successefully lauched");
             }
         };
         modal.show("Launching simulation...", true);
@@ -342,47 +364,41 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
 
     /*
     public List<GateLabInput> getGateLabInputs() {
-
-        List<GateLabInput> inputList = new ArrayList<GateLabInput>();
-
-        for (Canvas canvas : inputsLayout.getMembers()) {
-            //inputsLayout contains begInputsLayout and advInputsLayout
-            for (Canvas inputCanvas : canvas.getChildren()) {
-                if (inputCanvas instanceof GateLabInput) {
-                    GateLabInput input = (GateLabInput) inputCanvas;
-                    inputList.add(input);
-                }
-            }
-        }
-
-        return inputList;
-
+    
+    List<GateLabInput> inputList = new ArrayList<GateLabInput>();
+    
+    for (Canvas canvas : inputsLayout.getMembers()) {
+    //inputsLayout contains begInputsLayout and advInputsLayout
+    for (Canvas inputCanvas : canvas.getChildren()) {
+    if (inputCanvas instanceof GateLabInput) {
+    GateLabInput input = (GateLabInput) inputCanvas;
+    inputList.add(input);
+    }
+    }
+    }
+    
+    return inputList;
+    
     }
      *
      */
-
-      /**
+    /**
      * Gets the list of all GateLabInputs objects.
      *
      * @return list of all GateLabInputs objects
      */
-
-     public List<GateLabInput> getGateLabInputs() {
+    public List<GateLabInput> getGateLabInputs() {
 
         List<GateLabInput> inputList = new ArrayList<GateLabInput>();
 
         for (Canvas inputCanvas : inputsLayout.getMembers()) {
 
-                if (inputCanvas instanceof GateLabInput) {
-                    GateLabInput input = (GateLabInput) inputCanvas;
-                    inputList.add(input);
-                }
-            
+            if (inputCanvas instanceof GateLabInput) {
+                GateLabInput input = (GateLabInput) inputCanvas;
+                inputList.add(input);
+            }
+
         }
-
         return inputList;
-
     }
-
-
 }
