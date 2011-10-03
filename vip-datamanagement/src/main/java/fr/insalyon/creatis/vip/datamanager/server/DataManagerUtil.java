@@ -34,8 +34,6 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server;
 
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
-import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
