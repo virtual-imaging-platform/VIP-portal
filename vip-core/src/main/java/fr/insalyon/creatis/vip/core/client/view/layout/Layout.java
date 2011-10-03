@@ -176,6 +176,10 @@ public class Layout {
     public void removeMainSection(String sectionID) {
         mainSectionStack.removeSection(sectionID);
     }
+    
+    public SectionStackSection getMainSection(String sectionID) {
+        return mainSectionStack.getSection(sectionID);
+    }
 
     public void removeTab(String id) {
         Tab tab = getTab(id);
