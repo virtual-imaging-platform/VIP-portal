@@ -239,7 +239,6 @@ public class WorkflowBusiness {
             }
 
         } catch (RemoteException ex) {
-            logger.error(ex);
             throw new BusinessException(ex);
         } catch (ServiceException ex) {
             logger.error(ex);
