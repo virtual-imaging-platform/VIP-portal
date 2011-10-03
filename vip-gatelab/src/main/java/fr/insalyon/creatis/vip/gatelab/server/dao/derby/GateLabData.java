@@ -35,8 +35,8 @@
 package fr.insalyon.creatis.vip.gatelab.server.dao.derby;
 
 import fr.insalyon.creatis.vip.application.server.dao.derby.connection.JobsConnection;
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.gatelab.server.dao.GateLabDAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -53,7 +53,7 @@ public class GateLabData implements GateLabDAO {
 
     public GateLabData(String workflowID) throws DAOException {
         connection = JobsConnection.getInstance().connect(
-                ServerConfiguration.getInstance().getWorkflowsPath() + "/" + workflowID + "/jobs.db");
+                Server.getInstance().getWorkflowsPath() + "/" + workflowID + "/jobs.db");
     }
 
     public long getNumberParticles() throws DAOException {

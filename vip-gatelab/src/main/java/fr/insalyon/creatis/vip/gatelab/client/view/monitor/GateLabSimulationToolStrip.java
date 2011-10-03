@@ -35,33 +35,42 @@
 package fr.insalyon.creatis.vip.gatelab.client.view.monitor;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
-import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationToolStrip;
 import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabService;
 import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabServiceAsync;
+import java.util.Date;
 
 /**
  *
  * @author Rafael Silva
  */
-public class GateLabSimulationToolStrip extends SimulationToolStrip {
+public class GateLabSimulationToolStrip extends ToolStrip {
 
     private String simulationID;
     private ToolStripButton stopButton;
+    private Label lastUpdated;
 
     public GateLabSimulationToolStrip(String simulationID, boolean completed) {
-        super(simulationID);
+        this.setWidth100();
+
+        this.setPadding(2);
+        this.addMenuButton(new LogsMenuButton(simulationID));
+        configure();
+
         this.simulationID = simulationID;
         if (completed) {
             stopButton.setDisabled(true);
         }
     }
 
-    @Override
+
     protected void configure() {
 
         stopButton = new ToolStripButton();
@@ -82,7 +91,20 @@ public class GateLabSimulationToolStrip extends SimulationToolStrip {
         });
         this.addButton(stopButton);
 
-        super.configure();
+        this.addFill();
+        lastUpdated = new Label();
+        lastUpdated.setWidth(300);
+        lastUpdated.setAlign(Alignment.RIGHT);
+        this.updateDate();
+        this.addMember(lastUpdated);
+
+
+    }
+
+    public void updateDate() {
+
+        this.lastUpdated.setContents("Last updated on " + new Date());
+
     }
 
     private void stopSimulation() {

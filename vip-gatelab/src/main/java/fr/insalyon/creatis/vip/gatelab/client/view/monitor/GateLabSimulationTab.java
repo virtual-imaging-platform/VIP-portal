@@ -34,104 +34,33 @@
  */
 package fr.insalyon.creatis.vip.gatelab.client.view.monitor;
 
-import com.google.gwt.user.client.Timer;
-import com.smartgwt.client.types.VisibilityMode;
-import com.smartgwt.client.widgets.layout.SectionStack;
-import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tab.events.TabDeselectedEvent;
-import com.smartgwt.client.widgets.tab.events.TabDeselectedHandler;
-import com.smartgwt.client.widgets.tab.events.TabSelectedEvent;
-import com.smartgwt.client.widgets.tab.events.TabSelectedHandler;
-import fr.insalyon.creatis.vip.application.client.view.monitor.ChartsStackSection;
-import fr.insalyon.creatis.vip.application.client.view.monitor.JobsStackSection;
-import fr.insalyon.creatis.vip.application.client.view.monitor.SummaryStackSection;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
+import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SummaryTab;
 
 /**
  *
  * @author Rafael Silva
  */
-public class GateLabSimulationTab extends Tab {
+public class GateLabSimulationTab extends AbstractSimulationTab { 
+    private GateLabGeneralTab generalTab;
+    private SummaryTab summaryTab;
+    
+    public GateLabSimulationTab(String simulationID, String title, SimulationStatus status, String date) {
 
-    private boolean completed;
-    private Timer timer;
-    private GateLabSimulationToolStrip simulationToolStrip;
-    private GeneralInformationStackSection informationStackSection;
-    private SummaryStackSection summaryStackSection;
-    private JobsStackSection jobsStackSection;
-    private ChartsStackSection chartsStackSection;
+        super(simulationID,title, status);
 
-    public GateLabSimulationTab(String simulationID, String status, String date) {
+        summaryTab=new SummaryTab (simulationID, completed);
+        generalTab = new GateLabGeneralTab(simulationID, status, date, completed);
 
-        this.setTitle(simulationID);
-        this.setID(simulationID + "-gatetab");
-        this.setIcon("icon-simulation-monitor.png");
-        this.setCanClose(true);
-        this.completed = status.equals("Running") ? false : true;
-
-        VLayout vLayout = new VLayout();
-        simulationToolStrip = new GateLabSimulationToolStrip(simulationID, completed);
-        vLayout.addMember(simulationToolStrip);
-
-        SectionStack sectionStack = new SectionStack();
-        sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
-        sectionStack.setAnimateSections(true);
-        sectionStack.setCanResizeSections(true);
-
-        informationStackSection = new GeneralInformationStackSection(simulationID, status, date);
-        summaryStackSection = new SummaryStackSection(simulationID, completed);
-        jobsStackSection = new JobsStackSection(simulationID);
-        chartsStackSection = new ChartsStackSection(simulationID);
-
-        sectionStack.setSections(
-                informationStackSection,
-                summaryStackSection,
-                jobsStackSection,
-                chartsStackSection);
-
-        vLayout.addMember(sectionStack);
-
-        this.setPane(vLayout);
-
-        if (!completed) {
-            timer = new Timer() {
-
-                public void run() {
-                    updateData();
-                }
-            };
-            timer.scheduleRepeating(30000);
-        }
-
-        this.addTabDeselectedHandler(new TabDeselectedHandler() {
-
-            public void onTabDeselected(TabDeselectedEvent event) {
-                if (!completed) {
-                    timer.cancel();
-                }
-            }
-        });
-        this.addTabSelectedHandler(new TabSelectedHandler() {
-
-            public void onTabSelected(TabSelectedEvent event) {
-                if (!completed) {
-                    updateData();
-                    timer.scheduleRepeating(30000);
-                }
-            }
-        });
+        tabSet.addTab(summaryTab);
+        tabSet.addTab(generalTab);
     }
 
-    private void updateData() {
-        informationStackSection.loadData();
-        summaryStackSection.loadData();
-        jobsStackSection.loadData();
-        simulationToolStrip.updateDate();
-    }
-
-    public void destroy() {
-        if (!completed) {
-            timer.cancel();
-        }
+    protected void updateData() {
+        generalTab.loadData();
+        summaryTab.loadData();
+        
+  
     }
 }

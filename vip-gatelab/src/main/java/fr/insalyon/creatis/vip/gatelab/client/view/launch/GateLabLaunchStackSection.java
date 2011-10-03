@@ -21,9 +21,8 @@ import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchStackSection;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.AppletHTMLPane;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,8 +49,8 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
     //private ListGridField categoryField;
 
     //private GateLabLaunchTab myLaunchTab;
-    public GateLabLaunchStackSection(String launchTabID) {
-        super("GATE", launchTabID);
+    public GateLabLaunchStackSection(String applicationName) {
+        super(applicationName);
 
         initComplete(this);
 
@@ -60,7 +59,7 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
         advInputsLayout = new VLayout(3);
         begInputsLayout = new VLayout(3);
         loadMac = new IButton("Load Main MacFile");
-        modal = new ModalWindow(layout);
+        //modal = new ModalWindow(layout);
 
         baseDir = "/vip/Home/myGateSimus/inputs";
 
@@ -68,7 +67,7 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
 
         configureForm();
 
-        this.addItem(layout);
+        //this.addItem(layout);
 
 
     }
@@ -91,9 +90,6 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
             //setInputValue(st[0], st[1]);
             String[] np = nbPart.split(" = ");
             setInputValue(np[0], np[1]);
-
-            //temporaily set the GateAlias
-            setInputValue("GateAlias", "TypeHereYourGateAlias");
 
             inputsLayout.setVisible(true);
 
@@ -150,8 +146,8 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
         inputsLayout.addMember(FieldUtil.getForm(new TextItem("Advanced inputs")));
         inputsLayout.addMember(advInputsLayout);
 
-        layout.addMember(nameLayout);
-        layout.addMember(inputsLayout);
+        vLayout.addMember(nameLayout);
+        vLayout.addMember(inputsLayout);
 
     }
 
@@ -285,9 +281,7 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
             }
         };
         //modal.show("Loading Launch Panel...", true);
-        Context context = Context.getInstance();
-        service.getWorkflowSources(context.getUser(),
-                context.getProxyFileName(), simulationName, callback);
+        service.getApplicationSources(applicationName, callback);
     }
 
     /**
@@ -311,22 +305,20 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
      */
     private void launch() {
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        final AsyncCallback<String> callback = new AsyncCallback<String>() {
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Error while launching simulation: " + caught.getMessage());
             }
 
-           public void onSuccess(String result) {
+           public void onSuccess(Void result) {
                 modal.hide();
-                SC.say("Simulation successfully launched with ID: " + result);
+                SC.say("Simulation " + simulationNameItem.getValueAsString()+ "successefully lauched");
             }
         };
         modal.show("Launching simulation...", true);
-        Context context = Context.getInstance();
-        service.launchWorkflow(context.getUser(), getParametersMap(), simulationName,
-                context.getProxyFileName(), simulationNameItem.getValueAsString(), callback);
+        service.launchSimulation(getParametersMap(), applicationName, simulationNameItem.getValueAsString(), callback);
 
 
     }
@@ -391,11 +383,5 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
 
     }
 
-    public String getSimulationName() {
-        return simulationName;
-    }
 
-    public void setSimulationName(String simulationName) {
-        this.simulationName = simulationName;
-    }
 }

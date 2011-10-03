@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,51 +32,47 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.gatelab.client.view;
+package fr.insalyon.creatis.vip.gatelab.client;
 
-import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabSimulationsTab;
-import fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab;
-import com.smartgwt.client.widgets.menu.Menu;
-import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.ClickHandler;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
-import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
-//import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import com.smartgwt.client.widgets.tab.Tab;
+import com.smartgwt.client.widgets.tab.events.CloseClickHandler;
+import com.smartgwt.client.widgets.tab.events.TabCloseClickEvent;
+import fr.insalyon.creatis.vip.application.client.view.ApplicationHomeParser;
+import fr.insalyon.creatis.vip.application.client.view.ApplicationSystemParser;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationTab;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.Module;
+import fr.insalyon.creatis.vip.core.client.view.layout.CenterTabSet;
+import fr.insalyon.creatis.vip.gatelab.client.view.GateLabHomeParser;
+import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabSimulationTab;
 
 /**
  *
  * @author Rafael Silva
  */
-public class GateLabMenuButton extends ToolStripMenuButton {
+public class GateLabModule extends Module {
 
-    public GateLabMenuButton(final boolean groupAdmin) {
+    public GateLabModule() {
         
-        this.setTitle("GateLab");
-        
-        Menu menu = new Menu();
-        menu.setShowShadow(true);
-        menu.setShadowDepth(3);
-        
-        MenuItem launchItem = new MenuItem("Launch Simulation");
-        launchItem.setIcon("icon-launch.png");
-        launchItem.addClickHandler(new ClickHandler() {
+        CoreModule.homeExecutor.addParser(new GateLabHomeParser());
+    }
 
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new GateLabLaunchTab());
+    @Override
+    public void load() {
+        
+        // Simulation close tab
+        CenterTabSet.getInstance().addCloseClickHandler(new CloseClickHandler() {
+
+            public void onCloseClick(TabCloseClickEvent event) {
+                Tab tab = event.getTab();
+                if (tab instanceof GateLabSimulationTab) {
+                    ((GateLabSimulationTab) tab).destroy();
+                }
             }
         });
-        
-        MenuItem monitorItem = new MenuItem("Monitor Simulations");
-        monitorItem.setIcon("icon-simulation-monitor.png");
-        monitorItem.addClickHandler(new ClickHandler() {
+    }
 
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new GateLabSimulationsTab(groupAdmin));
-            }
-        });
-        
-        menu.setItems(launchItem, monitorItem);
-        this.setMenu(menu);
+    @Override
+    public void terminate() {
     }
 }

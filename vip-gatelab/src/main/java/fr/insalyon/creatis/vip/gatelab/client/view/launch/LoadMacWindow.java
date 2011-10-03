@@ -6,8 +6,7 @@
 package fr.insalyon.creatis.vip.gatelab.client.view.launch;
 
 import com.smartgwt.client.widgets.Window;
-import fr.insalyon.creatis.vip.common.client.view.Context;
-import fr.insalyon.creatis.vip.common.client.view.modal.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.AppletHTMLPane;
 /**
  *
@@ -30,10 +29,7 @@ public class LoadMacWindow extends Window {
                         "DataUpload",
                         "fr.insalyon.creatis.vip.gatelab.applet.loadmac.LoadMac",
                         "vip-gatelab-applet.jar", 710, 525,
-                        Context.getInstance().getUser(),
-                        Context.getInstance().getUserDN(),
-                        Context.getInstance().getProxyFileName(),
-                        baseDir, false, false));
+                         baseDir, false, false));
     }
     
 

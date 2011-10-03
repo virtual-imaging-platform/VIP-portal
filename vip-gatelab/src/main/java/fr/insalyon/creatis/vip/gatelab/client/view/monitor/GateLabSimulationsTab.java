@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.gatelab.client.view.monitor;
 
 import com.smartgwt.client.widgets.grid.events.RowMouseDownEvent;
 import com.smartgwt.client.widgets.grid.events.RowMouseDownHandler;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationsTab;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
@@ -45,24 +46,25 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
  */
 public class GateLabSimulationsTab extends SimulationsTab {
 
-    public GateLabSimulationsTab(boolean isGroupAdmin) {
+    public GateLabSimulationsTab() {
+
+        super();
+        //super("gate", isGroupAdmin);
+        //grid.getField("application").setHidden(true);
         
-        super("gate", isGroupAdmin);
-        grid.getField("application").setHidden(true);
-        /*
         rowMouseDownHandler.removeHandler();
         grid.addRowMouseDownHandler(new RowMouseDownHandler() {
 
             public void onRowMouseDown(RowMouseDownEvent event) {
                 if (event.getColNum() != 1) {
                     String simulationID = event.getRecord().getAttribute("simulationId");
-                    String status = event.getRecord().getAttribute("status");
+                    SimulationStatus status = SimulationStatus.valueOf(event.getRecord().getAttribute("status"));
                     String date = event.getRecord().getAttribute("date");
-                    Layout.getInstance().addTab(new GateLabSimulationTab(simulationID, status, date));
+                    String title = event.getRecord().getAttribute("simulationName");
+                    Layout.getInstance().addTab(new GateLabSimulationTab(simulationID, title, status, date));
                 }
             }
         });
-         * 
-         */
+        
     }
 }

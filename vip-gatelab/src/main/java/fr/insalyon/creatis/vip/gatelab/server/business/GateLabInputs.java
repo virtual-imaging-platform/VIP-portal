@@ -34,7 +34,7 @@
  */
 package fr.insalyon.creatis.vip.gatelab.server.business;
 
-import fr.insalyon.creatis.vip.common.server.ServerConfiguration;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.util.Map;
@@ -53,15 +53,15 @@ public class GateLabInputs {
 
     public GateLabInputs(String workflowID) {
         inputsMap = new HashMap<String, String>();
-        inputfile = ServerConfiguration.getInstance().getWorkflowsPath() + "/" + workflowID + "/input-m2.xml";
+        inputfile = Server.getInstance().getWorkflowsPath() + "/" + workflowID + "/input-m2.xml";
         GateLabInputsParser in = new GateLabInputsParser();
         inputsMap = in.parse(inputfile);
     }
 
     public Map<String, String> getWorkflowInputs() {
         try {
-            String input = inputsMap.get("input_tgz");
-
+            String input = inputsMap.get("GateInput");
+/*
             int ind = input.lastIndexOf("/");
             String inputlink = input.substring(0, ind);
 
@@ -81,14 +81,14 @@ public class GateLabInputs {
             }
 
             String outputlink = inputlink + "/output";
+*/
+            String release = inputsMap.get("GateRelease");
+            //int ind = release.lastIndexOf("/") + 1;
+            //release = release.substring(ind, release.indexOf(".tar.gz"));
 
-            String release = inputsMap.get("fgate_release_tgz");
-            ind = release.lastIndexOf("/") + 1;
-            release = release.substring(ind, release.indexOf(".tar.gz"));
+            String particles = inputsMap.get("NumberOfParticles");
 
-            String particles = inputsMap.get("nParticles");
-
-            String simtype = inputsMap.get("wrapperType");
+            String simtype = inputsMap.get("ParallelizationType");
             if (simtype.equals("dyn")) {
                 simtype = "Dynamic";
             } else {
@@ -96,9 +96,8 @@ public class GateLabInputs {
             }
 
             Map<String, String> inputMap = new HashMap<String, String>();
-            inputMap.put("application_name", application_name);
-            inputMap.put("inputlink", DataManagerUtil.parseRealDir(inputlink));
-            inputMap.put("outputlink", DataManagerUtil.parseRealDir(outputlink));
+            inputMap.put("inputlink", DataManagerUtil.parseRealDir(input));
+            //inputMap.put("outputlink", DataManagerUtil.parseRealDir(outputlink));
             inputMap.put("gate_version", release);
             inputMap.put("particles", particles);
             inputMap.put("simulation", simtype);

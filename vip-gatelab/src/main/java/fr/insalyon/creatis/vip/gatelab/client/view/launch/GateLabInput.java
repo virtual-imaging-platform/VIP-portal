@@ -4,25 +4,19 @@
  */
 package fr.insalyon.creatis.vip.gatelab.client.view.launch;
 
-import com.google.gwt.user.client.ui.Widget;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.common.client.view.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.selection.PathSelectionWindow;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 /**
  *

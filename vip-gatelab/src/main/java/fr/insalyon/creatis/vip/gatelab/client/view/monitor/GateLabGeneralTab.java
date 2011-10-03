@@ -34,43 +34,59 @@
  */
 package fr.insalyon.creatis.vip.gatelab.client.view.monitor;
 
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
-import com.smartgwt.client.widgets.grid.events.CellClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellClickHandler;
-import com.smartgwt.client.widgets.layout.SectionStackSection;
-import fr.insalyon.creatis.vip.common.client.view.property.PropertyRecord;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
-import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
+import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
+import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
+import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
+import fr.insalyon.creatis.vip.application.client.bean.InOutData;
+import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
+import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
 import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabService;
 import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabServiceAsync;
 import java.util.Map;
+import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class GeneralInformationStackSection extends SectionStackSection {
+public class GateLabGeneralTab extends Tab {
 
+    private GateLabSimulationToolStrip simulationToolStrip;
     private String simulationID;
-    private String status;
+    private SimulationStatus status;
     private String date;
     private ListGrid grid;
+    private ModalWindow modal;
 
-    public GeneralInformationStackSection(String simulationID, String status, String date) {
+    public GateLabGeneralTab(String simulationID, SimulationStatus status, String date, boolean completed) {
 
         this.simulationID = simulationID;
         this.status = status;
         this.date = date;
         this.setTitle("General Information");
-        this.setCanCollapse(true);
-        this.setExpanded(true);
-        this.setResizeable(true);
+
+        simulationToolStrip=new GateLabSimulationToolStrip(simulationID, completed);
+
+        VLayout vLayout = new VLayout();
+        vLayout.setHeight(100);
+        vLayout.setOverflow(Overflow.AUTO);
+        vLayout.addMember(simulationToolStrip);
 
         configureGrid();
-        this.addItem(grid);
+        vLayout.addMember(grid);
+        modal = new ModalWindow(grid);
+
+        this.setPane(vLayout);
 
         loadData();
     }
@@ -88,19 +104,34 @@ public class GeneralInformationStackSection extends SectionStackSection {
         ListGridField valueField = new ListGridField("value", "Value");
 
         grid.setFields(propertyField, valueField);
-        
+
+
+        grid.addCellContextClickHandler(new CellContextClickHandler() {
+
+            public void onCellContextClick(CellContextClickEvent event) {
+                event.cancel();
+                PropertyRecord prop = (PropertyRecord) event.getRecord();
+                new GeneralInformationContextMenu(simulationID, prop, modal).showContextMenu();
+            }
+        });
+/*
         grid.addCellClickHandler(new CellClickHandler() {
 
             public void onCellClick(CellClickEvent event) {
                 if (event.getRowNum() == 6 || event.getRowNum() == 7) {
-                    String path = event.getRecord().getAttribute("value");
+                    String path = event.getRecord().getAttributeAsString("value");
                     BrowserLayout.getInstance().loadData(path, false);
                 }
             }
         });
+ * 
+ */
     }
 
     public void loadData() {
+
+        simulationToolStrip.updateDate();
+
         GateLabServiceAsync gatelabservice = GateLabService.Util.getInstance();
         final AsyncCallback<Map<String, String>> callback = new AsyncCallback<Map<String, String>>() {
 
@@ -109,22 +140,43 @@ public class GeneralInformationStackSection extends SectionStackSection {
             }
 
             public void onSuccess(Map<String, String> result) {
-                
+
                 PropertyRecord[] data = new PropertyRecord[]{
-                    new PropertyRecord("Simulation Name", result.get("application_name")),
-                    new PropertyRecord("Simulation Identifier", simulationID),
+                    //new PropertyRecord("Simulation Name", result.get("application_name")),
+                    //new PropertyRecord("Simulation Identifier", simulationID),
                     new PropertyRecord("Submitted Time", date),
-                    new PropertyRecord("Status", status),
+                    new PropertyRecord("Status", status.name()),
                     new PropertyRecord("Total Particles", result.get("particles")),
                     new PropertyRecord("Total Particles simulated", result.get("runnedparticles")),
-                    new PropertyRecord("Input Folder", result.get("inputlink")),
-                    new PropertyRecord("Output Folder", result.get("outputlink")),
                     new PropertyRecord("Simulation Type", result.get("simulation")),
-                    new PropertyRecord("Gate Version", result.get("gate_version"))                    
+                    new PropertyRecord("Input", result.get("inputlink")),
+                    //new PropertyRecord("Output", result.get("outputlink")),
+                    new PropertyRecord("Gate Release", result.get("gate_version"))
                 };
                 grid.setData(data);
             }
         };
         gatelabservice.getGatelabWorkflowInputs(simulationID, callback);
+
+
+        WorkflowServiceAsync serviceOut = WorkflowService.Util.getInstance();
+        AsyncCallback<List<InOutData>> callbackOut = new AsyncCallback<List<InOutData>>() {
+
+            public void onFailure(Throwable caught) {
+                SC.warn("Error executing get simulation output\n" + caught.getMessage());
+            }
+
+            public void onSuccess(List<InOutData> result) {
+                for (InOutData data : result) {
+                    if (data.getProcessor().equals("merged_results")) {
+                        grid.addData(new PropertyRecord("Output", data.getPath()));
+                        break;
+                    }
+
+                }
+            }
+        };
+        serviceOut.getOutputData(simulationID, callbackOut);
+
     }
 }

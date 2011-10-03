@@ -24,22 +24,15 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
 
     //private GateLabLaunchStackSection launchSection;
 
-    public GateLabLaunchTab () {
+    public GateLabLaunchTab (String applicationName) {
 
-        super("Launch GateLab", "GATE", true,  "launch-gate-tab");
-        initTab();
-        //done in LaunchToolsSTrip inst by the asbtract class
-        //createSimulation("GATE");
-        //addInputsSection();
-    }
-
-    private void initTab() {
+        super(applicationName);
 
         this.launchSection = new GateLabLaunchStackSection(this.getID());
         sectionStack.setSections(launchSection);
+
+        addInputsSection();
     }
-
-
 
     /**
      * Sets a value to an input name. The value should be in the following forms:
@@ -55,30 +48,5 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
         //launchSection.setInputValue(inputName, value);
     }
 
-/*
-        private void initTab(String title, String applicationClass, boolean showToolStrip, String id) {
 
-        this.setTitle(title);
-        this.setID(id);
-        this.setCanClose(true);
-        this.setAttribute("paneMargin", 0);
-
-
-        VLayout vLayout = new VLayout();
-
-        vLayout.setWidth100();
-        vLayout.setHeight100();
-
-        SectionStack sectionStack = new SectionStack();
-        sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
-        sectionStack.setAnimateSections(true);
-
-        launchSection = new GateLabLaunchStackSection();
-
-        sectionStack.setSections(launchSection);
-        vLayout.addMember(sectionStack);
-
-        this.setPane(vLayout);
-    }
-*/
 }

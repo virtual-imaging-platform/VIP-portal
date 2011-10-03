@@ -34,8 +34,8 @@
  */
 package fr.insalyon.creatis.vip.gatelab.server.rpc;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import fr.insalyon.creatis.vip.common.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabService;
 import fr.insalyon.creatis.vip.gatelab.server.business.GateLabInputs;
 import fr.insalyon.creatis.vip.gatelab.server.dao.DAOFactory;
@@ -46,7 +46,7 @@ import java.util.HashMap;
  *
  * @author Ibrahim Kallel, Rafael Silva
  */
-public class GateLabServiceImpl extends RemoteServiceServlet implements GateLabService {
+public class GateLabServiceImpl extends AbstractRemoteServiceServlet implements GateLabService {
 
     public Map<String, String> getGatelabWorkflowInputs(String workflowID) {
         try {
