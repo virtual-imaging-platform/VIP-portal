@@ -44,7 +44,6 @@ import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationsTab;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
-import fr.insalyon.creatis.vip.core.client.view.application.ApplicationTileRecord;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,14 +68,15 @@ public class ApplicationHomeParser extends ApplicationParser {
 
             public void onSuccess(List<Application> result) {
 
-                List<ApplicationTileRecord> list = new ArrayList<ApplicationTileRecord>();
-                applicationNames = new ArrayList<String>();
-                addApplication(ApplicationConstants.APP_MONITOR,
-                        ApplicationConstants.APP_IMG_MONITOR);
+                if (!result.isEmpty()) {
+                    applicationNames = new ArrayList<String>();
+                    addApplication(ApplicationConstants.APP_MONITOR,
+                            ApplicationConstants.APP_IMG_MONITOR);
 
-                for (Application app : result) {
-                    addApplication(app.getName(), ApplicationConstants.APP_IMG_APPLICATION);
-                    applicationNames.add(app.getName());
+                    for (Application app : result) {
+                        addApplication(app.getName(), ApplicationConstants.APP_IMG_APPLICATION);
+                        applicationNames.add(app.getName());
+                    }
                 }
             }
         };
