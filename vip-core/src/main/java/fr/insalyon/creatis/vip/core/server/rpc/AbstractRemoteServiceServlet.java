@@ -55,13 +55,13 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
     protected ConfigurationBusiness configurationBusiness;
 
     public AbstractRemoteServiceServlet() {
-        
+
         configurationBusiness = new ConfigurationBusiness();
     }
 
     @Override
     protected void checkPermutationStrongName() throws SecurityException {
-        
+
         // Content-Type text/x-gwt-rpc; charset=utf-8
         // X-GWT-Permutation F1AEC601C5D8E4490E7096AB58EB
         HttpServletRequest req = this.getThreadLocalRequest();
@@ -75,7 +75,7 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
      * @return 
      */
     protected HttpSession getSession() {
-        
+
         return this.getThreadLocalRequest().getSession();
     }
 
@@ -85,21 +85,21 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
      * @throws CoreException 
      */
     protected User getSessionUser() throws CoreException {
-        
+
         User user = (User) getSession().getAttribute(CoreConstants.SESSION_USER);
         if (user != null) {
             return user;
         }
         throw new CoreException("User not logged in.");
     }
-    
+
     /**
      * 
      * @return
      * @throws CoreException 
      */
     protected Map<String, ROLE> getSessionUserGroups() throws CoreException {
-        
+
         Map<String, ROLE> groups = (Map<String, ROLE>) getSession().getAttribute(CoreConstants.SESSION_GROUPS);
         if (groups != null) {
             return groups;
@@ -114,7 +114,7 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
      * @throws BusinessException 
      */
     protected void authenticateSystemAdministrator(Logger logger) throws CoreException, BusinessException {
-        
+
         User user = getSessionUser();
         if (!user.isSystemAdministrator()) {
             logger.error("The user has no administrator rights: " + user.getEmail());
@@ -129,7 +129,13 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
      * @throws CoreException 
      */
     protected void trace(Logger logger, String message) throws CoreException {
-        
-        logger.info("(" + getSessionUser().getEmail() + ") " + message);
+
+        try {
+            logger.info("(" + getSessionUser().getEmail() + ") " + message);
+            
+        } catch (CoreException ex) {
+            logger.error(ex);
+            throw ex;
+        }
     }
 }
