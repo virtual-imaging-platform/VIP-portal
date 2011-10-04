@@ -147,11 +147,5 @@
             </resource>
         </resources>
     </build>
-    <repositories>
-        <repository>
-            <id>Unice-releases</id>
-            <name>Unice Releases Repository</name>
-            <url>http://nyx.unice.fr:9007/nexus/content/repositories/releases</url>
-        </repository>
-    </repositories>
+
 </project>

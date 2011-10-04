@@ -34,15 +34,10 @@
  */
 package fr.insalyon.creatis.vip.gatelab.client;
 
-import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tab.events.CloseClickHandler;
-import com.smartgwt.client.widgets.tab.events.TabCloseClickEvent;
 import fr.insalyon.creatis.vip.application.client.ApplicationModule;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Module;
-import fr.insalyon.creatis.vip.core.client.view.layout.CenterTabSet;
 import fr.insalyon.creatis.vip.gatelab.client.view.GateLabHomeParser;
-import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabSimulationTab;
 
 /**
  *
@@ -58,17 +53,6 @@ public class GateLabModule extends Module {
 
     @Override
     public void load() {
-        
-        // Simulation close tab
-        CenterTabSet.getInstance().addCloseClickHandler(new CloseClickHandler() {
-
-            public void onCloseClick(TabCloseClickEvent event) {
-                Tab tab = event.getTab();
-                if (tab instanceof GateLabSimulationTab) {
-                    ((GateLabSimulationTab) tab).destroy();
-                }
-            }
-        });
     }
 
     @Override

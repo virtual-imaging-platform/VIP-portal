@@ -41,7 +41,6 @@ import java.io.InputStream;
 import java.util.List;
 import javax.xml.rpc.ServiceException;
 import localhost.moteur_service_wsdl.Moteur_ServiceLocator;
-import nl.uva.vlet.exception.VlException;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.configuration.FileProvider;
 
