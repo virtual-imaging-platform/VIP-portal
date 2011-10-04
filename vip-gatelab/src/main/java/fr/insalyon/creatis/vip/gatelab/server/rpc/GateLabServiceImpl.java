@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -34,13 +34,16 @@
  */
 package fr.insalyon.creatis.vip.gatelab.server.rpc;
 
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabService;
-import fr.insalyon.creatis.vip.gatelab.server.business.GateLabInputs;
-import fr.insalyon.creatis.vip.gatelab.server.dao.DAOFactory;
+import fr.insalyon.creatis.vip.gatelab.client.view.GateLabException;
+import fr.insalyon.creatis.vip.gatelab.server.business.GateLabBusiness;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -48,34 +51,54 @@ import java.util.HashMap;
  */
 public class GateLabServiceImpl extends AbstractRemoteServiceServlet implements GateLabService {
 
-    public Map<String, String> getGatelabWorkflowInputs(String workflowID) {
+    private final static Logger logger = Logger.getLogger(GateLabServiceImpl.class);
+    private GateLabBusiness gatelabBusiness;
+
+    public GateLabServiceImpl() {
+        
+        gatelabBusiness = new GateLabBusiness();
+    }
+
+    public List<Application> getApplications() throws GateLabException {
+
         try {
-            GateLabInputs gateinputs = new GateLabInputs(workflowID);
-            long nb = DAOFactory.getDAOFactory().getGatelabDAO(workflowID).getNumberParticles();
-            Map<String, String> inputMap = new HashMap<String, String>();
-            inputMap = gateinputs.getWorkflowInputs();
-            inputMap.put("runnedparticles", "" + nb);
-            return inputMap;
-        } catch (DAOException ex) {
-            ex.printStackTrace();
-            return null;
+            return gatelabBusiness.getApplications();
+
+        } catch (BusinessException ex) {
+            throw new GateLabException(ex);
         }
     }
 
-    public long getNumberParticles(String workflowID) {
-        try {
-            return DAOFactory.getDAOFactory().getGatelabDAO(workflowID).getNumberParticles();
-        } catch (DAOException ex) {
-            return 0;
-        }
+    public Map<String, String> getGatelabWorkflowInputs(String simulationID) throws GateLabException {
 
+        try {
+            return gatelabBusiness.getGatelabWorkflowInputs(simulationID);
+
+        } catch (BusinessException ex) {
+            throw new GateLabException(ex);
+        }
     }
 
-    public void StopWorkflowSimulation(String workflowID) {
+    public long getNumberParticles(String simulationID) throws GateLabException {
+
         try {
-            DAOFactory.getDAOFactory().getGatelabDAO(workflowID).StopWorkflowSimulation();
-        } catch (DAOException ex) {
-            ex.printStackTrace();
+            return gatelabBusiness.getNumberParticles(simulationID);
+
+        } catch (BusinessException ex) {
+            throw new GateLabException(ex);
+        }
+    }
+
+    public void StopWorkflowSimulation(String simulationID) throws GateLabException {
+
+        try {
+            trace(logger, "Stopping GateLab simulation: " + simulationID);
+            gatelabBusiness.StopWorkflowSimulation(simulationID);
+
+        } catch (CoreException ex) {
+            throw new GateLabException(ex);
+        } catch (BusinessException ex) {
+            throw new GateLabException(ex);
         }
     }
 }

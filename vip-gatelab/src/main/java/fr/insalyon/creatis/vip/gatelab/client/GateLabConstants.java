@@ -40,15 +40,14 @@ package fr.insalyon.creatis.vip.gatelab.client;
  */
 public class GateLabConstants {
 
-    // Tabs
-    public final static String TAB_APPLICATION = "applications-tab";
     // Icons
-    private static final String IMG_FOLDER = "gatelab/";
-    public static final String ICON_APPLICATION = IMG_FOLDER + "icon-application.png";
+    private final static String IMG_FOLDER = "gatelab/";
+    public final static String ICON_APPLICATION = IMG_FOLDER + "icon-application.png";
     // Application Names
-    public final static String APP_GROUP = "GATE";
+    public final static String APP_MONITOR = "Monitor GateLab";
     // Application Images
-    public static final String APP_IMG_APPLICATION = IMG_FOLDER + "app-application.png";
+    public final static String APP_IMG_MONITOR = IMG_FOLDER + "app-application.png";
+    public final static String APP_IMG_APPLICATION = IMG_FOLDER + "app-application.png";
     // Configuration
     public final static String GATELAB_CLASS = "GATE";
 }

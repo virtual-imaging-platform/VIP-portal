@@ -32,24 +32,24 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.gatelab.client.rpc;
+package fr.insalyon.creatis.vip.gatelab.client.view;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
-import java.util.List;
-import java.util.Map;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  *
- * @author Ibrahim Kallel, Rafael Silva
+ * @author Rafael Silva
  */
-public interface GateLabServiceAsync {
+public class GateLabException extends Exception implements IsSerializable {
 
-    public void getApplications(AsyncCallback<List<Application>> asyncCallback);
-    
-    public void getGatelabWorkflowInputs(String workflowID, AsyncCallback<Map<String, String>> asyncCallback);
+    public GateLabException() {
+    }
 
-    public void getNumberParticles(String workflowID, AsyncCallback<java.lang.Long> asyncCallback);
+    public GateLabException(String string) {
+        super(string);
+    }
 
-    public void StopWorkflowSimulation(String workflowID, AsyncCallback<Void> asyncCallback);
+    public GateLabException(Throwable thrwbl) {
+        super(thrwbl);
+    }
 }

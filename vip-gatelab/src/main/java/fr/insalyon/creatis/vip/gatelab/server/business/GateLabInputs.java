@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.gatelab.server.business;
 
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
@@ -58,7 +59,8 @@ public class GateLabInputs {
         inputsMap = in.parse(inputfile);
     }
 
-    public Map<String, String> getWorkflowInputs() {
+    public Map<String, String> getWorkflowInputs() throws BusinessException {
+        
         try {
             String input = inputsMap.get("GateInput");
 /*
@@ -106,7 +108,7 @@ public class GateLabInputs {
             
         } catch (DataManagerException ex) {
             logger.error(ex);
-            return null;
+            throw new BusinessException(ex);
         }
     }
 }

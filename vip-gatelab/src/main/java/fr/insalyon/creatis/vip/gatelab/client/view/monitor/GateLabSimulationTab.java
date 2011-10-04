@@ -34,23 +34,28 @@
  */
 package fr.insalyon.creatis.vip.gatelab.client.view.monitor;
 
+import com.smartgwt.client.widgets.Canvas;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SummaryTab;
+import fr.insalyon.creatis.vip.gatelab.client.GateLabConstants;
 
 /**
  *
- * @author Rafael Silva
+ * @author Sorina Camarasu, Rafael Silva
  */
-public class GateLabSimulationTab extends AbstractSimulationTab { 
+public class GateLabSimulationTab extends AbstractSimulationTab {
+
     private GateLabGeneralTab generalTab;
     private SummaryTab summaryTab;
-    
-    public GateLabSimulationTab(String simulationID, String title, SimulationStatus status, String date) {
 
-        super(simulationID,title, status);
+    public GateLabSimulationTab(String simulationID, String simulationName, SimulationStatus status, String date) {
 
-        summaryTab=new SummaryTab (simulationID, completed);
+        super(simulationID, simulationName, status);
+        
+        this.setTitle(Canvas.imgHTML(GateLabConstants.ICON_APPLICATION) + " " + simulationName);
+
+        summaryTab = new SummaryTab(simulationID, completed);
         generalTab = new GateLabGeneralTab(simulationID, status, date, completed);
 
         tabSet.addTab(generalTab);
@@ -58,9 +63,8 @@ public class GateLabSimulationTab extends AbstractSimulationTab {
     }
 
     protected void updateData() {
+        
         generalTab.loadData();
         summaryTab.loadData();
-        
-  
     }
 }

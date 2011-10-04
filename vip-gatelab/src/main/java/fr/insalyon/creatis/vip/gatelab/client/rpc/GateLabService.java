@@ -37,6 +37,9 @@ package fr.insalyon.creatis.vip.gatelab.client.rpc;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.gatelab.client.view.GateLabException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -58,9 +61,11 @@ public interface GateLabService extends RemoteService {
         }
     }
 
-    public Map<String, String> getGatelabWorkflowInputs(String workflowID);
+    public List<Application> getApplications() throws GateLabException;
 
-    public long getNumberParticles(String workflowID);
+    public Map<String, String> getGatelabWorkflowInputs(String workflowID) throws GateLabException;
 
-    public void StopWorkflowSimulation(String workflowID);
+    public long getNumberParticles(String workflowID) throws GateLabException;
+
+    public void StopWorkflowSimulation(String workflowID) throws GateLabException;
 }

@@ -15,7 +15,7 @@
  * As a counterpart to the access to the source code and  rights to copy,
  * modify and redistribute granted by the license, users are provided only
  * with a limited warranty  and the software's author,  the holder of the
- * economic rights,  and the successive licensors  have only  limited
+ * economic rights,  and the successive licensors  have only limited
  * liability.
  *
  * In this respect, the user's attention is drawn to the risks associated
@@ -34,10 +34,17 @@
  */
 package fr.insalyon.creatis.vip.gatelab.client.view;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.util.SC;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.gatelab.client.GateLabConstants;
+import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabService;
+import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabServiceAsync;
 import fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab;
 import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabSimulationsTab;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -51,46 +58,41 @@ public class GateLabHomeParser extends ApplicationParser {
     @Override
     public void loadApplications() {
 
-        addApplication("GateLaunch", "img");
-        addApplication("GateMonitor", "img");
-        /*
-        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        GateLabServiceAsync service = GateLabService.Util.getInstance();
         final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
 
-        public void onFailure(Throwable caught) {
-        SC.say("Unable to load applications:<br />" + caught.getMessage());
-        }
+            public void onFailure(Throwable caught) {
+                SC.say("Unable to load applications:<br />" + caught.getMessage());
+            }
 
-        public void onSuccess(List<Application> result) {
+            public void onSuccess(List<Application> result) {
 
-        List<ApplicationTileRecord> list = new ArrayList<ApplicationTileRecord>();
-        applicationNames = new ArrayList<String>();
-        addApplication(ApplicationConstants.APP_MONITOR,
-        ApplicationConstants.APP_IMG_MONITOR);
+                if (!result.isEmpty()) {
+                    applicationNames = new ArrayList<String>();
+                    addApplication(GateLabConstants.APP_MONITOR,
+                            GateLabConstants.APP_IMG_MONITOR);
 
-        for (Application app : result) {
-        addApplication(app.getName(), ApplicationConstants.APP_IMG_APPLICATION);
-        applicationNames.add(app.getName());
-        }
-        }
+                    for (Application app : result) {
+                        addApplication(app.getName(), GateLabConstants.APP_IMG_APPLICATION);
+                        applicationNames.add(app.getName());
+                    }
+                }
+            }
         };
         service.getApplications(callback);
-         *
-         */
     }
 
     @Override
     public boolean parse(String applicationName) {
 
-        if (applicationName.equals("GateMonitor")) {
+        if (applicationNames.contains(applicationName)) {
+            Layout.getInstance().addTab(new GateLabLaunchTab(applicationName));
+            return true;
+
+        } else if (applicationName.equals(GateLabConstants.APP_MONITOR)) {
             Layout.getInstance().addTab(new GateLabSimulationsTab());
             return true;
         }
-        if (applicationName.equals("GateLaunch")) {
-            Layout.getInstance().addTab(new GateLabLaunchTab("GateTest"));
-            return true;
-        }
-
         return false;
     }
 }
