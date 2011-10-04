@@ -49,6 +49,7 @@ import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
 import fr.insalyon.creatis.vip.docs.client.DocsModule;
 import fr.insalyon.creatis.vip.gatelab.client.GateLabModule;
 import fr.insalyon.creatis.vip.models.client.ModelModule;
+import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIModule;
 
 /**
  *
@@ -62,10 +63,11 @@ public class Main implements EntryPoint {
         ModulesInit modulesInit = ModulesInit.getInstance();
         modulesInit.add(new CoreModule());
         modulesInit.add(new DataManagerModule());
-        modulesInit.add(new ApplicationModule());
-        modulesInit.add(new GateLabModule());
+        modulesInit.add(new SimulationGUIModule());
         modulesInit.add(new ModelModule());
         modulesInit.add(new DocsModule());
+        modulesInit.add(new ApplicationModule());
+        modulesInit.add(new GateLabModule());
         // End-Modules
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();

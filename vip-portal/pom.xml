@@ -77,11 +77,11 @@
             <version>${vip.provenance.version}</version>
         </dependency>-->
                 
-<!--        <dependency>
+        <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-simulation-gui</artifactId>
             <version>${vip.simulation-gui.version}</version>
-        </dependency>-->
+        </dependency>
         
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
