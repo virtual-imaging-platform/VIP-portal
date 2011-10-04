@@ -32,42 +32,28 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.simulationgui.client.util.math;
+package fr.insalyon.creatis.vip.simulationgui.client;
+
+import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.Module;
+import fr.insalyon.creatis.vip.simulationgui.client.view.SimulationGUIParser;
 
 /**
- * Interface of vector with float components
- * 
- * @author Sönke Sothmann
+ *
+ * @author Rafael Silva
  */
-public interface Vectorf {
+public class SimulationGUIModule extends Module {
 
-    /**
-     * Creates a new Vector that is this vector multiplied with the given
-     * scalar.
-     *
-     * @param scalar
-     * @return the multiplied Vector
-     */
-    public abstract Vectorf multiply(float scalar);
+    public SimulationGUIModule() {
 
-    /**
-     * Returns the length of the vector.
-     *
-     * @return the length of the vector
-     */
-    public abstract float length();
+        CoreModule.homeExecutor.addParser(new SimulationGUIParser());
+    }
 
-    /**
-     * Creates a new Vector that is the unit vector of this vector.
-     *
-     * @return the unit vector
-     */
-    public abstract Vectorf toUnitVector();
+    @Override
+    public void load() {
+    }
 
-    /**
-     * Returns the data of this vector as array.
-     *
-     * @return the data as array
-     */
-    public abstract float[] toArray();
+    @Override
+    public void terminate() {
+    }
 }

@@ -32,42 +32,32 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.simulationgui.client.util.math;
+package fr.insalyon.creatis.vip.simulationgui.client;
 
 /**
- * Interface of vector with float components
- * 
- * @author Sönke Sothmann
+ *
+ * @author Rafael Silva
  */
-public interface Vectorf {
+public class SimulationGUIConstants {
 
-    /**
-     * Creates a new Vector that is this vector multiplied with the given
-     * scalar.
-     *
-     * @param scalar
-     * @return the multiplied Vector
-     */
-    public abstract Vectorf multiply(float scalar);
-
-    /**
-     * Returns the length of the vector.
-     *
-     * @return the length of the vector
-     */
-    public abstract float length();
-
-    /**
-     * Creates a new Vector that is the unit vector of this vector.
-     *
-     * @return the unit vector
-     */
-    public abstract Vectorf toUnitVector();
-
-    /**
-     * Returns the data of this vector as array.
-     *
-     * @return the data as array
-     */
-    public abstract float[] toArray();
+    // Tabs
+    public final static String TAB_EDITOR = "gui-editor-tab";
+    // Icons
+    private final static String IMG_FOLDER = "simulation-gui/";
+    public final static String ICON_AXIS = IMG_FOLDER + "icon-axis.jpg";
+    public final static String ICON_CAMERA = IMG_FOLDER + "icon-camera.jpg";
+    public final static String ICON_EDITOR = IMG_FOLDER + "icon-editor.png";
+    public final static String ICON_EXAMPLE = IMG_FOLDER + "icon-information.png";
+    public final static String ICON_MOUSE = IMG_FOLDER + "icon-mouse.png";
+    public final static String ICON_TOOL = IMG_FOLDER + "icon-tool.png";
+    public final static String ICON_XBACK = IMG_FOLDER + "icon-xFront.jpg";
+    public final static String ICON_XFRONT = IMG_FOLDER + "icon-xBack.jpg";
+    public final static String ICON_YBACK = IMG_FOLDER + "icon-yFront.jpg";
+    public final static String ICON_YFRONT = IMG_FOLDER + "icon-yBack.jpg";
+    public final static String ICON_ZBACK = IMG_FOLDER + "icon-zFront.jpg";
+    public final static String ICON_ZFRONT = IMG_FOLDER + "icon-zBack.jpg";
+    // Application Names
+    public final static String APP_EDITOR = "Simulation Editor";
+    // Application Images
+    public static final String APP_IMG_EDITOR = IMG_FOLDER + "app-editor.png";
 }

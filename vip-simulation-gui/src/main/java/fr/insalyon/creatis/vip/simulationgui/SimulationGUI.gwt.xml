@@ -1,34 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 1.7.0//EN" "http://google-web-toolkit.googlecode.com/svn/tags/1.7.0/distro-source/core/src/gwt-module.dtd">
 <module>
-    <!-- Inherit the core Web Toolkit stuff.                        -->
-    <inherits name='com.google.gwt.user.User' />
-    <inherits name="com.google.gwt.core.Core" />
-    <!-- Inherit the default GWT style sheet.  You can change       -->
-    <!-- the theme of your GWT application by uncommenting          -->
-    <!-- any one of the following lines.                            -->
-    <inherits name='com.google.gwt.user.theme.standard.Standard' />
-    <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
-    <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
 
-    <!-- Other module inherits                                      -->
-
-    <!-- Specify the app entry point class.                         -->
-    <inherits name='fr.insalyon.creatis.vip.common.Common'/>
-    <inherits name='fr.insalyon.creatis.vip.datamanager.DataManager'/>
     <inherits name='fr.insalyon.creatis.vip.core.Core'/>
+    <inherits name='fr.insalyon.creatis.vip.datamanager.DataManager'/>    
     <inherits name='fr.insalyon.creatis.vip.models.Models'/>
     <inherits name='fr.insalyon.creatis.vip.application.Application'/>
+    
     <inherits name='com.googlecode.gwtgl.binding'/>
-   <inherits name="fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjects" />
+    <inherits name="fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjects" />
    
     <!-- Servlets -->
-     <servlet  class="fr.insalyon.creatis.vip.simulationgui.server.rpc.VTKControllerImpl" path="/vtkcontroller"/>
-      <servlet class="fr.insalyon.creatis.vip.models.server.rpc.ModelServiceImpl" path="/modelservice"/>
-      <servlet class="fr.insalyon.creatis.vip.application.server.rpc.WorkflowServiceImpl" path="/workflowservice"/>
+    <servlet  class="fr.insalyon.creatis.vip.simulationgui.server.rpc.VTKControllerImpl" path="/vtkcontroller"/>
+    <servlet class="fr.insalyon.creatis.vip.models.server.rpc.ModelServiceImpl" path="/modelservice"/>
+    <servlet class="fr.insalyon.creatis.vip.application.server.rpc.WorkflowServiceImpl" path="/workflowservice"/>
     <servlet class="fr.insalyon.creatis.vip.application.server.rpc.JobServiceImpl" path="/jobservice"/>
 
-<!--
-
-<servlet class="fr.insalyon.creatis.vip.gatelab.server.rpc.GateLabServiceImpl" path="/gatelabservice"/>-->
 </module>

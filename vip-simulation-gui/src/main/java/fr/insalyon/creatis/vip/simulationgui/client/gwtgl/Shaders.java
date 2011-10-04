@@ -31,43 +31,38 @@
  *
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
+ * 
+ * Code extracted from:
+ * http://code.google.com/p/gwtgl/
  */
-package fr.insalyon.creatis.vip.simulationgui.client.util.math;
+package fr.insalyon.creatis.vip.simulationgui.client.gwtgl;
+
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.resources.client.ClientBundle;
+import com.google.gwt.resources.client.TextResource;
 
 /**
- * Interface of vector with float components
- * 
- * @author Sönke Sothmann
+ *
+ * @author Kevin Moulin
  */
-public interface Vectorf {
+public interface Shaders extends ClientBundle {
+
+    /** The instance of the Shaders ClientBundle. */
+    public static Shaders INSTANCE = GWT.create(Shaders.class);
 
     /**
-     * Creates a new Vector that is this vector multiplied with the given
-     * scalar.
+     * The fragment shader to use in the example.
      *
-     * @param scalar
-     * @return the multiplied Vector
+     * @return the source of the fragment shader.
      */
-    public abstract Vectorf multiply(float scalar);
+    @Source(value = {"fragment-shader.txt"})
+    TextResource fragmentShader();
 
     /**
-     * Returns the length of the vector.
+     * The vertex shader to use in the example.
      *
-     * @return the length of the vector
+     * @return the source of the vertex shader.
      */
-    public abstract float length();
-
-    /**
-     * Creates a new Vector that is the unit vector of this vector.
-     *
-     * @return the unit vector
-     */
-    public abstract Vectorf toUnitVector();
-
-    /**
-     * Returns the data of this vector as array.
-     *
-     * @return the data as array
-     */
-    public abstract float[] toArray();
+    @Source(value = {"vertex-shader.txt"})
+    TextResource vertexShader();
 }

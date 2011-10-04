@@ -32,42 +32,32 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.simulationgui.client.util.math;
+package fr.insalyon.creatis.vip.simulationgui.client.view;
+
+import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIConstants;
 
 /**
- * Interface of vector with float components
- * 
- * @author Sönke Sothmann
+ *
+ * @author Rafael Silva
  */
-public interface Vectorf {
+public class SimulationGUIParser extends ApplicationParser {
 
-    /**
-     * Creates a new Vector that is this vector multiplied with the given
-     * scalar.
-     *
-     * @param scalar
-     * @return the multiplied Vector
-     */
-    public abstract Vectorf multiply(float scalar);
+    @Override
+    public void loadApplications() {
+        
+        //TODO: Verify Group Access (Admin and VIP)
+        addApplication(SimulationGUIConstants.APP_EDITOR, SimulationGUIConstants.APP_IMG_EDITOR);
+    }
 
-    /**
-     * Returns the length of the vector.
-     *
-     * @return the length of the vector
-     */
-    public abstract float length();
-
-    /**
-     * Creates a new Vector that is the unit vector of this vector.
-     *
-     * @return the unit vector
-     */
-    public abstract Vectorf toUnitVector();
-
-    /**
-     * Returns the data of this vector as array.
-     *
-     * @return the data as array
-     */
-    public abstract float[] toArray();
+    @Override
+    public boolean parse(String applicationName) {
+        
+        if (applicationName.equals(SimulationGUIConstants.APP_EDITOR)) {
+            Layout.getInstance().addTab(new SimulationGUITab());
+            return true;
+        }
+        return false;
+    }
 }
