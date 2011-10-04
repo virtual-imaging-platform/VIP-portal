@@ -37,9 +37,7 @@ package fr.insalyon.creatis.vip.gatelab.client;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.events.CloseClickHandler;
 import com.smartgwt.client.widgets.tab.events.TabCloseClickEvent;
-import fr.insalyon.creatis.vip.application.client.view.ApplicationHomeParser;
-import fr.insalyon.creatis.vip.application.client.view.ApplicationSystemParser;
-import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationTab;
+import fr.insalyon.creatis.vip.application.client.ApplicationModule;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Module;
 import fr.insalyon.creatis.vip.core.client.view.layout.CenterTabSet;
@@ -54,6 +52,7 @@ public class GateLabModule extends Module {
 
     public GateLabModule() {
         
+        ApplicationModule.reservedClasses.add(GateLabConstants.GATELAB_CLASS);
         CoreModule.homeExecutor.addParser(new GateLabHomeParser());
     }
 

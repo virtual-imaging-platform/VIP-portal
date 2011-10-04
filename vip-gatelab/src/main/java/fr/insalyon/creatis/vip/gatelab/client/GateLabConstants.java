@@ -42,57 +42,13 @@ public class GateLabConstants {
 
     // Tabs
     public final static String TAB_APPLICATION = "applications-tab";
-    public final static String TAB_MANAGE_APPLICATION = "manage-application-tab";
-    public final static String TAB_MANAGE_CLASSES = "manage-classes-tab";
-    public final static String TAB_MONITOR = "monitor-tab";
-    public final static String TAB_STATS = "stats-tab";
     // Icons
-    private static final String IMG_FOLDER = "application/";
+    private static final String IMG_FOLDER = "gatelab/";
     public static final String ICON_APPLICATION = IMG_FOLDER + "icon-application.png";
-    public static final String ICON_CHART = IMG_FOLDER + "icon-chart.png";
-    public static final String ICON_CLASSES = IMG_FOLDER + "icon-classes.png";
-    public static final String ICON_CLEAN = IMG_FOLDER + "icon-clean.png";
-    public static final String ICON_GENERAL = IMG_FOLDER + "icon-general.png";
-    public static final String ICON_KILL = IMG_FOLDER + "icon-kill.png";
-    public static final String ICON_LOG = IMG_FOLDER + "icon-log.png";
-    public static final String ICON_MONITOR = IMG_FOLDER + "icon-monitor.png";
-    public static final String ICON_PREVIEW = IMG_FOLDER + "icon-preview.png";
-    public static final String ICON_SEARCH = IMG_FOLDER + "icon-search.png";
-    public static final String ICON_SIMULATION_VIEW = IMG_FOLDER + "icon-simulation-view.png";
-    public static final String ICON_SUMMARY = IMG_FOLDER + "icon-summary.png";
-    public static final String ICON_TREE_INPUT = IMG_FOLDER + "tree/icon-tree-input.png";
-    public static final String ICON_TREE_OUTPUT = IMG_FOLDER + "tree/icon-tree-output.png";
-    public static final String ICON_TREE_SERVICE = IMG_FOLDER + "tree/icon-tree-service.png";
-    public static final String ICON_TREE_SIMULATION = IMG_FOLDER + "tree/icon-tree-simulation.png";
     // Application Names
     public final static String APP_GROUP = "GATE";
-    public static final String APP_APPLICATION = "Applications";
-    public static final String APP_CLASSES = "Classes";
-    public static final String APP_MONITOR = "Simulations Monitor";
-    public static final String APP_SIMULATION_ERROR = "Error File";
-    public static final String APP_SIMULATION_OUT = "Output File";
     // Application Images
     public static final String APP_IMG_APPLICATION = IMG_FOLDER + "app-application.png";
-    public static final String APP_IMG_CLASSES = IMG_FOLDER + "app-classes.png";
-    public static final String APP_IMG_MONITOR = IMG_FOLDER + "app-monitor.png";
-    public static final String APP_IMG_SIMULATION_ERROR = IMG_FOLDER + "app-simulation-error.png";
-    public static final String APP_IMG_SIMULATION_OUT = IMG_FOLDER + "app-simulation-out.png";
-    // Enums
-    public static enum JobStatus {
-        KILL, RESCHEDULE, ERROR, COMPLETED
-    };
-    
-    public static enum SimulationStatus {
-        Running, Completed, Killed, Cleaned
-    };
-    
-    public static enum MoteurStatus {
-        RUNNING, COMPLETE, TERMINATED, UNKNOWN
-    };
-    
-    public static String getLaunchTabID(String applicationName) {
-        
-        return "launch-" + applicationName.replaceAll(" ", "-").toLowerCase() 
-                + "-tab";
-    }
+    // Configuration
+    public final static String GATELAB_CLASS = "GATE";
 }

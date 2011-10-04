@@ -58,7 +58,7 @@ import java.util.Map;
 
 /**
  *
- * @author camarasu
+ * @author Sorina Camarasu
  */
 public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
 
@@ -145,7 +145,6 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
             public void onClick(ClickEvent event) {
                 //set the correct path for upload
 
-
                 loadMacWindow = new LoadMacWindow(modal, baseDir);
                 loadMacWindow.show();
 
@@ -163,7 +162,6 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
                  */
                 //layout.show();
                 //layout.showMember(stack, null);
-
             }
         });
 
@@ -176,13 +174,13 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
     }
 
     public void loadNameLayout() {
+        
         nameLayout.addMember(getSimulatioNameLayout());
         HLayout macLayout = new HLayout(5);
         macLayout.setAlign(VerticalAlignment.CENTER);
         macLayout.setMargin(20);
         macLayout.addMember(loadMac);
         nameLayout.addMember(macLayout);
-
     }
 
     /**
@@ -275,7 +273,6 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
                          */
                         inputsLayout.addMember(new GateLabInput(source.getName(), ul));
                         //inputsListGrid.se
-
                     }
 
                     HLayout buttonsLayout = new HLayout(5);
@@ -297,6 +294,7 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
                     buttonsLayout.addMember(launchButton);
                     buttonsLayout.addMember(getSaveInputsButton());
                     modal.hide();
+                    
                 } else {
                     modal.hide();
                     SC.warn("Unable to download application source file.");
@@ -313,6 +311,7 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
      * @return Result of the validation
      */
     private boolean validate() {
+        
         boolean valid = simulationNameItem.validate();
         for (GateLabInput input : getGateLabInputs()) {
             if (!input.validate()) {
@@ -327,6 +326,7 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
      * Launches a simulation.
      */
     private void launch() {
+        
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
@@ -342,8 +342,6 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
         };
         modal.show("Launching simulation...", true);
         service.launchSimulation(getParametersMap(), applicationName, simulationNameItem.getValueAsString(), callback);
-
-
     }
 
     /**

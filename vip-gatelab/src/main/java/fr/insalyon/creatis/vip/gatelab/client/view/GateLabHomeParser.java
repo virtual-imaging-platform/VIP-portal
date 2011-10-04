@@ -34,19 +34,10 @@
  */
 package fr.insalyon.creatis.vip.gatelab.client.view;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
-import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
-import fr.insalyon.creatis.vip.core.client.view.application.ApplicationTileRecord;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.gatelab.client.GateLabConstants;
 import fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab;
 import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabSimulationsTab;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -100,19 +91,6 @@ public class GateLabHomeParser extends ApplicationParser {
             return true;
         }
 
-        /*
-        if (applicationNames.contains(applicationName)) {
-        Layout.getInstance().addTab(new GateLabLaunchTab(applicationName));
-        return true;
-        
-        } else if (applicationName.equals(GateLabConstants.APP_MONITOR)) {
-        Layout.getInstance().addTab(new GateLabSimulationsTab());
-        return true;
-        }
-        return false;
-        }
-         *
-         */
         return false;
     }
 }
