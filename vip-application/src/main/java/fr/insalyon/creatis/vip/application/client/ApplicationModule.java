@@ -34,12 +34,16 @@
  */
 package fr.insalyon.creatis.vip.application.client;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.events.CloseClickHandler;
 import com.smartgwt.client.widgets.tab.events.TabCloseClickEvent;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationHomeParser;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationSystemParser;
-import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationTab;
+import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Module;
 import fr.insalyon.creatis.vip.core.client.view.layout.CenterTabSet;
@@ -52,11 +56,11 @@ import java.util.List;
  */
 public class ApplicationModule extends Module {
 
-    public static List<String> specialGroups;
+    public static List<String> reservedClasses;
     
     public ApplicationModule() {
         
-        specialGroups = new ArrayList<String>();
+        reservedClasses = new ArrayList<String>();
         
         CoreModule.systemExecutor.addParser(new ApplicationSystemParser());
         CoreModule.homeExecutor.addParser(new ApplicationHomeParser());
@@ -70,8 +74,8 @@ public class ApplicationModule extends Module {
 
             public void onCloseClick(TabCloseClickEvent event) {
                 Tab tab = event.getTab();
-                if (tab instanceof SimulationTab) {
-                    ((SimulationTab) tab).destroy();
+                if (tab instanceof AbstractSimulationTab) {
+                    ((AbstractSimulationTab) tab).destroy();
                 }
             }
         });
@@ -79,5 +83,17 @@ public class ApplicationModule extends Module {
 
     @Override
     public void terminate() {
+        
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            public void onFailure(Throwable caught) {
+                SC.say("Unable to signout:<br />" + caught.getMessage());
+            }
+
+            public void onSuccess(Void result) {
+            }
+        };
+        service.signout(callback);
     }
 }

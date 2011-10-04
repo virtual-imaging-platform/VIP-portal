@@ -80,14 +80,14 @@ public class ApplicationBusiness {
 
     /**
      * 
-     * @param email
+     * @param classes
      * @return
      * @throws BusinessException 
      */
-    public List<Application> getApplications(String email, boolean validGroup) throws BusinessException {
+    public List<Application> getApplications(List<String> classes) throws BusinessException {
 
         try {
-            return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getApplications(email, validGroup);
+            return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getApplications(classes);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -111,14 +111,14 @@ public class ApplicationBusiness {
 
     /**
      * 
-     * @param email
+     * @param classes
      * @return
      * @throws BusinessException 
      */
-    public List<String> getApplicationNames(String email) throws BusinessException {
+    public List<String> getApplicationNames(List<String> classes) throws BusinessException {
 
         List<String> applicationNames = new ArrayList<String>();
-        for (Application application : getApplications(email, false)) {
+        for (Application application : getApplications(classes)) {
             applicationNames.add(application.getName());
         }
 

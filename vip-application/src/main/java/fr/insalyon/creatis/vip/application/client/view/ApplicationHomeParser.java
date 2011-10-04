@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.application.client.view;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.ApplicationModule;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
@@ -79,7 +80,7 @@ public class ApplicationHomeParser extends ApplicationParser {
                 }
             }
         };
-        service.getApplications(callback);
+        service.getApplications(ApplicationModule.reservedClasses, callback);
     }
 
     @Override

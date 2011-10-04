@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.server.rpc;
 
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
@@ -60,9 +61,14 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     private ApplicationBusiness applicationBusiness;
 
     public ApplicationServiceImpl() {
-        
+
         classBusiness = new ClassBusiness();
         applicationBusiness = new ApplicationBusiness();
+    }
+
+    public void signout() throws ApplicationException {
+        
+        getSession().removeAttribute(ApplicationConstants.SESSION_CLASSES);
     }
 
     public void add(Application application) throws ApplicationException {
@@ -115,10 +121,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     public Application getApplication(String name) {
-        
+
         try {
             return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getApplication(name);
-            
+
         } catch (DAOException ex) {
             return null;
         }
@@ -127,13 +133,24 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     public List<Application> getApplications() throws ApplicationException {
 
         try {
-            User user = getSessionUser();
-            if (user.isSystemAdministrator()) {
-                return applicationBusiness.getApplications();
+            authenticateSystemAdministrator(logger);
+            return applicationBusiness.getApplications();
 
-            } else {
-                return applicationBusiness.getApplications(user.getEmail(), true);
-            }
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    public List<Application> getApplications(List<String> reservedClasses) throws ApplicationException {
+
+        try {
+            List<String> classes = getUserClasses(getSessionUser());
+            classes.removeAll(reservedClasses);
+
+            return applicationBusiness.getApplications(classes);
+
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
         } catch (BusinessException ex) {
@@ -195,19 +212,21 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
-    public List<String>[] getApplicationsAndUsers() throws ApplicationException {
-        
+    public List<String>[] getApplicationsAndUsers(List<String> reservedClasses) throws ApplicationException {
+
         try {
             User user = getSessionUser();
-            if (configurationBusiness.isSystemAdministrator(user.getEmail())) {
-                
-                return new List[]{configurationBusiness.getUserNames(user.getEmail(), false), 
-                    applicationBusiness.getApplicationNames()};
-                
+            if (user.isSystemAdministrator()) {
+
+                return new List[]{configurationBusiness.getUserNames(user.getEmail(), false),
+                            applicationBusiness.getApplicationNames()};
+
             } else {
-                
+                List<String> classes = getUserClasses(getSessionUser());
+                classes.removeAll(reservedClasses);
+
                 return new List[]{configurationBusiness.getUserNames(user.getEmail(), true),
-                    applicationBusiness.getApplicationNames(user.getEmail())};                
+                            applicationBusiness.getApplicationNames(classes)};
             }
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
@@ -217,10 +236,21 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     public AppClass getClass(String className) {
+
         try {
             return ApplicationDAOFactory.getDAOFactory().getClassDAO().getClass(className);
         } catch (DAOException ex) {
             return null;
         }
+    }
+
+    private List<String> getUserClasses(User user) throws BusinessException {
+
+        List<String> classes = (List<String>) getSession().getAttribute(ApplicationConstants.SESSION_CLASSES);
+        if (classes == null) {
+            classes = classBusiness.getUserClasses(user.getEmail(), !user.isSystemAdministrator());
+            getSession().setAttribute(ApplicationConstants.SESSION_CLASSES, classes);
+        }
+        return classes;
     }
 }

@@ -105,4 +105,22 @@ public class ClassBusiness {
             throw new BusinessException(ex);
         }
     }
+    
+    /**
+     * 
+     * @param email
+     * @param validAdmin
+     * @return
+     * @throws BusinessException 
+     */
+    public List<String> getUserClasses(String email, boolean validAdmin) 
+            throws BusinessException {
+        
+        try {
+            return ApplicationDAOFactory.getDAOFactory().getClassDAO().getUserClasses(email, validAdmin);
+        
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
 }

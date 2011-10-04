@@ -182,11 +182,9 @@ public class ApplicationData implements ApplicationDAO {
         }
     }
 
-    public List<Application> getApplications(String email, boolean validGroup) throws DAOException {
+    public List<Application> getApplications(List<String> classes) throws DAOException {
 
         try {
-
-            List<String> classes = ApplicationDAOFactory.getDAOFactory().getClassDAO().getUserClasses(email, validGroup);
             List<Application> applications = new ArrayList<Application>();
 
             if (!classes.isEmpty()) {
@@ -200,7 +198,6 @@ public class ApplicationData implements ApplicationDAO {
                 }
 
                 String clause = sb.length() > 0 ? " AND (" + sb.toString() + ")" : "";
-
 
                 PreparedStatement stat = connection.prepareStatement("SELECT "
                         + "name, lfn FROM "

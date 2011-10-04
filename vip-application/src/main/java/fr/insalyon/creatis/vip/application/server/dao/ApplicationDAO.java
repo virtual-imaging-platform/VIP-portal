@@ -54,7 +54,7 @@ public interface ApplicationDAO {
 
     public List<Application> getApplications() throws DAOException;
     
-    public List<Application> getApplications(String email, boolean validGroup) throws DAOException;
+    public List<Application> getApplications(List<String> classes) throws DAOException;
     
     public List<String> getApplicationsName(String applicationClass) throws DAOException;
 

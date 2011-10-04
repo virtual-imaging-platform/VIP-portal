@@ -48,6 +48,7 @@ import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
+import fr.insalyon.creatis.vip.application.client.ApplicationModule;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
@@ -119,10 +120,8 @@ public class SearchStackSection extends SectionStackSection {
 
                 SimulationsTab simulationsTab = (SimulationsTab) Layout.getInstance().getTab(ApplicationConstants.TAB_MONITOR);
 
-                if (CoreModule.user.isSystemAdministrator()) { //TODO: || groupAdmin) {
-                    String userText = userItem.getValueAsString();
-                    simulationsTab.setUser(userText == null || userText.isEmpty() || userText.equals("All") ? null : userText);
-                }
+                String userText = userItem.getValueAsString();
+                simulationsTab.setUser(userText == null || userText.isEmpty() || userText.equals("All") ? null : userText);
 
                 String simuText = simulationItem.getValueAsString();
                 simulationsTab.setApp(simuText == null || simuText.isEmpty() || simuText.equals("All") ? null : simuText);
@@ -152,17 +151,12 @@ public class SearchStackSection extends SectionStackSection {
             }
         });
 
-//        if (CoreModule.user.isSystemAdministrator()) { //TODO: || groupAdmin) {
-            form.setFields(userItem, startDateItem, simulationItem,
-                    endDateItem, statusItem);
-//        } else {
-//            form.setFields(simulationItem, startDateItem,
-//                    statusItem, endDateItem);
-//        }
+        form.setFields(userItem, startDateItem, simulationItem,
+                endDateItem, statusItem);
     }
 
     private void loadData() {
-        
+
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<List<String>[]> callback = new AsyncCallback<List<String>[]>() {
 
@@ -202,6 +196,6 @@ public class SearchStackSection extends SectionStackSection {
             }
         };
         modal.show("Loading search form data...", true);
-        service.getApplicationsAndUsers(callback);
+        service.getApplicationsAndUsers(ApplicationModule.reservedClasses, callback);
     }
 }

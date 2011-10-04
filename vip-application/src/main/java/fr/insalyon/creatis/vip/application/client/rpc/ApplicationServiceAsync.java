@@ -45,7 +45,11 @@ import java.util.List;
  */
 public interface ApplicationServiceAsync {
 
+    public void signout(AsyncCallback<Void> asyncCallback);
+    
     public void getApplications(AsyncCallback<List<Application>> asyncCallback);
+    
+    public void getApplications(List<String> reservedClasses, AsyncCallback<List<Application>> asyncCallback);
 
     public void getApplication(String name, AsyncCallback<Application> asyncCallback);
 
@@ -65,5 +69,5 @@ public interface ApplicationServiceAsync {
 
     public void getClass(String className, AsyncCallback<AppClass> asyncCallback);
 
-    public void getApplicationsAndUsers(AsyncCallback<List<String>[]> asyncCallback);
+    public void getApplicationsAndUsers(List<String> reservedClasses, AsyncCallback<List<String>[]> asyncCallback);
 }
