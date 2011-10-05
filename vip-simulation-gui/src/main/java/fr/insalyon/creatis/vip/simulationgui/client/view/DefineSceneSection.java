@@ -110,11 +110,10 @@ public class DefineSceneSection extends SectionStackSection {
         topTabSet.setWidth(550);
         topTabSet.setHeight(140);
 
-
-        boxUs = SimulationGUIControlBox.getInstance("US");
-        boxMri = SimulationGUIControlBox.getInstance("MRI");//MRI
-        boxCt = SimulationGUIControlBox.getInstance("CT");
-        boxPet = SimulationGUIControlBox.getInstance("PET");
+        boxUs = SimulationGUIControlBox.getInstance(SimulationGUIConstants.CLASS_US);
+        boxMri = SimulationGUIControlBox.getInstance(SimulationGUIConstants.CLASS_MRI);
+        boxCt = SimulationGUIControlBox.getInstance(SimulationGUIConstants.CLASS_CT);
+        boxPet = SimulationGUIControlBox.getInstance(SimulationGUIConstants.CLASS_PET);
 
         checkBoxUs = boxUs.getCheckbox();
         checkBoxMri = boxMri.getCheckbox();

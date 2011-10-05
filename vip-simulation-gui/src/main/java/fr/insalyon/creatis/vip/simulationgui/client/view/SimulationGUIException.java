@@ -32,38 +32,24 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.simulationgui.client.rpc;
+package fr.insalyon.creatis.vip.simulationgui.client.view;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
-import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3D;
-import fr.insalyon.creatis.vip.simulationgui.client.view.SimulationGUIException;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  *
- * @author Kevin Moulin, Rafael Silva
+ * @author Rafael Silva
  */
-@RemoteServiceRelativePath("vtk")
-public interface VTKController extends RemoteService {
+public class SimulationGUIException extends Exception implements IsSerializable {
 
-    public static final String SERVICE_URI = "/vtkcontroller";
-
-    public static class Util {
-
-        public static VTKControllerAsync getInstance() {
-
-            VTKControllerAsync instance = (VTKControllerAsync) GWT.create(VTKController.class);
-            ServiceDefTarget target = (ServiceDefTarget) instance;
-            target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
-            return instance;
-        }
+    public SimulationGUIException() {
     }
-    
-    public void configure() throws SimulationGUIException;
 
-    public Data3D[][] downloadAndUnzipExample(String path) throws SimulationGUIException;
+    public SimulationGUIException(String string) {
+        super(string);
+    }
 
-    public Data3D[][] downloadAndUnzipModel(String url) throws SimulationGUIException;
+    public SimulationGUIException(Throwable thrwbl) {
+        super(thrwbl);
+    }
 }

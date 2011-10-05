@@ -34,8 +34,12 @@
  */
 package fr.insalyon.creatis.vip.simulationgui.client;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Module;
+import fr.insalyon.creatis.vip.simulationgui.client.rpc.VTKController;
+import fr.insalyon.creatis.vip.simulationgui.client.rpc.VTKControllerAsync;
 import fr.insalyon.creatis.vip.simulationgui.client.view.SimulationGUIParser;
 
 /**
@@ -51,6 +55,18 @@ public class SimulationGUIModule extends Module {
 
     @Override
     public void load() {
+        
+        VTKControllerAsync service = VTKController.Util.getInstance();
+        AsyncCallback<Void> asyncCallback = new AsyncCallback<Void>() {
+
+            public void onFailure(Throwable caught) {
+                SC.say("Unable to configure Simulation GUI:<br />" + caught.getMessage());
+            }
+
+            public void onSuccess(Void result) {
+            }
+        };
+        service.configure(asyncCallback);
     }
 
     @Override

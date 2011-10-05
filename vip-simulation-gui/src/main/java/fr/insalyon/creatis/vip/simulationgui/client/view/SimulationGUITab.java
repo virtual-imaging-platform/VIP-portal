@@ -238,9 +238,9 @@ public class SimulationGUITab extends Tab {
 
     private void refreshLaunchTabValue() {
         
-        SimulationGUIControlBox.getInstance("US").refreshLaunchTabValue();
-        SimulationGUIControlBox.getInstance("MRI").refreshLaunchTabValue();
-        SimulationGUIControlBox.getInstance("CT").refreshLaunchTabValue();
-        SimulationGUIControlBox.getInstance("PET").refreshLaunchTabValue();
+        SimulationGUIControlBox.getInstance(SimulationGUIConstants.CLASS_US).refreshLaunchTabValue();
+        SimulationGUIControlBox.getInstance(SimulationGUIConstants.CLASS_MRI).refreshLaunchTabValue();
+        SimulationGUIControlBox.getInstance(SimulationGUIConstants.CLASS_CT).refreshLaunchTabValue();
+        SimulationGUIControlBox.getInstance(SimulationGUIConstants.CLASS_PET).refreshLaunchTabValue();
     }
 }

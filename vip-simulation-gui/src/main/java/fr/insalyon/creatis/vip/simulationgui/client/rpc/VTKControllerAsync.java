@@ -43,6 +43,8 @@ import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3D;
  */
 public interface VTKControllerAsync {
 
+    public void configure(AsyncCallback<Void> asyncCallback);
+    
     public void downloadAndUnzipExample(String path, AsyncCallback<Data3D[][]> callback);
 
     public void downloadAndUnzipModel(String url, AsyncCallback<Data3D[][]> callback);

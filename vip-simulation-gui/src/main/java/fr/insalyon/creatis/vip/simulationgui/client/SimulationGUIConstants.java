@@ -59,5 +59,10 @@ public class SimulationGUIConstants {
     // Application Names
     public final static String APP_EDITOR = "Simulation Editor";
     // Application Images
-    public static final String APP_IMG_EDITOR = IMG_FOLDER + "app-editor.png";
+    public final static String APP_IMG_EDITOR = IMG_FOLDER + "app-editor.png";
+    // Classes
+    public final static String CLASS_CT = "CT";
+    public final static String CLASS_MRI = "MRI";
+    public final static String CLASS_US = "US";
+    public final static String CLASS_PET = "PET";
 }

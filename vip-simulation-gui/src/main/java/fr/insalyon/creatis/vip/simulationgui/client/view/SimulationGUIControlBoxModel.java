@@ -65,6 +65,7 @@ import com.smartgwt.client.widgets.layout.Portlet;
 import com.smartgwt.client.widgets.tree.Tree;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeNode;
+import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIConstants;
 import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3D;
 import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.Object3D;
 import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.ObjectModel;
@@ -476,9 +477,9 @@ public class SimulationGUIControlBoxModel extends Portlet {
 
     private void refreshLaunchTabValue() {
         
-        SimulationGUIControlBox.getInstance("US").refreshLaunchTabValue();
-        SimulationGUIControlBox.getInstance("MRI").refreshLaunchTabValue();
-        SimulationGUIControlBox.getInstance("CT").refreshLaunchTabValue();
-        SimulationGUIControlBox.getInstance("PET").refreshLaunchTabValue();
+        SimulationGUIControlBox.getInstance(SimulationGUIConstants.CLASS_US).refreshLaunchTabValue();
+        SimulationGUIControlBox.getInstance(SimulationGUIConstants.CLASS_MRI).refreshLaunchTabValue();
+        SimulationGUIControlBox.getInstance(SimulationGUIConstants.CLASS_CT).refreshLaunchTabValue();
+        SimulationGUIControlBox.getInstance(SimulationGUIConstants.CLASS_PET).refreshLaunchTabValue();
     }
 }

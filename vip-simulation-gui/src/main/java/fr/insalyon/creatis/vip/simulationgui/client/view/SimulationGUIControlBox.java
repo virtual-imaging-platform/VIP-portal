@@ -85,7 +85,7 @@ public class SimulationGUIControlBox {
     private SpinnerItem spinneray = new SpinnerItem();
     private SpinnerItem spinneraz = new SpinnerItem();
     private Slider hSlider = new Slider("Step");
-    private String id;
+    private String applicationClass;
     private Object3D simu;
     private CheckboxItem modBox;
     private CheckboxItem modAxis;
@@ -95,25 +95,25 @@ public class SimulationGUIControlBox {
     private LaunchTab launchTab = null;
     private static HashMap<String, SimulationGUIControlBox> instances = new HashMap<String, SimulationGUIControlBox>();
 
-    public static synchronized SimulationGUIControlBox getInstance(String key) {
+    public static synchronized SimulationGUIControlBox getInstance(String applicationClass) {
 
-        SimulationGUIControlBox inst = instances.get(key);
+        SimulationGUIControlBox inst = instances.get(applicationClass);
         if (inst == null) {
-            inst = new SimulationGUIControlBox(key);
-            instances.put(key, inst);
+            inst = new SimulationGUIControlBox(applicationClass);
+            instances.put(applicationClass, inst);
         }
         return inst;
     }
 
-    private SimulationGUIControlBox(String contents) {
+    private SimulationGUIControlBox(String applicationClass) {
 
-        id = contents;
-        simu = new ObjectSimulateur(contents);
+        this.applicationClass = applicationClass;
+        simu = new ObjectSimulateur(applicationClass);
 
-        masterCheckbox = new CheckboxItem(id);
+        masterCheckbox = new CheckboxItem(applicationClass);
 
         portletControl = new Portlet();
-        portletControl.setTitle(id);
+        portletControl.setTitle(applicationClass);
 
         simulatorSelectItem = new SelectItem("simulator ");
         form4.setFields(simulatorSelectItem);
@@ -170,7 +170,7 @@ public class SimulationGUIControlBox {
         portletControl.addItem(form);
         portletControl.addItem(form3);
         portletControl.addItem(hLayout1);
-        simu = new ObjectSimulateur(id);
+        simu = new ObjectSimulateur(applicationClass);
 
         loadFormSimulator();
         setControl();
@@ -370,12 +370,12 @@ public class SimulationGUIControlBox {
     public float[] getTabValue() {
 
         return new float[]{
-                    spinnerx.getAttributeAsFloat(id),
-                    spinnery.getAttributeAsFloat(id),
-                    spinnerz.getAttributeAsFloat(id),
-                    spinnerax.getAttributeAsFloat(id),
-                    spinneray.getAttributeAsFloat(id),
-                    spinneraz.getAttributeAsFloat(id)
+                    spinnerx.getAttributeAsFloat(applicationClass),
+                    spinnery.getAttributeAsFloat(applicationClass),
+                    spinnerz.getAttributeAsFloat(applicationClass),
+                    spinnerax.getAttributeAsFloat(applicationClass),
+                    spinneray.getAttributeAsFloat(applicationClass),
+                    spinneraz.getAttributeAsFloat(applicationClass)
                 };
     }
 
@@ -442,6 +442,6 @@ public class SimulationGUIControlBox {
                 refreshLaunchTabValue();
             }
         };
-        service.getApplications(callback);
+        service.getApplicationsByClass(applicationClass, callback);
     }
 }

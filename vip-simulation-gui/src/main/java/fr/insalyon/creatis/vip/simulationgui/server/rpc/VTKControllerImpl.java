@@ -34,19 +34,36 @@
  */
 package fr.insalyon.creatis.vip.simulationgui.server.rpc;
 
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
+import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIConstants;
 import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3D;
 import fr.insalyon.creatis.vip.simulationgui.client.rpc.VTKController;
+import fr.insalyon.creatis.vip.simulationgui.client.view.SimulationGUIException;
 import fr.insalyon.creatis.vip.simulationgui.server.business.DownloadService;
 import fr.insalyon.creatis.vip.simulationgui.server.business.ObjectFactory;
+import java.util.ArrayList;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author Kevin Moulin, Rafael Silva
  */
 public class VTKControllerImpl extends AbstractRemoteServiceServlet implements VTKController {
+
+    private static Logger logger = Logger.getLogger(VTKControllerImpl.class);
+
+    public void configure() throws SimulationGUIException {
+
+        addClass(SimulationGUIConstants.CLASS_CT);
+        addClass(SimulationGUIConstants.CLASS_MRI);
+        addClass(SimulationGUIConstants.CLASS_PET);
+        addClass(SimulationGUIConstants.CLASS_US);
+    }
 
     public Data3D[][] downloadAndUnzipExample(String path) {
 
@@ -114,15 +131,28 @@ public class VTKControllerImpl extends AbstractRemoteServiceServlet implements V
 
     }
 
-    public Data3D[][] downloadAndUnzipModel(String url) {
-        
+    public Data3D[][] downloadAndUnzipModel(String url) throws SimulationGUIException {
+
         try {
             User user = getSessionUser();
             DownloadService service = new DownloadService(url, user.getFullName());
             return service.getObject();
-        
+
         } catch (CoreException ex) {
             return null;
+        }
+    }
+
+    private void addClass(String className) throws SimulationGUIException {
+
+        try {
+            ApplicationDAOFactory.getDAOFactory().getClassDAO().add(new AppClass(className, new ArrayList<String>()));
+
+        } catch (DAOException ex) {
+            if (!ex.getMessage().contains("A class named \"" + className + "\" already exists")) {
+                logger.error(ex);
+                throw new SimulationGUIException(ex);
+            }
         }
     }
 }
