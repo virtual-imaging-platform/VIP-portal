@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.portal.client;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.application.client.ApplicationModule;
@@ -58,7 +59,7 @@ import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIModule;
 public class Main implements EntryPoint {
 
     public void onModuleLoad() {
-        
+
         // Modules
         ModulesInit modulesInit = ModulesInit.getInstance();
         modulesInit.add(new CoreModule());
@@ -70,6 +71,15 @@ public class Main implements EntryPoint {
         modulesInit.add(new GateLabModule());
         // End-Modules
 
+        // Cookies
+        String email = null;
+        String session = null;
+        
+        if (Cookies.getCookieNames().contains(CoreConstants.COOKIES_USER)) {
+            email = Cookies.getCookie(CoreConstants.COOKIES_USER);
+            session = Cookies.getCookie(CoreConstants.COOKIES_SESSION);
+        }
+
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<User> callback = new AsyncCallback<User>() {
 
@@ -79,11 +89,22 @@ public class Main implements EntryPoint {
             }
 
             public void onSuccess(User user) {
+
+                if (user != null) {
+                    
+                    Cookies.setCookie(CoreConstants.COOKIES_USER,
+                            user.getEmail(), CoreConstants.COOKIES_EXPIRATION_DATE, 
+                            null, "/", false);
+                    Cookies.setCookie(CoreConstants.COOKIES_SESSION,
+                            user.getSession(), CoreConstants.COOKIES_EXPIRATION_DATE,
+                            null, "/", false);
+                }
+
                 Layout.getInstance().getModal().hide();
                 Layout.getInstance().authenticate(user);
             }
         };
         Layout.getInstance().getModal().show("Loading VIP " + CoreConstants.VERSION, true);
-        service.configure(callback);
+        service.configure(email, session, callback);
     }
 }
