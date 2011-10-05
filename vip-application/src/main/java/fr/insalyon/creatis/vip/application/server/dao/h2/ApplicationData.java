@@ -62,6 +62,11 @@ public class ApplicationData implements ApplicationDAO {
         connection = PlatformConnection.getInstance().getConnection();
     }
 
+    /**
+     * 
+     * @param application
+     * @throws DAOException 
+     */
     public void add(Application application) throws DAOException {
 
         try {
@@ -88,6 +93,11 @@ public class ApplicationData implements ApplicationDAO {
         }
     }
 
+    /**
+     * 
+     * @param application
+     * @throws DAOException 
+     */
     public void update(Application application) throws DAOException {
 
         try {
@@ -111,6 +121,11 @@ public class ApplicationData implements ApplicationDAO {
         }
     }
 
+    /**
+     * 
+     * @param name
+     * @throws DAOException 
+     */
     public void remove(String name) throws DAOException {
 
         try {
@@ -126,6 +141,12 @@ public class ApplicationData implements ApplicationDAO {
         }
     }
 
+    /**
+     * 
+     * @param email
+     * @param name
+     * @throws DAOException 
+     */
     public void remove(String email, String name) throws DAOException {
 
         try {
@@ -145,6 +166,11 @@ public class ApplicationData implements ApplicationDAO {
         }
     }
 
+    /**
+     * 
+     * @return
+     * @throws DAOException 
+     */
     public List<Application> getApplications() throws DAOException {
 
         try {
@@ -181,6 +207,12 @@ public class ApplicationData implements ApplicationDAO {
         }
     }
 
+    /**
+     * 
+     * @param classes
+     * @return
+     * @throws DAOException 
+     */
     public List<Application> getApplications(List<String> classes) throws DAOException {
 
         try {
@@ -198,16 +230,16 @@ public class ApplicationData implements ApplicationDAO {
 
                 String clause = sb.length() > 0 ? " AND (" + sb.toString() + ")" : "";
 
-                PreparedStatement stat = connection.prepareStatement("SELECT "
+                PreparedStatement stat = connection.prepareStatement("SELECT DISTINCT "
                         + "name, lfn FROM "
                         + "VIPApplications app, VIPApplicationClasses appc "
-                        + "WHERE app.name = appc.application " + clause);
+                        + "WHERE app.name = appc.application " + clause + " "
+                        + "ORDER BY name");
 
                 ResultSet rs = stat.executeQuery();
                 while (rs.next()) {
-                    String name = rs.getString("name");
-                    System.out.println("------ " + name);
-                    applications.add(new Application(name, rs.getString("lfn")));
+                    applications.add(new Application(
+                            rs.getString("name"), rs.getString("lfn")));
                 }
             }
             return applications;
@@ -218,6 +250,12 @@ public class ApplicationData implements ApplicationDAO {
         }
     }
 
+    /**
+     * 
+     * @param applicationName
+     * @return
+     * @throws DAOException 
+     */
     public Application getApplication(String applicationName) throws DAOException {
 
         try {
@@ -252,6 +290,11 @@ public class ApplicationData implements ApplicationDAO {
         }
     }
 
+    /**
+     * 
+     * @param applicationClass
+     * @return 
+     */
     public List<String> getApplicationsName(String applicationClass) {
         try {
 
@@ -279,7 +322,14 @@ public class ApplicationData implements ApplicationDAO {
         return null;
     }
 
-    private void addClassToApplication(String applicationName, String className) throws DAOException {
+    /**
+     * 
+     * @param applicationName
+     * @param className
+     * @throws DAOException 
+     */
+    private void addClassToApplication(String applicationName, String className) 
+            throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("INSERT INTO "
@@ -301,6 +351,11 @@ public class ApplicationData implements ApplicationDAO {
         }
     }
 
+    /**
+     * 
+     * @param workflowName
+     * @throws DAOException 
+     */
     private void removeAllClassesFromApplication(String workflowName) throws DAOException {
 
         try {
