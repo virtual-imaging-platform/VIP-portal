@@ -47,6 +47,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
 
@@ -153,6 +154,19 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
 
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+    
+    public List<Application> getApplicationsByClass(String applicationClass) throws ApplicationException {
+        
+        try {
+            List<String> classes = new ArrayList<String>();
+            classes.add(applicationClass);
+            
+            return applicationBusiness.getApplications(classes);
+            
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }

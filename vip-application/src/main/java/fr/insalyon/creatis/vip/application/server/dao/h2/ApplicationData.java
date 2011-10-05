@@ -36,7 +36,6 @@ package fr.insalyon.creatis.vip.application.server.dao.h2;
 
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
-import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
@@ -207,6 +206,7 @@ public class ApplicationData implements ApplicationDAO {
                 ResultSet rs = stat.executeQuery();
                 while (rs.next()) {
                     String name = rs.getString("name");
+                    System.out.println("------ " + name);
                     applications.add(new Application(name, rs.getString("lfn")));
                 }
             }

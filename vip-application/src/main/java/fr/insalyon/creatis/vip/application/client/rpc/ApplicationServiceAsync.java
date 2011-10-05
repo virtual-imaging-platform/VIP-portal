@@ -50,6 +50,8 @@ public interface ApplicationServiceAsync {
     public void getApplications(AsyncCallback<List<Application>> asyncCallback);
     
     public void getApplications(List<String> reservedClasses, AsyncCallback<List<Application>> asyncCallback);
+    
+    public void getApplicationsByClass(String applicationClass, AsyncCallback<List<Application>> asyncCallback);
 
     public void getApplication(String name, AsyncCallback<Application> asyncCallback);
 
