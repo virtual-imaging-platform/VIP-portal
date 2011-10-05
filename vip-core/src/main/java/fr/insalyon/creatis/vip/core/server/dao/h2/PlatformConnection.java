@@ -82,6 +82,7 @@ public class PlatformConnection {
                     + "code VARCHAR(40), "
                     + "confirmed BOOLEAN, "
                     + "folder VARCHAR(100), "
+                    + "session VARCHAR(255), "
                     + "PRIMARY KEY(email)")) {
 
                 Server server = Server.getInstance();
@@ -96,13 +97,13 @@ public class PlatformConnection {
                             server.getAdminInstitution(),
                             server.getAdminPassword(),
                             server.getAdminPhone(), true,
-                            UUID.randomUUID().toString(), folder));
+                            UUID.randomUUID().toString(), folder, ""));
 
                 } catch (DAOException ex) {
                     logger.error(ex);
                 }
             }
-
+            
             if (createTable("VIPGroups",
                     "groupname VARCHAR(50), "
                     + "PRIMARY KEY(groupname)")) {
@@ -142,7 +143,6 @@ public class PlatformConnection {
                     + "posted TIMESTAMP, "
                     + "owner VARCHAR(255), "
                     + "PRIMARY KEY (title, owner)");
-
 
             firstExecution = false;
         }

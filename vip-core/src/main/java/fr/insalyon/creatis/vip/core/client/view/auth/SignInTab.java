@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.auth;
 
+import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
@@ -42,9 +43,12 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.LinkItem;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
+import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -67,6 +71,7 @@ public class SignInTab extends Tab {
     private DynamicForm newForm;
     private TextItem emailField;
     private PasswordItem passwordField;
+    private CheckboxItem remembermeField;
     private IButton signinButton;
 
     public SignInTab() {
@@ -99,13 +104,33 @@ public class SignInTab extends Tab {
 
         emailField = FieldUtil.getTextItem(300, true, "Your Email", "[a-zA-Z0-9_.\\-+@]");
         emailField.setValidators(ValidatorUtil.getEmailValidator());
+        emailField.addKeyPressHandler(new KeyPressHandler() {
+
+            public void onKeyPress(KeyPressEvent event) {
+                if (event.getKeyName().equals("Enter")) {
+                    signin();
+                }
+            }
+        });
 
         passwordField = new PasswordItem("password", "Password");
         passwordField.setWidth(150);
         passwordField.setLength(32);
         passwordField.setRequired(true);
+        passwordField.addKeyPressHandler(new KeyPressHandler() {
 
-        signinForm = FieldUtil.getForm(emailField, passwordField);
+            public void onKeyPress(KeyPressEvent event) {
+                if (event.getKeyName().equals("Enter")) {
+                    signin();
+                }
+            }
+        });
+        
+        remembermeField = new CheckboxItem("rememberme", "Keep me logged in");
+        remembermeField.setWidth(150);
+        remembermeField.setValue(false);
+
+        signinForm = FieldUtil.getForm(emailField, passwordField, remembermeField);
         signinForm.setWidth(500);
         signinForm.setTitleWidth(150);
         signinForm.setBorder("1px solid #F6F6F6");
@@ -119,31 +144,7 @@ public class SignInTab extends Tab {
         signinButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                if (signinForm.validate()) {
-
-                    ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-                    final AsyncCallback<User> callback = new AsyncCallback<User>() {
-
-                        public void onFailure(Throwable caught) {
-                            modal.hide();
-                            if (caught.getMessage().contains("Authentication failed")) {
-                                SC.warn("The username or password you entered is incorrect.");
-                            } else {
-                                SC.warn("Unable to signing in:\n" + caught.getMessage());
-                            }
-                        }
-
-                        public void onSuccess(User result) {
-                            modal.hide();
-                            Layout.getInstance().removeTab(CoreConstants.TAB_SIGNIN);
-                            Layout.getInstance().removeTab(CoreConstants.TAB_SIGNUP);
-                            Layout.getInstance().authenticate(result);
-                        }
-                    };
-                    modal.show("Signing in...", true);
-                    service.signin(emailField.getValueAsString(),
-                            passwordField.getValueAsString(), callback);
-                }
+                signin();
             }
         });
     }
@@ -162,5 +163,54 @@ public class SignInTab extends Tab {
 
         newForm = FieldUtil.getForm(createAccount);
         newForm.setWidth(500);
+    }
+
+    private void signin() {
+        
+        if (signinForm.validate()) {
+
+            ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+            final AsyncCallback<User> callback = new AsyncCallback<User>() {
+
+                public void onFailure(Throwable caught) {
+                    modal.hide();
+                    if (caught.getMessage().contains("Authentication failed")) {
+                        SC.warn("The username or password you entered is incorrect.");
+                    } else {
+                        SC.warn("Unable to signing in:\n" + caught.getMessage());
+                    }
+                }
+
+                public void onSuccess(User result) {
+                    modal.hide();
+                    Layout.getInstance().removeTab(CoreConstants.TAB_SIGNIN);
+                    Layout.getInstance().removeTab(CoreConstants.TAB_SIGNUP);
+                    
+                    if (remembermeField.getValueAsBoolean()) {
+                        
+                        Cookies.setCookie(CoreConstants.COOKIES_USER, 
+                                result.getEmail(), CoreConstants.COOKIES_EXPIRATION_DATE,
+                                null, "/", false);
+                        Cookies.setCookie(CoreConstants.COOKIES_SESSION, 
+                                result.getSession(), CoreConstants.COOKIES_EXPIRATION_DATE,
+                                null, "/", false);
+                    
+                    } else {
+                        
+                        Cookies.setCookie(CoreConstants.COOKIES_USER, 
+                                null, CoreConstants.COOKIES_EXPIRATION_DATE,
+                                null, "/", false);
+                        Cookies.setCookie(CoreConstants.COOKIES_SESSION, 
+                                null, CoreConstants.COOKIES_EXPIRATION_DATE,
+                                null, "/", false);
+                    }
+                    
+                    Layout.getInstance().authenticate(result);
+                }
+            };
+            modal.show("Signing in...", true);
+            service.signin(emailField.getValueAsString(),
+                    passwordField.getValueAsString(), callback);
+        }
     }
 }

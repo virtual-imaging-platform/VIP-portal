@@ -175,7 +175,7 @@ public class UserData implements UserDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
-                    + "code, confirmed, folder "
+                    + "code, confirmed, folder, session "
                     + "FROM VIPUsers "
                     + "WHERE email=?");
 
@@ -187,7 +187,8 @@ public class UserData implements UserDAO {
                         rs.getString("first_name"), rs.getString("last_name"),
                         rs.getString("email"), rs.getString("institution"),
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
-                        rs.getString("code"), rs.getString("folder"));
+                        rs.getString("code"), rs.getString("folder"),
+                        rs.getString("session"));
             }
 
             logger.error("There is no user registered with the e-mail: " + email);
@@ -220,7 +221,7 @@ public class UserData implements UserDAO {
                         rs.getString("first_name"), rs.getString("last_name"),
                         rs.getString("email"), rs.getString("institution"),
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
-                        rs.getString("code"), rs.getString("folder")));
+                        rs.getString("code"), rs.getString("folder"), ""));
             }
             return users;
 
@@ -232,8 +233,8 @@ public class UserData implements UserDAO {
 
     /**
      * 
-     * @param dn
-     * @return
+     * @param email
+     * @throws DAOException 
      */
     public void remove(String email) throws DAOException {
         try {
@@ -249,25 +250,6 @@ public class UserData implements UserDAO {
         }
     }
 
-    public boolean exists(String dn) {
-        try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "dn "
-                    + "FROM PlatformUsers "
-                    + "WHERE dn=?");
-            ps.setString(1, dn);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return true;
-            }
-
-        } catch (SQLException ex) {
-            logger.error(ex);
-        }
-        return false;
-    }
-
     /**
      * 
      * @param user
@@ -280,7 +262,7 @@ public class UserData implements UserDAO {
                     + "VIPUsers SET "
                     + "first_name = ?, last_name = ?, institution = ?, "
                     + "phone = ?, folder = ? "
-                    + "WHERE email=?");
+                    + "WHERE email = ?");
 
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
@@ -288,7 +270,7 @@ public class UserData implements UserDAO {
             ps.setString(4, user.getPhone());
             ps.setString(5, user.getFolder());
             ps.setString(6, user.getEmail());
-            
+
             ps.executeUpdate();
 
         } catch (SQLException ex) {
@@ -304,26 +286,79 @@ public class UserData implements UserDAO {
      * @param newPassword
      * @throws DAOException 
      */
-    public void updatePassword(String email, String currentPassword, 
+    public void updatePassword(String email, String currentPassword,
             String newPassword) throws DAOException {
-        
+
         if (authenticate(email, currentPassword)) {
             try {
                 PreparedStatement ps = connection.prepareStatement("UPDATE "
                         + "VIPUsers SET pass = ? WHERE email = ?");
-                
+
                 ps.setString(1, newPassword);
                 ps.setString(2, email);
-                
+
                 ps.executeUpdate();
-                
+
             } catch (SQLException ex) {
                 logger.error(ex);
                 throw new DAOException(ex);
             }
         } else {
-            logger.error("The current password mismatch for '" + email +"'.");
+            logger.error("The current password mismatch for '" + email + "'.");
             throw new DAOException("The current password mismatch.");
+        }
+    }
+
+    /**
+     * 
+     * @param email
+     * @param session
+     * @throws DAOException 
+     */
+    public void updateSession(String email, String session) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "VIPUsers SET session = ? WHERE email = ?");
+
+            ps.setString(1, session);
+            ps.setString(2, email);
+
+            ps.executeUpdate();
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param email
+     * @param session
+     * @return
+     * @throws DAOException 
+     */
+    public boolean verifySession(String email, String session) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "session FROM VIPUsers WHERE email=?");
+
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String sess = rs.getString("session");
+                if (sess.equals(session)) {
+                    return true;
+                }
+            }
+            return false;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
         }
     }
 }

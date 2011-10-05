@@ -46,7 +46,7 @@ import java.util.Map;
  */
 public interface ConfigurationServiceAsync {
 
-    public void configure(AsyncCallback<User> asyncCallback);
+    public void configure(String email, String session, AsyncCallback<User> asyncCallback);
 
     public void signup(User user, AsyncCallback<Void> asyncCallback);
 

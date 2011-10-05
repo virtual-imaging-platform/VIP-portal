@@ -51,6 +51,7 @@ public class User implements IsSerializable {
     private boolean confirmed;
     private String code;
     private String folder;
+    private String session;
     private boolean systemAdministrator;
 
     public User() {
@@ -59,18 +60,18 @@ public class User implements IsSerializable {
     public User(String firstName, String lastName, String email, String institution,
             String phone) {
 
-        this(firstName, lastName, email, institution, "", phone, false, "", "");
+        this(firstName, lastName, email, institution, "", phone, false, "", "", "");
     }
-    
+
     public User(String firstName, String lastName, String email, String institution,
             String password, String phone) {
 
-        this(firstName, lastName, email, institution, password, phone, false, "", "");
+        this(firstName, lastName, email, institution, password, phone, false, "", "", "");
     }
 
     public User(String firstName, String lastName, String email, String institution,
             String password, String phone, boolean confirmed, String code,
-            String folder) {
+            String folder, String session) {
 
         this.firstName = firstName;
         this.lastName = lastName;
@@ -81,6 +82,7 @@ public class User implements IsSerializable {
         this.confirmed = confirmed;
         this.code = code;
         this.folder = folder;
+        this.session = session;
     }
 
     public boolean isConfirmed() {
@@ -141,5 +143,9 @@ public class User implements IsSerializable {
 
     public boolean isSystemAdministrator() {
         return systemAdministrator;
+    }
+
+    public String getSession() {
+        return session;
     }
 }

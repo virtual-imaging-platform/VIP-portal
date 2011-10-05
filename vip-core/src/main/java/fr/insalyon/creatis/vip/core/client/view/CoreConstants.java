@@ -34,6 +34,8 @@
  */
 package fr.insalyon.creatis.vip.core.client.view;
 
+import java.util.Date;
+
 /**
  *
  * @author Rafael Silva
@@ -83,8 +85,11 @@ public class CoreConstants {
     public static final String APP_IMG_NEWS = IMG_FOLDER + "system/app-news.png";
     public static final String APP_IMG_USER = IMG_FOLDER + "system/app-user.png";
     // Session Attributes
+    public static final String COOKIES_USER = "vip-cookie-user";
+    public static final String COOKIES_SESSION = "vip-cookie-session";
     public static final String SESSION_USER = "vip-user";
     public static final String SESSION_GROUPS = "vip-groups";
+    public static final Date COOKIES_EXPIRATION_DATE = new Date(new Date().getTime() + (1000l * 60 * 60 * 24 * 7));
     // Roles and Groups
     public static final String GROUP_ADMIN = "Administrator";
     public static final String GROUP_GUEST = "Guest";

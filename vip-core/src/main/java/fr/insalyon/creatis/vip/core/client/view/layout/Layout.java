@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.layout;
 
+import com.google.gwt.user.client.Cookies;
 import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.BottomToolStrip;
 import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -47,9 +48,11 @@ import fr.insalyon.creatis.vip.core.client.ModulesInit;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.auth.ActivationTab;
 import fr.insalyon.creatis.vip.core.client.view.auth.SignInTab;
+import java.util.Date;
 
 /**
  *
@@ -137,6 +140,10 @@ public class Layout {
             }
 
             public void onSuccess(Void result) {
+                
+                Cookies.setCookie(CoreConstants.COOKIES_USER, null, new Date(0), null, "/", false);
+                Cookies.setCookie(CoreConstants.COOKIES_SESSION, null, new Date(0), null, "/", false);
+                
                 for (Tab tab : centerTabSet.getTabs()) {
                     centerTabSet.removeTab(tab);
                 }

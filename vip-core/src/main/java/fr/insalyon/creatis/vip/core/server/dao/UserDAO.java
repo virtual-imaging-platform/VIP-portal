@@ -58,6 +58,8 @@ public interface UserDAO {
     public void remove(String email) throws DAOException;
     
     public void updatePassword(String email, String currentPassword, String newPassword) throws DAOException;
-
-    public boolean exists(String dn);
+    
+    public void updateSession(String email, String session) throws DAOException;
+    
+    public boolean verifySession(String email, String session) throws DAOException;
 }

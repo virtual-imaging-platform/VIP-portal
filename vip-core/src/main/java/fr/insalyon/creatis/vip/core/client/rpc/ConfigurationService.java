@@ -62,7 +62,7 @@ public interface ConfigurationService extends RemoteService {
         }
     }
 
-    public User configure() throws CoreException;
+    public User configure(String email, String session) throws CoreException;
 
     public void signup(User user) throws CoreException;
 

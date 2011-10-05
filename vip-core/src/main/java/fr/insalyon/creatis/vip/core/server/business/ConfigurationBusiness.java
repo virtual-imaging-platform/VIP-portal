@@ -45,8 +45,6 @@ import fr.insalyon.creatis.vip.core.server.business.proxy.Proxy;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -126,6 +124,49 @@ public class ConfigurationBusiness {
 
     /**
      * 
+     * @param email
+     * @param session
+     * @return
+     * @throws BusinessException 
+     */
+    public boolean validateSession(String email, String session) throws BusinessException {
+
+        try {
+            if (email != null && session != null) {
+                UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
+                
+                if (userDAO.verifySession(email, session)) {
+                    String newSession = UUID.randomUUID().toString();
+                    userDAO.updateSession(email, newSession);
+                    
+                    return true;
+                }
+            }
+            return false;
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param email
+     * @return
+     * @throws BusinessException 
+     */
+    public User getUser(String email) throws BusinessException {
+        
+        try {
+            return CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
+            
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
+    /**
+     * 
      * @param user
      * @throws BusinessException 
      */
@@ -180,14 +221,18 @@ public class ConfigurationBusiness {
         try {
             password = MD5.get(password);
             UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
+
             if (userDAO.authenticate(email, password)) {
+                
+                String session = UUID.randomUUID().toString();
+                userDAO.updateSession(email, session);
+                
                 return userDAO.getUser(email);
 
             } else {
                 logger.error("Authentication failed to '" + email + "' (email or password incorrect).");
                 throw new BusinessException("Authentication failed.");
             }
-
         } catch (NoSuchAlgorithmException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
@@ -199,6 +244,22 @@ public class ConfigurationBusiness {
         }
     }
 
+    /**
+     * 
+     * @param email
+     * @throws BusinessException 
+     */
+    public void signout(String email) throws BusinessException {
+        
+        try {
+            String session = UUID.randomUUID().toString();
+            CoreDAOFactory.getDAOFactory().getUserDAO().updateSession(email, session);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
     /**
      * 
      * @param email
