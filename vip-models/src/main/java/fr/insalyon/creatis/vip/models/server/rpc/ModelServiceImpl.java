@@ -34,9 +34,9 @@
  */
 package fr.insalyon.creatis.vip.models.server.rpc;
 
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
@@ -84,8 +84,14 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public List<SimulationObjectModelLight> listAllModels() {
-        return modelBusiness.listAllModels();
+    public List<SimulationObjectModelLight> listAllModels() throws ModelException {
+
+        try {
+            return modelBusiness.listAllModels();
+
+        } catch (BusinessException ex) {
+            throw new ModelException(ex);
+        }
     }
 
     public SimulationObjectModel getADAM() {
@@ -130,7 +136,14 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
     }
 
-    public List<SimulationObjectModelLight> searchModels(String query, String[] types, String[] time) {
-        return modelBusiness.searchModels(query, types, time);
+    public List<SimulationObjectModelLight> searchModels(String query, 
+            String[] types, String[] time) throws ModelException {
+
+        try {
+            return modelBusiness.searchModels(query, types, time);
+
+        } catch (BusinessException ex) {
+            throw new ModelException(ex);
+        }
     }
 }

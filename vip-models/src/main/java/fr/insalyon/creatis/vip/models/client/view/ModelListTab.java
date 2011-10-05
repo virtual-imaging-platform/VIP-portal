@@ -235,7 +235,7 @@ public class ModelListTab extends Tab {
         final AsyncCallback<List<SimulationObjectModelLight>> callback = new AsyncCallback<List<SimulationObjectModelLight>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Cannot list models");
+                SC.warn("Cannot list models:<br />" + caught.getMessage());
                 modal.hide();
             }
 

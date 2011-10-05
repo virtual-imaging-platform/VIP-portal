@@ -127,8 +127,15 @@ public class ModelBusiness {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public List<SimulationObjectModelLight> listAllModels() {
-        return SimulationObjectModelQueryer.getAllModels();
+    public List<SimulationObjectModelLight> listAllModels() throws BusinessException {
+        
+        try {
+            return SimulationObjectModelQueryer.getAllModels();
+            
+        } catch (Exception ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
     }
 
     public SimulationObjectModel getADAM() {
@@ -159,10 +166,11 @@ public class ModelBusiness {
     }
 
     public void deleteAllModelsInTheTripleStore() {
-        SimulationObjectModelFactory.deleteAllModelsInPersistentStore();
+//        SimulationObjectModelFactory.deleteAllModelsInPersistentStore();
     }
 
-    public List<SimulationObjectModelLight> searchModels(String query, String[] types, String[] time) {
+    public List<SimulationObjectModelLight> searchModels(String query, 
+            String[] types, String[] time) throws BusinessException {
 
 //        System.out.println("Model part: " + query + " ; types: ");
 //        for (int i = 0; i < types.length; i++) {
