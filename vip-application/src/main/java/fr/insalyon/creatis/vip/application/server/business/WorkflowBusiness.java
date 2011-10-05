@@ -192,6 +192,7 @@ public class WorkflowBusiness {
 //                
 //            } else {
             MoteurWSConfig moteur = new MoteurWSConfig(workflowPath, parameters);
+            moteur.setAddressWS(Server.getInstance().getMoteurServer());
             moteur.setSettings(settings);
             String ws = moteur.launch(Server.getInstance().getServerProxy(), null);
             workflowID = ws.substring(ws.lastIndexOf("/") + 1, ws.lastIndexOf("."));
