@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view;
 
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
@@ -48,7 +49,8 @@ public class DataManagerSection extends SectionStackSection {
     
     public DataManagerSection() {
 
-        this.setTitle("File Transfer");
+        this.setTitle(Canvas.imgHTML(DataManagerConstants.ICON_FILE_TRANSFER) 
+                + " " + DataManagerConstants.APP_FILE_TRANSFER);
         this.setCanCollapse(true);
         this.setExpanded(false);
         this.setResizeable(true);

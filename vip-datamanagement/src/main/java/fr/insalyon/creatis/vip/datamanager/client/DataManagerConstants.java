@@ -54,18 +54,21 @@ public class DataManagerConstants {
     public static final String ICON_CUT = IMG_FOLDER + "icon-cut.png";
     public static final String ICON_DOWNLOAD = IMG_FOLDER + "icon-download.png";
     public static final String ICON_EMPTY_TRASH = IMG_FOLDER + "icon-trash-empty.png";
-    public static final String ICON_OPERATION = IMG_FOLDER + "icon-operation.png";
+    public static final String ICON_FILE_TRANSFER = IMG_FOLDER + "icon-file-transfer.png";
     public static final String ICON_FOLDER_UP = IMG_FOLDER + "icon-folderup.png";
     public static final String ICON_FOLDER_ADD = IMG_FOLDER + "icon-addfolder.png";
+    public static final String ICON_OPERATION = IMG_FOLDER + "icon-operation.png";
     public static final String ICON_PASTE = IMG_FOLDER + "icon-paste.png";
     public static final String ICON_TRASH = IMG_FOLDER + "icon-trash.png";
     public static final String ICON_UPLOAD = IMG_FOLDER + "icon-upload.png";
     // Application Names
-    public final static String APP_OPERATIONS = "Operations";
     public final static String APP_CACHED_FILES = "Cached Files";
+    public final static String APP_FILE_TRANSFER = "File Transfer";
+    public final static String APP_OPERATIONS = "Operations";
     // Application Images
-    public static final String APP_IMG_OPERATIONS = IMG_FOLDER + "app-operation.png";
     public static final String APP_IMG_CACHED_FILES = IMG_FOLDER + "app-cache.png";
+    public static final String APP_IMG_FILE_TRANSFER = IMG_FOLDER + "app-file-transfer.png";
+    public static final String APP_IMG_OPERATIONS = IMG_FOLDER + "app-operation.png";
     // Configuration Constants
     public final static String ROOT = "/vip";
     public final static String USERS_HOME = "Home";

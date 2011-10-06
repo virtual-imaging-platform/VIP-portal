@@ -37,33 +37,25 @@ package fr.insalyon.creatis.vip.datamanager.client.view;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import fr.insalyon.creatis.vip.datamanager.client.view.cache.ManageCachedFilesTab;
-import fr.insalyon.creatis.vip.datamanager.client.view.operation.manage.ManageOperationsTab;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DataManagerParser extends ApplicationParser {
+public class DataManagerHomeParser extends ApplicationParser {
 
     @Override
     public void loadApplications() {
 
-        addApplication(DataManagerConstants.APP_OPERATIONS, DataManagerConstants.APP_IMG_OPERATIONS);
-        addApplication(DataManagerConstants.APP_CACHED_FILES, DataManagerConstants.APP_IMG_CACHED_FILES);
+        addApplication(DataManagerConstants.APP_FILE_TRANSFER, DataManagerConstants.APP_IMG_FILE_TRANSFER);
     }
 
     @Override
     public boolean parse(String applicationName) {
 
-        if (applicationName.equals(DataManagerConstants.APP_OPERATIONS)) {
-            Layout.getInstance().addTab(new ManageOperationsTab());
+        if (applicationName.equals(DataManagerConstants.APP_FILE_TRANSFER)) {
+            ((DataManagerSection) Layout.getInstance().getMainSection(DataManagerConstants.SECTION_FILE_TRANSFER)).expand();
             return true;
-
-        } else if (applicationName.equals(DataManagerConstants.APP_CACHED_FILES)) {
-            Layout.getInstance().addTab(new ManageCachedFilesTab());
-            return true;
-
         }
         return false;
     }
