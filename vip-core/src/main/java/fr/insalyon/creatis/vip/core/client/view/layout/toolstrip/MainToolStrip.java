@@ -34,9 +34,10 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.layout.toolstrip;
 
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
-import fr.insalyon.creatis.vip.core.client.view.main.HomeMenuButton;
 
 /**
  *
@@ -58,16 +59,25 @@ public class MainToolStrip extends ToolStrip {
         this.setWidth100();
         this.setPadding(2);
         
-        this.addMember(new HomeMenuButton());
+        this.addMember(getVipLabel());
         this.addSeparator();
     }
 
     public void reset() {
 
-        for (Canvas canva : getMembers()) {
-            this.removeMember(canva);
+        for (Canvas c : getMembers()) {
+            this.removeMember(c);
         }
-        this.addMember(new HomeMenuButton());
+        this.addMember(getVipLabel());
         this.addSeparator();
+    }
+    
+    private Label getVipLabel() {
+        
+        Label vipLabel = new Label("VIP");
+        vipLabel.setAlign(Alignment.CENTER);
+        vipLabel.setWidth(30);
+        
+        return vipLabel;
     }
 }
