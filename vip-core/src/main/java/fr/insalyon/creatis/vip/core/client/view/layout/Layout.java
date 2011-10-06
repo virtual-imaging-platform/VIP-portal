@@ -35,7 +35,6 @@
 package fr.insalyon.creatis.vip.core.client.view.layout;
 
 import com.google.gwt.user.client.Cookies;
-import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.BottomToolStrip;
 import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.VisibilityMode;
@@ -96,7 +95,6 @@ public class Layout {
         mainSectionStack.setSections(mainTabSection);
 
         vLayout.addMember(mainSectionStack);
-        vLayout.addMember(new BottomToolStrip());
 
         modal = new ModalWindow(vLayout);
 
