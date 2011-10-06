@@ -83,12 +83,12 @@ public class Server {
     private int workflowsPort = 1527;
     // Moteur
     private String moteurServer = "https://localhost:443/cgi-bin/moteurServer/moteur_server";
+    private int moteurMaxWorkflows = 5;
+    private String truststoreFile = "/usr/local/apache-tomcat-6.0.29/conf/truststore.jks";
+    private String truststorePass = "";
     // Apache
     private String apacheHost = "localhost";
     private int apacheSSLPort = 80;
-    // TrustStore
-    private String truststoreFile = "/usr/local/apache-tomcat-6.0.29/conf/truststore.jks";
-    private String truststorePass = "";
     // News
     private String[] newsRecipients = new String[]{};
     // Data Manager
@@ -133,20 +133,23 @@ public class Server {
             mailHost = config.getString("mail.host", mailHost);
             mailTransportProtocol = config.getString("mail.transport.protocol", mailTransportProtocol);
             mailFrom = config.getString("mail.from", mailFrom);
-            
+
             vletagentHost = config.getString("vletagent.host", vletagentHost);
             vletagentPort = config.getInt("vletagent.port", vletagentPort);
-            
+
             dataManagerUsersHome = config.getString("datamanager.users.home", dataManagerUsersHome);
             dataManagerGroupsHome = config.getString("datamanager.groups.home", dataManagerGroupsHome);
+
+            moteurServer = config.getString("moteur.host", moteurServer);
+            moteurMaxWorkflows = config.getInt("moteur.max.workflows", moteurMaxWorkflows);
+            truststoreFile = config.getString("truststore.file", truststoreFile);
+            truststorePass = config.getString("truststore.password", truststorePass);
 
             workflowsPath = config.getString("workflows.directory", workflowsPath);
             workflowsDB = config.getString("workflows.db.name", workflowsDB);
             workflowsHost = config.getString("workflows.db.host", workflowsHost);
             workflowsPort = config.getInt("workflows.db.port", workflowsPort);
-            moteurServer = config.getString("moteur.host", moteurServer);
-            truststoreFile = config.getString("truststore.file", truststoreFile);
-            truststorePass = config.getString("truststore.password", truststorePass);
+
             apacheHost = config.getString("apache.host", apacheHost);
             apacheSSLPort = config.getInt("apache.ssl.port", apacheSSLPort);
 
@@ -313,5 +316,9 @@ public class Server {
 
     public String getAdminPhone() {
         return adminPhone;
+    }
+
+    public int getMoteurMaxWorkflows() {
+        return moteurMaxWorkflows;
     }
 }
