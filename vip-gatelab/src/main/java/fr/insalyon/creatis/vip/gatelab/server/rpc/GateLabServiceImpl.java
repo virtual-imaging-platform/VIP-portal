@@ -35,12 +35,16 @@
 package fr.insalyon.creatis.vip.gatelab.server.rpc;
 
 import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
+import fr.insalyon.creatis.vip.gatelab.client.GateLabConstants;
 import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabService;
 import fr.insalyon.creatis.vip.gatelab.client.view.GateLabException;
 import fr.insalyon.creatis.vip.gatelab.server.business.GateLabBusiness;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -53,17 +57,29 @@ public class GateLabServiceImpl extends AbstractRemoteServiceServlet implements 
 
     private final static Logger logger = Logger.getLogger(GateLabServiceImpl.class);
     private GateLabBusiness gatelabBusiness;
+    private ClassBusiness classBusiness;
 
     public GateLabServiceImpl() {
-        
+
         gatelabBusiness = new GateLabBusiness();
+        classBusiness = new ClassBusiness();
     }
 
     public List<Application> getApplications() throws GateLabException {
 
         try {
-            return gatelabBusiness.getApplications();
+            User user = getSessionUser();
+            List<String> classes = classBusiness.getUserClassesName(user.getEmail(), false);
+            
+            if (user.isSystemAdministrator() || 
+                    classes.contains(GateLabConstants.GATELAB_CLASS)) {
+                
+                return gatelabBusiness.getApplications();
+            }
+            return new ArrayList<Application>();
 
+        } catch (CoreException ex) {
+            throw new GateLabException(ex);
         } catch (BusinessException ex) {
             throw new GateLabException(ex);
         }

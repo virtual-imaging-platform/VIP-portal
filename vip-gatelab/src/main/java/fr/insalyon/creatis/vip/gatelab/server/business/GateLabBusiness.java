@@ -73,7 +73,7 @@ public class GateLabBusiness {
                 throw new BusinessException(ex);
             }
         }
-
+        
         ApplicationBusiness applicationBusiness = new ApplicationBusiness();
         List<String> classes = new ArrayList<String>();
         classes.add(GateLabConstants.GATELAB_CLASS);

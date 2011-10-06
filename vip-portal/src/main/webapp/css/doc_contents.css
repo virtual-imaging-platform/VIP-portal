@@ -8,12 +8,12 @@
 html {
     margin: 0;
     padding: 0;
-    background-color: #D0DFEB;
+    background-color: #6889B2;
 }
 body { 
     font: 75% georgia, sans-serif;
     line-height: 1.88889;
-    color: #000000; 
+    color: #FFFFFF;
     margin: 0; 
     padding: 10px;
 }
@@ -24,14 +24,21 @@ p {
 
 a:link, a:visited {
     text-decoration: none;
-    color: #000000;
+    color: #C8E0FF;
 }
 
 a:hover, a:active {
     text-decoration: underline;
-    color: #000000;
+    color: #C8E0FF;
 }
 
 ul {
     padding-left: 10px;
+    list-style-type: none;
+}
+
+li {
+    display: list-item;
+    padding-left: 5px;
+    border-bottom: 1px solid #D0DFEB;
 }

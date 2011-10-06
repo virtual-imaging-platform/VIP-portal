@@ -63,10 +63,10 @@ public class Main implements EntryPoint {
         // Modules
         ModulesInit modulesInit = ModulesInit.getInstance();
         modulesInit.add(new CoreModule());
-        modulesInit.add(new DataManagerModule());
-        modulesInit.add(new SimulationGUIModule());
-        modulesInit.add(new ModelModule());
         modulesInit.add(new DocsModule());
+        modulesInit.add(new DataManagerModule());
+        modulesInit.add(new ModelModule());
+        modulesInit.add(new SimulationGUIModule());
         modulesInit.add(new ApplicationModule());
         modulesInit.add(new GateLabModule());
         // End-Modules

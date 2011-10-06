@@ -48,7 +48,9 @@ public class ModelParser extends ApplicationParser {
     @Override
     public void loadApplications() {
 
-        if (CoreModule.user.isSystemAdministrator()) {
+        if (CoreModule.user.isSystemAdministrator() 
+                || CoreModule.user.isGroupAdmin(ModelConstants.GROUP_VIP)) {
+            
             addApplication(ModelConstants.APP_MODEL, ModelConstants.APP_IMG_MODEL);
         }
     }

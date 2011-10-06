@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view;
 
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
@@ -49,8 +50,10 @@ public class DataManagerSystemParser extends ApplicationParser {
     @Override
     public void loadApplications() {
 
-        addApplication(DataManagerConstants.APP_OPERATIONS, DataManagerConstants.APP_IMG_OPERATIONS);
-        addApplication(DataManagerConstants.APP_CACHED_FILES, DataManagerConstants.APP_IMG_CACHED_FILES);
+        if (CoreModule.user.isSystemAdministrator()) {
+            addApplication(DataManagerConstants.APP_OPERATIONS, DataManagerConstants.APP_IMG_OPERATIONS);
+            addApplication(DataManagerConstants.APP_CACHED_FILES, DataManagerConstants.APP_IMG_CACHED_FILES);
+        }
     }
 
     @Override
