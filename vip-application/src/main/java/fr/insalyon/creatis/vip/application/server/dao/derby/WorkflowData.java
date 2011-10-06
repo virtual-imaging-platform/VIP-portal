@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao.derby;
 
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAO;
@@ -555,6 +556,31 @@ public class WorkflowData implements WorkflowDAO {
                 }
             }
             return data;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+    
+    /**
+     * 
+     * @param user
+     * @return
+     * @throws DAOException 
+     */
+    public int getRunningWorkflows(String user) throws DAOException {
+        
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "COUNT(id) AS run FROM Workflows WHERE username = ? "
+                    + "AND status = ?");
+            
+            ps.setString(1, user);
+            ps.setString(2, SimulationStatus.Running.name());
+            ResultSet rs = ps.executeQuery();
+            
+            return rs.next() ? rs.getInt("run") : 0;
 
         } catch (SQLException ex) {
             logger.error(ex);

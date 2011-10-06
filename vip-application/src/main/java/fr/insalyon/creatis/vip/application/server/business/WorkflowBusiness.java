@@ -131,6 +131,16 @@ public class WorkflowBusiness {
             String simulationName) throws BusinessException {
 
         try {
+            WorkflowDAO workflowDAO = WorkflowDAOFactory.getDAOFactory().getWorkflowDAO();
+            int runningWorkflows = workflowDAO.getRunningWorkflows(user);
+
+            if (runningWorkflows >= Server.getInstance().getMoteurMaxWorkflows()) {
+                logger.warn("Unable to launch simulation '" + simulationName + "': max "
+                        + "number of running workflows reached for user '" + user + "'.");
+                throw new BusinessException("Max number of running simulations reached.<br />You "
+                        + "already have " + runningWorkflows + " running simulations.");
+            }
+
             String settings = "GRID=DIRAC\n"
                     + "SE=ccsrm02.in2p3.fr\n"
                     + "TIMEOUT=100000\n"
@@ -198,9 +208,8 @@ public class WorkflowBusiness {
             workflowID = ws.substring(ws.lastIndexOf("/") + 1, ws.lastIndexOf("."));
 //            }
 
-            WorkflowDAOFactory.getDAOFactory().getWorkflowDAO().add(new Simulation(
-                    applicationName, workflowID, user, new Date(), simulationName,
-                    SimulationStatus.Running.name()));
+            workflowDAO.add(new Simulation(applicationName, workflowID, user,
+                    new Date(), simulationName, SimulationStatus.Running.name()));
 
             return workflowID;
 
@@ -240,7 +249,7 @@ public class WorkflowBusiness {
             }
 
         } catch (RemoteException ex) {
-            throw new BusinessException(ex);
+            // ignore
         } catch (ServiceException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
@@ -525,15 +534,15 @@ public class WorkflowBusiness {
             throws BusinessException {
 
         if (path.startsWith(Server.getInstance().getDataManagerUsersHome())) {
-            
+
             path = path.replace(Server.getInstance().getDataManagerUsersHome() + "/", "");
             if (!path.startsWith(user.replaceAll(" ", "_").toLowerCase())) {
                 logger.error("User '" + user + "' tried to access data from another user: " + path + "");
                 throw new BusinessException("Access denied to another user's home.");
             }
-            
+
         } else if (path.startsWith(Server.getInstance().getDataManagerGroupsHome())) {
-            
+
             path = path.replace(Server.getInstance().getDataManagerGroupsHome() + "/", "");
             if (path.indexOf("/") != -1) {
                 path = path.substring(0, path.indexOf("/"));
