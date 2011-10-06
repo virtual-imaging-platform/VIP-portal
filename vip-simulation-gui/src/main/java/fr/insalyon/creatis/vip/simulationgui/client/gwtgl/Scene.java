@@ -375,18 +375,18 @@ public class Scene extends Canvas {
 
     private void createShaderProgram() {
         
-        // Create the Shaders
-        WebGLShader fragmentShader = getShader(WebGLRenderingContext.FRAGMENT_SHADER, Shaders.INSTANCE.fragmentShader().getText());
+        // Create the Shader
+        WebGLShader fragmentShader = getShader(WebGLRenderingContext.FRAGMENT_SHADER, Shader.INSTANCE.fragmentShader().getText());
         log("Created fragment shader");
 
-        WebGLShader vertexShader = getShader(WebGLRenderingContext.VERTEX_SHADER, Shaders.INSTANCE.vertexShader().getText());
+        WebGLShader vertexShader = getShader(WebGLRenderingContext.VERTEX_SHADER, Shader.INSTANCE.vertexShader().getText());
         log("Created vertex shader");
         if (vertexShader == null || fragmentShader == null) {
             log("Shader error");
             throw new RuntimeException("shader error");
         }
 
-        // create the ShaderProgram and attach the Shaders
+        // create the ShaderProgram and attach the Shader
         shaderProgram = glContext.createProgram();
         if (shaderProgram == null || glContext.getError() != WebGLRenderingContext.NO_ERROR) {
             log("Program errror");

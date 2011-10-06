@@ -45,10 +45,10 @@ import com.google.gwt.resources.client.TextResource;
  *
  * @author Kevin Moulin
  */
-public interface Shaders extends ClientBundle {
+public interface Shader extends ClientBundle {
 
-    /** The instance of the Shaders ClientBundle. */
-    public static Shaders INSTANCE = GWT.create(Shaders.class);
+    /** The instance of the Shader ClientBundle. */
+    public static Shader INSTANCE = GWT.create(Shader.class);
 
     /**
      * The fragment shader to use in the example.
