@@ -143,7 +143,6 @@ public class SignUpTab extends Tab {
                 confirmPasswordField, termsField, acceptField);
         form.setWidth(500);
         form.setTitleWidth(150);
-
     }
 
     private String getDisclaimer() {

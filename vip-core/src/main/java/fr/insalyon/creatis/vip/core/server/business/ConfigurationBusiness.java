@@ -45,6 +45,8 @@ import fr.insalyon.creatis.vip.core.server.business.proxy.Proxy;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -90,31 +92,31 @@ public class ConfigurationBusiness {
             }
 
             // Voms Extension
-//            Server serverConf = Server.getInstance();
-//            String command = "voms-proxy-init --voms biomed"
-//                    + " -cert " + serverConf.getServerProxy()
-//                    + " -key " + serverConf.getServerProxy()
-//                    + " -out " + serverConf.getServerProxy()
-//                    + " -noregen -hours 240";
-//            Process process = Runtime.getRuntime().exec(command);
-//
-//            BufferedReader r = new BufferedReader(new InputStreamReader(process.getInputStream()));
-//            String s = null;
-//            String cout = "";
-//
-//            while ((s = r.readLine()) != null) {
-//                cout += s + "\n";
-//            }
-//            process.waitFor();
-//
-//            logger.info(cout);
-//            
-//            process.getOutputStream().close();
-//            process.getInputStream().close();
-//            process.getErrorStream().close();
-//            r.close();
-//            
-//            process = null;
+            Server serverConf = Server.getInstance();
+            String command = "voms-proxy-init --voms biomed"
+                    + " -cert " + serverConf.getServerProxy()
+                    + " -key " + serverConf.getServerProxy()
+                    + " -out " + serverConf.getServerProxy()
+                    + " -noregen -hours 240";
+            Process process = Runtime.getRuntime().exec(command);
+
+            BufferedReader r = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String s = null;
+            String cout = "";
+
+            while ((s = r.readLine()) != null) {
+                cout += s + "\n";
+            }
+            process.waitFor();
+
+            logger.info(cout);
+            
+            process.getOutputStream().close();
+            process.getInputStream().close();
+            process.getErrorStream().close();
+            r.close();
+            
+            process = null;
 
         } catch (Exception ex) {
             logger.error(ex);
@@ -134,11 +136,11 @@ public class ConfigurationBusiness {
         try {
             if (email != null && session != null) {
                 UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
-                
+
                 if (userDAO.verifySession(email, session)) {
                     String newSession = UUID.randomUUID().toString();
                     userDAO.updateSession(email, newSession);
-                    
+
                     return true;
                 }
             }
@@ -156,15 +158,15 @@ public class ConfigurationBusiness {
      * @throws BusinessException 
      */
     public User getUser(String email) throws BusinessException {
-        
+
         try {
             return CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
      * 
      * @param user
@@ -195,8 +197,8 @@ public class ConfigurationBusiness {
                     + "</html>";
 
             logger.info("Sending confirmation email to '" + user.getEmail() + "'.");
-            CoreUtil.sendEmail("VIP", "VIP account details", emailContent,
-                    new String[]{user.getEmail()});
+            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
+                    "VIP account details", emailContent, new String[]{user.getEmail()});
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -223,10 +225,10 @@ public class ConfigurationBusiness {
             UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
 
             if (userDAO.authenticate(email, password)) {
-                
+
                 String session = UUID.randomUUID().toString();
                 userDAO.updateSession(email, session);
-                
+
                 return userDAO.getUser(email);
 
             } else {
@@ -250,7 +252,7 @@ public class ConfigurationBusiness {
      * @throws BusinessException 
      */
     public void signout(String email) throws BusinessException {
-        
+
         try {
             String session = UUID.randomUUID().toString();
             CoreDAOFactory.getDAOFactory().getUserDAO().updateSession(email, session);
@@ -259,7 +261,7 @@ public class ConfigurationBusiness {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
      * 
      * @param email
@@ -322,7 +324,8 @@ public class ConfigurationBusiness {
                     + "</body>"
                     + "</html>";
 
-            CoreUtil.sendEmail("VIP", "VIP activation code (reminder)", emailContent,
+            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
+                    "VIP activation code (reminder)", emailContent,
                     new String[]{user.getEmail()});
 
         } catch (DAOException ex) {
@@ -619,6 +622,46 @@ public class ConfigurationBusiness {
         } catch (UnsupportedEncodingException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param user
+     * @param category
+     * @param subject
+     * @param comment
+     * @throws BusinessException 
+     */
+    public void sendContactMail(User user, String category, String subject,
+            String comment) throws BusinessException {
+
+        try {
+            String emailContent = "<html>"
+                    + "<head></head>"
+                    + "<body>"
+                    + "<p><b>VIP Contact</b></p>"
+                    + "<p><b>User:</b> " + user.getFullName() + "</p>"
+                    + "<p><b>Email:</b> <a href=\"mailto:" + user.getEmail() +"\">" + user.getEmail() + "</a></p>"
+                    + "<p>&nbsp;</p>"
+                    + "<p><b>Category:</b> " + category + "</p>"
+                    + "<p><b>Subject:</b> " + subject + "</p>"
+                    + "<p>&nbsp;</p>"
+                    + "<p><b>Comments:</b></p>"
+                    + "<p>" + comment + "</p>"
+                    + "</body>"
+                    + "</html>";
+
+            List<String> emails = new ArrayList<String>();
+            for (User admin : CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getAdminstrators()) {
+                emails.add(admin.getEmail());
+            }
+
+            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
+                    "[VIP Contact] " + category, emailContent, emails.toArray(new String[]{}));
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

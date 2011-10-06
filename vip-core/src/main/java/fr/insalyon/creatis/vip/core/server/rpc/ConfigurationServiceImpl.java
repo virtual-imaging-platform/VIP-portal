@@ -41,6 +41,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.h2.PlatformConnection;
 import java.sql.Connection;
@@ -86,6 +87,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 user.setSystemAdministrator(configurationBusiness.isSystemAdministrator(user.getEmail()));
 
                 Map<String, ROLE> groups = configurationBusiness.getUserGroups(email);
+                user.setGroups(groups);
 
                 getSession().setAttribute(CoreConstants.SESSION_USER, user);
                 getSession().setAttribute(CoreConstants.SESSION_GROUPS, groups);
@@ -131,6 +133,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             user.setSystemAdministrator(configurationBusiness.isSystemAdministrator(user.getEmail()));
 
             Map<String, ROLE> groups = configurationBusiness.getUserGroups(email);
+            user.setGroups(groups);
 
             getSession().setAttribute(CoreConstants.SESSION_USER, user);
             getSession().setAttribute(CoreConstants.SESSION_GROUPS, groups);
@@ -268,6 +271,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @throws CoreException 
      */
     public List<String> getGroups() throws CoreException {
+
         try {
             authenticateSystemAdministrator(logger);
             return configurationBusiness.getGroups();
@@ -392,6 +396,24 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             trace(logger, "Updating user password.");
             configurationBusiness.updateUserPassword(getSessionUser().getEmail(),
                     currentPassword, newPassword);
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param category
+     * @param subject
+     * @param comment
+     * @throws CoreException 
+     */
+    public void sendContactMail(String category, String subject, String comment)
+            throws CoreException {
+
+        try {
+            configurationBusiness.sendContactMail(getSessionUser(), category, subject, comment);
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);

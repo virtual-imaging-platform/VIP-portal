@@ -57,7 +57,8 @@ public class NewsBusiness {
     public void add(News news) throws BusinessException {
         try {
             CoreDAOFactory.getDAOFactory().getNewsDAO().add(news);
-            CoreUtil.sendEmail("VIP News", news.getTitle(), news.getMessage(), 
+            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP News", 
+                    news.getTitle(), news.getMessage(), 
                     Server.getInstance().getNewsRecipients());
 
         } catch (DAOException ex) {

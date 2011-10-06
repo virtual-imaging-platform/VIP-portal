@@ -113,13 +113,36 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
      * @throws CoreException
      * @throws BusinessException 
      */
-    protected void authenticateSystemAdministrator(Logger logger) throws CoreException, BusinessException {
+    protected void authenticateSystemAdministrator(Logger logger) throws CoreException {
 
         User user = getSessionUser();
         if (!user.isSystemAdministrator()) {
-            logger.error("The user has no administrator rights: " + user.getEmail());
-            throw new CoreException("The user has no administrator rights.");
+            logger.error("The user has no system administrator rights: " + user.getEmail());
+            throw new CoreException("The user has no system administrator rights.");
         }
+    }
+
+    /**
+     * 
+     * @param logger
+     * @throws CoreException
+     * @throws BusinessException 
+     */
+    protected void authenticateGroupAdministrator(Logger logger) throws CoreException {
+
+        User user = getSessionUser();
+        if (!user.isGroupAdmin()) {
+            logger.error("The user has no group administrator rights: " + user.getEmail());
+            throw new CoreException("The user has no group administrator rights.");
+        }
+    }
+    
+    protected boolean isSystemAdministrator() throws CoreException {
+        return getSessionUser().isSystemAdministrator();
+    }
+    
+    protected boolean isGroupAdministrator() throws CoreException {
+        return getSessionUser().isGroupAdmin();
     }
 
     /**
@@ -132,7 +155,7 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
 
         try {
             logger.info("(" + getSessionUser().getEmail() + ") " + message);
-            
+
         } catch (CoreException ex) {
             logger.error(ex);
             throw ex;

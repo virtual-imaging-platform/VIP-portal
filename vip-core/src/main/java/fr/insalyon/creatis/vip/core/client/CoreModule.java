@@ -34,8 +34,13 @@
  */
 package fr.insalyon.creatis.vip.core.client;
 
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationExecutor;
+import fr.insalyon.creatis.vip.core.client.view.contact.ContactTab;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
 import fr.insalyon.creatis.vip.core.client.view.system.SystemParser;
@@ -55,10 +60,10 @@ public class CoreModule extends Module {
     public static ApplicationExecutor homeExecutor;
 
     public CoreModule() {
-        
+
         systemExecutor = new ApplicationExecutor();
         systemExecutor.addParser(new SystemParser());
-        
+
         homeExecutor = new ApplicationExecutor();
         homeExecutor.addParser(new HomeParser());
     }
@@ -69,8 +74,20 @@ public class CoreModule extends Module {
         // Configure User's toolstrip        
         MainToolStrip.getInstance().addMenuButton(new UserMenuButton(user));
 
+        ToolStripButton helpButton = new ToolStripButton("Experiencing problems?");
+        helpButton.setIcon(CoreConstants.ICON_HELP);
+        helpButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                Layout.getInstance().addTab(new ContactTab());
+            }
+        });
+        
+        MainToolStrip.getInstance().addFill();
+        MainToolStrip.getInstance().addMember(helpButton);
+
         // Tabs
-        if (user.isSystemAdministrator()) {
+        if (user.isGroupAdmin()) {
             Layout.getInstance().addTab(new SystemTab());
         }
         Layout.getInstance().addTab(new HomeTab());

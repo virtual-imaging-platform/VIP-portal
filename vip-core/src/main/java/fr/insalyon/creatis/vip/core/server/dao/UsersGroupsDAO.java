@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.core.server.dao;
 
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import java.util.List;
 import java.util.Map;
@@ -51,4 +52,6 @@ public interface UsersGroupsDAO {
     public void setUserGroups(String email, Map<String, CoreConstants.ROLE> groups) throws DAOException;
     
     public List<String> getUsersFromGroups(List<String> groups) throws DAOException;
+    
+    public List<User> getAdminstrators() throws DAOException;
 }

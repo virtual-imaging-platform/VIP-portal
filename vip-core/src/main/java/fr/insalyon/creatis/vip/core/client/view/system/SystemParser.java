@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.system;
 
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -50,9 +51,11 @@ public class SystemParser extends ApplicationParser {
     @Override
     public void loadApplications() {
 
-        addApplication(CoreConstants.APP_USER, CoreConstants.APP_IMG_USER);
-        addApplication(CoreConstants.APP_GROUP, CoreConstants.APP_IMG_GROUP);
-        addApplication(CoreConstants.APP_NEWS, CoreConstants.APP_IMG_NEWS);
+        if (CoreModule.user.isSystemAdministrator()) {
+            addApplication(CoreConstants.APP_USER, CoreConstants.APP_IMG_USER);
+            addApplication(CoreConstants.APP_GROUP, CoreConstants.APP_IMG_GROUP);
+            addApplication(CoreConstants.APP_NEWS, CoreConstants.APP_IMG_NEWS);
+        }
     }
 
     @Override

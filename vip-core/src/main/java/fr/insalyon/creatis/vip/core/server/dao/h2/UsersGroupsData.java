@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.core.server.dao.h2;
 
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UsersGroupsDAO;
@@ -160,15 +161,50 @@ public class UsersGroupsData implements UsersGroupsDAO {
                     + "first_name, last_name "
                     + "FROM VIPUsers vu, VIPUsersGroups vg "
                     + "WHERE vu.email = vg.email AND (" + sb.toString() + ")");
-            
+
             ResultSet rs = ps.executeQuery();
             List<String> users = new ArrayList<String>();
-            
+
             while (rs.next()) {
                 users.add(rs.getString("first_name") + " "
                         + rs.getString("last_name"));
             }
+
+            return users;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @return
+     * @throws DAOException 
+     */
+    public List<User> getAdminstrators() throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "us.email AS uemail, first_name, last_name, institution, "
+                    + "phone, code, confirmed, folder "
+                    + "FROM VIPUsers us, VIPUsersGroups ug "
+                    + "WHERE us.email = ug.email AND ug.groupname = ? "
+                    + "ORDER BY first_name, last_name");
             
+            ps.setString(1, CoreConstants.GROUP_ADMIN);
+
+            ResultSet rs = ps.executeQuery();
+            List<User> users = new ArrayList<User>();
+
+            while (rs.next()) {
+                users.add(new User(
+                        rs.getString("first_name"), rs.getString("last_name"),
+                        rs.getString("uemail"), rs.getString("institution"),
+                        "", rs.getString("phone"), rs.getBoolean("confirmed"),
+                        rs.getString("code"), rs.getString("folder"), ""));
+            }
             return users;
 
         } catch (SQLException ex) {

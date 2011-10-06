@@ -56,8 +56,8 @@ public class CoreUtil {
 
     private static final Logger logger = Logger.getLogger(CoreUtil.class);
 
-    public static void sendEmail(String owner, String subject, String content,
-            String[] recipients) throws BusinessException {
+    public static void sendEmail(String ownerEmail, String owner, String subject,
+            String content, String[] recipients) throws BusinessException {
 
         try {
             Server server = Server.getInstance();
@@ -73,7 +73,7 @@ public class CoreUtil {
             mimeMessage.setContent(content, "text/html");
             mimeMessage.addHeader("Content-Type", "text/html");
 
-            InternetAddress from = new InternetAddress(server.getMailFrom(), owner);
+            InternetAddress from = new InternetAddress(ownerEmail, owner);
             mimeMessage.setReplyTo(new InternetAddress[]{from});
             mimeMessage.setFrom(from);
             mimeMessage.setSentDate(new Date());

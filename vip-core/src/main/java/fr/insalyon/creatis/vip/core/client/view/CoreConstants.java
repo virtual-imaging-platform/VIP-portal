@@ -47,6 +47,7 @@ public class CoreConstants {
     // Tabs
     public static final String TAB_ACCOUNT = "account-tab";
     public static final String TAB_ACTIVATION = "activation-tab";
+    public static final String TAB_CONTACT = "contact-tab";
     public static final String TAB_HOME = "home-tab";
     public static final String TAB_SIGNIN = "signin-tab";
     public static final String TAB_SIGNUP = "signup-tab";
@@ -62,6 +63,7 @@ public class CoreConstants {
     public static final String ICON_CLEAR = IMG_FOLDER + "icon-clear.png";
     public static final String ICON_DELETE = IMG_FOLDER + "icon-delete.png";
     public static final String ICON_EDIT = IMG_FOLDER + "icon-edit.png";
+    public static final String ICON_HELP = IMG_FOLDER + "icon-help.png";
     public static final String ICON_HOME = IMG_FOLDER + "icon-home.png";
     public static final String ICON_LOADING = IMG_FOLDER + "icon-loading.gif";
     public static final String ICON_MAIL = IMG_FOLDER + "system/icon-message.png";

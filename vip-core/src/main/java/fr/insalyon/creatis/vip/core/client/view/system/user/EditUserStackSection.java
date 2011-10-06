@@ -121,7 +121,7 @@ public class EditUserStackSection extends SectionStackSection {
                             CoreConstants.ROLE role = v.contains("("
                                     + CoreConstants.ROLE.Admin.name() + ")")
                                     ? CoreConstants.ROLE.Admin
-                                    : CoreConstants.ROLE.Admin;
+                                    : CoreConstants.ROLE.User;
 
                             if (map.get(name) == null || role == CoreConstants.ROLE.Admin) {
                                 map.put(name, role);

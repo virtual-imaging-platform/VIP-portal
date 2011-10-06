@@ -35,6 +35,8 @@
 package fr.insalyon.creatis.vip.core.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
+import java.util.Map;
 
 /**
  *
@@ -53,6 +55,7 @@ public class User implements IsSerializable {
     private String folder;
     private String session;
     private boolean systemAdministrator;
+    private Map<String, ROLE> groups;
 
     public User() {
     }
@@ -147,5 +150,31 @@ public class User implements IsSerializable {
 
     public String getSession() {
         return session;
+    }
+
+    public void setGroups(Map<String, ROLE> groups) {
+        this.groups = groups;
+    }
+    
+    public boolean hasGroupAccess(String groupName) {
+        return groups.containsKey(groupName);
+    }
+    
+    public boolean isGroupAdmin() {
+        
+        for (String groupName : groups.keySet()) {
+            if (groups.get(groupName) == ROLE.Admin) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public boolean isGroupAdmin(String groupName) {
+        
+        if (hasGroupAccess(groupName) && groups.get(groupName) == ROLE.Admin) {
+            return true;
+        }
+        return false;
     }
 }
