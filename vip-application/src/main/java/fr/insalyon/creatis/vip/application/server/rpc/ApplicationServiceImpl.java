@@ -68,7 +68,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     public void signout() throws ApplicationException {
-        
+
         getSession().removeAttribute(ApplicationConstants.SESSION_CLASSES);
     }
 
@@ -88,14 +88,14 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     public void update(Application application) throws ApplicationException {
 
         try {
-            User user = getSessionUser();
-            trace(logger, "Updating application '" + application.getName() + "'.");
-
-            if (configurationBusiness.isSystemAdministrator(user.getEmail())) {
+            if (isSystemAdministrator() || isGroupAdministrator()) {
+                trace(logger, "Updating application '" + application.getName() + "'.");
                 applicationBusiness.update(application);
 
             } else {
+                throw new ApplicationException("You have no administrator rights.");
             }
+
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
         } catch (BusinessException ex) {
@@ -106,13 +106,13 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     public void remove(String name) throws ApplicationException {
 
         try {
-            User user = getSessionUser();
-            if (configurationBusiness.isSystemAdministrator(user.getEmail())) {
+            if (isSystemAdministrator()) {
                 trace(logger, "Removing application '" + name + "'.");
                 applicationBusiness.remove(name);
 
             } else {
-                applicationBusiness.remove(user.getEmail(), name);
+                trace(logger, "Removing classes from application '" + name + "'.");
+                applicationBusiness.remove(getSessionUser().getEmail(), name);
             }
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
@@ -121,21 +121,18 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
-    public Application getApplication(String name) {
-
-        try {
-            return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getApplication(name);
-
-        } catch (DAOException ex) {
-            return null;
-        }
-    }
-
     public List<Application> getApplications() throws ApplicationException {
 
         try {
-            authenticateSystemAdministrator(logger);
-            return applicationBusiness.getApplications();
+            if (isSystemAdministrator()) {
+                return applicationBusiness.getApplications();
+
+            } else if (isGroupAdministrator()) {
+                List<String> classes = classBusiness.getUserClassesName(getSessionUser().getEmail(), true);
+                return applicationBusiness.getApplications(classes);
+
+            }
+            throw new ApplicationException("You have no administrator rights.");
 
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
@@ -147,7 +144,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     public List<Application> getApplications(List<String> reservedClasses) throws ApplicationException {
 
         try {
-            List<String> classes = getUserClasses(getSessionUser());
+            List<String> classes = classBusiness.getUserClassesName(getSessionUser().getEmail(), false);
             classes.removeAll(reservedClasses);
 
             return applicationBusiness.getApplications(classes);
@@ -158,15 +155,15 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             throw new ApplicationException(ex);
         }
     }
-    
+
     public List<Application> getApplicationsByClass(String applicationClass) throws ApplicationException {
-        
+
         try {
             List<String> classes = new ArrayList<String>();
             classes.add(applicationClass);
-            
+
             return applicationBusiness.getApplications(classes);
-            
+
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
@@ -216,8 +213,13 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     public List<AppClass> getClasses() throws ApplicationException {
 
         try {
-            authenticateSystemAdministrator(logger);
-            return classBusiness.getClasses();
+            if (isSystemAdministrator()) {
+                return classBusiness.getClasses();
+
+            } else if (isGroupAdministrator()) {
+                return classBusiness.getUserClasses(getSessionUser().getEmail(), true);
+            }
+            throw new ApplicationException("You have no administrator rights.");
 
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
@@ -230,13 +232,13 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
 
         try {
             User user = getSessionUser();
-            if (user.isSystemAdministrator()) {
+            if (isSystemAdministrator()) {
 
                 return new List[]{configurationBusiness.getUserNames(user.getEmail(), false),
                             applicationBusiness.getApplicationNames()};
 
             } else {
-                List<String> classes = getUserClasses(getSessionUser());
+                List<String> classes = classBusiness.getUserClassesName(user.getEmail(), !user.isSystemAdministrator());
                 classes.removeAll(reservedClasses);
 
                 return new List[]{configurationBusiness.getUserNames(user.getEmail(), true),
@@ -256,15 +258,5 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         } catch (DAOException ex) {
             return null;
         }
-    }
-
-    private List<String> getUserClasses(User user) throws BusinessException {
-
-        List<String> classes = (List<String>) getSession().getAttribute(ApplicationConstants.SESSION_CLASSES);
-        if (classes == null) {
-            classes = classBusiness.getUserClasses(user.getEmail(), !user.isSystemAdministrator());
-            getSession().setAttribute(ApplicationConstants.SESSION_CLASSES, classes);
-        }
-        return classes;
     }
 }

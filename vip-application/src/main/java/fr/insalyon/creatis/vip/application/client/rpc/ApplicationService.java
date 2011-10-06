@@ -69,8 +69,6 @@ public interface ApplicationService extends RemoteService {
     
     public List<Application> getApplicationsByClass(String applicationClass) throws ApplicationException;
 
-    public Application getApplication(String name) throws ApplicationException;
-
     public void add(Application application) throws ApplicationException;
 
     public void update(Application application) throws ApplicationException;

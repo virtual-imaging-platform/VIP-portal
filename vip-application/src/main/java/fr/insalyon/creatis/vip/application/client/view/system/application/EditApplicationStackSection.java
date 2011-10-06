@@ -132,6 +132,7 @@ public class EditApplicationStackSection extends SectionStackSection {
      * @param groups Class groups
      */
     public void setApplication(String name, String lfn, String classes) {
+        
         if (name != null) {
             this.setTitle("Editing Application: " + name);
             this.nameItem.setValue(name);
@@ -139,6 +140,7 @@ public class EditApplicationStackSection extends SectionStackSection {
             this.lfnItem.setValue(lfn);
             this.classesPickList.setValues(classes.split(", "));
             this.newApplication = false;
+            
         } else {
             this.setTitle("Add Application");
             this.nameItem.setValue("");
@@ -203,7 +205,7 @@ public class EditApplicationStackSection extends SectionStackSection {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to get list of groups:<br />" + caught.getMessage());
+                SC.warn("Unable to get list of classes:<br />" + caught.getMessage());
             }
 
             public void onSuccess(List<AppClass> result) {

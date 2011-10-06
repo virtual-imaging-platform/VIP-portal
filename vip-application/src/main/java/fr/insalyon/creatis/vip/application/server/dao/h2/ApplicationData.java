@@ -34,10 +34,10 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao.h2;
 
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
-import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.h2.PlatformConnection;
 import java.sql.Connection;
@@ -46,7 +46,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
@@ -150,15 +149,15 @@ public class ApplicationData implements ApplicationDAO {
     public void remove(String email, String name) throws DAOException {
 
         try {
+            for (AppClass c : ApplicationDAOFactory.getDAOFactory().getClassDAO().getUserClasses(email, true)) {
+                PreparedStatement ps = connection.prepareStatement("DELETE "
+                        + "FROM VIPApplicationClasses "
+                        + "WHERE class=? AND application=?");
 
-            Map<String, ROLE> groups = CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUserGroups(email);
-            // TODO
-            PreparedStatement ps = connection.prepareStatement("DELETE "
-                    + "FROM WorkflowClasses WHERE class=? AND workflow=?");
-
-            ps.setString(1, email);
-            ps.setString(2, name);
-            ps.execute();
+                ps.setString(1, c.getName());
+                ps.setString(2, name);
+                ps.execute();
+            }
 
         } catch (SQLException ex) {
             logger.error(ex);
@@ -237,9 +236,23 @@ public class ApplicationData implements ApplicationDAO {
                         + "ORDER BY name");
 
                 ResultSet rs = stat.executeQuery();
+
                 while (rs.next()) {
-                    applications.add(new Application(
-                            rs.getString("name"), rs.getString("lfn")));
+                    String name = rs.getString("name");
+                    PreparedStatement stat2 = connection.prepareStatement("SELECT "
+                            + "class FROM VIPApplicationClasses WHERE application = ?");
+
+                    stat2.setString(1, name);
+
+                    ResultSet rs2 = stat2.executeQuery();
+                    List<String> appClasses = new ArrayList<String>();
+
+                    while (rs2.next()) {
+                        appClasses.add(rs2.getString("class"));
+                    }
+
+                    applications.add(new Application(name,
+                            rs.getString("lfn"), appClasses));
                 }
             }
             return applications;
@@ -328,7 +341,7 @@ public class ApplicationData implements ApplicationDAO {
      * @param className
      * @throws DAOException 
      */
-    private void addClassToApplication(String applicationName, String className) 
+    private void addClassToApplication(String applicationName, String className)
             throws DAOException {
 
         try {

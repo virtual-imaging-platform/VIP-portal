@@ -113,11 +113,12 @@ public class ClassData implements ClassDAO {
     public List<AppClass> getClasses() throws DAOException {
 
         try {
-            List<AppClass> classes = new ArrayList<AppClass>();
             PreparedStatement stat = connection.prepareStatement(
                     "SELECT name FROM VIPClasses  ORDER BY name");
 
             ResultSet rs = stat.executeQuery();
+            List<AppClass> classes = new ArrayList<AppClass>();
+            
             while (rs.next()) {
                 List<String> groups = new ArrayList<String>();
                 PreparedStatement s = connection.prepareStatement(
@@ -164,7 +165,7 @@ public class ClassData implements ClassDAO {
         }
     }
 
-    public List<String> getUserClasses(String email, boolean validAdmin) throws DAOException {
+    public List<AppClass> getUserClasses(String email, boolean validAdmin) throws DAOException {
 
         try {
             String clause = validAdmin ? " AND ug.role = ?" : "";
@@ -177,12 +178,22 @@ public class ClassData implements ClassDAO {
             if (validAdmin) {
                 ps.setString(2, ROLE.Admin.name());
             }
+            
             ResultSet rs = ps.executeQuery();
-
-            List<String> classes = new ArrayList<String>();
+            List<AppClass> classes = new ArrayList<AppClass>();
 
             while (rs.next()) {
-                classes.add(rs.getString("classname"));
+                List<String> groups = new ArrayList<String>();
+                PreparedStatement s = connection.prepareStatement(
+                        "SELECT groupname FROM VIPGroupsClasses "
+                        + "WHERE classname=? ORDER BY groupname");
+                s.setString(1, rs.getString("classname"));
+                ResultSet r = s.executeQuery();
+
+                while (r.next()) {
+                    groups.add(r.getString("groupname"));
+                }
+                classes.add(new AppClass(rs.getString("classname"), groups));
             }
 
             return classes;

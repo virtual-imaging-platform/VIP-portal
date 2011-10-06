@@ -53,8 +53,6 @@ public interface ApplicationServiceAsync {
     
     public void getApplicationsByClass(String applicationClass, AsyncCallback<List<Application>> asyncCallback);
 
-    public void getApplication(String name, AsyncCallback<Application> asyncCallback);
-
     public void add(Application workflowDescriptor, AsyncCallback<Void> asyncCallback);
 
     public void update(Application workflowDescriptor, AsyncCallback<Void> asyncCallback);

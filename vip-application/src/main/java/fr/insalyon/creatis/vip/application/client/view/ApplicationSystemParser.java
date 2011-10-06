@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.application.client.view;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.view.system.application.ManageApplicationsTab;
 import fr.insalyon.creatis.vip.application.client.view.system.classes.ManageClassesTab;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
@@ -48,9 +49,13 @@ public class ApplicationSystemParser extends ApplicationParser {
 
     @Override
     public void loadApplications() {
-        
-        addApplication(ApplicationConstants.APP_APPLICATION, ApplicationConstants.APP_IMG_APPLICATION);
-        addApplication(ApplicationConstants.APP_CLASSES, ApplicationConstants.APP_IMG_CLASSES);
+
+        if (CoreModule.user.isSystemAdministrator() || CoreModule.user.isGroupAdmin()) {
+            addApplication(ApplicationConstants.APP_APPLICATION, ApplicationConstants.APP_IMG_APPLICATION);
+        }
+        if (CoreModule.user.isSystemAdministrator()) {
+            addApplication(ApplicationConstants.APP_CLASSES, ApplicationConstants.APP_IMG_CLASSES);
+        }
     }
 
     @Override
@@ -59,7 +64,7 @@ public class ApplicationSystemParser extends ApplicationParser {
         if (applicationName.equals(ApplicationConstants.APP_APPLICATION)) {
             Layout.getInstance().addTab(new ManageApplicationsTab());
             return true;
-        
+
         } else if (applicationName.equals(ApplicationConstants.APP_CLASSES)) {
             Layout.getInstance().addTab(new ManageClassesTab());
             return true;

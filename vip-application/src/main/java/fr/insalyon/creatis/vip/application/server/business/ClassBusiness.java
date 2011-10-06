@@ -36,76 +36,79 @@ package fr.insalyon.creatis.vip.application.server.business;
 
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author Rafael Silva
  */
 public class ClassBusiness {
-    
+
     /**
      * 
      * @return
      * @throws BusinessException 
      */
     public List<AppClass> getClasses() throws BusinessException {
-        
+
         try {
             return ApplicationDAOFactory.getDAOFactory().getClassDAO().getClasses();
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
      * 
      * @param c
      * @throws BusinessException 
      */
     public void addClass(AppClass c) throws BusinessException {
-        
+
         try {
             ApplicationDAOFactory.getDAOFactory().getClassDAO().add(c);
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
      * 
      * @param c
      * @throws BusinessException 
      */
     public void updateClass(AppClass c) throws BusinessException {
-        
+
         try {
             ApplicationDAOFactory.getDAOFactory().getClassDAO().update(c);
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
      * 
      * @param name
      * @throws BusinessException 
      */
     public void removeClass(String name) throws BusinessException {
-        
+
         try {
             ApplicationDAOFactory.getDAOFactory().getClassDAO().remove(name);
-        
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
      * 
      * @param email
@@ -113,12 +116,30 @@ public class ClassBusiness {
      * @return
      * @throws BusinessException 
      */
-    public List<String> getUserClasses(String email, boolean validAdmin) 
+    public List<String> getUserClassesName(String email, boolean validAdmin)
             throws BusinessException {
-        
+
+        List<String> classesName = new ArrayList<String>();
+        for (AppClass appClass : getUserClasses(email, validAdmin)) {
+            classesName.add(appClass.getName());
+        }
+
+        return classesName;
+    }
+
+    /**
+     * 
+     * @param email
+     * @param validAdmin
+     * @return
+     * @throws BusinessException 
+     */
+    public List<AppClass> getUserClasses(String email, boolean validAdmin)
+            throws BusinessException {
+
         try {
             return ApplicationDAOFactory.getDAOFactory().getClassDAO().getUserClasses(email, validAdmin);
-        
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
