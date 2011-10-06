@@ -302,6 +302,36 @@ public class JobData implements JobDAO {
         }
     }
 
+      /**
+     * 
+     * @return
+     * @throws DAOException 
+     */
+    public List<String> getCkptsPerJob() throws DAOException {
+        
+        try {
+            List<String> list = new ArrayList<String>();
+            Statement stat = connection.createStatement();
+            ResultSet rs = stat.executeQuery("SELECT j.id, status, COALESCE(jm.occ, 0) as ckpt_occ FROM Jobs AS j "
+                    + "LEFT JOIN "
+                    + "(SELECT id, count(minor_status) as occ FROM JobsMinorStatus WHERE minor_status=102  GROUP BY id) AS jm "
+                    + "ON j.id = jm.id "
+                    + "ORDER BY ckpt_occ");
+
+            while (rs.next()) {
+                list.add(rs.getString("status")
+                        + "##" + rs.getString("ckpt_occ"));
+            }
+
+            return list;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    
     public void sendSignal(String jobID, ApplicationConstants.JobStatus status) 
             throws DAOException {
         

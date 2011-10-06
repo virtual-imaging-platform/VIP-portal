@@ -88,7 +88,7 @@ public class ChartsTab extends Tab {
     private ListGrid grid;
 
     public ChartsTab(String simulationID) {
-        
+
         this.simulationID = simulationID;
         this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_CHART));
         this.setPrompt("Performance Statistics");
@@ -100,14 +100,14 @@ public class ChartsTab extends Tab {
         vLayout.setOverflow(Overflow.AUTO);
         vLayout.setPadding(10);
         vLayout.addMember(form);
-        
+
         modal = new ModalWindow(vLayout);
 
         this.setPane(vLayout);
     }
 
     private void configureForm() {
-        
+
         form = new DynamicForm();
         form.setWidth(500);
         form.setNumCols(5);
@@ -117,6 +117,7 @@ public class ChartsTab extends Tab {
         chartsMap.put("2", "Histogram of Execution Times");
         chartsMap.put("3", "Histogram of Download Times");
         chartsMap.put("4", "Histogram of Upload Times");
+        chartsMap.put("5", "Checkpoints per job");
         chartsItem = new SelectItem("charts", "Chart");
         chartsItem.setValueMap(chartsMap);
         chartsItem.setEmptyDisplayValue("Select a chart...");
@@ -131,7 +132,7 @@ public class ChartsTab extends Tab {
                 }
             }
         });
-        
+
         binItem = new TextItem("bin", "Bin Size");
         binItem.setWidth(50);
         binItem.setValue("100");
@@ -150,7 +151,7 @@ public class ChartsTab extends Tab {
     }
 
     private void generateChart() {
-        
+
         int value = new Integer(chartsItem.getValueAsString());
         int binSize = 100;
         if (binItem.getValueAsString() != null && !binItem.getValueAsString().equals("")) {
@@ -169,6 +170,9 @@ public class ChartsTab extends Tab {
                 break;
             case 4:
                 plotUploadPerNumberOfJobs(binSize);
+                break;
+            case 5:
+                plotCkptsPerJob();
                 break;
         }
     }
@@ -190,6 +194,25 @@ public class ChartsTab extends Tab {
         };
         modal.show("Building chart...", true);
         service.getJobsPertTime(simulationID, callback);
+    }
+
+    private void plotCkptsPerJob() {
+
+        JobServiceAsync service = JobService.Util.getInstance();
+        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Unable to get chart data:<br />" + caught.getMessage());
+            }
+
+            public void onSuccess(List<String> result) {
+                buildCkptChart(result);
+                modal.hide();
+            }
+        };
+        modal.show("Building chart...", true);
+        service.getCkptsPerJob(simulationID, callback);
     }
 
     /**
@@ -261,6 +284,90 @@ public class ChartsTab extends Tab {
         service.getUploadPerNumberOfJobs(simulationID, binSize, callback);
     }
 
+    private void buildCkptChart(List<String> result) {
+
+        ChartData chartData = new ChartData();
+        chartData.setBackgroundColour("#ffffff");
+
+        StackedBarChart stack = new StackedBarChart();
+        int max = 0;
+        int occ_completed = 0;
+        int occ_error = 0;
+        int occ_stalled = 0;
+        int occ_cancelled = 0;
+        int nb_jobs=0;
+
+
+        for (String values : result) {
+            Stack s = new Stack();
+            String[] v = values.split("##");
+
+            int nb_occ = new Integer(v[1]);
+
+            if (v[0].equals("COMPLETED")) {
+                s.addStackValues(new StackedBarChart.StackValue(nb_occ, "#009966"));
+                occ_completed=occ_completed+nb_occ;
+                nb_jobs++;
+            } else {
+                if (v[0].equals("ERROR")) {
+                    s.addStackValues(new StackedBarChart.StackValue(nb_occ, "#CC0033"));
+                    occ_error=occ_error+nb_occ;
+                    nb_jobs++;
+                } else {
+                    if (v[0].equals("STALLED")) {
+                        s.addStackValues(new StackedBarChart.StackValue(nb_occ, "#663366"));
+                        occ_stalled=occ_stalled+nb_occ;
+                        nb_jobs++;
+                    } else {
+                        if (v[0].equals("CANCELLED")) {
+                            s.addStackValues(new StackedBarChart.StackValue(nb_occ, "#FF9933"));
+                            occ_cancelled=occ_cancelled+nb_occ;
+                            nb_jobs++;
+                        }
+                    }
+                }
+            }
+            stack.addStack(s);
+
+            if (nb_occ > max) {
+                max = nb_occ;
+            }
+        }
+
+        stack.setKeys(
+                new Keys("Completed", "#009966", 9),
+                new Keys("Error", "#CC0033", 9),
+                new Keys("Stalled", "#663366", 9),
+                new Keys("Cancelled", "#FF9933", 9));
+
+
+        chartData.addElements(stack);
+
+        XAxis xa = new XAxis();
+        xa.setRange(0, nb_jobs, (nb_jobs / 10));
+        chartData.setXAxis(xa);
+        chartData.setXLegend(new Text("Jobs", "{font-size: 10px; color: #000000}"));
+
+        YAxis ya = new YAxis();
+        ya.setRange(0, max, (max / 10));
+        chartData.setYAxis(ya);
+        chartData.setYLegend(new Text("Number of checkpoints", "{font-size: 10px; color: #000000}"));
+
+        if (chart == null) {
+            configureChartAndGrid();
+        }
+
+        PropertyRecord[] data = new PropertyRecord[]{
+            new PropertyRecord("Total ckpts for completed jobs", occ_completed + ""),
+            new PropertyRecord("Total ckpts for error jobs", occ_error + ""),
+            new PropertyRecord("Total ckpts for stalled jobs", occ_stalled + ""),
+            new PropertyRecord("Total ckpts for cancelled jobs", occ_cancelled + "")
+        };
+
+        grid.setData(data);
+        chart.setChartData(chartData);
+    }
+
     private void buildStackChart(List<String> result) {
 
         ChartData chartData = new ChartData();
@@ -325,14 +432,14 @@ public class ChartsTab extends Tab {
         if (chart == null) {
             configureChartAndGrid();
         }
-        
+
         PropertyRecord[] data = new PropertyRecord[]{
-                new PropertyRecord("Makespan (s)", max + ""),
-                new PropertyRecord("Cumulated CPU time (s)", cpuTime + ""),
-                new PropertyRecord("Speed-up", (cpuTime / (float) max) + ""),
-                new PropertyRecord("Efficiency", (cpuTime / (float) sequentialTime) + "")
-            };
-               
+            new PropertyRecord("Makespan (s)", max + ""),
+            new PropertyRecord("Cumulated CPU time (s)", cpuTime + ""),
+            new PropertyRecord("Speed-up", (cpuTime / (float) max) + ""),
+            new PropertyRecord("Efficiency", (cpuTime / (float) sequentialTime) + "")
+        };
+
         grid.setData(data);
         chart.setChartData(chartData);
     }
@@ -446,7 +553,7 @@ public class ChartsTab extends Tab {
     }
 
     private void configureChartAndGrid() {
-        
+
         chart = new ChartWidget();
         chart.setSize("700", "370");
 

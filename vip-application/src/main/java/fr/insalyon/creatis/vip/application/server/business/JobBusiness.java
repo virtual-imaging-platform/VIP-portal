@@ -194,6 +194,22 @@ public class JobBusiness {
         }
     }
     
+        /**
+     * 
+     * @param simulationID
+     * @return
+     * @throws BusinessException 
+     */
+    public List<String> getCkptsPerJob(String simulationID) throws BusinessException {
+        
+        try {
+            return WorkflowDAOFactory.getDAOFactory().getJobDAO(simulationID).getCkptsPerJob();
+        
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
     /**
      * 
      * @param simulationID

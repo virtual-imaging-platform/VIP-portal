@@ -182,6 +182,22 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
             throw new ApplicationException(ex);
         }
     }
+    
+        /**
+     * 
+     * @param simulationID
+     * @return
+     * @throws ApplicationException 
+     */
+    public List<String> getCkptsPerJob(String simulationID) throws ApplicationException {
+
+        try {
+            return jobBusiness.getCkptsPerJob(simulationID);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    } 
 
     /**
      * 

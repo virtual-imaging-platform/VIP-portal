@@ -61,6 +61,8 @@ public interface JobServiceAsync {
     public void getUploadPerNumberOfJobs(String simulationID, int binSize, AsyncCallback<List<String>> asyncCallback);
 
     public void getJobsPertTime(String simulationID, AsyncCallback<List<String>> asyncCallback);
+    
+    public void getCkptsPerJob(String simulationID, AsyncCallback<List<String>> asyncCallback);
 
     public void getNode(String simulationID, String siteName, String nodeName, AsyncCallback<Node> asyncCallback);
     

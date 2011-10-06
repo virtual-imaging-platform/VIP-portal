@@ -77,6 +77,8 @@ public interface JobService extends RemoteService {
     public List<String> getUploadPerNumberOfJobs(String simulationID, int binSize) throws ApplicationException ;
 
     public List<String> getJobsPertTime(String simulationID) throws ApplicationException ;
+    
+    public List<String> getCkptsPerJob(String simulationID) throws ApplicationException ;
 
     public Node getNode(String simulationID, String siteName, String nodeName) throws ApplicationException ;
     
