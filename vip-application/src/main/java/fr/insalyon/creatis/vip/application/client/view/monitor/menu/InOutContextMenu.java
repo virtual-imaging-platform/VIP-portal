@@ -44,9 +44,10 @@ import com.smartgwt.client.widgets.tree.Tree;
 import com.smartgwt.client.widgets.tree.TreeNode;
 import fr.insalyon.creatis.vip.application.client.view.monitor.InOutTreeNode;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 import java.util.ArrayList;
@@ -75,16 +76,16 @@ public class InOutContextMenu extends Menu {
         this.setWidth(90);
 
         MenuItem downloadFilesItem = new MenuItem("Download Files");
-        downloadFilesItem.setIcon("icon-download.png");
+        downloadFilesItem.setIcon(DataManagerConstants.ICON_DOWNLOAD);
         downloadFilesItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
                 download();
             }
         });
-        
+
         MenuItem downloadFileItem = new MenuItem("Download File");
-        downloadFileItem.setIcon("icon-download.png");
+        downloadFileItem.setIcon(DataManagerConstants.ICON_DOWNLOAD);
         downloadFileItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -93,7 +94,7 @@ public class InOutContextMenu extends Menu {
         });
 
         MenuItem jumpToItem = new MenuItem("Go to Folder");
-        jumpToItem.setIcon("icon-jumpto.png");
+        jumpToItem.setIcon(DataManagerConstants.ICON_JUMPTO);
         jumpToItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -113,8 +114,8 @@ public class InOutContextMenu extends Menu {
     }
 
     private void downloadFile(String path) {
-        
-        TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+
+        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {
@@ -130,13 +131,9 @@ public class InOutContextMenu extends Menu {
             }
         };
         modal.show("Adding file to transfer queue...", true);
-//        Context context = Context.getInstance();
-//        service.downloadFile(
-//                context.getUser(), path, 
-//                context.getUserDN(), context.getProxyFileName(),
-//                callback);
+        service.downloadFile(path, callback);
     }
-    
+
     private void download() {
 
         List<String> paths = new ArrayList<String>();
@@ -156,7 +153,7 @@ public class InOutContextMenu extends Menu {
 
     private void downloadFiles(List<String> paths, String packName) {
 
-        TransferPoolServiceAsync service = TransferPoolService.Util.getInstance();
+        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {
@@ -172,11 +169,6 @@ public class InOutContextMenu extends Menu {
             }
         };
         modal.show("Adding files to transfer queue...", true);
-//        Context context = Context.getInstance();
-//        service.downloadFiles(
-//                context.getUser(),
-//                paths, packName,
-//                context.getUserDN(), context.getProxyFileName(),
-//                callback);
+        service.downloadFiles(paths, packName, callback);
     }
 }

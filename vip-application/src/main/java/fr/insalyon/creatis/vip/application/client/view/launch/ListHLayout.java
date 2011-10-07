@@ -38,7 +38,10 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
+import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
@@ -49,22 +52,22 @@ import fr.insalyon.creatis.vip.datamanager.client.view.selection.PathSelectionWi
  * @author Rafael Silva
  */
 public class ListHLayout extends HLayout {
-    
+
     private ListHLayout instance;
     private TextItem listItem;
     private DynamicForm listItemForm;
     private IButton controlButton;
     private IButton browseButton;
-    
+
     public ListHLayout(final VLayout parent, boolean master) {
         this(parent, master, "");
     }
-    
+
     public ListHLayout(final VLayout parent, boolean master, String value) {
-        
+
         this.instance = this;
         this.setMembersMargin(3);
-                
+
         if (master) {
             controlButton = new IButton("+");
             controlButton.addClickHandler(new ClickHandler() {
@@ -73,7 +76,7 @@ public class ListHLayout extends HLayout {
                     parent.addMember(new ListHLayout(parent, false));
                 }
             });
-            
+
         } else {
             controlButton = new IButton("-");
             controlButton.addClickHandler(new ClickHandler() {
@@ -85,27 +88,25 @@ public class ListHLayout extends HLayout {
         }
         controlButton.setWidth(30);
         this.addMember(controlButton);
-        
+
         listItem = FieldUtil.getTextItem(400, false, "", null);
         listItem.setValue(value);
-        listItemForm = FieldUtil.getForm(listItem);
-        this.addMember(listItemForm);
-        
-        browseButton = new IButton("Browse");
-        browseButton.setWidth(60);
-        browseButton.addClickHandler(new ClickHandler() {
+        PickerIcon browsePicker = new PickerIcon(PickerIcon.SEARCH, new FormItemClickHandler() {
 
-            public void onClick(ClickEvent event) {
+            public void onFormItemClick(FormItemIconClickEvent event) {
                 new PathSelectionWindow(listItem).show();
             }
         });
-        this.addMember(browseButton);
+        browsePicker.setPrompt("Browse on the Grid");
+        listItem.setIcons(browsePicker);
+        listItemForm = FieldUtil.getForm(listItem);
+        this.addMember(listItemForm);
     }
-    
+
     public boolean validate() {
         return listItem.validate();
     }
-    
+
     public String getValue() {
         return listItem.getValueAsString();
     }

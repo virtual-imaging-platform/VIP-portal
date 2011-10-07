@@ -90,7 +90,7 @@ public class InputHLayout extends VLayout {
         label.setAlign(Alignment.RIGHT);
         hLayout.addMember(label);
 
-        configureTypeSelectItem(name);
+        configureTypeSelectItem();
         hLayout.addMember(FieldUtil.getForm(selectItem));
 
         // List
@@ -109,7 +109,8 @@ public class InputHLayout extends VLayout {
         this.addMember(hLayout);
     }
 
-    private void configureTypeSelectItem(String title) {
+    private void configureTypeSelectItem() {
+        
         selectItem = new SelectItem();
         selectItem.setShowTitle(false);
         selectItem.setValueMap(InputType.valuesAsString());
@@ -129,6 +130,7 @@ public class InputHLayout extends VLayout {
     }
 
     private void setList() {
+        
         hLayout.addMember(listLayout);
         hLayout.removeMember(startItemForm);
         hLayout.removeMember(stopItemForm);
@@ -136,6 +138,7 @@ public class InputHLayout extends VLayout {
     }
 
     private void setRange() {
+        
         hLayout.removeMember(listLayout);
         hLayout.addMember(startItemForm);
         hLayout.addMember(stopItemForm);
