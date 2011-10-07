@@ -296,7 +296,7 @@ public class ChartsTab extends Tab {
         int occ_stalled = 0;
         int occ_cancelled = 0;
         int nb_jobs=0;
-
+        int failed_jobs=0;
 
         for (String values : result) {
             Stack s = new Stack();
@@ -312,12 +312,14 @@ public class ChartsTab extends Tab {
                 if (v[0].equals("ERROR")) {
                     s.addStackValues(new StackedBarChart.StackValue(nb_occ, "#CC0033"));
                     occ_error=occ_error+nb_occ;
+                    failed_jobs++;
                     nb_jobs++;
                 } else {
                     if (v[0].equals("STALLED")) {
                         s.addStackValues(new StackedBarChart.StackValue(nb_occ, "#663366"));
                         occ_stalled=occ_stalled+nb_occ;
                         nb_jobs++;
+                        failed_jobs++;
                     } else {
                         if (v[0].equals("CANCELLED")) {
                             s.addStackValues(new StackedBarChart.StackValue(nb_occ, "#FF9933"));
@@ -361,7 +363,8 @@ public class ChartsTab extends Tab {
             new PropertyRecord("Total ckpts for completed jobs", occ_completed + ""),
             new PropertyRecord("Total ckpts for error jobs", occ_error + ""),
             new PropertyRecord("Total ckpts for stalled jobs", occ_stalled + ""),
-            new PropertyRecord("Total ckpts for cancelled jobs", occ_cancelled + "")
+            new PropertyRecord("Total ckpts for cancelled jobs", occ_cancelled + ""),
+            new PropertyRecord("Failure rate", (failed_jobs / (float) nb_jobs) + "")
         };
 
         grid.setData(data);
@@ -375,7 +378,9 @@ public class ChartsTab extends Tab {
 
         StackedBarChart stack = new StackedBarChart();
         int max = 0;
+        int nbJobs = 0;
         long cpuTime = 0;
+        long waitingTime = 0;
         long sequentialTime = 0;
 
         for (String values : result) {
@@ -391,6 +396,8 @@ public class ChartsTab extends Tab {
             int count = creation + queued + input + execution + output;
             cpuTime += execution;
             sequentialTime += input + execution + output;
+            nbJobs++;
+            waitingTime += queued;
 
             if (v[0].equals("COMPLETED")) {
                 s.addStackValues(new StackedBarChart.StackValue(creation, "#996633"));
@@ -437,7 +444,8 @@ public class ChartsTab extends Tab {
             new PropertyRecord("Makespan (s)", max + ""),
             new PropertyRecord("Cumulated CPU time (s)", cpuTime + ""),
             new PropertyRecord("Speed-up", (cpuTime / (float) max) + ""),
-            new PropertyRecord("Efficiency", (cpuTime / (float) sequentialTime) + "")
+            new PropertyRecord("Efficiency", (cpuTime / (float) sequentialTime) + ""),
+            new PropertyRecord("Mean waiting time", (waitingTime / (float) nbJobs) + "")
         };
 
         grid.setData(data);
