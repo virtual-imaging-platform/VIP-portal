@@ -241,6 +241,22 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
+    public void downloadFiles(List<String> remoteFiles, String packName)
+            throws DataManagerException {
+
+        try {
+            trace(logger, "Adding files to transfer queue: " + remoteFiles);
+            User user = getSessionUser();
+            transferPoolBusiness.downloadFiles(user.getFullName(),
+                    user.getEmail(), remoteFiles, packName);
+
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
+        }
+    }
+
     public void downloadFolder(String remoteFolder) throws DataManagerException {
 
         try {
@@ -261,9 +277,9 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             trace(logger, "Uploading file '" + localFile + "' to '" + remoteFile + "'.");
             User user = getSessionUser();
-            transferPoolBusiness.uploadFile(user.getFullName(), 
+            transferPoolBusiness.uploadFile(user.getFullName(),
                     user.getEmail(), localFile, remoteFile);
-            
+
         } catch (CoreException ex) {
             throw new DataManagerException(ex);
         } catch (BusinessException ex) {

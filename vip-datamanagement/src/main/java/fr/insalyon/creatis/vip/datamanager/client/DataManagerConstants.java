@@ -57,6 +57,7 @@ public class DataManagerConstants {
     public static final String ICON_FILE_TRANSFER = IMG_FOLDER + "icon-file-transfer.png";
     public static final String ICON_FOLDER_UP = IMG_FOLDER + "icon-folderup.png";
     public static final String ICON_FOLDER_ADD = IMG_FOLDER + "icon-addfolder.png";
+    public static final String ICON_JUMPTO = IMG_FOLDER + "icon-jumpto.png";
     public static final String ICON_OPERATION = IMG_FOLDER + "icon-operation.png";
     public static final String ICON_PASTE = IMG_FOLDER + "icon-paste.png";
     public static final String ICON_TRASH = IMG_FOLDER + "icon-trash.png";

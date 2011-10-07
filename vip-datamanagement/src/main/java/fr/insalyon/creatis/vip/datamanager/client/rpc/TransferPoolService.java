@@ -39,7 +39,6 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
-import java.util.List;
 
 /**
  *
@@ -61,8 +60,6 @@ public interface TransferPoolService extends RemoteService {
     }
 
     public PoolOperation getOperationById(String id, String proxy) throws DataManagerException;
-
-    public void downloadFiles(String user, List<String> remoteFiles, String packName, String userDN, String proxy) throws DataManagerException;
 
     public void clearDeleteOperations(String proxy) throws DataManagerException;
 }

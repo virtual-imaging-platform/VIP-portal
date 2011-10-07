@@ -88,6 +88,8 @@ public interface DataManagerService extends RemoteService {
     public void removeOperationById(String id) throws DataManagerException;
 
     public void downloadFile(String remoteFile) throws DataManagerException;
+    
+    public void downloadFiles(List<String> remoteFiles, String packName) throws DataManagerException;
 
     public void downloadFolder(String remoteFolder) throws DataManagerException;
     

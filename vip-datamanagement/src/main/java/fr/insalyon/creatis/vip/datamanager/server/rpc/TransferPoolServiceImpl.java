@@ -39,15 +39,10 @@ import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
 import fr.insalyon.creatis.agent.vlet.common.bean.Operation;
 import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
-import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.log4j.Logger;
 
 /**
@@ -68,36 +63,6 @@ public class TransferPoolServiceImpl extends RemoteServiceServlet implements Tra
                     op.getId(), op.getRegistration(), op.getSource(),
                     op.getDest(), op.getType().name(), op.getStatus().name(), op.getUser());
 
-        } catch (VletAgentClientException ex) {
-            logger.error(ex);
-            throw new DataManagerException(ex);
-        }
-    }
-
-    public void downloadFiles(String user, List<String> remoteFiles, String packName,
-            String userDN, String proxy) throws DataManagerException {
-
-        try {
-            LFCBusiness business = new LFCBusiness();
-            business.getModificationDate(user, remoteFiles);
-
-            VletAgentPoolClient poolClient = CoreUtil.getVletAgentPoolClient();
-
-            List<String> remotePaths = new ArrayList<String>();
-            for (String remoteFile : remoteFiles) {
-                remotePaths.add(DataManagerUtil.parseBaseDir(user, remoteFile));
-            }
-            String localDirPath = serverConfiguration.getDataManagerPath()
-                    + "/downloads/" + packName;
-
-            poolClient.downloadFiles(remotePaths.toArray(new String[]{}), localDirPath, userDN);
-
-        } catch (BusinessException ex) {
-            logger.error(ex);
-            throw new DataManagerException(ex);
-        } catch (DataManagerException ex) {
-            logger.error(ex);
-            throw ex;
         } catch (VletAgentClientException ex) {
             logger.error(ex);
             throw new DataManagerException(ex);

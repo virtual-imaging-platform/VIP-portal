@@ -221,6 +221,39 @@ public class TransferPoolBusiness {
      * 
      * @param userName
      * @param email
+     * @param remoteFiles
+     * @param packName
+     * @throws BusinessException 
+     */
+    public void downloadFiles(String userName, String email, List<String> remoteFiles, 
+            String packName) throws BusinessException {
+
+        try {
+            lfcBusiness.getModificationDate(userName, remoteFiles);
+            VletAgentPoolClient poolClient = CoreUtil.getVletAgentPoolClient();
+
+            List<String> remotePaths = new ArrayList<String>();
+            for (String remoteFile : remoteFiles) {
+                remotePaths.add(DataManagerUtil.parseBaseDir(userName, remoteFile));
+            }
+            String localDirPath = serverConfiguration.getDataManagerPath()
+                    + "/downloads/" + packName;
+
+            poolClient.downloadFiles(remotePaths.toArray(new String[]{}), localDirPath, email);
+
+        } catch (DataManagerException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        } catch (VletAgentClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param userName
+     * @param email
      * @param remoteFolder
      * @throws BusinessException 
      */
@@ -253,7 +286,7 @@ public class TransferPoolBusiness {
      * @param remoteFile
      * @throws BusinessException 
      */
-    public void uploadFile(String userName, String email, String localFile, 
+    public void uploadFile(String userName, String email, String localFile,
             String remoteFile) throws BusinessException {
 
         try {
