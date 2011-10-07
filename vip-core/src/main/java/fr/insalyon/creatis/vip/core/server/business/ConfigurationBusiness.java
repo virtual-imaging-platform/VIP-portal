@@ -40,18 +40,13 @@ import fr.insalyon.creatis.devtools.MD5;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
-import fr.insalyon.creatis.vip.core.server.business.proxy.MyProxyClient;
-import fr.insalyon.creatis.vip.core.server.business.proxy.Proxy;
+import fr.insalyon.creatis.vip.core.server.business.proxy.ProxyClient;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -75,48 +70,9 @@ public class ConfigurationBusiness {
         PropertyConfigurator.configure(ConfigurationBusiness.class.getClassLoader().getResource("vipLog4j.properties"));
 
         try {
-            // MyProxy
             logger.info("Configuring VIP server proxy.");
-            MyProxyClient myproxy = new MyProxyClient();
-            Proxy proxy = myproxy.getProxy();
-
-            Calendar currentDate = Calendar.getInstance();
-            currentDate.setTime(new Date());
-            currentDate.add(Calendar.DAY_OF_MONTH, 2);
-            Calendar proxyDate = Calendar.getInstance();
-            proxyDate.setTime(proxy.getEndDate());
-
-            if (proxyDate.before(currentDate)) {
-                logger.error("The server proxy is valid for less than 2 days.");
-                throw new BusinessException("Unable to load VIP configuration.");
-            }
-
-            // Voms Extension
-            Server serverConf = Server.getInstance();
-            String command = "voms-proxy-init --voms biomed"
-                    + " -cert " + serverConf.getServerProxy()
-                    + " -key " + serverConf.getServerProxy()
-                    + " -out " + serverConf.getServerProxy()
-                    + " -noregen -hours 240";
-            Process process = Runtime.getRuntime().exec(command);
-
-            BufferedReader r = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String s = null;
-            String cout = "";
-
-            while ((s = r.readLine()) != null) {
-                cout += s + "\n";
-            }
-            process.waitFor();
-
-            logger.info(cout);
-            
-            process.getOutputStream().close();
-            process.getInputStream().close();
-            process.getErrorStream().close();
-            r.close();
-            
-            process = null;
+            ProxyClient myproxy = new ProxyClient();
+            myproxy.getProxy();
 
         } catch (Exception ex) {
             logger.error(ex);
@@ -644,7 +600,7 @@ public class ConfigurationBusiness {
                     + "<body>"
                     + "<p><b>VIP Contact</b></p>"
                     + "<p><b>User:</b> " + user.getFullName() + "</p>"
-                    + "<p><b>Email:</b> <a href=\"mailto:" + user.getEmail() +"\">" + user.getEmail() + "</a></p>"
+                    + "<p><b>Email:</b> <a href=\"mailto:" + user.getEmail() + "\">" + user.getEmail() + "</a></p>"
                     + "<p>&nbsp;</p>"
                     + "<p><b>Category:</b> " + category + "</p>"
                     + "<p><b>Subject:</b> " + subject + "</p>"

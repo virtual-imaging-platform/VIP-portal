@@ -42,6 +42,7 @@ import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
@@ -50,6 +51,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.ProtocolException;
@@ -95,9 +97,9 @@ import org.bouncycastle.util.encoders.Base64;
  *
  * @author Rafael Silva
  */
-public class MyProxyClient {
+public class ProxyClient {
 
-    private final static Logger logger = Logger.getLogger(MyProxyClient.class);
+    private final static Logger logger = Logger.getLogger(ProxyClient.class);
     private SSLSocket socket;
     private BufferedInputStream socketIn;
     private BufferedOutputStream socketOut;
@@ -108,15 +110,15 @@ public class MyProxyClient {
     private final String GETCOMMAND = "COMMAND=0";
     private final String USERNAME = "USERNAME=";
     private final String PASSPHRASE = "PASSPHRASE=";
-    private final String LIFETIME = "LIFETIME=864000"; // 10 days
+    private final String LIFETIME = "LIFETIME=43200"; // 10 days
     private final String RESPONSE = "RESPONSE=";
     private final String ERROR = "ERROR=";
 
     /**
-     * The MyProxyClient class provides an interface for retrieving credentials
+     * The ProxyClient class provides an interface for retrieving credentials
      * from a MyProxy server.
      */
-    public MyProxyClient() {
+    public ProxyClient() {
     }
 
     /**
@@ -142,7 +144,7 @@ public class MyProxyClient {
                     X509Certificate certificate = (X509Certificate) cf.generateCertificate(is);
                     Calendar currentDate = Calendar.getInstance();
                     currentDate.setTime(new Date());
-                    currentDate.add(Calendar.DAY_OF_MONTH, 4);
+                    currentDate.add(Calendar.HOUR, 2);
                     try {
                         certificate.checkValidity(currentDate.getTime());
                         if (endDate != null && certificate.getNotAfter().getTime() < endDate.getTime()) {
@@ -156,14 +158,17 @@ public class MyProxyClient {
                     }
                 }
                 if (valid) {
+                    logger.info("Server proxy still valid until: " + endDate);
                     return new Proxy(proxyFileName, endDate);
                 }
             }
+            logger.info("Fetching server proxy from MyProxy server.");
             connect();
             logon();
             getCredentials();
             Date endDate = saveCredentials(proxyFileName);
             disconnect();
+            addVomsExtension();
 
             return new Proxy(proxyFileName, endDate);
 
@@ -177,6 +182,37 @@ public class MyProxyClient {
             }
             throw new BusinessException(ex.getMessage());
         }
+    }
+
+    private void addVomsExtension() throws Exception {
+        
+        logger.info("Adding VOMS Extension to server proxy.");
+        // Voms Extension
+        Server serverConf = Server.getInstance();
+        String command = "voms-proxy-init --voms biomed"
+                + " -cert " + serverConf.getServerProxy()
+                + " -key " + serverConf.getServerProxy()
+                + " -out " + serverConf.getServerProxy()
+                + " -noregen -hours 240";
+        Process process = Runtime.getRuntime().exec(command);
+
+        BufferedReader r = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String s = null;
+        String cout = "";
+
+        while ((s = r.readLine()) != null) {
+            cout += s + "\n";
+        }
+        process.waitFor();
+
+        logger.info(cout);
+
+        process.getOutputStream().close();
+        process.getInputStream().close();
+        process.getErrorStream().close();
+        r.close();
+
+        process = null;
     }
 
     private void connect() throws Exception {
