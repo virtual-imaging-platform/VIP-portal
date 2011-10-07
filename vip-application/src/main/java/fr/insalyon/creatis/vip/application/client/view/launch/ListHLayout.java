@@ -35,8 +35,6 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -44,6 +42,7 @@ import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.selection.PathSelectionWindow;
 
@@ -68,29 +67,9 @@ public class ListHLayout extends HLayout {
         this.instance = this;
         this.setMembersMargin(3);
 
-        if (master) {
-            controlButton = new IButton("+");
-            controlButton.addClickHandler(new ClickHandler() {
-
-                public void onClick(ClickEvent event) {
-                    parent.addMember(new ListHLayout(parent, false));
-                }
-            });
-
-        } else {
-            controlButton = new IButton("-");
-            controlButton.addClickHandler(new ClickHandler() {
-
-                public void onClick(ClickEvent event) {
-                    parent.removeMember(instance);
-                }
-            });
-        }
-        controlButton.setWidth(30);
-        this.addMember(controlButton);
-
         listItem = FieldUtil.getTextItem(400, false, "", null);
         listItem.setValue(value);
+        
         PickerIcon browsePicker = new PickerIcon(PickerIcon.SEARCH, new FormItemClickHandler() {
 
             public void onFormItemClick(FormItemIconClickEvent event) {
@@ -98,7 +77,29 @@ public class ListHLayout extends HLayout {
             }
         });
         browsePicker.setPrompt("Browse on the Grid");
-        listItem.setIcons(browsePicker);
+        
+        PickerIcon morePicker = new PickerIcon(new PickerIcon.Picker(ApplicationConstants.ICON_PICKER_MORE), new FormItemClickHandler() {
+
+            public void onFormItemClick(FormItemIconClickEvent event) {
+                parent.addMember(new ListHLayout(parent, false));
+            }
+        });
+        morePicker.setPrompt("Add");
+        
+        PickerIcon lessPicker = new PickerIcon(new PickerIcon.Picker(ApplicationConstants.ICON_PICKER_LESS), new FormItemClickHandler() {
+
+            public void onFormItemClick(FormItemIconClickEvent event) {
+                parent.removeMember(instance);
+            }
+        });
+        lessPicker.setPrompt("Remove");
+        
+        if (master) {
+            listItem.setIcons(morePicker, browsePicker);
+        } else {
+            listItem.setIcons(lessPicker, browsePicker);
+        }
+        
         listItemForm = FieldUtil.getForm(listItem);
         this.addMember(listItemForm);
     }
