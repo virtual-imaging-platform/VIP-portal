@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.gatelab.client.view.monitor;
 import com.smartgwt.client.widgets.Canvas;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
+import fr.insalyon.creatis.vip.application.client.view.monitor.ChartsTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SummaryTab;
 import fr.insalyon.creatis.vip.gatelab.client.GateLabConstants;
 
@@ -48,6 +49,7 @@ public class GateLabSimulationTab extends AbstractSimulationTab {
 
     private GateLabGeneralTab generalTab;
     private SummaryTab summaryTab;
+    private ChartsTab chartsTab;
 
     public GateLabSimulationTab(String simulationID, String simulationName, SimulationStatus status, String date) {
 
@@ -57,9 +59,11 @@ public class GateLabSimulationTab extends AbstractSimulationTab {
 
         summaryTab = new SummaryTab(simulationID, completed);
         generalTab = new GateLabGeneralTab(simulationID, status, date, completed);
+        chartsTab = new ChartsTab(simulationID);
 
         tabSet.addTab(generalTab);
         tabSet.addTab(summaryTab);
+        tabSet.addTab(chartsTab);
     }
 
     protected void updateData() {
