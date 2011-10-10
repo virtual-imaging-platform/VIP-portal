@@ -95,7 +95,8 @@ public class WorkflowBusiness {
             DataManagerBusiness dmBusiness = new DataManagerBusiness();
             String workflowPath = dmBusiness.getRemoteFile(user, app.getLfn(),
                     Server.getInstance().getConfigurationFolder()
-                    + "workflows/"
+                    + "workflows/" +
+                    FilenameUtils.getPath(app.getLfn()) + "/"
                     + FilenameUtils.getName(app.getLfn()));
 
             if (workflowPath.endsWith(".gwendia")) {
