@@ -173,12 +173,12 @@ public class JobData implements JobDAO {
             List<String> list = new ArrayList<String>();
             Statement stat = connection.createStatement();
             ResultSet rs = stat.executeQuery("SELECT "
-                    + "(upload - running)/" + binSize + "*" + binSize + " as execut, "
-                    + "count(id) as num, min(upload - running) as mini, "
-                    + "max(upload - running) as maxi, sum(upload - running) "
+                    + "running/" + binSize + "*" + binSize + " as execut, "
+                    + "count(id) as num, min(running) as mini, "
+                    + "max(running) as maxi, sum(running) "
                     + "as som FROM jobs "
                     + "WHERE status='COMPLETED' "
-                    + "GROUP BY (upload - running)/" + binSize + "*" + binSize);
+                    + "GROUP BY running/" + binSize + "*" + binSize);
 
             while (rs.next()) {
                 list.add(rs.getString("execut")
@@ -208,12 +208,12 @@ public class JobData implements JobDAO {
             List<String> list = new ArrayList<String>();
             Statement stat = connection.createStatement();
             ResultSet rs = stat.executeQuery("SELECT "
-                    + "(running - download)/" + binSize + "*" + binSize + " as execut, "
-                    + "count(id) as num, min(running - download) as mini, "
-                    + "max(running - download) as maxi, sum(running - download) "
+                    + "download/" + binSize + "*" + binSize + " as execut, "
+                    + "count(id) as num, min(download) as mini, "
+                    + "max(download) as maxi, sum(download) "
                     + "as som FROM jobs "
                     + "WHERE status='COMPLETED' "
-                    + "GROUP BY (running - download)/" + binSize + "*" + binSize);
+                    + "GROUP BY download/" + binSize + "*" + binSize);
 
             while (rs.next()) {
                 list.add(rs.getString("execut")
@@ -243,11 +243,11 @@ public class JobData implements JobDAO {
             List<String> list = new ArrayList<String>();
             Statement stat = connection.createStatement();
             ResultSet rs = stat.executeQuery("SELECT "
-                    + "(end_e - upload)/" + binSize + "*" + binSize + " as execut, "
-                    + "count(id) as num, min(end_e - upload) as mini, "
-                    + "max(end_e - upload) as maxi, sum(end_e - upload) as som FROM jobs "
+                    + "upload/" + binSize + "*" + binSize + " as execut, "
+                    + "count(id) as num, min(upload) as mini, "
+                    + "max(upload) as maxi, sum(upload) as som FROM jobs "
                     + "WHERE status='COMPLETED' "
-                    + "GROUP BY (end_e - upload)/" + binSize + "*" + binSize);
+                    + "GROUP BY upload/" + binSize + "*" + binSize);
 
             while (rs.next()) {
                 list.add(rs.getString("execut")
@@ -276,22 +276,21 @@ public class JobData implements JobDAO {
             List<String> list = new ArrayList<String>();
             Statement stat = connection.createStatement();
             ResultSet rs = stat.executeQuery("SELECT "
-                    + "status, queued as cre, "
-                    + "(download - queued) as que, "
-                    + "(running - download) as inp, "
-                    + "(upload - running) as exe, "
-                    + "(end_e - upload) as outp "
+                    + "status, creation, queued, download, running, upload, "
+                    + "checkpoint_init, checkpoint_upload "
                     + "FROM jobs "
                     + "WHERE status='COMPLETED' OR status='ERROR' "
                     + "ORDER BY id");
 
             while (rs.next()) {
                 list.add(rs.getString("status")
-                        + "##" + rs.getString("cre")
-                        + "##" + rs.getString("que")
-                        + "##" + rs.getString("inp")
-                        + "##" + rs.getString("exe")
-                        + "##" + rs.getString("outp"));
+                        + "##" + rs.getString("creation")
+                        + "##" + rs.getString("queued")
+                        + "##" + rs.getString("download")
+                        + "##" + rs.getString("running")
+                        + "##" + rs.getString("upload")
+                        + "##" + rs.getString("checkpoint_init")
+                        + "##" + rs.getString("checkpoint_upload"));
             }
 
             return list;

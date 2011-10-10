@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -392,21 +392,28 @@ public class ChartsTab extends Tab {
             int input = new Integer(v[3]) >= 0 ? new Integer(v[3]) : 0;
             int execution = new Integer(v[4]) >= 0 ? new Integer(v[4]) : 0;
             int output = new Integer(v[5]) >= 0 ? new Integer(v[5]) : 0;
+            int checkpointInit = new Integer(v[6]) >= 0 ? new Integer(v[6]) : 0;
+            int checkpointUpload = new Integer(v[7]) >= 0 ? new Integer(v[7]) : 0;
 
-            int count = creation + queued + input + execution + output;
+            int count = creation + queued + input + execution + output 
+                    + checkpointInit + checkpointUpload;
             cpuTime += execution;
             sequentialTime += input + execution + output;
             nbJobs++;
             waitingTime += queued;
 
-            if (v[0].equals("COMPLETED")) {
+            if (v[0].equals("COMPLETED") || v[0].equals("STALLED") || v[0].equals("CANCELLED")) {
+                
                 s.addStackValues(new StackedBarChart.StackValue(creation, "#996633"));
                 s.addStackValues(new StackedBarChart.StackValue(queued, "#FF9933"));
                 s.addStackValues(new StackedBarChart.StackValue(input, "#3366FF"));
                 s.addStackValues(new StackedBarChart.StackValue(execution, "#009966"));
                 s.addStackValues(new StackedBarChart.StackValue(output, "#663366"));
+                s.addStackValues(new StackedBarChart.StackValue(checkpointInit, "#E8830C"));
+                s.addStackValues(new StackedBarChart.StackValue(checkpointUpload, "#E82E0C"));
 
             } else {
+                
                 s.addStackValues(new StackedBarChart.StackValue(count, "#CC0033"));
             }
             stack.addStack(s);
@@ -422,6 +429,8 @@ public class ChartsTab extends Tab {
                 new Keys("Input", "#3366FF", 9),
                 new Keys("Execution", "#009966", 9),
                 new Keys("Output", "#663366", 9),
+                new Keys("Checkpoint Init", "#E8830C", 9),
+                new Keys("Checkpoint Upload", "#E82E0C", 9),
                 new Keys("Error", "#CC0033", 9));
 
         chartData.addElements(stack);
