@@ -80,6 +80,8 @@ public interface JobService extends RemoteService {
     
     public List<String> getCkptsPerJob(String simulationID) throws ApplicationException ;
 
+    public List<String> getSiteHistogram(String simulationID) throws ApplicationException;
+    
     public Node getNode(String simulationID, String siteName, String nodeName) throws ApplicationException ;
     
     public void sendSignal(String simulationID, String jobID, ApplicationConstants.JobStatus status) throws ApplicationException ;

@@ -64,6 +64,8 @@ public interface JobServiceAsync {
     
     public void getCkptsPerJob(String simulationID, AsyncCallback<List<String>> asyncCallback);
 
+    public void getSiteHistogram(String simulationID, AsyncCallback<List<String>> asyncCallback);
+    
     public void getNode(String simulationID, String siteName, String nodeName, AsyncCallback<Node> asyncCallback);
     
     public void sendSignal(String simulationID, String jobID, ApplicationConstants.JobStatus status, AsyncCallback<Void> asyncCallback);

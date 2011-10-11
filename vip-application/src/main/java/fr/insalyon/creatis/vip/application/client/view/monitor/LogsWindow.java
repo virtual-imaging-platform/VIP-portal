@@ -100,11 +100,11 @@ public class LogsWindow extends Window {
     private void parse(String applicationName) {
 
         if (applicationName.equals(ApplicationConstants.APP_SIMULATION_OUT)) {
-            new FileViewerWindow("Simulation Output File", simulationID,
+            new ViewerWindow("Simulation Output File", simulationID,
                     "", "workflow", ".out").show();
 
         } else if (applicationName.equals(ApplicationConstants.APP_SIMULATION_ERROR)) {
-            new FileViewerWindow("Simulation Error File", simulationID,
+            new ViewerWindow("Simulation Error File", simulationID,
                     "", "workflow", ".err").show();
         }
     }

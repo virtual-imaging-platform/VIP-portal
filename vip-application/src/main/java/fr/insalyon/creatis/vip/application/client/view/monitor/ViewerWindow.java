@@ -54,7 +54,7 @@ import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
  *
  * @author Rafael Silva
  */
-public class FileViewerWindow extends Window {
+public class ViewerWindow extends Window {
 
     private ModalWindow modal;
     private ToolStrip toolStrip;
@@ -63,15 +63,11 @@ public class FileViewerWindow extends Window {
     private String folder;
     private String fileName;
     private String extension;
+    private String content = null;
+    private boolean file;
 
-    public FileViewerWindow(String title, String simulationID, String folder,
-            String fileName, String extension) {
-
+    private void init(String title, String simulationID) {
         this.simulationID = simulationID;
-        this.folder = folder;
-        this.fileName = fileName;
-        this.extension = extension;
-
         this.setTitle(title);
         this.setCanDragReposition(true);
         this.setCanDragResize(true);
@@ -84,7 +80,7 @@ public class FileViewerWindow extends Window {
         pane.setPadding(10);
         pane.setOverflow(Overflow.AUTO);
         pane.setStyleName("defaultBorder");
-        
+
         modal = new ModalWindow(pane);
 
         configureToolStrip();
@@ -92,11 +88,50 @@ public class FileViewerWindow extends Window {
         this.addItem(toolStrip);
         this.addItem(pane);
 
-        loadFile();
+        load();
+    }
+
+    /**
+     * Views string content
+     * @param title
+     * @param simulationID
+     * @param content 
+     */
+    public ViewerWindow(String title, String simulationID, String content) {
+        this.file = false;
+        this.content = content;
+        init(title, simulationID);
+
+    }
+
+    /**
+     * Views file content
+     * @param title
+     * @param simulationID
+     * @param folder
+     * @param fileName
+     * @param extension 
+     */
+    public ViewerWindow(String title, String simulationID, String folder,
+            String fileName, String extension) {
+        this.file = true;
+        this.folder = folder;
+        this.fileName = fileName;
+        this.extension = extension;
+        init(title, simulationID);
+
+    }
+
+    private void load() {
+        if (file) {
+            loadFile();
+        } else {
+            loadString();
+        }
     }
 
     private void loadFile() {
-        
+
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<String> callback = new AsyncCallback<String>() {
 
@@ -107,14 +142,12 @@ public class FileViewerWindow extends Window {
 
             public void onSuccess(String result) {
                 modal.hide();
-                pane.setContents(result
-                        .replaceAll("<", "&lt;")
-                        .replaceAll(">", "&gt;")
-                        .replaceAll("\n", "<br />"));
+                pane.setContents(result.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br />"));
             }
         };
         modal.show("Loading file '" + fileName + extension + "'...", true);
         service.readFile(simulationID, folder, fileName, extension, callback);
+
     }
 
     private void configureToolStrip() {
@@ -128,7 +161,7 @@ public class FileViewerWindow extends Window {
         refreshButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                loadFile();
+                load();
             }
         });
         toolStrip.addButton(refreshButton);
@@ -147,5 +180,9 @@ public class FileViewerWindow extends Window {
             }
         });
         toolStrip.addButton(downloadButton);
+    }
+
+    private void loadString() {
+        pane.setContents(content.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br />"));
     }
 }

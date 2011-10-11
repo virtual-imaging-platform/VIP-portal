@@ -46,7 +46,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
-import fr.insalyon.creatis.vip.application.client.view.monitor.FileViewerWindow;
+import fr.insalyon.creatis.vip.application.client.view.monitor.ViewerWindow;
 import fr.insalyon.creatis.vip.application.client.view.monitor.LogsTab;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
@@ -74,7 +74,7 @@ public class LogsContextMenu extends Menu {
         viewItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                new FileViewerWindow("Viewing File: " + dataName,
+                new ViewerWindow("Viewing File: " + dataName,
                         simulationID, folder, dataName, "").show();
             }
         });

@@ -63,10 +63,15 @@ import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+import com.smartgwt.client.widgets.tile.TileGrid;
+import com.smartgwt.client.widgets.tile.events.RecordClickEvent;
+import com.smartgwt.client.widgets.tile.events.RecordClickHandler;
+import com.smartgwt.client.widgets.viewer.DetailViewerField;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.application.ApplicationTileRecord;
 import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -86,12 +91,16 @@ public class ChartsTab extends Tab {
     private VLayout vLayout;
     private ChartWidget chart;
     private ListGrid grid;
+    private TileGrid tileGrid;
+    private String data;
 
     public ChartsTab(String simulationID) {
 
         this.simulationID = simulationID;
         this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_CHART));
         this.setPrompt("Performance Statistics");
+
+        this.data = "";
 
         configureForm();
 
@@ -114,10 +123,11 @@ public class ChartsTab extends Tab {
 
         LinkedHashMap<String, String> chartsMap = new LinkedHashMap<String, String>();
         chartsMap.put("1", "Job Flow");
-        chartsMap.put("2", "Histogram of Execution Times");
-        chartsMap.put("3", "Histogram of Download Times");
-        chartsMap.put("4", "Histogram of Upload Times");
-        chartsMap.put("5", "Checkpoints per job");
+        chartsMap.put("2", "Checkpoints per job");
+        chartsMap.put("3", "Histogram of Execution Times");
+        chartsMap.put("4", "Histogram of Download Times");
+        chartsMap.put("5", "Histogram of Upload Times");
+        chartsMap.put("6", "Site histogram");
         chartsItem = new SelectItem("charts", "Chart");
         chartsItem.setValueMap(chartsMap);
         chartsItem.setEmptyDisplayValue("Select a chart...");
@@ -163,16 +173,20 @@ public class ChartsTab extends Tab {
                 plotJobsPerTime();
                 break;
             case 2:
-                plotExecutionPerNumberOfJobs(binSize);
+                plotCkptsPerJob();
                 break;
             case 3:
-                plotDownloadPerNumberOfJobs(binSize);
+                plotExecutionPerNumberOfJobs(binSize);
                 break;
             case 4:
-                plotUploadPerNumberOfJobs(binSize);
+                plotDownloadPerNumberOfJobs(binSize);
                 break;
             case 5:
-                plotCkptsPerJob();
+                plotUploadPerNumberOfJobs(binSize);
+                break;
+
+            case 6:
+                plotSiteHistogram();
                 break;
         }
     }
@@ -284,6 +298,24 @@ public class ChartsTab extends Tab {
         service.getUploadPerNumberOfJobs(simulationID, binSize, callback);
     }
 
+    private void plotSiteHistogram() {
+        JobServiceAsync service = JobService.Util.getInstance();
+        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Unable to get chart data:<br />" + caught.getMessage());
+            }
+
+            public void onSuccess(List<String> result) {
+                modal.hide();
+                buildBarChartAndGrid(result, "Site", "#FF0000", 1);
+            }
+        };
+        modal.show("Building chart...", true);
+        service.getSiteHistogram(simulationID, callback);
+    }
+
     private void buildCkptChart(List<String> result) {
 
         ChartData chartData = new ChartData();
@@ -295,10 +327,13 @@ public class ChartsTab extends Tab {
         int occ_error = 0;
         int occ_stalled = 0;
         int occ_cancelled = 0;
-        int nb_jobs=0;
-        int failed_jobs=0;
+        int nb_jobs = 0;
+        int failed_jobs = 0;
 
+
+        this.data = "";
         for (String values : result) {
+            this.data = this.data + "\n" + values;
             Stack s = new Stack();
             String[] v = values.split("##");
 
@@ -306,24 +341,24 @@ public class ChartsTab extends Tab {
 
             if (v[0].equals("COMPLETED")) {
                 s.addStackValues(new StackedBarChart.StackValue(nb_occ, "#009966"));
-                occ_completed=occ_completed+nb_occ;
+                occ_completed = occ_completed + nb_occ;
                 nb_jobs++;
             } else {
                 if (v[0].equals("ERROR")) {
                     s.addStackValues(new StackedBarChart.StackValue(nb_occ, "#CC0033"));
-                    occ_error=occ_error+nb_occ;
+                    occ_error = occ_error + nb_occ;
                     failed_jobs++;
                     nb_jobs++;
                 } else {
                     if (v[0].equals("STALLED")) {
                         s.addStackValues(new StackedBarChart.StackValue(nb_occ, "#663366"));
-                        occ_stalled=occ_stalled+nb_occ;
+                        occ_stalled = occ_stalled + nb_occ;
                         nb_jobs++;
                         failed_jobs++;
                     } else {
                         if (v[0].equals("CANCELLED")) {
                             s.addStackValues(new StackedBarChart.StackValue(nb_occ, "#FF9933"));
-                            occ_cancelled=occ_cancelled+nb_occ;
+                            occ_cancelled = occ_cancelled + nb_occ;
                             nb_jobs++;
                         }
                     }
@@ -382,8 +417,9 @@ public class ChartsTab extends Tab {
         long cpuTime = 0;
         long waitingTime = 0;
         long sequentialTime = 0;
-
+        this.data = "";
         for (String values : result) {
+            this.data = this.data + "\n" + values;
             Stack s = new Stack();
             String[] v = values.split("##");
 
@@ -395,7 +431,7 @@ public class ChartsTab extends Tab {
             int checkpointInit = new Integer(v[6]) >= 0 ? new Integer(v[6]) : 0;
             int checkpointUpload = new Integer(v[7]) >= 0 ? new Integer(v[7]) : 0;
 
-            int count = creation + queued + input + execution + output 
+            int count = creation + queued + input + execution + output
                     + checkpointInit + checkpointUpload;
             cpuTime += execution;
             sequentialTime += input + execution + output;
@@ -403,7 +439,7 @@ public class ChartsTab extends Tab {
             waitingTime += queued;
 
             if (v[0].equals("COMPLETED") || v[0].equals("STALLED") || v[0].equals("CANCELLED")) {
-                
+
                 s.addStackValues(new StackedBarChart.StackValue(creation, "#996633"));
                 s.addStackValues(new StackedBarChart.StackValue(queued, "#FF9933"));
                 s.addStackValues(new StackedBarChart.StackValue(input, "#3366FF"));
@@ -413,7 +449,7 @@ public class ChartsTab extends Tab {
                 s.addStackValues(new StackedBarChart.StackValue(checkpointUpload, "#E82E0C"));
 
             } else {
-                
+
                 s.addStackValues(new StackedBarChart.StackValue(count, "#CC0033"));
             }
             stack.addStack(s);
@@ -477,27 +513,36 @@ public class ChartsTab extends Tab {
         int max = 0;
         int sum = 0;
         int count = 0;
-
+        this.data = "";
         for (String s : result) {
+            this.data = this.data + "\n" + s;
             String[] res = s.split("##");
             int range = new Integer(res[0]);
             rangesList.add(range);
             if (range > maxRange) {
                 maxRange = range;
             }
-            int numJobs = new Integer(res[1]);
-            numJobsList.add(numJobs);
-            if (numJobs > maxNumJobs) {
-                maxNumJobs = numJobs;
+            if (res.length > 1) {
+                int numJobs = new Integer(res[1]);
+                numJobsList.add(numJobs);
+                if (numJobs > maxNumJobs) {
+                    maxNumJobs = numJobs;
+                }
+                if (res.length > 2) {
+                    if (new Integer(res[2]) < min) {
+                        min = new Integer(res[2]);
+                    }
+                    if (res.length > 3) {
+                        if (new Integer(res[3]) > max) {
+                            max = new Integer(res[3]);
+                        }
+                        if (res.length > 4) {
+                            sum += new Integer(res[4]);
+                        }
+                    }
+                }
+                count += new Integer(res[1]);
             }
-            if (new Integer(res[2]) < min) {
-                min = new Integer(res[2]);
-            }
-            if (new Integer(res[3]) > max) {
-                max = new Integer(res[3]);
-            }
-            sum += new Integer(res[4]);
-            count += new Integer(res[1]);
         }
 
         ChartData chartData = new ChartData();
@@ -567,6 +612,8 @@ public class ChartsTab extends Tab {
         }
         grid.setData(data);
         chart.setChartData(chartData);
+
+
     }
 
     private void configureChartAndGrid() {
@@ -586,7 +633,37 @@ public class ChartsTab extends Tab {
 
         grid.setFields(propertyField, valueField);
 
+        tileGrid = new TileGrid();
+        tileGrid.setWidth100();
+        tileGrid.setHeight100();
+        tileGrid.setTileWidth(110);
+        tileGrid.setTileHeight(80);
+
+        tileGrid.setCanReorderTiles(true);
+        tileGrid.setShowAllRecords(true);
+        tileGrid.setAnimateTileChange(true);
+        tileGrid.setShowEdges(false);
+
+        DetailViewerField pictureField = new DetailViewerField("picture");
+        pictureField.setType("image");
+        DetailViewerField commonNameField = new DetailViewerField("commonName");
+
+        tileGrid.setFields(pictureField, commonNameField);
+
+        tileGrid.addRecordClickHandler(new RecordClickHandler() {
+
+            public void onRecordClick(RecordClickEvent event) {
+                new ViewerWindow("Data", simulationID,
+                        data).show();
+            }
+        });
+        tileGrid.setData(new ApplicationTileRecord[]{
+                    new ApplicationTileRecord("Data", ApplicationConstants.APP_IMG_SIMULATION_OUT),});
+
+
+
         vLayout.addMember(chart);
         vLayout.addMember(grid);
+        vLayout.addMember(tileGrid);
     }
 }

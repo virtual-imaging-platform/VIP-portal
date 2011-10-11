@@ -61,4 +61,6 @@ public interface JobDAO {
     public List<String> getCkptsPerJob() throws DAOException ;
     
     public void sendSignal(String jobID, JobStatus status) throws DAOException;
+
+    public List<String> getSiteHistogram() throws DAOException;
 }

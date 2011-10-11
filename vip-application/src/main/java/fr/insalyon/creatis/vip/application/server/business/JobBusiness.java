@@ -246,4 +246,13 @@ public class JobBusiness {
             throw new BusinessException(ex);
         }
     }
+
+    public List<String> getSiteHistogram(String simulationID) throws BusinessException {
+         try {
+            return WorkflowDAOFactory.getDAOFactory().getJobDAO(simulationID).getSiteHistogram();
+               
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
 }

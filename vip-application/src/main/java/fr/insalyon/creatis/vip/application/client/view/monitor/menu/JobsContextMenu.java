@@ -46,7 +46,7 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
-import fr.insalyon.creatis.vip.application.client.view.monitor.FileViewerWindow;
+import fr.insalyon.creatis.vip.application.client.view.monitor.ViewerWindow;
 import fr.insalyon.creatis.vip.application.client.view.monitor.NodeInfoWindow;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.JobRecord;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
@@ -70,7 +70,7 @@ public class JobsContextMenu extends Menu {
         appOutputItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                new FileViewerWindow("Viewing Application Output for Job ID " + job.getID(),
+                new ViewerWindow("Viewing Application Output for Job ID " + job.getID(),
                         simulationID, "out", job.getFileName(), ".sh.app.out").show();
             }
         });
@@ -79,7 +79,7 @@ public class JobsContextMenu extends Menu {
         appErrorItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                new FileViewerWindow("Viewing Application Error for Job ID " + job.getID(),
+                new ViewerWindow("Viewing Application Error for Job ID " + job.getID(),
                         simulationID, "err", job.getFileName(), ".sh.app.err").show();
             }
         });
@@ -88,7 +88,7 @@ public class JobsContextMenu extends Menu {
         outputItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                new FileViewerWindow("Viewing Output File for Job ID " + job.getID(),
+                new ViewerWindow("Viewing Output File for Job ID " + job.getID(),
                         simulationID, "out", job.getFileName(), ".sh.out").show();
             }
         });
@@ -97,7 +97,7 @@ public class JobsContextMenu extends Menu {
         errorItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                new FileViewerWindow("Viewing Error File for Job ID " + job.getID(),
+                new ViewerWindow("Viewing Error File for Job ID " + job.getID(),
                         simulationID, "err", job.getFileName(), ".sh.err").show();
             }
         });
@@ -106,7 +106,7 @@ public class JobsContextMenu extends Menu {
         scriptItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                new FileViewerWindow("Viewing Script File for Job ID " + job.getID(),
+                new ViewerWindow("Viewing Script File for Job ID " + job.getID(),
                         simulationID, "sh", job.getFileName(), ".sh").show();
             }
         });

@@ -239,4 +239,13 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
             throw new ApplicationException(ex);
         }
     }
+
+    public List<String> getSiteHistogram(String simulationID) throws ApplicationException {
+        try {
+            return jobBusiness.getSiteHistogram(simulationID);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
 }

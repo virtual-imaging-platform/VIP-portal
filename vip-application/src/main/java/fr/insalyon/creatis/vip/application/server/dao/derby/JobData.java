@@ -351,4 +351,22 @@ public class JobData implements JobDAO {
     public Connection getConnection() {
         return this.connection;
     }
+
+    public List<String> getSiteHistogram() throws DAOException{
+         try {
+            List<String> list = new ArrayList<String>();
+            Statement stat = connection.createStatement();
+            ResultSet rs = stat.executeQuery("select count(id) as num,node_site as site from jobs group by node_site order by num desc");
+            int count=0;
+            while (rs.next()) {
+                list.add(+(count++)+"##"+rs.getString("num")+"##-1##-1##-1##"+ rs.getString("site"));
+            }
+
+            return list;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
 }
