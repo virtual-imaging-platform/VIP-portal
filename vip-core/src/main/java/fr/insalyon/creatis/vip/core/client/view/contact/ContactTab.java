@@ -107,8 +107,9 @@ public class ContactTab extends Tab {
 
         categoryItem = new SelectItem("category", "Category");
         LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-        map.put("General Contact", "General Contact");
-        map.put("Report Bug", "Report Bug");
+        map.put("General question", "General question");
+        map.put("Report bug", "Report bug");
+        map.put("Report missing term in ontologies","Report missing term in ontologies");
         categoryItem.setValueMap(map);
         categoryItem.setValue("General Contact");
 
