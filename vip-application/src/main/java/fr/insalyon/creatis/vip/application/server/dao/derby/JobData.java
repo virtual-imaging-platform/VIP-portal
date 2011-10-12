@@ -177,7 +177,7 @@ public class JobData implements JobDAO {
                     + "count(id) as num, min(running) as mini, "
                     + "max(running) as maxi, sum(running) "
                     + "as som FROM jobs "
-                    + "WHERE status='COMPLETED' "
+                    //+ "WHERE status='COMPLETED' "
                     + "GROUP BY running/" + binSize + "*" + binSize);
 
             while (rs.next()) {
@@ -212,7 +212,7 @@ public class JobData implements JobDAO {
                     + "count(id) as num, min(download) as mini, "
                     + "max(download) as maxi, sum(download) "
                     + "as som FROM jobs "
-                    + "WHERE status='COMPLETED' "
+                    //+ "WHERE status='COMPLETED' "
                     + "GROUP BY download/" + binSize + "*" + binSize);
 
             while (rs.next()) {
@@ -246,7 +246,7 @@ public class JobData implements JobDAO {
                     + "upload/" + binSize + "*" + binSize + " as execut, "
                     + "count(id) as num, min(upload) as mini, "
                     + "max(upload) as maxi, sum(upload) as som FROM jobs "
-                    + "WHERE status='COMPLETED' "
+                    //+ "WHERE status='COMPLETED' "
                     + "GROUP BY upload/" + binSize + "*" + binSize);
 
             while (rs.next()) {
@@ -277,9 +277,9 @@ public class JobData implements JobDAO {
             Statement stat = connection.createStatement();
             ResultSet rs = stat.executeQuery("SELECT "
                     + "status, creation, queued, download, running, upload, "
-                    + "checkpoint_init, checkpoint_upload "
+                    + "checkpoint_init, checkpoint_upload, end_e "
                     + "FROM jobs "
-                    + "WHERE status='COMPLETED' OR status='ERROR' "
+                    //+ "WHERE status='COMPLETED' OR status='ERROR' "
                     + "ORDER BY id");
 
             while (rs.next()) {
@@ -290,7 +290,8 @@ public class JobData implements JobDAO {
                         + "##" + rs.getString("running")
                         + "##" + rs.getString("upload")
                         + "##" + rs.getString("checkpoint_init")
-                        + "##" + rs.getString("checkpoint_upload"));
+                        + "##" + rs.getString("checkpoint_upload")
+                        + "##" + rs.getString("end_e"));
             }
 
             return list;
