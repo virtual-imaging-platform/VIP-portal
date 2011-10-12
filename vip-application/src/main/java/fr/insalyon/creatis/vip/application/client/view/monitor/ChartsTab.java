@@ -430,6 +430,7 @@ public class ChartsTab extends Tab {
             int output = new Integer(v[5]) >= 0 ? new Integer(v[5]) : 0;
             int checkpointInit = new Integer(v[6]) >= 0 ? new Integer(v[6]) : 0;
             int checkpointUpload = new Integer(v[7]) >= 0 ? new Integer(v[7]) : 0;
+            int failedTime = new Integer(v[8]) >= 0 ? new Integer(v[8]) : 0;
 
             int count = creation + queued + input + execution + output
                     + checkpointInit + checkpointUpload;
@@ -437,21 +438,20 @@ public class ChartsTab extends Tab {
             sequentialTime += input + execution + output;
             nbJobs++;
             waitingTime += queued;
+            
+            s.addStackValues(new StackedBarChart.StackValue(creation, "#996633"));
+            s.addStackValues(new StackedBarChart.StackValue(queued, "#FF9933"));
 
-            if (v[0].equals("COMPLETED") || v[0].equals("STALLED") || v[0].equals("CANCELLED")) {
-
-                s.addStackValues(new StackedBarChart.StackValue(creation, "#996633"));
-                s.addStackValues(new StackedBarChart.StackValue(queued, "#FF9933"));
+           // if (v[0].equals("COMPLETED") || checkpointUpload!=0 ) {          
                 s.addStackValues(new StackedBarChart.StackValue(input, "#3366FF"));
                 s.addStackValues(new StackedBarChart.StackValue(execution, "#009966"));
                 s.addStackValues(new StackedBarChart.StackValue(output, "#663366"));
                 s.addStackValues(new StackedBarChart.StackValue(checkpointInit, "#E8830C"));
                 s.addStackValues(new StackedBarChart.StackValue(checkpointUpload, "#E82E0C"));
 
-            } else {
-
-                s.addStackValues(new StackedBarChart.StackValue(count, "#CC0033"));
-            }
+            //} 
+            s.addStackValues(new StackedBarChart.StackValue(failedTime, "#CC0033"));  
+            
             stack.addStack(s);
 
             if (count > max) {
