@@ -10,7 +10,7 @@ import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
-import fr.insalyon.creatis.vip.application.client.view.monitor.FileViewerWindow;
+import fr.insalyon.creatis.vip.application.client.view.monitor.ViewerWindow;
 
 /**
  *
@@ -29,7 +29,7 @@ public class LogsMenuButton extends ToolStripMenuButton{
         simulationOutItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                new FileViewerWindow("Simulation Output File", simulationID,
+                new ViewerWindow("Simulation Output File", simulationID,
                         "", "workflow", ".out").show();
             }
         });
@@ -38,7 +38,7 @@ public class LogsMenuButton extends ToolStripMenuButton{
         simulationErrItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                new FileViewerWindow("Simulation Error File", simulationID,
+                new ViewerWindow("Simulation Error File", simulationID,
                         "", "workflow", ".err").show();
             }
         });
@@ -47,7 +47,7 @@ public class LogsMenuButton extends ToolStripMenuButton{
         simulationInputsItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                new FileViewerWindow("Simulation Inputs File", simulationID,
+                new ViewerWindow("Simulation Inputs File", simulationID,
                         "", "input-m2", ".xml").show();
             }
         });
@@ -56,7 +56,7 @@ public class LogsMenuButton extends ToolStripMenuButton{
         simulationDescItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                new FileViewerWindow("Simulation Descriptor File", simulationID,
+                new ViewerWindow("Simulation Descriptor File", simulationID,
                         "", "workflow", ".xml").show();
             }
         });
