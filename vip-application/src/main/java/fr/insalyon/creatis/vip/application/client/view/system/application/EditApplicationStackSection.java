@@ -115,8 +115,8 @@ public class EditApplicationStackSection extends SectionStackSection {
                     List<String> values = new ArrayList<String>();
                     values.addAll(Arrays.asList(classesPickList.getValues()));
 
-                    save(new Application(nameItem.getValueAsString(),
-                            lfnItem.getValueAsString(), values));
+                    save(new Application(nameItem.getValueAsString().trim(),
+                            lfnItem.getValueAsString().trim(), values));
                 }
             }
         });

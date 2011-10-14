@@ -165,7 +165,7 @@ public class ChartsTab extends Tab {
         int value = new Integer(chartsItem.getValueAsString());
         int binSize = 100;
         if (binItem.getValueAsString() != null && !binItem.getValueAsString().equals("")) {
-            binSize = new Integer(binItem.getValueAsString());
+            binSize = new Integer(binItem.getValueAsString().trim());
         }
 
         switch (value) {

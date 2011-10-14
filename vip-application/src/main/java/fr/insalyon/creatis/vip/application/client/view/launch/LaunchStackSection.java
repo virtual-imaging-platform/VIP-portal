@@ -213,7 +213,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
         modal.show("Launching simulation '" + simulationNameItem.getValueAsString() 
                 + "'...", true);
         service.launchSimulation(getParametersMap(), applicationName, 
-                simulationNameItem.getValueAsString(), callback);
+                simulationNameItem.getValueAsString().trim(), callback);
     }
 
     /**

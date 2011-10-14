@@ -122,12 +122,13 @@ public class WorkflowData implements WorkflowDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
                     + "Workflows "
-                    + "SET application=?, simulation_name=? "
+                    + "SET application=?, simulation_name=?, username = ? "
                     + "WHERE id=?");
 
             ps.setString(1, workflow.getApplication());
             ps.setString(2, workflow.getSimulationName());
-            ps.setString(3, workflow.getID());
+            ps.setString(3, workflow.getUserName());
+            ps.setString(4, workflow.getID());
 
             ps.executeUpdate();
 

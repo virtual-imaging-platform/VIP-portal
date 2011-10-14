@@ -186,9 +186,9 @@ public class InputHLayout extends VLayout {
             return sb.toString();
 
         } else {
-            return startItem.getValueAsString() + "##"
-                    + stopItem.getValueAsString() + "##"
-                    + stepItem.getValueAsString();
+            return startItem.getValueAsString().trim() + "##"
+                    + stopItem.getValueAsString().trim() + "##"
+                    + stepItem.getValueAsString().trim();
         }
     }
 

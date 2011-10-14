@@ -149,7 +149,7 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
             }
         };
         modal.show("Verifying simulation name...", true);
-        service.getInputByNameUserApp(simulationNameItem.getValueAsString(),
+        service.getInputByNameUserApp(simulationNameItem.getValueAsString().trim(),
                 applicationName, callback);
     }
 
@@ -197,6 +197,6 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
         }
 
         return new SimulationInput(applicationName,
-                simulationNameItem.getValueAsString(), sb.toString());
+                simulationNameItem.getValueAsString().trim(), sb.toString());
     }
 }

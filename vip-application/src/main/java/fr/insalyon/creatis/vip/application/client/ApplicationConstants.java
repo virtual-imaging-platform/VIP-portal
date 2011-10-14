@@ -82,7 +82,7 @@ public class ApplicationConstants {
     public final static String SESSION_CLASSES = "vip-classes";
     // Enums
     public static enum JobStatus {
-        KILL, RESCHEDULE, ERROR, COMPLETED, RUNNING, STALED, CANCELLED
+        KILL, RESCHEDULE, ERROR, COMPLETED, RUNNING, STALLED, CANCELLED, QUEUED
     };
     
     public static enum SimulationStatus {

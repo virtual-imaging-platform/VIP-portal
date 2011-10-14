@@ -49,6 +49,7 @@ import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.ViewerWindow;
 import fr.insalyon.creatis.vip.application.client.view.monitor.NodeInfoWindow;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.JobRecord;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 
 /**
@@ -67,6 +68,7 @@ public class JobsContextMenu extends Menu {
         this.setWidth(90);
 
         MenuItem appOutputItem = new MenuItem("View Application Output");
+        appOutputItem.setIcon(ApplicationConstants.ICON_PREVIEW);
         appOutputItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -76,6 +78,7 @@ public class JobsContextMenu extends Menu {
         });
 
         MenuItem appErrorItem = new MenuItem("View Application Error");
+        appErrorItem.setIcon(ApplicationConstants.ICON_PREVIEW);
         appErrorItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -85,6 +88,7 @@ public class JobsContextMenu extends Menu {
         });
 
         MenuItem outputItem = new MenuItem("View Output File");
+        outputItem.setIcon(ApplicationConstants.ICON_PREVIEW);
         outputItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -94,6 +98,7 @@ public class JobsContextMenu extends Menu {
         });
 
         MenuItem errorItem = new MenuItem("View Error File");
+        errorItem.setIcon(ApplicationConstants.ICON_PREVIEW);
         errorItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -103,6 +108,7 @@ public class JobsContextMenu extends Menu {
         });
 
         MenuItem scriptItem = new MenuItem("View Script File");
+        scriptItem.setIcon(ApplicationConstants.ICON_PREVIEW);
         scriptItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -153,7 +159,8 @@ public class JobsContextMenu extends Menu {
         MenuItemSeparator separator = new MenuItemSeparator();
 
         JobStatus status = JobStatus.valueOf(job.getStatus());
-        if (status == JobStatus.ERROR || status == JobStatus.COMPLETED) {
+        if (status == JobStatus.ERROR || status == JobStatus.COMPLETED ||
+                status == JobStatus.CANCELLED || status == JobStatus.STALLED) {
 
             this.setItems(appOutputItem, appErrorItem, separator,
                     outputItem, errorItem, separator, scriptItem,

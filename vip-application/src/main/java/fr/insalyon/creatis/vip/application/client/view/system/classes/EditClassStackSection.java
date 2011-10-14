@@ -115,7 +115,7 @@ public class EditClassStackSection extends SectionStackSection {
                     values.addAll(Arrays.asList(groupsPickList.getValues()));
                     values.add(CoreConstants.GROUP_ADMIN);
 
-                    save(new AppClass(nameItem.getValueAsString(),
+                    save(new AppClass(nameItem.getValueAsString().trim(),
                             values));
                 }
             }
