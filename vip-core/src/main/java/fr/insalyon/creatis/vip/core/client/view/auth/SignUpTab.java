@@ -148,17 +148,10 @@ public class SignUpTab extends Tab {
     private String getDisclaimer() {
 
         return "-- VIP Terms of Use --\n\n"
-                + "This portal is exclusively dedicated to academic use. It shows "
+                + "This portal is exclusively dedicated to non-commercial academic use. It shows "
                 + "some functionalities of the VIP platform but it is not in a "
                 + "stable release yet. Please acknowledge the Virtual Imaging "
                 + "Platform (VIP) ANR project ANR-09-COSI-03 wherever appropriate.\n\n"
-                + "The Virtual Imaging Platform (VIP) project targets multi-modality, "
-                + "multi-organ and dynamic (4D) medical image simulation. Integrating "
-                + "proven simulation software of the four main imaging modalities "
-                + "(MRI, US, PET and CT), the platform will cope with interoperability "
-                + "challenges among simulators, will address compatibility issues "
-                + "between organmodels and will provide transparent access to "
-                + "computing and storage resources.\n\n"
                 + "The simulators integrated in the platform must be acknowledged "
                 + "separately and explicitly as follows:\n\n"
                 + "Field II is citationware. If you are publishing any work, "
@@ -174,7 +167,8 @@ public class SignUpTab extends Tab {
                 + "[2] J.A.Jensen and N.B.Svendsen: Calculation of pressure fields "
                 + "from arbitrarily shaped, apodized, and excited ultrasound "
                 + "transducers, IEEE Trans.Ultrason., Ferroelec., Freq.Contr., 39, "
-                + "pp. 262-267, 1992.";
+                + "pp. 262-267, 1992.\n\n"
+                + "Sindbad is developed at CEA-Leti and is not freely available.";
     }
 
     private void configureButton() {
