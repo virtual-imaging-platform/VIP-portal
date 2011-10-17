@@ -42,7 +42,6 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -73,7 +72,7 @@ public interface DataManagerService extends RemoteService {
 
     public void rename(String oldPath, String newPath, boolean extendPath) throws DataManagerException;
 
-    public void rename(Map<String, String> paths, boolean extendPath) throws DataManagerException;
+    public void rename(String baseDir, List<String> paths, String newBaseDir, boolean extendPath) throws DataManagerException;
 
     public List<DMCachedFile> getCachedFiles() throws DataManagerException;
 

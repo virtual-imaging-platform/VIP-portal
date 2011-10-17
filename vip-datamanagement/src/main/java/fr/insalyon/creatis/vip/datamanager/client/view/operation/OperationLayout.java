@@ -81,7 +81,7 @@ public class OperationLayout extends VLayout {
 
     private OperationLayout() {
 
-        this.setWidth(550);
+        this.setWidth(500);
         this.setHeight100();
         this.setOverflow(Overflow.AUTO);
 

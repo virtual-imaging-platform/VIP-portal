@@ -119,7 +119,7 @@ public class BasicBrowserToolStrip extends ToolStrip {
                 if (path.equals(DataManagerConstants.ROOT)) {
                     SC.warn("You cannot create a folder in the root folder.");
                 } else {
-                    new AddFolderWindow(modal, path, grid, toolStrip).show();
+                    new AddFolderWindow(modal, path).show();
                 }
             }
         });

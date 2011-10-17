@@ -34,7 +34,6 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.browser;
 
-import fr.insalyon.creatis.vip.datamanager.client.view.common.BrowserUtil;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
@@ -44,11 +43,11 @@ import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
-import com.smartgwt.client.widgets.grid.ListGrid;
+import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
+import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
-import fr.insalyon.creatis.vip.datamanager.client.view.common.BasicBrowserToolStrip;
 
 /**
  *
@@ -58,10 +57,14 @@ public class AddFolderWindow extends Window {
 
     private DynamicForm form;
     private TextItem nameItem;
+    private ModalWindow modal;
+    private String baseDir;
 
-    public AddFolderWindow(final ModalWindow modal, final String baseDir, 
-            final ListGrid grid, final BasicBrowserToolStrip toolStrip) {
-       
+    public AddFolderWindow(ModalWindow modal, String baseDir) {
+
+        this.modal = modal;
+        this.baseDir = baseDir;
+        
         this.setTitle("Create folder into: " + baseDir);
         this.setWidth(350);
         this.setHeight(110);
@@ -79,34 +82,47 @@ public class AddFolderWindow extends Window {
         nameItem = new TextItem("name", "Name");
         nameItem.setRequired(true);
         nameItem.setWidth(200);
+        nameItem.addKeyPressHandler(new KeyPressHandler() {
+
+            public void onKeyPress(KeyPressEvent event) {
+                if (event.getKeyName().equals("Enter")) {
+                    createFolder();
+                }
+            }
+        });
 
         ButtonItem saveButton = new ButtonItem("addButton", "Create");
         saveButton.setWidth(60);
         saveButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                if (form.validate()) {
-                    DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-                    AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-                        public void onFailure(Throwable caught) {
-                            modal.hide();
-                            SC.warn("Unable to create dir:<br />" + caught.getMessage());
-                        }
-
-                        public void onSuccess(Void result) {
-                            modal.hide();
-                            BrowserUtil.loadData(modal, grid, toolStrip, baseDir, true);
-                        }
-                    };
-                    modal.show("Creating folder...", true);
-                    service.createDir(baseDir, nameItem.getValueAsString(), callback);
-                    destroy();
-                }
+                createFolder();
             }
         });
 
         form.setFields(nameItem, saveButton);
         this.addItem(form);
+    }
+
+    private void createFolder() {
+        
+        if (form.validate()) {
+            DataManagerServiceAsync service = DataManagerService.Util.getInstance();
+            AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                public void onFailure(Throwable caught) {
+                    modal.hide();
+                    SC.warn("Unable to create folder:<br />" + caught.getMessage());
+                }
+
+                public void onSuccess(Void result) {
+                    modal.hide();
+                    BrowserLayout.getInstance().loadData(baseDir, true);
+                }
+            };
+            modal.show("Creating folder...", true);
+            service.createDir(baseDir, nameItem.getValueAsString().trim(), callback);
+            destroy();
+        }
     }
 }

@@ -133,11 +133,12 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
-    public void rename(Map<String, String> paths, boolean extendPath)
-            throws DataManagerException {
+    public void rename(String baseDir, List<String> paths, String newBaseDir,
+            boolean extendPath) throws DataManagerException {
 
         try {
-            lfcBusiness.rename(getSessionUser().getFullName(), paths, extendPath);
+            lfcBusiness.rename(getSessionUser().getFullName(), baseDir, paths, 
+                    newBaseDir, extendPath);
 
         } catch (CoreException ex) {
             throw new DataManagerException(ex);
@@ -201,7 +202,6 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     public void removeOperations(List<String> ids) throws DataManagerException {
 
         try {
-            authenticateSystemAdministrator(logger);
             trace(logger, "Removing operations: " + ids);
             transferPoolBusiness.removeOperations(ids);
 
@@ -215,7 +215,6 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     public void removeOperationById(String id) throws DataManagerException {
 
         try {
-            authenticateSystemAdministrator(logger);
             trace(logger, "Removing operation: " + id);
             transferPoolBusiness.removeOperationById(id);
 

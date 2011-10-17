@@ -46,10 +46,11 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerContext;
-import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *
@@ -97,6 +98,7 @@ public class BrowserContextMenu extends Menu {
                     SC.warn("You cannot cut a folder from the root folder.");
                 } else {
                     DataManagerContext.getInstance().setCutAction(baseDir, data.getName());
+                    BrowserLayout.getInstance().getToolStrip().enablePasteButton();
                 }
             }
         });
@@ -301,18 +303,17 @@ public class BrowserContextMenu extends Menu {
             public void onSuccess(Void result) {
                 modal.hide();
                 DataManagerContext.getInstance().resetCutAction();
+                BrowserLayout.getInstance().getToolStrip().resetPasteButton();
                 BrowserLayout.getInstance().loadData(baseDir, true);
             }
         };
 
         if (!baseDir.equals(DataManagerContext.getInstance().getCutFolder())) {
 
-            String oldPath = DataManagerContext.getInstance().getCutFolder() + "/"
-                    + DataManagerContext.getInstance().getCutName();
-            String newPath = baseDir + "/" + DataManagerContext.getInstance().getCutName();
-
-            modal.show("Moving " + oldPath + " to<br />" + newPath + "...", true);
-            service.rename(oldPath, newPath, false, callback);
+            modal.show("Moving data...", true);
+            service.rename(DataManagerContext.getInstance().getCutFolder(), 
+                    new ArrayList(Arrays.asList(DataManagerContext.getInstance().getCutName())), 
+                    baseDir, false, callback);
         } else {
             SC.warn("Unable to move data into the same folder.");
         }

@@ -189,16 +189,17 @@ public class LFCBusiness {
     /**
      * 
      * @param user
+     * @param baseDir
      * @param paths
+     * @param newBaseDir
      * @param extendPath
      * @throws BusinessException 
      */
-    public void rename(String user, Map<String, String> paths,
-            boolean extendPath) throws BusinessException {
+    public void rename(String user, String baseDir, List<String> paths,
+            String newBaseDir, boolean extendPath) throws BusinessException {
 
-        for (String oldPath : paths.keySet()) {
-            String newPath = paths.get(oldPath);
-            rename(user, oldPath, newPath, extendPath);
+        for (String name : paths) {
+            rename(user, baseDir + "/" + name, newBaseDir + "/" + name, extendPath);
         }
     }
 

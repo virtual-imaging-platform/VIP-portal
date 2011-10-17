@@ -39,7 +39,6 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -57,7 +56,7 @@ public interface DataManagerServiceAsync {
 
     public void rename(String oldPath, String newPath, boolean extendPath, AsyncCallback<Void> asyncCallback);
 
-    public void rename(Map<String, String> paths, boolean extendPath, AsyncCallback<Void> asyncCallback);
+    public void rename(String baseDir, List<String> paths, String newBaseDir, boolean extendPath, AsyncCallback<Void> asyncCallback);
 
     public void getCachedFiles(AsyncCallback<List<DMCachedFile>> asyncCallback);
 

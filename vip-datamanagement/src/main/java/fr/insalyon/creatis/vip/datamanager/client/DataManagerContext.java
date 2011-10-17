@@ -42,7 +42,7 @@ public class DataManagerContext {
 
     private static DataManagerContext instance;
     private String cutFolder;
-    private String cutName;
+    private String[] cutNames;
 
     public static DataManagerContext getInstance() {
         if (instance == null) {
@@ -54,25 +54,25 @@ public class DataManagerContext {
     private DataManagerContext() {
     }
 
-    public void setCutAction(String folder, String name) {
+    public void setCutAction(String folder, String... names) {
         this.cutFolder = folder;
-        this.cutName = name;
+        this.cutNames = names;
     }
 
     public boolean hasCutAction() {
-        return cutName != null && !cutName.isEmpty();
+        return cutNames != null && cutNames.length > 0;
     }
 
     public void resetCutAction() {
         this.cutFolder = null;
-        this.cutName = null;
+        this.cutNames = null;
     }
 
     public String getCutFolder() {
         return cutFolder;
     }
 
-    public String getCutName() {
-        return cutName;
+    public String[] getCutName() {
+        return cutNames;
     }
 }

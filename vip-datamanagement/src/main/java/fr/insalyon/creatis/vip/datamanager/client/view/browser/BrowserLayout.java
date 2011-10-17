@@ -147,6 +147,10 @@ public class BrowserLayout extends VLayout {
     public void setDataUploadWindow(DataUploadWindow dataUploadWindow) {
         this.dataUploadWindow = dataUploadWindow;
     }
+    
+    public BrowserToolStrip getToolStrip() {
+        return toolStrip;
+    }
 
     public void uploadComplete(String fileName) {
         if (dataUploadWindow != null) {

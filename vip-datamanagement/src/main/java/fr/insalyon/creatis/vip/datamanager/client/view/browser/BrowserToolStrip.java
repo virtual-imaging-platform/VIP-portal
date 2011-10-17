@@ -45,15 +45,15 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerContext;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.BasicBrowserToolStrip;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -61,10 +61,46 @@ import java.util.Map;
  */
 public class BrowserToolStrip extends BasicBrowserToolStrip {
 
+    private ToolStripButton pasteButton;
+
     public BrowserToolStrip(final ModalWindow modal, final ListGrid grid) {
 
         super(modal, grid);
-        
+
+        this.addSeparator();
+        ToolStripButton cutButton = new ToolStripButton();
+        cutButton.setIcon(DataManagerConstants.ICON_CUT);
+        cutButton.setPrompt("Cut");
+        cutButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                String path = pathItem.getValueAsString();
+                if (path.equals(DataManagerConstants.ROOT)) {
+                    SC.warn("You cannot cut a folder from the root folder.");
+                } else {
+                    cut();
+                }
+            }
+        });
+        this.addButton(cutButton);
+
+        pasteButton = new ToolStripButton();
+        pasteButton.setIcon(DataManagerConstants.ICON_PASTE);
+        pasteButton.setPrompt("Paste");
+        pasteButton.setDisabled(true);
+        pasteButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                String path = pathItem.getValueAsString();
+                if (path.equals(DataManagerConstants.ROOT)) {
+                    SC.warn("You cannot paste in the root folder.");
+                } else {
+                    paste(modal, path);
+                }
+            }
+        });
+        this.addButton(pasteButton);
+
         this.addSeparator();
         ToolStripButton uploadButton = new ToolStripButton();
         uploadButton.setIcon(DataManagerConstants.ICON_UPLOAD);
@@ -186,16 +222,64 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         }
     }
 
-    private void delete() {
-        
+    private void cut() {
+
         ListGridRecord[] records = BrowserLayout.getInstance().getGridSelection();
-        final Map<String, String> paths = new HashMap<String, String>();
+        if (records.length > 0) {
+            final List<String> paths = new ArrayList<String>();
+
+            for (ListGridRecord record : records) {
+                paths.add(((DataRecord) record).getName());
+            }
+
+            DataManagerContext.getInstance().setCutAction(pathItem.getValueAsString(),
+                    paths.toArray(new String[]{}));
+
+            pasteButton.setDisabled(false);
+
+        } else {
+            SC.warn("There are no data selected to cut.");
+        }
+    }
+
+    private void paste(final ModalWindow modal, final String baseDir) {
+
+        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
+        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Unable to paste file/folder:<br />" + caught.getMessage());
+            }
+
+            public void onSuccess(Void result) {
+                modal.hide();
+                pasteButton.setDisabled(true);
+                DataManagerContext.getInstance().resetCutAction();
+                BrowserLayout.getInstance().loadData(baseDir, true);
+            }
+        };
+
+        if (!baseDir.equals(DataManagerContext.getInstance().getCutFolder())) {
+
+            modal.show("Moving data...", true);
+            service.rename(DataManagerContext.getInstance().getCutFolder(),
+                    new ArrayList(Arrays.asList(DataManagerContext.getInstance().getCutName())),
+                    baseDir, false, callback);
+
+        } else {
+            SC.warn("Unable to move data into the same folder.");
+        }
+    }
+
+    private void delete() {
+
+        ListGridRecord[] records = BrowserLayout.getInstance().getGridSelection();
+        final List<String> paths = new ArrayList<String>();
 
         for (ListGridRecord record : records) {
             DataRecord data = (DataRecord) record;
-            paths.put(pathItem.getValueAsString() + "/" + data.getName(),
-                    DataManagerConstants.ROOT + "/"
-                    + DataManagerConstants.TRASH_HOME + "/" + data.getName());
+            paths.add(data.getName());
         }
         SC.confirm("Do you really want to delete the selected files/folders?", new BooleanCallback() {
 
@@ -215,7 +299,8 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                         }
                     };
                     modal.show("Deleting files/folders...", true);
-                    service.rename(paths, true, callback);
+                    service.rename(pathItem.getValueAsString(), paths,
+                            DataManagerConstants.TRASH_HOME, true, callback);
                 }
             }
         });
@@ -267,5 +352,13 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                 }
             }
         });
+    }
+
+    public void resetPasteButton() {
+        pasteButton.setDisabled(true);
+    }
+
+    public void enablePasteButton() {
+        pasteButton.setDisabled(false);
     }
 }
