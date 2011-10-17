@@ -148,7 +148,7 @@ public class ContactTab extends Tab {
                     modal.show("Sending contact messsage...", true);
                     service.sendContactMail(
                             categoryItem.getValueAsString(), 
-                            subjectField.getValueAsString(), 
+                            subjectField.getValueAsString().trim(), 
                             commentItem.getValueAsString(), callback);
                 }
             }

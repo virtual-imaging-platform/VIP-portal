@@ -41,7 +41,6 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.h2.PlatformConnection;
 import java.sql.Connection;
@@ -86,11 +85,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 user = configurationBusiness.getUser(email);
                 user.setSystemAdministrator(configurationBusiness.isSystemAdministrator(user.getEmail()));
 
-                Map<String, ROLE> groups = configurationBusiness.getUserGroups(email);
-                user.setGroups(groups);
-
-                getSession().setAttribute(CoreConstants.SESSION_USER, user);
-                getSession().setAttribute(CoreConstants.SESSION_GROUPS, groups);
+                setUserSession(user);
+                trace(logger, "Connected.");
             }
 
             return user;
@@ -132,13 +128,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             User user = configurationBusiness.signin(email, password);
             user.setSystemAdministrator(configurationBusiness.isSystemAdministrator(user.getEmail()));
 
-            Map<String, ROLE> groups = configurationBusiness.getUserGroups(email);
-            user.setGroups(groups);
-
-            getSession().setAttribute(CoreConstants.SESSION_USER, user);
-            getSession().setAttribute(CoreConstants.SESSION_GROUPS, groups);
-
-            return user;
+            return setUserSession(user);
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
@@ -153,6 +143,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
         try {
             configurationBusiness.signout(getSessionUser().getEmail());
+            trace(logger, "Signed out.");
             getSession().removeAttribute(CoreConstants.SESSION_USER);
             getSession().removeAttribute(CoreConstants.SESSION_GROUPS);
 
@@ -168,15 +159,14 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @return
      * @throws CoreException 
      */
-    public User activate(String email, String code) throws CoreException {
+    public User activate(String code) throws CoreException {
 
         try {
-            logger.info("Activating '" + email + "'.");
-            User user = configurationBusiness.activate(email, code);
+            User user = getSessionUser();
+            logger.info("Activating '" + user.getEmail() + "'.");
+            user = configurationBusiness.activate(user.getEmail(), code);
 
-            getSession().setAttribute(CoreConstants.SESSION_USER, user);
-
-            return user;
+            return setUserSession(user);
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
@@ -188,11 +178,12 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @param email
      * @throws CoreException 
      */
-    public void sendActivationCode(String email) throws CoreException {
+    public void sendActivationCode() throws CoreException {
 
         try {
-            logger.info("Sending activation code to: " + email + ".");
-            configurationBusiness.sendActivationCode(email);
+            User user = getSessionUser();
+            logger.info("Sending activation code to: " + user.getEmail() + ".");
+            configurationBusiness.sendActivationCode(user.getEmail());
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
@@ -418,5 +409,22 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
+    }
+
+    /**
+     * 
+     * @param user
+     * @return
+     * @throws BusinessException 
+     */
+    private User setUserSession(User user) throws BusinessException {
+
+        Map<String, ROLE> groups = configurationBusiness.getUserGroups(user.getEmail());
+        user.setGroups(groups);
+
+        getSession().setAttribute(CoreConstants.SESSION_USER, user);
+        getSession().setAttribute(CoreConstants.SESSION_GROUPS, groups);
+        
+        return user;
     }
 }

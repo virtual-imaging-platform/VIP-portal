@@ -180,12 +180,12 @@ public class SignUpTab extends Tab {
                 if (form.validate()) {
 
                     User user = new User(
-                            firstNameField.getValueAsString(),
-                            lastNameField.getValueAsString(),
-                            emailField.getValueAsString(),
-                            institutionField.getValueAsString(),
+                            firstNameField.getValueAsString().trim(),
+                            lastNameField.getValueAsString().trim(),
+                            emailField.getValueAsString().trim(),
+                            institutionField.getValueAsString().trim(),
                             passwordField.getValueAsString(),
-                            phoneField.getValueAsString());
+                            phoneField.getValueAsString().trim());
 
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
                     final AsyncCallback<Void> callback = new AsyncCallback<Void>() {

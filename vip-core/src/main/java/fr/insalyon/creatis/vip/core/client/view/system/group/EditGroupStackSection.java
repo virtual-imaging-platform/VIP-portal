@@ -96,7 +96,7 @@ public class EditGroupStackSection extends SectionStackSection {
 
             public void onClick(ClickEvent event) {
                 if (form.validate()) {
-                    save(nameItem.getValueAsString());
+                    save(nameItem.getValueAsString().trim());
                 }
             }
         });

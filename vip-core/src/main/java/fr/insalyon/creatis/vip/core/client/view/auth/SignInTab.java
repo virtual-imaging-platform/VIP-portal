@@ -209,7 +209,7 @@ public class SignInTab extends Tab {
                 }
             };
             modal.show("Signing in...", true);
-            service.signin(emailField.getValueAsString(),
+            service.signin(emailField.getValueAsString().trim(),
                     passwordField.getValueAsString(), callback);
         }
     }

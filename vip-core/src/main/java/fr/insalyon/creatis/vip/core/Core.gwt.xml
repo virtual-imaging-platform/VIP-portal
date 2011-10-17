@@ -9,6 +9,7 @@
     <inherits name='com.google.gwt.user.theme.standard.Standard' />
 
     <!-- Servlets -->
-    <servlet class="fr.insalyon.creatis.vip.portal.server.rpc.ConfigurationServiceImpl" path="/configurationservice"/>
-    <servlet class="fr.insalyon.creatis.vip.portal.server.rpc.NewsServiceImpl" path="/newsservice"/>
+    <servlet class="fr.insalyon.creatis.vip.core.server.rpc.GetFileServiceImpl" path="/getfileservice"/>
+    <servlet class="fr.insalyon.creatis.vip.core.server.rpc.ConfigurationServiceImpl" path="/configurationservice"/>
+    <servlet class="fr.insalyon.creatis.vip.core.server.rpc.NewsServiceImpl" path="/newsservice"/>
 </module>

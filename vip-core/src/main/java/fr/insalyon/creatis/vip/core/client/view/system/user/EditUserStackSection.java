@@ -128,7 +128,7 @@ public class EditUserStackSection extends SectionStackSection {
                             }
                         }
                     }
-                    save(emailField.getValueAsString(), map);
+                    save(emailField.getValueAsString().trim(), map);
                 }
             }
         });

@@ -133,8 +133,7 @@ public class ActivationTab extends Tab {
                         }
                     };
                     modal.show("Activating account...", true);
-                    service.activate(user.getEmail(),
-                            codeField.getValueAsString(), callback);
+                    service.activate(codeField.getValueAsString().trim(), callback);
                 }
             }
         });
@@ -162,7 +161,7 @@ public class ActivationTab extends Tab {
                     }
                 };
                 modal.show("Resending activation code...", true);
-                service.sendActivationCode(user.getEmail(), callback);
+                service.sendActivationCode(callback);
             }
         });
 

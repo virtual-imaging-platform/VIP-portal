@@ -54,9 +54,9 @@ public interface ConfigurationServiceAsync {
 
     public void signout(AsyncCallback<Void> asyncCallback);
 
-    public void activate(String email, String code, AsyncCallback<User> asyncCallback);
+    public void activate(String code, AsyncCallback<User> asyncCallback);
 
-    public void sendActivationCode(String email, AsyncCallback<Void> asyncCallback);
+    public void sendActivationCode(AsyncCallback<Void> asyncCallback);
 
     public void addGroup(String groupName, AsyncCallback<Void> asyncCallback);
 

@@ -110,7 +110,7 @@ public class ProxyClient {
     private final String GETCOMMAND = "COMMAND=0";
     private final String USERNAME = "USERNAME=";
     private final String PASSPHRASE = "PASSPHRASE=";
-    private final String LIFETIME = "LIFETIME=43200"; // 10 days
+    private final String LIFETIME = "LIFETIME=43200"; // 12 hours
     private final String RESPONSE = "RESPONSE=";
     private final String ERROR = "ERROR=";
 

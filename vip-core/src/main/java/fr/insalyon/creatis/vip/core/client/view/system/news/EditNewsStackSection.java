@@ -110,7 +110,7 @@ public class EditNewsStackSection extends SectionStackSection {
 
             public void onClick(ClickEvent event) {
                 if (form.validate()) {
-                    String title = titleItem.getValueAsString();
+                    String title = titleItem.getValueAsString().trim();
                     String message = richTextEditor.getValue();
 
                     save(new News(title, message));

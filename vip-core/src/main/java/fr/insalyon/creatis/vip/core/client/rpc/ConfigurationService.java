@@ -70,9 +70,9 @@ public interface ConfigurationService extends RemoteService {
 
     public void signout() throws CoreException;
 
-    public User activate(String email, String code) throws CoreException;
+    public User activate(String code) throws CoreException;
 
-    public void sendActivationCode(String email) throws CoreException;
+    public void sendActivationCode() throws CoreException;
 
     public List<User> getUsers() throws CoreException;
 

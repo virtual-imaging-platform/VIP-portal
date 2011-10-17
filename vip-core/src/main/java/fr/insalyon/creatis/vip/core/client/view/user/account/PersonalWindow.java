@@ -120,11 +120,11 @@ public class PersonalWindow extends Window {
 
                 if (form.validate()) {
                     User user = new User(
-                            firstNameField.getValueAsString(), 
-                            lastNameField.getValueAsString(), 
-                            emailField.getValueAsString(), 
-                            institutionField.getValueAsString(), 
-                            phoneField.getValueAsString());
+                            firstNameField.getValueAsString().trim(), 
+                            lastNameField.getValueAsString().trim(), 
+                            emailField.getValueAsString().trim(), 
+                            institutionField.getValueAsString().trim(), 
+                            phoneField.getValueAsString().trim());
                     user.setFolder(folder);
                     
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
