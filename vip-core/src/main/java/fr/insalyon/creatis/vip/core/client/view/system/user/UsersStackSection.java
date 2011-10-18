@@ -50,10 +50,11 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
+import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
+import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.viewer.DetailViewer;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
@@ -113,7 +114,8 @@ public class UsersStackSection extends SectionStackSection {
                     loadImg.addClickHandler(new ClickHandler() {
 
                         public void onClick(ClickEvent event) {
-                            edit(rollOverRecord.getAttribute("email"));
+                            edit(rollOverRecord.getAttribute("email"),
+                                    rollOverRecord.getAttributeAsBoolean("confirmed"));
                         }
                     });
                     ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
@@ -171,10 +173,21 @@ public class UsersStackSection extends SectionStackSection {
                 institutionField, phoneField);
         grid.setSortField("firstName");
         grid.setSortDirection(SortDirection.ASCENDING);
+        
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 
             public void onCellDoubleClick(CellDoubleClickEvent event) {
-                edit(event.getRecord().getAttribute("email"));
+                edit(event.getRecord().getAttribute("email"),
+                        event.getRecord().getAttributeAsBoolean("confirmed"));
+            }
+        });
+        
+        grid.addRowContextClickHandler(new RowContextClickHandler() {
+
+            public void onRowContextClick(RowContextClickEvent event) {
+                event.cancel();
+                new UsersContextMenu(modal, event.getRecord().getAttribute("email"),
+                        event.getRecord().getAttributeAsBoolean("confirmed")).showContextMenu();
             }
         });
     }
@@ -225,9 +238,9 @@ public class UsersStackSection extends SectionStackSection {
         service.removeUser(email, callback);
     }
 
-    private void edit(String email) {
+    private void edit(String email, boolean confirmed) {
         ManageUsersTab usersTab = (ManageUsersTab) Layout.getInstance().
                 getTab(CoreConstants.TAB_MANAGE_USERS);
-        usersTab.setUser(email);
+        usersTab.setUser(email, confirmed);
     }
 }

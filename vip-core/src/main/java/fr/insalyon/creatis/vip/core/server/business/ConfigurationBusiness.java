@@ -240,9 +240,6 @@ public class ConfigurationBusiness {
                 client.createDirectory(Server.getInstance().getDataManagerUsersHome(),
                         user.getFolder() + "_" + CoreConstants.FOLDER_TRASH);
 
-                CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().add(email,
-                        CoreConstants.GROUP_GUEST, ROLE.User);
-
                 return user;
 
             } else {
@@ -253,6 +250,22 @@ public class ConfigurationBusiness {
         } catch (VletAgentClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param email
+     * @throws BusinessException 
+     */
+    public void activateUser(String email) throws BusinessException {
+
+        try {
+            User user = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
+            activate(email, user.getCode());
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

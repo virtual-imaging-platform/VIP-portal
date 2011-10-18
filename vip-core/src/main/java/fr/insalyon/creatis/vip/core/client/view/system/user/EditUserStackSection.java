@@ -40,6 +40,7 @@ import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
@@ -67,6 +68,7 @@ public class EditUserStackSection extends SectionStackSection {
     private DynamicForm form;
     private TextItem emailField;
     private SelectItem groupsPickList;
+    private CheckboxItem confirmedField;
 
     public EditUserStackSection() {
 
@@ -102,6 +104,10 @@ public class EditUserStackSection extends SectionStackSection {
         groupsPickList.setMultiple(true);
         groupsPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
         groupsPickList.setWidth(350);
+        
+        confirmedField = new CheckboxItem();
+        confirmedField.setTitle("Confirmed");
+        confirmedField.setDisabled(true);
 
         ButtonItem saveItem = new ButtonItem("Save");
         saveItem.setWidth(50);
@@ -133,7 +139,7 @@ public class EditUserStackSection extends SectionStackSection {
             }
         });
 
-        form.setFields(emailField, groupsPickList, saveItem);
+        form.setFields(emailField, groupsPickList, confirmedField, saveItem);
     }
 
     /**
@@ -141,9 +147,10 @@ public class EditUserStackSection extends SectionStackSection {
      * 
      * @param name User name
      */
-    public void setUser(String email) {
+    public void setUser(String email, boolean confirmed) {
 
         this.emailField.setValue(email);
+        this.confirmedField.setValue(confirmed);
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<Map<String, CoreConstants.ROLE>> callback = new AsyncCallback<Map<String, CoreConstants.ROLE>>() {

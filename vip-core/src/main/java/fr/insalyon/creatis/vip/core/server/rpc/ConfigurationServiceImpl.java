@@ -427,4 +427,21 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         
         return user;
     }
+
+    /**
+     * 
+     * @param email
+     * @throws CoreException 
+     */
+    public void activateUser(String email) throws CoreException {
+        
+        try {
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Activating user: " + email);
+            configurationBusiness.activateUser(email);
+            
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
 }

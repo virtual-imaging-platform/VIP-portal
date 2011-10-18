@@ -83,4 +83,6 @@ public interface ConfigurationServiceAsync {
     public void updateUserPassword(String currentPassword, String newPassword, AsyncCallback<Void> asyncCallback);
     
     public void sendContactMail(String category, String subject, String comment, AsyncCallback<Void> asyncCallback);
+    
+    public void activateUser(String email, AsyncCallback<Void> asyncCallback);
 }

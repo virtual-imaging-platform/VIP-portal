@@ -45,6 +45,7 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.BasicBrowserToolStrip;
@@ -128,7 +129,7 @@ public class PathSelectionWindow extends Window {
         contextMenu.setWidth(90);
 
         MenuItem selectItem = new MenuItem("Select this path");
-        selectItem.setIcon("icon-select.png");
+        selectItem.setIcon(CoreConstants.ICON_ACTIVATE);
         selectItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {

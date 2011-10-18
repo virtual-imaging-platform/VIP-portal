@@ -99,4 +99,6 @@ public interface ConfigurationService extends RemoteService {
     public void updateUserPassword(String currentPassword, String newPassword) throws CoreException;
     
     public void sendContactMail(String category, String subject, String comment) throws CoreException;
+    
+    public void activateUser(String email) throws CoreException;
 }
