@@ -300,7 +300,8 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                     };
                     modal.show("Deleting files/folders...", true);
                     service.rename(pathItem.getValueAsString(), paths,
-                            DataManagerConstants.TRASH_HOME, true, callback);
+                            DataManagerConstants.ROOT + "/" 
+                            + DataManagerConstants.TRASH_HOME, true, callback);
                 }
             }
         });

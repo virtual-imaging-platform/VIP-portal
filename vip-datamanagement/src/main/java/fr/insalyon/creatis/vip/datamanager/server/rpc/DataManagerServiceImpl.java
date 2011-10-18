@@ -47,7 +47,6 @@ import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import java.util.List;
-import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
