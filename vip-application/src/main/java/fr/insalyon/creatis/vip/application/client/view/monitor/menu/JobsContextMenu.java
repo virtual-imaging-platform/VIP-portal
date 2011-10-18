@@ -49,7 +49,6 @@ import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.ViewerWindow;
 import fr.insalyon.creatis.vip.application.client.view.monitor.NodeInfoWindow;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.JobRecord;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 
 /**
