@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.datamanager.client.view.browser;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -46,6 +47,8 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 
@@ -65,7 +68,7 @@ public class AddFolderWindow extends Window {
         this.modal = modal;
         this.baseDir = baseDir;
         
-        this.setTitle("Create folder into: " + baseDir);
+        this.setTitle(Canvas.imgHTML(DataManagerConstants.ICON_FOLDER_ADD) + " Create folder into: " + baseDir);
         this.setWidth(350);
         this.setHeight(110);
         this.setShowMinimizeButton(false);
@@ -79,9 +82,7 @@ public class AddFolderWindow extends Window {
         form.setPadding(5);
         form.setLayoutAlign(VerticalAlignment.BOTTOM);
 
-        nameItem = new TextItem("name", "Name");
-        nameItem.setRequired(true);
-        nameItem.setWidth(200);
+        nameItem = FieldUtil.getTextItem(200, true, "Name", "[0-9A-Za-z-_]");
         nameItem.addKeyPressHandler(new KeyPressHandler() {
 
             public void onKeyPress(KeyPressEvent event) {

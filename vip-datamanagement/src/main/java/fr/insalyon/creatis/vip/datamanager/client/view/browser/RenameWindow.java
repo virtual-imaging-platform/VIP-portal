@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.datamanager.client.view.browser;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -45,7 +46,9 @@ import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 
@@ -67,7 +70,7 @@ public class RenameWindow extends Window {
         this.baseDir = baseDir;
         this.name = name;
 
-        this.setTitle("Renaming: " + baseDir + "/" + name);
+        this.setTitle(Canvas.imgHTML(CoreConstants.ICON_EDIT) + " Renaming: " + baseDir + "/" + name);
         this.setWidth(350);
         this.setHeight(110);
         this.setShowMinimizeButton(false);
@@ -81,9 +84,7 @@ public class RenameWindow extends Window {
         form.setPadding(5);
         form.setLayoutAlign(VerticalAlignment.BOTTOM);
 
-        nameItem = new TextItem("name", "Name");
-        nameItem.setRequired(true);
-        nameItem.setWidth(200);
+        nameItem = FieldUtil.getTextItem(200, true, "Name", "[0-9A-Za-z-_]");
         nameItem.setValue(name);
         nameItem.addKeyPressHandler(new KeyPressHandler() {
 
@@ -109,23 +110,28 @@ public class RenameWindow extends Window {
     private void rename() {
 
         if (form.validate()) {
-            DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-            AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            if (!name.equals(nameItem.getValueAsString().trim())) {
+                DataManagerServiceAsync service = DataManagerService.Util.getInstance();
+                AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
-                public void onFailure(Throwable caught) {
-                    modal.hide();
-                    SC.warn("Unable to rename:<br />" + caught.getMessage());
-                }
+                    public void onFailure(Throwable caught) {
+                        modal.hide();
+                        SC.warn("Unable to rename:<br />" + caught.getMessage());
+                    }
 
-                public void onSuccess(Void result) {
-                    modal.hide();
-                    BrowserLayout.getInstance().loadData(baseDir, true);
-                }
-            };
-            modal.show("Renaming " + baseDir + "/" + name + "...", true);
-            service.rename(baseDir + "/" + name, nameItem.getValueAsString().trim(),
-                    false, callback);
-            destroy();
+                    public void onSuccess(Void result) {
+                        modal.hide();
+                        BrowserLayout.getInstance().loadData(baseDir, true);
+                    }
+                };
+                modal.show("Renaming " + baseDir + "/" + name + "...", true);
+                service.rename(baseDir + "/" + name, nameItem.getValueAsString().trim(),
+                        false, callback);
+                destroy();
+            
+            } else {
+                SC.warn("The specified name is the same as the original one.");
+            }
         }
     }
 }
