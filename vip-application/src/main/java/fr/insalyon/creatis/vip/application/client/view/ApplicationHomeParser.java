@@ -56,6 +56,10 @@ public class ApplicationHomeParser extends ApplicationParser {
 
     private List<String> applicationNames;
 
+    public ApplicationHomeParser() {
+        applicationNames = new ArrayList<String>();
+    }
+
     @Override
     public void loadApplications() {
 
@@ -69,7 +73,6 @@ public class ApplicationHomeParser extends ApplicationParser {
             public void onSuccess(List<Application> result) {
 
                 if (!result.isEmpty()) {
-                    applicationNames = new ArrayList<String>();
                     addApplication(ApplicationConstants.APP_MONITOR,
                             ApplicationConstants.APP_IMG_MONITOR);
 
