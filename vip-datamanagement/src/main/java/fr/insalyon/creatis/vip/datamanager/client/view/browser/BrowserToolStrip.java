@@ -104,7 +104,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         this.addSeparator();
         ToolStripButton uploadButton = new ToolStripButton();
         uploadButton.setIcon(DataManagerConstants.ICON_UPLOAD);
-        uploadButton.setPrompt("Upload");
+        uploadButton.setPrompt("Upload a File");
         uploadButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
@@ -113,17 +113,34 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                     SC.warn("You cannot upload a file in the root folder.");
 
                 } else {
+                    new FileUploadWindow(modal, path, "dataManagerUploadComplete").show();
+                }
+            }
+        });
+        this.addButton(uploadButton);
+        
+        ToolStripButton uploadMultipleButton = new ToolStripButton();
+        uploadMultipleButton.setIcon(DataManagerConstants.ICON_UPLOAD_MULTIPLE);
+        uploadMultipleButton.setPrompt("Upload Multiple Data");
+        uploadMultipleButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                String path = pathItem.getValueAsString();
+                if (path.equals(DataManagerConstants.ROOT)) {
+                    SC.warn("You cannot upload data in the root folder.");
+
+                } else {
                     DataUploadWindow window = new DataUploadWindow(modal, path);
                     BrowserLayout.getInstance().setDataUploadWindow(window);
                     window.show();
                 }
             }
         });
-        this.addButton(uploadButton);
+        this.addButton(uploadMultipleButton);
 
         ToolStripButton downloadButton = new ToolStripButton();
         downloadButton.setIcon(DataManagerConstants.ICON_DOWNLOAD);
-        downloadButton.setPrompt("Download Selected Files");
+        downloadButton.setPrompt("Download Selected Data");
         downloadButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {

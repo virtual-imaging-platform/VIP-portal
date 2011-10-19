@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.datamanager.client.view.browser;
 import com.google.gwt.core.client.GWT;
 import com.smartgwt.client.types.Encoding;
 import com.smartgwt.client.types.FormMethod;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -45,6 +46,7 @@ import com.smartgwt.client.widgets.form.fields.UploadItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 
 /**
  *
@@ -57,16 +59,16 @@ public class FileUploadWindow extends Window {
 
     public FileUploadWindow(final ModalWindow modal, String baseDir, String target) {
 
-        this.setTitle("Upload file to: " + baseDir);
+        this.setTitle(Canvas.imgHTML(DataManagerConstants.ICON_UPLOAD) + " Upload file to: " + baseDir);
         this.setWidth(400);
         this.setHeight(110);
         this.setShowMinimizeButton(false);
         this.setIsModal(true);
         this.setShowModalMask(true);
         this.centerInPage();
-        this.setPadding(5);
 
         form = new DynamicForm();
+        form.setPadding(5);
         form.setEncoding(Encoding.MULTIPART);
         form.setMethod(FormMethod.POST);
         form.setAction(GWT.getModuleBaseURL() + "/fileuploadservice");

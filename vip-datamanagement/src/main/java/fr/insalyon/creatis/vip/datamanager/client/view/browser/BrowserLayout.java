@@ -92,7 +92,7 @@ public class BrowserLayout extends VLayout {
 
         loadData(DataManagerConstants.ROOT, false);
 
-        NamedFrame frame = new NamedFrame("uploadTarget");
+        NamedFrame frame = new NamedFrame("dataManagerUploadComplete");
         frame.setVisible(false);
         frame.setHeight("1px");
         frame.setWidth("1px");
@@ -163,7 +163,7 @@ public class BrowserLayout extends VLayout {
     }
 
     private native void initComplete(BrowserLayout upload) /*-{
-    $wnd.uploadComplete = function (fileName) {
+    $wnd.dataManagerUploadComplete = function (fileName) {
     upload.@fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout::uploadComplete(Ljava/lang/String;)(fileName);
     };
     }-*/;
