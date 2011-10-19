@@ -55,6 +55,10 @@ public class GateLabHomeParser extends ApplicationParser {
 
     private List<String> applicationNames;
 
+    public GateLabHomeParser() {
+        applicationNames = new ArrayList<String>();
+    }
+
     @Override
     public void loadApplications() {
 
@@ -68,7 +72,6 @@ public class GateLabHomeParser extends ApplicationParser {
             public void onSuccess(List<Application> result) {
 
                 if (!result.isEmpty()) {
-                    applicationNames = new ArrayList<String>();
                     addApplication(GateLabConstants.APP_MONITOR,
                             GateLabConstants.APP_IMG_MONITOR);
 
