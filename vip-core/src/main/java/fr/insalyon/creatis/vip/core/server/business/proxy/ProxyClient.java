@@ -160,6 +160,8 @@ public class ProxyClient {
                 if (valid) {
                     logger.info("Server proxy still valid until: " + endDate);
                     return new Proxy(proxyFileName, endDate);
+                } else {
+                    new File(proxyFileName).delete();
                 }
             }
             logger.info("Fetching server proxy from MyProxy server.");
@@ -193,7 +195,7 @@ public class ProxyClient {
                 + " -cert " + serverConf.getServerProxy()
                 + " -key " + serverConf.getServerProxy()
                 + " -out " + serverConf.getServerProxy()
-                + " -noregen -hours 240";
+                + " -noregen -valid 12:00";
         Process process = Runtime.getRuntime().exec(command);
 
         BufferedReader r = new BufferedReader(new InputStreamReader(process.getInputStream()));
