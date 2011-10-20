@@ -50,7 +50,7 @@ public class DataUploadWindow extends Window {
 
         this.setTitle(Canvas.imgHTML(DataManagerConstants.ICON_UPLOAD_MULTIPLE) + " Upload data to: " + baseDir);
         this.setWidth(575);
-        this.setHeight(360);
+        this.setHeight(375);
         this.setShowMinimizeButton(false);
         this.setIsModal(true);
         this.setShowModalMask(true);
@@ -60,7 +60,7 @@ public class DataUploadWindow extends Window {
         this.addItem(new AppletHTMLPane(
                 "DataUpload", 
                 "fr.insalyon.creatis.vip.datamanager.applet.upload.UploadFiles", 
-                "vip-datamanager-applet.jar", 550, 320, 
+                "vip-datamanager-applet.jar", 550, 335, 
                 baseDir, true, true));
     }
 }
