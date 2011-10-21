@@ -120,7 +120,7 @@ public class JobData implements JobDAO {
                         + "node_name, parameters, COALESCE(ms, -1) AS ms "
                         + "FROM Jobs AS j LEFT JOIN "
                         + "(SELECT id, max(minor_status) AS ms "
-                        + "FROM JobsMinorStatus GROUP BY id) AS jm "
+                        + "FROM JobsMinorStatus WHERE minor_status < 100 GROUP BY id) AS jm "
                         + "ON j.id = jm.id ORDER BY j.id");
 
                 while (rs.next()) {
