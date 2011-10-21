@@ -51,7 +51,6 @@
     </developers>
     
     <modules>
-        <module>vip-common</module>
         <module>vip-core</module>
         <module>vip-docs</module>
         <module>vip-application</module>
@@ -60,7 +59,7 @@
         <module>vip-portal</module>
         <module>vip-simulation-gui</module>
         <module>vip-models</module>
-        <module>vip-provenance</module>
+<!--        <module>vip-provenance</module>-->
 <!--        <module>vip-physical-properties</module>-->
     </modules>
     
