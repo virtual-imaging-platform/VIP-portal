@@ -148,12 +148,16 @@ public class SignUpTab extends Tab {
     private String getDisclaimer() {
 
         return "-- VIP Terms of Use --\n\n"
-                + "This portal is exclusively dedicated to non-commercial academic use. It shows "
-                + "some functionalities of the VIP platform but it is not in a "
-                + "stable release yet. Please acknowledge the Virtual Imaging "
-                + "Platform (VIP) ANR project ANR-09-COSI-03 wherever appropriate.\n\n"
+                
+                
+                 
+                
+                + "This portal is exclusively dedicated to non-commercial academic use. "
+                + "It can be accessed free of charge but it is provided \"as is\" without warranty of any kind."
+                + "The entire risk as to the quality and performance of the program is with you.\n\n"
+              
                 + "The simulators integrated in the platform must be acknowledged "
-                + "separately and explicitly as follows:\n\n"
+                + " as follows:\n\n"
                 + "Field II is citationware. If you are publishing any work, "
                 + "where this program has been used, please remember that it was "
                 + "obtained free of charge. You must reference the two papers "
@@ -168,7 +172,12 @@ public class SignUpTab extends Tab {
                 + "from arbitrarily shaped, apodized, and excited ultrasound "
                 + "transducers, IEEE Trans.Ultrason., Ferroelec., Freq.Contr., 39, "
                 + "pp. 262-267, 1992.\n\n"
-                + "Sindbad is developed at CEA-Leti and is not freely available.";
+                + "Sindbad is developed at CEA-Leti.\n\n"
+                + "PET-SORTEO is citationware. If you are publishing any work, where"
+                + "this program has been used, please remember that it was obtained free of charge."
+                + "You must reference the paper shown below and the name of the program PET-SORTEO must be mentioned in the publication.\n\n"
+                + "A. Reilhac, C. Lartizien, N. Costes, S. Sans, C. Comtat, R. Gunn, A. Evans. PET-SORTEO: A Monte Carlo-based simulator with high count rate capabilities. IEEE Transactions on Nuclear Science, 5: 46-52, 2004."
+                ;
     }
 
     private void configureButton() {
