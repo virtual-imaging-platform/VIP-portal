@@ -1,50 +1,60 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>VIP Documentation - Simulators Description</title>
+        <title>VIP Documentation - Simulator Descriptions</title>
         <link rel="StyleSheet" href="../css/doc_main.css" type="text/css" />
     </head>
     <body>
-        <h1>Simulators Description</h1>
+        <h1>Simulator Descriptions</h1>
+        VIP hosts several applications but the following 4 simulators received special attention. 
+        Don't hesitate to contact us in case you want to access another application. 
+        
 
         <h2>Field II</h2>
-        US Simulator
-        Inputs:
+        FIELD-II has 3 inputs:
         <ul>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-        </ul>
+            <li>"ProbeParameters_mat" is a Matlab mat file containing parameters for the US probe to use and image to generate:</li>
+            <li>"TissueParameters_mat" is a Matlab mat file containing two structures describing the scatterers used in the simulation:
+                <ul><li>points is a matrix of size n x 3 containing the positions of the scatterers</li><li>amplitudes is a matrix of size n x 1 containing the scattering coefficients of the scatterers</li></ul>
+            </li>
+            <li>"SimulationDirectory" is the output directory where the simulation results will be stored (a unique directory will be created)</li>
+                    </ul>
 
         <h2>Simri</h2>
         <p>Simri (http://www.simri.org/) is a 3D MRI simulator based on the Bloch equation.  It takes into account the main static field value and enables realistic simulations of the chemical shift artifact, including             off-resonance phenomena. It also simulates the artifacts linked to the static field inhomogeneity like those induced by susceptibility variation within an object. </p>
-        <p>The inputLfn of the Simri workflow corresponds to a tarball containing : </p>
+        <p>Simri has 4 inputs:
         <ul>
-            <li>mdh/raw label file</li>
+            <li>"outputDir" is the output directory where the simulation results will be stored (a unique directory will be created)</li>
+            <li>"inputLfn" is a tarball containing :
+                <ul>
+                    <li>mdh/raw label file describing the object model</li>
             <li>labelToMatter.txt file - associates the labels used with generic matter names</li>
             <li>matters.xml file - associates physical values (rho, t1, t2, t2star and their standard deviation) to each matter type</li>
             <li>params.txt file - defines simulation parameters such as tacq, TE, TR, teta, pulsedur, seqname)</li>
         </ul>
-
-        <h2>Sindbad</h2>
-        CT Simulator
-        Inputs:
-        <ul>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
+            <li>"paramsFileName" must contain the name of the parameter file in the tarball (e.g. "params.txt")</li>
+            <li>"fileoutName" is the desired name for the output image</li>
+            </li>
         </ul>
 
-        <h2>Sorteo</h2>
-        PET Simulator
-        Inputs:
+        <h2>Sindbad</h2>
+        Sindbad has 6 inputs:
         <ul>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
+            <li>"scan_file" contains the definition of the scanner</li>
+            <li>"chain" is a .mdf file containing simulation parameters. If more than 1 file are needed to run the simulation, use a zip or tar.gz or bz2 file containing: (i) a .conf file (<a href="./chaineGXL_0.conf">example</a>) specifying the mdf files to be used for each part of the simulation and (ii) the mdf files (max 3 .mdf files). Note that the program will always do analytic and Monte-Carlo simulations separately, even with a single mdf input.</li>
+            <li>"phantom" contains the object model as a .g file (brlcad phantom file). If you are using voxel phantoms, then use a zip or tar.gz or bz2 file containing: (i) a .conf (<a href="./modelGXL_0.conf">example</a>) filespecifying the sindbad options to be used for each part of the simulation and (ii) the phantom files (e.g. 1 .g file, 1 .sdt and 1 .spr files with same names and 1 labels reference (.dat) file).</li>
+            <li>"geo" is a .geo file(geometry specific parameters). If more than 1 file are needed to run the simulation, use a zip or tar.gz or bz2 file containing: (i) a .conf file (<a href="geoGXL_1.conf">example</a>) specifying the geometry to be used for each part of the simulation and (ii) the .geo files (max 3 .geo files).</li>
+            <li>"pegs4dat" is a file containing pegs4 materials.</li>
+            <li>"result_directory" is the output directory where the simulation results will be stored (a unique directory will be created).</li>
+        </ul>
+
+        <h2>PET-Sorteo</h2>
+        PET-Sorteo has 3 inputs:
+         <ul>
+            <li>"text_protocol" is a text file containing the acquisition parameters</li>
+            <li>"fantome_v" is a v file containing the labeled object model used in the simulation or an archive (zip, gz or tgz) containing all the v files involved in the simulation.</li>
+            <li>"result_directory" is the output directory where the simulation results will be stored (a unique directory will be created)</li>
+            
         </ul>
 
     </body>
