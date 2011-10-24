@@ -13,7 +13,53 @@
         <h2>Field II</h2>
         FIELD-II has 3 inputs:
         <ul>
-            <li>"ProbeParameters_mat" is a Matlab mat file containing parameters for the US probe to use and image to generate:</li>
+            <li>"ProbeParameters_mat" is a Matlab mat file containing parameters for the US probe to use and image to generate. It has two structures (names must be respected):</li>
+            
+            <ul>           
+                <li>"probe" contains the probe-specific parameters:
+                    <ul>
+ 
+                        <li>f0: is the central frequency of the transducer elements</li>
+                        <li>lambda: is the wavelength associated assuming a sound speed of 1540m.s-1</li>
+                        <li>pitch: is the distance (in meters) between the center of two consecutive elements</li>
+                        <li>kerf: is the distance between two elements</li>
+                        <li>width: is the width of one element (note that pitch = kerf + width)</li>
+                        <li>element_height: is the height of each element</li>
+                        <li>focus: is the elevation focus of the transducer</li>
+                        <li>n_sub_x and n_sub_y are the number of subdivisions in the lateral and elevation direction used  for calculating the elements response. They are field II parameters which are necessary if you want the elevation focus to be taken into account.</li>
+                        <li>n_elements: is the number of elements of the probe</li>
+                        <li>impulse_response: is the elements impulse response sampled at fs</li>
+                        <li>dimension: 1 for linear of phased array, 2 for 2D matrix array</li>
+                    </ul>
+                <li>"img" contains the parameters specific to the imaging sequence. Note that not any kind of imaging sequence can be simulated. Only a linear array imaging, a sector scan using a phased array and a 2D matrix array imaging can be simulated. In terms of parameters : dynamic focusing and apodization can be used in transmit and in receive or multi focusing and apodization using zones can also be used.
+                    <ul>
+                        <b>General parameters:</b><br/>
+                        <li>c: speed of sound usually 1540m.s-1
+                        <li>fs: sampling frequency
+                        <li>excitation: excitation pulse used for each element
+                        <li>linear: parameter to say if linear (1) or sector (0) scan is used To be used only if the probe is 1D
+                        <li>n_lines: number of lines in the image
+                        <li>n_active: number of active elements
+                        <li>rx_dynamic_focus: set to 1 if dynamic receive focusing is expected
+                        <li>tx_dynamic_focus: set to 1 if dynamic transmit focusing is expected
+                        <li>rx_cst_apo: set to 1 if constant receive apodization is used
+                        <li>tx_cst_apo: set to 1 if constant transmit apodization is used
+                        <li>tx_focal_zones: focal zones are used if dynamic focusing is switched off. Zones corresponds to the different depths of focusing
+                        <li>tx_focus_times: Focus times corresponds to the time after which a focal point becomes the current focal point.
+                        <li>rx_focal_zones,  rx_focal zones, same as previsously but in receive
+                        <li>rx_apo_zones, rx_apo_times, tx_apo_zones, tx_apo_times : same as previsouly but for the apodization
+                        <li>tx_apo_vector, rx_apo_vector: transmit and receive apodization matrices (can be a vector in case of constant tx or rx apodization). For the 2D matrix has to be calculated to fit for 2D matrices used in Field II<br/>
+                        <b>Parameters for sectorial imaging:</b>
+                        <li>sector: size in radians of the sector<br/>
+                           <b> Parameters for linear imaging:</b>
+                        <li>width = width of the final image<br/>
+                           <b> Parameters of 2D matrix arrays:</b>
+                        <li>sector_phi : size of the sector in lateral dimension
+                        <li>sector_theta : size of the sector in elevation
+                        <li>nlines_by_plane : number of lines by plane (the number of plane is calculated by dividing number of lines by number of lines by plane) 
+                    </ul>
+            </ul>
+            
             <li>"TissueParameters_mat" is a Matlab mat file containing two structures describing the scatterers used in the simulation:
                 <ul><li>points is a matrix of size n x 3 containing the positions of the scatterers</li><li>amplitudes is a matrix of size n x 1 containing the scattering coefficients of the scatterers</li></ul>
             </li>
@@ -51,7 +97,7 @@
         <h2>PET-Sorteo</h2>
         PET-Sorteo has 3 inputs:
          <ul>
-            <li>"text_protocol" is a text file containing the acquisition parameters</li>
+            <li>"text_protocol" is a text file containing the acquisition parameters. More information about the available parameters is found in the <a href="manual-sorteo.pdf">PET-Sorteo manual</a>.</li>
             <li>"fantome_v" is a v file containing the labeled object model used in the simulation or an archive (zip, gz or tgz) containing all the v files involved in the simulation.</li>
             <li>"result_directory" is the output directory where the simulation results will be stored (a unique directory will be created)</li>
             
