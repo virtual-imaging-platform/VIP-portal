@@ -1,12 +1,89 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>VIP Documentation - The GateLab</title>
+        <title>The GateLab</title>
         <link rel="StyleSheet" href="../css/doc_main.css" type="text/css" />
     </head>
     <body>
         <h1>The GateLab</h1>
+        <h2>Launch a simulation</h2>
 
-      
+
+        <p>Click on the "GateLab" icon in your Home tab. A new tab opens.</p>
+        <ul>
+            <li>Fill in the simulation name.</li>
+            <li>Click on the LoadMac button. This will start a Java applet in your browser. Attention, you need to have the <strong>Java plugin installed in your browser</strong>.</li>
+            <li>Select your main macro file using the file browser opened by the LoadMac button
+                <ul>
+                    <li>Your main mac file is the one that contains the initialization line (e.g. "/gate/application/setTotalNumberOfPrimaries") </li>
+                    <li>Your main mac file has to be on your local PC in a "mac/" folder as explained in the first remark below</li>
+                    <li>Your main macro file is automatically parsed and uploaded on the distant storage space (see also the <a href="./filetransfer.html">file transfer</a> page) together with your other input data</li>
+                </ul>
+            </li>
+            <li>Fill in the rest of the form:
+                <ul>
+                    <li>CPU estimation: this will determine the number of parallel jobs into which your simulation is automatically split.</li>
+                    <li>GateRelease: you can keep the default value or browse the distant storage space for available releases. Contact the portal admins if you want to deploy your own release.</li>
+                    <li>Parallelization Type: if you have multiple runs or simulations with time logic (e.g. seconds instead of events), you have to choose static parallelization.  
+                        Otherwise you can choose among the two (dynamic is known to be faster). Dynamic parallelization simulates more events than needed (the final number of simulated events is known and available)</li>
+                </ul>
+            </li>
+            <li>Before you launch the simulation, you can use the "Save Inputs" button to save the form and reload it for a future simulation </li>
+            <li>Click on the launch button to launch the simulation.</li>
+
+        </ul>
+
+        <h3>Important Remarks</h3>
+        <ul>
+            <li>Please note that in order for the parsing to be accurate, all input files must be in a "data" folder, all macro files in a "mac" folder and all output files in a 
+                "output" folder, and all of these folders must be in the same parent folder from which GATE will be executed. 
+                Your macro files should therefore refer to the inputs as "data/..." to macros as "mac/..." and outputs as "output/..."</li>
+            <li>If you have header-file inputs (e.g. hdr/img hdr/bin file "couples") the data file must have the same name as the header file (for ex: input1.hdr and input1.img)</li>
+            <li>The initialization line "/gate/application/setTotalNumberOfPrimaries" must be present in the submitted macro file.</li>
+            <li>Primary particle number must be an integer number. Formats like "20e9" are not supported.</li>
+        </ul>
+
+
+        <h2>Monitor your simulations</h2>
+        
+        <h3>All your simulations</h3>
+        <p>In your Home tab you have a 'Monitor GateLab' icon </p>
+        <ul>
+            <li>Click on the 'Monitor GateLab' icon. A new tab with the list of all your simulations opens.</li>
+            <li>The small icon on the left gives the status of the simulation.
+                <ul>
+                    <li>Green wheel = the simulation is running</li>
+                    <li>Red wheel = the simulation has failed</li>
+                    <li>Blue tick = the simulation has completed successefully</li>
+                </ul></li>
+            <li>For each simulation you can
+                <ul>
+                    <li>Click on the simulation you want to monitor. The simulation will open in a new tab</li>
+                    <li>Kill the simulation. This will stop all the jobs and the workflow</li>
+                    <li>Clean the simulation. Attention, this will delete the simulation output and log files!</li>
+                </ul>
+            </li>
+
+        </ul>
+        
+        <h3>One of your simulations</h3>
+         <ul>
+            <li>Click on the simulation you want to monitor. The simulation will open in a new tab</li>
+            <li>On you left hand side, you have three available tabs
+            <ul>
+                    <li>General Information tab (default): gives access to general information, as well as on the simulation logs (output and error files). 
+                        The "total particles simulated" field corresponds to what has been computed (more than requested in the case of dynamic parallelization)</li>
+                    <li>Jobs Summary tab: list of jobs submitted by the platform. Error and stalled jobs are automatically resubmitted.</li>
+                    <li>Performance statistics: graphs ans stats on executed jobs</li>
+                </ul>
+            
+            </li>
+        </ul>
+
+        <h2>Retrieving outputs</h2>
+        <p>In the General Information tab of you simulation, you have access to a list of the simulation's inputs and outputs.
+            In order to retrieve the output, simply click on the output link and download it. 
+            For more information on file transfer see also the <a href="./filetransfer.html">file transfer</a> page.
+        </p>
     </body>
 </html>
