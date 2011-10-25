@@ -35,16 +35,14 @@
 package fr.insalyon.creatis.vip.application.client.view.monitor;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.rednels.ofcgwt.client.ChartWidget;
-import com.rednels.ofcgwt.client.model.ChartData;
-import com.rednels.ofcgwt.client.model.Legend;
-import com.rednels.ofcgwt.client.model.Legend.Position;
-import com.rednels.ofcgwt.client.model.ToolTip;
-import com.rednels.ofcgwt.client.model.ToolTip.MouseStyle;
-import com.rednels.ofcgwt.client.model.axis.XAxis;
-import com.rednels.ofcgwt.client.model.axis.YAxis;
-import com.rednels.ofcgwt.client.model.elements.HorizontalBarChart;
-import com.rednels.ofcgwt.client.model.elements.PieChart;
+import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
+import com.google.gwt.visualization.client.DataTable;
+import com.google.gwt.visualization.client.VisualizationUtils;
+import com.google.gwt.visualization.client.visualizations.corechart.AxisOptions;
+import com.google.gwt.visualization.client.visualizations.corechart.Options;
+import com.google.gwt.visualization.client.visualizations.corechart.BarChart;
+import com.google.gwt.visualization.client.visualizations.corechart.PieChart;
+import com.google.gwt.visualization.client.visualizations.corechart.PieChart.PieOptions;
 import com.smartgwt.client.types.ExpansionMode;
 import com.smartgwt.client.types.GroupStartOpen;
 import com.smartgwt.client.types.Overflow;
@@ -68,7 +66,6 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.record.JobRecord;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.SummaryRecord;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -84,7 +81,8 @@ public class SummaryTab extends Tab {
     private boolean completed;
     private String[] states = {"Error", "Completed", "Running", "Queued",
         "Successfully_Submitted", "Cancelled", "Stalled"};
-    private ChartWidget chart;
+    private VLayout chartLayout;
+    private VLayout innerChartLayout;
     private ListGrid summaryGrid;
     private ListGrid detailGrid;
 
@@ -109,12 +107,12 @@ public class SummaryTab extends Tab {
         summaryLayout.setHeight(330);
         summaryLayout.setWidth100();
         summaryLayout.setOverflow(Overflow.AUTO);
-        summaryLayout.addMember(chart);
+        summaryLayout.addMember(chartLayout);
         summaryLayout.addMember(summaryGrid);
 
         summaryModal = new ModalWindow(summaryLayout);
         vLayout.addMember(summaryLayout);
-        
+
         detailModal = new ModalWindow(detailGrid);
         vLayout.addMember(detailGrid);
 
@@ -123,10 +121,16 @@ public class SummaryTab extends Tab {
     }
 
     private void configureChart() {
+
+        chartLayout = new VLayout();
+        chartLayout.setWidth(600);
+        chartLayout.setHeight(300);
         
-        chart = new ChartWidget();
-        chart.setSize("550", "300");
-        chart.setChartData(new ChartData());
+        innerChartLayout = new VLayout();
+        innerChartLayout.setWidth(600);
+        innerChartLayout.setHeight(300);
+        
+        chartLayout.addMember(innerChartLayout);
     }
 
     private void configureSummaryGrid() {
@@ -145,7 +149,7 @@ public class SummaryTab extends Tab {
     }
 
     private void configureDetailGrid() {
-        
+
         detailGrid = new ListGrid();
         detailGrid.setWidth100();
         detailGrid.setHeight100();
@@ -183,13 +187,13 @@ public class SummaryTab extends Tab {
             }
         });
     }
-    
+
     public void loadData() {
-        
+
         loadSummaryData();
         loadDetailData();
     }
-    
+
     private void loadSummaryData() {
 
         JobServiceAsync service = JobService.Util.getInstance();
@@ -219,73 +223,96 @@ public class SummaryTab extends Tab {
                 summaryGrid.setData(data);
 
                 if (completed) {
-                    chart.setChartData(getPieChartData(data));
+                    VisualizationUtils.loadVisualizationApi(getPieChartRunnable(data), PieChart.PACKAGE);
                 } else {
-                    chart.setChartData(getBarChartGlassData(data, maxValue));
+                    VisualizationUtils.loadVisualizationApi(getBarChartRunnable(data), BarChart.PACKAGE);
                 }
                 summaryModal.hide();
             }
 
-            private ChartData getBarChartGlassData(SummaryRecord[] data, int maxValue) {
-                ChartData chartData = new ChartData();
-                chartData.setBackgroundColour("#ffffff");
+            private Runnable getPieChartRunnable(final SummaryRecord[] data) {
 
-                XAxis xa = new XAxis();
-                xa.setSteps(maxValue / 10);
-                xa.setMax(maxValue);
-                xa.setMin(0);
-                xa.setOffset(Boolean.FALSE);
-                chartData.setXAxis(xa);
+                return new Runnable() {
 
-                YAxis ya = new YAxis();
-                ya.addLabels(Arrays.asList(states));
-                ya.setOffset(true);
-                chartData.setYAxis(ya);
+                    public void run() {
 
-                HorizontalBarChart hchart = new HorizontalBarChart();
-                hchart.setColour("#00aa00");
-                hchart.setTooltip("#val# jobs");
-                hchart.setBarwidth(.5);
+                        PieOptions options = PieOptions.create();
+                        options.setWidth(600);
+                        options.setHeight(300);
+                        options.set3D(true);
+                        options.setColors("#1A767F", "#FEA101", "#47A259", "#B00504");
 
-                hchart.addBars(new HorizontalBarChart.Bar(new Integer(data[0].getJobs()), "#669999"));
-                hchart.addBars(new HorizontalBarChart.Bar(new Integer(data[1].getJobs()), "#993300"));
-                hchart.addBars(new HorizontalBarChart.Bar(new Integer(data[2].getJobs()), "#cc9933"));
-                hchart.addBars(new HorizontalBarChart.Bar(new Integer(data[3].getJobs()), "#ffff66"));
-                hchart.addBars(new HorizontalBarChart.Bar(new Integer(data[4].getJobs()), "#3399ff"));
-                hchart.addBars(new HorizontalBarChart.Bar(new Integer(data[5].getJobs()), "#99ff66"));
-                hchart.addBars(new HorizontalBarChart.Bar(new Integer(data[6].getJobs()), "#cc0033"));
-                chartData.addElements(hchart);
-                chartData.setTooltipStyle(new ToolTip(MouseStyle.FOLLOW));
+                        DataTable dataTable = DataTable.create();
+                        dataTable.addColumn(ColumnType.STRING, "Status");
+                        dataTable.addColumn(ColumnType.NUMBER, "Amount of Jobs");
+                        dataTable.addRows(4);
 
-                return chartData;
+                        dataTable.setValue(0, 0, "Stalled");
+                        dataTable.setValue(0, 1, new Integer(data[0].getJobs()));
+                        dataTable.setValue(1, 0, "Cancelled");
+                        dataTable.setValue(1, 1, new Integer(data[1].getJobs()));
+                        dataTable.setValue(2, 0, "Completed");
+                        dataTable.setValue(2, 1, new Integer(data[5].getJobs()));
+                        dataTable.setValue(3, 0, "Error");
+                        dataTable.setValue(3, 1, new Integer(data[6].getJobs()));
+
+                        PieChart pie = new PieChart(dataTable, options);
+
+                        chartLayout.removeMember(innerChartLayout);
+                        innerChartLayout = new VLayout();
+                        innerChartLayout.setWidth(600);
+                        innerChartLayout.setHeight(300);
+                        innerChartLayout.addMember(pie);
+                        chartLayout.addMember(innerChartLayout);
+                    }
+                };
             }
 
-            private ChartData getPieChartData(SummaryRecord[] data) {
-                ChartData chartData = new ChartData();
-                chartData.setBackgroundColour("#ffffff");
-                chartData.setLegend(new Legend(Position.RIGHT, true));
+            private Runnable getBarChartRunnable(final SummaryRecord[] data) {
 
-                PieChart pie = new PieChart();
-                pie.setAlpha(0.5f);
-                pie.setRadius(120);
-                pie.setNoLabels(true);
-                pie.setTooltip("#label# #val# jobs<br>#percent#");
-                pie.setGradientFill(true);
-                pie.setColours("#008000", "#cc0033", "#FEA101", "#669999");
-                pie.addSlices(new PieChart.Slice(new Integer(data[5].getJobs()), "Completed"));
-                pie.addSlices(new PieChart.Slice(new Integer(data[6].getJobs()), "Error"));
-                pie.addSlices(new PieChart.Slice(new Integer(data[1].getJobs()), "Cancelled"));
-                pie.addSlices(new PieChart.Slice(new Integer(data[0].getJobs()), "Stalled"));
+                return new Runnable() {
 
-                chartData.addElements(pie);
-                pie.setAnimateOnShow(false);
-                return chartData;
+                    public void run() {
+
+                        Options options = Options.create();
+                        options.setWidth(600);
+                        options.setHeight(300);
+                        options.setFontSize(10);
+                        options.setColors("#1A767F", "#993300", "#cc9933",
+                                "#E8DD80", "#64A1E8", "#47A259", "#B00504");
+                        
+                        AxisOptions hAxisOptions = AxisOptions.create();
+                        hAxisOptions.setTitle("Number of Jobs");
+                        options.setHAxisOptions(hAxisOptions);
+                       
+                        DataTable dataTable = DataTable.create();
+                        dataTable.addColumn(ColumnType.STRING, "Status");
+                        for (int i = 0; i < data.length; i++) {
+                            dataTable.addColumn(ColumnType.NUMBER, data[i].getState());
+                        }
+
+                        dataTable.addRows(1);
+                        dataTable.setValue(0, 0, "");
+                        for (int i = 1; i < dataTable.getNumberOfColumns(); i++) {
+                            dataTable.setValue(0, i, new Integer(data[i - 1].getJobs()));
+                        }
+
+                        BarChart bar = new BarChart(dataTable, options);
+
+                        chartLayout.removeMember(innerChartLayout);
+                        innerChartLayout = new VLayout();
+                        innerChartLayout.setWidth(600);
+                        innerChartLayout.setHeight(300);
+                        innerChartLayout.addMember(bar);
+                        chartLayout.addMember(innerChartLayout);
+                    }
+                };
             }
         };
         summaryModal.show("Loading data...", true);
         service.getStatusMap(simulationID, callback);
     }
-    
+
     private void loadDetailData() {
 
         JobServiceAsync service = JobService.Util.getInstance();
