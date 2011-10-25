@@ -172,7 +172,7 @@ public class SignUpTab extends Tab {
                 + "from arbitrarily shaped, apodized, and excited ultrasound "
                 + "transducers, IEEE Trans.Ultrason., Ferroelec., Freq.Contr., 39, "
                 + "pp. 262-267, 1992.\n\n"
-                + "Sindbad is developed at CEA-Leti.\n\n"
+                + "Sindbad is developed at CEA-LETI-MINATEC. Access to the simulator has to be specifically requested to Joachim Tabary (joachim.tabary@cea.fr).\n\n"
                 + "PET-SORTEO is citationware. If you are publishing any work, where"
                 + "this program has been used, please remember that it was obtained free of charge."
                 + "You must reference the paper shown below and the name of the program PET-SORTEO must be mentioned in the publication.\n\n"
