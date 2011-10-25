@@ -34,8 +34,10 @@
  */
 package fr.insalyon.creatis.vip.simulationgui.client.view;
 
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.models.client.ModelConstants;
 import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIConstants;
 
 /**
@@ -46,14 +48,17 @@ public class SimulationGUIParser extends ApplicationParser {
 
     @Override
     public void loadApplications() {
-        
-        //TODO: Verify Group Access (Admin and VIP)
-        addApplication(SimulationGUIConstants.APP_EDITOR, SimulationGUIConstants.APP_IMG_EDITOR);
+
+        if (CoreModule.user.isSystemAdministrator()
+                || CoreModule.user.hasGroupAccess(ModelConstants.GROUP_VIP)) {
+            
+            addApplication(SimulationGUIConstants.APP_EDITOR, SimulationGUIConstants.APP_IMG_EDITOR);
+        }
     }
 
     @Override
     public boolean parse(String applicationName) {
-        
+
         if (applicationName.equals(SimulationGUIConstants.APP_EDITOR)) {
             Layout.getInstance().addTab(new SimulationGUITab());
             return true;
