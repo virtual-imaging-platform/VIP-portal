@@ -73,6 +73,7 @@ public class SignUpTab extends Tab {
     private TextItem phoneField;
     private PasswordItem passwordField;
     private PasswordItem confirmPasswordField;
+    private TextAreaItem commentItem;
     private CheckboxItem acceptField;
     private IButton signupButton;
 
@@ -128,6 +129,10 @@ public class SignUpTab extends Tab {
         confirmPasswordField.setValidators(
                 ValidatorUtil.getMatchesValidator("password", "Passwords do not match"));
 
+        commentItem = new TextAreaItem("comment", "Comments");
+        commentItem.setHeight(80);
+        commentItem.setWidth(300);
+        
         TextAreaItem termsField = new TextAreaItem("terms", "Terms of Use");
         termsField.setWidth(300);
         termsField.setHeight(100);
@@ -140,7 +145,7 @@ public class SignUpTab extends Tab {
 
         form = FieldUtil.getForm(firstNameField, lastNameField, emailField,
                 confirmEmailField, institutionField, phoneField, passwordField,
-                confirmPasswordField, termsField, acceptField);
+                confirmPasswordField, commentItem, termsField, acceptField);
         form.setWidth(500);
         form.setTitleWidth(150);
     }
@@ -148,9 +153,6 @@ public class SignUpTab extends Tab {
     private String getDisclaimer() {
 
         return "-- VIP Terms of Use --\n\n"
-                
-                
-                 
                 
                 + "This portal is exclusively dedicated to non-commercial academic use. "
                 + "It can be accessed free of charge but it is provided \"as is\" without warranty of any kind."
@@ -213,7 +215,7 @@ public class SignUpTab extends Tab {
                         }
                     };
                     modal.show("Signing up...", true);
-                    service.signup(user, callback);
+                    service.signup(user, commentItem.getValueAsString(), callback);
                 }
             }
         });

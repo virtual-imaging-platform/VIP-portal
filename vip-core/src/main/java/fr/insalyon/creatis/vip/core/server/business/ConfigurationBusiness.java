@@ -126,9 +126,10 @@ public class ConfigurationBusiness {
     /**
      * 
      * @param user
+     * @param comments
      * @throws BusinessException 
      */
-    public void signup(User user) throws BusinessException {
+    public void signup(User user, String comments) throws BusinessException {
 
         try {
             user.setCode(UUID.randomUUID().toString());
@@ -155,6 +156,26 @@ public class ConfigurationBusiness {
             logger.info("Sending confirmation email to '" + user.getEmail() + "'.");
             CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
                     "VIP account details", emailContent, new String[]{user.getEmail()});
+
+            String adminsEmailContents = "<html>"
+                    + "<head></head>"
+                    + "<body>"
+                    + "<p>Dear Administrators,</p>"
+                    + "<p>A new user requested an account:</p>"
+                    + "<p><b>First Name:</b> " + user.getFirstName() + "</p>"
+                    + "<p><b>Last Name:</b> " + user.getLastName() + "</p>"
+                    + "<p><b>Email:</b> " + user.getEmail() + "</p>"
+                    + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
+                    + "<p><b>Phone:</b> " + user.getPhone() + "</p>"
+                    + "<p><b>Comments:</b><br />" + comments + "</p>"
+                    + "<p>&nbsp;</p>"
+                    + "<p>Best Regards,</p>"
+                    + "<p>VIP Team</p>"
+                    + "</body>"
+                    + "</html>";
+
+            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
+                    "[VIP Admin] Account Requested", adminsEmailContents, getAdministratorsEmail());
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -623,16 +644,21 @@ public class ConfigurationBusiness {
                     + "</body>"
                     + "</html>";
 
-            List<String> emails = new ArrayList<String>();
-            for (User admin : CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getAdminstrators()) {
-                emails.add(admin.getEmail());
-            }
 
             CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
-                    "[VIP Contact] " + category, emailContent, emails.toArray(new String[]{}));
+                    "[VIP Contact] " + category, emailContent, getAdministratorsEmail());
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
+    }
+
+    private String[] getAdministratorsEmail() throws DAOException {
+
+        List<String> emails = new ArrayList<String>();
+        for (User admin : CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getAdminstrators()) {
+            emails.add(admin.getEmail());
+        }
+        return emails.toArray(new String[]{});
     }
 }

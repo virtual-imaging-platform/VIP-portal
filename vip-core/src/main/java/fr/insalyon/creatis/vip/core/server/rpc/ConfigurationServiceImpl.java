@@ -101,13 +101,14 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     /**
      * 
      * @param user
+     * @param comments
      * @throws CoreException 
      */
-    public void signup(User user) throws CoreException {
+    public void signup(User user, String comments) throws CoreException {
 
         try {
             logger.info("Sign up request from '" + user.getEmail() + "'.");
-            configurationBusiness.signup(user);
+            configurationBusiness.signup(user, comments);
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
