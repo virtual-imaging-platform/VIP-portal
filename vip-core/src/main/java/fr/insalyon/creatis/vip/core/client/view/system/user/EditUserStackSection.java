@@ -120,8 +120,9 @@ public class EditUserStackSection extends SectionStackSection {
                     Map<String, CoreConstants.ROLE> map = new HashMap<String, CoreConstants.ROLE>();
 
                     for (String v : values) {
-                        if (v.equals(CoreConstants.GROUP_ADMIN)) {
+                        if (v.equals(CoreConstants.GROUP_ADMIN) || v.equals(CoreConstants.GROUP_SUPPORT)) {
                             map.put(v, CoreConstants.ROLE.Admin);
+                            
                         } else {
                             String name = v.substring(0, v.indexOf(" ("));
                             CoreConstants.ROLE role = v.contains("("
@@ -145,7 +146,8 @@ public class EditUserStackSection extends SectionStackSection {
     /**
      * Sets a user to edit.
      * 
-     * @param name User name
+     * @param email User's email
+     * @param confirmed If the user confirmed his account
      */
     public void setUser(String email, boolean confirmed) {
 
@@ -166,8 +168,8 @@ public class EditUserStackSection extends SectionStackSection {
                 List<String> groups = new ArrayList<String>();
                 for (String group : result.keySet()) {
 
-                    if (group.equals(CoreConstants.GROUP_ADMIN)) {
-                        groups.add(CoreConstants.GROUP_ADMIN);
+                    if (group.equals(CoreConstants.GROUP_ADMIN) || group.equals(CoreConstants.GROUP_SUPPORT)) {
+                        groups.add(group);
 
                     } else {
                         if (result.get(group) == CoreConstants.ROLE.Admin) {
@@ -187,8 +189,8 @@ public class EditUserStackSection extends SectionStackSection {
 
     /**
      * 
-     * @param email
-     * @param groups 
+     * @param email User's email
+     * @param groups List of groups
      */
     private void save(String email, Map<String, CoreConstants.ROLE> groups) {
 
@@ -212,7 +214,7 @@ public class EditUserStackSection extends SectionStackSection {
     }
 
     /**
-     * Loads groups list
+     * Loads list of groups.
      */
     private void loadData() {
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
@@ -226,7 +228,7 @@ public class EditUserStackSection extends SectionStackSection {
 
                 List<String> dataList = new ArrayList<String>();
                 for (String g : result) {
-                    if (g.equals(CoreConstants.GROUP_ADMIN)) {
+                    if (g.equals(CoreConstants.GROUP_ADMIN) || g.equals(CoreConstants.GROUP_SUPPORT)) {
                         dataList.add(g);
                     } else {
                         dataList.add(g + " (" + CoreConstants.ROLE.Admin.name() + ")");

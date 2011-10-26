@@ -95,6 +95,6 @@ public class CoreConstants {
     public static final Date COOKIES_EXPIRATION_DATE = new Date(new Date().getTime() + (1000l * 60 * 60 * 24 * 7));
     // Roles and Groups
     public static final String GROUP_ADMIN = "Administrator";
-    public static final String GROUP_GUEST = "Guest";
+    public static final String GROUP_SUPPORT = "Support";
     public static enum ROLE { Admin, User };
 }

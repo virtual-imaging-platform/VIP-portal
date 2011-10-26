@@ -183,7 +183,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
      * @return
      * @throws DAOException 
      */
-    public List<User> getAdminstrators() throws DAOException {
+    public List<User> getUsersFromGroup(String groupName) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
@@ -193,7 +193,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
                     + "WHERE us.email = ug.email AND ug.groupname = ? "
                     + "ORDER BY first_name, last_name");
             
-            ps.setString(1, CoreConstants.GROUP_ADMIN);
+            ps.setString(1, groupName);
 
             ResultSet rs = ps.executeQuery();
             List<User> users = new ArrayList<User>();

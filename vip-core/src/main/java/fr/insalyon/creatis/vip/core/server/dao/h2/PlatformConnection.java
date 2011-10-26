@@ -112,7 +112,7 @@ public class PlatformConnection {
                     CoreDAOFactory.getDAOFactory().getGroupDAO().add(
                             CoreConstants.GROUP_ADMIN);
                     CoreDAOFactory.getDAOFactory().getGroupDAO().add(
-                            CoreConstants.GROUP_GUEST);
+                            CoreConstants.GROUP_SUPPORT);
                 } catch (DAOException ex) {
                     logger.error(ex);
                 }

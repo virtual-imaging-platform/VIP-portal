@@ -112,19 +112,7 @@ public class GroupsStackSection extends SectionStackSection {
                     deleteImg.addClickHandler(new ClickHandler() {
 
                         public void onClick(ClickEvent event) {
-                            final String name = rollOverRecord.getAttribute("name");
-                            if (name.equals(CoreConstants.GROUP_ADMIN)) {
-                                SC.warn("You can not remove the System Administrator group.");
-                                return;
-                            }
-                            SC.confirm("Do you really want to remove the group \"" + name + "\"?", new BooleanCallback() {
-
-                                public void execute(Boolean value) {
-                                    if (value != null && value) {
-                                        remove(name);
-                                    }
-                                }
-                            });
+                            remove(rollOverRecord.getAttribute("name"));
                         }
                     });
                     rollOverCanvas.addMember(loadImg);
@@ -166,7 +154,11 @@ public class GroupsStackSection extends SectionStackSection {
         });
     }
 
+    /**
+     * Loads list of groups into grid.
+     */
     public void loadData() {
+        
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
@@ -186,26 +178,49 @@ public class GroupsStackSection extends SectionStackSection {
         service.getGroups(callback);
     }
 
-    private void remove(String name) {
-        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+    /**
+     * Removes a group.
+     * 
+     * @param name Group name
+     */
+    private void remove(final String name) {
 
-        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+        if (name.equals(CoreConstants.GROUP_ADMIN) || name.equals(CoreConstants.GROUP_SUPPORT)) {
+            SC.warn("You can not remove the " + name + " group.");
+            return;
+        }
+        SC.confirm("Do you really want to remove the group \"" + name + "\"?", new BooleanCallback() {
 
-            public void onFailure(Throwable caught) {
-                SC.warn("Unable to remove group:<br />" + caught.getMessage());
+            public void execute(Boolean value) {
+                if (value != null && value) {
+                    ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+
+                    final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                        public void onFailure(Throwable caught) {
+                            SC.warn("Unable to remove group:<br />" + caught.getMessage());
+                        }
+
+                        public void onSuccess(Void result) {
+                            SC.say("The group was successfully removed!");
+                            loadData();
+                        }
+                    };
+                    service.removeGroup(name, callback);
+                }
             }
-
-            public void onSuccess(Void result) {
-                SC.say("The group was successfully removed!");
-                loadData();
-            }
-        };
-        service.removeGroup(name, callback);
+        });
     }
 
+    /**
+     * Edits a group.
+     * 
+     * @param name Group name
+     */
     private void edit(String name) {
-        if (name.equals(CoreConstants.GROUP_ADMIN)) {
-            SC.warn("You can not edit the System Administrator group.");
+
+        if (name.equals(CoreConstants.GROUP_ADMIN) || name.equals(CoreConstants.GROUP_SUPPORT)) {
+            SC.warn("You can not edit the " + name + " group.");
             return;
         }
         ManageGroupsTab groupsTab = (ManageGroupsTab) Layout.getInstance().

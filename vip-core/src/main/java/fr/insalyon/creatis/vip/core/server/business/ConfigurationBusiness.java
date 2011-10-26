@@ -174,8 +174,13 @@ public class ConfigurationBusiness {
                     + "</body>"
                     + "</html>";
 
+            List<String> emails = new ArrayList<String>();
+            for (User admin : CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroup(CoreConstants.GROUP_ADMIN)) {
+                emails.add(admin.getEmail());
+            }
+
             CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
-                    "[VIP Admin] Account Requested", adminsEmailContents, getAdministratorsEmail());
+                    "[VIP Admin] Account Requested", adminsEmailContents, emails.toArray(new String[]{}));
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -644,21 +649,16 @@ public class ConfigurationBusiness {
                     + "</body>"
                     + "</html>";
 
+            List<String> emails = new ArrayList<String>();
+            for (User u : CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
+                emails.add(u.getEmail());
+            }
 
             CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
-                    "[VIP Contact] " + category, emailContent, getAdministratorsEmail());
+                    "[VIP Contact] " + category, emailContent, emails.toArray(new String[]{}));
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
-    }
-
-    private String[] getAdministratorsEmail() throws DAOException {
-
-        List<String> emails = new ArrayList<String>();
-        for (User admin : CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getAdminstrators()) {
-            emails.add(admin.getEmail());
-        }
-        return emails.toArray(new String[]{});
     }
 }

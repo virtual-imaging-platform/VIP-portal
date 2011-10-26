@@ -53,5 +53,5 @@ public interface UsersGroupsDAO {
     
     public List<String> getUsersFromGroups(List<String> groups) throws DAOException;
     
-    public List<User> getAdminstrators() throws DAOException;
+    public List<User> getUsersFromGroup(String groupName) throws DAOException;
 }
