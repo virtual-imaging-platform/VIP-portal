@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>VIP Documentation - Tutorial ESMP 2011</title>
+        <link rel="StyleSheet" href="../css/doc_main.css" type="text/css" />
+    </head>
+    <body>
+
+        <h2>Account creation and login</h2>
+        
+        <p><ul><li>Make sure that you are registered as a tutorial user. Your home page should look like this:</li>
+        <img alt="login-page" src="./tutorial/login.png"/>
+        </p>      
+        
+        <h2>Launching simulations</h2>
+        
+        <p>You have access to 5 simulators:<ol><li>FIELD-II for ultrasound imaging</li><li>SIMRI for MRI</li><li>Sindbad for Computed Tomography</li><li>PET-Sorteo for Positron Emission Tomography</li><li>GATE for radiotherapy</li></ol>
+        Choose at most 3 simulators and launch the test simulations.
+        </p>
+        
+        <h3>Ultrasound</h3>
+        
+        <p>
+        <ul>
+            <li>Sample inputs are in <code>/vip/Tutorial (group)/TestData/FIELD-II</code>.
+            Use the <a href="filetransfer.html">File Transfer</a> in case you want to check or modify them (requires Matlab).<br/>
+            More information about these parameters is available <a href="simudescription.html#field">here</a>.</li>
+            <li>Launch and monitor the simulation as described <a href="simulaunch.html">here.</a></li>
+            <li>Note that the simulation will compute a total of 17 radio-frequency lines. Each line is computed in a separate job. Merge and reconstruction are also computed in separate jobs.</li>
+            <li>At the end of the simulation, outputs <code>raw</code> and <code>img</code> should contain this image (you can visualize it with VV):<br/><img alt="example-field" width="200" src="tutorial/example-field.png"/></li>
+        </ul>        
+        </p>
+        <h3>MRI</h3>
+        
+                <p>
+        <ul>
+            <li>Sample inputs are in <code>/vip/Tutorial (group)/TestData/Simri</code>.
+            Use the <a href="filetransfer.html">File Transfer</a> in case you want to check or modify them.<br/>
+            More information about these parameters is available <a href="simudescription.html#simri">here</a>.</li>
+            <li>Launch and monitor the simulation as described <a href="simulaunch.html">here.</a> Note that you can simulate several image slices at the same time:<br/>
+            <img alt="params-simri" src="tutorial/simri.png"/>
+            </li>
+ 
+            <li>At the end of the simulation, output <code>outputFileLfn</code> should contain an image looking like this (you can visualize it with VV):<br/><img alt="example-simri" width="200"  src="tutorial/example-simri.png"/></li>
+        </ul>
+        
+        </p>
+
+        
+        <h3>Computed Tomography</h3>
+        
+                
+                <p>
+                <ul>
+            <li>Sample inputs are in <code>/vip/Tutorial (group)/TestData/Sindbad</code>.
+            Use the <a href="filetransfer.html">File Transfer</a> in case you want to check or modify them.<br/>
+            More information about these parameters is available <a href="simudescription.html#sindbad">here</a>. The phantom used in this tutorial is <a href="http://dmip1.rad.jhmi.edu/xcat">XCAT</a>. Due to licensing issues you cannot access it from the platform but you can use it to generate simulated images.</li>
+            <li>Launch and monitor the simulation as described <a href="simulaunch.html">here.</a> Note that the simulation will compute a total of 10 X-ray projections. Each projection is computed in a separate job.<br/>
+                     </li>
+ 
+            <li>At the end of the simulation, output <code>ResultFile</code> should contain 10 <code>tgz</code> archives containing projection images looking like this. To visualize them with <a href="http://rsbweb.nih.gov/ij/download.html">ImageJ</a>, import <code>0deg0mm_img0_0.sdt</code> as raw data, choose Width=672, Height=512, White is zero, Little-Endian Byte Order:<br/><img alt="example-sindbad" width="200"  src="tutorial/example-sindbad.png"/></li>
+        </ul>
+        
+        <h3>Positron Emission Tomography</h3>
+ <ul>
+            <li>Sample inputs are in <code>/vip/Tutorial (group)/TestData/Sorteo</code>.
+            Use the <a href="filetransfer.html">File Transfer</a> in case you want to check or modify them.<br/>
+            More information about these parameters is available <a href="simudescription.html#sorteo">here</a>. </li>
+            <li>Launch and monitor the simulation as described <a href="simulaunch.html">here.</a> Note that the simulation will be split in 13 jobs.<br/>
+                     </li>
+ 
+                     <li>At the end of the simulation, a sinogram is available in output <code>Sinogram</code>. You can visualize it using <a href="http://amide.sourceforge.net/packages.html">Amide</a>.</li>
+        </ul>
+        
+        
+        <h3>Radiotherapy</h3>
+        <ul>
+            <li>Download and unpack the <a href="http://kingkong.grid.creatis.insa-lyon.fr:8080/esmp-november-2011/">test simulation</a>.</li>
+            <li>Open <code>mac/main.mac</code> using GateLab. Launch, monitor and retrieve the simulation results as explained <a href="gatelab.html">here</a>.
+                 </ul>
+         </body>
+</html>
+

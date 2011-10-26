@@ -10,6 +10,7 @@
         Don't hesitate to contact us in case you want to access another application. 
         
 
+        <A NAME="field"> </A> 
         <h2>Field II</h2>
         FIELD-II has 3 inputs:
         <ul>
@@ -66,23 +67,23 @@
             <li>"SimulationDirectory" is the output directory where the simulation results will be stored (a unique directory will be created)</li>
                     </ul>
 
+        <A NAME="simri"> </A>
         <h2>Simri</h2>
         <p>Simri (http://www.simri.org/) is a 3D MRI simulator based on the Bloch equation.  It takes into account the main static field value and enables realistic simulations of the chemical shift artifact, including             off-resonance phenomena. It also simulates the artifacts linked to the static field inhomogeneity like those induced by susceptibility variation within an object. </p>
-        <p>Simri has 4 inputs:
+        <p>Simri has 2 inputs:
         <ul>
             <li>"outputDir" is the output directory where the simulation results will be stored (a unique directory will be created)</li>
-            <li>"inputLfn" is a tarball containing :
+            <li>"inputZip" is a zip file containing :
                 <ul>
                     <li>mdh/raw label file describing the object model</li>
             <li>labelToMatter.txt file - associates the labels used with generic matter names</li>
             <li>matters.xml file - associates physical values (rho, t1, t2, t2star and their standard deviation) to each matter type</li>
             <li>params.txt file - defines simulation parameters such as tacq, TE, TR, teta, pulsedur, seqname)</li>
         </ul>
-            <li>"paramsFileName" must contain the name of the parameter file in the tarball (e.g. "params.txt")</li>
-            <li>"fileoutName" is the desired name for the output image</li>
-            </li>
+           
         </ul>
 
+        <A NAME="sindbad"> </A>
         <h2>Sindbad</h2>
         Sindbad has 6 inputs:
         <ul>
@@ -94,6 +95,7 @@
             <li>"result_directory" is the output directory where the simulation results will be stored (a unique directory will be created).</li>
         </ul>
 
+        <A NAME="sorteo"> </A>
         <h2>PET-Sorteo</h2>
         PET-Sorteo has 3 inputs:
          <ul>
