@@ -278,7 +278,7 @@ public class SummaryTab extends Tab {
                         options.setWidth(600);
                         options.setHeight(300);
                         options.setFontSize(10);
-                        options.setColors("#1A767F", "#993300", "#cc9933",
+                        options.setColors("#1A767F", "#FF8575", "#cc9933",
                                 "#E8DD80", "#64A1E8", "#47A259", "#B00504");
                         
                         AxisOptions hAxisOptions = AxisOptions.create();

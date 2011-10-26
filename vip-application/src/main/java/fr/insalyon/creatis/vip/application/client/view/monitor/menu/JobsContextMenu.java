@@ -158,8 +158,9 @@ public class JobsContextMenu extends Menu {
         MenuItemSeparator separator = new MenuItemSeparator();
 
         JobStatus status = JobStatus.valueOf(job.getStatus());
-        if (status == JobStatus.ERROR || status == JobStatus.COMPLETED ||
-                status == JobStatus.CANCELLED || status == JobStatus.STALLED) {
+        if ((status == JobStatus.ERROR || status == JobStatus.COMPLETED ||
+                status == JobStatus.CANCELLED || status == JobStatus.STALLED)
+                && !job.getMinorStatus().equals("Retrieving Status")) {
 
             this.setItems(appOutputItem, appErrorItem, separator,
                     outputItem, errorItem, separator, scriptItem,
