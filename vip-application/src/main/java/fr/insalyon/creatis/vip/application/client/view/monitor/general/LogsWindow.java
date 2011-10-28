@@ -32,7 +32,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.monitor;
+package fr.insalyon.creatis.vip.application.client.view.monitor.general;
 
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Window;
@@ -41,6 +41,7 @@ import com.smartgwt.client.widgets.tile.events.RecordClickEvent;
 import com.smartgwt.client.widgets.tile.events.RecordClickHandler;
 import com.smartgwt.client.widgets.viewer.DetailViewerField;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.view.monitor.ViewerWindow;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationTileRecord;
 
 /**

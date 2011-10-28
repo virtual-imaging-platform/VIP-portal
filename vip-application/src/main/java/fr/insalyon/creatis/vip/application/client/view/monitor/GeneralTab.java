@@ -39,9 +39,6 @@ import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.TreeModelType;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.grid.ListGrid;
-import com.smartgwt.client.widgets.grid.ListGridField;
-import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
@@ -52,14 +49,15 @@ import com.smartgwt.client.widgets.tree.TreeNode;
 import com.smartgwt.client.widgets.tree.events.NodeContextClickEvent;
 import com.smartgwt.client.widgets.tree.events.NodeContextClickHandler;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
-import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
+import fr.insalyon.creatis.vip.application.client.view.monitor.general.GeneralInformationWindow;
+import fr.insalyon.creatis.vip.application.client.view.monitor.general.InOutTreeNode;
+import fr.insalyon.creatis.vip.application.client.view.monitor.general.LogsWindow;
+import fr.insalyon.creatis.vip.application.client.view.monitor.general.ProcessorsWindow;
 import fr.insalyon.creatis.vip.application.client.view.monitor.menu.InOutContextMenu;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
-import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
 import java.util.List;
 
 /**
@@ -70,13 +68,13 @@ public class GeneralTab extends Tab {
 
     private String simulationID;
     private String simulationName;
-    private ModalWindow generalModal;
-    private ListGrid generalGrid;
     private ModalWindow inOutTreeModal;
     private TreeGrid inOutTreeGrid;
     private Tree inOutTree;
     private InOutTreeNode inputs;
     private InOutTreeNode outputs;
+    private GeneralInformationWindow generalWindow;
+    private ProcessorsWindow processorsWindow;
 
     public GeneralTab(String simulationID, String simulationName) {
 
@@ -98,10 +96,11 @@ public class GeneralTab extends Tab {
         leftLayout.setHeight100();
         leftLayout.setOverflow(Overflow.AUTO);
 
-        configureGeneralGrid();
-        generalModal = new ModalWindow(generalGrid);
-        leftLayout.addMember(generalGrid);
+        generalWindow = new GeneralInformationWindow(simulationID);
+        leftLayout.addMember(generalWindow);
 
+        processorsWindow = new ProcessorsWindow(simulationID);
+        leftLayout.addMember(processorsWindow);
         leftLayout.addMember(new LogsWindow(simulationID));
 
         // Right column
@@ -123,71 +122,10 @@ public class GeneralTab extends Tab {
 
     public void loadData() {
 
-        loadSimulationInfo();
         loadTreeData(inputs, InOutTreeNode.Icon.Input);
         loadTreeData(outputs, InOutTreeNode.Icon.Output);
-    }
-
-    private void configureGeneralGrid() {
-
-        generalGrid = new ListGrid() {
-
-            @Override
-            protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
-
-                if (getFieldName(colNum).equals("value")) {
-                    PropertyRecord propertyRecord = (PropertyRecord) record;
-                    SimulationStatus status = SimulationStatus.valueOf(propertyRecord.getValue());
-
-                    if (status == SimulationStatus.Running) {
-                        return "font-weight:bold; color:#009900;";
-
-                    } else if (status == SimulationStatus.Completed) {
-                        return "font-weight:bold; color:#287fd6;";
-
-                    } else if (status == SimulationStatus.Killed) {
-                        return "font-weight:bold; color:#d64949;";
-                    }
-                }
-                return super.getCellCSSText(record, rowNum, colNum);
-            }
-        };
-        generalGrid.setWidth100();
-        generalGrid.setHeight(160);
-        generalGrid.setShowAllRecords(true);
-        generalGrid.setShowEmptyMessage(true);
-        generalGrid.setEmptyMessage("<br>No data available.");
-
-        ListGridField propertyField = new ListGridField("property", "Properties");
-        ListGridField valueField = new ListGridField("value", "Value");
-
-        generalGrid.setFields(propertyField, valueField);
-    }
-
-    private void loadSimulationInfo() {
-
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        final AsyncCallback<Simulation> callback = new AsyncCallback<Simulation>() {
-
-            public void onFailure(Throwable caught) {
-                generalModal.hide();
-                SC.warn("Unable to load general information:<br />" + caught.getMessage());
-            }
-
-            public void onSuccess(Simulation result) {
-                generalModal.hide();
-                generalGrid.setData(new PropertyRecord[]{
-                            new PropertyRecord("Simulation Name", result.getSimulationName()),
-                            new PropertyRecord("Simulation Identifier", result.getID()),
-                            new PropertyRecord("Submitted Time", result.getDate().toString()),
-                            new PropertyRecord("Owner", result.getUserName()),
-                            new PropertyRecord("Application", result.getApplication()),
-                            new PropertyRecord("Status", result.getMajorStatus())
-                        });
-            }
-        };
-        generalModal.show("Loading data...", true);
-        service.getSimulation(simulationID, callback);
+        generalWindow.loadData();
+        processorsWindow.loadData();
     }
 
     private void configureTreeGrid() {

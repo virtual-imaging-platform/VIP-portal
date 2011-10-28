@@ -40,6 +40,7 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants.MoteurSta
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
+import fr.insalyon.creatis.vip.application.client.bean.Processor;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.server.business.simulation.MoteurPoolConfig;
@@ -478,6 +479,7 @@ public class WorkflowBusiness {
 
         try {
             return WorkflowDAOFactory.getDAOFactory().getWorkflowDAO().getInOutData(simulationID, "Outputs");
+            
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -493,6 +495,7 @@ public class WorkflowBusiness {
 
         try {
             return WorkflowDAOFactory.getDAOFactory().getWorkflowDAO().getInOutData(simulationID, "Inputs");
+            
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -518,6 +521,22 @@ public class WorkflowBusiness {
             }
         } catch (Exception ex) {
             logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+    
+    /**
+     * 
+     * @param simulationID
+     * @return
+     * @throws BusinessException 
+     */
+    public List<Processor> getProcessors(String simulationID) throws BusinessException {
+        
+        try {
+            return WorkflowDAOFactory.getDAOFactory().getWorkflowDAO().getProcessors(simulationID);
+            
+        } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }

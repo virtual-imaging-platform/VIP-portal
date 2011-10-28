@@ -38,6 +38,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
+import fr.insalyon.creatis.vip.application.client.bean.Processor;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
@@ -114,4 +115,6 @@ public interface WorkflowService extends RemoteService {
     public List<InOutData> getOutputData(String simulationID) throws ApplicationException;
 
     public List<InOutData> getInputData(String simulationID) throws ApplicationException;
+    
+    public List<Processor> getProcessors(String simulationID) throws ApplicationException;
 }

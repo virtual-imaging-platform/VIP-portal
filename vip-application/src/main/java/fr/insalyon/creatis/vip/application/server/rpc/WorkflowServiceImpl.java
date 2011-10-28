@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.application.server.rpc;
 
 import fr.insalyon.creatis.devtools.FileUtils;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
+import fr.insalyon.creatis.vip.application.client.bean.Processor;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
@@ -552,6 +553,15 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             WorkflowBusiness business = new WorkflowBusiness();
             return business.getInputData(simulationID);
 
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    public List<Processor> getProcessors(String simulationID) throws ApplicationException {
+        try {
+            return workflowBusiness.getProcessors(simulationID);
+            
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }

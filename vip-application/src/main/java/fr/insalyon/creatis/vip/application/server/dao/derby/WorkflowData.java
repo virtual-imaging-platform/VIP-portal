@@ -34,8 +34,10 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao.derby;
 
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants.ProcessorStatus;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
+import fr.insalyon.creatis.vip.application.client.bean.Processor;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAO;
 import fr.insalyon.creatis.vip.application.server.dao.derby.connection.WorkflowsConnection;
@@ -583,6 +585,54 @@ public class WorkflowData implements WorkflowDAO {
             
             return rs.next() ? rs.getInt("run") : 0;
 
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param simulationID
+     * @return
+     * @throws DAOException 
+     */
+    public List<Processor> getProcessors(String simulationID) throws DAOException {
+        
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "processor, completed, queued, failed FROM "
+                    + "Processors WHERE workflow_id = ? ORDER BY processor");
+            
+            ps.setString(1, simulationID);
+            ResultSet rs = ps.executeQuery();
+            
+            List<Processor> processors = new ArrayList<Processor>();
+            
+            while (rs.next()) {
+                
+                int completed = rs.getInt("completed");
+                int queued = rs.getInt("queued");
+                int failed = rs.getInt("failed");
+                
+                ProcessorStatus status = ProcessorStatus.Unstarted;
+                
+                if (completed + queued + failed > 0) {
+                    if (failed > 0) {
+                        status = ProcessorStatus.Failed;
+                    } else if (queued > 0) {
+                        status = ProcessorStatus.Active;
+                    } else {
+                        status = ProcessorStatus.Completed;
+                    }
+                }
+                
+                processors.add(new Processor(rs.getString("processor"), status, 
+                        completed, queued, failed));
+            }
+            
+            return processors;
+            
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);

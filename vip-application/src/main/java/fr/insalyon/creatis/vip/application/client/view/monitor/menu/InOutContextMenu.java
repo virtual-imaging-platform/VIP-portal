@@ -42,7 +42,7 @@ import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.tree.Tree;
 import com.smartgwt.client.widgets.tree.TreeNode;
-import fr.insalyon.creatis.vip.application.client.view.monitor.InOutTreeNode;
+import fr.insalyon.creatis.vip.application.client.view.monitor.general.InOutTreeNode;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;

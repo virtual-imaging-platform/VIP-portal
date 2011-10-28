@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.application.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
+import fr.insalyon.creatis.vip.application.client.bean.Processor;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
@@ -98,4 +99,6 @@ public interface WorkflowServiceAsync {
     public void getOutputData(String simulationID, AsyncCallback<List<InOutData>> asyncCallback);
 
     public void getInputData(String simulationID, AsyncCallback<List<InOutData>> asyncCallback);
+    
+    public void getProcessors(String simulationID, AsyncCallback<List<Processor>> asyncCallback);
 }

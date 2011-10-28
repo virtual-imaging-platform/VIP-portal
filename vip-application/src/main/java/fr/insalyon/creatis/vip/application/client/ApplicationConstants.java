@@ -59,6 +59,7 @@ public class ApplicationConstants {
     public static final String ICON_PICKER_MORE = IMG_FOLDER + "icon-picker-more.png";
     public static final String ICON_PICKER_LESS = IMG_FOLDER + "icon-picker-less.png";
     public static final String ICON_PREVIEW = IMG_FOLDER + "icon-preview.png";
+    public static final String ICON_PROCESSOR = IMG_FOLDER + "icon-processor.png";
     public static final String ICON_SEARCH = IMG_FOLDER + "icon-search.png";
     public static final String ICON_SIMULATION_VIEW = IMG_FOLDER + "icon-simulation-view.png";
     public static final String ICON_SUMMARY = IMG_FOLDER + "icon-summary.png";
@@ -92,6 +93,10 @@ public class ApplicationConstants {
     
     public static enum MoteurStatus {
         RUNNING, COMPLETE, TERMINATED, UNKNOWN
+    };
+    
+    public static enum ProcessorStatus {
+        Unstarted, Active, Completed, Failed
     };
     
     public static String getLaunchTabID(String applicationName) {

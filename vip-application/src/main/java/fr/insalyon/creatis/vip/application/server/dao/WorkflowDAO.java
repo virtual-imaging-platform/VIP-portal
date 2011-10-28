@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.application.server.dao;
 
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
+import fr.insalyon.creatis.vip.application.client.bean.Processor;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.util.Date;
@@ -156,4 +157,12 @@ public interface WorkflowDAO {
      * @throws DAOException 
      */
     public int getRunningWorkflows(String user) throws DAOException;
+    
+    /**
+     * 
+     * @param simulationID
+     * @return
+     * @throws DAOException 
+     */
+    public List<Processor> getProcessors(String simulationID) throws DAOException;
 }
