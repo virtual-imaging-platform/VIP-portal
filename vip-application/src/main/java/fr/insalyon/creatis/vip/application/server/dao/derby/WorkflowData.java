@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao.derby;
 
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.ProcessorStatus;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
@@ -425,112 +426,6 @@ public class WorkflowData implements WorkflowDAO {
         }
     }
 
-    public List<String> getStats(List<Simulation> wfIdList, int type, int binSize) throws DAOException {
-
-        List<String> list = new ArrayList<String>();
-        int nbJobs = 0;
-        int execTime = 0;
-        int uploadTime = 0;
-        int downloadTime = 0;
-        int cancelled = 0;
-        int completed = 0;
-        int error = 0;
-        String stringExe;
-        List<String> ls;
-        try {
-            for (int i = 0; i < wfIdList.size(); i++) {
-                JobData jd = new JobData(wfIdList.get(i).getID());
-                System.out.println("getStats - wf id is " + wfIdList.get(i).getID());
-                Statement stat = jd.getConnection().createStatement();
-                //PreparedStatement stat = null;
-                //binSize of 1000000 so that we get only one set of values
-                //type 1=executionStats, type2=downloadStats, type3=downloadStats
-                switch (type) {
-                    case 1:
-
-
-                        try {
-
-                            ResultSet rs = stat.executeQuery(
-                                    "SELECT "
-                                    + "sum(upload - running) as exect, sum(running - download) as downl, sum(end_e - upload) as upl,"
-                                    + "count(id) as num FROM jobs "
-                                    + "WHERE status='COMPLETED' ");
-
-                            while (rs.next()) {
-                                if ((rs.getString(1) != null) && (rs.getString(2) != null)) {
-                                    execTime = execTime + Integer.parseInt(rs.getString("exect"));
-                                    uploadTime = uploadTime + Integer.parseInt(rs.getString("upl"));
-                                    downloadTime = downloadTime + Integer.parseInt(rs.getString("downl"));
-                                    nbJobs = nbJobs + Integer.parseInt(rs.getString("num"));
-
-                                }
-                            }
-
-                        } catch (SQLException ex) {
-                            logger.error(ex);
-                        }
-
-                        break;
-                    case 2:
-
-                        try {
-                            ResultSet rs = stat.executeQuery("select status,count(id) as num from jobs group by status");
-
-                            while (rs.next()) {
-                                if (rs.getString("status").equalsIgnoreCase("COMPLETED")) {
-                                    completed = completed + Integer.parseInt(rs.getString("num"));
-                                    System.out.println("completed is " + completed);
-                                } else {
-                                    if (rs.getString("status").equalsIgnoreCase("CANCELLED")) {
-                                        cancelled = cancelled + Integer.parseInt(rs.getString("num"));
-                                        System.out.println("cancelled is " + cancelled);
-                                    } else {
-                                        if (rs.getString("status").equalsIgnoreCase("ERROR")) {
-                                            error = error + Integer.parseInt(rs.getString("num"));
-                                            System.out.println("error is " + error);
-                                        }
-                                    }
-                                }
-
-                            }
-
-                        } catch (SQLException ex) {
-                            logger.error(ex);
-                        }
-                        break;
-
-                    default:
-                        stringExe = jd.getExecutionPerNumberOfJobs(1000000).get(0);
-                        logger.info("No type defined for stats, using default execution stats");
-                }
-
-
-            }
-
-            switch (type) {
-                case 1:
-                    list.add(Integer.toString(nbJobs) + "##" + Integer.toString(execTime) + "##" + Integer.toString(uploadTime) + "##" + Integer.toString(downloadTime));
-                    logger.info("getStats case 1 list contains " + Integer.toString(nbJobs) + "##" + Integer.toString(execTime) + "##" + Integer.toString(uploadTime) + "##" + Integer.toString(downloadTime));
-                    break;
-                case 2:
-                    nbJobs = completed + cancelled + error;
-                    list.add(Integer.toString(nbJobs) + "##" + Integer.toString(completed) + "##" + Integer.toString(cancelled) + "##" + Integer.toString(error));
-                    logger.info("getStats case 2 list contains " + Integer.toString(nbJobs) + "##" + Integer.toString(completed) + "##" + Integer.toString(cancelled) + "##" + Integer.toString(error));
-                    break;
-                default:
-
-                    logger.info("No type defined for stats, using default execution stats");
-            }
-
-            return list;
-
-        } catch (Exception ex) {
-            logger.error(ex);
-            throw new DAOException(ex);
-        }
-    }
-
     /**
      * 
      * @param simulationID
@@ -565,7 +460,7 @@ public class WorkflowData implements WorkflowDAO {
             throw new DAOException(ex);
         }
     }
-    
+
     /**
      * 
      * @param user
@@ -573,16 +468,16 @@ public class WorkflowData implements WorkflowDAO {
      * @throws DAOException 
      */
     public int getRunningWorkflows(String user) throws DAOException {
-        
+
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "COUNT(id) AS run FROM Workflows WHERE username = ? "
                     + "AND status = ?");
-            
+
             ps.setString(1, user);
             ps.setString(2, SimulationStatus.Running.name());
             ResultSet rs = ps.executeQuery();
-            
+
             return rs.next() ? rs.getInt("run") : 0;
 
         } catch (SQLException ex) {
@@ -598,25 +493,25 @@ public class WorkflowData implements WorkflowDAO {
      * @throws DAOException 
      */
     public List<Processor> getProcessors(String simulationID) throws DAOException {
-        
+
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "processor, completed, queued, failed FROM "
                     + "Processors WHERE workflow_id = ? ORDER BY processor");
-            
+
             ps.setString(1, simulationID);
             ResultSet rs = ps.executeQuery();
-            
+
             List<Processor> processors = new ArrayList<Processor>();
-            
+
             while (rs.next()) {
-                
+
                 int completed = rs.getInt("completed");
                 int queued = rs.getInt("queued");
                 int failed = rs.getInt("failed");
-                
+
                 ProcessorStatus status = ProcessorStatus.Unstarted;
-                
+
                 if (completed + queued + failed > 0) {
                     if (failed > 0) {
                         status = ProcessorStatus.Failed;
@@ -626,16 +521,100 @@ public class WorkflowData implements WorkflowDAO {
                         status = ProcessorStatus.Completed;
                     }
                 }
-                
-                processors.add(new Processor(rs.getString("processor"), status, 
+
+                processors.add(new Processor(rs.getString("processor"), status,
                         completed, queued, failed));
             }
-            
+
             return processors;
-            
+
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
         }
+    }
+
+    /**
+     * 
+     * @param simulationList
+     * @return
+     * @throws DAOException 
+     */
+    public String getTimeAnalysis(List<Simulation> simulationList) throws DAOException {
+
+        int executionTime = 0;
+        int uploadTime = 0;
+        int downloadTime = 0;
+        int numberOfJobs = 0;
+
+        for (Simulation simulation : simulationList) {
+            JobData jobData = new JobData(simulation.getID());
+
+            try {
+                PreparedStatement ps = jobData.getConnection().prepareStatement(
+                        "SELECT SUM(download) AS downl, SUM(running) "
+                        + "AS exect, SUM(upload) AS upl, COUNT(id) AS num "
+                        + "FROM Jobs WHERE status = ?");
+                ps.setString(1, JobStatus.COMPLETED.name());
+                ResultSet rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    executionTime += rs.getInt("exect");
+                    uploadTime += rs.getInt("upl");
+                    downloadTime += rs.getInt("downl");
+                    numberOfJobs += rs.getInt("num");
+                }
+            } catch (SQLException ex) {
+                logger.error(ex);
+            }
+        }
+
+        logger.info("Time Analysis: " + numberOfJobs + "##" + executionTime + "##" + uploadTime + "##" + downloadTime);
+        return numberOfJobs + "##" + executionTime + "##" + uploadTime + "##" + downloadTime;
+    }
+
+    /**
+     * 
+     * @param simulationList
+     * @return
+     * @throws DAOException 
+     */
+    public String getJobStatuses(List<Simulation> simulationList) throws DAOException {
+        
+        int completed = 0;
+        int cancelled = 0;
+        int error = 0;
+        
+        for (Simulation simulation : simulationList) {
+            JobData jobData = new JobData(simulation.getID());
+
+            try {
+                PreparedStatement ps = jobData.getConnection().prepareStatement(
+                        "SELECT status, count(id) AS num "
+                        + "FROM Jobs GROUP BY status");
+                ResultSet rs = ps.executeQuery();
+
+                while (rs.next()) {
+
+                    JobStatus status = JobStatus.valueOf(rs.getString("status"));
+
+                    if (status == JobStatus.COMPLETED) {
+                        completed += rs.getInt("num");
+
+                    } else if (status == JobStatus.CANCELLED) {
+                        cancelled += rs.getInt("num");
+
+                    } else if (status == JobStatus.ERROR) {
+                        error += rs.getInt("num");
+                    }
+                }
+            } catch (SQLException ex) {
+                logger.error(ex);
+            }
+        }
+
+        int numberOfJobs = completed + cancelled + error;
+        logger.info("Job Statuses: " + Integer.toString(numberOfJobs) + "##" + Integer.toString(completed) + "##" + Integer.toString(cancelled) + "##" + Integer.toString(error));
+        return numberOfJobs + "##" + completed + "##" + cancelled + "##" + error;
     }
 }

@@ -447,7 +447,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         }
     }
 
-    @Override
     public String getFile(String baseDir, String fileName) {
         try {
             FileReader fr = new FileReader(
@@ -474,7 +473,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         return null;
     }
 
-    @Override
     public String getFileURL(String baseDir, String fileName) {
         Server configuration = Server.getInstance();
         return "https://" + configuration.getApacheHost() + ":"
@@ -483,7 +481,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
                 + baseDir + "/" + fileName;
     }
 
-    @Override
     public List<String> getLogs(String baseDir) {
         List<String> list = new ArrayList<String>();
 
@@ -503,11 +500,15 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         return list;
     }
 
+    /**
+     * 
+     * @param path
+     * @throws ApplicationException 
+     */
     public void deleteLogData(String path) throws ApplicationException {
 
         try {
-            WorkflowBusiness business = new WorkflowBusiness();
-            business.deleteLogData(path);
+            workflowBusiness.deleteLogData(path);
 
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
@@ -529,36 +530,63 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         }
     }
 
-    public List<String> getStats(List<Simulation> workflowIdList, int type, int binSize) {
+    /**
+     * 
+     * @param simulationList
+     * @param type
+     * @return
+     * @throws ApplicationException 
+     */
+    public String getPerformanceStats(List<Simulation> simulationList, int type) throws ApplicationException {
+        
         try {
-            return WorkflowDAOFactory.getDAOFactory().getWorkflowDAO().getStats(workflowIdList, type, binSize);
-        } catch (DAOException ex) {
-            return null;
+            return workflowBusiness.getPerformanceStats(simulationList, type);
+        
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
-
     }
 
+    /**
+     * 
+     * @param simulationID
+     * @return
+     * @throws ApplicationException 
+     */
     public List<InOutData> getOutputData(String simulationID) throws ApplicationException {
+
         try {
-            WorkflowBusiness business = new WorkflowBusiness();
-            return business.getOutputData(simulationID);
+            return workflowBusiness.getOutputData(simulationID);
 
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
 
+    /**
+     * 
+     * @param simulationID
+     * @return
+     * @throws ApplicationException 
+     */
     public List<InOutData> getInputData(String simulationID) throws ApplicationException {
+        
         try {
-            WorkflowBusiness business = new WorkflowBusiness();
-            return business.getInputData(simulationID);
+            return workflowBusiness.getInputData(simulationID);
 
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
 
+    /**
+     * 
+     * @param simulationID
+     * @return
+     * @throws ApplicationException 
+     */
     public List<Processor> getProcessors(String simulationID) throws ApplicationException {
+        
         try {
             return workflowBusiness.getProcessors(simulationID);
             

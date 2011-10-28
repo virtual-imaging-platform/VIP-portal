@@ -94,7 +94,7 @@ public interface WorkflowServiceAsync {
 
     public void getFileURL(String baseDir, String fileName, AsyncCallback<String> asyncCallback);
 
-    public void getStats(List<Simulation> workflowIdList, int type, int binSize, AsyncCallback<List<String>> asyncCallback);
+    public void getPerformanceStats(List<Simulation> simulationList, int type, AsyncCallback<String> asyncCallback);
 
     public void getOutputData(String simulationID, AsyncCallback<List<InOutData>> asyncCallback);
 

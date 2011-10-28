@@ -96,8 +96,8 @@ public class WorkflowBusiness {
             DataManagerBusiness dmBusiness = new DataManagerBusiness();
             String workflowPath = dmBusiness.getRemoteFile(user, app.getLfn(),
                     Server.getInstance().getConfigurationFolder()
-                    + "workflows/" +
-                    FilenameUtils.getPath(app.getLfn()) + "/"
+                    + "workflows/"
+                    + FilenameUtils.getPath(app.getLfn()) + "/"
                     + FilenameUtils.getName(app.getLfn()));
 
             if (workflowPath.endsWith(".gwendia")) {
@@ -479,7 +479,7 @@ public class WorkflowBusiness {
 
         try {
             return WorkflowDAOFactory.getDAOFactory().getWorkflowDAO().getInOutData(simulationID, "Outputs");
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -495,7 +495,7 @@ public class WorkflowBusiness {
 
         try {
             return WorkflowDAOFactory.getDAOFactory().getWorkflowDAO().getInOutData(simulationID, "Inputs");
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -524,7 +524,7 @@ public class WorkflowBusiness {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
      * 
      * @param simulationID
@@ -532,10 +532,36 @@ public class WorkflowBusiness {
      * @throws BusinessException 
      */
     public List<Processor> getProcessors(String simulationID) throws BusinessException {
-        
+
         try {
             return WorkflowDAOFactory.getDAOFactory().getWorkflowDAO().getProcessors(simulationID);
-            
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param simulationIDList
+     * @param type
+     * @param binSize
+     * @return
+     * @throws BusinessException 
+     */
+    public String getPerformanceStats(List<Simulation> simulationIDList, int type) 
+            throws BusinessException {
+
+        try {
+            switch (type) {
+                case 1:
+                    return WorkflowDAOFactory.getDAOFactory().getWorkflowDAO().getTimeAnalysis(simulationIDList);
+                case 2:
+                    return WorkflowDAOFactory.getDAOFactory().getWorkflowDAO().getJobStatuses(simulationIDList);
+                default:
+                    logger.error("Type '" + type + "' not supported.");
+                    throw new BusinessException("Type '" + type + "' not supported.");
+            }
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

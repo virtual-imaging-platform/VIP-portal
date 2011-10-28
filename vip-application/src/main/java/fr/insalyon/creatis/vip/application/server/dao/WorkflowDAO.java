@@ -133,16 +133,6 @@ public interface WorkflowDAO {
 
     /**
      * 
-     * @param workflowIdList
-     * @param type
-     * @param binSize
-     * @return
-     * @throws DAOException 
-     */
-    public List<String> getStats(List<Simulation> workflowIdList, int type, int binSize) throws DAOException;
-
-    /**
-     * 
      * @param simulationID
      * @param type
      * @return
@@ -165,4 +155,20 @@ public interface WorkflowDAO {
      * @throws DAOException 
      */
     public List<Processor> getProcessors(String simulationID) throws DAOException;
+    
+    /**
+     * 
+     * @param simulationList
+     * @return
+     * @throws DAOException 
+     */
+    public String getTimeAnalysis(List<Simulation> simulationList) throws DAOException;
+    
+    /**
+     * 
+     * @param simulationList
+     * @return
+     * @throws DAOException 
+     */
+    public String getJobStatuses(List<Simulation> simulationList) throws DAOException;
 }

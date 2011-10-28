@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -35,13 +35,14 @@
 package fr.insalyon.creatis.vip.application.client.view.monitor;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.rednels.ofcgwt.client.ChartWidget;
-import com.rednels.ofcgwt.client.model.ChartData;
-import com.rednels.ofcgwt.client.model.Legend;
-import com.rednels.ofcgwt.client.model.Legend.Position;
-import com.rednels.ofcgwt.client.model.elements.PieChart;
+import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
+import com.google.gwt.visualization.client.DataTable;
+import com.google.gwt.visualization.client.VisualizationUtils;
+import com.google.gwt.visualization.client.visualizations.corechart.PieChart;
+import com.google.gwt.visualization.client.visualizations.corechart.PieChart.PieOptions;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -49,6 +50,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
@@ -65,31 +67,39 @@ public class StatsTab extends Tab {
     private DynamicForm form;
     private VLayout vLayout;
     private SelectItem chartsItem;
-    private ChartWidget chart;
     private ModalWindow modal;
     private List<Simulation> simulationsList;
+    private VLayout chartLayout;
+    private VLayout innerChartLayout;
+    private int chartWidth = 780;
+    private int chartHeight = 500;
 
     public StatsTab() {
 
-        this.setTitle("Performance Statistics");
-        this.setID("stats-tab");
+        this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_CHART) + " Performance Statistics");
+        this.setID(ApplicationConstants.TAB_STATS);
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
 
-        configureForm();
-
         vLayout = new VLayout(15);
+        vLayout.setWidth100();
         vLayout.setHeight100();
         vLayout.setOverflow(Overflow.AUTO);
-        vLayout.setMargin(5);
-        vLayout.addMember(form);
+        vLayout.setPadding(5);
+        
+        configureForm();
+        configureChart();
 
-        modal = new ModalWindow(vLayout);
+        vLayout.addMember(form);
+        vLayout.addMember(chartLayout);
+
+        modal = new ModalWindow(chartLayout);
 
         this.setPane(vLayout);
     }
 
     private void configureForm() {
+
         form = new DynamicForm();
         form.setWidth(500);
         form.setNumCols(5);
@@ -115,13 +125,20 @@ public class StatsTab extends Tab {
     }
 
     private void configureChart() {
-        chart = new ChartWidget();
-        chart.setSize("700", "370");
-        vLayout.addMember(chart);
-        modal = new ModalWindow(vLayout);
+
+        chartLayout = new VLayout();
+        chartLayout.setWidth(chartWidth);
+        chartLayout.setHeight(chartHeight);
+
+        innerChartLayout = new VLayout();
+        innerChartLayout.setWidth100();
+        innerChartLayout.setHeight100();
+
+        chartLayout.addMember(innerChartLayout);
     }
 
     private void generateChart() {
+
         int value = new Integer(chartsItem.getValueAsString());
         switch (value) {
             case 1:
@@ -136,46 +153,43 @@ public class StatsTab extends Tab {
     private void plotOverallStats() {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+        final AsyncCallback<String> callback = new AsyncCallback<String>() {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Error executing get chart data\n" + caught.getMessage());
+                SC.warn("Unable to load chart data:<br />" + caught.getMessage());
             }
 
-            public void onSuccess(List<String> result) {
+            public void onSuccess(String result) {
 
-                String[] res = result.get(0).split("##");
+                String[] res = result.split("##");
                 Object[][] data = new Object[][]{
-                    {"NumberOfCompletedJobs", new Integer(res[0])},
-                    {"ExecutionTime (s)", new Integer(res[1])},
-                    {"UploadTime (s)", new Integer(res[2])},
-                    {"DownloadTime (s)", new Integer(res[3])}
+                    {"Number Of Completed Jobs", new Integer(res[0])},
+                    {"Execution Time (s)", new Integer(res[1])},
+                    {"Upload Time (s)", new Integer(res[2])},
+                    {"Download Time (s)", new Integer(res[3])}
                 };
                 modal.hide();
-                if (chart == null) {
-                    configureChart();
-                }
-                chart.setChartData(getPieChartData(data));
+                VisualizationUtils.loadVisualizationApi(getPieChartRunnable(data), PieChart.PACKAGE);
             }
         };
         modal.show("Loading Time Analysis for Completed Jobs...", true);
-        service.getStats(simulationsList, 1, 1000000, callback);
+        service.getPerformanceStats(simulationsList, 1, callback);
     }
 
     private void plotJobsSummary() {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+        final AsyncCallback<String> callback = new AsyncCallback<String>() {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Error executing get chart data\n" + caught.getMessage());
+                SC.warn("Unable to load chart data:<br />" + caught.getMessage());
             }
 
-            public void onSuccess(List<String> result) {
+            public void onSuccess(String result) {
 
-                String[] res = result.get(0).split("##");
+                String[] res = result.split("##");
                 Object[][] data = new Object[][]{
                     {"TotalNumberOfJobs", new Integer(res[0])},
                     {"Completed", new Integer(res[1])},
@@ -183,35 +197,47 @@ public class StatsTab extends Tab {
                     {"Cancelled", new Integer(res[2])}
                 };
                 modal.hide();
-                if (chart == null) {
-                    configureChart();
-                }
-                chart.setChartData(getPieChartData(data));
+                VisualizationUtils.loadVisualizationApi(getPieChartRunnable(data), PieChart.PACKAGE);
             }
         };
         modal.show("Loading Job Statuses...", true);
-        service.getStats(simulationsList, 2, 1000000, callback);
+        service.getPerformanceStats(simulationsList, 2, callback);
     }
 
-    private ChartData getPieChartData(Object[][] data) {
-        ChartData chartData = new ChartData();
-        chartData.setBackgroundColour("#ffffff");
-        chartData.setLegend(new Legend(Position.RIGHT, true));
+    private Runnable getPieChartRunnable(final Object[][] data) {
 
-        PieChart pie = new PieChart();
-        pie.setAlpha(0.5f);
-        pie.setRadius(120);
-        pie.setNoLabels(true);
-        pie.setTooltip("#label# #val#<br>#percent#");
-        pie.setGradientFill(true);
-        pie.setColours("#008000", "#cc0033", "#FEA101", "#669999");
-        pie.addSlices(new PieChart.Slice((Integer) data[1][1], (String) data[1][0]));
-        pie.addSlices(new PieChart.Slice((Integer) data[2][1], (String) data[2][0]));
-        pie.addSlices(new PieChart.Slice((Integer) data[3][1], (String) data[3][0]));
+        return new Runnable() {
 
-        chartData.addElements(pie);
-        pie.setAnimateOnShow(false);
-        return chartData;
+            public void run() {
+
+                PieOptions options = PieOptions.create();
+                options.setWidth(chartWidth);
+                options.setHeight(chartHeight);
+                options.set3D(true);
+                options.setColors("#008000", "#cc0033", "#FEA101", "#669999");
+
+                DataTable dataTable = DataTable.create();
+                dataTable.addColumn(ColumnType.STRING, "Property");
+                dataTable.addColumn(ColumnType.NUMBER, "Value");
+                dataTable.addRows(3);
+
+                dataTable.setValue(0, 0, (String) data[1][0]);
+                dataTable.setValue(0, 1, (Integer) data[1][1]);
+                dataTable.setValue(1, 0, (String) data[2][0]);
+                dataTable.setValue(1, 1, (Integer) data[2][1]);
+                dataTable.setValue(2, 0, (String) data[3][0]);
+                dataTable.setValue(2, 1, (Integer) data[3][1]);
+
+                PieChart pie = new PieChart(dataTable, options);
+
+                chartLayout.removeMember(innerChartLayout);
+                innerChartLayout = new VLayout();
+                innerChartLayout.setWidth100();
+                innerChartLayout.setHeight100();
+                innerChartLayout.addMember(pie);
+                chartLayout.addMember(innerChartLayout);
+            }
+        };
     }
 
     public void setSimulationsList(List<Simulation> simulationsList) {
