@@ -50,7 +50,8 @@ public class SimulationGUIParser extends ApplicationParser {
     public void loadApplications() {
 
         if (CoreModule.user.isSystemAdministrator()
-                || CoreModule.user.hasGroupAccess(ModelConstants.GROUP_VIP)) {
+                || CoreModule.user.hasGroupAccess(ModelConstants.GROUP_VIP)
+                || CoreModule.user.hasGroupAccess("Tutorial")) {
             
             addApplication(SimulationGUIConstants.APP_EDITOR, SimulationGUIConstants.APP_IMG_EDITOR);
         }
