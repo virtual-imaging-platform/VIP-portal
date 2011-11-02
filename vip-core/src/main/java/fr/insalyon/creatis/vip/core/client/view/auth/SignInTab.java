@@ -103,7 +103,6 @@ public class SignInTab extends Tab {
     private void configureSigninForm() {
 
         emailField = FieldUtil.getTextItem(300, true, "Your Email", "[a-zA-Z0-9_.\\-+@]");
-        emailField.setValidators(ValidatorUtil.getEmailValidator());
         emailField.addKeyPressHandler(new KeyPressHandler() {
 
             public void onKeyPress(KeyPressEvent event) {

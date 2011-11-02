@@ -106,9 +106,9 @@ public class SignUpTab extends Tab {
         firstNameField = FieldUtil.getTextItem(300, true, "First Name", null);
         lastNameField = FieldUtil.getTextItem(300, true, "Last Name", null);
 
-        emailField = FieldUtil.getTextItem(300, true, "Your Email", null);
+        emailField = FieldUtil.getTextItem(300, true, "Your Email", "[a-zA-Z0-9_.\\-+@]");
         emailField.setName("email");
-        confirmEmailField = FieldUtil.getTextItem(300, true, "Re-enter Email", null);
+        confirmEmailField = FieldUtil.getTextItem(300, true, "Re-enter Email", "[a-zA-Z0-9_.\\-+@]");
 
         emailField.setValidators(ValidatorUtil.getEmailValidator());
         confirmEmailField.setValidators(
