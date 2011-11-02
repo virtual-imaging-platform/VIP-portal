@@ -57,25 +57,27 @@ import java.util.List;
 public class ApplicationModule extends Module {
 
     public static List<String> reservedClasses;
-    
+
     public ApplicationModule() {
-        
+
         reservedClasses = new ArrayList<String>();
-        
+
         CoreModule.systemExecutor.addParser(new ApplicationSystemParser());
         CoreModule.homeExecutor.addParser(new ApplicationHomeParser());
     }
 
     @Override
     public void load() {
-        
+
         // Simulation close tab
         CenterTabSet.getInstance().addCloseClickHandler(new CloseClickHandler() {
 
             public void onCloseClick(TabCloseClickEvent event) {
                 Tab tab = event.getTab();
-                if (tab instanceof AbstractSimulationTab) {
+                try {
                     ((AbstractSimulationTab) tab).destroy();
+                } catch (ClassCastException ex) {
+                    // do nothing
                 }
             }
         });
@@ -83,7 +85,7 @@ public class ApplicationModule extends Module {
 
     @Override
     public void terminate() {
-        
+
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
