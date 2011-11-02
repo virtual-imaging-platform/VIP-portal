@@ -156,7 +156,7 @@ public class SignUpTab extends Tab {
                 
                 + "This portal is exclusively dedicated to non-commercial academic use. "
                 + "It can be accessed free of charge but it is provided \"as is\" without warranty of any kind."
-                + "The entire risk as to the quality and performance of the program is with you.\n\n"
+                + "The entire risk as to the quality and performance of the program is with you. VIP can only be used to process and store scientific data using applications registered in the VIP platform. \n\n"
               
                 + "The simulators integrated in the platform must be acknowledged "
                 + " as follows:\n\n"
@@ -178,7 +178,9 @@ public class SignUpTab extends Tab {
                 + "PET-SORTEO is citationware. If you are publishing any work, where"
                 + "this program has been used, please remember that it was obtained free of charge."
                 + "You must reference the paper shown below and the name of the program PET-SORTEO must be mentioned in the publication.\n\n"
-                + "A. Reilhac, C. Lartizien, N. Costes, S. Sans, C. Comtat, R. Gunn, A. Evans. PET-SORTEO: A Monte Carlo-based simulator with high count rate capabilities. IEEE Transactions on Nuclear Science, 5: 46-52, 2004."
+                + "A. Reilhac, C. Lartizien, N. Costes, S. Sans, C. Comtat, R. Gunn, A. Evans. PET-SORTEO: A Monte Carlo-based simulator with high count rate capabilities. IEEE Transactions on Nuclear Science, 5: 46-52, 2004.\n\n"
+                + "If you are publishing any work, where SIMRI has been used, you must reference the paper shown below and the name of the program SIMRI must be mentioned in the publication. You can also mention the SIMRI web site (http://simri.org) and that SIMRI is distributed under the free software CeCiLL license."
+                + "\n\nH. Benoit-Cattin, G. Collewet, B. Belaroussi, H. Saint-Jalmes, and C. Odet, \"The SIMRI project: A versatile and interactive MRI simulator\", Journal of Magnetic Resonance, vol. 173, pp. 97-115, 2005."
                 ;
     }
 
