@@ -183,7 +183,7 @@
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
     
-    <security-constraint>
+<!--    <security-constraint>
         <web-resource-collection>
             <web-resource-name>site</web-resource-name>
             <description>Only HTTPS Access</description>
@@ -195,7 +195,7 @@
             <description>Use SSL</description>
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
         </user-data-constraint>
-    </security-constraint>
+    </security-constraint>-->
     
 <!--    <login-config>
         <auth-method>CLIENT-CERT</auth-method>
