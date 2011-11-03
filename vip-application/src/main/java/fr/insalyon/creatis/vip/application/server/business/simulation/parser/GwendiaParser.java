@@ -44,6 +44,9 @@ import org.xml.sax.SAXException;
  */
 public class GwendiaParser extends AbstractWorkflowParser {
 
+    private Source currentSource = null;
+    private String text = null;
+    
     public GwendiaParser() {
         super();
     }
@@ -54,7 +57,29 @@ public class GwendiaParser extends AbstractWorkflowParser {
         if (localName.equals("source")) {
             Source s = new Source(attributes.getValue("name"),attributes.getValue("user-level"),attributes.getValue("description"));
             sources.add(s);
+            currentSource = s;
             return;
         }
+        if(localName.equals("source-comment"))
+            text="";
     }
+
+    @Override
+    public void characters(char[] ch, int start, int length) throws SAXException {
+         if(text != null) {
+            String chars = new String(ch);
+            text += chars.substring(start,start+length);
+        }
+    }
+
+    @Override
+    public void endElement(String uri, String localName, String qName) throws SAXException {
+        if(localName.equals("source")){
+            currentSource = null;
+        }
+        if (localName.equals("source-comment")) {
+            currentSource.setDescription(text);
+        }
+    }
+    
 }

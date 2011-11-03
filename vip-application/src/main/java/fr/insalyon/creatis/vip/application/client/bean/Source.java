@@ -64,4 +64,8 @@ public class Source implements IsSerializable {
     public String getUserLevel() {
         return userLevel;
     }
+
+    public void setDescription(String text) {
+        this.description = text;
+    }
 }

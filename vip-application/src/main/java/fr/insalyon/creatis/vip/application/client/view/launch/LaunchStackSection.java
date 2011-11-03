@@ -146,7 +146,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
                 formLayout.addMember(getSimulatioNameLayout());
 
                 for (Source source : result) {
-                    formLayout.addMember(new InputHLayout(source.getName()));
+                    formLayout.addMember(new InputHLayout(source.getName(),source.getDescription()));
                 }
 
                 HLayout buttonsLayout = new HLayout(5);
