@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.server.business;
 
+import fr.cnrs.i3s.moteur2.execution.Workflow;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.MoteurStatus;
@@ -43,6 +44,7 @@ import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Processor;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
+import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.server.business.simulation.MoteurPoolConfig;
 import fr.insalyon.creatis.vip.application.server.business.simulation.MoteurWSConfig;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
@@ -87,10 +89,11 @@ public class WorkflowBusiness {
      * @return
      * @throws BusinessException 
      */
-    public List<Source> getApplicationSources(String user, String applicationName)
+    public Descriptor getApplicationDescriptor(String user, String applicationName)
             throws BusinessException {
 
         try {
+
             Application app = ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getApplication(applicationName);
 
             DataManagerBusiness dmBusiness = new DataManagerBusiness();
@@ -101,10 +104,9 @@ public class WorkflowBusiness {
                     + FilenameUtils.getName(app.getLfn()));
 
             if (workflowPath.endsWith(".gwendia")) {
-                return new GwendiaParser().parse(workflowPath).getSources();
-
+                return new GwendiaParser().parse(workflowPath);
             } else {
-                return new ScuflParser().parse(workflowPath).getSources();
+                return new ScuflParser().parse(workflowPath);
             }
 
         } catch (IOException ex) {

@@ -130,35 +130,35 @@ public class MoteurPoolConfig extends WorkflowMoteurConfig {
         list.add(new SHIWAProperty("GRID", "DIRAC"));
         list.add(new SHIWAProperty("SE", "ccsrm02.in2p3.fr"));
         list.add(new SHIWAProperty("TIMEOUT", "100000"));
-        list.add(new SHIWAProperty("RETRYCOUNT", "3"));
-        list.add(new SHIWAProperty("MULTIJOB", "1"));
-        try {
-            BundleHelpers.createBundle(wfFile, inputFile, bundleFile, list);
-        } catch (SHIWADesktopIOException ex) {
-            logger.error(" Bundle Creation Exception, Error in method createBundle in MooteurPoolConfig ");
-            RemoteException e = new RemoteException("Exception Made in bundle creation, check parameters ", ex);
-            throw e;
-        }
-
-        //submit bundle
-        int id = 0;
-        try {
-            id = ClientFactory.getUserClient().submitWorkflow(bundleFile, connection.getConnection());
-            logger.error(" Bundle instance submitted Fine " + id);
-        } catch (SHIWADesktopIOException ex) {
-            logger.error("XMPPException in submit bundle");
-            RemoteException e = new RemoteException("Cannot submit workflow to SHIWA pool", ex);
-            throw e;
-        } catch (XMPPException ex) {
-            connection.disconnectClient();
-            logger.error("XMPPException in submit bundle");
-            RemoteException e = new RemoteException("Cannot submit workflow to SHIWA pool", ex);
-            throw e;
-        }
+//        list.add(new SHIWAProperty("RETRYCOUNT", "3"));
+//        list.add(new SHIWAProperty("MULTIJOB", "1"));
+//        try {
+//            BundleHelpers.createBundle(wfFile, inputFile, bundleFile, list);
+//        } catch (SHIWADesktopIOException ex) {
+//            logger.error(" Bundle Creation Exception, Error in method createBundle in MooteurPoolConfig ");
+//            RemoteException e = new RemoteException("Exception Made in bundle creation, check parameters ", ex);
+//            throw e;
+//        }
+//
+//        //submit bundle
+//        int id = 0;
+//        try {
+//            id = ClientFactory.getUserClient().submitWorkflow(bundleFile, connection.getConnection());
+//            logger.error(" Bundle instance submitted Fine " + id);
+//        } catch (SHIWADesktopIOException ex) {
+//            logger.error("XMPPException in submit bundle");
+//            RemoteException e = new RemoteException("Cannot submit workflow to SHIWA pool", ex);
+//            throw e;
+//        } catch (XMPPException ex) {
+//            connection.disconnectClient();
+//            logger.error("XMPPException in submit bundle");
+//            RemoteException e = new RemoteException("Cannot submit workflow to SHIWA pool", ex);
+//            throw e;
+//        }
         connection.getConnection().disconnect();
         wfFile.delete();
         inputFile.delete();
-        return "" + id;
+        return "";// + id;
     }
 
     @Override
@@ -190,38 +190,38 @@ public class MoteurPoolConfig extends WorkflowMoteurConfig {
 
     @Override
     public String getStatus(String workflowID) throws RemoteException, ServiceException {
-        
-        ClientConnection connection = new ClientConnection();
-        try {
-            connection.connect();
-        } catch (XMPPException ex) {
-            RemoteException e = new RemoteException("XMPPException : BAD connexion ", ex);
-            throw e;
-        }
-
-        if (!connection.getConnection().isAuthenticated()) {
-            System.out.println("Authentication Failed");
-            RemoteException e = new RemoteException("XMPPException : Bad User Authentication ");
-            throw e;
-        }
-
-        String status = null;
-        try {
-            status = ClientFactory.getUserClient().getStatus(Integer.parseInt(workflowID.split("shiwa-instance-")[1]), connection.getConnection()).toString();
-
-        } catch (InterruptedException ex) {
-            connection.disconnectClient();
-            logger.error("[Getstatus Method] InterreptedException: check thread to get status in shiwa client");
-            RemoteException e = new RemoteException("Thread in Getstatus method Fail", ex);
-            throw e;
-        } catch (XMPPException ex) {
-            connection.disconnectClient();
-            logger.error("[Getstatus Method] InterreptedException: check thread to get status in shiwa client");
-            RemoteException e = new RemoteException("Thread in Getstatus method Fail", ex);
-            throw e;
-        }
-
-        connection.disconnectClient();
-        return status;
+        return "";
+//        ClientConnection connection = new ClientConnection();
+//        try {
+//            connection.connect();
+//        } catch (XMPPException ex) {
+//            RemoteException e = new RemoteException("XMPPException : BAD connexion ", ex);
+//            throw e;
+//        }
+//
+//        if (!connection.getConnection().isAuthenticated()) {
+//            System.out.println("Authentication Failed");
+//            RemoteException e = new RemoteException("XMPPException : Bad User Authentication ");
+//            throw e;
+//        }
+//
+//        String status = null;
+//        try {
+//            status = ClientFactory.getUserClient().getStatus(Integer.parseInt(workflowID.split("shiwa-instance-")[1]), connection.getConnection()).toString();
+//
+//        } catch (InterruptedException ex) {
+//            connection.disconnectClient();
+//            logger.error("[Getstatus Method] InterreptedException: check thread to get status in shiwa client");
+//            RemoteException e = new RemoteException("Thread in Getstatus method Fail", ex);
+//            throw e;
+//        } catch (XMPPException ex) {
+//            connection.disconnectClient();
+//            logger.error("[Getstatus Method] InterreptedException: check thread to get status in shiwa client");
+//            RemoteException e = new RemoteException("Thread in Getstatus method Fail", ex);
+//            throw e;
+//        }
+//
+//        connection.disconnectClient();
+//        return status;
     }
 }

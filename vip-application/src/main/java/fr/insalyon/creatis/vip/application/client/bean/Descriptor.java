@@ -33,24 +33,43 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-package fr.insalyon.creatis.vip.application.server.bean;
+package fr.insalyon.creatis.vip.application.client.bean;
 
-import fr.insalyon.creatis.vip.application.client.bean.Source;
+import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class Descriptor {
+public class Descriptor implements IsSerializable {
 
     private List<Source> sources;
+    private String description;
 
-    public Descriptor(List<Source> sources) {
+    public Descriptor(List<Source> sources, String description) {
+        this.sources = sources;
+        this.description = description;
+    }
+
+    public Descriptor() {
+        
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setSources(List<Source> sources) {
         this.sources = sources;
     }
 
     public List<Source> getSources() {
         return sources;
     }
+    
+      public String getDescription() {
+        return description;
+    }
+
 }

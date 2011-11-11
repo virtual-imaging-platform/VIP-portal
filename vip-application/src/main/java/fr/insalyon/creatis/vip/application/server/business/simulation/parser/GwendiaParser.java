@@ -47,6 +47,7 @@ public class GwendiaParser extends AbstractWorkflowParser {
     private Source currentSource = null;
     private String text = null;
     
+    
     public GwendiaParser() {
         super();
     }
@@ -60,7 +61,7 @@ public class GwendiaParser extends AbstractWorkflowParser {
             currentSource = s;
             return;
         }
-        if(localName.equals("source-comment"))
+        if(localName.equals("source-comment") || localName.equals("description"))
             text="";
     }
 
@@ -79,6 +80,9 @@ public class GwendiaParser extends AbstractWorkflowParser {
         }
         if (localName.equals("source-comment")) {
             currentSource.setDescription(text);
+        }
+        if (localName.equals("description")) {
+            description = text;
         }
     }
     

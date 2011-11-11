@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Label;
@@ -85,7 +86,6 @@ public class InputHLayout extends VLayout {
         this.name = name;
 
         hLayout = new HLayout(3);
-
         Label label = new Label(name + ":");
         label.setWidth(150);
         label.setAlign(Alignment.RIGHT);

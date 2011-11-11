@@ -34,7 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.server.business.simulation.parser;
 
-import fr.insalyon.creatis.vip.application.server.bean.Descriptor;
+import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
 import java.io.FileReader;
 import java.io.IOException;
@@ -55,6 +55,7 @@ public class AbstractWorkflowParser extends DefaultHandler {
 
     protected XMLReader reader;
     protected List<Source> sources;
+    protected String description = "No description found for this application. Please contact the developer to know what it is about.";
 
     protected AbstractWorkflowParser() {
         sources = new ArrayList<Source>();
@@ -65,6 +66,6 @@ public class AbstractWorkflowParser extends DefaultHandler {
         reader.setContentHandler(this);
         reader.parse(new InputSource(new FileReader(fileName)));
 
-        return new Descriptor(sources);
+        return new Descriptor(sources,description);
     }
 }

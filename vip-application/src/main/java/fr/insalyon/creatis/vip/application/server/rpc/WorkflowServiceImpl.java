@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.application.server.rpc;
 
 import fr.insalyon.creatis.devtools.FileUtils;
+import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Processor;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
@@ -85,10 +86,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @return
      * @throws ApplicationException 
      */
-    public List<Source> getApplicationSources(String applicationName) throws ApplicationException {
+    public Descriptor getApplicationDescriptor(String applicationName) throws ApplicationException {
 
         try {
-            return workflowBusiness.getApplicationSources(
+            return workflowBusiness.getApplicationDescriptor(
                     getSessionUser().getFullName(), applicationName);
 
         } catch (CoreException ex) {

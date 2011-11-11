@@ -35,14 +35,18 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
@@ -58,15 +62,24 @@ import java.util.Map;
 public class LaunchStackSection extends AbstractLaunchStackSection {
 
     private VLayout formLayout;
+    private Label descriptionPane;
 
     public LaunchStackSection(String applicationName) {
 
         super(applicationName);
-
+        
+        
+        descriptionPane = new Label();
+        descriptionPane.setWidth(600);
+        descriptionPane.setHeight(100);
+        descriptionPane.setShowEdges(true);
+       
+        
         formLayout = new VLayout(3);
-        formLayout.setWidth100();
+        //formLayout.setWidth100();
         formLayout.setAutoHeight();
         vLayout.addMember(formLayout);
+        
 
         loadData();
     }
@@ -135,19 +148,36 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
         formLayout.removeMembers(formLayout.getMembers());
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        final AsyncCallback<List<Source>> callback = new AsyncCallback<List<Source>>() {
+        final AsyncCallback<Descriptor> callback = new AsyncCallback<Descriptor>() {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to download application source file:<br />" + caught.getMessage());
             }
 
-            public void onSuccess(List<Source> result) {
+            public void onSuccess(Descriptor d) {
+                descriptionPane.setContents(d.getDescription());
+                List<Source> sources = d.getSources();
+                HLayout descriptionLayout = new HLayout(5);
+                descriptionLayout.setAlign(VerticalAlignment.CENTER);
+                descriptionLayout.setMargin(20);
+                descriptionLayout.addMember(descriptionPane);
+                formLayout.addMember(descriptionLayout);
                 formLayout.addMember(getSimulatioNameLayout());
-
-                for (Source source : result) {
-                    formLayout.addMember(new InputHLayout(source.getName(),source.getDescription()));
+                
+                HLayout inputLayout = new HLayout(5);
+                inputLayout.setMargin(20);
+                
+                VLayout inputs = new VLayout(3);
+                inputs.setAutoHeight();
+                for (Source source : sources) {
+                    inputs.addMember(new InputHLayout(source.getName(), source.getDescription()));
                 }
+                HLayout inputsLayout = new HLayout(5);
+                inputsLayout.setAlign(VerticalAlignment.CENTER);
+                inputsLayout.setMargin(20);
+                inputsLayout.addMember(inputs);
+                formLayout.addMember(inputsLayout);
 
                 HLayout buttonsLayout = new HLayout(5);
                 buttonsLayout.setAlign(VerticalAlignment.CENTER);
@@ -169,7 +199,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
             }
         };
         modal.show("Loading launch panel...", true);
-        service.getApplicationSources(applicationName, callback);
+        service.getApplicationDescriptor(applicationName, callback);
     }
 
     /**
