@@ -68,6 +68,7 @@ class ModelDisplayTab extends Tab {
     protected VLayout layout;
     protected SimulationObjectModel model = null;
     protected ToolStrip toolStrip;
+    private ToolStripButton download;
 
     public ModelDisplayTab(final String uri, String title) {
 
@@ -93,55 +94,13 @@ class ModelDisplayTab extends Tab {
             public void onSuccess(SimulationObjectModel result) {
                 modal.hide();
                 if (result != null) {
-
-
-
-
-
                     layout.addMember(new ModelTreeGrid(result));
                     model = result;
-
-                    ToolStripButton download = new ToolStripButton("Download");
+                    download = new ToolStripButton("Download");
                     download.setIcon(DataManagerConstants.ICON_DOWNLOAD);
-                    download.addClickHandler(new ClickHandler() {
-
-                        public void onClick(ClickEvent event) {
-                            String lfn = model.getStorageURL();
-                            downloadModel(lfn);
-                        }
-                    });
-                    if (model.getStorageURL() != null) {
-                        toolStrip.addButton(download);
-                    } else {
-                        Label label = new Label();
-                        label.setAlign(Alignment.LEFT);
-                        label.setValign(VerticalAlignment.CENTER);
-                        label.setWrap(false);
-                        label.setShowEdges(false);
-                        label.setContents("No file is available for this model (it may be a fake model).");
-                        layout.addMember(label);
-                    }
-                    if (SimulationObjectModelUtil.isReadyForSimulation(result, SimulationObjectModelUtil.Modality.IRM)) {
-                        toolStrip.addMember(testModality("MRI", true));
-                    } else {
-                        toolStrip.addMember(testModality("MRI", false));
-                    }
-
-                    if (SimulationObjectModelUtil.isReadyForSimulation(result, SimulationObjectModelUtil.Modality.CT)) {
-                        toolStrip.addMember(testModality("CT", true));
-                    } else {
-                        toolStrip.addMember(testModality("CT", false));
-                    }
-                    if (SimulationObjectModelUtil.isReadyForSimulation(result, SimulationObjectModelUtil.Modality.PET)) {
-                        toolStrip.addMember(testModality("PET", true));
-                    } else {
-                        toolStrip.addMember(testModality("PET", false));
-                    }
-                    if (SimulationObjectModelUtil.isReadyForSimulation(result, SimulationObjectModelUtil.Modality.US)) {
-                        toolStrip.addMember(testModality("Ultrasound", true));
-                    } else {
-                        toolStrip.addMember(testModality("Ultrasound", false));
-                    }
+                    download.setTooltip("Download model files");
+                    toolStrip.addButton(download);
+                    checkModel(model);
                 } else {
                     SC.say("Cannot load model");
                 }
@@ -151,6 +110,62 @@ class ModelDisplayTab extends Tab {
         ms.rebuildObjectModelFromTripleStore(uri, callback);
 
         this.setPane(layout);
+    }
+
+    private void checkModel(final SimulationObjectModel model) {
+        final String lfn = model.getStorageURL();
+        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
+
+        AsyncCallback<Boolean> callback = new AsyncCallback<Boolean>() {
+
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                disableDownload(lfn);
+            }
+
+            public void onSuccess(Boolean result) {
+                modal.hide();
+                download.addClickHandler(new ClickHandler() {
+
+                    public void onClick(ClickEvent event) {
+                        String lfn = model.getStorageURL();
+
+                        downloadModel(lfn);
+                    }
+                });
+                if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.IRM)) {
+                    toolStrip.addMember(testModality("MRI", true));
+                } else {
+                    toolStrip.addMember(testModality("MRI", false));
+                }
+                if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.CT)) {
+                    toolStrip.addMember(testModality("CT", true));
+                } else {
+                    toolStrip.addMember(testModality("CT", false));
+                }
+                if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.PET)) {
+                    toolStrip.addMember(testModality("PET", true));
+                } else {
+                    toolStrip.addMember(testModality("PET", false));
+                }
+                if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.US)) {
+                    toolStrip.addMember(testModality("Ultrasound", true));
+                } else {
+                    toolStrip.addMember(testModality("Ultrasound", false));
+                }
+            }
+        };
+        if (model.getStorageURL() != null) {
+            modal.show("Checking if model files exist", true);
+            service.exists(lfn, callback);
+        } else {
+            disableDownload("No storage URL");
+        }
+    }
+
+    private void disableDownload(String lfn) {
+        download.setIcon(ModelConstants.APP_IMG_KO);
+        download.setTooltip("Cannot find model files (" + lfn + ")");
     }
 
     private void downloadModel(final String lfnModel) {
@@ -184,7 +199,7 @@ class ModelDisplayTab extends Tab {
             ok.setTooltip("This model lacks physical parameters to be used in a simulation of this modality.");
             ok.setIcon(ModelConstants.APP_IMG_KO);
         }
-        
+
         return ok;
     }
 }
