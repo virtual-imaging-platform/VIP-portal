@@ -77,4 +77,6 @@ public interface DataManagerServiceAsync {
     public void downloadFolder(String remoteFolder, AsyncCallback<Void> asyncCallback);
     
     public void uploadFile(String localFile, String remoteFile, AsyncCallback<Void> asyncCallback);
+    
+   public void exists(String remoteFile, AsyncCallback<Boolean> asyncCallback);
 }

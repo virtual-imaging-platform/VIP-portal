@@ -284,4 +284,18 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             throw new DataManagerException(ex);
         }
     }
+    
+    public boolean exists(String remoteFile) throws DataManagerException {
+        try {
+            trace(logger, "Test if file '" + remoteFile + " exists");
+            User user = getSessionUser();
+            return lfcBusiness.exists(user.getFullName(), remoteFile);
+
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
+        }
+    
+    }
 }

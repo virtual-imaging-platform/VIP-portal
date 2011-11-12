@@ -203,6 +203,28 @@ public class LFCBusiness {
         }
     }
 
+    
+    /**
+     * 
+     * @param user
+     * @param path
+     * @return
+     * @throws BusinessException 
+     */
+    public boolean exists(String user, String path) throws BusinessException {
+        try {
+            ArrayList<String> files = new ArrayList<String>();
+            files.add(DataManagerUtil.parseBaseDir(user, path));
+            return CoreUtil.getVletAgentClient().exist(files);
+        } catch (VletAgentClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        } catch (DataManagerException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+    
     /**
      * 
      * @param user
@@ -212,6 +234,7 @@ public class LFCBusiness {
      */
     public long getModificationDate(String user, String path) throws BusinessException {
         try {
+            
             return CoreUtil.getVletAgentClient().
                     getModificationDate(DataManagerUtil.parseBaseDir(user, path));
 
