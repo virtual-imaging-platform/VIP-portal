@@ -207,7 +207,7 @@ public class ModelListTab extends Tab {
         ListGridField longitudinalField = new ListGridField("longitudinal", "Longitudinal");
         ListGridField movementField = new ListGridField("movement", "Movement");
         ListGridField URIField = new ListGridField("uri", "URI");
-
+        
         grid.setFields(modelNameField, typeField, longitudinalField, movementField, URIField);
 
         rowContextClickHandler = grid.addRowContextClickHandler(new RowContextClickHandler() {

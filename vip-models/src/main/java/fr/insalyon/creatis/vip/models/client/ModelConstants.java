@@ -48,10 +48,27 @@ public class ModelConstants {
     // Icons
     private static final String IMG_FOLDER = "model/";
     public static final String ICON_MODEL = IMG_FOLDER + "icon-model.png";
-    // Application Names
+    // Names
     public static final String APP_MODEL = "Models";
-    // Application Images
+    // Images
     public static final String APP_IMG_MODEL = IMG_FOLDER + "app-model.png";
+    public static final String APP_IMG_ANATOMY = IMG_FOLDER + "icon-anatomy.png";
+     public static final String APP_IMG_GEOMETRY = IMG_FOLDER + "icon-geometry.png";
+    public static final String APP_IMG_EXTERNAL = IMG_FOLDER + "icon-external.png";
+    public static final String APP_IMG_FOREIGN = IMG_FOLDER + "icon-foreign.png";
+    public static final String APP_IMG_INSTANT = IMG_FOLDER + "icon-instant.png";
+    public static final String APP_IMG_OBJECT = IMG_FOLDER + "icon-object.png";
+    public static final String APP_IMG_RADIO = IMG_FOLDER + "icon-radio.png";
+    public static final String APP_IMG_ECHO = IMG_FOLDER + "icon-echo.png";
+    public static final String APP_IMG_MAGNETIC = IMG_FOLDER + "icon-magnetic.png";
+    public static final String APP_IMG_CHEMICAL = IMG_FOLDER + "icon-chemical.png";
+    public static final String APP_IMG_PATHOLOGY = IMG_FOLDER + "icon-pathology.png";
+    public static final String APP_IMG_LUT = IMG_FOLDER + "icon-physical-lut.png";
+    public static final String APP_IMG_MAP = IMG_FOLDER + "icon-physical-map.png";
+    public static final String APP_IMG_TIMEPOINT = IMG_FOLDER + "icon-timepoint.png";
+    public static final String APP_IMG_PHYSICAL_PARAMS = IMG_FOLDER + "icon-physparams.png";
+    public static final String APP_IMG_OK = IMG_FOLDER + "icon-ok.png";
+    public static final String APP_IMG_KO = IMG_FOLDER + "icon-ko.png";
     // Configuration Constants
     public static final String GROUP_VIP = "VIP";
     public static final String MODEL_HOME = DataManagerConstants.ROOT + "/VIP/Models";

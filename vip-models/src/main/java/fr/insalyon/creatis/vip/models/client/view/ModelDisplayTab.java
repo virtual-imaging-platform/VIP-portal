@@ -44,13 +44,17 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelUtil;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
+import fr.insalyon.creatis.vip.models.client.ModelConstants;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 
@@ -63,6 +67,7 @@ class ModelDisplayTab extends Tab {
     protected ModalWindow modal;
     protected VLayout layout;
     protected SimulationObjectModel model = null;
+    protected ToolStrip toolStrip;
 
     public ModelDisplayTab(final String uri, String title) {
 
@@ -72,6 +77,10 @@ class ModelDisplayTab extends Tab {
 
         layout = new VLayout();
         modal = new ModalWindow(layout);
+
+        toolStrip = new ToolStrip();
+        toolStrip.setWidth100();
+        layout.addMember(toolStrip);
 
         ModelServiceAsync ms = ModelService.Util.getInstance();
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
@@ -84,10 +93,15 @@ class ModelDisplayTab extends Tab {
             public void onSuccess(SimulationObjectModel result) {
                 modal.hide();
                 if (result != null) {
+
+
+
+
+
                     layout.addMember(new ModelTreeGrid(result));
                     model = result;
 
-                    Button download = new Button("Download");
+                    ToolStripButton download = new ToolStripButton("Download");
                     download.setIcon(DataManagerConstants.ICON_DOWNLOAD);
                     download.addClickHandler(new ClickHandler() {
 
@@ -97,7 +111,7 @@ class ModelDisplayTab extends Tab {
                         }
                     });
                     if (model.getStorageURL() != null) {
-                        layout.addMember(download);
+                        toolStrip.addButton(download);
                     } else {
                         Label label = new Label();
                         label.setAlign(Alignment.LEFT);
@@ -106,6 +120,27 @@ class ModelDisplayTab extends Tab {
                         label.setShowEdges(false);
                         label.setContents("No file is available for this model (it may be a fake model).");
                         layout.addMember(label);
+                    }
+                    if (SimulationObjectModelUtil.isReadyForSimulation(result, SimulationObjectModelUtil.Modality.IRM)) {
+                        toolStrip.addMember(testModality("MRI", true));
+                    } else {
+                        toolStrip.addMember(testModality("MRI", false));
+                    }
+
+                    if (SimulationObjectModelUtil.isReadyForSimulation(result, SimulationObjectModelUtil.Modality.CT)) {
+                        toolStrip.addMember(testModality("CT", true));
+                    } else {
+                        toolStrip.addMember(testModality("CT", false));
+                    }
+                    if (SimulationObjectModelUtil.isReadyForSimulation(result, SimulationObjectModelUtil.Modality.PET)) {
+                        toolStrip.addMember(testModality("PET", true));
+                    } else {
+                        toolStrip.addMember(testModality("PET", false));
+                    }
+                    if (SimulationObjectModelUtil.isReadyForSimulation(result, SimulationObjectModelUtil.Modality.US)) {
+                        toolStrip.addMember(testModality("Ultrasound", true));
+                    } else {
+                        toolStrip.addMember(testModality("Ultrasound", false));
                     }
                 } else {
                     SC.say("Cannot load model");
@@ -119,7 +154,7 @@ class ModelDisplayTab extends Tab {
     }
 
     private void downloadModel(final String lfnModel) {
-        
+
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
@@ -133,5 +168,23 @@ class ModelDisplayTab extends Tab {
             }
         };
         service.downloadFile(lfnModel, callback);
+    }
+
+    private ToolStripButton testModality(String caption, boolean test) {
+        ToolStripButton ok = new ToolStripButton(caption);
+//        ok.setHeight(30);
+//        ok.setPadding(10);
+//        ok.setAlign(Alignment.CENTER);
+//        ok.setValign(VerticalAlignment.CENTER);
+//        ok.setWrap(false);
+        if (test) {
+            ok.setIcon(ModelConstants.APP_IMG_OK);
+            ok.setTooltip("This model can be used in a simulation of this modality.");
+        } else {
+            ok.setTooltip("This model lacks physical parameters to be used in a simulation of this modality.");
+            ok.setIcon(ModelConstants.APP_IMG_KO);
+        }
+        
+        return ok;
     }
 }
