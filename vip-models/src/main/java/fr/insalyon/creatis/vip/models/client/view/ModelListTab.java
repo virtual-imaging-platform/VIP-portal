@@ -86,6 +86,8 @@ public class ModelListTab extends Tab {
         configureGrid();
         modal = new ModalWindow(grid);
 
+        
+             
         VLayout layout = new VLayout();
 
         ToolStrip toolStrip = new ToolStrip();
@@ -214,13 +216,11 @@ public class ModelListTab extends Tab {
 
             public void onRowContextClick(RowContextClickEvent event) {
                 event.cancel();
-                //call download model method below to download the model zip file.
-
-                //SC.say("context click");
-//                String simulationId = event.getRecord().getAttribute("simulationId");
-//                String status = event.getRecord().getAttribute("status");
-//                new SimulationsContextMenu(modal, simulationId, status).showContextMenu();
+                String modelURI = event.getRecord().getAttribute("uri");
+                String title = event.getRecord().getAttribute("name");
+                new ModelContextMenu(modal, modelURI, title).showContextMenu();
             }
+            
         });
         rowMouseDownHandler = grid.addRowMouseDownHandler(new RowMouseDownHandler() {
 

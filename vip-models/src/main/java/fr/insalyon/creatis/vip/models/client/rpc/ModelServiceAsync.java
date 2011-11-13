@@ -61,9 +61,9 @@ public interface ModelServiceAsync {
 
     public void setStorageUrl(SimulationObjectModel som, String url, AsyncCallback<SimulationObjectModel> asyncCallback);
 
-    public void removeObjectModelFromTripleStore(String uri, AsyncCallback<Void> asyncCallback);
-
     public void deleteAllModelsInTheTripleStore(AsyncCallback<Void> asyncCallback);
     
     public void searchModels(String query, String[] types, String[] time, AsyncCallback<List<SimulationObjectModelLight>> asyncCallback);
+    
+    public void deleteModel(String uri, AsyncCallback<Void> asyncCallback);
 }

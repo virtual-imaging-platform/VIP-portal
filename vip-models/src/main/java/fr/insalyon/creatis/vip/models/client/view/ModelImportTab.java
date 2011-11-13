@@ -67,6 +67,7 @@ import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 import fr.insalyon.creatis.vip.models.client.ModelConstants;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -82,6 +83,7 @@ class ModelImportTab extends Tab {
     private String zipFile;
     private Label label;
     private String rdfFile;
+    private Button upload;
 
     public ModelImportTab() {
 
@@ -95,7 +97,7 @@ class ModelImportTab extends Tab {
         modal = new ModalWindow(vl);
         label = new Label();
 
-        Button upload = new Button("Upload model");
+        upload = new Button("Upload model");
         upload.setIcon(DataManagerConstants.ICON_UPLOAD);
         upload.addClickHandler(new ClickHandler() {
 
@@ -112,7 +114,8 @@ class ModelImportTab extends Tab {
                 }
 
                 modal.show("Uploading " + zipFile, true);
-                final String lfn = uploadModel(zipFile, "uri");
+                final String lfn = uploadModel(zipFile);
+                
                 modal.show("Committing annotations to the Triple Store", true);
                 //commit rdf annotations
                 ModelServiceAsync ms = ModelService.Util.getInstance();
@@ -132,6 +135,7 @@ class ModelImportTab extends Tab {
                             }
 
                             public void onSuccess(SimulationObjectModel result) {
+                                final String uri = result.getURI();
                                 ModelServiceAsync mms = ModelService.Util.getInstance();
                                 AsyncCallback<Void> callback1 = new AsyncCallback<Void>() {
 
@@ -142,7 +146,7 @@ class ModelImportTab extends Tab {
 
                                     public void onSuccess(Void result) {
                                         modal.hide();
-                                        SC.say("Model successfully comitted to the Triple Store");
+                                        SC.say("Model successfully comitted to the Triple Store ("+uri+")");
                                         ModelListTab modelsTab = (ModelListTab) Layout.getInstance().getTab("model-browse-tab");
                                         if (modelsTab != null) {
                                             modelsTab.loadModels();
@@ -296,7 +300,7 @@ class ModelImportTab extends Tab {
         }
     }
 
-    private String uploadModel(String file, String URI) {
+    private String uploadModel(String file) {
 
         //uploading zip file
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
@@ -312,11 +316,16 @@ class ModelImportTab extends Tab {
             }
         };
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-        String lfn = ModelConstants.MODEL_HOME;
+        String remoteDir = ModelConstants.MODEL_HOME;
         //TODO: check if this exists
-        String name = URI + "-" + file;
-        service.uploadFile(name, lfn, callback);
-
-        return lfn + "/" + name;
+        String remoteName = getTimeStampMilli()+"-"+file;
+        String localName = file;
+        service.uploadFile(localName, remoteName, remoteDir, callback);
+        upload.disable();
+        return remoteDir + "/" + remoteName;
     }
+    private long getTimeStampMilli() {
+        Date date = new Date();
+        return date.getTime();
+}
 }

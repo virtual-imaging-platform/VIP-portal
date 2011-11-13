@@ -35,11 +35,7 @@
 package fr.insalyon.creatis.vip.models.client.view;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -187,11 +183,6 @@ class ModelDisplayTab extends Tab {
 
     private ToolStripButton testModality(String caption, boolean test) {
         ToolStripButton ok = new ToolStripButton(caption);
-//        ok.setHeight(30);
-//        ok.setPadding(10);
-//        ok.setAlign(Alignment.CENTER);
-//        ok.setValign(VerticalAlignment.CENTER);
-//        ok.setWrap(false);
         if (test) {
             ok.setIcon(ModelConstants.APP_IMG_OK);
             ok.setTooltip("This model can be used in a simulation of this modality.");

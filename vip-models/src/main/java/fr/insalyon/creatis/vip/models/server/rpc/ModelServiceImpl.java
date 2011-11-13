@@ -43,6 +43,7 @@ import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.models.client.view.ModelException;
 import fr.insalyon.creatis.vip.models.server.business.ModelBusiness;
 import java.util.List;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -114,17 +115,7 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         return modelBusiness.setStorageUrl(som, url);
     }
 
-    public void removeObjectModelFromTripleStore(String uri) throws ModelException {
-
-        try {
-            trace(logger, "Removing object model: " + uri);
-            modelBusiness.removeObjectModelFromTripleStore(uri);
-
-        } catch (CoreException ex) {
-            throw new ModelException(ex);
-        }
-    }
-
+  
     public void deleteAllModelsInTheTripleStore() throws ModelException {
 
         try {
@@ -143,6 +134,19 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
             return modelBusiness.searchModels(query, types, time);
 
         } catch (BusinessException ex) {
+            throw new ModelException(ex);
+        }
+    }
+
+    public void deleteModel(String uri) throws ModelException {
+        try{
+            try {
+                trace(logger, "Removing object model: " + uri);
+            } catch (CoreException ex) {
+                java.util.logging.Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        modelBusiness.deleteModel(uri);
+        }catch (BusinessException ex){
             throw new ModelException(ex);
         }
     }

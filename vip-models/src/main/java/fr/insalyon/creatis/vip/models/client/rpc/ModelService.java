@@ -77,9 +77,9 @@ public interface ModelService extends RemoteService {
 
     public SimulationObjectModel setStorageUrl(SimulationObjectModel som, String url) throws ModelException;
 
-    public void removeObjectModelFromTripleStore(String uri) throws ModelException;
-
     public void deleteAllModelsInTheTripleStore() throws ModelException;
-    
+
     public List<SimulationObjectModelLight> searchModels(String query, String[] types, String[] time) throws ModelException;
+
+    public void deleteModel(String uri) throws ModelException;
 }

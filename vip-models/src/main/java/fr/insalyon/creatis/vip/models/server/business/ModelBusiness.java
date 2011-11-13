@@ -161,14 +161,20 @@ public class ModelBusiness {
         return som;
     }
 
-    public void removeObjectModelFromTripleStore(String uri) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
+  
     public void deleteAllModelsInTheTripleStore() {
 //        SimulationObjectModelFactory.deleteAllModelsInPersistentStore();
     }
 
+    public void deleteModel(String uri) throws BusinessException{
+        try {
+            SimulationObjectModel som = SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri);
+            SimulationObjectModelFactory.deleteModelInPersistentStore(som);
+                            } catch (Exception e) {
+            throw new BusinessException(e);
+        }
+    }
+    
     public List<SimulationObjectModelLight> searchModels(String query, 
             String[] types, String[] time) throws BusinessException {
 
