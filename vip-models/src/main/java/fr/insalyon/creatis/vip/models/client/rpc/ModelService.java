@@ -82,4 +82,6 @@ public interface ModelService extends RemoteService {
     public List<SimulationObjectModelLight> searchModels(String query, String[] types, String[] time) throws ModelException;
 
     public void deleteModel(String uri) throws ModelException;
+    
+     public String getStorageURL(String uri) throws ModelException;
 }

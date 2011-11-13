@@ -44,7 +44,7 @@ public class ModelConstants {
 
     // Tabs
     public static final String TAB_MODEL_BROWSER = "model-browse-tab";
-    public static final String TAB_MODEL_IMPORT = "model-import-tab";
+ 
     // Icons
     private static final String IMG_FOLDER = "model/";
     public static final String ICON_MODEL = IMG_FOLDER + "icon-model.png";

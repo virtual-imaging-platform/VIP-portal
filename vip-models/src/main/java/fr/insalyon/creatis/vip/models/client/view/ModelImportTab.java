@@ -50,6 +50,8 @@ import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeNode;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import com.smartgwt.client.widgets.tree.events.LeafClickEvent;
 import com.smartgwt.client.widgets.tree.events.LeafClickHandler;
 import com.smartgwt.client.widgets.tree.events.LeafContextClickEvent;
@@ -83,12 +85,12 @@ class ModelImportTab extends Tab {
     private String zipFile;
     private Label label;
     private String rdfFile;
-    private Button upload;
-
+    private ToolStripButton upload;
+    
     public ModelImportTab() {
 
         this.setTitle("Import model");
-        this.setID(ModelConstants.TAB_MODEL_IMPORT);
+        //this.setID();
         this.setCanClose(true);
         initComplete(this);
 
@@ -97,7 +99,11 @@ class ModelImportTab extends Tab {
         modal = new ModalWindow(vl);
         label = new Label();
 
-        upload = new Button("Upload model");
+        ToolStrip toolStrip = new ToolStrip();
+        toolStrip.setWidth100();
+
+        
+        upload = new ToolStripButton("Upload model");
         upload.setIcon(DataManagerConstants.ICON_UPLOAD);
         upload.addClickHandler(new ClickHandler() {
 
@@ -177,9 +183,10 @@ class ModelImportTab extends Tab {
         label.setWrap(false);
         label.setShowEdges(false);
         label.setContents("");
+        
+        toolStrip.addButton(upload);
+        vl.addMember(toolStrip);
         vl.addMember(files);
-
-        vl.addMember(upload);
         vl.addMember(label);
 
         this.setPane(vl);
@@ -190,6 +197,7 @@ class ModelImportTab extends Tab {
     public void uploadComplete(String fileName) {
 //        modal.hide();
 //        OperationLayout.getInstance().loadData();
+        upload.enable();
         setZipFile(fileName);
     }
 

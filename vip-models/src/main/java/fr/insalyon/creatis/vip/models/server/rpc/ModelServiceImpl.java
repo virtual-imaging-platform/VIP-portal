@@ -138,6 +138,19 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
     }
 
+    public String getStorageURL(String uri) throws ModelException {
+        try{
+            try {
+                trace(logger, "Removing object model: " + uri);
+            } catch (CoreException ex) {
+                java.util.logging.Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        return modelBusiness.getStorageURL(uri);
+        }catch (BusinessException ex){
+            throw new ModelException(ex);
+        }
+    }
+    
     public void deleteModel(String uri) throws ModelException {
         try{
             try {

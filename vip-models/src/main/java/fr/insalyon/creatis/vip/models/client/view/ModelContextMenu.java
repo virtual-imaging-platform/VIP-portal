@@ -14,6 +14,8 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 
@@ -27,11 +29,11 @@ class ModelContextMenu extends Menu {
     private String modelURI;
     private String modelName;
 
-    public ModelContextMenu(ModalWindow modal, String uri, String title) {
+    public ModelContextMenu(ModalWindow modal, String uri,  String title) {
         this.modal = modal;
         this.modelURI = uri;
         this.modelName = title;
-
+    
         this.setShowShadow(true);
         this.setShadowDepth(10);
         this.setWidth(90);
@@ -66,22 +68,46 @@ class ModelContextMenu extends Menu {
     }
 
     private void deleteModel() {
-        ModelServiceAsync ms = ModelService.Util.getInstance();
-        AsyncCallback<Void> callback = new AsyncCallback<Void>(){
+        final ModelServiceAsync ms = ModelService.Util.getInstance();
+        AsyncCallback<String> cb1 = new AsyncCallback<String>(){
 
             public void onFailure(Throwable caught) {
-                SC.say("Cannot delete model ("+caught.getMessage()+")");
+            SC.warn("Cannot get model storage URL");
             }
 
-            public void onSuccess(Void result) {
-                SC.say("Model deleted");
+            public void onSuccess(String modelURL) {
+                DataManagerServiceAsync dm = DataManagerService.Util.getInstance();
+                AsyncCallback<Void> cb = new AsyncCallback<Void>() {
+
+                    public void onFailure(Throwable caught) {
+                        SC.warn("Cannot delete model files.");
+                    }
+
+                    public void onSuccess(Void result) {
+                        SC.say("Deleted model files.");
+                        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                            public void onFailure(Throwable caught) {
+                                SC.warn("Cannot delete model annotations (" + caught.getMessage() + ")");
+                            }
+
+                            public void onSuccess(Void result) {
+                                SC.say("Deleted model annotations.");
+                                ModelListTab modelsTab = (ModelListTab) Layout.getInstance().getTab("model-browse-tab");
+                                if (modelsTab != null) {
+                                    modelsTab.loadModels();
+                                }
+                            }
+                        };
+
+                        ms.deleteModel(modelURI, callback);
+                    }
+                };
+                dm.delete(modelURL, cb);
             }
         };
+        ms.getStorageURL(modelURI, cb1);  
         
-        ms.deleteModel(modelURI, callback);
-        ModelListTab modelsTab = (ModelListTab) Layout.getInstance().getTab("model-browse-tab");
-        if (modelsTab != null) {
-            modelsTab.loadModels();
-        }
+       
     }
 }

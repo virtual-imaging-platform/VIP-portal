@@ -122,7 +122,7 @@ public class ModelListTab extends Tab {
         deleteButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                SC.confirm("Do you really want to delete all the models? Zip files will not be removed.", new BooleanCallback() {
+                SC.confirm("Do you really want to delete all the models? Model files will not be removed: you will have to clean them yourself.", new BooleanCallback() {
 
                     public void execute(Boolean value) {
 
@@ -147,7 +147,7 @@ public class ModelListTab extends Tab {
             }
         });
         //disable model deletion for now
-        //toolStrip.addButton(deleteButton);
+        toolStrip.addButton(deleteButton);
 
         //Search
         searchSection = new SearchStackSection(this.getID());

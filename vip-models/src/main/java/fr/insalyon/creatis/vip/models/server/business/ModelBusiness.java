@@ -44,6 +44,7 @@ import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Simulat
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Timepoint;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.datamanager.server.rpc.DataManagerServiceImpl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -163,14 +164,16 @@ public class ModelBusiness {
 
   
     public void deleteAllModelsInTheTripleStore() {
-//        SimulationObjectModelFactory.deleteAllModelsInPersistentStore();
+        SimulationObjectModelFactory.deleteAllModelsInPersistentStore();
     }
 
     public void deleteModel(String uri) throws BusinessException{
         try {
+            System.out.println("Deleting model with uri "+uri);
             SimulationObjectModel som = SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri);
             SimulationObjectModelFactory.deleteModelInPersistentStore(som);
                             } catch (Exception e) {
+                                e.printStackTrace();
             throw new BusinessException(e);
         }
     }
@@ -321,4 +324,12 @@ public class ModelBusiness {
     private boolean matches(String target, String query) {
         return ((target.toLowerCase().indexOf(query.toLowerCase()) != -1) || (query.toLowerCase().indexOf(target.toLowerCase()) != -1));
     }
+
+    public String getStorageURL(String uri) throws BusinessException {
+        try{
+            return SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri).getStorageURL();
+        }catch (Exception e){
+            throw new BusinessException(e);
+        }
+        }
 }

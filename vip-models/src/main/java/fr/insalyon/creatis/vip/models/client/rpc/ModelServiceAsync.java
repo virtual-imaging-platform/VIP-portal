@@ -66,4 +66,6 @@ public interface ModelServiceAsync {
     public void searchModels(String query, String[] types, String[] time, AsyncCallback<List<SimulationObjectModelLight>> asyncCallback);
     
     public void deleteModel(String uri, AsyncCallback<Void> asyncCallback);
+    
+     public void getStorageURL(String uri, AsyncCallback<String> asyncCallback);
 }
