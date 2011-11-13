@@ -35,10 +35,15 @@
 package fr.insalyon.creatis.vip.models.client.view;
 
 import com.smartgwt.client.types.TreeModelType;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.tree.Tree;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeGridField;
 import com.smartgwt.client.widgets.tree.TreeNode;
+import com.smartgwt.client.widgets.tree.events.LeafClickEvent;
+import com.smartgwt.client.widgets.tree.events.LeafClickHandler;
+import com.smartgwt.client.widgets.tree.events.LeafContextClickEvent;
+import com.smartgwt.client.widgets.tree.events.LeafContextClickHandler;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Instant;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectLayer;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectLayerPart;
@@ -61,9 +66,9 @@ public class ModelTreeGrid extends TreeGrid {
         return model;
     }
 
-    public ModelTreeGrid(SimulationObjectModel model) {
+    public ModelTreeGrid(final SimulationObjectModel model) {
+        super();
         this.model = model;
-
         //init the tree grid
         setLoadDataOnDemand(false);
         setWidth(700);
@@ -74,14 +79,30 @@ public class ModelTreeGrid extends TreeGrid {
         setAutoFetchData(true);
         setCanFreezeFields(true);
         setCanReparentNodes(false);
-        setFields(new TreeGridField(model.getModelName()));
-
-        //test timepoints
-        //TreeNode modelRoot = new ModelTreeNode("1","Root",new ModelTreeNode("2","TP1"),new ModelTreeNode("3","TP2", new ModelTreeNode("4","I1"), new ModelTreeNode("5","I2")));
-
         
+        if (model != null) {
+            setFields(new TreeGridField(model.getModelName()));
+            load();
+        } 
+        
+          addLeafClickHandler(new LeafClickHandler() {
 
-        //model timepoints
+            public void onLeafClick(LeafClickEvent event) {
+                SC.say("click");
+            }
+        });
+
+        addLeafContextClickHandler(new LeafContextClickHandler() {
+
+            public void onLeafContextClick(LeafContextClickEvent event) {
+                new AnnotationsContextMenu(model,event.getLeaf().getName()).showContextMenu();
+            }
+
+       });
+
+    }
+    private void load(){
+         //model timepoints
         int id = 0;
         int ntp = 0;
 
@@ -123,7 +144,6 @@ public class ModelTreeGrid extends TreeGrid {
 
 
                 for (ObjectLayer ol : it.getObjectLayers()) {
-
                     int nolp = 0;
                     ModelTreeNode[] objectLayerParts = new ModelTreeNode[2];
 
@@ -132,7 +152,7 @@ public class ModelTreeGrid extends TreeGrid {
                     int olppl = 0;
                     ModelTreeNode[] objectLayerPhysParamsLUT = new ModelTreeNode[ol.getPhysicalParameters().size()];
                     for (PhysicalParameter pp : ol.getPhysicalParameters()) {
-                        String description = pp.toString();
+                          String description = pp.toString();
                         String icon = ModelConstants.APP_IMG_MAGNETIC;
                         if (pp.getType() == PhysicalParameterType.T1 || pp.getType() == PhysicalParameterType.T2 || pp.getType() == PhysicalParameterType.T2s || pp.getType() == PhysicalParameterType.protonDensity || pp.getType() == PhysicalParameterType.susceptibility) {
                             icon = ModelConstants.APP_IMG_MAGNETIC;
@@ -243,12 +263,13 @@ public class ModelTreeGrid extends TreeGrid {
 
         setData(modelTree);
     }
-
     public class ModelTreeNode extends TreeNode {
 
+        
+        
         public ModelTreeNode(String entityId, String entityName, boolean display) {
             this(entityId, entityName, display, new ModelTreeNode[]{});
-        }
+             }
 
         public ModelTreeNode(String entityId, String entityName, boolean display, ModelTreeNode... children) {
             setAttribute(model.getModelName(), entityName);
@@ -256,5 +277,6 @@ public class ModelTreeGrid extends TreeGrid {
             setAttribute("Children", children);
             setAttribute("isOpen", display);
         }
-    }
+        
+           }
 }

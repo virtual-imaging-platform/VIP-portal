@@ -37,25 +37,17 @@ package fr.insalyon.creatis.vip.models.client.view;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.NamedFrame;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.DragDataAction;
-import com.smartgwt.client.types.TreeModelType;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tree.Tree;
-import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeNode;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
-import com.smartgwt.client.widgets.tree.events.LeafClickEvent;
-import com.smartgwt.client.widgets.tree.events.LeafClickHandler;
-import com.smartgwt.client.widgets.tree.events.LeafContextClickEvent;
-import com.smartgwt.client.widgets.tree.events.LeafContextClickHandler;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
@@ -82,10 +74,12 @@ class ModelImportTab extends Tab {
     protected ModalWindow modal;
     private VLayout vl;
     private VLayout files;
+    private HLayout hl;
     private String zipFile;
     private Label label;
-    private String rdfFile;
-    private ToolStripButton upload;
+    private SimulationObjectModel simulationObjectModel = null;
+    private ModelDisplay modelDisplay;
+
     
     public ModelImportTab() {
 
@@ -94,82 +88,13 @@ class ModelImportTab extends Tab {
         this.setCanClose(true);
         initComplete(this);
 
+        hl = new HLayout();
+        
         vl = new VLayout();
         files = new VLayout();
-        modal = new ModalWindow(vl);
+        modal = new ModalWindow(hl);
         label = new Label();
 
-        ToolStrip toolStrip = new ToolStrip();
-        toolStrip.setWidth100();
-
-        
-        upload = new ToolStripButton("Upload model");
-        upload.setIcon(DataManagerConstants.ICON_UPLOAD);
-        upload.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-
-                if (zipFile == null) {
-                    SC.warn("No zip file");
-                    return;
-                }
-
-                if (rdfFile == null) {
-                    SC.warn("No annotation file found in zip file");
-                    return;
-                }
-
-                modal.show("Uploading " + zipFile, true);
-                final String lfn = uploadModel(zipFile);
-                
-                modal.show("Committing annotations to the Triple Store", true);
-                //commit rdf annotations
-                ModelServiceAsync ms = ModelService.Util.getInstance();
-                AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
-
-                    public void onFailure(Throwable caught) {
-                        modal.hide();
-                        SC.warn("Cannot build simulation object model from annotations");
-                    }
-
-                    public void onSuccess(SimulationObjectModel result) {
-                        ModelServiceAsync ssu = ModelService.Util.getInstance();
-                        AsyncCallback<SimulationObjectModel> cbssu = new AsyncCallback<SimulationObjectModel>() {
-
-                            public void onFailure(Throwable caught) {
-                                SC.warn("Cannot set the model storage URL");
-                            }
-
-                            public void onSuccess(SimulationObjectModel result) {
-                                final String uri = result.getURI();
-                                ModelServiceAsync mms = ModelService.Util.getInstance();
-                                AsyncCallback<Void> callback1 = new AsyncCallback<Void>() {
-
-                                    public void onFailure(Throwable caught) {
-                                        modal.hide();
-                                        SC.warn("Cannot commit model to the Triple Store");
-                                    }
-
-                                    public void onSuccess(Void result) {
-                                        modal.hide();
-                                        SC.say("Model successfully comitted to the Triple Store ("+uri+")");
-                                        ModelListTab modelsTab = (ModelListTab) Layout.getInstance().getTab("model-browse-tab");
-                                        if (modelsTab != null) {
-                                            modelsTab.loadModels();
-                                        }
-                                        OperationLayout.getInstance().loadData();
-                                        OperationLayout.getInstance().activateAutoRefresh();
-                                    }
-                                };
-                                mms.completeModel(result, callback1);
-                            }
-                        };
-                        ssu.setStorageUrl(result, lfn, cbssu);
-                    }
-                };
-                ms.rebuildObjectModelFromAnnotationFile(rdfFile, callback);
-            }
-        });
 
         NamedFrame frame = new NamedFrame("uploadTarget");
         frame.setVisible(false);
@@ -184,21 +109,19 @@ class ModelImportTab extends Tab {
         label.setShowEdges(false);
         label.setContents("");
         
-        toolStrip.addButton(upload);
-        vl.addMember(toolStrip);
+          
         vl.addMember(files);
         vl.addMember(label);
 
-        this.setPane(vl);
+        hl.addMember(vl);
+        this.setPane(hl);
 
         new FileUploadWindow("local").show();
     }
 
     public void uploadComplete(String fileName) {
-//        modal.hide();
-//        OperationLayout.getInstance().loadData();
-        upload.enable();
-        setZipFile(fileName);
+          setZipFile(fileName);
+          modelDisplay.enableCommit();
     }
 
     private native void initComplete(ModelImportTab upload) /*-{
@@ -234,106 +157,43 @@ class ModelImportTab extends Tab {
 
     public void displayFiles(String zipName, List<String> result) {
 
-//        Window window = new Window();
-//        window.setTitle(zipName);
-//        window.setWidth(260);
-//        window.setHeight(300);
-//        window.setCanDragReposition(true);
-//        window.setCanDragResize(true);
-
-        Tree fileTree = new Tree();
-        fileTree.setModelType(TreeModelType.PARENT);
-        fileTree.setRootValue(1);
-        fileTree.setNameProperty("FileName");
-        fileTree.setIdField("FileName");
-        fileTree.setParentIdField("ArchiveName");
-        fileTree.setOpenProperty("isOpen");
-        TreeNode[] fileData = new TreeNode[result.size()];
-        for (int i = 0; i < result.size(); i++) {
-            String name = result.get(i).substring(result.get(i).lastIndexOf('/') + 1);
-            if (name.endsWith(".rdf")) {
-                rdfFile = result.get(i);
-                updateLabel();
-            }
-            fileData[i] = new FileTreeNode(zipName, name);
-        }
-        fileTree.setData(fileData);
-
-        TreeGrid fileTreeGrid = new TreeGrid();
-        fileTreeGrid = new TreeGrid();
-        fileTreeGrid.setWidth(500);
-        fileTreeGrid.setHeight(900);
-        fileTreeGrid.setNodeIcon("icon-file.png");
-        fileTreeGrid.setFolderIcon("icon-folder.png");
-        fileTreeGrid.setCanReorderRecords(true);
-        fileTreeGrid.setCanAcceptDroppedRecords(true);
-        fileTreeGrid.setShowOpenIcons(false);
-        fileTreeGrid.setDropIconSuffix("into");
-        fileTreeGrid.setClosedIconSuffix("");
-        fileTreeGrid.setDragDataAction(DragDataAction.MOVE);
-        fileTreeGrid.setData(fileTree);
-
-        fileTreeGrid.addLeafClickHandler(new LeafClickHandler() {
-
-            public void onLeafClick(LeafClickEvent event) {
-                SC.say("click");
-            }
-        });
-
-        fileTreeGrid.addLeafContextClickHandler(new LeafContextClickHandler() {
-
-            public void onLeafContextClick(LeafContextClickEvent event) {
-                SC.say("context click");
-            }
-        });
-
         // window.addItem(fileTreeGrid);
-        files.addMember(fileTreeGrid);
-    }
-
-    private void updateLabel() {
-        label.setContents("(Annotations: " + rdfFile.substring(rdfFile.lastIndexOf('/') + 1) + ")");
-    }
-
-    public class FileTreeNode extends TreeNode {
-
-        public FileTreeNode(String zipFileName, String fileName) {
-            setAttribute("ArchiveName", zipFileName);
-            setAttribute("FileName", fileName);
-            setAttribute("isOpen", true);
-
-            //    setAttribute("description", getFileDescription(zipFileName));
-
-            //extract file
-        }
-    }
-
-    private String uploadModel(String file) {
-
-        //uploading zip file
-        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
+        FileTree fileTree = new FileTree(zipFile, result);
+        files.addMember(fileTree);
+        final String rdf = fileTree.getRdfFile();
+        if(rdf != null) {
+            label.setContents("(Initialized annotations from file: " + rdf.substring(rdf.lastIndexOf('/') + 1) + ")");
+        
+        //building object model
+        modal.show("Building simulation object model.",true);
+         ModelServiceAsync ms = ModelService.Util.getInstance();
+         AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
+                
             public void onFailure(Throwable caught) {
-                SC.warn("Cannot upload zip file");
+                modal.hide();
+                SC.warn("Couldn't build a simulation object model from file "+rdf.substring(rdf.lastIndexOf('/') + 1)+". You will have to annotate the model yourself.");
             }
 
-            public void onSuccess(Void result) {
-                SC.say("Added zip file to the upload pool");
-                ((DataManagerSection) Layout.getInstance().getMainSection(DataManagerConstants.SECTION_FILE_TRANSFER)).expand();
-                BrowserLayout.getInstance().loadData(ModelConstants.MODEL_HOME, true);
+            public void onSuccess(SimulationObjectModel result) {
+                modal.hide();
+                setSimulationObjectModel(result);
+                
             }
+
+                
         };
-        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-        String remoteDir = ModelConstants.MODEL_HOME;
-        //TODO: check if this exists
-        String remoteName = getTimeStampMilli()+"-"+file;
-        String localName = file;
-        service.uploadFile(localName, remoteName, remoteDir, callback);
-        upload.disable();
-        return remoteDir + "/" + remoteName;
+        ms.rebuildObjectModelFromAnnotationFile(rdf, callback);
+        }else{
+        SC.say("Couldn't find any annotation file in this archive. You will have to annotate the model yourself.");
+        }
+        
     }
-    private long getTimeStampMilli() {
-        Date date = new Date();
-        return date.getTime();
-}
+    public void setSimulationObjectModel(SimulationObjectModel result) {
+        modelDisplay = new ModelDisplay(result);
+        modelDisplay.setZipFile(zipFile);
+        modelDisplay.enableCommit();
+        hl.addMember(modelDisplay);
+    }
+  
+   
 }
