@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.datamanager.server.rpc;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
@@ -46,6 +47,7 @@ import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
+import java.io.File;
 import java.util.List;
 import org.apache.log4j.Logger;
 
@@ -270,6 +272,14 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
+    
+    public void uploadFile(String localFile, String remoteName, String remoteDir) throws DataManagerException {
+        File f = new File(Server.getInstance().getDataManagerPath()
+                    + "/uploads/"+localFile);
+        f.renameTo(new File(Server.getInstance().getDataManagerPath()
+                    + "/uploads/"+remoteName));
+        uploadFile(remoteName,remoteDir);
+    }
     public void uploadFile(String localFile, String remoteFile) throws DataManagerException {
 
         try {

@@ -92,6 +92,8 @@ public interface DataManagerService extends RemoteService {
 
     public void downloadFolder(String remoteFolder) throws DataManagerException;
     
+    public void uploadFile(String localFile, String remoteName, String remoteDir) throws DataManagerException;
+    
     public void uploadFile(String localFile, String remoteFile) throws DataManagerException;
 
     public boolean exists(String remoteFile) throws DataManagerException;

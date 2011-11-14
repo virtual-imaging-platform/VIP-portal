@@ -291,10 +291,9 @@ public class TransferPoolBusiness {
 
         try {
             VletAgentPoolClient poolClient = CoreUtil.getVletAgentPoolClient();
-
-            String localPath = "file://" + serverConfiguration.getDataManagerPath()
+            String localPath = serverConfiguration.getDataManagerPath()
                     + "/uploads/" + localFile;
-            String remotePath = DataManagerUtil.parseBaseDir(userName, remoteFile);
+                       String remotePath = DataManagerUtil.parseBaseDir(userName, remoteFile);
             poolClient.uploadFile(localPath, remotePath, email);
 
         } catch (DataManagerException ex) {
