@@ -55,7 +55,7 @@ import java.util.LinkedHashMap;
 public class GateLabInput extends VLayout {
 
     private String name;
-    private String userLevel;
+    private String comment;
     private HLayout hLayout;
     private SelectItem selectItem;
     private TextItem textItem;
@@ -65,10 +65,10 @@ public class GateLabInput extends VLayout {
     private Boolean isSelectItem;
     //private TextItem listItem;
 
-    public GateLabInput(String name, String userLevel) {
+    public GateLabInput(String name, String comment) {
 
         this.name = name;
-        this.userLevel = userLevel;
+        this.comment = comment;
         
         if (this.name.compareToIgnoreCase("GateRelease") == 0) {
             hLayout = new HLayout(3);
@@ -79,6 +79,10 @@ public class GateLabInput extends VLayout {
         label = new Label(name + ":");
         label.setWidth(150);
         label.setAlign(Alignment.RIGHT);
+        if (comment != null) {
+            label.setTooltip(comment);
+            label.setHoverWidth(500);
+        }
         hLayout.addMember(label);
 
         if ((this.name.compareToIgnoreCase("CPUestimation") == 0)) {

@@ -48,6 +48,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchStackSection;
+import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.AppletHTMLPane;
@@ -244,34 +245,22 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
         inputsLayout.removeMembers(inputsLayout.getMembers());
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        final AsyncCallback<List<Source>> callback = new AsyncCallback<List<Source>>() {
+        final AsyncCallback<Descriptor> callback = new AsyncCallback<Descriptor>() {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Error executing get application sources list: " + caught.getMessage());
             }
 
-            public void onSuccess(List<Source> result) {
+            public void onSuccess(Descriptor d) {
 
-                if (result != null) {
+                if (d != null) {
 
                     //nameLayout.addMember(getSimulatioNameLayout());
                     loadNameLayout();
-
-                    for (Source source : result) {
-                        String ul = "";
-                        if (source.getUserLevel() != null) {
-                            ul = source.getUserLevel();
-                        }
-                        /*
-                        if (ul.compareToIgnoreCase("advanced") == 0) {
-                        advInputsLayout.addMember(new GateLabInput(source.getName(), ul));
-                        } else {
-                        begInputsLayout.addMember(new GateLabInput(source.getName(), ul));
-                        }
-                         *
-                         */
-                        inputsLayout.addMember(new GateLabInput(source.getName(), ul));
+                    List<Source> sources = d.getSources();
+                    for (Source source : sources) {
+                        inputsLayout.addMember(new GateLabInput(source.getName(), source.getDescription()));
                         //inputsListGrid.se
                     }
 
@@ -302,7 +291,7 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
             }
         };
         modal.show("Loading Launch Panel...", true);
-        service.getApplicationSources(applicationName, callback);
+        service.getApplicationDescriptor(applicationName, callback);
     }
 
     /**

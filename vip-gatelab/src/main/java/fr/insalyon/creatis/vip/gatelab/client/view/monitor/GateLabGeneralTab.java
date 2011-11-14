@@ -127,8 +127,8 @@ public class GateLabGeneralTab extends Tab {
         }
         }
         });
- * 
- */
+         * 
+         */
     }
 
     public void loadData() {
@@ -157,28 +157,30 @@ public class GateLabGeneralTab extends Tab {
                     new PropertyRecord("Gate Release", result.get("gate_version"))
                 };
                 grid.setData(data);
+
+
+                WorkflowServiceAsync serviceOut = WorkflowService.Util.getInstance();
+                AsyncCallback<List<InOutData>> callbackOut = new AsyncCallback<List<InOutData>>() {
+
+                    public void onFailure(Throwable caught) {
+                        SC.warn("Error executing get simulation output\n" + caught.getMessage());
+                    }
+
+                    public void onSuccess(List<InOutData> result) {
+                        for (InOutData data : result) {
+                            if (data.getProcessor().equals("merged_results")) {
+                                grid.addData(new PropertyRecord("Output", data.getPath()));
+                                break;
+                            }
+
+                        }
+                    }
+                };
+                serviceOut.getOutputData(simulationID, callbackOut);
             }
         };
         gatelabservice.getGatelabWorkflowInputs(simulationID, callback);
 
 
-        WorkflowServiceAsync serviceOut = WorkflowService.Util.getInstance();
-        AsyncCallback<List<InOutData>> callbackOut = new AsyncCallback<List<InOutData>>() {
-
-            public void onFailure(Throwable caught) {
-                SC.warn("Error executing get simulation output\n" + caught.getMessage());
-            }
-
-            public void onSuccess(List<InOutData> result) {
-                for (InOutData data : result) {
-                    if (data.getProcessor().equals("merged_results")) {
-                        grid.addData(new PropertyRecord("Output", data.getPath()));
-                        break;
-                    }
-
-                }
-            }
-        };
-        serviceOut.getOutputData(simulationID, callbackOut);
     }
 }
