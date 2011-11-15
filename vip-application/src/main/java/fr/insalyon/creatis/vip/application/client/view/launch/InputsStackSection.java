@@ -79,7 +79,7 @@ public class InputsStackSection extends SectionStackSection {
     public InputsStackSection(String tabID) {
 
         this.tabID = tabID;
-        this.setTitle("Inputs");
+        this.setTitle("Saved inputs");
         this.setCanCollapse(true);
         this.setExpanded(false);
         this.setResizeable(true);

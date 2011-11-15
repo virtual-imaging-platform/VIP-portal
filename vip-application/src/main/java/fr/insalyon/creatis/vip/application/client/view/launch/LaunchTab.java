@@ -45,10 +45,11 @@ public class LaunchTab extends AbstractLaunchTab {
     public LaunchTab(String applicationName) {
 
         super(applicationName);
-        
-        launchSection = new LaunchStackSection(applicationName);
-        sectionStack.setSections(launchSection);
-        
+
+        sectionStack.clear();
+
+        addDocumentationSection();
+        addLaunchSection(applicationName);
         addInputsSection();
     }
 
@@ -64,5 +65,11 @@ public class LaunchTab extends AbstractLaunchTab {
      */
     public void setInputValue(String inputName, String value) {
         ((LaunchStackSection) launchSection).setInputValue(inputName, value);
+    }
+
+    private void addLaunchSection(String applicationName) {
+        launchSection = new LaunchStackSection(applicationName, this.getID());
+        sectionStack.addSection(launchSection);
+
     }
 }

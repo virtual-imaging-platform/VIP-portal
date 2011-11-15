@@ -34,7 +34,9 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.common;
 
+import fr.insalyon.creatis.vip.application.client.view.launch.DocumentationSection;
 import com.smartgwt.client.types.VisibilityMode;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -51,9 +53,11 @@ public abstract class AbstractLaunchTab extends Tab {
     protected SectionStack sectionStack;
     protected AbstractLaunchStackSection launchSection;
     protected InputsStackSection inputsSection;
-
+    protected DocumentationSection documentationSection;
+    protected String applicationName;
+    
     public AbstractLaunchTab(String applicationName) {
-
+        this.applicationName = applicationName;
         this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_APPLICATION) + " "
                 + applicationName);
         this.setCanClose(true);
@@ -72,6 +76,11 @@ public abstract class AbstractLaunchTab extends Tab {
         this.setPane(vLayout);
     }
     
+    protected void addDocumentationSection(){
+        documentationSection = new DocumentationSection(applicationName);
+        sectionStack.addSection(documentationSection);
+    }
+    
     protected void addInputsSection() {
         inputsSection = new InputsStackSection(this.getID());
         sectionStack.addSection(inputsSection);
@@ -83,5 +92,9 @@ public abstract class AbstractLaunchTab extends Tab {
 
     public void loadInput(String name, String values) {
         launchSection.loadInput(name, values);
+    }
+
+    public DocumentationSection getDescriptionSection() {
+        return documentationSection;
     }
 }

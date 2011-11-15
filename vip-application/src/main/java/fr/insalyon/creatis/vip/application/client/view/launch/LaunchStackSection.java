@@ -51,6 +51,8 @@ import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchStackSection;
+import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,19 +64,13 @@ import java.util.Map;
 public class LaunchStackSection extends AbstractLaunchStackSection {
 
     private VLayout formLayout;
-    private Label descriptionPane;
+    private String tabID;
 
-    public LaunchStackSection(String applicationName) {
+    public LaunchStackSection(String applicationName, String tabId) {
 
         super(applicationName);
         
-        
-        descriptionPane = new Label();
-        descriptionPane.setWidth(600);
-        descriptionPane.setHeight(100);
-        descriptionPane.setShowEdges(true);
-       
-        
+        this.tabID = tabId;
         formLayout = new VLayout(3);
         //formLayout.setWidth100();
         formLayout.setAutoHeight();
@@ -156,13 +152,11 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
             }
 
             public void onSuccess(Descriptor d) {
-                descriptionPane.setContents(d.getDescription());
+                 AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().getTab(tabID);
+                launchTab.getDescriptionSection().setContents(d.getDescription());
                 List<Source> sources = d.getSources();
-                HLayout descriptionLayout = new HLayout(5);
-                descriptionLayout.setAlign(VerticalAlignment.CENTER);
-                descriptionLayout.setMargin(20);
-                descriptionLayout.addMember(descriptionPane);
-                formLayout.addMember(descriptionLayout);
+
+
                 formLayout.addMember(getSimulatioNameLayout());
                 
                 HLayout inputLayout = new HLayout(5);
