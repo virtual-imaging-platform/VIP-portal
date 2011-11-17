@@ -69,7 +69,7 @@ public class GateLabInput extends VLayout {
 
         this.name = name;
         this.comment = comment;
-        
+
         if (this.name.compareToIgnoreCase("GateRelease") == 0) {
             hLayout = new HLayout(3);
         } else {
@@ -86,7 +86,7 @@ public class GateLabInput extends VLayout {
         hLayout.addMember(label);
 
         if ((this.name.compareToIgnoreCase("CPUestimation") == 0)) {
-            
+
             selectItem = new SelectItem();
             LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
             valueMap.put("1", "A few minutes");
@@ -146,7 +146,7 @@ public class GateLabInput extends VLayout {
     }
 
     public boolean validate() {
-        
+
         if (this.isSelectItem) {
             return this.selectItem.validate();
         } else {
@@ -155,12 +155,12 @@ public class GateLabInput extends VLayout {
     }
 
     public String getName() {
-        
+
         return this.name;
     }
 
     public String getValue() {
-        
+
         if (this.isSelectItem) {
             return this.selectItem.getValueAsString();
         } else {
@@ -171,12 +171,19 @@ public class GateLabInput extends VLayout {
     public void setValue(String value) {
         if (this.isSelectItem) {
             this.selectItem.setValue(value);
+             if (this.name.equals("ParallelizationType") && value.equals("stat")) {
+                    this.selectItem.setDisabled(true);
+             }
         } else {
             this.textItem.setValue(value);
         }
     }
 
     public void setTextNonEdit() {
-        this.textItem.setDisabled(true);
+        if (this.isSelectItem) {
+            this.selectItem.setDisabled(true);
+        } else {
+            this.textItem.setDisabled(true);
+        }
     }
 }

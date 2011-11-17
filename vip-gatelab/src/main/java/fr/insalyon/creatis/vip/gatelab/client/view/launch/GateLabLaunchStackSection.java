@@ -49,7 +49,9 @@ import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchStackSection;
 import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
+import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.AppletHTMLPane;
 import java.util.ArrayList;
@@ -72,13 +74,14 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
     private AppletHTMLPane myApplet;
     private Map<String, String> paramsMap;
     private LoadMacWindow loadMacWindow;
+    private String tabID;
     //private ListGrid inputsListGrid;
     //private ListGridField categoryField;
 
     //private GateLabLaunchTab myLaunchTab;
-    public GateLabLaunchStackSection(String applicationName) {
+    public GateLabLaunchStackSection(String applicationName, String tabId) {
         super(applicationName);
-
+    //    this.tabID = tabId;
         initComplete(this);
 
         nameLayout = new VLayout(5);
@@ -106,8 +109,6 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
             loadMacWindow = null;
 
             modal.hide();
-            //SC.say("File name is " + inputTgz + " simu type " + simuType);
-            //add info to the map and launch button
 
             String[] it = inputTgz.split(" = ");
             setInputValue(it[0], baseDir.concat("/").concat(it[1]));
@@ -116,6 +117,9 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
             //setInputValue(st[0], st[1]);
             String[] np = nbPart.split(" = ");
             setInputValue(np[0], np[1]);
+
+            String[] st = simuType.split(" = ");
+            setInputValue(st[0], st[1]);
 
             inputsLayout.setVisible(true);
 
@@ -149,20 +153,6 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
                 loadMacWindow = new LoadMacWindow(modal, baseDir);
                 loadMacWindow.show();
 
-                /*
-                myApplet = new AppletHTMLPane(
-                "DataUpload",
-                "fr.insalyon.creatis.vip.gatelab.applet.loadmac.LoadMac",
-                "vip-gatelab-applet.jar", 800, 450,
-                Context.getInstance().getUser(),
-                Context.getInstance().getUserDN(),
-                Context.getInstance().getProxyFileName(),
-                baseDir, false, false);
-                layout.addChild(myApplet);
-                 *
-                 */
-                //layout.show();
-                //layout.showMember(stack, null);
             }
         });
 
@@ -175,7 +165,7 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
     }
 
     public void loadNameLayout() {
-        
+
         nameLayout.addMember(getSimulatioNameLayout());
         HLayout macLayout = new HLayout(5);
         macLayout.setAlign(VerticalAlignment.CENTER);
@@ -255,7 +245,8 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
             public void onSuccess(Descriptor d) {
 
                 if (d != null) {
-
+                    //AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().getTab(tabID);
+                    //launchTab.getDescriptionSection().setContents(d.getDescription());
                     //nameLayout.addMember(getSimulatioNameLayout());
                     loadNameLayout();
                     List<Source> sources = d.getSources();
@@ -283,7 +274,7 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
                     buttonsLayout.addMember(launchButton);
                     buttonsLayout.addMember(getSaveInputsButton());
                     modal.hide();
-                    
+
                 } else {
                     modal.hide();
                     SC.warn("Unable to download application source file.");
@@ -300,7 +291,7 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
      * @return Result of the validation
      */
     private boolean validate() {
-        
+
         boolean valid = simulationNameItem.validate();
         for (GateLabInput input : getGateLabInputs()) {
             if (!input.validate()) {
@@ -315,7 +306,7 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
      * Launches a simulation.
      */
     private void launch() {
-        
+
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
@@ -349,26 +340,6 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
         return paramsMap;
     }
 
-    /*
-    public List<GateLabInput> getGateLabInputs() {
-    
-    List<GateLabInput> inputList = new ArrayList<GateLabInput>();
-    
-    for (Canvas canvas : inputsLayout.getMembers()) {
-    //inputsLayout contains begInputsLayout and advInputsLayout
-    for (Canvas inputCanvas : canvas.getChildren()) {
-    if (inputCanvas instanceof GateLabInput) {
-    GateLabInput input = (GateLabInput) inputCanvas;
-    inputList.add(input);
-    }
-    }
-    }
-    
-    return inputList;
-    
-    }
-     *
-     */
     /**
      * Gets the list of all GateLabInputs objects.
      *

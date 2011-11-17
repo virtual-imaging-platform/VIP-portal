@@ -50,7 +50,7 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
 
         super(applicationName);
 
-        this.launchSection = new GateLabLaunchStackSection(applicationName);
+        this.launchSection = new GateLabLaunchStackSection(applicationName, this.getID());
         sectionStack.setSections(launchSection);
 
         addInputsSection();
