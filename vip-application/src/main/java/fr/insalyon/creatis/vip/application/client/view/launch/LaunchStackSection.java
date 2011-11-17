@@ -63,7 +63,7 @@ import java.util.Map;
  */
 public class LaunchStackSection extends AbstractLaunchStackSection {
 
-    private VLayout formLayout;
+    private VLayout formLayout, inputs;
     private String tabID;
 
     public LaunchStackSection(String applicationName, String tabId) {
@@ -96,7 +96,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
         }
 
         StringBuilder sb = new StringBuilder();
-        for (Canvas canvas : formLayout.getMembers()) {
+        for (Canvas canvas : inputs.getMembers()) {
             if (canvas instanceof InputHLayout) {
                 InputHLayout input = (InputHLayout) canvas;
                 String value = valuesMap.get(input.getName());
@@ -162,7 +162,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
                 HLayout inputLayout = new HLayout(5);
                 inputLayout.setMargin(20);
                 
-                VLayout inputs = new VLayout(3);
+                inputs = new VLayout(3);
                 inputs.setAutoHeight();
                 for (Source source : sources) {
                     inputs.addMember(new InputHLayout(source.getName(), source.getDescription()));
