@@ -35,13 +35,10 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -72,10 +69,8 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
         
         this.tabID = tabId;
         formLayout = new VLayout(3);
-        //formLayout.setWidth100();
         formLayout.setAutoHeight();
-        vLayout.addMember(formLayout);
-        
+        vLayout.addMember(formLayout);       
 
         loadData();
     }
@@ -204,7 +199,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
     private boolean validate() {
         
         boolean valid = simulationNameItem.validate();
-        for (Canvas canvas : formLayout.getMembers()) {
+        for (Canvas canvas : inputs.getMembers()) {
             if (canvas instanceof InputHLayout) {
                 InputHLayout input = (InputHLayout) canvas;
                 if (!input.validate()) {
@@ -249,7 +244,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
 
         Map<String, String> paramsMap = new HashMap<String, String>();
 
-        for (Canvas canvas : formLayout.getMembers()) {
+        for (Canvas canvas : inputs.getMembers()) {
             if (canvas instanceof InputHLayout) {
                 InputHLayout input = (InputHLayout) canvas;
                 paramsMap.put(input.getName(), input.getValue());
