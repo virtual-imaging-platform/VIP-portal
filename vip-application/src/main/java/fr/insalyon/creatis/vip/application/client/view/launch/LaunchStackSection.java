@@ -196,7 +196,8 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
      * 
      * @return Result of the validation
      */
-    private boolean validate() {
+    @Override
+    protected boolean validate() {
         
         boolean valid = simulationNameItem.validate();
         for (Canvas canvas : inputs.getMembers()) {

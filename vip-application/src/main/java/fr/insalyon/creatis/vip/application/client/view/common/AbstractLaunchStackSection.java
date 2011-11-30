@@ -111,15 +111,20 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
         saveButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                if (simulationNameItem.validate()) {
+                if (validate()) {
                     verifySimulationName();
-                } else {
-                    SC.warn("You should provide a Simulation Name.");
                 }
             }
         });
         return saveButton;
     }
+    
+    /**
+     * Validates the form before launch a simulation.
+     * 
+     * @return Result of the validation
+     */
+    protected abstract boolean validate();
 
     private void verifySimulationName() {
 

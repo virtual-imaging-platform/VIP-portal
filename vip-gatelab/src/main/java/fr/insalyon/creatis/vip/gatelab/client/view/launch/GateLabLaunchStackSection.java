@@ -49,9 +49,7 @@ import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchStackSection;
 import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
-import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.AppletHTMLPane;
 import java.util.ArrayList;
@@ -81,7 +79,7 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
     //private GateLabLaunchTab myLaunchTab;
     public GateLabLaunchStackSection(String applicationName, String tabId) {
         super(applicationName);
-    //    this.tabID = tabId;
+        //    this.tabID = tabId;
         initComplete(this);
 
         nameLayout = new VLayout(5);
@@ -149,10 +147,8 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
 
             public void onClick(ClickEvent event) {
                 //set the correct path for upload
-
                 loadMacWindow = new LoadMacWindow(modal, baseDir);
                 loadMacWindow.show();
-
             }
         });
 
@@ -290,14 +286,14 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
      *
      * @return Result of the validation
      */
-    private boolean validate() {
+    @Override
+    protected boolean validate() {
 
         boolean valid = simulationNameItem.validate();
         for (GateLabInput input : getGateLabInputs()) {
             if (!input.validate()) {
                 valid = false;
             }
-
         }
         return valid;
     }
