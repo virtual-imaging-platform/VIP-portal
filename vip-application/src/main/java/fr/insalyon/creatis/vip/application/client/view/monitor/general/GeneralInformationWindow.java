@@ -125,7 +125,7 @@ public class GeneralInformationWindow extends Window {
                 grid.setData(new PropertyRecord[]{
                             new PropertyRecord("Simulation Name", result.getSimulationName()),
                             new PropertyRecord("Simulation Identifier", result.getID()),
-                            new PropertyRecord("Submitted Time", result.getDate().toString()),
+                            new PropertyRecord("Submission Time", result.getDate().toString()),
                             new PropertyRecord("Owner", result.getUserName()),
                             new PropertyRecord("Application", result.getApplication()),
                             new PropertyRecord("Status", result.getMajorStatus())

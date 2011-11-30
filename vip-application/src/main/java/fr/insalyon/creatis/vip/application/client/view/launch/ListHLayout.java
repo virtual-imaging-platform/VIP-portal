@@ -34,7 +34,6 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
-import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -55,8 +54,6 @@ public class ListHLayout extends HLayout {
     private ListHLayout instance;
     private TextItem listItem;
     private DynamicForm listItemForm;
-    private IButton controlButton;
-    private IButton browseButton;
 
     public ListHLayout(final VLayout parent, boolean master) {
         this(parent, master, "");
@@ -67,7 +64,7 @@ public class ListHLayout extends HLayout {
         this.instance = this;
         this.setMembersMargin(3);
 
-        listItem = FieldUtil.getTextItem(400, false, "", null);
+        listItem = FieldUtil.getTextItem(400, false, "", "[0-9.A-Za-z-+/_() ]");
         listItem.setValue(value);
         
         PickerIcon browsePicker = new PickerIcon(PickerIcon.SEARCH, new FormItemClickHandler() {
