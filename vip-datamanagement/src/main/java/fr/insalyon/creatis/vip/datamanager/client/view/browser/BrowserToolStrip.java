@@ -118,7 +118,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
             }
         });
         this.addButton(uploadButton);
-        
+
         ToolStripButton uploadMultipleButton = new ToolStripButton();
         uploadMultipleButton.setIcon(DataManagerConstants.ICON_UPLOAD_MULTIPLE);
         uploadMultipleButton.setPrompt("Upload Multiple Data");
@@ -291,37 +291,56 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
     private void delete() {
 
-        ListGridRecord[] records = BrowserLayout.getInstance().getGridSelection();
         final List<String> paths = new ArrayList<String>();
+        final String baseDir = pathItem.getValueAsString();
+        final DataManagerServiceAsync service = DataManagerService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
-        for (ListGridRecord record : records) {
-            DataRecord data = (DataRecord) record;
-            paths.add(data.getName());
-        }
-        SC.confirm("Do you really want to delete the selected files/folders?", new BooleanCallback() {
-
-            public void execute(Boolean value) {
-                if (value != null && value) {
-                    DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-                    AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-                        public void onFailure(Throwable caught) {
-                            modal.hide();
-                            SC.warn("Unable to delete files/folders:<br />" + caught.getMessage());
-                        }
-
-                        public void onSuccess(Void result) {
-                            modal.hide();
-                            BrowserLayout.getInstance().loadData(pathItem.getValueAsString(), true);
-                        }
-                    };
-                    modal.show("Deleting files/folders...", true);
-                    service.rename(pathItem.getValueAsString(), paths,
-                            DataManagerConstants.ROOT + "/" 
-                            + DataManagerConstants.TRASH_HOME, true, callback);
-                }
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Unable to delete files/folders:<br />" + caught.getMessage());
             }
-        });
+
+            public void onSuccess(Void result) {
+                modal.hide();
+                BrowserLayout.getInstance().loadData(baseDir, true);
+            }
+        };
+
+        if (baseDir.startsWith(DataManagerConstants.ROOT + "/" + DataManagerConstants.TRASH_HOME)) {
+            SC.confirm("Do you really want to permanently delete the selected files/folders?", new BooleanCallback() {
+
+                public void execute(Boolean value) {
+                    if (value != null && value) {
+
+                        for (ListGridRecord record : BrowserLayout.getInstance().getGridSelection()) {
+                            DataRecord data = (DataRecord) record;
+                            paths.add(baseDir + "/" + data.getName());
+                        }
+                        modal.show("Deleting files/folders...", true);
+                        service.delete(paths, callback);
+                    }
+                }
+            });
+
+        } else {
+            SC.confirm("Do you really want to delete the selected files/folders?", new BooleanCallback() {
+
+                public void execute(Boolean value) {
+                    if (value != null && value) {
+
+                        for (ListGridRecord record : BrowserLayout.getInstance().getGridSelection()) {
+                            DataRecord data = (DataRecord) record;
+                            paths.add(data.getName());
+                        }
+                        modal.show("Deleting files/folders...", true);
+                        service.rename(baseDir, paths,
+                                DataManagerConstants.ROOT + "/"
+                                + DataManagerConstants.TRASH_HOME, true, callback);
+                    }
+                }
+            });
+        }
     }
 
     private void emptyTrash() {

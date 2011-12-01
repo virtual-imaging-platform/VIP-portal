@@ -57,8 +57,8 @@ import java.util.Arrays;
  * @author Rafael Silva
  */
 public class BrowserContextMenu extends Menu {
-    
-    public BrowserContextMenu(final ModalWindow modal, final String baseDir, 
+
+    public BrowserContextMenu(final ModalWindow modal, final String baseDir,
             final DataRecord data) {
 
         this.setShowShadow(true);
@@ -173,24 +173,25 @@ public class BrowserContextMenu extends Menu {
      */
     private void delete(final ModalWindow modal, final String baseDir, final String name) {
 
+        final DataManagerServiceAsync service = DataManagerService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Unable to delete file/folder:<br />" + caught.getMessage());
+            }
+
+            public void onSuccess(Void result) {
+                modal.hide();
+                BrowserLayout.getInstance().loadData(baseDir, true);
+            }
+        };
+
         if (baseDir.startsWith(DataManagerConstants.ROOT + "/" + DataManagerConstants.TRASH_HOME)) {
             SC.confirm("Do you really want to permanently delete \"" + name + "\"?", new BooleanCallback() {
 
                 public void execute(Boolean value) {
                     if (value != null && value) {
-                        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-                        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-                            public void onFailure(Throwable caught) {
-                                modal.hide();
-                                SC.warn("Unable to delete file/folder:<br />" + caught.getMessage());
-                            }
-
-                            public void onSuccess(Void result) {
-                                modal.hide();
-                                BrowserLayout.getInstance().loadData(baseDir, true);
-                            }
-                        };
                         modal.show("Deleting " + name + "...", true);
                         service.delete(baseDir + "/" + name, callback);
                     }
@@ -202,19 +203,6 @@ public class BrowserContextMenu extends Menu {
 
                 public void execute(Boolean value) {
                     if (value != null && value) {
-                        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-                        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-                            public void onFailure(Throwable caught) {
-                                modal.hide();
-                                SC.warn("Unable to delete file/folder:<br />" + caught.getMessage());
-                            }
-
-                            public void onSuccess(Void result) {
-                                modal.hide();
-                                BrowserLayout.getInstance().loadData(baseDir, true);
-                            }
-                        };
                         modal.show("Deleting " + name + "...", true);
                         service.rename(baseDir + "/" + name,
                                 DataManagerConstants.ROOT + "/"
@@ -311,8 +299,8 @@ public class BrowserContextMenu extends Menu {
         if (!baseDir.equals(DataManagerContext.getInstance().getCutFolder())) {
 
             modal.show("Moving data...", true);
-            service.rename(DataManagerContext.getInstance().getCutFolder(), 
-                    new ArrayList(Arrays.asList(DataManagerContext.getInstance().getCutName())), 
+            service.rename(DataManagerContext.getInstance().getCutFolder(),
+                    new ArrayList(Arrays.asList(DataManagerContext.getInstance().getCutName())),
                     baseDir, false, callback);
         } else {
             SC.warn("Unable to move data into the same folder.");
