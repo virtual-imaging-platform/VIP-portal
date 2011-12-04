@@ -61,6 +61,7 @@ import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -168,9 +169,10 @@ public class UsersStackSection extends SectionStackSection {
         ListGridField emailField = new ListGridField("email", "Email");
         ListGridField institutionField = new ListGridField("institution", "Institution");
         ListGridField phoneField = new ListGridField("phone", "Phone");
+        ListGridField lastLoginField = FieldUtil.getDateField("lastLogin", "Last Login");
 
         grid.setFields(confirmedField, firstNameField, lastNameField, emailField, 
-                institutionField, phoneField);
+                institutionField, phoneField, lastLoginField);
         grid.setSortField("firstName");
         grid.setSortDirection(SortDirection.ASCENDING);
         
@@ -209,7 +211,7 @@ public class UsersStackSection extends SectionStackSection {
                 for (User u : result) {
                     dataList.add(new UserRecord(u.getFirstName(), u.getLastName(),
                             u.getEmail(), u.getInstitution(), u.getPhone(),
-                            u.isConfirmed(), u.getFolder()));
+                            u.isConfirmed(), u.getFolder(), u.getLastLogin()));
                 }
                 grid.setData(dataList.toArray(new UserRecord[]{}));
             }

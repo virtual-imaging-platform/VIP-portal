@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.core.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -54,6 +55,7 @@ public class User implements IsSerializable {
     private String code;
     private String folder;
     private String session;
+    private Date lastLogin;
     private boolean systemAdministrator;
     private Map<String, ROLE> groups;
 
@@ -63,18 +65,18 @@ public class User implements IsSerializable {
     public User(String firstName, String lastName, String email, String institution,
             String phone) {
 
-        this(firstName, lastName, email, institution, "", phone, false, "", "", "");
+        this(firstName, lastName, email, institution, "", phone, false, "", "", "", null);
     }
 
     public User(String firstName, String lastName, String email, String institution,
             String password, String phone) {
 
-        this(firstName, lastName, email, institution, password, phone, false, "", "", "");
+        this(firstName, lastName, email, institution, password, phone, false, "", "", "", null);
     }
 
     public User(String firstName, String lastName, String email, String institution,
             String password, String phone, boolean confirmed, String code,
-            String folder, String session) {
+            String folder, String session, Date lastLogin) {
 
         this.firstName = firstName;
         this.lastName = lastName;
@@ -86,6 +88,7 @@ public class User implements IsSerializable {
         this.code = code;
         this.folder = folder;
         this.session = session;
+        this.lastLogin = lastLogin;
     }
 
     public boolean isConfirmed() {
@@ -152,16 +155,24 @@ public class User implements IsSerializable {
         return session;
     }
 
+    public Date getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(Date lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
     public void setGroups(Map<String, ROLE> groups) {
         this.groups = groups;
     }
-    
+
     public boolean hasGroupAccess(String groupName) {
         return groups.containsKey(groupName);
     }
-    
+
     public boolean isGroupAdmin() {
-        
+
         for (String groupName : groups.keySet()) {
             if (groups.get(groupName) == ROLE.Admin) {
                 return true;
@@ -169,9 +180,9 @@ public class User implements IsSerializable {
         }
         return false;
     }
-    
+
     public boolean isGroupAdmin(String groupName) {
-        
+
         if (hasGroupAccess(groupName) && groups.get(groupName) == ROLE.Admin) {
             return true;
         }

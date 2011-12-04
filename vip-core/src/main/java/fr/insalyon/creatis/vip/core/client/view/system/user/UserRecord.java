@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.core.client.view.system.user;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import java.util.Date;
 
 /**
  *
@@ -46,7 +47,8 @@ public class UserRecord extends ListGridRecord {
     }
 
     public UserRecord(String firstName, String lastName, String email,
-            String institution, String phone, boolean confirmed, String folder) {
+            String institution, String phone, boolean confirmed, String folder,
+            Date lastLogin) {
 
         setAttribute("firstName", firstName);
         setAttribute("lastName", lastName);
@@ -55,5 +57,6 @@ public class UserRecord extends ListGridRecord {
         setAttribute("phone", phone);
         setAttribute("confirmed", confirmed);
         setAttribute("folder", folder);
+        setAttribute("lastLogin", lastLogin);
     }
 }

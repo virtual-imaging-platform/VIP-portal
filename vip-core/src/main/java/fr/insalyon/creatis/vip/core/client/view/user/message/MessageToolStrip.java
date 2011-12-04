@@ -32,57 +32,16 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.system.news;
+package fr.insalyon.creatis.vip.core.client.view.user.message;
 
-import com.smartgwt.client.types.VisibilityMode;
-import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.layout.SectionStack;
-import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
-import fr.insalyon.creatis.vip.core.client.bean.News;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 
 /**
  *
  * @author Rafael Silva
  */
-public class ManageNewsTab extends Tab {
+public class MessageToolStrip extends ToolStrip {
 
-    private ToolStrip toolStrip;
-    private NewsStackSection newsStackSection;
-    private EditNewsStackSection editStackSection;
-
-    public ManageNewsTab() {
-
-        this.setTitle(Canvas.imgHTML(CoreConstants.ICON_MESSAGE) + " " + CoreConstants.APP_NEWS);
-        this.setID(CoreConstants.TAB_MANAGE_NEWS);
-        this.setCanClose(true);
-
-        VLayout vLayout = new VLayout();
-
-        toolStrip = new ManageNewsToolStrip();
-        vLayout.addMember(toolStrip);
-
-        SectionStack sectionStack = new SectionStack();
-        sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
-        sectionStack.setAnimateSections(true);
-        sectionStack.setCanResizeSections(true);
-
-        newsStackSection = new NewsStackSection();
-        editStackSection = new EditNewsStackSection();
-
-        sectionStack.setSections(newsStackSection, editStackSection);
-        vLayout.addMember(sectionStack);
-
-        this.setPane(vLayout);
-    }
-    
-    public void loadNews() {
-        newsStackSection.loadData();
-    }
-    
-    public void setNews(News news) {
-        editStackSection.setNews(news);
+    public MessageToolStrip() {
     }
 }

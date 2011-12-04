@@ -52,6 +52,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.user.mail.NewsViewerWindow;
 import fr.insalyon.creatis.vip.core.client.view.system.news.NewsRecord;
+import fr.insalyon.creatis.vip.core.client.view.user.message.MessageToolStrip;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,16 +60,16 @@ import java.util.List;
  *
  * @author Rafael Silva
  */
-public class MailTab extends Tab {
+public class MessageTab extends Tab {
 
     private ModalWindow modal;
     private ListGrid grid;
 
-    public MailTab() {
+    public MessageTab() {
 
-        this.setTitle(Canvas.imgHTML(CoreConstants.ICON_MAIL) + " "
-                + CoreConstants.APP_MAIL);
-        this.setID(CoreConstants.TAB_MAIL);
+        this.setTitle(Canvas.imgHTML(CoreConstants.ICON_MESSAGE) + " "
+                + CoreConstants.APP_MESSAGE);
+        this.setID(CoreConstants.TAB_MESSAGE);
         this.setCanClose(true);
 
         configureGrid();
@@ -79,6 +80,7 @@ public class MailTab extends Tab {
         vLayout.setHeight100();
         vLayout.setOverflow(Overflow.AUTO);
         
+        vLayout.addMember(new MessageToolStrip());
         vLayout.addMember(grid);
         
         this.setPane(vLayout);

@@ -59,6 +59,16 @@ public class UserMenuButton extends ToolStripMenuButton {
         menu.setShowShadow(true);
         menu.setShadowDepth(3);
         
+        // Account Settings
+        MenuItem accountItem = new MenuItem("Account Settings");
+        accountItem.setIcon(CoreConstants.ICON_ACCOUNT);
+        accountItem.addClickHandler(new ClickHandler() {
+
+            public void onClick(MenuItemClickEvent event) {
+                Layout.getInstance().addTab(new AccountTab());
+            }
+        });
+        
         // Sign out
         MenuItem signoutItem = new MenuItem("Sign Out");
         signoutItem.setIcon(CoreConstants.ICON_SIGNOUT);
@@ -69,7 +79,7 @@ public class UserMenuButton extends ToolStripMenuButton {
             }
         });
         
-        menu.setItems(signoutItem);
+        menu.setItems(accountItem, signoutItem);
         
         this.setMenu(menu);
     }

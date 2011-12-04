@@ -49,7 +49,7 @@ public class NewsViewerWindow extends Window {
 
     public NewsViewerWindow(NewsRecord record) {
         
-        this.setTitle(Canvas.imgHTML(CoreConstants.ICON_MAIL) + " Subject: " 
+        this.setTitle(Canvas.imgHTML(CoreConstants.ICON_MESSAGE) + " Subject: " 
                 + record.getTitle());
         this.setCanDragReposition(true);
         this.setCanDragResize(true);
