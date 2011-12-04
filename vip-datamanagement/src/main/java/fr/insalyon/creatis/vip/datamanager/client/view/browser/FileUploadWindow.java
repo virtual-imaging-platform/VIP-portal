@@ -73,17 +73,17 @@ public class FileUploadWindow extends Window {
         form.setMethod(FormMethod.POST);
         form.setAction(GWT.getModuleBaseURL() + "/fileuploadservice");
         form.setTarget(target);
-        
+
         fileItem = new UploadItem("file");
         fileItem.setTitle("File");
         fileItem.setWidth(300);
         fileItem.setRequired(true);
-        
+
         HiddenItem pathItem = new HiddenItem("path");
         pathItem.setValue(baseDir);
         HiddenItem targetItem = new HiddenItem("target");
         targetItem.setValue(target);
-        
+
         ButtonItem uploadButton = new ButtonItem("Upload");
         uploadButton.addClickHandler(new ClickHandler() {
 
@@ -95,9 +95,9 @@ public class FileUploadWindow extends Window {
                 }
             }
         });
-        
+
         form.setItems(fileItem, pathItem, targetItem, uploadButton);
-        
+
         this.addItem(form);
     }
 }

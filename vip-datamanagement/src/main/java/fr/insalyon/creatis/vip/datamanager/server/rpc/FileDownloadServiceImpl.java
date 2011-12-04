@@ -37,8 +37,9 @@ package fr.insalyon.creatis.vip.datamanager.server.rpc;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
 import fr.insalyon.creatis.agent.vlet.common.bean.Operation;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
-import fr.insalyon.creatis.vip.core.server.business.Server;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -64,12 +65,12 @@ public class FileDownloadServiceImpl extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        User user = (User) req.getSession().getAttribute(CoreConstants.SESSION_USER);
         String operationId = req.getParameter("operationid");
 
-        if (operationId != null && !operationId.isEmpty()) {
+        if (user != null && operationId != null && !operationId.isEmpty()) {
 
             try {
-                Server serverConfiguration = Server.getInstance();
                 VletAgentPoolClient client = CoreUtil.getVletAgentPoolClient();
                 Operation operation = client.getOperationById(operationId);
 
@@ -82,6 +83,8 @@ public class FileDownloadServiceImpl extends HttpServlet {
                 ServletOutputStream op = resp.getOutputStream();
                 ServletContext context = getServletConfig().getServletContext();
                 String mimetype = context.getMimeType(file.getName());
+                
+                logger.info("(" + user.getEmail() + ") Downloading '" + file.getAbsolutePath() + "'.");
 
                 resp.setContentType((mimetype != null) ? mimetype : "application/octet-stream");
                 resp.setContentLength((int) file.length());

@@ -42,6 +42,7 @@ import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.Normalizer;
 import java.util.Iterator;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -96,7 +97,8 @@ public class FileUploadServiceImpl extends HttpServlet {
 
                     boolean local = path.equals("local") ? true : false;
                     String rootDirectory = DataManagerUtil.getUploadRootDirectory(local);
-                    fileName = new File(fileName).getName();
+                    fileName = new File(fileName).getName().trim().replaceAll(" ", "_");
+                    fileName = Normalizer.normalize(fileName, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
                     File uploadedFile = new File(rootDirectory + fileName);
 
                     try {
@@ -105,11 +107,15 @@ public class FileUploadServiceImpl extends HttpServlet {
 
                         if (!local) {
                             // Vlet Agent Pool Client
+                            logger.info("(" + user.getEmail() + ") Uploading '" + uploadedFile.getAbsolutePath() + "' to '" + path + "'.");
                             VletAgentPoolClient client = CoreUtil.getVletAgentPoolClient();
                             client.uploadFile(
                                     uploadedFile.getAbsolutePath(),
                                     DataManagerUtil.parseBaseDir(user.getFullName(), path),
                                     user.getEmail());
+
+                        } else {
+                            logger.info("(" + user.getEmail() + ") Uploaded '" + uploadedFile.getAbsolutePath() + "'.");
                         }
                     } catch (Exception ex) {
                         logger.error(ex);
