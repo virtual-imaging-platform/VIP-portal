@@ -41,7 +41,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.apache.log4j.Logger;
 
@@ -71,8 +73,8 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement(
                     "INSERT INTO VIPUsers("
                     + "email, pass, first_name, last_name, institution, phone, "
-                    + "code, confirmed, folder) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    + "code, confirmed, folder, last_login) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getPassword());
@@ -83,6 +85,7 @@ public class UserData implements UserDAO {
             ps.setString(7, user.getCode());
             ps.setBoolean(8, user.isConfirmed());
             ps.setString(9, user.getFolder());
+            ps.setTimestamp(10, new Timestamp(user.getLastLogin().getTime()));
             ps.execute();
 
         } catch (SQLException ex) {
@@ -175,7 +178,7 @@ public class UserData implements UserDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
-                    + "code, confirmed, folder, session "
+                    + "code, confirmed, folder, session, last_login "
                     + "FROM VIPUsers "
                     + "WHERE email=?");
 
@@ -188,7 +191,8 @@ public class UserData implements UserDAO {
                         rs.getString("email"), rs.getString("institution"),
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"),
-                        rs.getString("session"));
+                        rs.getString("session"), 
+                        new Date(rs.getTimestamp("last_login").getTime()));
             }
 
             logger.error("There is no user registered with the e-mail: " + email);
@@ -210,7 +214,7 @@ public class UserData implements UserDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
-                    + "code, confirmed, folder "
+                    + "code, confirmed, folder, last_login "
                     + "FROM VIPUsers ORDER BY first_name, last_name");
 
             ResultSet rs = ps.executeQuery();
@@ -221,7 +225,8 @@ public class UserData implements UserDAO {
                         rs.getString("first_name"), rs.getString("last_name"),
                         rs.getString("email"), rs.getString("institution"),
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
-                        rs.getString("code"), rs.getString("folder"), ""));
+                        rs.getString("code"), rs.getString("folder"), "",
+                        new Date(rs.getTimestamp("last_login").getTime())));
             }
             return users;
 
@@ -355,6 +360,29 @@ public class UserData implements UserDAO {
                 }
             }
             return false;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+    
+    /**
+     * 
+     * @param email
+     * @param lastLogin
+     * @throws DAOException 
+     */
+    public void updateLastLogin(String email, Date lastLogin) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "VIPUsers SET last_login = ? WHERE email = ?");
+
+            ps.setTimestamp(1, new Timestamp(lastLogin.getTime()));
+            ps.setString(2, email);
+
+            ps.executeUpdate();
 
         } catch (SQLException ex) {
             logger.error(ex);

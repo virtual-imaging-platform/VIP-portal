@@ -43,6 +43,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -188,7 +189,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "us.email AS uemail, first_name, last_name, institution, "
-                    + "phone, code, confirmed, folder "
+                    + "phone, code, confirmed, folder, last_login "
                     + "FROM VIPUsers us, VIPUsersGroups ug "
                     + "WHERE us.email = ug.email AND ug.groupname = ? "
                     + "ORDER BY first_name, last_name");
@@ -203,7 +204,8 @@ public class UsersGroupsData implements UsersGroupsDAO {
                         rs.getString("first_name"), rs.getString("last_name"),
                         rs.getString("uemail"), rs.getString("institution"),
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
-                        rs.getString("code"), rs.getString("folder"), ""));
+                        rs.getString("code"), rs.getString("folder"), "",
+                        new Date(rs.getTimestamp("last_login").getTime())));
             }
             return users;
 

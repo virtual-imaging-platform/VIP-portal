@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.core.server.dao;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -62,4 +63,6 @@ public interface UserDAO {
     public void updateSession(String email, String session) throws DAOException;
     
     public boolean verifySession(String email, String session) throws DAOException;
+    
+    public void updateLastLogin(String email, Date lastLogin) throws DAOException;
 }

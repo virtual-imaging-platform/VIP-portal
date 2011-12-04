@@ -47,6 +47,7 @@ import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -136,6 +137,7 @@ public class ConfigurationBusiness {
             user.setPassword(MD5.get(user.getPassword()));
             user.setFolder(user.getFirstName().toLowerCase() + "_"
                     + user.getLastName().toLowerCase());
+            user.setLastLogin(new Date());
 
             CoreDAOFactory.getDAOFactory().getUserDAO().add(user);
 
@@ -657,6 +659,21 @@ public class ConfigurationBusiness {
             CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
                     "[VIP Contact] " + category, emailContent, emails.toArray(new String[]{}));
 
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
+    /**
+     * 
+     * @param email
+     * @throws BusinessException 
+     */
+    public void updateUserLastLogin(String email) throws BusinessException {
+        
+        try {
+            CoreDAOFactory.getDAOFactory().getUserDAO().updateLastLogin(email, new Date());
+            
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

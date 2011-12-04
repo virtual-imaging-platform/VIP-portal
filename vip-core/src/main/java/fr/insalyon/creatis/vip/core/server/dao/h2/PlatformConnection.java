@@ -83,6 +83,7 @@ public class PlatformConnection {
                     + "confirmed BOOLEAN, "
                     + "folder VARCHAR(100), "
                     + "session VARCHAR(255), "
+                    + "last_login TIMESTAMP, "
                     + "PRIMARY KEY(email)")) {
 
                 Server server = Server.getInstance();
@@ -97,7 +98,7 @@ public class PlatformConnection {
                             server.getAdminInstitution(),
                             server.getAdminPassword(),
                             server.getAdminPhone(), true,
-                            UUID.randomUUID().toString(), folder, ""));
+                            UUID.randomUUID().toString(), folder, "", null));
 
                 } catch (DAOException ex) {
                     logger.error(ex);

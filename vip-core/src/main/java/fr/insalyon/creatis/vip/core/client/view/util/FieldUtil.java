@@ -75,7 +75,18 @@ public class FieldUtil {
      * @return List grid field
      */
     public static ListGridField getDateField() {
-        ListGridField dateField = new ListGridField("date", "Date", 120);
+        return getDateField("date", "Date");
+    }
+    
+    /**
+     * Gets a ListGridField configured to display dates.
+     * 
+     * @param name
+     * @param title
+     * @return 
+     */
+    public static ListGridField getDateField(String name, String title) {
+        ListGridField dateField = new ListGridField(name, title, 120);
         dateField.setType(ListGridFieldType.DATE);
         dateField.setDateFormatter(DateDisplayFormat.TOUSSHORTDATETIME);
         return dateField;

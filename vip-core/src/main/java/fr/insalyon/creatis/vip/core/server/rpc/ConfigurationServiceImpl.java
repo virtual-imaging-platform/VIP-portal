@@ -79,6 +79,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             User user = (User) getSession().getAttribute(CoreConstants.SESSION_USER);
             if (user != null) {
                 user.setSystemAdministrator(configurationBusiness.isSystemAdministrator(user.getEmail()));
+                configurationBusiness.updateUserLastLogin(email);
+                trace(logger, "Connected.");
 
             } else if (configurationBusiness.validateSession(email, session)) {
 
@@ -86,6 +88,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 user.setSystemAdministrator(configurationBusiness.isSystemAdministrator(user.getEmail()));
 
                 setUserSession(user);
+                configurationBusiness.updateUserLastLogin(email);
                 trace(logger, "Connected.");
             }
 
@@ -129,7 +132,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             User user = configurationBusiness.signin(email, password);
             user.setSystemAdministrator(configurationBusiness.isSystemAdministrator(user.getEmail()));
 
-            return setUserSession(user);
+            setUserSession(user);
+            configurationBusiness.updateUserLastLogin(email);
+            trace(logger, "Connected.");
+
+            return user;
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
@@ -425,7 +432,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
         getSession().setAttribute(CoreConstants.SESSION_USER, user);
         getSession().setAttribute(CoreConstants.SESSION_GROUPS, groups);
-        
+
         return user;
     }
 
@@ -435,12 +442,12 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @throws CoreException 
      */
     public void activateUser(String email) throws CoreException {
-        
+
         try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Activating user: " + email);
             configurationBusiness.activateUser(email);
-            
+
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
