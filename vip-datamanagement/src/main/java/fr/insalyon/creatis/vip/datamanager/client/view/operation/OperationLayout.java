@@ -84,7 +84,7 @@ public class OperationLayout extends VLayout {
         operationsLayout.setPadding(5);
         operationsLayout.setOverflow(Overflow.AUTO);
         operationsLayout.setAlign(VerticalAlignment.TOP);
-        operationsLayout.setBackgroundColor("#F7F7F7");
+        operationsLayout.setBackgroundColor("#F2F2F2");
 
         modal = new ModalWindow(operationsLayout);
         toolStrip = new OperationToolStrip(modal);
