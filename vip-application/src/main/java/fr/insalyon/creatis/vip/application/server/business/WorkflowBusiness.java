@@ -34,7 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.server.business;
 
-import fr.cnrs.i3s.moteur2.execution.Workflow;
+import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.MoteurStatus;
@@ -43,7 +43,6 @@ import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Processor;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
-import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.server.business.simulation.MoteurPoolConfig;
 import fr.insalyon.creatis.vip.application.server.business.simulation.MoteurWSConfig;
@@ -551,7 +550,7 @@ public class WorkflowBusiness {
      * @return
      * @throws BusinessException 
      */
-    public String getPerformanceStats(List<Simulation> simulationIDList, int type) 
+    public String getPerformanceStats(List<Simulation> simulationIDList, int type)
             throws BusinessException {
 
         try {
@@ -565,6 +564,40 @@ public class WorkflowBusiness {
                     throw new BusinessException("Type '" + type + "' not supported.");
             }
         } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param user
+     * @param inputs
+     * @throws BusinessException 
+     */
+    public void validateInputs(String user, List<String> inputs) throws BusinessException {
+
+        try {
+            VletAgentClient client = CoreUtil.getVletAgentClient();
+            StringBuilder sb = new StringBuilder();
+
+            for (String input : inputs) {
+                if (!client.exist(input)) {
+                    if (sb.length() > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append(DataManagerUtil.parseBaseDir(user, input));
+                }
+            }
+
+            if (sb.length() > 0) {
+                logger.error("The following data does not exist: "
+                        + sb.toString());
+                throw new BusinessException("The following data does not exist: "
+                        + sb.toString());
+            }
+        } catch (DataManagerException ex) {
+            throw new BusinessException(ex);
+        } catch (VletAgentClientException ex) {
             throw new BusinessException(ex);
         }
     }

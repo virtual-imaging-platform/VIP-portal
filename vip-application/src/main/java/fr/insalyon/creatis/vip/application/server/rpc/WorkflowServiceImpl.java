@@ -42,11 +42,9 @@ import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
-import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.server.business.InputBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
-import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAOFactory;
 import fr.insalyon.creatis.vip.application.server.dao.derby.connection.JobsConnection;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
@@ -539,10 +537,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @throws ApplicationException 
      */
     public String getPerformanceStats(List<Simulation> simulationList, int type) throws ApplicationException {
-        
+
         try {
             return workflowBusiness.getPerformanceStats(simulationList, type);
-        
+
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
@@ -571,7 +569,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @throws ApplicationException 
      */
     public List<InOutData> getInputData(String simulationID) throws ApplicationException {
-        
+
         try {
             return workflowBusiness.getInputData(simulationID);
 
@@ -587,10 +585,27 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @throws ApplicationException 
      */
     public List<Processor> getProcessors(String simulationID) throws ApplicationException {
-        
+
         try {
             return workflowBusiness.getProcessors(simulationID);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param inputs
+     * @throws ApplicationException 
+     */
+    public void validateInputs(List<String> inputs) throws ApplicationException {
+
+        try {
+            workflowBusiness.validateInputs(getSessionUser().getFullName(), inputs);
             
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
