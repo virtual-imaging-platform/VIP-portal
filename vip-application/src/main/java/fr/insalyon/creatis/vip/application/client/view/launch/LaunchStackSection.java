@@ -50,6 +50,8 @@ import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchStackSection;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,11 +68,11 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
     public LaunchStackSection(String applicationName, String tabId) {
 
         super(applicationName);
-        
+
         this.tabID = tabId;
         formLayout = new VLayout(3);
         formLayout.setAutoHeight();
-        vLayout.addMember(formLayout);       
+        vLayout.addMember(formLayout);
 
         loadData();
     }
@@ -147,16 +149,16 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
             }
 
             public void onSuccess(Descriptor d) {
-                 AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().getTab(tabID);
+                AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().getTab(tabID);
                 launchTab.getDescriptionSection().setContents(d.getDescription());
                 List<Source> sources = d.getSources();
 
 
                 formLayout.addMember(getSimulatioNameLayout());
-                
+
                 HLayout inputLayout = new HLayout(5);
                 inputLayout.setMargin(20);
-                
+
                 inputs = new VLayout(3);
                 inputs.setAutoHeight();
                 for (Source source : sources) {
@@ -178,7 +180,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
 
                     public void onClick(ClickEvent event) {
                         if (validate()) {
-                            launch();
+                            verifyData();
                         }
                     }
                 });
@@ -198,7 +200,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
      */
     @Override
     protected boolean validate() {
-        
+
         boolean valid = simulationNameItem.validate();
         for (Canvas canvas : inputs.getMembers()) {
             if (canvas instanceof InputHLayout) {
@@ -212,10 +214,43 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
     }
 
     /**
+     * Verifies input data existence.
+     */
+    private void verifyData() {
+
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Error on input data:<br />" + caught.getMessage());
+            }
+
+            public void onSuccess(Void result) {
+                modal.hide();
+                launch();
+            }
+        };
+        modal.show("Verifying input data...", true);
+        List<String> inputData = new ArrayList<String>();
+        for (String input : getParametersMap().values()) {
+            if (input.startsWith(DataManagerConstants.ROOT)) {
+                inputData.add(input);
+            }
+        }
+        if (!inputData.isEmpty()) {
+            service.validateInputs(inputData, callback);
+        } else {
+            modal.hide();
+            launch();
+        }
+    }
+
+    /**
      * Launches a simulation.
      */
     private void launch() {
-        
+
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
@@ -230,9 +265,9 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
                         + "' successfully launched.");
             }
         };
-        modal.show("Launching simulation '" + simulationNameItem.getValueAsString() 
+        modal.show("Launching simulation '" + simulationNameItem.getValueAsString()
                 + "'...", true);
-        service.launchSimulation(getParametersMap(), applicationName, 
+        service.launchSimulation(getParametersMap(), applicationName,
                 simulationNameItem.getValueAsString().trim(), callback);
     }
 
@@ -251,7 +286,6 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
                 paramsMap.put(input.getName(), input.getValue());
             }
         }
-
         return paramsMap;
     }
 }
