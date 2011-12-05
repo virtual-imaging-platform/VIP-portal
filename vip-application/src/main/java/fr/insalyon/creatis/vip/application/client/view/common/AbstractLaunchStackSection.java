@@ -51,6 +51,7 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
@@ -108,6 +109,7 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
     protected IButton getSaveInputsButton() {
 
         IButton saveButton = new IButton("Save Inputs");
+        saveButton.setIcon(CoreConstants.ICON_SAVE);
         saveButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {

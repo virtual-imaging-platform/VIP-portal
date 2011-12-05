@@ -96,6 +96,21 @@ public class InputsStackSection extends SectionStackSection {
         vLayout.addMember(grid);
 
         this.addItem(vLayout);
+        
+        ImgButton button = new ImgButton();
+        button.setSrc(CoreConstants.ICON_SAVE);
+        button.setSize(16);
+        button.setShowFocused(false);
+        button.setShowRollOver(false);
+        button.setShowDown(false);
+        button.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                setExpanded(true);
+            }
+        });
+        this.setControls(button);
+        
         loadData();
     }
 
