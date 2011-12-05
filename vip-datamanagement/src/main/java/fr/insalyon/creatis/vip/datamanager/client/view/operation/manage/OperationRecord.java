@@ -32,7 +32,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client.view.operation;
+package fr.insalyon.creatis.vip.datamanager.client.view.operation.manage;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import java.util.Date;

@@ -54,7 +54,6 @@ import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
-import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationRecord;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -145,7 +144,8 @@ public class ManageOperationsTab extends Tab {
         AsyncCallback<List<PoolOperation>> callback = new AsyncCallback<List<PoolOperation>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Unable to get list of operations: " + caught.getMessage());
+                modal.hide();
+                SC.warn("Unable to get list of operations:<br />" + caught.getMessage());
             }
 
             public void onSuccess(List<PoolOperation> result) {

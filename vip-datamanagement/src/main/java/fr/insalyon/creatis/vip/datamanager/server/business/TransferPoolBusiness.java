@@ -141,6 +141,7 @@ public class TransferPoolBusiness {
                     dest = DataManagerUtil.parseRealDir(op.getDest());
 
                 } else if (op.getType() == Operation.Type.Delete) {
+                    type = PoolOperation.Type.Delete;
                     source = DataManagerUtil.parseRealDir(op.getSource());
 
                 } else {

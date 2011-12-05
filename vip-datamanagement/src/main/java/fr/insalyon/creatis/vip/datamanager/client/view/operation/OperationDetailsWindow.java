@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.operation;
 
+import fr.insalyon.creatis.vip.datamanager.client.view.operation.manage.OperationRecord;
 import fr.insalyon.creatis.vip.core.client.view.property.AbstractPropertyWindow;
 import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
 
