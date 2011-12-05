@@ -71,6 +71,7 @@ public class CoreConstants {
     public static final String ICON_PASSWORD = IMG_FOLDER + "icon-password.png";
     public static final String ICON_PERSONAL = IMG_FOLDER + "icon-personal.png";
     public static final String ICON_REFRESH = IMG_FOLDER + "icon-refresh.png";
+    public static final String ICON_SAVE = IMG_FOLDER + "icon-save.png";
     public static final String ICON_SIGNOUT = IMG_FOLDER + "icon-signout.png";
     public static final String ICON_SYSTEM = IMG_FOLDER + "system/icon-system.png";
     public static final String ICON_USER = IMG_FOLDER + "system/icon-user.png";
