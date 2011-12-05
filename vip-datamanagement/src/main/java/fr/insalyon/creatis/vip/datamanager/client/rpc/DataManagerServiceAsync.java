@@ -71,14 +71,14 @@ public interface DataManagerServiceAsync {
     public void removeOperationById(String id, AsyncCallback<Void> asyncCallback);
 
     public void downloadFile(String remoteFile, AsyncCallback<Void> asyncCallback);
-    
+
     public void downloadFiles(List<String> remoteFiles, String packName, AsyncCallback<Void> asyncCallback);
 
     public void downloadFolder(String remoteFolder, AsyncCallback<Void> asyncCallback);
-    
+
     public void uploadFile(String localFile, String remoteFile, AsyncCallback<Void> asyncCallback);
-    
-     public void uploadFile(String localFile, String remoteName, String remoteDir, AsyncCallback<Void> asyncCallback);
-    
-   public void exists(String remoteFile, AsyncCallback<Boolean> asyncCallback);
+
+    public void uploadFile(String localFile, String remoteName, String remoteDir, AsyncCallback<Void> asyncCallback);
+
+    public void exists(String remoteFile, AsyncCallback<Boolean> asyncCallback);
 }

@@ -45,7 +45,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
@@ -56,7 +55,16 @@ public class LFCBusiness {
 
     private static final Logger logger = Logger.getLogger(LFCBusiness.class);
 
-    public List<Data> listDir(String user, String baseDir, boolean refresh) throws BusinessException {
+    /**
+     * 
+     * @param user
+     * @param baseDir
+     * @param refresh
+     * @return
+     * @throws BusinessException 
+     */
+    public List<Data> listDir(String user, String baseDir, boolean refresh) 
+            throws BusinessException {
 
         try {
             List<GridData> list = CoreUtil.getVletAgentClient().getFolderData(
@@ -203,7 +211,6 @@ public class LFCBusiness {
         }
     }
 
-    
     /**
      * 
      * @param user
@@ -212,10 +219,10 @@ public class LFCBusiness {
      * @throws BusinessException 
      */
     public boolean exists(String user, String path) throws BusinessException {
+
         try {
-            ArrayList<String> files = new ArrayList<String>();
-            files.add(DataManagerUtil.parseBaseDir(user, path));
-            return CoreUtil.getVletAgentClient().exist(files);
+            return CoreUtil.getVletAgentClient().exist(DataManagerUtil.parseBaseDir(user, path));
+
         } catch (VletAgentClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
@@ -224,7 +231,7 @@ public class LFCBusiness {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
      * 
      * @param user
@@ -233,8 +240,8 @@ public class LFCBusiness {
      * @throws BusinessException 
      */
     public long getModificationDate(String user, String path) throws BusinessException {
+
         try {
-            
             return CoreUtil.getVletAgentClient().
                     getModificationDate(DataManagerUtil.parseBaseDir(user, path));
 
@@ -254,7 +261,7 @@ public class LFCBusiness {
      * @return
      * @throws BusinessException 
      */
-    public List<Long> getModificationDate(String user, List<String> paths) 
+    public List<Long> getModificationDate(String user, List<String> paths)
             throws BusinessException {
         try {
             List<String> parsedPaths = new ArrayList<String>();

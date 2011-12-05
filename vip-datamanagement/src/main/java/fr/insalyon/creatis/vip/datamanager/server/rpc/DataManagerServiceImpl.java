@@ -138,7 +138,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             boolean extendPath) throws DataManagerException {
 
         try {
-            lfcBusiness.rename(getSessionUser().getFullName(), baseDir, paths, 
+            lfcBusiness.rename(getSessionUser().getFullName(), baseDir, paths,
                     newBaseDir, extendPath);
 
         } catch (CoreException ex) {
@@ -272,14 +272,14 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
-    
     public void uploadFile(String localFile, String remoteName, String remoteDir) throws DataManagerException {
         File f = new File(Server.getInstance().getDataManagerPath()
-                    + "/uploads/"+localFile);
+                + "/uploads/" + localFile);
         f.renameTo(new File(Server.getInstance().getDataManagerPath()
-                    + "/uploads/"+remoteName));
-        uploadFile(remoteName,remoteDir);
+                + "/uploads/" + remoteName));
+        uploadFile(remoteName, remoteDir);
     }
+
     public void uploadFile(String localFile, String remoteFile) throws DataManagerException {
 
         try {
@@ -294,7 +294,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             throw new DataManagerException(ex);
         }
     }
-    
+
     public boolean exists(String remoteFile) throws DataManagerException {
         try {
             trace(logger, "Test if file '" + remoteFile + " exists");
@@ -306,6 +306,6 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         } catch (BusinessException ex) {
             throw new DataManagerException(ex);
         }
-    
+
     }
 }

@@ -34,13 +34,19 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.selection;
 
+import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.SelectionAppearance;
+import com.smartgwt.client.types.SelectionStyle;
+import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
+import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
+import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
@@ -60,6 +66,7 @@ public class PathSelectionWindow extends Window {
     private static String oldPath = DataManagerConstants.ROOT;
     private BasicBrowserToolStrip toolStrip;
     private ListGrid grid;
+    private HLayout bottomLayout;
     private ModalWindow modal;
     private TextItem textItem;
     private Menu contextMenu;
@@ -83,9 +90,11 @@ public class PathSelectionWindow extends Window {
 
         configureGrid();
         configureContextMenu();
+        configureBottom();
 
         this.addItem(toolStrip);
         this.addItem(grid);
+        this.addItem(bottomLayout);
 
         String path = textItem.getValueAsString().trim();
         if (path != null && !path.isEmpty() && path.startsWith(DataManagerConstants.ROOT)) {
@@ -95,6 +104,10 @@ public class PathSelectionWindow extends Window {
     }
 
     private void configureGrid() {
+        
+        grid.setSelectionType(SelectionStyle.SINGLE);
+        grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
+        
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 
             public void onCellDoubleClick(CellDoubleClickEvent event) {
@@ -118,7 +131,39 @@ public class PathSelectionWindow extends Window {
                 name = event.getRecord().getAttributeAsString("name");
                 contextMenu.showContextMenu();
             }
+        });        
+    }
+    
+    private void configureBottom() {
+        
+        bottomLayout = new HLayout(5);
+        bottomLayout.setWidth100();
+        bottomLayout.setHeight(24);
+        bottomLayout.setAlign(Alignment.RIGHT);
+        bottomLayout.setPadding(2);
+        
+        IButton selectButton = new IButton("Select");
+        selectButton.setIcon(CoreConstants.ICON_ACTIVATE);
+        selectButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                name = grid.getSelectedRecord().getAttributeAsString("name");
+                textItem.setValue(toolStrip.getPath() + "/" + name);
+                destroy();
+            }
         });
+        
+        IButton cancelButton = new IButton("Cancel");
+        cancelButton.setIcon(CoreConstants.ICON_DELETE);
+        cancelButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                destroy();
+            }
+        });
+        
+        bottomLayout.addMember(selectButton);
+        bottomLayout.addMember(cancelButton);
     }
 
     private void configureContextMenu() {
