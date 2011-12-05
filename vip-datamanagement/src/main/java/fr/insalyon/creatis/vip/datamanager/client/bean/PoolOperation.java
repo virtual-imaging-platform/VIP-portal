@@ -43,12 +43,22 @@ import java.util.Date;
  */
 public class PoolOperation implements IsSerializable {
 
+    public static enum Type {
+
+        Download, Upload, Delete
+    };
+
+    public static enum Status {
+
+        Queued, Running, Done, Failed, Rescheduled
+    };
     private String id;
     private Date registration;
+    private String parsedRegistration;
     private String source;
     private String dest;
-    private String type;
-    private String status;
+    private Type type;
+    private Status status;
     private String user;
 
     public PoolOperation() {
@@ -64,11 +74,12 @@ public class PoolOperation implements IsSerializable {
      * @param status
      * @param user
      */
-    public PoolOperation(String id, Date registration, String source,
-            String dest, String type, String status, String user) {
-        
+    public PoolOperation(String id, Date registration, String parsedResgistration,
+            String source, String dest, Type type, Status status, String user) {
+
         this.id = id;
         this.registration = registration;
+        this.parsedRegistration = parsedResgistration;
         this.source = source;
         this.dest = dest;
         this.type = type;
@@ -92,15 +103,19 @@ public class PoolOperation implements IsSerializable {
         return source;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public String getType() {
+    public Type getType() {
         return type;
     }
 
     public String getUser() {
         return user;
+    }
+
+    public String getParsedRegistration() {
+        return parsedRegistration;
     }
 }

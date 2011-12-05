@@ -43,6 +43,7 @@ import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.io.FilenameUtils;
@@ -76,28 +77,31 @@ public class TransferPoolBusiness {
 
             List<Operation> operationsList = client.getOperationsListByUser(email);
             List<PoolOperation> poolOperations = new ArrayList<PoolOperation>();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy HH:mm");
 
             for (Operation op : operationsList) {
                 if (op.getType() != Operation.Type.Delete) {
                     String source = "";
                     String dest = "";
+                    PoolOperation.Type type = null;
+                    PoolOperation.Status status = PoolOperation.Status.valueOf(op.getStatus().name());
 
-                    if (op.getType() == Operation.Type.Download) {
-                        source = DataManagerUtil.parseRealDir(op.getSource());
-                        dest = "Platform";
-
-                    } else if (op.getType() == Operation.Type.Download_Files) {
-                        source = FilenameUtils.getBaseName(op.getDest());
-                        dest = "Platform";
-
-                    } else {
+                    if (op.getType() == Operation.Type.Upload) {
+                        type = PoolOperation.Type.Upload;
                         source = FilenameUtils.getName(op.getSource());
                         dest = DataManagerUtil.parseRealDir(op.getDest());
+
+                    } else {
+                        type = PoolOperation.Type.Download;
+                        dest = "Platform";
+                        source = op.getType() == Operation.Type.Download
+                                ? DataManagerUtil.parseRealDir(op.getSource())
+                                : FilenameUtils.getBaseName(op.getDest());
                     }
 
                     poolOperations.add(new PoolOperation(op.getId(),
-                            op.getRegistration(), source, dest,
-                            op.getType().name(), op.getStatus().name(), op.getUser()));
+                            op.getRegistration(), dateFormat.format(op.getRegistration()),
+                            source, dest, type, status, op.getUser()));
                 }
             }
             return poolOperations;
@@ -123,22 +127,33 @@ public class TransferPoolBusiness {
 
             List<Operation> operationsList = client.getAllOperations();
             List<PoolOperation> poolOperations = new ArrayList<PoolOperation>();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy HH:mm");
 
             for (Operation op : operationsList) {
                 String source = "";
                 String dest = "";
-                if (op.getType() == Operation.Type.Download) {
-                    source = DataManagerUtil.parseRealDir(op.getSource());
-                    dest = "Platform";
-                } else if (op.getType() == Operation.Type.Delete) {
-                    source = DataManagerUtil.parseRealDir(op.getSource());
-                } else {
+                PoolOperation.Type type = null;
+                PoolOperation.Status status = PoolOperation.Status.valueOf(op.getStatus().name());
+
+                if (op.getType() == Operation.Type.Upload) {
+                    type = PoolOperation.Type.Upload;
                     source = FilenameUtils.getName(op.getSource());
                     dest = DataManagerUtil.parseRealDir(op.getDest());
+
+                } else if (op.getType() == Operation.Type.Delete) {
+                    source = DataManagerUtil.parseRealDir(op.getSource());
+
+                } else {
+                    type = PoolOperation.Type.Download;
+                    dest = "Platform";
+                    source = op.getType() == Operation.Type.Download
+                            ? DataManagerUtil.parseRealDir(op.getSource())
+                            : FilenameUtils.getBaseName(op.getDest());
                 }
+
                 poolOperations.add(new PoolOperation(op.getId(),
-                        op.getRegistration(), source, dest,
-                        op.getType().name(), op.getStatus().name(), op.getUser()));
+                        op.getRegistration(), dateFormat.format(op.getRegistration()),
+                        source, dest, type, status, op.getUser()));
             }
 
             return poolOperations;
@@ -166,6 +181,23 @@ public class TransferPoolBusiness {
                 client.removeOperationById(id);
             }
 
+        } catch (VletAgentClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+    
+    /**
+     * 
+     * @param email
+     * @throws BusinessException 
+     */
+    public void removeUserOperations(String email) throws BusinessException {
+       
+        try {
+            VletAgentPoolClient client = CoreUtil.getVletAgentPoolClient();
+            client.removeOperationsByUser(email);
+            
         } catch (VletAgentClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
@@ -225,7 +257,7 @@ public class TransferPoolBusiness {
      * @param packName
      * @throws BusinessException 
      */
-    public void downloadFiles(String userName, String email, List<String> remoteFiles, 
+    public void downloadFiles(String userName, String email, List<String> remoteFiles,
             String packName) throws BusinessException {
 
         try {
@@ -293,7 +325,7 @@ public class TransferPoolBusiness {
             VletAgentPoolClient poolClient = CoreUtil.getVletAgentPoolClient();
             String localPath = serverConfiguration.getDataManagerPath()
                     + "/uploads/" + localFile;
-                       String remotePath = DataManagerUtil.parseBaseDir(userName, remoteFile);
+            String remotePath = DataManagerUtil.parseBaseDir(userName, remoteFile);
             poolClient.uploadFile(localPath, remotePath, email);
 
         } catch (DataManagerException ex) {

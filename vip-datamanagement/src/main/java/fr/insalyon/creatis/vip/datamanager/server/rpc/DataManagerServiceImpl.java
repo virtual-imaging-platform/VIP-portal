@@ -213,6 +213,19 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
+    public void removeUserOperations() throws DataManagerException {
+
+        try {
+            trace(logger, "Removing all operations.");
+            transferPoolBusiness.removeUserOperations(getSessionUser().getEmail());
+
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
+        }
+    }
+
     public void removeOperationById(String id) throws DataManagerException {
 
         try {

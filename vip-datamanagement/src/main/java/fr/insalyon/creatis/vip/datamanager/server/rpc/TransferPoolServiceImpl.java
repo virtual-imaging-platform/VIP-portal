@@ -37,10 +37,7 @@ package fr.insalyon.creatis.vip.datamanager.server.rpc;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
-import fr.insalyon.creatis.agent.vlet.common.bean.Operation;
-import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
-import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.TransferPoolService;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import org.apache.log4j.Logger;
@@ -52,22 +49,6 @@ import org.apache.log4j.Logger;
 public class TransferPoolServiceImpl extends RemoteServiceServlet implements TransferPoolService {
 
     private static Logger logger = Logger.getLogger(TransferPoolServiceImpl.class);
-    private Server serverConfiguration = Server.getInstance();
-
-    public PoolOperation getOperationById(String id, String proxy) throws DataManagerException {
-        try {
-            VletAgentPoolClient client = CoreUtil.getVletAgentPoolClient();
-            Operation op = client.getOperationById(id);
-
-            return new PoolOperation(
-                    op.getId(), op.getRegistration(), op.getSource(),
-                    op.getDest(), op.getType().name(), op.getStatus().name(), op.getUser());
-
-        } catch (VletAgentClientException ex) {
-            logger.error(ex);
-            throw new DataManagerException(ex);
-        }
-    }
 
     public void clearDeleteOperations(String proxy) throws DataManagerException {
 

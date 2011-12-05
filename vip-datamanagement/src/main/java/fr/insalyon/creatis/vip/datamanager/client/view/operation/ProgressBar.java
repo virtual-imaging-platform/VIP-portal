@@ -32,15 +32,28 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client.rpc;
+package fr.insalyon.creatis.vip.datamanager.client.view.operation;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.widgets.layout.HStack;
 
 /**
  *
- * @author Rafael Silva, Tristan Glatard
+ * @author Rafael Silva
  */
-public interface TransferPoolServiceAsync {
+public class ProgressBar extends HStack {
 
-    public void clearDeleteOperations(String proxy, AsyncCallback<Void> asyncCallback);
+    private HStack progressHStack;
+
+    public ProgressBar(int height, String color, int percent) {
+
+        this.setWidth("95%");
+        this.setHeight(height);
+        this.setBorder("1px solid #BFBFBF");
+
+        progressHStack = new HStack();
+        progressHStack.setBackgroundColor(color);
+        progressHStack.setWidth(percent + "%");
+        progressHStack.setPadding(1);
+        this.addMember(progressHStack);
+    }
 }

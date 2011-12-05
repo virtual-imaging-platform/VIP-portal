@@ -67,6 +67,8 @@ public interface DataManagerServiceAsync {
     public void getPoolOperations(AsyncCallback<List<PoolOperation>> asyncCallback);
 
     public void removeOperations(List<String> ids, AsyncCallback<Void> asyncCallback);
+    
+    public void removeUserOperations(AsyncCallback<Void> asyncCallback);
 
     public void removeOperationById(String id, AsyncCallback<Void> asyncCallback);
 

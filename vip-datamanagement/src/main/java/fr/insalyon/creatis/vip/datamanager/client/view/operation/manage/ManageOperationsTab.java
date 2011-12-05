@@ -152,8 +152,8 @@ public class ManageOperationsTab extends Tab {
 
                 List<OperationRecord> dataList = new ArrayList<OperationRecord>();
                 for (PoolOperation o : result) {
-                    dataList.add(new OperationRecord(o.getId(), o.getType(),
-                            o.getStatus(), o.getSource(), o.getDest(),
+                    dataList.add(new OperationRecord(o.getId(), o.getType().name(),
+                            o.getStatus().name(), o.getSource(), o.getDest(),
                             o.getRegistration(), o.getUser()));
                 }
                 grid.setData(dataList.toArray(new OperationRecord[]{}));

@@ -34,15 +34,12 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.operation;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -50,8 +47,6 @@ import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -80,54 +75,24 @@ public class OperationToolStrip extends ToolStrip {
         });
         this.addButton(refreshButton);
 
-        ToolStripButton downloadButton = new ToolStripButton();
-        downloadButton.setIcon(DataManagerConstants.ICON_DOWNLOAD);
-        downloadButton.setPrompt("Download Selected Files");
-        downloadButton.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-                for (ListGridRecord record : OperationLayout.getInstance().getGridSelection()) {
-                    OperationRecord op = (OperationRecord) record;
-
-                    if (op.getType().equals("Download")
-                            && op.getStatus().equals("Done")) {
-
-                        Window.open(
-                                GWT.getModuleBaseURL()
-                                + "/filedownloadservice?operationid="
-                                + op.getId(),
-                                "", "");
-                    }
-                }
-            }
-        });
-        this.addButton(downloadButton);
-
-        this.addSeparator();
-        ToolStripButton clearButton = new ToolStripButton();
-        clearButton.setIcon(CoreConstants.ICON_CLEAR);
-        clearButton.setPrompt("Clear Selected Operations");
+        this.addFill();
+        ToolStripButton clearButton = new ToolStripButton("Clear List");
+        clearButton.setIcon(DataManagerConstants.OP_ICON_CLEAR);
+        clearButton.setPrompt("Remove all operations from this list");
         clearButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                SC.confirm("Do you want to clear all selected operations?", new BooleanCallback() {
+                SC.confirm("Do you want to clear all operations?", new BooleanCallback() {
 
                     public void execute(Boolean value) {
+                        
                         if (value != null && value) {
-                            List<String> ids = new ArrayList<String>();
-                            for (ListGridRecord record : OperationLayout.getInstance().getGridSelection()) {
-                                OperationRecord op = (OperationRecord) record;
-                                if (!op.getStatus().equals("Running")) {
-                                    ids.add(op.getId());
-                                }
-                            }
-
                             DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                                 public void onFailure(Throwable caught) {
                                     modal.hide();
-                                    SC.warn("Unable to clear operations:<br />" + caught.getMessage());
+                                    SC.warn("Unable to remove operations:<br />" + caught.getMessage());
                                 }
 
                                 public void onSuccess(Void result) {
@@ -135,8 +100,8 @@ public class OperationToolStrip extends ToolStrip {
                                     OperationLayout.getInstance().loadData();
                                 }
                             };
-                            modal.show("Clearing operations...", true);
-                            service.removeOperations(ids, callback);
+                            modal.show("Removing operations...", true);
+                            service.removeUserOperations(callback);
                         }
                     }
                 });

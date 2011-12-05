@@ -37,22 +37,14 @@ package fr.insalyon.creatis.vip.datamanager.client.view.operation;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.types.SelectionAppearance;
-import com.smartgwt.client.types.SelectionStyle;
+import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.grid.HoverCustomizer;
-import com.smartgwt.client.widgets.grid.ListGrid;
-import com.smartgwt.client.widgets.grid.ListGridField;
-import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
-import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
+import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Status;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -65,7 +57,7 @@ public class OperationLayout extends VLayout {
     private Timer timer;
     private ModalWindow modal;
     private OperationToolStrip toolStrip;
-    private ListGrid grid;
+    private VLayout operationsLayout;
 
     public static OperationLayout getInstance() {
         if (instance == null) {
@@ -81,16 +73,23 @@ public class OperationLayout extends VLayout {
 
     private OperationLayout() {
 
-        this.setWidth(500);
+        this.setWidth(450);
+        this.setMaxWidth(450);
         this.setHeight100();
         this.setOverflow(Overflow.AUTO);
 
-        configureGrid();
+        operationsLayout = new VLayout(2);
+        operationsLayout.setWidth100();
+        operationsLayout.setHeight100();
+        operationsLayout.setPadding(5);
+        operationsLayout.setOverflow(Overflow.AUTO);
+        operationsLayout.setAlign(VerticalAlignment.TOP);
+        operationsLayout.setBackgroundColor("#F7F7F7");
 
-        modal = new ModalWindow(grid);
+        modal = new ModalWindow(operationsLayout);
         toolStrip = new OperationToolStrip(modal);
         this.addMember(toolStrip);
-        this.addMember(grid);
+        this.addMember(operationsLayout);
 
         loadData();
 
@@ -100,52 +99,6 @@ public class OperationLayout extends VLayout {
                 loadData();
             }
         };
-    }
-
-    private void configureGrid() {
-
-        grid = new ListGrid();
-        grid.setWidth100();
-        grid.setHeight100();
-        grid.setShowAllRecords(false);
-        grid.setShowEmptyMessage(true);
-        grid.setEmptyMessage("<br>No data available.");
-        grid.setSelectionType(SelectionStyle.SIMPLE);
-        grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
-
-        ListGridField iconField = FieldUtil.getIconGridField("typeIcon");
-        iconField.setShowHover(true);
-        iconField.setHoverCustomizer(new HoverCustomizer() {
-
-            public String hoverHTML(Object value, ListGridRecord record, int rowNum, int colNum) {
-                OperationRecord operationRecord = (OperationRecord) record;
-                return operationRecord.getType();
-            }
-        });
-        ListGridField statusField = FieldUtil.getIconGridField("statusIcon");
-        statusField.setShowHover(true);
-        statusField.setHoverCustomizer(new HoverCustomizer() {
-
-            public String hoverHTML(Object value, ListGridRecord record, int rowNum, int colNum) {
-                OperationRecord operationRecord = (OperationRecord) record;
-                return operationRecord.getStatus();
-            }
-        });
-        ListGridField nameField = new ListGridField("name", "Name");
-        ListGridField dateField = FieldUtil.getDateField();
-
-        grid.setFields(iconField, statusField, nameField, dateField);
-
-        grid.addCellContextClickHandler(new CellContextClickHandler() {
-
-            public void onCellContextClick(CellContextClickEvent event) {
-                event.cancel();
-                if (event.getColNum() != 0) {
-                    ListGridRecord record = event.getRecord();
-                    new OperationContextMenu(modal, (OperationRecord) record).showContextMenu();
-                }
-            }
-        });
     }
 
     public void loadData() {
@@ -159,17 +112,16 @@ public class OperationLayout extends VLayout {
 
             public void onSuccess(List<PoolOperation> result) {
 
-                List<OperationRecord> dataList = new ArrayList<OperationRecord>();
+                operationsLayout.removeMembers(operationsLayout.getMembers());
                 boolean hasActiveOperations = false;
-                for (PoolOperation o : result) {
-                    if (o.getStatus().equals("Running") || o.getStatus().equals("Queued")) {
+
+                for (PoolOperation operation : result) {
+                    if (operation.getStatus() == Status.Running
+                            || operation.getStatus() == Status.Queued) {
                         hasActiveOperations = true;
                     }
-                    dataList.add(new OperationRecord(o.getId(), o.getType(),
-                            o.getStatus(), o.getSource(), o.getDest(),
-                            o.getRegistration(), o.getUser()));
+                    operationsLayout.addMember(new OperationBoxLayout(modal, operation));
                 }
-                grid.setData(dataList.toArray(new OperationRecord[]{}));
                 modal.hide();
 
                 if (!hasActiveOperations) {
@@ -179,10 +131,6 @@ public class OperationLayout extends VLayout {
         };
         modal.show("Loading operations...", true);
         service.getPoolOperationsByUser(callback);
-    }
-
-    public ListGridRecord[] getGridSelection() {
-        return grid.getSelectedRecords();
     }
 
     public void activateAutoRefresh() {

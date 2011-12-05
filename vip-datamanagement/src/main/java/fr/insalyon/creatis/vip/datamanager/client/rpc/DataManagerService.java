@@ -83,6 +83,8 @@ public interface DataManagerService extends RemoteService {
     public List<PoolOperation> getPoolOperations() throws DataManagerException;
 
     public void removeOperations(List<String> ids) throws DataManagerException;
+    
+    public void removeUserOperations() throws DataManagerException;
 
     public void removeOperationById(String id) throws DataManagerException;
 

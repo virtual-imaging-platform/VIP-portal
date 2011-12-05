@@ -71,6 +71,12 @@ public class DataManagerConstants {
     public static final String APP_IMG_CACHED_FILES = IMG_FOLDER + "app-cache.png";
     public static final String APP_IMG_FILE_TRANSFER = IMG_FOLDER + "app-file-transfer.png";
     public static final String APP_IMG_OPERATIONS = IMG_FOLDER + "app-operation.png";
+    // Operation
+    private static final String OP_FOLDER = IMG_FOLDER + "operation/";
+    public static final String OP_DOWNLOAD = OP_FOLDER + "img-download.png";
+    public static final String OP_UPLOAD = OP_FOLDER + "img-upload.png";
+    public static final String OP_ICON_DOWNLOAD = OP_FOLDER + "icon-download.png";
+    public static final String OP_ICON_CLEAR = OP_FOLDER + "icon-clear.png";
     // Configuration Constants
     public final static String ROOT = "/vip";
     public final static String USERS_HOME = "Home";
