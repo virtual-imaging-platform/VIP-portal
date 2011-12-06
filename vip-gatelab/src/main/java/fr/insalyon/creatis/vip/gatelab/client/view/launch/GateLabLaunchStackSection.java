@@ -49,7 +49,9 @@ import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchStackSection;
 import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
+import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.AppletHTMLPane;
 import java.util.ArrayList;
@@ -79,7 +81,7 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
     //private GateLabLaunchTab myLaunchTab;
     public GateLabLaunchStackSection(String applicationName, String tabId) {
         super(applicationName);
-        //    this.tabID = tabId;
+        this.tabID = tabId;
         initComplete(this);
 
         nameLayout = new VLayout(5);
@@ -93,6 +95,7 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
 
         initComplete(this);
 
+        loadDescription();
         configureForm();
 
         //this.addItem(layout);
@@ -220,6 +223,31 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
                 input.setValue(value);
             }
         }
+    }
+
+    /**
+     * Loads workflow description.
+     */
+    protected void loadDescription() {
+
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<Descriptor> callback = new AsyncCallback<Descriptor>() {
+
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Error executing get application sources list: " + caught.getMessage());
+            }
+
+            public void onSuccess(Descriptor d) {
+
+                if (d != null) {
+                    AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().getTab(tabID);
+                    launchTab.getDescriptionSection().setContents(d.getDescription());
+                }
+            }
+        };
+        modal.show("Loading Workflow Description...", true);
+        service.getApplicationDescriptor(applicationName, callback);
     }
 
     /**
