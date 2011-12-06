@@ -35,6 +35,12 @@
 package fr.insalyon.creatis.vip.application.client.view.monitor;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
+import com.google.gwt.visualization.client.DataTable;
+import com.google.gwt.visualization.client.VisualizationUtils;
+import com.google.gwt.visualization.client.visualizations.corechart.AxisOptions;
+import com.google.gwt.visualization.client.visualizations.corechart.ColumnChart;
+import com.google.gwt.visualization.client.visualizations.corechart.Options;
 import com.rednels.ofcgwt.client.ChartWidget;
 import com.rednels.ofcgwt.client.model.ChartData;
 import com.rednels.ofcgwt.client.model.Text;
@@ -81,7 +87,7 @@ import java.util.List;
  *
  * @author Rafael Silva
  */
-public class ChartsTab extends Tab {
+public class ChartsTab2 extends Tab {
 
     private ModalWindow modal;
     private String simulationID;
@@ -89,29 +95,32 @@ public class ChartsTab extends Tab {
     private SelectItem chartsItem;
     private TextItem binItem;
     private VLayout vLayout;
+    private VLayout mainLayout;
+    private VLayout chartLayout;
+    private VLayout innerChartLayout;
     private ChartWidget chart;
     private ListGrid grid;
     private TileGrid tileGrid;
-    private String data;
+    private StringBuilder data;
 
-    public ChartsTab(String simulationID) {
+    public ChartsTab2(String simulationID) {
 
         this.simulationID = simulationID;
         this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_CHART));
         this.setPrompt("Performance Statistics");
 
-        this.data = "";
-
         configureForm();
+        configureChart();
 
-        vLayout = new VLayout(15);
+        vLayout = new VLayout(20);
         vLayout.setHeight100();
         vLayout.setOverflow(Overflow.AUTO);
         vLayout.setPadding(10);
+
         vLayout.addMember(form);
+        vLayout.addMember(mainLayout);
 
         modal = new ModalWindow(vLayout);
-
         this.setPane(vLayout);
     }
 
@@ -160,6 +169,25 @@ public class ChartsTab extends Tab {
         form.setItems(chartsItem, binItem, generateButtonItem);
     }
 
+    private void configureChart() {
+
+        mainLayout = new VLayout(10);
+        mainLayout.setWidth100();
+        mainLayout.setHeight100();
+        mainLayout.setOverflow(Overflow.AUTO);
+
+        chartLayout = new VLayout();
+        chartLayout.setWidth(800);
+        chartLayout.setHeight(370);
+
+        innerChartLayout = new VLayout();
+        innerChartLayout.setWidth(800);
+        innerChartLayout.setHeight(370);
+
+        chartLayout.addMember(innerChartLayout);
+        mainLayout.addMember(chartLayout);
+    }
+
     private void generateChart() {
 
         int value = new Integer(chartsItem.getValueAsString());
@@ -184,7 +212,6 @@ public class ChartsTab extends Tab {
             case 5:
                 plotUploadPerNumberOfJobs(binSize);
                 break;
-
             case 6:
                 plotSiteHistogram();
                 break;
@@ -202,11 +229,11 @@ public class ChartsTab extends Tab {
             }
 
             public void onSuccess(List<String> result) {
-                buildStackChart(result);
+                VisualizationUtils.loadVisualizationApi(getColumnStackChartRunnable(result), ColumnChart.PACKAGE);
                 modal.hide();
             }
         };
-        modal.show("Building chart...", true);
+        modal.show("Building job flow chart...", true);
         service.getJobFlow(simulationID, callback);
     }
 
@@ -316,6 +343,165 @@ public class ChartsTab extends Tab {
         service.getSiteHistogram(simulationID, callback);
     }
 
+    private Runnable getColumnStackChartRunnable(final List<String> result) {
+
+        return new Runnable() {
+
+            public void run() {
+
+                DataTable dataTable = DataTable.create();
+                dataTable.addColumn(ColumnType.STRING, "Job");
+                dataTable.addColumn(ColumnType.NUMBER, "Submitted");
+                dataTable.addColumn(ColumnType.NUMBER, "Queued");
+                dataTable.addColumn(ColumnType.NUMBER, "Input");
+                dataTable.addColumn(ColumnType.NUMBER, "Execution");
+                dataTable.addColumn(ColumnType.NUMBER, "Output");
+                dataTable.addColumn(ColumnType.NUMBER, "Checkpoint Init");
+                dataTable.addColumn(ColumnType.NUMBER, "Checkpoint Upload");
+                dataTable.addColumn(ColumnType.NUMBER, "Error");
+
+                dataTable.addRows(result.size());
+                int row = 0;
+                data = new StringBuilder();
+                int max = 0;
+                int nbJobs = 0;
+                long cpuTime = 0;
+                long waitingTime = 0;
+                long sequentialTime = 0;
+
+                for (String values : result) {
+                    data.append(values.replaceAll("##", ","));
+                    data.append("\n");
+                    String[] v = values.split("##");
+
+                    int creation = new Integer(v[1]);
+                    int queued = new Integer(v[2]);
+                    int input = new Integer(v[3]) >= 0 ? new Integer(v[3]) : 0;
+                    int execution = new Integer(v[4]) >= 0 ? new Integer(v[4]) : 0;
+                    int output = new Integer(v[5]) >= 0 ? new Integer(v[5]) : 0;
+                    int checkpointInit = new Integer(v[6]) >= 0 ? new Integer(v[6]) : 0;
+                    int checkpointUpload = new Integer(v[7]) >= 0 ? new Integer(v[7]) : 0;
+                    int failedTime = new Integer(v[8]) >= 0 ? new Integer(v[8]) : 0;
+
+                    dataTable.setValue(row, 0, "");
+                    dataTable.setValue(row, 1, creation);
+                    dataTable.setValue(row, 2, queued);
+                    dataTable.setValue(row, 3, input);
+                    dataTable.setValue(row, 4, execution);
+                    dataTable.setValue(row, 5, output);
+                    dataTable.setValue(row, 6, checkpointInit);
+                    dataTable.setValue(row, 7, checkpointUpload);
+                    dataTable.setValue(row, 8, failedTime);
+                    row++;
+
+                    int count = creation + queued + input + execution + output
+                            + checkpointInit + checkpointUpload;
+                    cpuTime += execution;
+                    sequentialTime += input + execution + output;
+                    nbJobs++;
+                    waitingTime += queued;
+
+                    if (count > max) {
+                        max = count;
+                    }
+                }
+
+                Options options = Options.create();
+                options.setWidth(800);
+                options.setHeight(370);
+                options.setFontSize(10);
+                options.setIsStacked(true);
+                options.setColors("#8C8063", "#FFC682", "#2388E8", "#33AA82",
+                        "#7F667F", "#3E6864", "#1F3533", "#7F263D");
+
+                AxisOptions hAxisOptions = AxisOptions.create();
+                hAxisOptions.setTitle("Jobs");
+                options.setHAxisOptions(hAxisOptions);
+
+                AxisOptions vAxisOptions = AxisOptions.create();
+                vAxisOptions.setTitle("Time (s)");
+                vAxisOptions.setMaxValue(max);
+                options.setVAxisOptions(vAxisOptions);
+
+                chartLayout.removeMember(innerChartLayout);
+                innerChartLayout = new VLayout();
+                innerChartLayout.setWidth(800);
+                innerChartLayout.setHeight(370);
+                innerChartLayout.addMember(new ColumnChart(dataTable, options));
+                chartLayout.addMember(innerChartLayout);
+
+                configureGrid();
+                PropertyRecord[] data = new PropertyRecord[]{
+                    new PropertyRecord("Makespan (s)", max + ""),
+                    new PropertyRecord("Cumulated CPU time (s)", cpuTime + ""),
+                    new PropertyRecord("Speed-up", (cpuTime / (float) max) + ""),
+                    new PropertyRecord("Efficiency", (cpuTime / (float) sequentialTime) + ""),
+                    new PropertyRecord("Mean waiting time", (waitingTime / (float) nbJobs) + "")
+                };
+                grid.setData(data);
+            }
+        };
+    }
+
+    private Runnable getColumnChartRunnable(final List<String> result,
+            final String xAxis, final String color, final int binSize) {
+
+        return new Runnable() {
+
+            public void run() {
+
+                DataTable dataTable = DataTable.create();
+                dataTable.addColumn(ColumnType.NUMBER, "Time");
+                dataTable.addColumn(ColumnType.NUMBER, "Jobs");
+
+                dataTable.addRows(result.size());
+
+                List<Integer> rangesList = new ArrayList<Integer>();
+                List<Integer> numJobsList = new ArrayList<Integer>();
+                int maxRange = 0;
+                int maxNumJobs = 0;
+                int min = Integer.MAX_VALUE;
+                int max = 0;
+                int sum = 0;
+                int count = 0;
+                data = new StringBuilder();
+                
+                for (String values : result) {
+                    data.append(values.replace("##", ","));
+                    data.append("\n");                   
+                    String[] res = values.split("##");
+                    
+                    int range = new Integer(res[0]);
+                    rangesList.add(range);
+                    if (range > maxRange) {
+                        maxRange = range;
+                    }
+                    if (res.length > 1) {
+                        int numJobs = new Integer(res[1]);
+                        numJobsList.add(numJobs);
+                        if (numJobs > maxNumJobs) {
+                            maxNumJobs = numJobs;
+                        }
+                        if (res.length > 2) {
+                            if (new Integer(res[2]) < min) {
+                                min = new Integer(res[2]);
+                            }
+                            if (res.length > 3) {
+                                if (new Integer(res[3]) > max) {
+                                    max = new Integer(res[3]);
+                                }
+                                if (res.length > 4) {
+                                    sum += new Integer(res[4]);
+                                }
+                            }
+                        }
+                        count += new Integer(res[1]);
+                    }
+                }
+            }
+        };
+    }
+
     private void buildCkptChart(List<String> result) {
 
         ChartData chartData = new ChartData();
@@ -331,9 +517,9 @@ public class ChartsTab extends Tab {
         int failed_jobs = 0;
 
 
-        this.data = "";
+        this.data = new StringBuilder();
         for (String values : result) {
-            this.data = this.data + "\n" + values;
+            this.data.append(values + "\n");
             Stack s = new Stack();
             String[] v = values.split("##");
 
@@ -391,7 +577,7 @@ public class ChartsTab extends Tab {
         chartData.setYLegend(new Text("Number of checkpoints", "{font-size: 10px; color: #000000}"));
 
         if (chart == null) {
-            configureChartAndGrid();
+            configureGrid();
         }
 
         PropertyRecord[] data = new PropertyRecord[]{
@@ -400,97 +586,6 @@ public class ChartsTab extends Tab {
             new PropertyRecord("Total ckpts for stalled jobs", occ_stalled + ""),
             new PropertyRecord("Total ckpts for cancelled jobs", occ_cancelled + ""),
             new PropertyRecord("Failure rate", (failed_jobs / (float) nb_jobs) + "")
-        };
-
-        grid.setData(data);
-        chart.setChartData(chartData);
-    }
-
-    private void buildStackChart(List<String> result) {
-
-        ChartData chartData = new ChartData();
-        chartData.setBackgroundColour("#ffffff");
-
-        StackedBarChart stack = new StackedBarChart();
-        int max = 0;
-        int nbJobs = 0;
-        long cpuTime = 0;
-        long waitingTime = 0;
-        long sequentialTime = 0;
-        this.data = "";
-        for (String values : result) {
-            this.data = this.data + "\n" + values;
-            Stack s = new Stack();
-            String[] v = values.split("##");
-
-            int creation = new Integer(v[1]);
-            int queued = new Integer(v[2]);
-            int input = new Integer(v[3]) >= 0 ? new Integer(v[3]) : 0;
-            int execution = new Integer(v[4]) >= 0 ? new Integer(v[4]) : 0;
-            int output = new Integer(v[5]) >= 0 ? new Integer(v[5]) : 0;
-            int checkpointInit = new Integer(v[6]) >= 0 ? new Integer(v[6]) : 0;
-            int checkpointUpload = new Integer(v[7]) >= 0 ? new Integer(v[7]) : 0;
-            int failedTime = new Integer(v[8]) >= 0 ? new Integer(v[8]) : 0;
-
-            int count = creation + queued + input + execution + output
-                    + checkpointInit + checkpointUpload;
-            cpuTime += execution;
-            sequentialTime += input + execution + output;
-            nbJobs++;
-            waitingTime += queued;
-            
-            s.addStackValues(new StackedBarChart.StackValue(creation, "#996633"));
-            s.addStackValues(new StackedBarChart.StackValue(queued, "#FF9933"));
-
-           // if (v[0].equals("COMPLETED") || checkpointUpload!=0 ) {          
-                s.addStackValues(new StackedBarChart.StackValue(input, "#3366FF"));
-                s.addStackValues(new StackedBarChart.StackValue(execution, "#009966"));
-                s.addStackValues(new StackedBarChart.StackValue(output, "#663366"));
-                s.addStackValues(new StackedBarChart.StackValue(checkpointInit, "#E8830C"));
-                s.addStackValues(new StackedBarChart.StackValue(checkpointUpload, "#E82E0C"));
-
-            //} 
-            s.addStackValues(new StackedBarChart.StackValue(failedTime, "#CC0033"));  
-            
-            stack.addStack(s);
-
-            if (count > max) {
-                max = count;
-            }
-        }
-
-        stack.setKeys(
-                new Keys("Submitted", "#996633", 9),
-                new Keys("Queued", "#FF9933", 9),
-                new Keys("Input", "#3366FF", 9),
-                new Keys("Execution", "#009966", 9),
-                new Keys("Output", "#663366", 9),
-                new Keys("Checkpoint Init", "#E8830C", 9),
-                new Keys("Checkpoint Upload", "#E82E0C", 9),
-                new Keys("Error", "#CC0033", 9));
-
-        chartData.addElements(stack);
-
-        XAxis xa = new XAxis();
-        xa.setLabels("");
-        chartData.setXAxis(xa);
-        chartData.setXLegend(new Text("Jobs", "{font-size: 10px; color: #000000}"));
-
-        YAxis ya = new YAxis();
-        ya.setRange(0, max, (max / 10));
-        chartData.setYAxis(ya);
-        chartData.setYLegend(new Text("Time (sec)", "{font-size: 10px; color: #000000}"));
-
-        if (chart == null) {
-            configureChartAndGrid();
-        }
-
-        PropertyRecord[] data = new PropertyRecord[]{
-            new PropertyRecord("Makespan (s)", max + ""),
-            new PropertyRecord("Cumulated CPU time (s)", cpuTime + ""),
-            new PropertyRecord("Speed-up", (cpuTime / (float) max) + ""),
-            new PropertyRecord("Efficiency", (cpuTime / (float) sequentialTime) + ""),
-            new PropertyRecord("Mean waiting time", (waitingTime / (float) nbJobs) + "")
         };
 
         grid.setData(data);
@@ -513,9 +608,9 @@ public class ChartsTab extends Tab {
         int max = 0;
         int sum = 0;
         int count = 0;
-        this.data = "";
+        this.data = new StringBuilder();
         for (String s : result) {
-            this.data = this.data + "\n" + s;
+            this.data.append(s + "\n");
             String[] res = s.split("##");
             int range = new Integer(res[0]);
             rangesList.add(range);
@@ -608,7 +703,7 @@ public class ChartsTab extends Tab {
         }
 
         if (chart == null) {
-            configureChartAndGrid();
+            configureGrid();
         }
         grid.setData(data);
         chart.setChartData(chartData);
@@ -616,54 +711,48 @@ public class ChartsTab extends Tab {
 
     }
 
-    private void configureChartAndGrid() {
+    private void configureGrid() {
 
-        chart = new ChartWidget();
-        chart.setSize("700", "370");
+        if (grid == null) {
 
-        grid = new ListGrid();
-        grid.setWidth(300);
-        grid.setHeight(130);
-        grid.setShowAllRecords(true);
-        grid.setShowEmptyMessage(true);
-        grid.setEmptyMessage("<br>No data available.");
+            grid = new ListGrid();
+            grid.setWidth(300);
+            grid.setHeight(140);
+            grid.setShowAllRecords(true);
+            grid.setShowEmptyMessage(true);
+            grid.setEmptyMessage("<br>No data available.");
 
-        ListGridField propertyField = new ListGridField("property", "Properties");
-        ListGridField valueField = new ListGridField("value", "Value");
+            ListGridField propertyField = new ListGridField("property", "Properties");
+            ListGridField valueField = new ListGridField("value", "Value");
 
-        grid.setFields(propertyField, valueField);
+            grid.setFields(propertyField, valueField);
 
-        tileGrid = new TileGrid();
-        tileGrid.setWidth100();
-        tileGrid.setHeight100();
-        tileGrid.setTileWidth(110);
-        tileGrid.setTileHeight(80);
+            tileGrid = new TileGrid();
+            tileGrid.setWidth100();
+            tileGrid.setHeight100();
+            tileGrid.setTileWidth(110);
+            tileGrid.setTileHeight(80);
+            tileGrid.setShowAllRecords(true);
+            tileGrid.setShowEdges(false);
 
-        tileGrid.setCanReorderTiles(true);
-        tileGrid.setShowAllRecords(true);
-        tileGrid.setAnimateTileChange(true);
-        tileGrid.setShowEdges(false);
+            DetailViewerField pictureField = new DetailViewerField("picture");
+            pictureField.setType("image");
+            DetailViewerField commonNameField = new DetailViewerField("commonName");
 
-        DetailViewerField pictureField = new DetailViewerField("picture");
-        pictureField.setType("image");
-        DetailViewerField commonNameField = new DetailViewerField("commonName");
+            tileGrid.setFields(pictureField, commonNameField);
 
-        tileGrid.setFields(pictureField, commonNameField);
+            tileGrid.addRecordClickHandler(new RecordClickHandler() {
 
-        tileGrid.addRecordClickHandler(new RecordClickHandler() {
+                public void onRecordClick(RecordClickEvent event) {
+                    new ViewerWindow("Data", simulationID,
+                            data.toString()).show();
+                }
+            });
+            tileGrid.setData(new ApplicationTileRecord[]{
+                        new ApplicationTileRecord("Data", ApplicationConstants.APP_IMG_SIMULATION_OUT),});
 
-            public void onRecordClick(RecordClickEvent event) {
-                new ViewerWindow("Data", simulationID,
-                        data).show();
-            }
-        });
-        tileGrid.setData(new ApplicationTileRecord[]{
-                    new ApplicationTileRecord("Data", ApplicationConstants.APP_IMG_SIMULATION_OUT),});
-
-
-
-        vLayout.addMember(chart);
-        vLayout.addMember(grid);
-        vLayout.addMember(tileGrid);
+            mainLayout.addMember(grid);
+            mainLayout.addMember(tileGrid);
+        }
     }
 }

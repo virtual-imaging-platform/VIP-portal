@@ -173,7 +173,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      * @return
      * @throws ApplicationException 
      */
-    public List<String> getJobsPertTime(String simulationID) throws ApplicationException {
+    public List<String> getJobFlow(String simulationID) throws ApplicationException {
 
         try {
             return jobBusiness.getJobsPertTime(simulationID);
