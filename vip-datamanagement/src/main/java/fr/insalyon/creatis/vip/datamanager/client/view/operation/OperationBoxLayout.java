@@ -80,6 +80,9 @@ public class OperationBoxLayout extends HLayout {
         configureActionLayout();
     }
 
+    /**
+     * Configures the image layout.
+     */
     private void configureImageLayout() {
 
         VLayout imgLayout = new VLayout();
@@ -110,6 +113,9 @@ public class OperationBoxLayout extends HLayout {
         this.addMember(imgLayout);
     }
 
+    /**
+     * Configures the main layout of an operation.
+     */
     private void configureMainLayout() {
 
         VLayout mainLayout = new VLayout(2);
@@ -134,11 +140,38 @@ public class OperationBoxLayout extends HLayout {
             mainLayout.addMember(waitingLabel);
 
         } else if (operation.getStatus() == Status.Done) {
-            Label completedLabel = new Label(
-                    "<font color=\"#666666\">Completed - "
-                    + operation.getParsedRegistration() + "</font>");
-            completedLabel.setHeight(15);
-            mainLayout.addMember(completedLabel);
+            if (operation.getType() == Type.Upload) {
+                Label completedLabel = new Label(
+                        "<font color=\"#666666\">Uploaded - "
+                        + operation.getParsedRegistration() + "</font>");
+                completedLabel.setHeight(15);
+                mainLayout.addMember(completedLabel);
+
+            } else {
+                Label downloadLabel = new Label("<font color=\"#666666\"><u>Download</u></font>");
+                downloadLabel.setHeight(12);
+                downloadLabel.setWidth(55);
+                downloadLabel.setCursor(Cursor.HAND);
+                downloadLabel.addClickHandler(new ClickHandler() {
+
+                    public void onClick(ClickEvent event) {
+                        download();
+                    }
+                });
+
+                Label completedLabel = new Label("<font color=\"#666666\"> - " 
+                        + operation.getParsedRegistration() + "</font>");
+                completedLabel.setHeight(12);
+                completedLabel.setWidth("*");
+
+                HLayout hLayout = new HLayout();
+                hLayout.setWidth100();
+                hLayout.setHeight(12);
+                hLayout.addMember(downloadLabel);
+                hLayout.addMember(completedLabel);
+                
+                mainLayout.addMember(hLayout);
+            }
 
         } else if (operation.getStatus() == Status.Failed) {
             Label failedLabel = new Label(
@@ -148,8 +181,9 @@ public class OperationBoxLayout extends HLayout {
             mainLayout.addMember(failedLabel);
 
         } else if (operation.getStatus() == Status.Running) {
+            String text = operation.getType() == Type.Upload ? "Uploading" : "Downloading";
             Label failedLabel = new Label(
-                    "<font color=\"#1B9406\">Running</font> <font color=\"#666666\">- "
+                    "<font color=\"#1B9406\">" + text + "</font> <font color=\"#666666\">- "
                     + operation.getParsedRegistration() + "</font>");
             failedLabel.setHeight(15);
             mainLayout.addMember(failedLabel);
@@ -160,6 +194,9 @@ public class OperationBoxLayout extends HLayout {
         this.addMember(mainLayout);
     }
 
+    /**
+     * Configures actions related to an operation.
+     */
     private void configureActionLayout() {
 
         VLayout actionLayout = new VLayout(5);
@@ -194,6 +231,9 @@ public class OperationBoxLayout extends HLayout {
         this.addMember(actionLayout);
     }
 
+    /**
+     * Removes an operation.
+     */
     private void remove() {
 
         SC.confirm("Do you want to remove this operation?", new BooleanCallback() {
@@ -222,6 +262,9 @@ public class OperationBoxLayout extends HLayout {
         });
     }
 
+    /**
+     * Downloads a file (for download operations).
+     */
     private void download() {
 
         Window.open(GWT.getModuleBaseURL() + "/filedownloadservice?operationid="
