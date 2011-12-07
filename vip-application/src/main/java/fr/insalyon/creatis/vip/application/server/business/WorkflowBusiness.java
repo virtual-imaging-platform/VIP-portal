@@ -581,7 +581,7 @@ public class WorkflowBusiness {
             StringBuilder sb = new StringBuilder();
 
             for (String input : inputs) {
-                if (!client.exist(input)) {
+                if (!client.exist(DataManagerUtil.parseBaseDir(user, input))) {
                     if (sb.length() > 0) {
                         sb.append(", ");
                     }
