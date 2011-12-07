@@ -168,7 +168,7 @@ public class GateLabGeneralTab extends Tab {
 
                     public void onSuccess(List<InOutData> result) {
                         for (InOutData data : result) {
-                            if (data.getProcessor().equals("merged_results")) {
+                            if (data.getProcessor().equals("merged_result")) {
                                 grid.addData(new PropertyRecord("Output", data.getPath()));
                                 break;
                             }
