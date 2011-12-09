@@ -85,7 +85,7 @@ public class SocialModule extends Module {
                 verifyMessages();
             }
         };
-        timer.scheduleRepeating(30000); //TODO change to 3 * 60000
+        timer.scheduleRepeating(3 * 60000);
     }
 
     @Override
