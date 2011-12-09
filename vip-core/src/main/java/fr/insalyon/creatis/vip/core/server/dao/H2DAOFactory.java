@@ -35,7 +35,6 @@
 package fr.insalyon.creatis.vip.core.server.dao;
 
 import fr.insalyon.creatis.vip.core.server.dao.h2.GroupData;
-import fr.insalyon.creatis.vip.core.server.dao.h2.NewsData;
 import fr.insalyon.creatis.vip.core.server.dao.h2.UserData;
 import fr.insalyon.creatis.vip.core.server.dao.h2.UsersGroupsData;
 
@@ -71,10 +70,5 @@ public class H2DAOFactory extends CoreDAOFactory {
     @Override
     public UsersGroupsDAO getUsersGroupsDAO() throws DAOException {
         return new UsersGroupsData();
-    }
-
-    @Override
-    public NewsDAO getNewsDAO() throws DAOException {
-        return new NewsData();
     }
 }

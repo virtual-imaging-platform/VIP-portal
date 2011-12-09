@@ -42,7 +42,7 @@ import java.util.Date;
  */
 public class CoreConstants {
 
-    public static final String VERSION = "v0.5.3";
+    public static final String VERSION = "v0.5.4";
     public static final String FOLDER_TRASH = "Trash";
     // Tabs
     public static final String TAB_ACCOUNT = "account-tab";
@@ -52,9 +52,7 @@ public class CoreConstants {
     public static final String TAB_SIGNIN = "signin-tab";
     public static final String TAB_SIGNUP = "signup-tab";
     public static final String TAB_SYSTEM = "system-tab";
-    public static final String TAB_MESSAGE = "mail-tab";
     public static final String TAB_MANAGE_USERS = "manage-users-tab";
-    public static final String TAB_MANAGE_NEWS = "manage-news-tab";
     public static final String TAB_MANAGE_GROUPS = "manage-groups-tab";
     // Icons
     private static final String IMG_FOLDER = "core/";
@@ -67,7 +65,6 @@ public class CoreConstants {
     public static final String ICON_HELP = IMG_FOLDER + "icon-help.png";
     public static final String ICON_HOME = IMG_FOLDER + "icon-home.png";
     public static final String ICON_LOADING = IMG_FOLDER + "icon-loading.gif";
-    public static final String ICON_MESSAGE = IMG_FOLDER + "system/icon-message.png";
     public static final String ICON_PASSWORD = IMG_FOLDER + "icon-password.png";
     public static final String ICON_PERSONAL = IMG_FOLDER + "icon-personal.png";
     public static final String ICON_REFRESH = IMG_FOLDER + "icon-refresh.png";
@@ -79,13 +76,10 @@ public class CoreConstants {
     // Application Names
     public static final String APP_ACCOUNT = "My Account";
     public static final String APP_GROUP = "Groups";
-    public static final String APP_MESSAGE = "Messages";
-    public static final String APP_NEWS = "News";
     public static final String APP_USER = "Users";
     // Application Images
     public static final String APP_IMG_ACCOUNT = IMG_FOLDER + "app-account.png";
     public static final String APP_IMG_GROUP = IMG_FOLDER + "system/app-group.png";
-    public static final String APP_IMG_MESSAGE = IMG_FOLDER + "app-message.png";
     public static final String APP_IMG_NEWS = IMG_FOLDER + "system/app-news.png";
     public static final String APP_IMG_USER = IMG_FOLDER + "system/app-user.png";
     // Session Attributes

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>fr.insalyon.creatis</groupId>
+        <artifactId>vip</artifactId>
+        <version>0.5.4</version>
+        <relativePath>..</relativePath>
+    </parent>
+    
+    <groupId>fr.insalyon.creatis</groupId>
+    <artifactId>vip-social</artifactId>
+    <packaging>jar</packaging>
+    <version>${vip.social.version}</version>
+    <name>VIP-Social</name>
+    
+    <dependencies>
+        
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+       
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-core</artifactId>
+            <version>${vip.core.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
+    </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>gwt-maven-plugin</artifactId>
+                <version>2.2.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <hostedWebapp>${project.build.directory}/${project.build.finalName}</hostedWebapp>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>remove-javax</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <tasks>
+                        <delete dir="${project.build.directory}/classes/javax"/>
+                    </tasks>
+                </configuration>
+            </plugin>
+        </plugins>
+        <finalName>vip-simulation-gui</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.java</include>
+                    <include>**/*.xml</include>
+                    <include>**/*.txt</include>
+                    <include>**/*.png</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/resources</directory>
+            </resource>
+        </resources>
+        
+    </build>
+
+</project>

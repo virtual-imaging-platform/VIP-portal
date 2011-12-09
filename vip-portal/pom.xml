@@ -5,7 +5,7 @@
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>0.5.3</version>
+        <version>0.5.4</version>
         <relativePath>..</relativePath>
     </parent>
     <groupId>fr.insalyon.creatis</groupId>
@@ -95,6 +95,12 @@
             <version>0.1</version>
         </dependency-->
         <!-- END VIP MODULES -->
+        
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-social</artifactId>
+            <version>${vip.social.version}</version>
+        </dependency>
 
     </dependencies>
     

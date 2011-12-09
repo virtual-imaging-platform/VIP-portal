@@ -70,6 +70,9 @@ public class ModulesInit {
         for (Module module : modules) {
             module.load();
         }
+        for (Module module : modules) {
+            module.postLoading();
+        }
     }
     
     public void finalizeModules() {

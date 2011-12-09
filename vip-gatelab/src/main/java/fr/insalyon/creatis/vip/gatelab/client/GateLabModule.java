@@ -46,13 +46,17 @@ import fr.insalyon.creatis.vip.gatelab.client.view.GateLabHomeParser;
 public class GateLabModule extends Module {
 
     public GateLabModule() {
-        
+
         ApplicationModule.reservedClasses.add(GateLabConstants.GATELAB_CLASS);
         CoreModule.homeExecutor.addParser(new GateLabHomeParser());
     }
 
     @Override
     public void load() {
+    }
+
+    @Override
+    public void postLoading() {
     }
 
     @Override

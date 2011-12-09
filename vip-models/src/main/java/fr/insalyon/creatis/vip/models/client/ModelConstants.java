@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -53,7 +53,7 @@ public class ModelConstants {
     // Images
     public static final String APP_IMG_MODEL = IMG_FOLDER + "app-model.png";
     public static final String APP_IMG_ANATOMY = IMG_FOLDER + "icon-anatomy.png";
-     public static final String APP_IMG_GEOMETRY = IMG_FOLDER + "icon-geometry.png";
+    public static final String APP_IMG_GEOMETRY = IMG_FOLDER + "icon-geometry.png";
     public static final String APP_IMG_EXTERNAL = IMG_FOLDER + "icon-external.png";
     public static final String APP_IMG_FOREIGN = IMG_FOLDER + "icon-foreign.png";
     public static final String APP_IMG_INSTANT = IMG_FOLDER + "icon-instant.png";

@@ -74,6 +74,16 @@ public class CoreModule extends Module {
         // Configure User's toolstrip        
         MainToolStrip.getInstance().addMenuButton(new UserMenuButton(user));
 
+        // Tabs
+        if (user.isGroupAdmin()) {
+            Layout.getInstance().addTab(new SystemTab());
+        }
+        Layout.getInstance().addTab(new HomeTab());
+    }
+
+    @Override
+    public void postLoading() {
+        
         ToolStripButton helpButton = new ToolStripButton("Experiencing problems?");
         helpButton.setIcon(CoreConstants.ICON_HELP);
         helpButton.addClickHandler(new ClickHandler() {
@@ -85,15 +95,9 @@ public class CoreModule extends Module {
         
         MainToolStrip.getInstance().addFill();
         MainToolStrip.getInstance().addMember(helpButton);
-
-        // Tabs
-        if (user.isGroupAdmin()) {
-            Layout.getInstance().addTab(new SystemTab());
-        }
-        Layout.getInstance().addTab(new HomeTab());
     }
-
+    
     @Override
     public void terminate() {
-    }
+    }   
 }

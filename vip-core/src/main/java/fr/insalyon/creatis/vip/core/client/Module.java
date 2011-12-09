@@ -42,5 +42,7 @@ public abstract class Module {
 
     public abstract void load();
     
+    public abstract void postLoading();
+    
     public abstract void terminate();
 }

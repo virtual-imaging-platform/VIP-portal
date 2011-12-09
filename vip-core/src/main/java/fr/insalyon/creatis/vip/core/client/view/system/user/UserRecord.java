@@ -59,4 +59,9 @@ public class UserRecord extends ListGridRecord {
         setAttribute("folder", folder);
         setAttribute("lastLogin", lastLogin);
     }
+    
+    public Date getDate() {
+        
+        return getAttributeAsDate("lastLogin");
+    }
 }

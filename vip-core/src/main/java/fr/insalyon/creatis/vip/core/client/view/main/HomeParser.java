@@ -38,7 +38,6 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.user.AccountTab;
-import fr.insalyon.creatis.vip.core.client.view.user.MessageTab;
 
 /**
  *
@@ -50,7 +49,6 @@ public class HomeParser extends ApplicationParser {
     public void loadApplications() {
 
         addApplication(CoreConstants.APP_ACCOUNT, CoreConstants.APP_IMG_ACCOUNT);
-        addApplication(CoreConstants.APP_MESSAGE, CoreConstants.APP_IMG_MESSAGE);
     }
 
     @Override
@@ -59,11 +57,7 @@ public class HomeParser extends ApplicationParser {
         if (applicationName.equals(CoreConstants.APP_ACCOUNT)) {
             Layout.getInstance().addTab(new AccountTab());
             return true;
-        
-        } else if (applicationName.equals(CoreConstants.APP_MESSAGE)) {
-            Layout.getInstance().addTab(new MessageTab());
-            return true;
-        }
+        }        
         return false;
     }
 }

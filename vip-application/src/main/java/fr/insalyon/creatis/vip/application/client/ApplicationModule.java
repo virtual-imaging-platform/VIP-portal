@@ -84,6 +84,10 @@ public class ApplicationModule extends Module {
     }
 
     @Override
+    public void postLoading() {
+    }
+
+    @Override
     public void terminate() {
 
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();

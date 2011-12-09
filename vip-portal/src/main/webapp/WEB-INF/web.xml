@@ -40,14 +40,6 @@
         <servlet-name>GetFileService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/getfileservice</url-pattern>
     </servlet-mapping>
-    <servlet>
-        <servlet-name>NewsService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.core.server.rpc.NewsServiceImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>NewsService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/newsservice</url-pattern>
-    </servlet-mapping>
     <!-- End Core Module -->
     
     <!-- Provenance Module -->
@@ -174,6 +166,17 @@
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/vtkcontroller</url-pattern>
     </servlet-mapping>
     <!-- End Models Module -->
+    
+    <!-- Social Module -->
+    <servlet>
+        <servlet-name>SocialService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.social.server.rpc.SocialServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SocialService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/socialservice</url-pattern>
+    </servlet-mapping>
+    <!-- End Social Module -->
     
     <session-config>
         <session-timeout>-1</session-timeout>

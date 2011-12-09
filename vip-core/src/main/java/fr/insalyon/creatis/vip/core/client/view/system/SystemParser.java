@@ -39,7 +39,6 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.system.group.ManageGroupsTab;
-import fr.insalyon.creatis.vip.core.client.view.system.news.ManageNewsTab;
 import fr.insalyon.creatis.vip.core.client.view.system.user.ManageUsersTab;
 
 /**
@@ -54,7 +53,6 @@ public class SystemParser extends ApplicationParser {
         if (CoreModule.user.isSystemAdministrator()) {
             addApplication(CoreConstants.APP_USER, CoreConstants.APP_IMG_USER);
             addApplication(CoreConstants.APP_GROUP, CoreConstants.APP_IMG_GROUP);
-            addApplication(CoreConstants.APP_NEWS, CoreConstants.APP_IMG_NEWS);
         }
     }
 
@@ -68,11 +66,6 @@ public class SystemParser extends ApplicationParser {
         } else if (applicationName.equals(CoreConstants.APP_GROUP)) {
             Layout.getInstance().addTab(new ManageGroupsTab());
             return true;
-
-        } else if (applicationName.equals(CoreConstants.APP_NEWS)) {
-            Layout.getInstance().addTab(new ManageNewsTab());
-            return true;
-
         }
         return false;
     }

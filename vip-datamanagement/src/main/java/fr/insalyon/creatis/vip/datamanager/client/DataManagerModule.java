@@ -70,4 +70,9 @@ public class DataManagerModule extends Module {
         BrowserLayout.terminate();
         OperationLayout.terminate();
     }
+
+    @Override
+    public void postLoading() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

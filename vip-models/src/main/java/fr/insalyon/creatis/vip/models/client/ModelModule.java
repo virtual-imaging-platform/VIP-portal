@@ -54,6 +54,10 @@ public class ModelModule extends Module {
     }
 
     @Override
+    public void postLoading() {
+    }
+
+    @Override
     public void terminate() {
     }
 }

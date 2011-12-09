@@ -51,6 +51,7 @@ import fr.insalyon.creatis.vip.docs.client.DocsModule;
 import fr.insalyon.creatis.vip.gatelab.client.GateLabModule;
 import fr.insalyon.creatis.vip.models.client.ModelModule;
 import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIModule;
+import fr.insalyon.creatis.vip.social.client.SocialModule;
 
 /**
  *
@@ -63,6 +64,7 @@ public class Main implements EntryPoint {
         // Modules
         ModulesInit modulesInit = ModulesInit.getInstance();
         modulesInit.add(new CoreModule());
+        modulesInit.add(new SocialModule());
         modulesInit.add(new DocsModule());
         modulesInit.add(new DataManagerModule());
         modulesInit.add(new ModelModule());
@@ -79,6 +81,7 @@ public class Main implements EntryPoint {
             email = Cookies.getCookie(CoreConstants.COOKIES_USER);
             session = Cookies.getCookie(CoreConstants.COOKIES_SESSION);
         }
+        // End-Cookies
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<User> callback = new AsyncCallback<User>() {

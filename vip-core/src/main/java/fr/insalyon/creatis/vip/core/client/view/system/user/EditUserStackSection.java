@@ -221,7 +221,7 @@ public class EditUserStackSection extends SectionStackSection {
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get groups list\n" + caught.getMessage());
+                SC.warn("Unable to get groups list:<br />" + caught.getMessage());
             }
 
             public void onSuccess(List<String> result) {

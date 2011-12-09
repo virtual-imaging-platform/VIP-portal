@@ -58,6 +58,4 @@ public abstract class CoreDAOFactory {
     public abstract GroupDAO getGroupDAO() throws DAOException;
     
     public abstract UsersGroupsDAO getUsersGroupsDAO() throws DAOException;
-
-    public abstract NewsDAO getNewsDAO() throws DAOException;
 }

@@ -1,0 +1,184 @@
+/* Copyright CNRS-CREATIS
+ *
+ * Rafael Silva
+ * rafael.silva@creatis.insa-lyon.fr
+ * http://www.rafaelsilva.com
+ *
+ * This software is a grid-enabled data-driven workflow manager and editor.
+ *
+ * This software is governed by the CeCILL  license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * "http://www.cecill.info".
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.social.client.view.message;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.Cursor;
+import com.smartgwt.client.types.MultipleAppearance;
+import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.RichTextEditor;
+import com.smartgwt.client.widgets.Window;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+import fr.insalyon.creatis.vip.social.client.SocialConstants;
+import fr.insalyon.creatis.vip.social.client.rpc.SocialService;
+import fr.insalyon.creatis.vip.social.client.rpc.SocialServiceAsync;
+import java.util.LinkedHashMap;
+import java.util.List;
+
+/**
+ *
+ * @author Rafael Silva
+ */
+public class MessageComposerWindow extends Window {
+
+    private ModalWindow modal;
+    private VLayout vLayout;
+    private DynamicForm form;
+    private SelectItem usersPickList;
+    private TextItem subjectItem;
+    private RichTextEditor richTextEditor;
+
+    public MessageComposerWindow() {
+
+        this.setTitle(Canvas.imgHTML(SocialConstants.ICON_COMPOSE) + " Compose New Message");
+        this.setCanDragReposition(true);
+        this.setCanDragResize(true);
+        this.setWidth(700);
+        this.setHeight(450);
+        this.centerInPage();
+        this.setBackgroundColor("#F2F2F2");
+        this.setPadding(5);
+
+        vLayout = new VLayout(5);
+        vLayout.setWidth100();
+        vLayout.setHeight100();
+        vLayout.setOverflow(Overflow.AUTO);
+        vLayout.setPadding(5);
+
+        modal = new ModalWindow(vLayout);
+        
+        configureForm();
+        loadUsers();
+
+        this.addItem(vLayout);
+    }
+
+    private void configureForm() {
+
+        HLayout buttonsLayout = new HLayout(5);
+        Label sendLabel = WidgetUtil.getLabel("Send Message", SocialConstants.ICON_SEND, 15, Cursor.HAND);
+        sendLabel.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                if (form.validate()) {
+                    sendMessage(usersPickList.getValues(),
+                            subjectItem.getValueAsString().trim(),
+                            richTextEditor.getValue());
+                }
+            }
+        });
+        buttonsLayout.addMember(sendLabel);
+        vLayout.addMember(buttonsLayout);
+
+        usersPickList = new SelectItem();
+        usersPickList.setTitle("To");
+        usersPickList.setMultiple(true);
+        usersPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
+        usersPickList.setWidth(350);
+        usersPickList.setRequired(true);
+
+        subjectItem = FieldUtil.getTextItem(350, true, "Subject", "[0-9.A-Za-z-+/_() ]");
+
+        form = FieldUtil.getForm(usersPickList, subjectItem);
+        form.setWidth(500);
+        vLayout.addMember(form);
+
+        richTextEditor = new RichTextEditor();
+        richTextEditor.setHeight100();
+        richTextEditor.setOverflow(Overflow.HIDDEN);
+        richTextEditor.setCanDragResize(true);
+        richTextEditor.setShowEdges(true);
+        richTextEditor.setControlGroups("fontControls", "formatControls",
+                "styleControls", "editControls", "colorControls", "insertControls");
+        vLayout.addMember(richTextEditor);
+    }
+
+    private void loadUsers() {
+
+        SocialServiceAsync service = SocialService.Util.getInstance();
+        AsyncCallback<List<User>> callback = new AsyncCallback<List<User>>() {
+
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Unable to get users list:<br />" + caught.getMessage());
+            }
+
+            public void onSuccess(List<User> result) {
+
+                LinkedHashMap<String, String> usersMap = new LinkedHashMap<String, String>();
+                usersMap.put("All", "All");
+                for (User user : result) {
+                    usersMap.put(user.getEmail(), user.getFullName());
+                }
+                usersPickList.setValueMap(usersMap);
+                modal.hide();
+            }
+        };
+        service.getUsers(callback);
+        modal.show("Loading users list...", true);
+    }
+
+    private void sendMessage(String[] recipients, String subject, String message) {
+
+        SocialServiceAsync service = SocialService.Util.getInstance();
+        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Unable to send message:<br />" + caught.getMessage());
+            }
+
+            public void onSuccess(Void result) {
+                destroy();
+                SC.say("Message successfully sent.");
+            }
+        };
+        service.sendMessage(recipients, subject, message, callback);
+        modal.show("Sending message...", true);
+    }
+}

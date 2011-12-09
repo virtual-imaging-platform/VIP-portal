@@ -13,6 +13,7 @@
     <inherits name="fr.insalyon.creatis.vip.gatelab.GateLab" />
     <inherits name="fr.insalyon.creatis.vip.simulationgui.SimulationGUI" />
     <inherits name="fr.insalyon.creatis.vip.models.Models" />
+    <inherits name="fr.insalyon.creatis.vip.social.Social" />
     
     <!-- Specify the app entry point class.-->
     <entry-point class="fr.insalyon.creatis.vip.portal.client.Main"/>

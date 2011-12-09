@@ -55,7 +55,7 @@ public class SimulationGUIModule extends Module {
 
     @Override
     public void load() {
-        
+
         VTKControllerAsync service = VTKController.Util.getInstance();
         AsyncCallback<Void> asyncCallback = new AsyncCallback<Void>() {
 
@@ -67,6 +67,10 @@ public class SimulationGUIModule extends Module {
             }
         };
         service.configure(asyncCallback);
+    }
+
+    @Override
+    public void postLoading() {
     }
 
     @Override

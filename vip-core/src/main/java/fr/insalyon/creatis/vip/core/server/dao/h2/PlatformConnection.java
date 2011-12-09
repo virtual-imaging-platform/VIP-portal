@@ -138,13 +138,6 @@ public class PlatformConnection {
                 }
             }
 
-            createTable("VIPNews",
-                    "title VARCHAR(255), "
-                    + "message CLOB, "
-                    + "posted TIMESTAMP, "
-                    + "owner VARCHAR(255), "
-                    + "PRIMARY KEY (title, owner)");
-
             firstExecution = false;
         }
 

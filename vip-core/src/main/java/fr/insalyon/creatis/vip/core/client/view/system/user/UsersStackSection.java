@@ -63,6 +63,7 @@ import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -100,6 +101,23 @@ public class UsersStackSection extends SectionStackSection {
     private void configureGrid() {
         grid = new ListGrid() {
 
+            @Override
+            protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
+                
+                if (getFieldName(colNum).equals("lastLogin")) {
+                    UserRecord userRecord = (UserRecord) record;
+                    long oneMonthDate = (new Date()).getTime() - ((long) 30 * 24 * 3600000);
+                    long threeMonthsDate = (new Date()).getTime() - ((long) 90 * 24 * 3600000);
+                    
+                    if (userRecord.getDate().getTime() < threeMonthsDate) {
+                        return "color:#D64949;";
+                    } else if (userRecord.getDate().getTime() < oneMonthDate) {
+                        return "color:#D68E63;";
+                    }
+                }
+                return super.getCellCSSText(record, rowNum, colNum);
+            }
+            
             @Override
             protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
 
@@ -172,7 +190,7 @@ public class UsersStackSection extends SectionStackSection {
         ListGridField lastLoginField = FieldUtil.getDateField("lastLogin", "Last Login");
 
         grid.setFields(confirmedField, firstNameField, lastNameField, emailField, 
-                institutionField, phoneField, lastLoginField);
+                lastLoginField, institutionField, phoneField);
         grid.setSortField("firstName");
         grid.setSortDirection(SortDirection.ASCENDING);
         
