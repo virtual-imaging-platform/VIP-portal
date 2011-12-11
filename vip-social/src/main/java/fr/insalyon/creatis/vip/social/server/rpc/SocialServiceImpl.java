@@ -42,6 +42,7 @@ import fr.insalyon.creatis.vip.social.client.bean.Message;
 import fr.insalyon.creatis.vip.social.client.rpc.SocialService;
 import fr.insalyon.creatis.vip.social.client.view.SocialException;
 import fr.insalyon.creatis.vip.social.server.business.MessageBusiness;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.log4j.Logger;
 
@@ -109,7 +110,7 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
     public void sendMessage(String[] recipients, String subject, String message) throws SocialException {
 
         try {
-            trace(logger, "Sending message '" + subject + "' to '" + recipients + "'.");
+            trace(logger, "Sending message '" + subject + "' to '" + Arrays.asList(recipients) + "'.");
             messageBusiness.sendMessage(getSessionUser().getEmail(), recipients,
                     subject, message);
 
