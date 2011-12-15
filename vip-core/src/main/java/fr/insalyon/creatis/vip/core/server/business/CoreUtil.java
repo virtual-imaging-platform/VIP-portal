@@ -34,8 +34,9 @@
  */
 package fr.insalyon.creatis.vip.core.server.business;
 
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
-import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
+import fr.insalyon.creatis.grida.client.GRIDACacheClient;
+import fr.insalyon.creatis.grida.client.GRIDAClient;
+import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import java.io.UnsupportedEncodingException;
 import java.security.Security;
 import java.util.Date;
@@ -111,11 +112,11 @@ public class CoreUtil {
      * @param proxyFileName
      * @return 
      */
-    public static VletAgentClient getVletAgentClient() {
+    public static GRIDAClient getGRIDAClient() {
 
-        return new VletAgentClient(
-                Server.getInstance().getVletagentHost(),
-                Server.getInstance().getVletagentPort(),
+        return new GRIDAClient(
+                Server.getInstance().getGRIDAHost(),
+                Server.getInstance().getGRIDAPort(),
                 Server.getInstance().getServerProxy());
     }
 
@@ -124,11 +125,24 @@ public class CoreUtil {
      * @param proxyFileName
      * @return 
      */
-    public static VletAgentPoolClient getVletAgentPoolClient() {
+    public static GRIDAPoolClient getGRIDAPoolClient() {
 
-        return new VletAgentPoolClient(
-                Server.getInstance().getVletagentHost(),
-                Server.getInstance().getVletagentPort(),
+        return new GRIDAPoolClient(
+                Server.getInstance().getGRIDAHost(),
+                Server.getInstance().getGRIDAPort(),
+                Server.getInstance().getServerProxy());
+    }
+    
+    /**
+     * 
+     * @param proxyFileName
+     * @return 
+     */
+    public static GRIDACacheClient getGRIDACacheClient() {
+
+        return new GRIDACacheClient(
+                Server.getInstance().getGRIDAHost(),
+                Server.getInstance().getGRIDAPort(),
                 Server.getInstance().getServerProxy());
     }
 }
