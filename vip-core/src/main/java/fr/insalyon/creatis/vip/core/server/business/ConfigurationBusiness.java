@@ -34,9 +34,9 @@
  */
 package fr.insalyon.creatis.vip.core.server.business;
 
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
 import fr.insalyon.creatis.devtools.MD5;
+import fr.insalyon.creatis.grida.client.GRIDAClient;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
@@ -261,11 +261,11 @@ public class ConfigurationBusiness {
 
                 User user = userDAO.getUser(email);
 
-                VletAgentClient client = CoreUtil.getVletAgentClient();
-                client.createDirectory(Server.getInstance().getDataManagerUsersHome(),
+                GRIDAClient client = CoreUtil.getGRIDAClient();
+                client.createFolder(Server.getInstance().getDataManagerUsersHome(),
                         user.getFolder());
 
-                client.createDirectory(Server.getInstance().getDataManagerUsersHome(),
+                client.createFolder(Server.getInstance().getDataManagerUsersHome(),
                         user.getFolder() + "_" + CoreConstants.FOLDER_TRASH);
 
                 return user;
@@ -275,7 +275,7 @@ public class ConfigurationBusiness {
                 throw new BusinessException("Activation failed.");
             }
 
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         } catch (DAOException ex) {
@@ -436,15 +436,15 @@ public class ConfigurationBusiness {
     public void addGroup(String groupName) throws BusinessException {
 
         try {
-            VletAgentClient client = CoreUtil.getVletAgentClient();
-            client.createDirectory(Server.getInstance().getDataManagerGroupsHome(),
+            GRIDAClient client = CoreUtil.getGRIDAClient();
+            client.createFolder(Server.getInstance().getDataManagerGroupsHome(),
                     groupName.replaceAll(" ", "_"));
 
             CoreDAOFactory.getDAOFactory().getGroupDAO().add(groupName);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
@@ -475,7 +475,7 @@ public class ConfigurationBusiness {
     public void updateGroup(String oldName, String newName) throws BusinessException {
 
         try {
-            VletAgentClient client = CoreUtil.getVletAgentClient();
+            GRIDAClient client = CoreUtil.getGRIDAClient();
             client.rename(Server.getInstance().getDataManagerGroupsHome()
                     + "/" + oldName.replaceAll(" ", "_"), newName.replaceAll(" ", "_"));
 
@@ -483,7 +483,7 @@ public class ConfigurationBusiness {
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
@@ -579,7 +579,7 @@ public class ConfigurationBusiness {
             CoreDAOFactory.getDAOFactory().getUserDAO().update(user);
 
             if (!oldFolder.equals(user.getFolder())) {
-                VletAgentClient client = CoreUtil.getVletAgentClient();
+                GRIDAClient client = CoreUtil.getGRIDAClient();
                 client.rename(
                         Server.getInstance().getDataManagerUsersHome() + "/" + oldFolder,
                         Server.getInstance().getDataManagerUsersHome() + "/" + user.getFolder());
@@ -589,7 +589,7 @@ public class ConfigurationBusiness {
                         Server.getInstance().getDataManagerUsersHome() + "/" + user.getFolder() + "_" + CoreConstants.FOLDER_TRASH);
             }
 
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         } catch (DAOException ex) {
