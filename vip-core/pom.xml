@@ -68,8 +68,8 @@
         
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vlet-agent-client</artifactId>
-            <version>0.9.1</version>
+            <artifactId>grida-client</artifactId>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
