@@ -34,7 +34,7 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server.rpc;
 
-import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
+import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
@@ -106,9 +106,9 @@ public class FileUploadServiceImpl extends HttpServlet {
                         response.getWriter().write(fileName);
 
                         if (!local) {
-                            // Vlet Agent Pool Client
+                            // GRIDA Pool Client
                             logger.info("(" + user.getEmail() + ") Uploading '" + uploadedFile.getAbsolutePath() + "' to '" + path + "'.");
-                            VletAgentPoolClient client = CoreUtil.getVletAgentPoolClient();
+                            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
                             client.uploadFile(
                                     uploadedFile.getAbsolutePath(),
                                     DataManagerUtil.parseBaseDir(user.getFullName(), path),

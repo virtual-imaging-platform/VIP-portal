@@ -34,9 +34,9 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server.business;
 
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
-import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
-import fr.insalyon.creatis.agent.vlet.common.bean.Operation;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
+import fr.insalyon.creatis.grida.common.bean.Operation;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
@@ -73,7 +73,7 @@ public class TransferPoolBusiness {
     public List<PoolOperation> getOperations(String email) throws BusinessException {
 
         try {
-            VletAgentPoolClient client = CoreUtil.getVletAgentPoolClient();
+            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
 
             List<Operation> operationsList = client.getOperationsListByUser(email);
             List<PoolOperation> poolOperations = new ArrayList<PoolOperation>();
@@ -109,7 +109,7 @@ public class TransferPoolBusiness {
         } catch (DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
@@ -123,7 +123,7 @@ public class TransferPoolBusiness {
     public List<PoolOperation> getOperations() throws BusinessException {
 
         try {
-            VletAgentPoolClient client = CoreUtil.getVletAgentPoolClient();
+            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
 
             List<Operation> operationsList = client.getAllOperations();
             List<PoolOperation> poolOperations = new ArrayList<PoolOperation>();
@@ -162,7 +162,7 @@ public class TransferPoolBusiness {
         } catch (DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
@@ -176,13 +176,13 @@ public class TransferPoolBusiness {
     public void removeOperations(List<String> ids) throws BusinessException {
 
         try {
-            VletAgentPoolClient client = CoreUtil.getVletAgentPoolClient();
+            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
 
             for (String id : ids) {
                 client.removeOperationById(id);
             }
 
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
@@ -196,10 +196,10 @@ public class TransferPoolBusiness {
     public void removeUserOperations(String email) throws BusinessException {
        
         try {
-            VletAgentPoolClient client = CoreUtil.getVletAgentPoolClient();
+            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
             client.removeOperationsByUser(email);
             
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
@@ -213,10 +213,10 @@ public class TransferPoolBusiness {
     public void removeOperationById(String id) throws BusinessException {
 
         try {
-            VletAgentPoolClient client = CoreUtil.getVletAgentPoolClient();
+            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
             client.removeOperationById(id);
 
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
@@ -233,7 +233,7 @@ public class TransferPoolBusiness {
 
         try {
             lfcBusiness.getModificationDate(userName, remoteFile);
-            VletAgentPoolClient poolClient = CoreUtil.getVletAgentPoolClient();
+            GRIDAPoolClient poolClient = CoreUtil.getGRIDAPoolClient();
 
             String remotePath = DataManagerUtil.parseBaseDir(userName, remoteFile);
             String localDirPath = serverConfiguration.getDataManagerPath()
@@ -244,7 +244,7 @@ public class TransferPoolBusiness {
         } catch (DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
@@ -263,7 +263,7 @@ public class TransferPoolBusiness {
 
         try {
             lfcBusiness.getModificationDate(userName, remoteFiles);
-            VletAgentPoolClient poolClient = CoreUtil.getVletAgentPoolClient();
+            GRIDAPoolClient poolClient = CoreUtil.getGRIDAPoolClient();
 
             List<String> remotePaths = new ArrayList<String>();
             for (String remoteFile : remoteFiles) {
@@ -277,7 +277,7 @@ public class TransferPoolBusiness {
         } catch (DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
@@ -295,7 +295,7 @@ public class TransferPoolBusiness {
 
         try {
             lfcBusiness.getModificationDate(userName, remoteFolder);
-            VletAgentPoolClient poolClient = CoreUtil.getVletAgentPoolClient();
+            GRIDAPoolClient poolClient = CoreUtil.getGRIDAPoolClient();
 
             String remotePath = DataManagerUtil.parseBaseDir(userName, remoteFolder);
             String localDirPath = serverConfiguration.getDataManagerPath()
@@ -305,7 +305,7 @@ public class TransferPoolBusiness {
         } catch (DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
@@ -323,7 +323,7 @@ public class TransferPoolBusiness {
             String remoteFile) throws BusinessException {
 
         try {
-            VletAgentPoolClient poolClient = CoreUtil.getVletAgentPoolClient();
+            GRIDAPoolClient poolClient = CoreUtil.getGRIDAPoolClient();
             String localPath = serverConfiguration.getDataManagerPath()
                     + "/uploads/" + localFile;
             String remotePath = DataManagerUtil.parseBaseDir(userName, remoteFile);
@@ -332,7 +332,7 @@ public class TransferPoolBusiness {
         } catch (DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }

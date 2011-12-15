@@ -34,10 +34,10 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server.business;
 
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
-import fr.insalyon.creatis.agent.vlet.common.bean.CachedFile;
 import fr.insalyon.creatis.devtools.FileUtils;
+import fr.insalyon.creatis.grida.client.GRIDACacheClient;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.grida.common.bean.CachedFile;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
@@ -69,7 +69,7 @@ public class DataManagerBusiness {
     public List<DMCachedFile> getCachedFiles() throws BusinessException {
 
         try {
-            VletAgentClient client = CoreUtil.getVletAgentClient();
+            GRIDACacheClient client = CoreUtil.getGRIDACacheClient();
 
             List<CachedFile> cachedFilesList = client.getCachedFiles();
             List<DMCachedFile> dmCachedFiles = new ArrayList<DMCachedFile>();
@@ -82,7 +82,7 @@ public class DataManagerBusiness {
 
             return dmCachedFiles;
 
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
@@ -91,12 +91,12 @@ public class DataManagerBusiness {
     public void deleteCachedFiles(List<String> cachedFiles) throws BusinessException {
 
         try {
-            VletAgentClient client = CoreUtil.getVletAgentClient();
+            GRIDACacheClient client = CoreUtil.getGRIDACacheClient();
 
             for (String path : cachedFiles) {
                 client.deleteCachedFile(path);
             }
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
@@ -114,13 +114,13 @@ public class DataManagerBusiness {
             throws BusinessException {
 
         try {
-            return CoreUtil.getVletAgentClient().getRemoteFile(
+            return CoreUtil.getGRIDAClient().getRemoteFile(
                     DataManagerUtil.parseBaseDir(user, remoteFile), localDir);
             
         } catch (DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }

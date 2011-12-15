@@ -34,10 +34,10 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server.rpc;
 
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
-import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
 import fr.insalyon.creatis.devtools.zip.UnZipper;
+import fr.insalyon.creatis.grida.client.GRIDAClient;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
@@ -61,8 +61,8 @@ import org.apache.log4j.Logger;
 public class UploadFilesServiceImpl extends HttpServlet {
 
     private static Logger logger = Logger.getLogger(UploadFilesServiceImpl.class);
-    private VletAgentClient client;
-    private VletAgentPoolClient poolClient;
+    private GRIDAClient client;
+    private GRIDAPoolClient poolClient;
     private String userName;
     private String email;
     private String path;
@@ -119,9 +119,9 @@ public class UploadFilesServiceImpl extends HttpServlet {
             if (!local) {
                 try {
                     if (usePool) {
-                        poolClient = CoreUtil.getVletAgentPoolClient();
+                        poolClient = CoreUtil.getGRIDAPoolClient();
                     } else {
-                        client = CoreUtil.getVletAgentClient();
+                        client = CoreUtil.getGRIDAClient();
                     }
 
                     if (single || !unzip) {
@@ -135,7 +135,7 @@ public class UploadFilesServiceImpl extends HttpServlet {
                     }
                 } catch (DataManagerException ex) {
                     logger.error(ex);
-                } catch (VletAgentClientException ex) {
+                } catch (GRIDAClientException ex) {
                     logger.error(ex);
                 }
             }
@@ -158,7 +158,7 @@ public class UploadFilesServiceImpl extends HttpServlet {
     }
 
     private void processDir(String dir, String baseDir)
-            throws VletAgentClientException, DataManagerException {
+            throws GRIDAClientException, DataManagerException {
 
         File d = new File(dir);
         for (File f : d.listFiles()) {
@@ -171,7 +171,7 @@ public class UploadFilesServiceImpl extends HttpServlet {
     }
 
     private void uploadFile(String fileName, String dir)
-            throws VletAgentClientException, DataManagerException {
+            throws GRIDAClientException, DataManagerException {
 
         logger.info("(" + email + ") Uploading '" + fileName + "' to '" + dir + "'.");
         if (usePool) {

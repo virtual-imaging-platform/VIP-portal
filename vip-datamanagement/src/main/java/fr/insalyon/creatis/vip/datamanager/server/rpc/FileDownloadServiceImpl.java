@@ -34,9 +34,9 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server.rpc;
 
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
-import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
-import fr.insalyon.creatis.agent.vlet.common.bean.Operation;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
+import fr.insalyon.creatis.grida.common.bean.Operation;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
@@ -71,7 +71,7 @@ public class FileDownloadServiceImpl extends HttpServlet {
         if (user != null && operationId != null && !operationId.isEmpty()) {
 
             try {
-                VletAgentPoolClient client = CoreUtil.getVletAgentPoolClient();
+                GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
                 Operation operation = client.getOperationById(operationId);
 
                 File file = new File(operation.getDest());
@@ -101,7 +101,7 @@ public class FileDownloadServiceImpl extends HttpServlet {
                 in.close();
                 op.flush();
                 op.close();
-            } catch (VletAgentClientException ex) {
+            } catch (GRIDAClientException ex) {
                 logger.error(ex);
             }
         }

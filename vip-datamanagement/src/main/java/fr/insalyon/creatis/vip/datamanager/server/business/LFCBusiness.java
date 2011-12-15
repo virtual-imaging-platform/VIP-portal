@@ -34,8 +34,8 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server.business;
 
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
-import fr.insalyon.creatis.agent.vlet.common.bean.GridData;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.grida.common.bean.GridData;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
@@ -67,7 +67,7 @@ public class LFCBusiness {
             throws BusinessException {
 
         try {
-            List<GridData> list = CoreUtil.getVletAgentClient().getFolderData(
+            List<GridData> list = CoreUtil.getGRIDAClient().getFolderData(
                     DataManagerUtil.parseBaseDir(user, baseDir), refresh);
 
             List<Data> dataList = new ArrayList<Data>();
@@ -87,7 +87,7 @@ public class LFCBusiness {
         } catch (DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
@@ -102,13 +102,13 @@ public class LFCBusiness {
     public void delete(String user, String path) throws BusinessException {
 
         try {
-            CoreUtil.getVletAgentClient().delete(
+            CoreUtil.getGRIDAClient().delete(
                     DataManagerUtil.parseBaseDir(user, path));
 
         } catch (DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
@@ -131,9 +131,9 @@ public class LFCBusiness {
                     logger.error(ex);
                 }
             }
-            CoreUtil.getVletAgentClient().delete(parsedPaths);
+            CoreUtil.getGRIDAClient().delete(parsedPaths);
 
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
@@ -149,13 +149,13 @@ public class LFCBusiness {
     public void createDir(String user, String baseDir, String name) throws BusinessException {
 
         try {
-            CoreUtil.getVletAgentClient().createDirectory(
+            CoreUtil.getGRIDAClient().createFolder(
                     DataManagerUtil.parseBaseDir(user, baseDir), name);
 
         } catch (DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
@@ -173,11 +173,11 @@ public class LFCBusiness {
             boolean extendPath) throws BusinessException {
 
         try {
-            CoreUtil.getVletAgentClient().rename(
+            CoreUtil.getGRIDAClient().rename(
                     DataManagerUtil.parseBaseDir(user, oldPath),
                     DataManagerUtil.parseBaseDir(user, newPath));
 
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             if (ex.getMessage().contains("Can not rename/move") && extendPath) {
                 SimpleDateFormat sdf =
                         new SimpleDateFormat("-yyyy.MM.dd-HH.mm.ss");
@@ -221,9 +221,9 @@ public class LFCBusiness {
     public boolean exists(String user, String path) throws BusinessException {
 
         try {
-            return CoreUtil.getVletAgentClient().exist(DataManagerUtil.parseBaseDir(user, path));
+            return CoreUtil.getGRIDAClient().exist(DataManagerUtil.parseBaseDir(user, path));
 
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         } catch (DataManagerException ex) {
@@ -242,10 +242,10 @@ public class LFCBusiness {
     public long getModificationDate(String user, String path) throws BusinessException {
 
         try {
-            return CoreUtil.getVletAgentClient().
+            return CoreUtil.getGRIDAClient().
                     getModificationDate(DataManagerUtil.parseBaseDir(user, path));
 
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         } catch (DataManagerException ex) {
@@ -269,9 +269,9 @@ public class LFCBusiness {
                 parsedPaths.add(DataManagerUtil.parseBaseDir(user, path));
             }
 
-            return CoreUtil.getVletAgentClient().getModificationDate(parsedPaths);
+            return CoreUtil.getGRIDAClient().getModificationDate(parsedPaths);
 
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         } catch (DataManagerException ex) {
