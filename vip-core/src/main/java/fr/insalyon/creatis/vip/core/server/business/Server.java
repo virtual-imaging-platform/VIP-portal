@@ -70,9 +70,9 @@ public class Server {
     private String mailHost = "";
     private String mailTransportProtocol = "";
     private String mailFrom = "";
-    // Vlet Agent
-    private String vletagentHost = "localhost";
-    private int vletagentPort = 9006;
+    // GRIDA server
+    private String gridaHost = "localhost";
+    private int gridaPort = 9006;
     // Data Manager
     private String dataManagerUsersHome = "/users";
     private String dataManagerGroupsHome = "/groups";
@@ -134,8 +134,8 @@ public class Server {
             mailTransportProtocol = config.getString("mail.transport.protocol", mailTransportProtocol);
             mailFrom = config.getString("mail.from", mailFrom);
 
-            vletagentHost = config.getString("vletagent.host", vletagentHost);
-            vletagentPort = config.getInt("vletagent.port", vletagentPort);
+            gridaHost = config.getString("grida.server.host", gridaHost);
+            gridaPort = config.getInt("grida.server.port", gridaPort);
 
             dataManagerUsersHome = config.getString("datamanager.users.home", dataManagerUsersHome);
             dataManagerGroupsHome = config.getString("datamanager.groups.home", dataManagerGroupsHome);
@@ -206,12 +206,12 @@ public class Server {
         return moteurServer;
     }
 
-    public String getVletagentHost() {
-        return vletagentHost;
+    public String getGRIDAHost() {
+        return gridaHost;
     }
 
-    public int getVletagentPort() {
-        return vletagentPort;
+    public int getGRIDAPort() {
+        return gridaPort;
     }
 
     public String getWorkflowsDB() {
