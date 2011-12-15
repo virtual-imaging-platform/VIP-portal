@@ -79,14 +79,6 @@
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/filedownloadservice</url-pattern>
     </servlet-mapping>
     <servlet>
-        <servlet-name>TransferPoolService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.datamanager.server.rpc.TransferPoolServiceImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>TransferPoolService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/transferpoolservice</url-pattern>
-    </servlet-mapping>
-    <servlet>
         <servlet-name>UploadFilesService</servlet-name>
         <servlet-class>fr.insalyon.creatis.vip.datamanager.server.rpc.UploadFilesServiceImpl</servlet-class>
     </servlet>
