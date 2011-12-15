@@ -34,9 +34,9 @@
  */
 package fr.insalyon.creatis.vip.application.server.business;
 
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
-import fr.insalyon.creatis.agent.vlet.client.VletAgentPoolClient;
+import fr.insalyon.creatis.grida.client.GRIDAClient;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.MoteurStatus;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
@@ -283,7 +283,7 @@ public class WorkflowBusiness {
                 }
             }
             List<String> outputs = workflowDAO.getOutputs(simulationID);
-            VletAgentPoolClient client = CoreUtil.getVletAgentPoolClient();
+            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
 
             for (String output : outputs) {
                 client.delete(output, email);
@@ -292,7 +292,7 @@ public class WorkflowBusiness {
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
@@ -577,7 +577,7 @@ public class WorkflowBusiness {
     public void validateInputs(String user, List<String> inputs) throws BusinessException {
 
         try {
-            VletAgentClient client = CoreUtil.getVletAgentClient();
+            GRIDAClient client = CoreUtil.getGRIDAClient();
             StringBuilder sb = new StringBuilder();
 
             for (String input : inputs) {
@@ -597,7 +597,7 @@ public class WorkflowBusiness {
             }
         } catch (DataManagerException ex) {
             throw new BusinessException(ex);
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             throw new BusinessException(ex);
         }
     }
