@@ -40,8 +40,7 @@ import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectL
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectLayerPart;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Timepoint;
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClient;
-import fr.insalyon.creatis.agent.vlet.client.VletAgentClientException;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
@@ -101,7 +100,7 @@ public class DownloadService {
         } catch (DataManagerException ex) {
             logger.error(ex);
             zipPath = "null";
-        } catch (VletAgentClientException ex) {
+        } catch (GRIDAClientException ex) {
             logger.error(ex);
             zipPath = "null";
         }
@@ -118,12 +117,11 @@ public class DownloadService {
         }
     }
 
-    private String vletAgentConnexion(String url, String user) throws VletAgentClientException, URISyntaxException, DataManagerException {
+    private String vletAgentConnexion(String url, String user) throws GRIDAClientException, URISyntaxException, DataManagerException {
 
         URI URL = new URI(url);
         String path = "null2";
-        VletAgentClient client = CoreUtil.getVletAgentClient();
-        path = CoreUtil.getVletAgentClient().getRemoteFile(
+        path = CoreUtil.getGRIDAClient().getRemoteFile(
                 DataManagerUtil.parseBaseDir(user, URL.getPath()),
                 Server.getInstance().getConfigurationFolder() + "/models");
         
