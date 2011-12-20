@@ -74,6 +74,11 @@ public class SimulationGUIModule extends Module {
     }
 
     @Override
+    public boolean parseAccountType(String accountType) {
+        return false;
+    }
+
+    @Override
     public void terminate() {
     }
 }

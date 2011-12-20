@@ -76,23 +76,18 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             configurationBusiness.configure();
             logger.info("VIP successfully configured.");
 
-            User user = (User) getSession().getAttribute(CoreConstants.SESSION_USER);
-            if (user != null) {
-                user.setSystemAdministrator(configurationBusiness.isSystemAdministrator(user.getEmail()));
-                configurationBusiness.updateUserLastLogin(email);
-                trace(logger, "Connected.");
+            if (configurationBusiness.validateSession(email, session)) {
 
-            } else if (configurationBusiness.validateSession(email, session)) {
-
-                user = configurationBusiness.getUser(email);
+                User user = configurationBusiness.getUser(email);
                 user.setSystemAdministrator(configurationBusiness.isSystemAdministrator(user.getEmail()));
 
-                setUserSession(user);
+                user = setUserSession(user);
                 configurationBusiness.updateUserLastLogin(email);
                 trace(logger, "Connected.");
+                
+                return user;
             }
-
-            return user;
+            return null;
 
         } catch (DAOException ex) {
             throw new CoreException(ex);
@@ -132,7 +127,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             User user = configurationBusiness.signin(email, password);
             user.setSystemAdministrator(configurationBusiness.isSystemAdministrator(user.getEmail()));
 
-            setUserSession(user);
+            user = setUserSession(user);
             configurationBusiness.updateUserLastLogin(email);
             trace(logger, "Connected.");
 
@@ -186,12 +181,14 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @param email
      * @throws CoreException 
      */
-    public void sendActivationCode() throws CoreException {
+    public String sendActivationCode() throws CoreException {
 
         try {
             User user = getSessionUser();
             logger.info("Sending activation code to: " + user.getEmail() + ".");
             configurationBusiness.sendActivationCode(user.getEmail());
+
+            return user.getEmail();
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
@@ -447,6 +444,22 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             authenticateSystemAdministrator(logger);
             trace(logger, "Activating user: " + email);
             configurationBusiness.activateUser(email);
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param groupName
+     * @throws CoreException 
+     */
+    public void addUserToGroup(String groupName) throws CoreException {
+
+        try {
+            trace(logger, "Adding user to group '" + groupName + "'.");
+            configurationBusiness.addUserToGroup(getSessionUser().getEmail(), groupName);
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);

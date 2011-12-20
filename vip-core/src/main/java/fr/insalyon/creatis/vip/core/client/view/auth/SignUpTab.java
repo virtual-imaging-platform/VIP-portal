@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.auth;
 
+import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
@@ -44,10 +45,13 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
+import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.ModulesInit;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
@@ -73,6 +77,7 @@ public class SignUpTab extends Tab {
     private TextItem phoneField;
     private PasswordItem passwordField;
     private PasswordItem confirmPasswordField;
+    private RadioGroupItem accountRadioGroupItem;
     private TextAreaItem commentItem;
     private CheckboxItem acceptField;
     private IButton signupButton;
@@ -89,7 +94,7 @@ public class SignUpTab extends Tab {
         vLayout.setMargin(5);
         vLayout.setOverflow(Overflow.AUTO);
         vLayout.setDefaultLayoutAlign(Alignment.CENTER);
-        
+
         modal = new ModalWindow(vLayout);
 
         configureForm();
@@ -129,10 +134,16 @@ public class SignUpTab extends Tab {
         confirmPasswordField.setValidators(
                 ValidatorUtil.getMatchesValidator("password", "Passwords do not match"));
 
+        accountRadioGroupItem = new RadioGroupItem();
+        accountRadioGroupItem.setTitle("Account Type");
+        accountRadioGroupItem.setVertical(false);
+        accountRadioGroupItem.setValueMap(CoreModule.accountTypes.toArray(new String[]{}));
+        accountRadioGroupItem.setRequired(true);
+
         commentItem = new TextAreaItem("comment", "Comments");
         commentItem.setHeight(80);
         commentItem.setWidth(300);
-        
+
         TextAreaItem termsField = new TextAreaItem("terms", "Terms of Use");
         termsField.setWidth(300);
         termsField.setHeight(100);
@@ -145,7 +156,8 @@ public class SignUpTab extends Tab {
 
         form = FieldUtil.getForm(firstNameField, lastNameField, emailField,
                 confirmEmailField, institutionField, phoneField, passwordField,
-                confirmPasswordField, commentItem, termsField, acceptField);
+                confirmPasswordField, accountRadioGroupItem, commentItem,
+                termsField, acceptField);
         form.setWidth(500);
         form.setTitleWidth(150);
     }
@@ -153,11 +165,9 @@ public class SignUpTab extends Tab {
     private String getDisclaimer() {
 
         return "-- VIP Terms of Use --\n\n"
-                
                 + "This portal is exclusively dedicated to non-commercial academic use. "
                 + "It can be accessed free of charge but it is provided \"as is\" without warranty of any kind."
                 + "The entire risk as to the quality and performance of the program is with you. VIP can only be used to process and store scientific data using applications registered in the VIP platform. \n\n"
-              
                 + "The simulators integrated in the platform must be acknowledged "
                 + " as follows:\n\n"
                 + "Field II is citationware. If you are publishing any work, "
@@ -180,8 +190,7 @@ public class SignUpTab extends Tab {
                 + "You must reference the paper shown below and the name of the program PET-SORTEO must be mentioned in the publication.\n\n"
                 + "A. Reilhac, C. Lartizien, N. Costes, S. Sans, C. Comtat, R. Gunn, A. Evans. PET-SORTEO: A Monte Carlo-based simulator with high count rate capabilities. IEEE Transactions on Nuclear Science, 5: 46-52, 2004.\n\n"
                 + "If you are publishing any work, where SIMRI has been used, you must reference the paper shown below and the name of the program SIMRI must be mentioned in the publication. You can also mention the SIMRI web site (http://simri.org) and that SIMRI is distributed under the free software CeCiLL license."
-                + "\n\nH. Benoit-Cattin, G. Collewet, B. Belaroussi, H. Saint-Jalmes, and C. Odet, \"The SIMRI project: A versatile and interactive MRI simulator\", Journal of Magnetic Resonance, vol. 173, pp. 97-115, 2005."
-                ;
+                + "\n\nH. Benoit-Cattin, G. Collewet, B. Belaroussi, H. Saint-Jalmes, and C. Odet, \"The SIMRI project: A versatile and interactive MRI simulator\", Journal of Magnetic Resonance, vol. 173, pp. 97-115, 2005.";
     }
 
     private void configureButton() {
@@ -210,10 +219,10 @@ public class SignUpTab extends Tab {
 
                         public void onSuccess(Void result) {
                             modal.hide();
-                            Layout.getInstance().removeTab(CoreConstants.TAB_SIGNUP);
                             SC.say("Your membership request was successfully processed.\n"
                                     + "An activation code was sent to your email.\n"
                                     + "This code will be requested on your first login.");
+                            signin();
                         }
                     };
                     modal.show("Signing up...", true);
@@ -221,5 +230,40 @@ public class SignUpTab extends Tab {
                 }
             }
         });
+    }
+
+    private void signin() {
+        
+        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+        final AsyncCallback<User> callback = new AsyncCallback<User>() {
+
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                if (caught.getMessage().contains("Authentication failed")) {
+                    SC.warn("The username or password you entered is incorrect.");
+                } else {
+                    SC.warn("Unable to signing in:\n" + caught.getMessage());
+                }
+            }
+
+            public void onSuccess(User result) {
+                modal.hide();
+                ModulesInit.getInstance().parseAccountType(accountRadioGroupItem.getValueAsString());
+                Layout.getInstance().removeTab(CoreConstants.TAB_SIGNIN);
+                Layout.getInstance().removeTab(CoreConstants.TAB_SIGNUP);
+
+                Cookies.setCookie(CoreConstants.COOKIES_USER,
+                        result.getEmail(), CoreConstants.COOKIES_EXPIRATION_DATE,
+                        null, "/", false);
+                Cookies.setCookie(CoreConstants.COOKIES_SESSION,
+                        result.getSession(), CoreConstants.COOKIES_EXPIRATION_DATE,
+                        null, "/", false);
+
+                Layout.getInstance().authenticate(result);
+            }
+        };
+        modal.show("Signing in...", true);
+        service.signin(emailField.getValueAsString().trim(),
+                passwordField.getValueAsString(), callback);
     }
 }

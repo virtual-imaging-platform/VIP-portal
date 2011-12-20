@@ -56,7 +56,7 @@ public interface ConfigurationServiceAsync {
 
     public void activate(String code, AsyncCallback<User> asyncCallback);
 
-    public void sendActivationCode(AsyncCallback<Void> asyncCallback);
+    public void sendActivationCode(AsyncCallback<String> asyncCallback);
 
     public void addGroup(String groupName, AsyncCallback<Void> asyncCallback);
 
@@ -85,4 +85,6 @@ public interface ConfigurationServiceAsync {
     public void sendContactMail(String category, String subject, String comment, AsyncCallback<Void> asyncCallback);
     
     public void activateUser(String email, AsyncCallback<Void> asyncCallback);
+    
+    public void addUserToGroup(String groupName, AsyncCallback<Void> asyncCallback);
 }

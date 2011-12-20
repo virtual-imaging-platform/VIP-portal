@@ -46,6 +46,8 @@ import fr.insalyon.creatis.vip.application.client.view.ApplicationSystemParser;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Module;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.layout.CenterTabSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +66,7 @@ public class ApplicationModule extends Module {
 
         CoreModule.systemExecutor.addParser(new ApplicationSystemParser());
         CoreModule.homeExecutor.addParser(new ApplicationHomeParser());
+        addAccountType(ApplicationConstants.ACCOUNT_VIP);
     }
 
     @Override
@@ -85,6 +88,27 @@ public class ApplicationModule extends Module {
 
     @Override
     public void postLoading() {
+    }
+
+    @Override
+    public boolean parseAccountType(String accountType) {
+
+        if (accountType.equals(ApplicationConstants.ACCOUNT_VIP)) {
+            ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+            AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                public void onFailure(Throwable caught) {
+                    SC.say("Unable to add user to group '" + ApplicationConstants.GROUP_VIP
+                            + "':<br />" + caught.getMessage());
+                }
+
+                public void onSuccess(Void result) {
+                }
+            };
+            service.addUserToGroup(ApplicationConstants.GROUP_VIP, callback);
+            return true;
+        }
+        return false;
     }
 
     @Override

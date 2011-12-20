@@ -49,5 +49,7 @@ public class GateLabConstants {
     public final static String APP_IMG_MONITOR = IMG_FOLDER + "app-application.png";
     public final static String APP_IMG_APPLICATION = IMG_FOLDER + "app-application.png";
     // Configuration
+    public final static String ACCOUNT_GATELAB = "GATE-Lab";
+    public final static String GROUP_GATELAB = "GateLab";
     public final static String GATELAB_CLASS = "GATE";
 }

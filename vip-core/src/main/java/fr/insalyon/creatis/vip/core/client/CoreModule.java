@@ -48,6 +48,7 @@ import fr.insalyon.creatis.vip.core.client.view.system.SystemTab;
 import fr.insalyon.creatis.vip.core.client.view.user.UserMenuButton;
 import fr.insalyon.creatis.vip.core.client.view.main.HomeParser;
 import fr.insalyon.creatis.vip.core.client.view.main.HomeTab;
+import java.util.List;
 
 /**
  *
@@ -58,6 +59,7 @@ public class CoreModule extends Module {
     public static User user;
     public static ApplicationExecutor systemExecutor;
     public static ApplicationExecutor homeExecutor;
+    public static List<String> accountTypes;
 
     public CoreModule() {
 
@@ -95,6 +97,15 @@ public class CoreModule extends Module {
         
         MainToolStrip.getInstance().addFill();
         MainToolStrip.getInstance().addMember(helpButton);
+    }
+    
+    @Override
+    public boolean parseAccountType(String accountType) {
+        
+        if (accountType.equals(CoreConstants.ACCOUNT_OTHER)) {
+            return true;
+        }
+        return false;
     }
     
     @Override

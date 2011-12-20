@@ -80,6 +80,8 @@ public class ApplicationConstants {
     public static final String APP_IMG_SIMULATION_ERROR = IMG_FOLDER + "app-simulation-error.png";
     public static final String APP_IMG_SIMULATION_OUT = IMG_FOLDER + "app-simulation-out.png";
     // Configuration
+    public final static String ACCOUNT_VIP = "VIP";
+    public final static String GROUP_VIP = "VIP";
     public final static String SESSION_CLASSES = "vip-classes";
     // Enums
     public static enum JobStatus {

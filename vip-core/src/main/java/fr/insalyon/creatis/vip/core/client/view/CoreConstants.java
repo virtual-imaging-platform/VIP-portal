@@ -91,5 +91,7 @@ public class CoreConstants {
     // Roles and Groups
     public static final String GROUP_ADMIN = "Administrator";
     public static final String GROUP_SUPPORT = "Support";
+    // Account Type
+    public static final String ACCOUNT_OTHER = "Other";
     public static enum ROLE { Admin, User };
 }

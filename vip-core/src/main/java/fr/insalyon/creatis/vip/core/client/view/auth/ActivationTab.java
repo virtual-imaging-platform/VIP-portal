@@ -60,16 +60,14 @@ import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
  */
 public class ActivationTab extends Tab {
 
-    private User user;
     private ModalWindow modal;
     private DynamicForm validateForm;
     private DynamicForm resendForm;
     private TextItem codeField;
     private IButton validateButton;
 
-    public ActivationTab(User user) {
+    public ActivationTab() {
 
-        this.user = user;
         this.setID(CoreConstants.TAB_ACTIVATION);
         this.setTitle("Account Activation");
 
@@ -148,16 +146,16 @@ public class ActivationTab extends Tab {
 
             public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
                 ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-                final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+                final AsyncCallback<String> callback = new AsyncCallback<String>() {
 
                     public void onFailure(Throwable caught) {
                         modal.hide();
                         SC.warn("Unable to resend activation code:\n" + caught.getMessage());
                     }
 
-                    public void onSuccess(Void result) {
+                    public void onSuccess(String result) {
                         modal.hide();
-                        SC.say("An activation code was sent to:\n" + user.getEmail());
+                        SC.say("An activation code was sent to:\n" + result);
                     }
                 };
                 modal.show("Resending activation code...", true);

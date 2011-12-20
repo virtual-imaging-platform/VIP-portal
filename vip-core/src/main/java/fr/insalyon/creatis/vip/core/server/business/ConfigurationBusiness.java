@@ -183,7 +183,7 @@ public class ConfigurationBusiness {
 
             CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
                     "[VIP Admin] Account Requested", adminsEmailContents, emails.toArray(new String[]{}));
-
+            
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (NoSuchAlgorithmException ex) {
@@ -217,7 +217,7 @@ public class ConfigurationBusiness {
 
             } else {
                 logger.error("Authentication failed to '" + email + "' (email or password incorrect).");
-                throw new BusinessException("Authentication failed.");
+                throw new BusinessException("Authentication failed (email or password incorrect).");
             }
         } catch (NoSuchAlgorithmException ex) {
             logger.error(ex);
@@ -673,6 +673,22 @@ public class ConfigurationBusiness {
         
         try {
             CoreDAOFactory.getDAOFactory().getUserDAO().updateLastLogin(email, new Date());
+            
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
+    /**
+     * 
+     * @param email
+     * @param groupName
+     * @throws BusinessException 
+     */
+    public void addUserToGroup(String email, String groupName) throws BusinessException {
+        
+        try {
+            CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().add(email, groupName, ROLE.User);
             
         } catch (DAOException ex) {
             throw new BusinessException(ex);

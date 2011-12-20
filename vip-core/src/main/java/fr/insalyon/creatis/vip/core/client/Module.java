@@ -34,15 +34,32 @@
  */
 package fr.insalyon.creatis.vip.core.client;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Rafael Silva
  */
 public abstract class Module {
-
+   
+    private List<String> accountTypes = new ArrayList<String>();
+    
     public abstract void load();
     
     public abstract void postLoading();
     
     public abstract void terminate();
+    
+    public abstract boolean parseAccountType(String accountType);
+    
+    protected void addAccountType(String accountType) {
+        
+        accountTypes.add(accountType);
+    }
+    
+    public List<String> getAccountTypes() {
+        
+        return accountTypes;
+    }
 }

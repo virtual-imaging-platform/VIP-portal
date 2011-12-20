@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.core.client;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,22 +64,43 @@ public class ModulesInit {
 
         modules.add(module);
     }
-
+    
     public void initializeModules(User user) {
 
-        CoreModule.user = user;
+        CoreModule.user = user;      
+        
         for (Module module : modules) {
-            module.load();
+            module.load();            
         }
         for (Module module : modules) {
             module.postLoading();
-        }
+        }        
     }
     
     public void finalizeModules() {
         
         for (Module module : modules) {
             module.terminate();
+        }
+    }
+    
+    public void initializeAccountTypes() {
+        
+        CoreModule.accountTypes = new ArrayList<String>();
+        
+        for (Module module : modules) {
+            CoreModule.accountTypes.addAll(module.getAccountTypes());
+        }
+        
+        CoreModule.accountTypes.add(CoreConstants.ACCOUNT_OTHER);
+    }
+    
+    public void parseAccountType(String accountType) {
+        
+        for (Module module : modules) {
+            if (module.parseAccountType(accountType)) {
+                break;
+            }
         }
     }
 } 

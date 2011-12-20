@@ -34,9 +34,13 @@
  */
 package fr.insalyon.creatis.vip.gatelab.client;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.application.client.ApplicationModule;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Module;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.gatelab.client.view.GateLabHomeParser;
 
 /**
@@ -49,6 +53,7 @@ public class GateLabModule extends Module {
 
         ApplicationModule.reservedClasses.add(GateLabConstants.GATELAB_CLASS);
         CoreModule.homeExecutor.addParser(new GateLabHomeParser());
+        addAccountType(GateLabConstants.ACCOUNT_GATELAB);
     }
 
     @Override
@@ -57,6 +62,27 @@ public class GateLabModule extends Module {
 
     @Override
     public void postLoading() {
+    }
+
+    @Override
+    public boolean parseAccountType(String accountType) {
+
+        if (accountType.equals(GateLabConstants.ACCOUNT_GATELAB)) {
+            ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+            AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                public void onFailure(Throwable caught) {
+                    SC.say("Unable to add user to group '" + GateLabConstants.GROUP_GATELAB
+                            + "':<br />" + caught.getMessage());
+                }
+
+                public void onSuccess(Void result) {
+                }
+            };
+            service.addUserToGroup(GateLabConstants.GROUP_GATELAB, callback);
+            return true;
+        }
+        return false;
     }
 
     @Override

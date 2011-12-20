@@ -93,6 +93,11 @@ public class SocialModule extends Module {
     }
 
     @Override
+    public boolean parseAccountType(String accountType) {
+        return false;
+    }
+
+    @Override
     public void terminate() {
 
         timer.cancel();
@@ -110,10 +115,10 @@ public class SocialModule extends Module {
             public void onSuccess(Integer result) {
 
                 if (result > 0) {
-                    socialButton.setTitle(Canvas.imgHTML(SocialConstants.ICON_SOCIAL) 
+                    socialButton.setTitle(Canvas.imgHTML(SocialConstants.ICON_SOCIAL)
                             + " " + Canvas.imgHTML(SocialConstants.ICON_MESSAGE_NEW));
                     socialButton.setPrompt(SocialConstants.APP_SOCIAL + " - New Message");
-                    
+
                 } else {
                     socialButton.setTitle(Canvas.imgHTML(SocialConstants.ICON_SOCIAL));
                     socialButton.setPrompt(SocialConstants.APP_SOCIAL);

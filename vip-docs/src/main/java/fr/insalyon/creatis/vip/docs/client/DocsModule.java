@@ -58,6 +58,11 @@ public class DocsModule extends Module {
     }
 
     @Override
+    public boolean parseAccountType(String accountType) {
+        return false;
+    }
+
+    @Override
     public void terminate() {
     }
 }

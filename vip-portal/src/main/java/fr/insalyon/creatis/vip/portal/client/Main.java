@@ -61,6 +61,8 @@ public class Main implements EntryPoint {
 
     public void onModuleLoad() {
 
+        Layout.getInstance().getModal().show("Loading VIP " + CoreConstants.VERSION, true);
+        
         // Modules
         ModulesInit modulesInit = ModulesInit.getInstance();
         modulesInit.add(new CoreModule());
@@ -71,6 +73,7 @@ public class Main implements EntryPoint {
         modulesInit.add(new SimulationGUIModule());
         modulesInit.add(new ApplicationModule());
         modulesInit.add(new GateLabModule());
+        modulesInit.initializeAccountTypes();
         // End-Modules
 
         // Cookies
@@ -93,21 +96,10 @@ public class Main implements EntryPoint {
 
             public void onSuccess(User user) {
 
-                if (user != null) {
-                    
-                    Cookies.setCookie(CoreConstants.COOKIES_USER,
-                            user.getEmail(), CoreConstants.COOKIES_EXPIRATION_DATE, 
-                            null, "/", false);
-                    Cookies.setCookie(CoreConstants.COOKIES_SESSION,
-                            user.getSession(), CoreConstants.COOKIES_EXPIRATION_DATE,
-                            null, "/", false);
-                }
-
                 Layout.getInstance().getModal().hide();
                 Layout.getInstance().authenticate(user);
             }
         };
-        Layout.getInstance().getModal().show("Loading VIP " + CoreConstants.VERSION, true);
         service.configure(email, session, callback);
     }
 }

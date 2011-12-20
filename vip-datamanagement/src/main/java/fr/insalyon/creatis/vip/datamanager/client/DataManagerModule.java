@@ -50,16 +50,16 @@ import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout
 public class DataManagerModule extends Module {
 
     public static DataManagerSection dataManagerSection;
-    
+
     public DataManagerModule() {
-        
+
         CoreModule.homeExecutor.addParser(new DataManagerHomeParser());
         CoreModule.systemExecutor.addParser(new DataManagerSystemParser());
     }
 
     @Override
     public void load() {
-        
+
         dataManagerSection = new DataManagerSection();
         Layout.getInstance().addMainSection(dataManagerSection);
     }
@@ -69,6 +69,11 @@ public class DataManagerModule extends Module {
         Layout.getInstance().removeMainSection(DataManagerConstants.SECTION_FILE_TRANSFER);
         BrowserLayout.terminate();
         OperationLayout.terminate();
+    }
+
+    @Override
+    public boolean parseAccountType(String accountType) {
+        return false;
     }
 
     @Override
