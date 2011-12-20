@@ -41,6 +41,8 @@ import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
+import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.io.File;
@@ -77,9 +79,8 @@ public class UploadFilesServiceImpl extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse response)
             throws ServletException, IOException {
-
-        User user = (User) req.getSession().getAttribute(CoreConstants.SESSION_USER);
-        if (user != null) {
+        try {
+            User user = CoreDAOFactory.getDAOFactory().getUserDAO().getUserBySession(req.getHeader(CoreConstants.COOKIES_SESSION));
 
             boolean overwrite = true;
             userName = user.getFullName();
@@ -138,6 +139,8 @@ public class UploadFilesServiceImpl extends HttpServlet {
                 } catch (GRIDAClientException ex) {
                     logger.error(ex);
                 }
+            } else {
+                logger.info("(" + email + ") Uploaded local file '" + uploadedFile.getAbsolutePath() + "'.");
             }
 
             response.setContentType("text/html");
@@ -154,6 +157,9 @@ public class UploadFilesServiceImpl extends HttpServlet {
             out.println("</body>");
             out.println("</html>");
             out.flush();
+
+        } catch (DAOException ex) {
+            throw new ServletException(ex);
         }
     }
 

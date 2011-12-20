@@ -34,7 +34,9 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.common;
 
+import com.google.gwt.user.client.Cookies;
 import com.smartgwt.client.widgets.HTMLPane;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 
 /**
  *
@@ -61,6 +63,7 @@ public class AppletHTMLPane extends HTMLPane {
                 + "<applet width=\"" + width + "\" height=\"" + height + "\" "
                 + "code=\"" + code + "\" "
                 + "archive=\"applets/" + archive + "\">"
+                + "<param name=\"sessionId\" value=\"" + Cookies.getCookie(CoreConstants.COOKIES_SESSION) + "\"/>"
                 + "<param name=\"path\" value=\"" + path + "\"/>"
                 + "<param name=\"unzip\" value=\"" + unzip + "\"/>"
                 + "<param name=\"pool\" value=\"" + usePool + "\"/>"
