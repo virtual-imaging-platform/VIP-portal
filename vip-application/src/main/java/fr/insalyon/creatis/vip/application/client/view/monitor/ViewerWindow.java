@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.application.client.view.monitor;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
@@ -175,7 +176,9 @@ public class ViewerWindow extends Window {
                 com.google.gwt.user.client.Window.open(
                         GWT.getModuleBaseURL()
                         + "/getfileservice?filepath=" + "/" + simulationID
-                        + "/" + folder + "/" + fileName + extension,
+                        + "/" + folder + "/" + fileName + extension
+                        + "&" + CoreConstants.COOKIES_SESSION 
+                        + "=" + Cookies.getCookie(CoreConstants.COOKIES_SESSION),
                         "", "");
             }
         });

@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.application.client.view.monitor.menu;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.BooleanCallback;
@@ -87,7 +88,8 @@ public class LogsContextMenu extends Menu {
                 Window.open(
                         GWT.getModuleBaseURL()
                         + "/getfileservice?filepath=" + baseDir
-                        + "/" + dataName, "", "");
+                        + "/" + dataName + "&" + CoreConstants.COOKIES_SESSION 
+                        + "=" + Cookies.getCookie(CoreConstants.COOKIES_SESSION), "", "");
             }
         });
 
