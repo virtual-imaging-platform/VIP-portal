@@ -389,4 +389,41 @@ public class UserData implements UserDAO {
             throw new DAOException(ex);
         }
     }
+
+    /**
+     * 
+     * @param session
+     * @return
+     * @throws DAOException 
+     */
+    public User getUserBySession(String session) throws DAOException {
+        
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "email, first_name, last_name, institution, phone, "
+                    + "code, confirmed, folder, session, last_login "
+                    + "FROM VIPUsers "
+                    + "WHERE session=?");
+
+            ps.setString(1, session);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return new User(
+                        rs.getString("first_name"), rs.getString("last_name"),
+                        rs.getString("email"), rs.getString("institution"),
+                        "", rs.getString("phone"), rs.getBoolean("confirmed"),
+                        rs.getString("code"), rs.getString("folder"),
+                        rs.getString("session"), 
+                        new Date(rs.getTimestamp("last_login").getTime()));
+            }
+
+            logger.error("There is no user registered with the session: " + session);
+            throw new DAOException("There is no user registered with the session: " + session);
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
 }

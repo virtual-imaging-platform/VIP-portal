@@ -34,7 +34,11 @@
  */
 package fr.insalyon.creatis.vip.core.server.rpc;
 
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -54,39 +58,45 @@ import org.apache.log4j.Logger;
 public class GetFileServiceImpl extends HttpServlet {
 
     private static Logger logger = Logger.getLogger(GetFileServiceImpl.class);
-    
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        try {
+            User user = CoreDAOFactory.getDAOFactory().getUserDAO().getUserBySession(req.getParameter(CoreConstants.COOKIES_SESSION));
 
-        String filepath = req.getParameter("filepath");
+            String filepath = req.getParameter("filepath");
 
-        if (filepath != null && !filepath.isEmpty()) {
+            if (filepath != null && !filepath.isEmpty()) {
 
-            File file = new File(
-                    Server.getInstance().getWorkflowsPath() 
-                    + filepath);
-            logger.info("Sending file '" + filepath + "' to user.");
-            int length = 0;
-            ServletOutputStream op = resp.getOutputStream();
-            ServletContext context = getServletConfig().getServletContext();
-            String mimetype = context.getMimeType(file.getName());
+                File file = new File(
+                        Server.getInstance().getWorkflowsPath()
+                        + filepath);
+                logger.info("(" + user.getEmail() + ") Downloading file '" + filepath + "'.");
+                int length = 0;
+                ServletOutputStream op = resp.getOutputStream();
+                ServletContext context = getServletConfig().getServletContext();
+                String mimetype = context.getMimeType(file.getName());
 
-            resp.setContentType((mimetype != null) ? mimetype : "application/octet-stream");
-            resp.setContentLength((int) file.length());
-            resp.setHeader("Content-Disposition", "attachment; filename=\""
-                    + file.getName() + "\"");
+                resp.setContentType((mimetype != null) ? mimetype : "application/octet-stream");
+                resp.setContentLength((int) file.length());
+                resp.setHeader("Content-Disposition", "attachment; filename=\""
+                        + file.getName() + "\"");
 
-            byte[] bbuf = new byte[4096];
-            DataInputStream in = new DataInputStream(new FileInputStream(file));
+                byte[] bbuf = new byte[4096];
+                DataInputStream in = new DataInputStream(new FileInputStream(file));
 
-            while ((in != null) && ((length = in.read(bbuf)) != -1)) {
-                op.write(bbuf, 0, length);
+                while ((in != null) && ((length = in.read(bbuf)) != -1)) {
+                    op.write(bbuf, 0, length);
+                }
+
+                in.close();
+                op.flush();
+                op.close();
             }
-
-            in.close();
-            op.flush();
-            op.close();
+            
+        } catch (DAOException ex) {
+            throw new ServletException(ex);
         }
     }
 }

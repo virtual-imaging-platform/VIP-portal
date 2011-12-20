@@ -113,11 +113,16 @@ public class Layout {
 
         if (user != null) {
 
+            Cookies.setCookie(CoreConstants.COOKIES_USER, user.getEmail(),
+                    CoreConstants.COOKIES_EXPIRATION_DATE, null, "/", false);
+            Cookies.setCookie(CoreConstants.COOKIES_SESSION, user.getSession(),
+                    CoreConstants.COOKIES_EXPIRATION_DATE, null, "/", false);
+
             if (user.isConfirmed()) {
                 ModulesInit.getInstance().initializeModules(user);
 
             } else {
-                addTab(new ActivationTab(user));
+                addTab(new ActivationTab());
             }
         } else {
             addTab(new SignInTab());
@@ -138,10 +143,10 @@ public class Layout {
             }
 
             public void onSuccess(Void result) {
-                
+
                 Cookies.setCookie(CoreConstants.COOKIES_USER, null, new Date(0), null, "/", false);
                 Cookies.setCookie(CoreConstants.COOKIES_SESSION, null, new Date(0), null, "/", false);
-                
+
                 for (Tab tab : centerTabSet.getTabs()) {
                     centerTabSet.removeTab(tab);
                 }
@@ -177,11 +182,11 @@ public class Layout {
     public void addMainSection(SectionStackSection section) {
         mainSectionStack.addSection(section);
     }
-    
+
     public void removeMainSection(String sectionID) {
         mainSectionStack.removeSection(sectionID);
     }
-    
+
     public SectionStackSection getMainSection(String sectionID) {
         return mainSectionStack.getSection(sectionID);
     }

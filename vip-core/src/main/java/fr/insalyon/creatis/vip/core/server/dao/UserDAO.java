@@ -65,4 +65,6 @@ public interface UserDAO {
     public boolean verifySession(String email, String session) throws DAOException;
     
     public void updateLastLogin(String email, Date lastLogin) throws DAOException;
+    
+    public User getUserBySession(String session) throws DAOException;
 }
