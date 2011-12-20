@@ -96,52 +96,6 @@ public class LFCBusiness {
     /**
      * 
      * @param user
-     * @param path
-     * @throws BusinessException 
-     */
-    public void delete(String user, String path) throws BusinessException {
-
-        try {
-            CoreUtil.getGRIDAClient().delete(
-                    DataManagerUtil.parseBaseDir(user, path));
-
-        } catch (DataManagerException ex) {
-            logger.error(ex);
-            throw new BusinessException(ex);
-        } catch (GRIDAClientException ex) {
-            logger.error(ex);
-            throw new BusinessException(ex);
-        }
-    }
-
-    /**
-     * 
-     * @param user
-     * @param paths
-     * @throws BusinessException 
-     */
-    public void delete(String user, List<String> paths) throws BusinessException {
-
-        try {
-            List<String> parsedPaths = new ArrayList<String>();
-            for (String path : paths) {
-                try {
-                    parsedPaths.add(DataManagerUtil.parseBaseDir(user, path));
-                } catch (DataManagerException ex) {
-                    logger.error(ex);
-                }
-            }
-            CoreUtil.getGRIDAClient().delete(parsedPaths);
-
-        } catch (GRIDAClientException ex) {
-            logger.error(ex);
-            throw new BusinessException(ex);
-        }
-    }
-
-    /**
-     * 
-     * @param user
      * @param baseDir
      * @param name
      * @throws BusinessException 

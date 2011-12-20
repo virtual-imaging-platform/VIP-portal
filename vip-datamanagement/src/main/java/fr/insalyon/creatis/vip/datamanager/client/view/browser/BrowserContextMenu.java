@@ -174,24 +174,25 @@ public class BrowserContextMenu extends Menu {
     private void delete(final ModalWindow modal, final String baseDir, final String name) {
 
         final DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-            public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to delete file/folder:<br />" + caught.getMessage());
-            }
-
-            public void onSuccess(Void result) {
-                modal.hide();
-                BrowserLayout.getInstance().loadData(baseDir, true);
-            }
-        };
 
         if (baseDir.startsWith(DataManagerConstants.ROOT + "/" + DataManagerConstants.TRASH_HOME)) {
             SC.confirm("Do you really want to permanently delete \"" + name + "\"?", new BooleanCallback() {
 
                 public void execute(Boolean value) {
                     if (value != null && value) {
+                        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                            public void onFailure(Throwable caught) {
+                                modal.hide();
+                                SC.warn("Unable to delete file/folder:<br />" + caught.getMessage());
+                            }
+
+                            public void onSuccess(Void result) {
+                                modal.hide();
+                                SC.say("The file/folder was successfully scheduled to be permanentely deleted.");
+                                BrowserLayout.getInstance().loadData(baseDir, true);
+                            }
+                        };
                         modal.show("Deleting " + name + "...", true);
                         service.delete(baseDir + "/" + name, callback);
                     }
@@ -203,6 +204,18 @@ public class BrowserContextMenu extends Menu {
 
                 public void execute(Boolean value) {
                     if (value != null && value) {
+                        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                            public void onFailure(Throwable caught) {
+                                modal.hide();
+                                SC.warn("Unable to delete file/folder:<br />" + caught.getMessage());
+                            }
+
+                            public void onSuccess(Void result) {
+                                modal.hide();
+                                BrowserLayout.getInstance().loadData(baseDir, true);
+                            }
+                        };
                         modal.show("Deleting " + name + "...", true);
                         service.rename(baseDir + "/" + name,
                                 DataManagerConstants.ROOT + "/"

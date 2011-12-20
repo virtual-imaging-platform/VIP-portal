@@ -85,7 +85,8 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
 
         try {
             trace(logger, "Deleting: " + path);
-            lfcBusiness.delete(getSessionUser().getFullName(), path);
+            User user = getSessionUser();
+            transferPoolBusiness.delete(user.getFullName(), user.getEmail(), path);
 
         } catch (CoreException ex) {
             throw new DataManagerException(ex);
@@ -98,7 +99,9 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
 
         try {
             trace(logger, "Deleting: " + paths);
-            lfcBusiness.delete(getSessionUser().getFullName(), paths);
+            User user = getSessionUser();
+            transferPoolBusiness.delete(user.getFullName(), user.getEmail(), 
+                    paths.toArray(new String[]{}));
 
         } catch (CoreException ex) {
             throw new DataManagerException(ex);

@@ -294,18 +294,6 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         final List<String> paths = new ArrayList<String>();
         final String baseDir = pathItem.getValueAsString();
         final DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-            public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to delete files/folders:<br />" + caught.getMessage());
-            }
-
-            public void onSuccess(Void result) {
-                modal.hide();
-                BrowserLayout.getInstance().loadData(baseDir, true);
-            }
-        };
 
         if (baseDir.startsWith(DataManagerConstants.ROOT + "/" + DataManagerConstants.TRASH_HOME)) {
             SC.confirm("Do you really want to permanently delete the selected files/folders?", new BooleanCallback() {
@@ -317,6 +305,20 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                             DataRecord data = (DataRecord) record;
                             paths.add(baseDir + "/" + data.getName());
                         }
+
+                        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                            public void onFailure(Throwable caught) {
+                                modal.hide();
+                                SC.warn("Unable to delete files/folders:<br />" + caught.getMessage());
+                            }
+
+                            public void onSuccess(Void result) {
+                                modal.hide();
+                                SC.say("The selected files/folders were successfully scheduled to be permanentely deleted.");
+                                BrowserLayout.getInstance().loadData(baseDir, true);
+                            }
+                        };
                         modal.show("Deleting files/folders...", true);
                         service.delete(paths, callback);
                     }
@@ -333,6 +335,19 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                             DataRecord data = (DataRecord) record;
                             paths.add(data.getName());
                         }
+
+                        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                            public void onFailure(Throwable caught) {
+                                modal.hide();
+                                SC.warn("Unable to delete files/folders:<br />" + caught.getMessage());
+                            }
+
+                            public void onSuccess(Void result) {
+                                modal.hide();
+                                BrowserLayout.getInstance().loadData(baseDir, true);
+                            }
+                        };
                         modal.show("Deleting files/folders...", true);
                         service.rename(baseDir, paths,
                                 DataManagerConstants.ROOT + "/"
@@ -375,6 +390,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
                                 public void onSuccess(Void result) {
                                     modal.hide();
+                                    SC.say("Your Trash folder was successfully scheduled to be emptied.");
                                     BrowserLayout.getInstance().loadData(
                                             DataManagerConstants.ROOT + "/"
                                             + DataManagerConstants.TRASH_HOME, true);

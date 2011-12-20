@@ -337,4 +337,30 @@ public class TransferPoolBusiness {
             throw new BusinessException(ex);
         }
     }
+    
+    /**
+     * 
+     * @param userName
+     * @param email
+     * @param paths
+     * @throws BusinessException 
+     */
+    public void delete(String userName, String email, String... paths) throws BusinessException {
+        
+        try {
+            GRIDAPoolClient poolClient = CoreUtil.getGRIDAPoolClient();
+            
+            for (String path : paths) {
+                String remotePath = DataManagerUtil.parseBaseDir(userName, path);
+                poolClient.delete(remotePath, email);
+            }
+            
+        } catch (DataManagerException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        } catch (GRIDAClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
 }
