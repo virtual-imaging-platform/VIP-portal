@@ -12,10 +12,10 @@
         <vip.docs.version>0.5.1</vip.docs.version>
         <vip.application.version>0.5.4</vip.application.version>
         <vip.datamanager.version>0.5.2</vip.datamanager.version>
-        <vip.datamanager-applet.version>0.2</vip.datamanager-applet.version>
+        <vip.datamanager-applet.version>0.2.1</vip.datamanager-applet.version>
         <vip.portal.version>0.5.4</vip.portal.version>
         <vip.gatelab.version>0.5.2</vip.gatelab.version>
-        <vip.gatelab-applet.version>0.2</vip.gatelab-applet.version>
+        <vip.gatelab-applet.version>0.2.1</vip.gatelab-applet.version>
         <vip.simulation-gui.version>0.2.4</vip.simulation-gui.version>
         <vip.models.version>0.3.1</vip.models.version>
         <vip.social.version>0.1</vip.social.version>
