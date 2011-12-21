@@ -45,6 +45,7 @@ import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
@@ -58,6 +59,7 @@ public class TransferPoolBusiness {
     private static Logger logger = Logger.getLogger(TransferPoolBusiness.class);
     private Server serverConfiguration = Server.getInstance();
     private LFCBusiness lfcBusiness;
+    private int operationsLimit = 10;
 
     public TransferPoolBusiness() {
 
@@ -70,12 +72,12 @@ public class TransferPoolBusiness {
      * @return
      * @throws BusinessException 
      */
-    public List<PoolOperation> getOperations(String email) throws BusinessException {
+    public List<PoolOperation> getOperations(String email, Date date) throws BusinessException {
 
         try {
             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
 
-            List<Operation> operationsList = client.getOperationsListByUser(email);
+            List<Operation> operationsList = client.getOperationsLimitedListByUserAndDate(email, operationsLimit, date);
             List<PoolOperation> poolOperations = new ArrayList<PoolOperation>();
             SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy HH:mm");
 
@@ -187,18 +189,18 @@ public class TransferPoolBusiness {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
      * 
      * @param email
      * @throws BusinessException 
      */
     public void removeUserOperations(String email) throws BusinessException {
-       
+
         try {
             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
             client.removeOperationsByUser(email);
-            
+
         } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
@@ -337,7 +339,7 @@ public class TransferPoolBusiness {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
      * 
      * @param userName
@@ -346,15 +348,15 @@ public class TransferPoolBusiness {
      * @throws BusinessException 
      */
     public void delete(String userName, String email, String... paths) throws BusinessException {
-        
+
         try {
             GRIDAPoolClient poolClient = CoreUtil.getGRIDAPoolClient();
-            
+
             for (String path : paths) {
                 String remotePath = DataManagerUtil.parseBaseDir(userName, path);
                 poolClient.delete(remotePath, email);
             }
-            
+
         } catch (DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);

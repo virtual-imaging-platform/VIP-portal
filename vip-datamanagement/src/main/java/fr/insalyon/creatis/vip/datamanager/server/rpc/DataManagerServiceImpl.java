@@ -48,6 +48,7 @@ import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import java.io.File;
+import java.util.Date;
 import java.util.List;
 import org.apache.log4j.Logger;
 
@@ -181,7 +182,19 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     public List<PoolOperation> getPoolOperationsByUser() throws DataManagerException {
 
         try {
-            return transferPoolBusiness.getOperations(getSessionUser().getEmail());
+            return transferPoolBusiness.getOperations(getSessionUser().getEmail(), new Date());
+
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
+        }
+    }
+    
+    public List<PoolOperation> getPoolOperationsByUserAndDate(Date startDate) throws DataManagerException {
+
+        try {
+            return transferPoolBusiness.getOperations(getSessionUser().getEmail(), startDate);
 
         } catch (CoreException ex) {
             throw new DataManagerException(ex);

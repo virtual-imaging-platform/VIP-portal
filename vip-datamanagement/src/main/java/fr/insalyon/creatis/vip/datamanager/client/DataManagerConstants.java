@@ -71,6 +71,9 @@ public class DataManagerConstants {
     public static final String APP_IMG_CACHED_FILES = IMG_FOLDER + "app-cache.png";
     public static final String APP_IMG_FILE_TRANSFER = IMG_FOLDER + "app-file-transfer.png";
     public static final String APP_IMG_OPERATIONS = IMG_FOLDER + "app-operation.png";
+    // Images
+    public static final String IMG_RELOAD = IMG_FOLDER + "img-reload.png";
+    public static final String IMG_WARNING = IMG_FOLDER + "img-warning.png";
     // Operation
     private static final String OP_FOLDER = IMG_FOLDER + "operation/";
     public static final String OP_DOWNLOAD = OP_FOLDER + "img-download.png";

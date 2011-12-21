@@ -41,6 +41,7 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -79,6 +80,8 @@ public interface DataManagerService extends RemoteService {
     public void deleteCachedFiles(List<String> cachedFiles) throws DataManagerException;
 
     public List<PoolOperation> getPoolOperationsByUser() throws DataManagerException;
+    
+    public List<PoolOperation> getPoolOperationsByUserAndDate(Date startDate) throws DataManagerException;
 
     public List<PoolOperation> getPoolOperations() throws DataManagerException;
 
