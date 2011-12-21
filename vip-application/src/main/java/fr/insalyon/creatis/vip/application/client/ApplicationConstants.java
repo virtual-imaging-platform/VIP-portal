@@ -39,7 +39,7 @@ package fr.insalyon.creatis.vip.application.client;
  * @author Rafael Silva
  */
 public class ApplicationConstants {
-    
+
     // Tabs
     public final static String TAB_APPLICATION = "applications-tab";
     public final static String TAB_MANAGE_APPLICATION = "manage-application-tab";
@@ -63,6 +63,9 @@ public class ApplicationConstants {
     public static final String ICON_SEARCH = IMG_FOLDER + "icon-search.png";
     public static final String ICON_SIMULATION_VIEW = IMG_FOLDER + "icon-simulation-view.png";
     public static final String ICON_SUMMARY = IMG_FOLDER + "icon-summary.png";
+    public static final String ICON_TASK_KILL = IMG_FOLDER + "icon-task-kill.png";
+    public static final String ICON_TASK_REPLICATE = IMG_FOLDER + "icon-task-replicate.png";
+    public static final String ICON_TASK_RESCHEDULE = IMG_FOLDER + "icon-task-reschedule.png";
     public static final String ICON_TREE_INPUT = IMG_FOLDER + "tree/icon-tree-input.png";
     public static final String ICON_TREE_OUTPUT = IMG_FOLDER + "tree/icon-tree-output.png";
     public static final String ICON_TREE_SERVICE = IMG_FOLDER + "tree/icon-tree-service.png";
@@ -84,26 +87,31 @@ public class ApplicationConstants {
     public final static String GROUP_VIP = "VIP";
     public final static String SESSION_CLASSES = "vip-classes";
     // Enums
+
     public static enum JobStatus {
-        KILL, RESCHEDULE, ERROR, COMPLETED, RUNNING, STALLED, CANCELLED, QUEUED,
-        SUCCESSFULLY_SUBMITTED
+
+        REPLICATE, KILL, RESCHEDULE, ERROR, COMPLETED, RUNNING, STALLED,
+        CANCELLED, QUEUED, SUCCESSFULLY_SUBMITTED
     };
-    
+
     public static enum SimulationStatus {
+
         Running, Completed, Killed, Cleaned
     };
-    
+
     public static enum MoteurStatus {
+
         RUNNING, COMPLETE, TERMINATED, UNKNOWN
     };
-    
+
     public static enum ProcessorStatus {
+
         Unstarted, Active, Completed, Failed
     };
-    
+
     public static String getLaunchTabID(String applicationName) {
-        
-        return "launch-" + applicationName.replaceAll(" ", "-").toLowerCase() 
+
+        return "launch-" + applicationName.replaceAll(" ", "-").toLowerCase()
                 + "-tab";
     }
 }

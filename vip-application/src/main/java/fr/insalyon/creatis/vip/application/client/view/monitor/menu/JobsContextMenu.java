@@ -125,54 +125,55 @@ public class JobsContextMenu extends Menu {
             }
         });
 
-        MenuItem killItem = new MenuItem("Send Kill Signal");
-        killItem.addClickHandler(new ClickHandler() {
+        MenuItem replicateItem = getSignalItem("Send Replicate Signal", ApplicationConstants.ICON_TASK_REPLICATE,
+                "replicate", simulationID, job.getID(), ApplicationConstants.JobStatus.REPLICATE);
 
-            public void onClick(MenuItemClickEvent event) {
-                SC.confirm("Do you really want to kill this job?", new BooleanCallback() {
+        MenuItem killItem = getSignalItem("Send Kill Signal", ApplicationConstants.ICON_TASK_KILL,
+                "kill", simulationID, job.getID(), ApplicationConstants.JobStatus.KILL);
 
-                    public void execute(Boolean value) {
-                        if (value != null && value) {
-                            sendSignal(simulationID, job.getID(), ApplicationConstants.JobStatus.KILL);
-                        }
-                    }
-                });
-            }
-        });
-
-        MenuItem rescheduleItem = new MenuItem("Send Reschedule Signal");
-        rescheduleItem.addClickHandler(new ClickHandler() {
-
-            public void onClick(MenuItemClickEvent event) {
-                SC.confirm("Do you really want to reschedule this job?", new BooleanCallback() {
-
-                    public void execute(Boolean value) {
-                        if (value != null && value) {
-                            sendSignal(simulationID, job.getID(), ApplicationConstants.JobStatus.RESCHEDULE);
-                        }
-                    }
-                });
-            }
-        });
+        MenuItem rescheduleItem = getSignalItem("Send Reschedule Signal", ApplicationConstants.ICON_TASK_RESCHEDULE,
+                "reschedule", simulationID, job.getID(), ApplicationConstants.JobStatus.RESCHEDULE);
 
         MenuItemSeparator separator = new MenuItemSeparator();
 
         JobStatus status = JobStatus.valueOf(job.getStatus());
-        if ((status == JobStatus.ERROR || status == JobStatus.COMPLETED ||
-                status == JobStatus.CANCELLED || status == JobStatus.STALLED)
+        if ((status == JobStatus.ERROR || status == JobStatus.COMPLETED
+                || status == JobStatus.CANCELLED || status == JobStatus.STALLED)
                 && !job.getMinorStatus().equals("Retrieving Status")) {
 
             this.setItems(appOutputItem, appErrorItem, separator,
                     outputItem, errorItem, separator, scriptItem,
                     separator, nodeItem);
         } else {
-            this.setItems(scriptItem, separator, killItem, rescheduleItem);
+            this.setItems(scriptItem, separator, replicateItem, killItem,
+                    rescheduleItem);
         }
     }
 
-    private void sendSignal(String simulationID, String jobID, 
+    private MenuItem getSignalItem(String title, String icon, final String question,
+            final String simulationID, final String jobID,
+            final ApplicationConstants.JobStatus status) {
+
+        MenuItem menuItem = new MenuItem(title, icon);
+        menuItem.addClickHandler(new ClickHandler() {
+
+            public void onClick(MenuItemClickEvent event) {
+                SC.confirm("Do you really want to " + question + " this task?", new BooleanCallback() {
+
+                    public void execute(Boolean value) {
+                        if (value != null && value) {
+                            sendSignal(simulationID, jobID, status);
+                        }
+                    }
+                });
+            }
+        });
+        return menuItem;
+    }
+
+    private void sendSignal(String simulationID, String jobID,
             ApplicationConstants.JobStatus status) {
-        
+
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
