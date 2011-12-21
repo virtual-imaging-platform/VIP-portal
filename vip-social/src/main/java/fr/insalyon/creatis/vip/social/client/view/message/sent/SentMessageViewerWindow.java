@@ -34,24 +34,17 @@
  */
 package fr.insalyon.creatis.vip.social.client.view.message.sent;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
-import fr.insalyon.creatis.vip.social.client.SocialModule;
 import fr.insalyon.creatis.vip.social.client.bean.Message;
-import fr.insalyon.creatis.vip.social.client.rpc.SocialService;
-import fr.insalyon.creatis.vip.social.client.rpc.SocialServiceAsync;
-import fr.insalyon.creatis.vip.social.client.view.SocialTab;
 
 /**
  *
@@ -86,10 +79,6 @@ public class SentMessageViewerWindow extends Window {
         configureBody();
 
         this.addItem(vLayout);
-
-        if (!message.isRead()) {
-            markAsRead();
-        }
     }
 
     private void configureHeader() {
@@ -138,22 +127,5 @@ public class SentMessageViewerWindow extends Window {
 
         pane.setContents(contents);
         vLayout.addMember(pane);
-    }
-
-    private void markAsRead() {
-
-        SocialServiceAsync service = SocialService.Util.getInstance();
-        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-            public void onFailure(Throwable caught) {
-                SC.warn("Unable to get list of messages:<br />" + caught.getMessage());
-            }
-
-            public void onSuccess(Void result) {
-                ((SocialTab) Layout.getInstance().getTab(SocialConstants.TAB_SOCIAL)).loadData();
-                SocialModule.verifyMessages();
-            }
-        };
-        service.markMessageAsRead(message.getId(), callback);
     }
 }
