@@ -68,6 +68,22 @@ public class MessageBusiness {
     
     /**
      * 
+     * @param email
+     * @return
+     * @throws BusinessException 
+     */
+    public List<Message> getSentMessagesByUser(String email) throws BusinessException {
+        
+        try {
+            return SocialDAOFactory.getDAOFactory().getMessageDAO().getSentMessagesByUser(email);
+            
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
+    /**
+     * 
      * @param id
      * @throws BusinessException 
      */

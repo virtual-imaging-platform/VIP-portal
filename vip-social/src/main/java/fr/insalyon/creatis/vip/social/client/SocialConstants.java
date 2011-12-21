@@ -49,6 +49,7 @@ public class SocialConstants {
     public static final String ICON_GROUP = IMG_FOLDER + "icon-group.png";
     public static final String ICON_MESSAGE = IMG_FOLDER + "icon-message.png";
     public static final String ICON_MESSAGE_NEW = IMG_FOLDER + "icon-message-new.png";
+    public static final String ICON_MESSAGE_SENT = IMG_FOLDER + "icon-message-sent.png";
     public static final String ICON_REFRESH = IMG_FOLDER + "icon-refresh.png";
     public static final String ICON_REMOVE = IMG_FOLDER + "icon-remove.png";
     public static final String ICON_SEND = IMG_FOLDER + "icon-send.png";
@@ -65,4 +66,5 @@ public class SocialConstants {
     public static final String MENU_FEED = "News Feed";
     public static final String MENU_GROUP = "Groups";
     public static final String MENU_MESSAGE = "Messages";
+    public static final String MENU_MESSAGE_SENT = "Sent Messages";
 }

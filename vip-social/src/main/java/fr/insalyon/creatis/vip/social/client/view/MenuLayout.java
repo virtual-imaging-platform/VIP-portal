@@ -40,9 +40,14 @@ import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
+import fr.insalyon.creatis.vip.social.client.view.message.MessageLayout;
+import fr.insalyon.creatis.vip.social.client.view.message.sent.SentMessageLayout;
 
 /**
  *
@@ -64,17 +69,20 @@ public class MenuLayout extends VLayout {
         appImgLayout.setWidth100();
         appImgLayout.setHeight(100);
         appImgLayout.setDefaultLayoutAlign(Alignment.CENTER);
-        
-        appImgLayout.addMember(new Img(SocialConstants.IMG_SOCIAL, 64, 64));       
+
+        appImgLayout.addMember(new Img(SocialConstants.IMG_SOCIAL, 64, 64));
         this.addMember(appImgLayout);
-        
+
         VLayout menuLayout = new VLayout(5);
 
 //        Label feedLabel = getLabel(SocialConstants.ICON_FEED, SocialConstants.MENU_FEED);
 //        menuLayout.addMember(feedLabel);
 
-        Label messageLabel = getLabel(SocialConstants.ICON_MESSAGE, SocialConstants.MENU_MESSAGE);
-        menuLayout.addMember(messageLabel);
+        menuLayout.addMember(getLabel(SocialConstants.ICON_MESSAGE,
+                SocialConstants.MENU_MESSAGE, new MessageLayout()));
+
+        menuLayout.addMember(getLabel(SocialConstants.ICON_MESSAGE_SENT,
+                SocialConstants.MENU_MESSAGE_SENT, new SentMessageLayout()));
 
 //        Label groupsLabel = getLabel(SocialConstants.ICON_GROUP, SocialConstants.MENU_GROUP);
 //        menuLayout.addMember(groupsLabel);
@@ -82,9 +90,18 @@ public class MenuLayout extends VLayout {
         this.addMember(menuLayout);
     }
 
-    private Label getLabel(String icon, String contents) {
+    private Label getLabel(String icon, String contents, final AbstractMainLayout layout) {
 
-        return WidgetUtil.getLabel("<font color=\"#FFFFFF\">" + contents
+        Label label = WidgetUtil.getLabel("<font color=\"#FFFFFF\">" + contents
                 + "</font>", icon, 12, Cursor.HAND);
+
+        label.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                ((SocialTab) Layout.getInstance().getTab(SocialConstants.TAB_SOCIAL)).setLayout(layout);
+            }
+        });
+
+        return label;
     }
 }

@@ -114,6 +114,35 @@ public class MessageData implements MessageDAO {
             throw new DAOException(ex);
         }
     }
+    
+    public List<Message> getSentMessagesByUser(String email) throws DAOException {
+        
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "id, receiver, title, message, posted, read "
+                    + "FROM VIPSocialMessage AS sc WHERE sender = ? "
+                    + "ORDER BY posted DESC");
+            ps.setString(1, email);
+            
+            ResultSet rs = ps.executeQuery();
+            List<Message> messages = new ArrayList<Message>();
+            SimpleDateFormat f = new SimpleDateFormat("MMMM d, yyyy HH:mm");
+            
+            while (rs.next()) {
+                User from = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
+                User to = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(rs.getString("receiver"));
+                messages.add(new Message(rs.getLong("id"), from, to, rs.getString("title"), 
+                        rs.getString("message"), f.format(rs.getTimestamp("posted")),
+                        rs.getBoolean("read")));
+            }
+            
+            return messages;
+            
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
 
     public void markAsRead(long id) throws DAOException {
        

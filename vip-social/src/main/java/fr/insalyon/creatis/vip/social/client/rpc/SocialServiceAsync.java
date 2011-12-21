@@ -47,6 +47,8 @@ public interface SocialServiceAsync {
 
     public void getMessagesByUser(AsyncCallback<List<Message>> asyncCallback);
     
+    public void getSentMessagesByUser(AsyncCallback<List<Message>> asyncCallback);
+    
     public void markMessageAsRead(long id, AsyncCallback<Void> asyncCallback);
     
     public void removeMessage(long id, AsyncCallback<Void> asyncCallback);

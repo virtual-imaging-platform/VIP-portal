@@ -71,6 +71,18 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
             throw new SocialException(ex);
         }
     }
+    
+    public List<Message> getSentMessagesByUser() throws SocialException {
+
+        try {
+            return messageBusiness.getSentMessagesByUser(getSessionUser().getEmail());
+
+        } catch (CoreException ex) {
+            throw new SocialException(ex);
+        } catch (BusinessException ex) {
+            throw new SocialException(ex);
+        }
+    }
 
     public void markMessageAsRead(long id) throws SocialException {
 

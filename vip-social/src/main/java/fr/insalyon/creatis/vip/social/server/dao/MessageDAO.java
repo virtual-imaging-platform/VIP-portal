@@ -48,6 +48,8 @@ public interface MessageDAO {
             
     public List<Message> getMessagesByUser(String email) throws DAOException;
     
+    public List<Message> getSentMessagesByUser(String email) throws DAOException;
+    
     public void markAsRead(long id) throws DAOException;
     
     public void remove(long id) throws DAOException;
