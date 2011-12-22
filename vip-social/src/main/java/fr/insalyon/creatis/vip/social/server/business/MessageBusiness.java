@@ -38,10 +38,12 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.social.client.SocialConstants;
 import fr.insalyon.creatis.vip.social.client.bean.Message;
 import fr.insalyon.creatis.vip.social.server.dao.MessageDAO;
 import fr.insalyon.creatis.vip.social.server.dao.SocialDAOFactory;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -53,13 +55,16 @@ public class MessageBusiness {
     /**
      * 
      * @param email
+     * @param startDate
      * @return
      * @throws BusinessException 
      */
-    public List<Message> getMessagesByUser(String email) throws BusinessException {
+    public List<Message> getMessagesByUser(String email, Date startDate) 
+            throws BusinessException {
         
         try {
-            return SocialDAOFactory.getDAOFactory().getMessageDAO().getMessagesByUser(email);
+            return SocialDAOFactory.getDAOFactory().getMessageDAO().getMessagesByUser(
+                    email, SocialConstants.MESSAGE_MAX_DISPLAY, startDate);
             
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -69,13 +74,16 @@ public class MessageBusiness {
     /**
      * 
      * @param email
+     * @param startDate
      * @return
      * @throws BusinessException 
      */
-    public List<Message> getSentMessagesByUser(String email) throws BusinessException {
+    public List<Message> getSentMessagesByUser(String email, Date startDate) 
+            throws BusinessException {
         
         try {
-            return SocialDAOFactory.getDAOFactory().getMessageDAO().getSentMessagesByUser(email);
+            return SocialDAOFactory.getDAOFactory().getMessageDAO().getSentMessagesByUser(
+                    email, SocialConstants.MESSAGE_MAX_DISPLAY, startDate);
             
         } catch (DAOException ex) {
             throw new BusinessException(ex);

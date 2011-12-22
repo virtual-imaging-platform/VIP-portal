@@ -150,7 +150,6 @@ public class MessageViewerWindow extends Window {
             }
 
             public void onSuccess(Void result) {
-                ((SocialTab) Layout.getInstance().getTab(SocialConstants.TAB_SOCIAL)).loadData();
                 SocialModule.verifyMessages();
             }
         };

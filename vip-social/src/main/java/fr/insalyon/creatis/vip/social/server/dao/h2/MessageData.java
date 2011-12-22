@@ -86,14 +86,16 @@ public class MessageData implements MessageDAO {
         }
     }
     
-    public List<Message> getMessagesByUser(String email) throws DAOException {
+    public List<Message> getMessagesByUser(String email, int limit, Date startDate) throws DAOException {
         
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "id, sender, title, message, posted, read "
                     + "FROM VIPSocialMessage AS sc WHERE receiver = ? "
-                    + "ORDER BY posted DESC");
+                    + "AND posted < ? "
+                    + "ORDER BY posted DESC LIMIT 0," + limit);
             ps.setString(1, email);
+            ps.setTimestamp(2, new Timestamp(startDate.getTime()));
             
             ResultSet rs = ps.executeQuery();
             List<Message> messages = new ArrayList<Message>();
@@ -102,8 +104,9 @@ public class MessageData implements MessageDAO {
             while (rs.next()) {
                 User from = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(rs.getString("sender"));
                 User to = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
+                Date posted = new Date(rs.getTimestamp("posted").getTime());
                 messages.add(new Message(rs.getLong("id"), from, to, rs.getString("title"), 
-                        rs.getString("message"), f.format(rs.getTimestamp("posted")),
+                        rs.getString("message"), f.format(posted), posted,
                         rs.getBoolean("read")));
             }
             
@@ -115,14 +118,16 @@ public class MessageData implements MessageDAO {
         }
     }
     
-    public List<Message> getSentMessagesByUser(String email) throws DAOException {
+    public List<Message> getSentMessagesByUser(String email, int limit, Date startDate) throws DAOException {
         
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "id, receiver, title, message, posted, read "
                     + "FROM VIPSocialMessage AS sc WHERE sender = ? "
-                    + "ORDER BY posted DESC");
+                    + "AND posted < ? "
+                    + "ORDER BY posted DESC LIMIT 0," + limit);
             ps.setString(1, email);
+            ps.setTimestamp(2, new Timestamp(startDate.getTime()));
             
             ResultSet rs = ps.executeQuery();
             List<Message> messages = new ArrayList<Message>();
@@ -131,8 +136,9 @@ public class MessageData implements MessageDAO {
             while (rs.next()) {
                 User from = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
                 User to = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(rs.getString("receiver"));
+                Date posted = new Date(rs.getTimestamp("posted").getTime());
                 messages.add(new Message(rs.getLong("id"), from, to, rs.getString("title"), 
-                        rs.getString("message"), f.format(rs.getTimestamp("posted")),
+                        rs.getString("message"), f.format(posted), posted,
                         rs.getBoolean("read")));
             }
             

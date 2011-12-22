@@ -43,6 +43,7 @@ import fr.insalyon.creatis.vip.social.client.rpc.SocialService;
 import fr.insalyon.creatis.vip.social.client.view.SocialException;
 import fr.insalyon.creatis.vip.social.server.business.MessageBusiness;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import org.apache.log4j.Logger;
 
@@ -60,10 +61,10 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         messageBusiness = new MessageBusiness();
     }
 
-    public List<Message> getMessagesByUser() throws SocialException {
+    public List<Message> getMessagesByUser(Date startDate) throws SocialException {
 
         try {
-            return messageBusiness.getMessagesByUser(getSessionUser().getEmail());
+            return messageBusiness.getMessagesByUser(getSessionUser().getEmail(), startDate);
 
         } catch (CoreException ex) {
             throw new SocialException(ex);
@@ -72,10 +73,10 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         }
     }
     
-    public List<Message> getSentMessagesByUser() throws SocialException {
+    public List<Message> getSentMessagesByUser(Date startDate) throws SocialException {
 
         try {
-            return messageBusiness.getSentMessagesByUser(getSessionUser().getEmail());
+            return messageBusiness.getSentMessagesByUser(getSessionUser().getEmail(), startDate);
 
         } catch (CoreException ex) {
             throw new SocialException(ex);

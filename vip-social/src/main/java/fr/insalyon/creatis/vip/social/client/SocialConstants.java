@@ -67,4 +67,6 @@ public class SocialConstants {
     public static final String MENU_GROUP = "Groups";
     public static final String MENU_MESSAGE = "Messages";
     public static final String MENU_MESSAGE_SENT = "Sent Messages";
+    // Configuration
+    public static final int MESSAGE_MAX_DISPLAY = 20;
 }

@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.social.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import java.util.Date;
 
 /**
  *
@@ -49,12 +50,14 @@ public class Message implements IsSerializable {
     private String title;
     private String message;
     private String posted;
+    private Date postedDate;
     private boolean read;
 
     public Message() {
     }
 
-    public Message(long id, User from, User to, String title, String message, String posted, boolean read) {
+    public Message(long id, User from, User to, String title, String message,
+            String posted, Date postedDate, boolean read) {
 
         this.id = id;
         this.from = from;
@@ -62,6 +65,7 @@ public class Message implements IsSerializable {
         this.title = title;
         this.message = message;
         this.posted = posted;
+        this.postedDate = postedDate;
         this.read = read;
     }
 
@@ -91,5 +95,9 @@ public class Message implements IsSerializable {
 
     public User getTo() {
         return to;
+    }
+
+    public Date getPostedDate() {
+        return postedDate;
     }
 }

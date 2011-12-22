@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.social.client.rpc;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.social.client.bean.Message;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -45,9 +46,9 @@ import java.util.List;
  */
 public interface SocialServiceAsync {
 
-    public void getMessagesByUser(AsyncCallback<List<Message>> asyncCallback);
+    public void getMessagesByUser(Date startDate, AsyncCallback<List<Message>> asyncCallback);
     
-    public void getSentMessagesByUser(AsyncCallback<List<Message>> asyncCallback);
+    public void getSentMessagesByUser(Date startDate, AsyncCallback<List<Message>> asyncCallback);
     
     public void markMessageAsRead(long id, AsyncCallback<Void> asyncCallback);
     

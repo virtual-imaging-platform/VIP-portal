@@ -51,6 +51,8 @@ import fr.insalyon.creatis.vip.social.client.bean.Message;
 import fr.insalyon.creatis.vip.social.client.rpc.SocialService;
 import fr.insalyon.creatis.vip.social.client.rpc.SocialServiceAsync;
 import fr.insalyon.creatis.vip.social.client.view.AbstractMainLayout;
+import fr.insalyon.creatis.vip.social.client.view.common.MoreDataBoxLayout;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -60,6 +62,8 @@ import java.util.List;
 public class SentMessageLayout extends AbstractMainLayout {
 
     private VLayout messagesLayout;
+    private Date lastDate;
+    private MoreDataBoxLayout moreDataBoxLayout;
 
     public SentMessageLayout() {
 
@@ -83,14 +87,28 @@ public class SentMessageLayout extends AbstractMainLayout {
         messagesLayout.setAlign(VerticalAlignment.TOP);
         messagesLayout.setBackgroundColor("#F2F2F2");
 
+        moreDataBoxLayout = new MoreDataBoxLayout("messages");
+        moreDataBoxLayout.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                messagesLayout.removeMember(moreDataBoxLayout);
+                loadData(lastDate);
+            }
+        });
+
         loadData();
 
         this.addMember(messagesLayout);
     }
 
     public void loadData() {
-
+        
         messagesLayout.removeMembers(messagesLayout.getMembers());
+        loadData(new Date());
+    }
+    
+    public void loadData(Date date) {
+
         SocialServiceAsync service = SocialService.Util.getInstance();
         AsyncCallback<List<Message>> callback = new AsyncCallback<List<Message>>() {
 
@@ -99,13 +117,20 @@ public class SentMessageLayout extends AbstractMainLayout {
             }
 
             public void onSuccess(List<Message> result) {
+               
+                if (!result.isEmpty()) {
 
-                for (Message message : result) {
-                    messagesLayout.addMember(new SentMessageBoxLayout(message));
+                    for (Message message : result) {
+                        messagesLayout.addMember(new SentMessageBoxLayout(message));
+                        lastDate = message.getPostedDate();
+                    }
+                    if (result.size() == SocialConstants.MESSAGE_MAX_DISPLAY) {
+                        messagesLayout.addMember(moreDataBoxLayout);
+                    }
                 }
             }
         };
-        service.getSentMessagesByUser(callback);
+        service.getSentMessagesByUser(date, callback);
     }
 
     private void configureButtons() {

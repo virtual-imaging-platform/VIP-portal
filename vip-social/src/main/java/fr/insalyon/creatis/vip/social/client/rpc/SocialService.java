@@ -40,6 +40,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.social.client.bean.Message;
 import fr.insalyon.creatis.vip.social.client.view.SocialException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -61,9 +62,9 @@ public interface SocialService extends RemoteService {
         }
     }
     
-    public List<Message> getMessagesByUser() throws SocialException;
+    public List<Message> getMessagesByUser(Date startDate) throws SocialException;
     
-    public List<Message> getSentMessagesByUser() throws SocialException;
+    public List<Message> getSentMessagesByUser(Date startDate) throws SocialException;
     
     public void markMessageAsRead(long id) throws SocialException;
     

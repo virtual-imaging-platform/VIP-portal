@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.social.server.dao;
 
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.social.client.bean.Message;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -46,9 +47,9 @@ public interface MessageDAO {
     
     public void add(String email, String receiver, String title, String message) throws DAOException;
             
-    public List<Message> getMessagesByUser(String email) throws DAOException;
+    public List<Message> getMessagesByUser(String email, int limit, Date startDate) throws DAOException;
     
-    public List<Message> getSentMessagesByUser(String email) throws DAOException;
+    public List<Message> getSentMessagesByUser(String email, int limit, Date startDate) throws DAOException;
     
     public void markAsRead(long id) throws DAOException;
     
