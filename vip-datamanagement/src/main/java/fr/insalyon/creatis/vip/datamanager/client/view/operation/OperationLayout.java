@@ -38,12 +38,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
-import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Status;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import java.util.Date;
@@ -133,7 +133,7 @@ public class OperationLayout extends VLayout {
         modal.show("Loading operations...", true);
         service.getPoolOperationsByUser(callback);
     }
-    
+        
     private void loadMoreData() {
 
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();

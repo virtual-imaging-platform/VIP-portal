@@ -228,16 +228,18 @@ public class OperationBoxLayout extends HLayout {
 
         actionLayout.removeMembers(actionLayout.getMembers());
 
-        Img removeImg = new Img(DataManagerConstants.OP_ICON_CLEAR, 16, 16);
-        removeImg.setCursor(Cursor.HAND);
-        removeImg.setPrompt("Remove");
-        removeImg.addClickHandler(new ClickHandler() {
+        if (operation.getStatus() != Status.Running) {
+            Img removeImg = new Img(DataManagerConstants.OP_ICON_CLEAR, 16, 16);
+            removeImg.setCursor(Cursor.HAND);
+            removeImg.setPrompt("Remove");
+            removeImg.addClickHandler(new ClickHandler() {
 
-            public void onClick(ClickEvent event) {
-                remove();
-            }
-        });
-        actionLayout.addMember(removeImg);
+                public void onClick(ClickEvent event) {
+                    remove();
+                }
+            });
+            actionLayout.addMember(removeImg);
+        }
 
         if (operation.getType() == Type.Download && operation.getStatus() == Status.Done) {
             Img downloadImg = new Img(DataManagerConstants.OP_ICON_DOWNLOAD, 16, 16);
@@ -290,23 +292,21 @@ public class OperationBoxLayout extends HLayout {
 
             public void execute(Boolean value) {
                 if (value != null && value) {
-                    if (operation.getStatus() != Status.Running) {
-                        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-                        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+                    DataManagerServiceAsync service = DataManagerService.Util.getInstance();
+                    AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
-                            public void onFailure(Throwable caught) {
-                                modal.hide();
-                                SC.warn("Unable to remove operation:<br />" + caught.getMessage());
-                            }
+                        public void onFailure(Throwable caught) {
+                            modal.hide();
+                            SC.warn("Unable to remove operation:<br />" + caught.getMessage());
+                        }
 
-                            public void onSuccess(Void result) {
-                                modal.hide();
-                                OperationLayout.getInstance().loadData();
-                            }
-                        };
-                        modal.show("Removing operation...", true);
-                        service.removeOperationById(operation.getId(), callback);
-                    }
+                        public void onSuccess(Void result) {
+                            modal.hide();
+                            destroy();
+                        }
+                    };
+                    modal.show("Removing operation...", true);
+                    service.removeOperationById(operation.getId(), callback);
                 }
             }
         });
