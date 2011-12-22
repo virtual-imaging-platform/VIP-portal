@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.core.server.business;
 import fr.insalyon.creatis.devtools.MD5;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
@@ -183,7 +184,7 @@ public class ConfigurationBusiness {
 
             CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
                     "[VIP Admin] Account Requested", adminsEmailContents, emails.toArray(new String[]{}));
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (NoSuchAlgorithmException ex) {
@@ -361,9 +362,20 @@ public class ConfigurationBusiness {
     public void removeUser(String email) throws BusinessException {
 
         try {
+            User user = getUser(email);
+            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
+
+            client.delete(Server.getInstance().getDataManagerUsersHome() + "/"
+                    + user.getFolder(), user.getEmail());
+            client.delete(Server.getInstance().getDataManagerUsersHome() + "/"
+                    + user.getFolder() + "_" + CoreConstants.FOLDER_TRASH, user.getEmail());
+
             CoreDAOFactory.getDAOFactory().getUserDAO().remove(email);
 
         } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        } catch (GRIDAClientException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -452,15 +464,22 @@ public class ConfigurationBusiness {
 
     /**
      * 
+     * @param user
      * @param groupName
      * @throws BusinessException
      */
-    public void removeGroup(String groupName) throws BusinessException {
+    public void removeGroup(String user, String groupName) throws BusinessException {
 
         try {
+            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
+            client.delete(Server.getInstance().getDataManagerGroupsHome() + "/"
+                    + groupName.replaceAll(" ", "_"), user);
             CoreDAOFactory.getDAOFactory().getGroupDAO().remove(groupName);
 
         } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        } catch (GRIDAClientException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -663,22 +682,22 @@ public class ConfigurationBusiness {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
      * 
      * @param email
      * @throws BusinessException 
      */
     public void updateUserLastLogin(String email) throws BusinessException {
-        
+
         try {
             CoreDAOFactory.getDAOFactory().getUserDAO().updateLastLogin(email, new Date());
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
      * 
      * @param email
@@ -686,10 +705,10 @@ public class ConfigurationBusiness {
      * @throws BusinessException 
      */
     public void addUserToGroup(String email, String groupName) throws BusinessException {
-        
+
         try {
             CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().add(email, groupName, ROLE.User);
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
