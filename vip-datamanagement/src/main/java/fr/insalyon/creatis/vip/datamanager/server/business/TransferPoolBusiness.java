@@ -76,34 +76,12 @@ public class TransferPoolBusiness {
 
         try {
             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
-
-            List<Operation> operationsList = client.getOperationsLimitedListByUserAndDate(email, operationsLimit, date);
             List<PoolOperation> poolOperations = new ArrayList<PoolOperation>();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy HH:mm");
 
-            for (Operation op : operationsList) {
-                if (op.getType() != Operation.Type.Delete) {
-                    String source = "";
-                    String dest = "";
-                    PoolOperation.Type type = null;
-                    PoolOperation.Status status = PoolOperation.Status.valueOf(op.getStatus().name());
-
-                    if (op.getType() == Operation.Type.Upload) {
-                        type = PoolOperation.Type.Upload;
-                        source = FilenameUtils.getName(op.getSource());
-                        dest = DataManagerUtil.parseRealDir(op.getDest());
-
-                    } else {
-                        type = PoolOperation.Type.Download;
-                        dest = "Platform";
-                        source = op.getType() == Operation.Type.Download
-                                ? DataManagerUtil.parseRealDir(op.getSource())
-                                : FilenameUtils.getBaseName(op.getDest());
-                    }
-
-                    poolOperations.add(new PoolOperation(op.getId(),
-                            op.getRegistration(), dateFormat.format(op.getRegistration()),
-                            source, dest, type, status, op.getUser()));
+            for (Operation operation : client.getOperationsLimitedListByUserAndDate(email, operationsLimit, date)) {
+                
+                if (operation.getType() != Operation.Type.Delete) {
+                    poolOperations.add(processOperation(operation));
                 }
             }
             return poolOperations;
@@ -126,37 +104,10 @@ public class TransferPoolBusiness {
 
         try {
             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
-
-            List<Operation> operationsList = client.getAllOperations();
             List<PoolOperation> poolOperations = new ArrayList<PoolOperation>();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy HH:mm");
 
-            for (Operation op : operationsList) {
-                String source = "";
-                String dest = "";
-                PoolOperation.Type type = null;
-                PoolOperation.Status status = PoolOperation.Status.valueOf(op.getStatus().name());
-
-                if (op.getType() == Operation.Type.Upload) {
-                    type = PoolOperation.Type.Upload;
-                    source = FilenameUtils.getName(op.getSource());
-                    dest = DataManagerUtil.parseRealDir(op.getDest());
-
-                } else if (op.getType() == Operation.Type.Delete) {
-                    type = PoolOperation.Type.Delete;
-                    source = DataManagerUtil.parseRealDir(op.getSource());
-
-                } else {
-                    type = PoolOperation.Type.Download;
-                    dest = "Platform";
-                    source = op.getType() == Operation.Type.Download
-                            ? DataManagerUtil.parseRealDir(op.getSource())
-                            : FilenameUtils.getBaseName(op.getDest());
-                }
-
-                poolOperations.add(new PoolOperation(op.getId(),
-                        op.getRegistration(), dateFormat.format(op.getRegistration()),
-                        source, dest, type, status, op.getUser()));
+            for (Operation operation : client.getAllOperations()) {
+                poolOperations.add(processOperation(operation));
             }
 
             return poolOperations;
@@ -168,6 +119,63 @@ public class TransferPoolBusiness {
             logger.error(ex);
             throw new BusinessException(ex);
         }
+    }
+
+    /**
+     * 
+     * @param operationId
+     * @return
+     * @throws BusinessException 
+     */
+    public PoolOperation getOperationById(String operationId) throws BusinessException {
+
+        try {
+            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
+            return processOperation(client.getOperationById(operationId));
+
+        } catch (DataManagerException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        } catch (GRIDAClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param operation
+     * @return
+     * @throws DataManagerException 
+     */
+    private PoolOperation processOperation(Operation operation) throws DataManagerException {
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy HH:mm");
+        String source = "";
+        String dest = "";
+        PoolOperation.Type type = null;
+        PoolOperation.Status status = PoolOperation.Status.valueOf(operation.getStatus().name());
+
+        if (operation.getType() == Operation.Type.Upload) {
+            type = PoolOperation.Type.Upload;
+            source = FilenameUtils.getName(operation.getSource());
+            dest = DataManagerUtil.parseRealDir(operation.getDest());
+
+        } else if (operation.getType() == Operation.Type.Delete) {
+            type = PoolOperation.Type.Delete;
+            source = DataManagerUtil.parseRealDir(operation.getSource());
+
+        } else {
+            type = PoolOperation.Type.Download;
+            dest = "Platform";
+            source = operation.getType() == Operation.Type.Download
+                    ? DataManagerUtil.parseRealDir(operation.getSource())
+                    : FilenameUtils.getBaseName(operation.getDest());
+        }
+
+        return new PoolOperation(operation.getId(), operation.getRegistration(),
+                dateFormat.format(operation.getRegistration()),
+                source, dest, type, status, operation.getUser());
     }
 
     /**

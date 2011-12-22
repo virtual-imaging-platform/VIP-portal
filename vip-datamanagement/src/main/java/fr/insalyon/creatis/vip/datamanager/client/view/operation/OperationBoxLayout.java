@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.datamanager.client.view.operation;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
@@ -64,6 +65,10 @@ public class OperationBoxLayout extends HLayout {
 
     private ModalWindow modal;
     private PoolOperation operation;
+    private Timer timer;
+    private VLayout imgLayout;
+    private VLayout mainLayout;
+    private VLayout actionLayout;
 
     public OperationBoxLayout(ModalWindow modal, PoolOperation operation) {
 
@@ -75,9 +80,38 @@ public class OperationBoxLayout extends HLayout {
         this.setHeight(40);
         this.setBackgroundColor("#FFFFFF");
 
+        imgLayout = new VLayout();
+        imgLayout.setPadding(2);
+        imgLayout.setWidth(40);
+        imgLayout.setHeight(45);
+        imgLayout.setAlign(Alignment.CENTER);
+
+        mainLayout = new VLayout(2);
+        mainLayout.setWidth("*");
+        mainLayout.setHeight(45);
+        mainLayout.setAlign(Alignment.CENTER);
+
+        actionLayout = new VLayout(5);
+        actionLayout.setHeight(45);
+        actionLayout.setWidth(30);
+        actionLayout.setAlign(VerticalAlignment.TOP);
+
         configureImageLayout();
         configureMainLayout();
         configureActionLayout();
+
+        if (operation.getStatus() == Status.Queued
+                || operation.getStatus() == Status.Running
+                || operation.getStatus() == Status.Rescheduled) {
+
+            timer = new Timer() {
+
+                public void run() {
+                    loadData();
+                }
+            };
+            timer.scheduleRepeating(15000);
+        }
     }
 
     /**
@@ -85,11 +119,7 @@ public class OperationBoxLayout extends HLayout {
      */
     private void configureImageLayout() {
 
-        VLayout imgLayout = new VLayout();
-        imgLayout.setPadding(2);
-        imgLayout.setWidth(40);
-        imgLayout.setHeight(45);
-        imgLayout.setAlign(Alignment.CENTER);
+        imgLayout.removeMembers(imgLayout.getMembers());
 
         Img icon;
 
@@ -118,10 +148,7 @@ public class OperationBoxLayout extends HLayout {
      */
     private void configureMainLayout() {
 
-        VLayout mainLayout = new VLayout(2);
-        mainLayout.setWidth("*");
-        mainLayout.setHeight(45);
-        mainLayout.setAlign(Alignment.CENTER);
+        mainLayout.removeMembers(mainLayout.getMembers());
 
         String source = operation.getSource();
         String message = operation.getType() == Type.Download
@@ -159,7 +186,7 @@ public class OperationBoxLayout extends HLayout {
                     }
                 });
 
-                Label completedLabel = new Label("<font color=\"#666666\"> - " 
+                Label completedLabel = new Label("<font color=\"#666666\"> - "
                         + operation.getParsedRegistration() + "</font>");
                 completedLabel.setHeight(12);
                 completedLabel.setWidth("*");
@@ -169,7 +196,7 @@ public class OperationBoxLayout extends HLayout {
                 hLayout.setHeight(12);
                 hLayout.addMember(downloadLabel);
                 hLayout.addMember(completedLabel);
-                
+
                 mainLayout.addMember(hLayout);
             }
 
@@ -199,10 +226,7 @@ public class OperationBoxLayout extends HLayout {
      */
     private void configureActionLayout() {
 
-        VLayout actionLayout = new VLayout(5);
-        actionLayout.setHeight(45);
-        actionLayout.setWidth(30);
-        actionLayout.setAlign(VerticalAlignment.TOP);
+        actionLayout.removeMembers(actionLayout.getMembers());
 
         Img removeImg = new Img(DataManagerConstants.OP_ICON_CLEAR, 16, 16);
         removeImg.setCursor(Cursor.HAND);
@@ -229,6 +253,32 @@ public class OperationBoxLayout extends HLayout {
         }
 
         this.addMember(actionLayout);
+    }
+
+    private void loadData() {
+
+        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
+        AsyncCallback<PoolOperation> asyncCallback = new AsyncCallback<PoolOperation>() {
+
+            public void onFailure(Throwable caught) {
+                SC.warn("Unable to update operation data:<br />" + caught.getMessage());
+            }
+
+            public void onSuccess(PoolOperation result) {
+
+                operation = result;
+                configureImageLayout();
+                configureMainLayout();
+                configureActionLayout();
+
+                if (operation.getStatus() == Status.Done
+                        || operation.getStatus() == Status.Failed) {
+
+                    timer.cancel();
+                }
+            }
+        };
+        service.getPoolOperationById(operation.getId(), asyncCallback);
     }
 
     /**

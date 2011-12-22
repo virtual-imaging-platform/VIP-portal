@@ -34,9 +34,7 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.operation;
 
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
@@ -58,7 +56,6 @@ import java.util.List;
 public class OperationLayout extends VLayout {
 
     private static OperationLayout instance;
-    private Timer timer;
     private ModalWindow modal;
     private OperationToolStrip toolStrip;
     private VLayout operationsLayout;
@@ -80,7 +77,7 @@ public class OperationLayout extends VLayout {
 
     private OperationLayout() {
 
-        this.setWidth(450);
+        this.setWidth("35%");
         this.setMaxWidth(450);
         this.setHeight100();
         this.setOverflow(Overflow.AUTO);
@@ -108,13 +105,6 @@ public class OperationLayout extends VLayout {
         noMoreDataBoxLayout = new NoOperationsBoxLayout();
 
         loadData();
-
-        timer = new Timer() {
-
-            public void run() {
-                loadData();
-            }
-        };
     }
 
     public void loadData() {
@@ -129,31 +119,21 @@ public class OperationLayout extends VLayout {
             public void onSuccess(List<PoolOperation> result) {
 
                 operationsLayout.removeMembers(operationsLayout.getMembers());
-                boolean hasActiveOperations = false;
 
                 if (!result.isEmpty()) {
                     for (PoolOperation operation : result) {
-                        if (operation.getStatus() == Status.Running
-                                || operation.getStatus() == Status.Queued) {
-                            hasActiveOperations = true;
-                        }
                         operationsLayout.addMember(new OperationBoxLayout(modal, operation));
                         lastDate = operation.getRegistration();
                     }
                     operationsLayout.addMember(loadMoreDataBoxLayout);
                 }
-
                 modal.hide();
-
-                if (!hasActiveOperations) {
-                    timer.cancel();
-                }
             }
         };
         modal.show("Loading operations...", true);
         service.getPoolOperationsByUser(callback);
     }
-
+    
     private void loadMoreData() {
 
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
@@ -170,10 +150,6 @@ public class OperationLayout extends VLayout {
                 if (!result.isEmpty()) {
 
                     for (PoolOperation operation : result) {
-                        if (operation.getStatus() == Status.Running
-                                || operation.getStatus() == Status.Queued) {
-                            activateAutoRefresh();
-                        }
                         operationsLayout.addMember(new OperationBoxLayout(modal, operation));
                         lastDate = operation.getRegistration();
                     }
@@ -188,9 +164,5 @@ public class OperationLayout extends VLayout {
         };
         modal.show("Loading more operations...", true);
         service.getPoolOperationsByUserAndDate(lastDate, callback);
-    }
-
-    public void activateAutoRefresh() {
-        timer.scheduleRepeating(15000);
     }
 }

@@ -77,7 +77,7 @@ public class BrowserLayout extends VLayout {
     private BrowserLayout() {
 
         initComplete(this);
-        this.setWidth100();
+        this.setWidth("*");
         this.setHeight100();
         this.setOverflow(Overflow.AUTO);
         this.setShowResizeBar(true);
@@ -159,7 +159,6 @@ public class BrowserLayout extends VLayout {
         }
         modal.hide();
         OperationLayout.getInstance().loadData();
-        OperationLayout.getInstance().activateAutoRefresh();
     }
 
     private native void initComplete(BrowserLayout upload) /*-{

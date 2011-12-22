@@ -51,7 +51,7 @@ public class NoOperationsBoxLayout extends HLayout {
 
         this.setMembersMargin(2);
         this.setWidth100();
-        this.setHeight(40);
+        this.setHeight(25);
         this.setBackgroundColor("#E2E2E2");
         this.setBorder("1px solid #D2D2D2");
         this.setAlign(Alignment.CENTER);
@@ -67,11 +67,11 @@ public class NoOperationsBoxLayout extends HLayout {
 
         VLayout imgLayout = new VLayout();
         imgLayout.setPadding(2);
-        imgLayout.setWidth(40);
-        imgLayout.setHeight(45);
+        imgLayout.setWidth(20);
+        imgLayout.setHeight(25);
         imgLayout.setAlign(Alignment.CENTER);
 
-        Img icon = new Img(DataManagerConstants.IMG_WARNING, 32, 32);
+        Img icon = new Img(DataManagerConstants.ICON_WARNING, 16, 16);
         icon.setPrompt("No more operations");
 
         imgLayout.addMember(icon);
@@ -85,10 +85,10 @@ public class NoOperationsBoxLayout extends HLayout {
 
         VLayout mainLayout = new VLayout(2);
         mainLayout.setWidth(120);
-        mainLayout.setHeight(45);
+        mainLayout.setHeight(25);
         mainLayout.setAlign(Alignment.CENTER);
 
-        Label messageLabel = new Label("No more operations");
+        Label messageLabel = new Label("<font color=\"#666666\">No more operations</font>");
         messageLabel.setHeight(15);
         mainLayout.addMember(messageLabel);
 

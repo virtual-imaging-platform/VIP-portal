@@ -126,7 +126,6 @@ public class InOutContextMenu extends Menu {
             public void onSuccess(Void result) {
                 modal.hide();
                 OperationLayout.getInstance().loadData();
-                OperationLayout.getInstance().activateAutoRefresh();
                 DataManagerModule.dataManagerSection.expand();
             }
         };
@@ -164,7 +163,6 @@ public class InOutContextMenu extends Menu {
             public void onSuccess(Void result) {
                 modal.hide();
                 OperationLayout.getInstance().loadData();
-                OperationLayout.getInstance().activateAutoRefresh();
                 DataManagerModule.dataManagerSection.expand();
             }
         };

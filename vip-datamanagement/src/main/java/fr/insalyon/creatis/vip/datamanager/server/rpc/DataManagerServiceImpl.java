@@ -215,6 +215,16 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             throw new DataManagerException(ex);
         }
     }
+    
+    public PoolOperation getPoolOperationById(String operationId) throws DataManagerException {
+        
+        try {
+            return transferPoolBusiness.getOperationById(operationId);
+            
+        } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
+        }
+    }
 
     public void removeOperations(List<String> ids) throws DataManagerException {
 

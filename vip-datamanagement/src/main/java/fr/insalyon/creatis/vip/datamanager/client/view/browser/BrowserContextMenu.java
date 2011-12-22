@@ -254,7 +254,6 @@ public class BrowserContextMenu extends Menu {
                 public void onSuccess(Void result) {
                     modal.hide();
                     OperationLayout.getInstance().loadData();
-                    OperationLayout.getInstance().activateAutoRefresh();
                 }
             };
             modal.show("Adding file to transfer queue...", true);
@@ -278,7 +277,6 @@ public class BrowserContextMenu extends Menu {
                 public void onSuccess(Void result) {
                     modal.hide();
                     OperationLayout.getInstance().loadData();
-                    OperationLayout.getInstance().activateAutoRefresh();
                 }
             };
             modal.show("Adding folder to transfer queue...", true);

@@ -52,7 +52,7 @@ import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout
 
 /**
  *
- * @author camarasu
+ * @author Sorina Camarasu
  */
 public class GeneralInformationContextMenu extends Menu {
 
@@ -111,7 +111,6 @@ public class GeneralInformationContextMenu extends Menu {
             public void onSuccess(Void result) {
                 modal.hide();
                 OperationLayout.getInstance().loadData();
-                OperationLayout.getInstance().activateAutoRefresh();
                 ((DataManagerSection)Layout.getInstance().getMainSection(DataManagerConstants.SECTION_FILE_TRANSFER)).expand();
             }
         };

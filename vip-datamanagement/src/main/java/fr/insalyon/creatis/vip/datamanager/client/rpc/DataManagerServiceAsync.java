@@ -68,6 +68,8 @@ public interface DataManagerServiceAsync {
     public void getPoolOperationsByUserAndDate(Date startDate, AsyncCallback<List<PoolOperation>> asyncCallback);
 
     public void getPoolOperations(AsyncCallback<List<PoolOperation>> asyncCallback);
+    
+    public void getPoolOperationById(String operationId, AsyncCallback<PoolOperation> asyncCallback);
 
     public void removeOperations(List<String> ids, AsyncCallback<Void> asyncCallback);
     

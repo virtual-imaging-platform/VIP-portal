@@ -60,9 +60,11 @@ public class DataManagerConstants {
     public static final String ICON_JUMPTO = IMG_FOLDER + "icon-jumpto.png";
     public static final String ICON_OPERATION = IMG_FOLDER + "icon-operation.png";
     public static final String ICON_PASTE = IMG_FOLDER + "icon-paste.png";
+    public static final String ICON_RELOAD = IMG_FOLDER + "icon-reload.png";
     public static final String ICON_TRASH = IMG_FOLDER + "icon-trash.png";
     public static final String ICON_UPLOAD = IMG_FOLDER + "icon-upload.png";
     public static final String ICON_UPLOAD_MULTIPLE = IMG_FOLDER + "icon-upload-multiple.png";
+    public static final String ICON_WARNING = IMG_FOLDER + "icon-warning.png";
     // Application Names
     public final static String APP_CACHED_FILES = "Cached Files";
     public final static String APP_FILE_TRANSFER = "File Transfer";
@@ -71,9 +73,6 @@ public class DataManagerConstants {
     public static final String APP_IMG_CACHED_FILES = IMG_FOLDER + "app-cache.png";
     public static final String APP_IMG_FILE_TRANSFER = IMG_FOLDER + "app-file-transfer.png";
     public static final String APP_IMG_OPERATIONS = IMG_FOLDER + "app-operation.png";
-    // Images
-    public static final String IMG_RELOAD = IMG_FOLDER + "img-reload.png";
-    public static final String IMG_WARNING = IMG_FOLDER + "img-warning.png";
     // Operation
     private static final String OP_FOLDER = IMG_FOLDER + "operation/";
     public static final String OP_DOWNLOAD = OP_FOLDER + "img-download.png";
