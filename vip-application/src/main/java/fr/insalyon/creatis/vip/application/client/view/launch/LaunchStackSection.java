@@ -180,7 +180,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
 
                     public void onClick(ClickEvent event) {
                         if (validate()) {
-                            verifyData();
+                            launch();
                         }
                     }
                 });
@@ -251,6 +251,36 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
      */
     private void launch() {
 
+        modal.show("Launching simulation '" + simulationNameItem.getValueAsString()
+                + "'...", true);
+        
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Error on input data:<br />" + caught.getMessage());
+            }
+
+            public void onSuccess(Void result) {
+                submitWorkflow();
+            }
+        };
+        List<String> inputData = new ArrayList<String>();
+        for (String input : getParametersMap().values()) {
+            if (input.startsWith(DataManagerConstants.ROOT)) {
+                inputData.add(input);
+            }
+        }
+        if (!inputData.isEmpty()) {
+            service.validateInputs(inputData, callback);
+        } else {
+            submitWorkflow();
+        }
+    }
+
+    private void submitWorkflow() {
+        
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
@@ -265,8 +295,6 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
                         + "' successfully launched.");
             }
         };
-        modal.show("Launching simulation '" + simulationNameItem.getValueAsString()
-                + "'...", true);
         service.launchSimulation(getParametersMap(), applicationName,
                 simulationNameItem.getValueAsString().trim(), callback);
     }
