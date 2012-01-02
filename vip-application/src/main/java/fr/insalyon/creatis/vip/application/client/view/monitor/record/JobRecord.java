@@ -100,6 +100,9 @@ public class JobRecord extends ListGridRecord {
     private void setMinorStatus(String status, int exitCode, int minorStatus) {
         if (status.equals("COMPLETED") || status.equals("ERROR")) {
             switch (exitCode) {
+                case -1:
+                    setAttribute("minorStatus", "Retrieving Status");
+                    break;
                 case 0:
                     setAttribute("minorStatus", "Execution Completed");
                     break;
@@ -116,7 +119,7 @@ public class JobRecord extends ListGridRecord {
                     setAttribute("minorStatus", "Directories Creation Failed");
                     break;
                 default:
-                    setAttribute("minorStatus", "Retrieving Status");
+                    setAttribute("minorStatus", "");
             }
 
         } else {
