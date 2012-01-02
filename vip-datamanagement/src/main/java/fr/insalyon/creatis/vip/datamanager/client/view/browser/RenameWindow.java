@@ -84,7 +84,7 @@ public class RenameWindow extends Window {
         form.setPadding(5);
         form.setLayoutAlign(VerticalAlignment.BOTTOM);
 
-        nameItem = FieldUtil.getTextItem(200, true, "Name", "[0-9A-Za-z-_]");
+        nameItem = FieldUtil.getTextItem(200, true, "Name", "[0-9A-Za-z-_.]");
         nameItem.setValue(name);
         nameItem.addKeyPressHandler(new KeyPressHandler() {
 
@@ -125,10 +125,11 @@ public class RenameWindow extends Window {
                     }
                 };
                 modal.show("Renaming " + baseDir + "/" + name + "...", true);
-                service.rename(baseDir + "/" + name, nameItem.getValueAsString().trim(),
+                service.rename(baseDir + "/" + name,
+                        baseDir + "/" + nameItem.getValueAsString().trim(),
                         false, callback);
                 destroy();
-            
+
             } else {
                 SC.warn("The specified name is the same as the original one.");
             }
