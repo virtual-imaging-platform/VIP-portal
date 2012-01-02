@@ -89,8 +89,6 @@ public class Server {
     // Apache
     private String apacheHost = "localhost";
     private int apacheSSLPort = 80;
-    // News
-    private String[] newsRecipients = new String[]{};
     // Data Manager
     private String dataManagerPath = "/tmp";
     private String dataManagerLFCHost = "lfc-biomed.in2p3.fr";
@@ -153,8 +151,6 @@ public class Server {
             apacheHost = config.getString("apache.host", apacheHost);
             apacheSSLPort = config.getInt("apache.ssl.port", apacheSSLPort);
 
-            newsRecipients = config.getStringArray("news.recipients");
-
             dataManagerPath = config.getString("datamanager.path", dataManagerPath);
             dataManagerLFCHost = config.getString("datamanager.lfc.host", dataManagerLFCHost);
             dataManagerLFCPort = config.getInt("datamanager.lfc.port", dataManagerLFCPort);
@@ -162,6 +158,41 @@ public class Server {
             provenanceDBUser = config.getString("provenance.db.user", provenanceDBUser);
             provenanceDBPass = config.getString("provenance.db.pass", provenanceDBPass);
             provenanceDBURL = config.getString("provenance.db.url", provenanceDBURL);
+            
+            
+            config.setProperty("admin.first.name", adminFirstName);
+            config.setProperty("admin.last.name", adminLastName);
+            config.setProperty("admin.email", adminEmail);
+            config.setProperty("admin.institution", adminInstitution);
+            config.setProperty("admin.phone", adminPhone);
+            config.setProperty("admin.pass", adminPassword);
+            config.setProperty("myproxy.host", myProxyHost);
+            config.setProperty("myproxy.port", myProxyPort);
+            config.setProperty("myproxy.user", myProxyUser);
+            config.setProperty("myproxy.pass", myProxyPass);
+            config.setProperty("mail.host", mailHost);
+            config.setProperty("mail.transport.protocol", mailTransportProtocol);
+            config.setProperty("mail.from", mailFrom);
+            config.setProperty("grida.server.host", gridaHost);
+            config.setProperty("grida.server.port", gridaPort);
+            config.setProperty("datamanager.users.home", dataManagerUsersHome);
+            config.setProperty("datamanager.groups.home", dataManagerGroupsHome);
+            config.setProperty("moteur.host", moteurServer);
+            config.setProperty("moteur.max.workflows", moteurMaxWorkflows);
+            config.setProperty("truststore.file", truststoreFile);
+            config.setProperty("truststore.password", truststorePass);
+            config.setProperty("workflows.directory", workflowsPath);
+            config.setProperty("workflows.db.name", workflowsDB);
+            config.setProperty("workflows.db.host", workflowsHost);
+            config.setProperty("workflows.db.port", workflowsPort);
+            config.setProperty("apache.host", apacheHost);
+            config.setProperty("apache.ssl.port", apacheSSLPort);
+            config.setProperty("datamanager.path", dataManagerPath);
+            config.setProperty("datamanager.lfc.host", dataManagerLFCHost);
+            config.setProperty("datamanager.lfc.port", dataManagerLFCPort);
+            config.setProperty("provenance.db.user", provenanceDBUser);
+            config.setProperty("provenance.db.pass", provenanceDBPass);
+            config.setProperty("provenance.db.url", provenanceDBURL);
 
             config.save();
 
@@ -244,10 +275,6 @@ public class Server {
 
     public String getMailHost() {
         return mailHost;
-    }
-
-    public String[] getNewsRecipients() {
-        return newsRecipients;
     }
 
     public String getDataManagerPath() {
