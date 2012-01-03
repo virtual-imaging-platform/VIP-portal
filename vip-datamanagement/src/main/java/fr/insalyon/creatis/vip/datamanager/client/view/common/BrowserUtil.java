@@ -123,7 +123,7 @@ public class BrowserUtil {
                         dataList.add(new DataRecord(
                                 data.getType().toLowerCase(),
                                 data.getName(),
-                                (int) data.getLength(),
+                                (long) data.getLength(),
                                 data.getModificationDate(),
                                 replicas,
                                 data.getPermissions()));
