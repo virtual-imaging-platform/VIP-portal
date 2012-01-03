@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.VerticalAlignment;
+import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
@@ -86,6 +87,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
 
         simulationNameItem.setValue(name);
         Map<String, String> valuesMap = new HashMap<String, String>();
+        final Map<String, String> conflictMap = new HashMap<String, String>();
 
         for (String input : values.split("<br />")) {
             String[] s = input.split(" = ");
@@ -95,16 +97,41 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
         StringBuilder sb = new StringBuilder();
         for (Canvas canvas : inputs.getMembers()) {
             if (canvas instanceof InputHLayout) {
-                InputHLayout input = (InputHLayout) canvas;
-                String value = valuesMap.get(input.getName());
+                final InputHLayout input = (InputHLayout) canvas;
+                final String inputValue = valuesMap.get(input.getName());
 
-                if (value != null) {
-                    input.setValue(value);
+                if (inputValue != null) {
+                    if (input.getValue() == null || input.getValue().isEmpty()) {
+                        input.setValue(inputValue);
+
+                    } else {
+                        conflictMap.put(input.getName(), inputValue);
+                    }
                 } else {
-                    sb.append("Could not find value for parameter \""
-                            + input.getName() + "\".<br />");
+                    sb.append("Could not find value for parameter \"");
+                    sb.append(input.getName()).append("\".<br />");
                 }
             }
+        }
+        if (!conflictMap.isEmpty()) {
+            SC.ask("The following fields already have a value.<br />"
+                    + "Do you want to replace them?<br />"
+                    + "Fields: " + conflictMap.keySet(), new BooleanCallback() {
+
+                public void execute(Boolean value) {
+                    if (value) {
+                        for (Canvas canvas : inputs.getMembers()) {
+                            if (canvas instanceof InputHLayout) {
+                                final InputHLayout input = (InputHLayout) canvas;
+                                final String inputValue = conflictMap.get(input.getName());
+                                if (inputValue != null) {
+                                    input.setValue(inputValue);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
         if (sb.length() > 0) {
             SC.warn(sb.toString());
@@ -253,7 +280,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
 
         modal.show("Launching simulation '" + simulationNameItem.getValueAsString()
                 + "'...", true);
-        
+
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
@@ -280,7 +307,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
     }
 
     private void submitWorkflow() {
-        
+
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
