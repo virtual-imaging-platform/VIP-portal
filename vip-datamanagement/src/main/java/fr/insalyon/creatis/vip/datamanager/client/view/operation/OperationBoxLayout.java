@@ -100,18 +100,13 @@ public class OperationBoxLayout extends HLayout {
         configureMainLayout();
         configureActionLayout();
 
-        if (operation.getStatus() == Status.Queued
-                || operation.getStatus() == Status.Running
-                || operation.getStatus() == Status.Rescheduled) {
+        timer = new Timer() {
 
-            timer = new Timer() {
-
-                public void run() {
-                    loadData();
-                }
-            };
-            timer.scheduleRepeating(15000);
-        }
+            public void run() {
+                loadData();
+            }
+        };
+        setTimer();
     }
 
     /**
@@ -277,6 +272,9 @@ public class OperationBoxLayout extends HLayout {
                         || operation.getStatus() == Status.Failed) {
 
                     timer.cancel();
+                
+                } else {
+                    setTimer();
                 }
             }
         };
@@ -319,5 +317,16 @@ public class OperationBoxLayout extends HLayout {
 
         Window.open(GWT.getModuleBaseURL() + "/filedownloadservice?operationid="
                 + operation.getId(), "", "");
+    }
+
+    private void setTimer() {
+        
+        if (operation.getStatus() == Status.Queued
+                || operation.getStatus() == Status.Rescheduled) {
+            timer.scheduleRepeating(15000);
+
+        } else if (operation.getStatus() == Status.Running) {
+            timer.scheduleRepeating(5000);
+        }
     }
 }
