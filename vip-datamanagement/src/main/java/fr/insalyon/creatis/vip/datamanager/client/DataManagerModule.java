@@ -51,14 +51,11 @@ public class DataManagerModule extends Module {
 
     public static DataManagerSection dataManagerSection;
 
-    public DataManagerModule() {
-
-        CoreModule.homeExecutor.addParser(new DataManagerHomeParser());
-        CoreModule.systemExecutor.addParser(new DataManagerSystemParser());
-    }
-
     @Override
     public void load() {
+
+        CoreModule.addGeneralApplicationParser(new DataManagerHomeParser());
+        CoreModule.addSystemApplicationParser(new DataManagerSystemParser());
 
         dataManagerSection = new DataManagerSection();
         Layout.getInstance().addMainSection(dataManagerSection);

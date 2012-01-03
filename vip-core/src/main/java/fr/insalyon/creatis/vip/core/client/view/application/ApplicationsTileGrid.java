@@ -35,40 +35,62 @@
 package fr.insalyon.creatis.vip.core.client.view.application;
 
 import com.smartgwt.client.widgets.tile.TileGrid;
-import java.util.ArrayList;
-import java.util.List;
+import com.smartgwt.client.widgets.tile.events.RecordClickEvent;
+import com.smartgwt.client.widgets.tile.events.RecordClickHandler;
+import com.smartgwt.client.widgets.viewer.DetailViewerField;
 
 /**
  *
  * @author Rafael Silva
  */
-public class ApplicationExecutor {
+public abstract class ApplicationsTileGrid extends TileGrid {
 
-    private List<ApplicationParser> parsers;
+    private String tileName;
 
-    public ApplicationExecutor() {
+    public ApplicationsTileGrid(String tileName) {
 
-        parsers = new ArrayList<ApplicationParser>();
-    }
+        this.tileName = tileName;
 
-    public void addParser(ApplicationParser parser) {
+        this.setWidth100();
+        this.setHeight(110);
+        this.setTileWidth(110);
+        this.setTileHeight(100);
 
-        parsers.add(parser);
-    }
+        this.setBorder("0px");
+        this.setCanReorderTiles(true);
+        this.setShowAllRecords(true);
+        this.setAnimateTileChange(true);
+        this.setShowEdges(false);
 
-    public void loadApplications(TileGrid tileGrid) {
+        DetailViewerField imageField = new DetailViewerField("picture");
+        imageField.setType("image");
+        DetailViewerField commonNameField = new DetailViewerField("commonName");
 
-        for (ApplicationParser parser : parsers) {
-            parser.loadApplications(tileGrid);
-        }
-    }
+        this.setFields(imageField, commonNameField);
+        this.setData(new ApplicationTileRecord[]{});
 
-    public void parse(String applicationName) {
+        this.addRecordClickHandler(new RecordClickHandler() {
 
-        for (ApplicationParser parser : parsers) {
-            if (parser.parse(applicationName)) {
-                return;
+            public void onRecordClick(RecordClickEvent event) {
+                ApplicationTileRecord record = (ApplicationTileRecord) event.getRecord();
+                parse(record.getName());
             }
-        }
+        });
+    }
+
+    protected void addApplication(String applicationName, String applicationImage) {
+
+        addApplication(new ApplicationTileRecord(applicationName, applicationImage));
+    }
+
+    protected void addApplication(ApplicationTileRecord record) {
+
+        this.addData(record);
+    }
+
+    public abstract void parse(String applicationName);
+
+    public String getTileName() {
+        return tileName;
     }
 }

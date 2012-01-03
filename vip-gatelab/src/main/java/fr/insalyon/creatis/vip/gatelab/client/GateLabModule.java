@@ -41,7 +41,7 @@ import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Module;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
-import fr.insalyon.creatis.vip.gatelab.client.view.GateLabHomeParser;
+import fr.insalyon.creatis.vip.gatelab.client.view.GateLabTileGrid;
 
 /**
  *
@@ -52,12 +52,13 @@ public class GateLabModule extends Module {
     public GateLabModule() {
 
         ApplicationModule.reservedClasses.add(GateLabConstants.GATELAB_CLASS);
-        CoreModule.homeExecutor.addParser(new GateLabHomeParser());
         addAccountType(GateLabConstants.ACCOUNT_GATELAB);
     }
 
     @Override
     public void load() {
+        
+        CoreModule.addApplicationsTileGrid(new GateLabTileGrid());
     }
 
     @Override

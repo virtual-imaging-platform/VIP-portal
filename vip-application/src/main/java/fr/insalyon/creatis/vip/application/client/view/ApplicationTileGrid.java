@@ -15,7 +15,7 @@
  * As a counterpart to the access to the source code and  rights to copy,
  * modify and redistribute granted by the license, users are provided only
  * with a limited warranty  and the software's author,  the holder of the
- * economic rights,  and the successive licensors  have only limited
+ * economic rights,  and the successive licensors  have only  limited
  * liability.
  *
  * In this respect, the user's attention is drawn to the risks associated
@@ -32,18 +32,17 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.gatelab.client.view;
+package fr.insalyon.creatis.vip.application.client.view;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
+import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
+import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.gatelab.client.GateLabConstants;
-import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabService;
-import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabServiceAsync;
-import fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab;
-import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabSimulationsTab;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,18 +50,29 @@ import java.util.List;
  *
  * @author Rafael Silva
  */
-public class GateLabHomeParser extends ApplicationParser {
+public class ApplicationTileGrid extends ApplicationsTileGrid {
 
     private List<String> applicationNames;
+    
+    public ApplicationTileGrid(String className) {
 
-    public GateLabHomeParser() {
+        super(className);
         applicationNames = new ArrayList<String>();
+        loadApplications(className);
     }
 
     @Override
-    public void loadApplications() {
+    public void parse(String applicationName) {
+        
+        if (applicationNames.contains(applicationName)) {
+            Layout.getInstance().addTab(new LaunchTab(applicationName));
+            return;
+        }
+    }
 
-        GateLabServiceAsync service = GateLabService.Util.getInstance();
+    private void loadApplications(String className) {
+
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
 
             public void onFailure(Throwable caught) {
@@ -71,31 +81,12 @@ public class GateLabHomeParser extends ApplicationParser {
 
             public void onSuccess(List<Application> result) {
 
-                if (!result.isEmpty()) {
-                    addApplication(GateLabConstants.APP_MONITOR,
-                            GateLabConstants.APP_IMG_MONITOR);
-
-                    for (Application app : result) {
-                        addApplication(app.getName(), GateLabConstants.APP_IMG_APPLICATION);
-                        applicationNames.add(app.getName());
-                    }
+                for (Application app : result) {
+                    addApplication(app.getName(), ApplicationConstants.APP_IMG_APPLICATION);
+                    applicationNames.add(app.getName());
                 }
             }
         };
-        service.getApplications(callback);
-    }
-
-    @Override
-    public boolean parse(String applicationName) {
-
-        if (applicationNames.contains(applicationName)) {
-            Layout.getInstance().addTab(new GateLabLaunchTab(applicationName));
-            return true;
-
-        } else if (applicationName.equals(GateLabConstants.APP_MONITOR)) {
-            Layout.getInstance().addTab(new GateLabSimulationsTab());
-            return true;
-        }
-        return false;
+        service.getApplications(className, callback);
     }
 }

@@ -39,15 +39,16 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.application.ApplicationExecutor;
+import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
+import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.contact.ContactTab;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
-import fr.insalyon.creatis.vip.core.client.view.system.SystemParser;
-import fr.insalyon.creatis.vip.core.client.view.system.SystemTab;
+import fr.insalyon.creatis.vip.core.client.view.main.GeneralTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.user.UserMenuButton;
-import fr.insalyon.creatis.vip.core.client.view.main.HomeParser;
 import fr.insalyon.creatis.vip.core.client.view.main.HomeTab;
+import fr.insalyon.creatis.vip.core.client.view.main.SystemParser;
+import fr.insalyon.creatis.vip.core.client.view.main.SystemTileGrid;
 import java.util.List;
 
 /**
@@ -57,35 +58,38 @@ import java.util.List;
 public class CoreModule extends Module {
 
     public static User user;
-    public static ApplicationExecutor systemExecutor;
-    public static ApplicationExecutor homeExecutor;
+    private static GeneralTileGrid generalTileGrid;
+    private static SystemTileGrid systemTileGrid;
+    private static HomeTab homeTab;
     public static List<String> accountTypes;
 
     public CoreModule() {
 
-        systemExecutor = new ApplicationExecutor();
-        systemExecutor.addParser(new SystemParser());
-
-        homeExecutor = new ApplicationExecutor();
-        homeExecutor.addParser(new HomeParser());
+        init();
     }
 
     @Override
     public void load() {
 
+        // Add tile grids
+        homeTab.addTileGrid(generalTileGrid);
+        if (CoreModule.user.isGroupAdmin()) {
+            systemTileGrid.addParser(new SystemParser());
+            homeTab.addTileGrid(systemTileGrid);
+        }
+
+
         // Configure User's toolstrip        
         MainToolStrip.getInstance().addMenuButton(new UserMenuButton(user));
 
-        // Tabs
-        if (user.isGroupAdmin()) {
-            Layout.getInstance().addTab(new SystemTab());
-        }
-        Layout.getInstance().addTab(new HomeTab());
+        // Home Tab
+        Layout.getInstance().addTab(homeTab);
     }
 
     @Override
     public void postLoading() {
-        
+
+        // Experiencing problems button
         ToolStripButton helpButton = new ToolStripButton("Experiencing problems?");
         helpButton.setIcon(CoreConstants.ICON_HELP);
         helpButton.addClickHandler(new ClickHandler() {
@@ -94,21 +98,60 @@ public class CoreModule extends Module {
                 Layout.getInstance().addTab(new ContactTab());
             }
         });
-        
+
         MainToolStrip.getInstance().addFill();
         MainToolStrip.getInstance().addMember(helpButton);
     }
-    
+
     @Override
     public boolean parseAccountType(String accountType) {
-        
+
         if (accountType.equals(CoreConstants.ACCOUNT_OTHER)) {
             return true;
         }
         return false;
     }
-    
+
     @Override
     public void terminate() {
-    }   
+
+        init();
+    }
+
+    /**
+     * Adds an application parser to the general tile grid.
+     * 
+     * @param parser Application parser
+     */
+    public static void addGeneralApplicationParser(ApplicationParser parser) {
+
+        generalTileGrid.addParser(parser);
+    }
+
+    /**
+     * Adds an application parser to the system tile grid.
+     * 
+     * @param parser Application parser
+     */
+    public static void addSystemApplicationParser(ApplicationParser parser) {
+
+        systemTileGrid.addParser(parser);
+    }
+
+    /**
+     * Adds a new applications tile grid to the home tab.
+     * 
+     * @param tileGrid 
+     */
+    public static void addApplicationsTileGrid(ApplicationsTileGrid tileGrid) {
+
+        homeTab.addTileGrid(tileGrid);
+    }
+
+    private void init() {
+
+        generalTileGrid = new GeneralTileGrid();
+        systemTileGrid = new SystemTileGrid();
+        homeTab = new HomeTab();
+    }
 }

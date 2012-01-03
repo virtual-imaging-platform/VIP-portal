@@ -34,19 +34,10 @@
  */
 package fr.insalyon.creatis.vip.application.client.view;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.ApplicationModule;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
-import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
-import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationsTab;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -54,46 +45,17 @@ import java.util.List;
  */
 public class ApplicationHomeParser extends ApplicationParser {
 
-    private List<String> applicationNames;
-
-    public ApplicationHomeParser() {
-        applicationNames = new ArrayList<String>();
-    }
-
     @Override
     public void loadApplications() {
 
-        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
-        final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
-
-            public void onFailure(Throwable caught) {
-                SC.say("Unable to load applications:<br />" + caught.getMessage());
-            }
-
-            public void onSuccess(List<Application> result) {
-
-                if (!result.isEmpty()) {
-                    addApplication(ApplicationConstants.APP_MONITOR,
-                            ApplicationConstants.APP_IMG_MONITOR);
-
-                    for (Application app : result) {
-                        addApplication(app.getName(), ApplicationConstants.APP_IMG_APPLICATION);
-                        applicationNames.add(app.getName());
-                    }
-                }
-            }
-        };
-        service.getApplications(ApplicationModule.reservedClasses, callback);
+        addApplication(ApplicationConstants.APP_MONITOR,
+                ApplicationConstants.APP_IMG_MONITOR);
     }
 
     @Override
     public boolean parse(String applicationName) {
 
-        if (applicationNames.contains(applicationName)) {
-            Layout.getInstance().addTab(new LaunchTab(applicationName));
-            return true;
-
-        } else if (applicationName.equals(ApplicationConstants.APP_MONITOR)) {
+        if (applicationName.equals(ApplicationConstants.APP_MONITOR)) {
             Layout.getInstance().addTab(new SimulationsTab());
             return true;
         }

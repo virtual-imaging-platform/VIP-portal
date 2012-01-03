@@ -59,13 +59,10 @@ public class SocialModule extends Module {
     private static ToolStripButton socialButton;
     private Timer timer;
 
-    public SocialModule() {
-
-        CoreModule.homeExecutor.addParser(new SocialParser());
-    }
-
     @Override
     public void load() {
+
+        CoreModule.addGeneralApplicationParser(new SocialParser());
 
         socialButton = new ToolStripButton();
         socialButton.addClickHandler(new ClickHandler() {

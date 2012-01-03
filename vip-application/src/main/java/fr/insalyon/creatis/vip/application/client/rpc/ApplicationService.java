@@ -65,6 +65,8 @@ public interface ApplicationService extends RemoteService {
     
     public List<Application> getApplications() throws ApplicationException;
     
+    public List<Application> getApplications(String className) throws ApplicationException;
+    
     public List<Application> getApplications(List<String> reservedClasses) throws ApplicationException;
     
     public List<Application> getApplicationsByClass(String applicationClass) throws ApplicationException;
@@ -82,7 +84,7 @@ public interface ApplicationService extends RemoteService {
     public void removeClass(String className) throws ApplicationException;
 
     public List<AppClass> getClasses() throws ApplicationException;
-
+    
     public AppClass getClass(String className) throws ApplicationException;
 
     public List<String>[] getApplicationsAndUsers(List<String> reservedClasses) throws ApplicationException;

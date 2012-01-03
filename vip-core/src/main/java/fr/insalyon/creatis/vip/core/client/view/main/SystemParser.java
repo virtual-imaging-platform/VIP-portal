@@ -32,34 +32,41 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.docs.client;
+package fr.insalyon.creatis.vip.core.client.view.main;
 
 import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.Module;
-import fr.insalyon.creatis.vip.docs.client.view.DocsParser;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.system.group.ManageGroupsTab;
+import fr.insalyon.creatis.vip.core.client.view.system.user.ManageUsersTab;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DocsModule extends Module {
+public class SystemParser extends ApplicationParser {
 
     @Override
-    public void load() {
+    public void loadApplications() {
+
+        if (CoreModule.user.isSystemAdministrator()) {
+            addApplication(CoreConstants.APP_USER, CoreConstants.APP_IMG_USER);
+            addApplication(CoreConstants.APP_GROUP, CoreConstants.APP_IMG_GROUP);
+        }
+    }
+
+    @Override
+    public boolean parse(String applicationName) {
         
-        CoreModule.addGeneralApplicationParser(new DocsParser());
-    }
+        if (applicationName.equals(CoreConstants.APP_USER)) {
+            Layout.getInstance().addTab(new ManageUsersTab());
+            return true;
 
-    @Override
-    public void postLoading() {
-    }
-
-    @Override
-    public boolean parseAccountType(String accountType) {
+        } else if (applicationName.equals(CoreConstants.APP_GROUP)) {
+            Layout.getInstance().addTab(new ManageGroupsTab());
+            return true;
+        }
         return false;
-    }
-
-    @Override
-    public void terminate() {
     }
 }

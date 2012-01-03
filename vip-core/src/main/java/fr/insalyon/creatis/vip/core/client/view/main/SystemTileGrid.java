@@ -34,30 +34,46 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.main;
 
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.user.AccountTab;
+import fr.insalyon.creatis.vip.core.client.view.application.ApplicationTileRecord;
+import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class HomeParser extends ApplicationParser {
+public class SystemTileGrid extends ApplicationsTileGrid {
 
-    @Override
-    public void loadApplications() {
+    private List<ApplicationParser> parsers;
+    
+    public SystemTileGrid() {
 
-        addApplication(CoreConstants.APP_ACCOUNT, CoreConstants.APP_IMG_ACCOUNT);
+        super("System");
+        parsers = new ArrayList<ApplicationParser>();
     }
 
     @Override
-    public boolean parse(String applicationName) {
-
-        if (applicationName.equals(CoreConstants.APP_ACCOUNT)) {
-            Layout.getInstance().addTab(new AccountTab());
-            return true;
-        }        
-        return false;
+    public void parse(String applicationName) {
+        
+        for (ApplicationParser parser : parsers) {
+            if (parser.parse(applicationName)) {
+                return;
+            }
+        }
+    }
+    
+    /**
+     * Adds a parser to the system tile grid.
+     * 
+     * @param parser 
+     */
+    public void addParser(ApplicationParser parser) {
+        
+        parsers.add(parser);
+        for (ApplicationTileRecord record : parser.getApplications()) {
+            addApplication(record);
+        }
     }
 }

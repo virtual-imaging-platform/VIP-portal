@@ -44,13 +44,10 @@ import fr.insalyon.creatis.vip.models.client.view.ModelParser;
  */
 public class ModelModule extends Module {
 
-    public ModelModule() {
-
-        CoreModule.homeExecutor.addParser(new ModelParser());
-    }
-
     @Override
     public void load() {
+        
+        CoreModule.addGeneralApplicationParser(new ModelParser());
     }
 
     @Override

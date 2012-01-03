@@ -99,7 +99,7 @@ public class ModulesInit {
         
         for (Module module : modules) {
             if (module.parseAccountType(accountType)) {
-                break;
+                return;
             }
         }
     }

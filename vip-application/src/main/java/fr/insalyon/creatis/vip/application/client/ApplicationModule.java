@@ -39,10 +39,12 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.events.CloseClickHandler;
 import com.smartgwt.client.widgets.tab.events.TabCloseClickEvent;
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationHomeParser;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationSystemParser;
+import fr.insalyon.creatis.vip.application.client.view.ApplicationTileGrid;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Module;
@@ -63,14 +65,34 @@ public class ApplicationModule extends Module {
     public ApplicationModule() {
 
         reservedClasses = new ArrayList<String>();
-
-        CoreModule.systemExecutor.addParser(new ApplicationSystemParser());
-        CoreModule.homeExecutor.addParser(new ApplicationHomeParser());
         addAccountType(ApplicationConstants.ACCOUNT_VIP);
     }
 
     @Override
     public void load() {
+
+        CoreModule.addGeneralApplicationParser(new ApplicationHomeParser());
+        CoreModule.addSystemApplicationParser(new ApplicationSystemParser());
+
+        // Applications Tile Grid
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        final AsyncCallback<List<AppClass>> callback = new AsyncCallback<List<AppClass>>() {
+
+            public void onFailure(Throwable caught) {
+                SC.say("Unable to load classes:<br />" + caught.getMessage());
+            }
+
+            public void onSuccess(List<AppClass> result) {
+
+                for (AppClass appClass : result) {
+                    if (!reservedClasses.contains(appClass.getName())) {
+                        CoreModule.addApplicationsTileGrid(
+                                new ApplicationTileGrid(appClass.getName()));
+                    }
+                }
+            }
+        };
+        service.getClasses(callback);
 
         // Simulation close tab
         CenterTabSet.getInstance().addCloseClickHandler(new CloseClickHandler() {

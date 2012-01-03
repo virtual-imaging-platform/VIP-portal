@@ -34,16 +34,13 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.main;
 
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tile.TileGrid;
-import com.smartgwt.client.widgets.tile.events.RecordClickEvent;
-import com.smartgwt.client.widgets.tile.events.RecordClickHandler;
-import com.smartgwt.client.widgets.viewer.DetailViewerField;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.application.ApplicationTileRecord;
+import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid;
 
 /**
  *
@@ -51,54 +48,31 @@ import fr.insalyon.creatis.vip.core.client.view.application.ApplicationTileRecor
  */
 public class HomeTab extends Tab {
 
-    private TileGrid tileGrid;
-
+    private VLayout vLayout;
+    
     public HomeTab() {
 
         this.setTitle("Home");
         this.setID(CoreConstants.TAB_HOME);
         this.setIcon(CoreConstants.ICON_HOME);
 
-        VLayout vLayout = new VLayout();
+        vLayout = new VLayout();
         vLayout.setWidth100();
         vLayout.setHeight100();
         vLayout.setOverflow(Overflow.AUTO);
-
-        configureGrid();
-
-        vLayout.addMember(tileGrid);
-
+        
         this.setPane(vLayout);
     }
-
-    private void configureGrid() {
-
-        tileGrid = new TileGrid();
-        tileGrid.setWidth100();
-        tileGrid.setHeight100();
-        tileGrid.setTileWidth(110);
-        tileGrid.setTileHeight(100);
-
-        tileGrid.setBorder("0px");
-        tileGrid.setCanReorderTiles(true);
-        tileGrid.setShowAllRecords(true);
-        tileGrid.setAnimateTileChange(true);
-        tileGrid.setShowEdges(false);
-
-        DetailViewerField pictureField = new DetailViewerField("picture");
-        pictureField.setType("image");
-        DetailViewerField commonNameField = new DetailViewerField("commonName");
-
-        tileGrid.setFields(pictureField, commonNameField);
-
-        tileGrid.addRecordClickHandler(new RecordClickHandler() {
-
-            public void onRecordClick(RecordClickEvent event) {
-                ApplicationTileRecord record = (ApplicationTileRecord) event.getRecord();
-                CoreModule.homeExecutor.parse(record.getName());
-            }
-        });
-        tileGrid.setData(new ApplicationTileRecord[]{});
-        CoreModule.homeExecutor.loadApplications(tileGrid);
+   
+    public void addTileGrid(ApplicationsTileGrid tileGrid) {
+        
+        Label tileName = new Label(tileGrid.getTileName());
+        tileName.setAlign(Alignment.LEFT);
+        tileName.setWidth100();
+        tileName.setHeight(15);
+        tileName.setBackgroundColor("#F2F2F2");
+        
+        vLayout.addMember(tileName);
+        vLayout.addMember(tileGrid);
     }
 }

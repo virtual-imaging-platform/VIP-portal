@@ -32,41 +32,57 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.system;
+package fr.insalyon.creatis.vip.core.client.view.main;
 
-import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
+import fr.insalyon.creatis.vip.core.client.view.application.ApplicationTileRecord;
+import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.system.group.ManageGroupsTab;
-import fr.insalyon.creatis.vip.core.client.view.system.user.ManageUsersTab;
+import fr.insalyon.creatis.vip.core.client.view.user.AccountTab;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class SystemParser extends ApplicationParser {
+public class GeneralTileGrid extends ApplicationsTileGrid {
 
-    @Override
-    public void loadApplications() {
+    private List<ApplicationParser> parsers;
+    
+    public GeneralTileGrid() {
 
-        if (CoreModule.user.isSystemAdministrator()) {
-            addApplication(CoreConstants.APP_USER, CoreConstants.APP_IMG_USER);
-            addApplication(CoreConstants.APP_GROUP, CoreConstants.APP_IMG_GROUP);
-        }
+        super("General");
+        addApplication(CoreConstants.APP_ACCOUNT, CoreConstants.APP_IMG_ACCOUNT);
+        parsers = new ArrayList<ApplicationParser>();
     }
 
     @Override
-    public boolean parse(String applicationName) {
+    public void parse(String applicationName) {
 
-        if (applicationName.equals(CoreConstants.APP_USER)) {
-            Layout.getInstance().addTab(new ManageUsersTab());
-            return true;
-
-        } else if (applicationName.equals(CoreConstants.APP_GROUP)) {
-            Layout.getInstance().addTab(new ManageGroupsTab());
-            return true;
+        if (applicationName.equals(CoreConstants.APP_ACCOUNT)) {
+            Layout.getInstance().addTab(new AccountTab());
+            return;
         }
-        return false;
+        
+        for (ApplicationParser parser : parsers) {
+            if (parser.parse(applicationName)) {
+                return;
+            }
+        }
+    }
+    
+    /**
+     * Adds a parser to the general tile grid.
+     * 
+     * @param parser 
+     */
+    public void addParser(ApplicationParser parser) {
+        
+        parsers.add(parser);
+        for (ApplicationTileRecord record : parser.getApplications()) {
+            addApplication(record);
+        }
     }
 }

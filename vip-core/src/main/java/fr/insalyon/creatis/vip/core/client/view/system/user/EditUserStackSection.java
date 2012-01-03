@@ -120,8 +120,11 @@ public class EditUserStackSection extends SectionStackSection {
                     Map<String, CoreConstants.ROLE> map = new HashMap<String, CoreConstants.ROLE>();
 
                     for (String v : values) {
-                        if (v.equals(CoreConstants.GROUP_ADMIN) || v.equals(CoreConstants.GROUP_SUPPORT)) {
+                        if (v.equals(CoreConstants.GROUP_ADMIN)) {
                             map.put(v, CoreConstants.ROLE.Admin);
+                            
+                        } else if (v.equals(CoreConstants.GROUP_SUPPORT)) {
+                            map.put(v, CoreConstants.ROLE.User);
                             
                         } else {
                             String name = v.substring(0, v.indexOf(" ("));

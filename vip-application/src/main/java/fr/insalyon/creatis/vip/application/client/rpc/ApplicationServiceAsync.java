@@ -49,6 +49,8 @@ public interface ApplicationServiceAsync {
     
     public void getApplications(AsyncCallback<List<Application>> asyncCallback);
     
+    public void getApplications(String className, AsyncCallback<List<Application>> asyncCallback);
+    
     public void getApplications(List<String> reservedClasses, AsyncCallback<List<Application>> asyncCallback);
     
     public void getApplicationsByClass(String applicationClass, AsyncCallback<List<Application>> asyncCallback);
@@ -62,7 +64,7 @@ public interface ApplicationServiceAsync {
     public void removeClass(String name, AsyncCallback<Void> asyncCallback);
 
     public void getClasses(AsyncCallback<List<AppClass>> asyncCallback);
-
+    
     public void addClass(AppClass c, AsyncCallback<Void> asyncCallback);
 
     public void updateClass(AppClass c, AsyncCallback<Void> asyncCallback);

@@ -80,6 +80,22 @@ public class ApplicationBusiness {
 
     /**
      * 
+     * @param className
+     * @return
+     * @throws BusinessException 
+     */
+    public List<Application> getApplications(String className) throws BusinessException {
+        
+        try {
+            return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getApplications(className);
+            
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
+    /**
+     * 
      * @param classes
      * @return
      * @throws BusinessException 

@@ -34,7 +34,8 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.application;
 
-import com.smartgwt.client.widgets.tile.TileGrid;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -42,11 +43,11 @@ import com.smartgwt.client.widgets.tile.TileGrid;
  */
 public abstract class ApplicationParser {
 
-    private TileGrid tileGrid;
+    private List<ApplicationTileRecord> applications;
 
-    public void loadApplications(TileGrid tileGrid) {
-        
-        this.tileGrid = tileGrid;
+    public ApplicationParser() {
+
+        applications = new ArrayList<ApplicationTileRecord>();
         loadApplications();
     }
 
@@ -54,9 +55,25 @@ public abstract class ApplicationParser {
 
     public abstract boolean parse(String applicationName);
 
+    /**
+     * Adds an application.
+     * 
+     * @param applicationName
+     * @param applicationImage 
+     */
     protected void addApplication(String applicationName, String applicationImage) {
 
-        tileGrid.addData(new ApplicationTileRecord(applicationName,
+        applications.add(new ApplicationTileRecord(applicationName,
                 applicationImage));
+    }
+
+    /**
+     * Gets the list of applications.
+     * 
+     * @return 
+     */
+    public List<ApplicationTileRecord> getApplications() {
+
+        return applications;
     }
 }

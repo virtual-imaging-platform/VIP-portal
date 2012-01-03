@@ -48,14 +48,11 @@ import fr.insalyon.creatis.vip.simulationgui.client.view.SimulationGUIParser;
  */
 public class SimulationGUIModule extends Module {
 
-    public SimulationGUIModule() {
-
-        CoreModule.homeExecutor.addParser(new SimulationGUIParser());
-    }
-
     @Override
     public void load() {
 
+        CoreModule.addGeneralApplicationParser(new SimulationGUIParser());
+        
         VTKControllerAsync service = VTKController.Util.getInstance();
         AsyncCallback<Void> asyncCallback = new AsyncCallback<Void>() {
 

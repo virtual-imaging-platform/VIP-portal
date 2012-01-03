@@ -208,6 +208,37 @@ public class ApplicationData implements ApplicationDAO {
 
     /**
      * 
+     * @param className
+     * @return
+     * @throws DAOException 
+     */
+    public List<Application> getApplications(String className) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "name, lfn FROM "
+                    + "VIPApplications app, VIPApplicationClasses appc "
+                    + "WHERE appc.class = ? AND app.name = appc.application "
+                    + "ORDER BY name");
+            ps.setString(1, className);
+            
+            ResultSet rs = ps.executeQuery();
+            List<Application> applications = new ArrayList<Application>();
+            
+            while (rs.next()) {
+                applications.add(new Application(
+                        rs.getString("name"), rs.getString("lfn")));
+            }
+            return applications;
+            
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    /**
+     * 
      * @param classes
      * @return
      * @throws DAOException 

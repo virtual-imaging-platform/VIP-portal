@@ -140,6 +140,16 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             throw new ApplicationException(ex);
         }
     }
+    
+    public List<Application> getApplications(String className) throws ApplicationException {
+
+        try {
+            return applicationBusiness.getApplications(className);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
 
     public List<Application> getApplications(List<String> reservedClasses) throws ApplicationException {
 
@@ -219,7 +229,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             } else if (isGroupAdministrator()) {
                 return classBusiness.getUserClasses(getSessionUser().getEmail(), true);
             }
-            throw new ApplicationException("You have no administrator rights.");
+            return classBusiness.getUserClasses(getSessionUser().getEmail(), false);
 
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
@@ -227,7 +237,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             throw new ApplicationException(ex);
         }
     }
-
+    
     public List<String>[] getApplicationsAndUsers(List<String> reservedClasses) throws ApplicationException {
 
         try {
