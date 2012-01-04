@@ -6,7 +6,13 @@
     </head>
     <body>
         <h1>The GateLab</h1>
-        <h2>Launch a simulation</h2>
+        <h2>Preparing your simulation</h2>
+        <ul>
+            <li>A GATE simulation is composed of several files (macros files, but also data files. Your simulation folder <b>must</b> be organized as followed : all input files must be in a "data" folder, all macro files in a "mac" folder and all output files in a "output" folder. All of these three folders <b>must</b> be in the same parent folder from which GATE will be executed. Your macro files <b>must</b> therefore refer to the inputs as "data/..." to macros as "mac/..." and outputs as "output/...".
+</li><li>Currently, only some types of simulations are possible with the GateLab. It is <b>not</b> possible to submit simulation that use time decomposition (with SetTiimeSlice, SetTimeStart and so on). Examples of possible simulation types include : radiation therapy, radiography imaging, SPECT, simple PET without exponential decay source.
+        </ul>
+            
+            <h2>Launching your simulation</h2>
 
 
         <p>Click on the "GateLab" icon in your Home tab:<br/><img alt="gatelab-icon" src="gatelab.png"/><br/>A new tab opens.</p>
@@ -44,7 +50,7 @@
         </ul>
 
 
-        <h2>Monitor your simulations</h2>
+        <h2>Monitoring your simulations</h2>
         
         <h3>All your simulations</h3>
         <p>In your Home tab you have a 'Monitor GateLab' icon:<br/><br/><img alt="gatelab-monitor-icon" src="gatelab-monitor.png"/><br/> </p>
