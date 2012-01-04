@@ -103,7 +103,7 @@ public class MessageBoxLayout extends HLayout {
         mainLayout.setHeight(50);
         mainLayout.setAlign(Alignment.CENTER);
 
-        mainLayout.addMember(WidgetUtil.getLabel("<b>" + message.getFrom().getFullName()
+        mainLayout.addMember(WidgetUtil.getLabel("<b>" + message.getSender().getFullName()
                 + "</b>: " + message.getTitle(), 15, Cursor.HAND));
 
         mainLayout.addMember(WidgetUtil.getLabel("<font color=\"#666666\">"
@@ -178,7 +178,7 @@ public class MessageBoxLayout extends HLayout {
                             destroy();
                         }
                     };
-                    service.removeMessage(message.getId(), callback);
+                    service.removeMessageByReceiver(message.getId(), callback);
                 }
             }
         });

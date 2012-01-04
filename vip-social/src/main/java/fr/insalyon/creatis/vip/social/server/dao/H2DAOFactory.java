@@ -61,17 +61,22 @@ public class H2DAOFactory extends SocialDAOFactory {
             logger.info("Configuring VIP Social database.");
 
             PlatformConnection.getInstance().createTable("VIPSocialMessage",
-                    "id IDENTITY, "
+                    "id IDENTITY PRIMARY KEY, "
                     + "sender VARCHAR(255), "
-                    + "receiver VARCHAR(255), "
                     + "title VARCHAR(255), "
                     + "message CLOB, "
                     + "posted TIMESTAMP, "
-                    + "read BOOLEAN, "
-                    + "PRIMARY KEY (id), "
                     + "FOREIGN KEY (sender) REFERENCES VIPUsers(email) "
-                    + "ON DELETE CASCADE ON UPDATE RESTRICT, "
+                    + "ON DELETE CASCADE ON UPDATE RESTRICT");
+
+            PlatformConnection.getInstance().createTable("VIPSocialMessageSenderReceiver",
+                    "message_id BIGINT, "
+                    + "receiver VARCHAR(255), "
+                    + "read BOOLEAN, "
+                    + "PRIMARY KEY (message_id, receiver), "
                     + "FOREIGN KEY (receiver) REFERENCES VIPUsers(email) "
+                    + "ON DELETE CASCADE ON UPDATE RESTRICT, "
+                    + "FOREIGN KEY (message_id) REFERENCES VIPSocialMessage(id) "
                     + "ON DELETE CASCADE ON UPDATE RESTRICT");
 
         } catch (DAOException ex) {

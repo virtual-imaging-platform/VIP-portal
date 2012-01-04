@@ -42,6 +42,7 @@ import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
 import fr.insalyon.creatis.vip.social.client.bean.Message;
@@ -104,10 +105,26 @@ public class SentMessageViewerWindow extends Window {
         mainLayout.setHeight(50);
         mainLayout.setAlign(Alignment.CENTER);
 
-        mainLayout.addMember(WidgetUtil.getLabel("<strong>" + message.getTo().getFullName()
+        StringBuilder sb = new StringBuilder();
+        int count = 0;
+        int numOfReceivers = message.getReceivers().length;
+        for (User user : message.getReceivers()) {
+            if (count == SocialConstants.MESSAGE_MAX_RECEIVERS_DISPLAY) {
+                sb.append(" and ").append(numOfReceivers - count).append(" other users");
+                break;
+            } else {
+                if (sb.length() > 0) {
+                    sb.append(", ");
+                }
+                sb.append(user.getFullName());
+                count++;
+            }
+        }
+
+        mainLayout.addMember(WidgetUtil.getLabel("<strong>" + sb.toString() 
                 + "</strong>: " + message.getTitle(), 15));
 
-        mainLayout.addMember(WidgetUtil.getLabel("<font color=\"#666666\">" 
+        mainLayout.addMember(WidgetUtil.getLabel("<font color=\"#666666\">"
                 + message.getPosted() + "</font>", 15));
 
         hLayout.addMember(mainLayout);

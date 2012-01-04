@@ -45,8 +45,8 @@ import java.util.Date;
 public class Message implements IsSerializable {
 
     private long id;
-    private User from;
-    private User to;
+    private User sender;
+    private User[] receivers;
     private String title;
     private String message;
     private String posted;
@@ -56,12 +56,16 @@ public class Message implements IsSerializable {
     public Message() {
     }
 
-    public Message(long id, User from, User to, String title, String message,
+    public Message(long id, User sender, User receiver, String title, String message,
             String posted, Date postedDate, boolean read) {
 
+        this(id, sender, new User[]{receiver}, title, message, posted, postedDate, read);
+    }
+
+    public Message(long id, User sender, User[] receivers, String title, String message, String posted, Date postedDate, boolean read) {
         this.id = id;
-        this.from = from;
-        this.to = to;
+        this.sender = sender;
+        this.receivers = receivers;
         this.title = title;
         this.message = message;
         this.posted = posted;
@@ -73,8 +77,8 @@ public class Message implements IsSerializable {
         return id;
     }
 
-    public User getFrom() {
-        return from;
+    public User getSender() {
+        return sender;
     }
 
     public String getMessage() {
@@ -93,8 +97,8 @@ public class Message implements IsSerializable {
         return title;
     }
 
-    public User getTo() {
-        return to;
+    public User[] getReceivers() {
+        return receivers;
     }
 
     public Date getPostedDate() {

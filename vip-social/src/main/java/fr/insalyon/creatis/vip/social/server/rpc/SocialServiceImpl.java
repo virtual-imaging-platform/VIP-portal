@@ -72,7 +72,7 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
             throw new SocialException(ex);
         }
     }
-    
+
     public List<Message> getSentMessagesByUser(Date startDate) throws SocialException {
 
         try {
@@ -85,10 +85,10 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         }
     }
 
-    public void markMessageAsRead(long id) throws SocialException {
+    public void markMessageAsRead(long id, String receiver) throws SocialException {
 
         try {
-            messageBusiness.markAsRead(id);
+            messageBusiness.markAsRead(id, receiver);
 
         } catch (BusinessException ex) {
             throw new SocialException(ex);
@@ -100,6 +100,18 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         try {
             messageBusiness.remove(id);
 
+        } catch (BusinessException ex) {
+            throw new SocialException(ex);
+        }
+    }
+
+    public void removeMessageByReceiver(long id) throws SocialException {
+
+        try {
+            messageBusiness.removeByReceiver(id, getSessionUser().getEmail());
+
+        } catch (CoreException ex) {
+            throw new SocialException(ex);
         } catch (BusinessException ex) {
             throw new SocialException(ex);
         }
@@ -138,7 +150,7 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
 
         try {
             return messageBusiness.verifyMessages(getSessionUser().getEmail());
-            
+
         } catch (CoreException ex) {
             throw new SocialException(ex);
         } catch (BusinessException ex) {

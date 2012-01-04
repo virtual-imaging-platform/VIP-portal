@@ -44,14 +44,12 @@ import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
 import fr.insalyon.creatis.vip.social.client.SocialModule;
 import fr.insalyon.creatis.vip.social.client.bean.Message;
 import fr.insalyon.creatis.vip.social.client.rpc.SocialService;
 import fr.insalyon.creatis.vip.social.client.rpc.SocialServiceAsync;
-import fr.insalyon.creatis.vip.social.client.view.SocialTab;
 
 /**
  *
@@ -115,7 +113,7 @@ public class MessageViewerWindow extends Window {
         mainLayout.setHeight(50);
         mainLayout.setAlign(Alignment.CENTER);
 
-        mainLayout.addMember(WidgetUtil.getLabel("<strong>" + message.getFrom().getFullName()
+        mainLayout.addMember(WidgetUtil.getLabel("<strong>" + message.getSender().getFullName()
                 + "</strong>: " + message.getTitle(), 15));
 
         mainLayout.addMember(WidgetUtil.getLabel("<font color=\"#666666\">" 
@@ -153,6 +151,6 @@ public class MessageViewerWindow extends Window {
                 SocialModule.verifyMessages();
             }
         };
-        service.markMessageAsRead(message.getId(), callback);
+        service.markMessageAsRead(message.getId(), message.getReceivers()[0].getEmail(), callback);
     }
 }

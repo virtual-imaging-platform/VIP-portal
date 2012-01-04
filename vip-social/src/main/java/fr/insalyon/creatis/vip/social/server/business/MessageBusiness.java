@@ -47,15 +47,12 @@ import fr.insalyon.creatis.vip.social.server.dao.SocialDAOFactory;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.apache.log4j.Logger;
 
 /**
  *
  * @author Rafael Silva
  */
 public class MessageBusiness {
-
-    private static final Logger logger = Logger.getLogger(MessageBusiness.class);
 
     /**
      * 
@@ -98,12 +95,13 @@ public class MessageBusiness {
     /**
      * 
      * @param id
+     * @param receiver
      * @throws BusinessException 
      */
-    public void markAsRead(long id) throws BusinessException {
+    public void markAsRead(long id, String receiver) throws BusinessException {
 
         try {
-            SocialDAOFactory.getDAOFactory().getMessageDAO().markAsRead(id);
+            SocialDAOFactory.getDAOFactory().getMessageDAO().markAsRead(id, receiver);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -119,6 +117,22 @@ public class MessageBusiness {
 
         try {
             SocialDAOFactory.getDAOFactory().getMessageDAO().remove(id);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param id
+     * @param receiver
+     * @throws BusinessException 
+     */
+    public void removeByReceiver(long id, String receiver) throws BusinessException {
+
+        try {
+            SocialDAOFactory.getDAOFactory().getMessageDAO().removeByReceiver(id, receiver);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -147,8 +161,10 @@ public class MessageBusiness {
             }
 
             MessageDAO messageDAO = SocialDAOFactory.getDAOFactory().getMessageDAO();
+            long messageId = messageDAO.add(user.getEmail(), subject, message);
+
             for (String recipient : recipients) {
-                messageDAO.add(user.getEmail(), recipient, subject, message);
+                messageDAO.associateMessageToUser(recipient, messageId);
 
                 String emailContent = "<html>"
                         + "<head></head>"

@@ -44,6 +44,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -61,120 +62,180 @@ public class MessageData implements MessageDAO {
     private Connection connection;
 
     public MessageData() throws DAOException {
-        
+
         connection = PlatformConnection.getInstance().getConnection();
     }
-    
-    public void add(String email, String receiver, String title, String message) 
-            throws DAOException {
-        
+
+    public long add(String sender, String title, String message) throws DAOException {
+
         try {
             PreparedStatement ps = connection.prepareStatement("INSERT INTO "
-                    + "VIPSocialMessage(sender, receiver, title, message, posted, read) "
-                    + "VALUES(?, ?, ?, ?, ?, ?)");
-            ps.setString(1, email);
-            ps.setString(2, receiver);
-            ps.setString(3, title);
-            ps.setString(4, message);
-            ps.setTimestamp(5, new Timestamp(new Date().getTime()));
-            ps.setBoolean(6, false);
+                    + "VIPSocialMessage(sender, title, message, posted) "
+                    + "VALUES(?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, sender);
+            ps.setString(2, title);
+            ps.setString(3, message);
+            ps.setTimestamp(4, new Timestamp(new Date().getTime()));
             ps.execute();
-            
-        } catch (SQLException ex) {
-            logger.error(ex);
-            throw new DAOException(ex);
-        }
-    }
-    
-    public List<Message> getMessagesByUser(String email, int limit, Date startDate) throws DAOException {
-        
-        try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "id, sender, title, message, posted, read "
-                    + "FROM VIPSocialMessage AS sc WHERE receiver = ? "
-                    + "AND posted < ? "
-                    + "ORDER BY posted DESC LIMIT 0," + limit);
-            ps.setString(1, email);
-            ps.setTimestamp(2, new Timestamp(startDate.getTime()));
-            
-            ResultSet rs = ps.executeQuery();
-            List<Message> messages = new ArrayList<Message>();
-            SimpleDateFormat f = new SimpleDateFormat("MMMM d, yyyy HH:mm");
-            
-            while (rs.next()) {
-                User from = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(rs.getString("sender"));
-                User to = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
-                Date posted = new Date(rs.getTimestamp("posted").getTime());
-                messages.add(new Message(rs.getLong("id"), from, to, rs.getString("title"), 
-                        rs.getString("message"), f.format(posted), posted,
-                        rs.getBoolean("read")));
-            }
-            
-            return messages;
-            
-        } catch (SQLException ex) {
-            logger.error(ex);
-            throw new DAOException(ex);
-        }
-    }
-    
-    public List<Message> getSentMessagesByUser(String email, int limit, Date startDate) throws DAOException {
-        
-        try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "id, receiver, title, message, posted, read "
-                    + "FROM VIPSocialMessage AS sc WHERE sender = ? "
-                    + "AND posted < ? "
-                    + "ORDER BY posted DESC LIMIT 0," + limit);
-            ps.setString(1, email);
-            ps.setTimestamp(2, new Timestamp(startDate.getTime()));
-            
-            ResultSet rs = ps.executeQuery();
-            List<Message> messages = new ArrayList<Message>();
-            SimpleDateFormat f = new SimpleDateFormat("MMMM d, yyyy HH:mm");
-            
-            while (rs.next()) {
-                User from = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
-                User to = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(rs.getString("receiver"));
-                Date posted = new Date(rs.getTimestamp("posted").getTime());
-                messages.add(new Message(rs.getLong("id"), from, to, rs.getString("title"), 
-                        rs.getString("message"), f.format(posted), posted,
-                        rs.getBoolean("read")));
-            }
-            
-            return messages;
-            
+
+            ResultSet rs = ps.getGeneratedKeys();
+            rs.next();
+            return rs.getLong(1);
+
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
         }
     }
 
-    public void markAsRead(long id) throws DAOException {
-       
+    public void associateMessageToUser(String receiver, long messageId) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO "
+                    + "VIPSocialMessageSenderReceiver(receiver, message_id, read) "
+                    + "VALUES(?, ?, ?)");
+            ps.setString(1, receiver);
+            ps.setLong(2, messageId);
+            ps.setBoolean(3, false);
+            ps.execute();
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    public List<Message> getMessagesByUser(String email, int limit, Date startDate) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "id, sender, title, message, posted, read "
+                    + "FROM VIPSocialMessage AS sc, VIPSocialMessageSenderReceiver AS ss "
+                    + "WHERE sc.id = ss.message_id AND receiver = ? "
+                    + "AND posted < ? "
+                    + "ORDER BY posted DESC LIMIT 0," + limit);
+            ps.setString(1, email);
+            ps.setTimestamp(2, new Timestamp(startDate.getTime()));
+
+            ResultSet rs = ps.executeQuery();
+            List<Message> messages = new ArrayList<Message>();
+            SimpleDateFormat f = new SimpleDateFormat("MMMM d, yyyy HH:mm");
+
+            while (rs.next()) {
+                User from = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(rs.getString("sender"));
+                User to = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
+                Date posted = new Date(rs.getTimestamp("posted").getTime());
+                messages.add(new Message(rs.getLong("id"), from, to, rs.getString("title"),
+                        rs.getString("message"), f.format(posted), posted,
+                        rs.getBoolean("read")));
+            }
+
+            return messages;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    public List<Message> getSentMessagesByUser(String email, int limit, Date startDate) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "id, title, message, posted "
+                    + "FROM VIPSocialMessage "
+                    + "WHERE sender = ? "
+                    + "AND posted < ? "
+                    + "ORDER BY posted DESC LIMIT 0," + limit);
+            ps.setString(1, email);
+            ps.setTimestamp(2, new Timestamp(startDate.getTime()));
+
+            ResultSet rs = ps.executeQuery();
+            List<Message> messages = new ArrayList<Message>();
+            SimpleDateFormat f = new SimpleDateFormat("MMMM d, yyyy HH:mm");
+
+            while (rs.next()) {
+
+                User sender = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
+
+                PreparedStatement ps2 = connection.prepareStatement("SELECT "
+                        + "receiver FROM VIPSocialMessageSenderReceiver "
+                        + "WHERE message_id = ?");
+                ps2.setLong(1, rs.getLong("id"));
+
+                ResultSet rs2 = ps2.executeQuery();
+                List<User> receivers = new ArrayList<User>();
+
+                while (rs2.next()) {
+                    receivers.add(CoreDAOFactory.getDAOFactory().getUserDAO().getUser(rs2.getString("receiver")));
+                }
+                Date posted = new Date(rs.getTimestamp("posted").getTime());
+                messages.add(new Message(rs.getLong("id"), sender,
+                        receivers.toArray(new User[]{}), rs.getString("title"),
+                        rs.getString("message"), f.format(posted), posted,
+                        true));
+            }
+            return messages;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    public void markAsRead(long id, String receiver) throws DAOException {
+
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
-                    + "VIPSocialMessage SET read = ? WHERE id = ?");
+                    + "VIPSocialMessageSenderReceiver SET read = ? "
+                    + "WHERE message_id = ? AND receiver = ?");
             ps.setBoolean(1, true);
             ps.setLong(2, id);
-            
+            ps.setString(3, receiver);
+
             ps.executeUpdate();
-            
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    public void remove(long id) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("DELETE FROM "
+                    + "VIPSocialMessage WHERE id = ?");
+            ps.setLong(1, id);
+
+            ps.executeUpdate();
+
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
         }
     }
     
-    public void remove(long id) throws DAOException {
-        
+    public void removeByReceiver(long id, String receiver) throws DAOException {
+
         try {
             PreparedStatement ps = connection.prepareStatement("DELETE FROM "
-                    + "VIPSocialMessage WHERE id = ?");
+                    + "VIPSocialMessageSenderReceiver "
+                    + "WHERE message_id = ? AND receiver = ?");
             ps.setLong(1, id);
-            
+            ps.setString(2, receiver);
             ps.executeUpdate();
             
+            ps = connection.prepareStatement("SELECT count(message_id) AS num "
+                    + "FROM VIPSocialMessageSenderReceiver "
+                    + "WHERE message_id = ?");
+            ps.setLong(1, id);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            if (rs.getInt("num") == 0) {
+                remove(id);
+            }
+
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
@@ -182,18 +243,19 @@ public class MessageData implements MessageDAO {
     }
 
     public int verifyMessages(String email) throws DAOException {
-        
+
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "COUNT(id) AS num FROM VIPSocialMessage "
-                    + "WHERE receiver = ? AND read = ?");
+                    + "COUNT(id) AS num "
+                    + "FROM VIPSocialMessage AS sc, VIPSocialMessageSenderReceiver AS ss "
+                    + "WHERE sc.id = ss.message_id AND receiver = ? AND read = ?");
             ps.setString(1, email);
             ps.setBoolean(2, false);
-            
+
             ResultSet rs = ps.executeQuery();
-            
+
             return rs.next() ? rs.getInt("num") : 0;
-            
+
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);

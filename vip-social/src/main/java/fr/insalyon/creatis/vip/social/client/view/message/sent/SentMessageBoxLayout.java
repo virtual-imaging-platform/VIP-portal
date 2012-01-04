@@ -45,6 +45,7 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
 import fr.insalyon.creatis.vip.social.client.bean.Message;
@@ -103,8 +104,24 @@ public class SentMessageBoxLayout extends HLayout {
         mainLayout.setHeight(50);
         mainLayout.setAlign(Alignment.CENTER);
 
-        mainLayout.addMember(WidgetUtil.getLabel("<b>" + message.getTo().getFullName()
-                + "</b>: " + message.getTitle(), 15, Cursor.HAND));
+        StringBuilder sb = new StringBuilder();
+        int count = 0;
+        int numOfReceivers = message.getReceivers().length;
+        for (User user : message.getReceivers()) {
+            if (count == SocialConstants.MESSAGE_MAX_RECEIVERS_DISPLAY) {
+                sb.append(" and ").append(numOfReceivers - count).append(" other users");
+                break;
+            } else {
+                if (sb.length() > 0) {
+                    sb.append(", ");
+                }
+                sb.append(user.getFullName());
+                count++;
+            }
+        }
+
+        mainLayout.addMember(WidgetUtil.getLabel("<strong>" + sb.toString() + "</strong>: " 
+                + message.getTitle(), 15, Cursor.HAND));
 
         mainLayout.addMember(WidgetUtil.getLabel("<font color=\"#666666\">"
                 + message.getMessage().substring(0, 50) + "...</font>", 15, Cursor.HAND));
@@ -129,7 +146,7 @@ public class SentMessageBoxLayout extends HLayout {
         dateLayout.setWidth(150);
         dateLayout.setAlign(VerticalAlignment.TOP);
 
-        dateLayout.addMember(WidgetUtil.getLabel("<font color=\"#666666\">" 
+        dateLayout.addMember(WidgetUtil.getLabel("<font color=\"#666666\">"
                 + message.getPosted() + "</font>", 15));
 
         this.addMember(dateLayout);

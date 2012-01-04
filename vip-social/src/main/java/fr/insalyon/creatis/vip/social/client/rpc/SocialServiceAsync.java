@@ -50,9 +50,11 @@ public interface SocialServiceAsync {
     
     public void getSentMessagesByUser(Date startDate, AsyncCallback<List<Message>> asyncCallback);
     
-    public void markMessageAsRead(long id, AsyncCallback<Void> asyncCallback);
+    public void markMessageAsRead(long id, String receiver, AsyncCallback<Void> asyncCallback);
     
     public void removeMessage(long id, AsyncCallback<Void> asyncCallback);
+    
+    public void removeMessageByReceiver(long id, AsyncCallback<Void> asyncCallback);
     
     public void getUsers(AsyncCallback<List<User>> asyncCallback);
     

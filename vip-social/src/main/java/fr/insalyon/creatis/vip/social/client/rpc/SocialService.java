@@ -66,9 +66,11 @@ public interface SocialService extends RemoteService {
     
     public List<Message> getSentMessagesByUser(Date startDate) throws SocialException;
     
-    public void markMessageAsRead(long id) throws SocialException;
+    public void markMessageAsRead(long id, String receiver) throws SocialException;
     
     public void removeMessage(long id) throws SocialException;
+    
+    public void removeMessageByReceiver(long id) throws SocialException;
     
     public List<User> getUsers() throws SocialException;
     
