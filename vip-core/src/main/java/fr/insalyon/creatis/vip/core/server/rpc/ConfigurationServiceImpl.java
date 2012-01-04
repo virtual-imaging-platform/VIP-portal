@@ -84,7 +84,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 user = setUserSession(user);
                 configurationBusiness.updateUserLastLogin(email);
                 trace(logger, "Connected.");
-                
+
                 return user;
             }
             return null;
@@ -323,7 +323,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public List<String> getUserGroups() throws CoreException {
 
         try {
-            return configurationBusiness.getUserGroupsName(getSessionUserGroups());
+            if (getSessionUser().isSystemAdministrator()) {
+                return configurationBusiness.getGroups();
+            } else {
+                return configurationBusiness.getUserGroupsName(getSessionUserGroups());
+            }
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
