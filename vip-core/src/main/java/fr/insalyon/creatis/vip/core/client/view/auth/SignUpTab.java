@@ -144,20 +144,20 @@ public class SignUpTab extends Tab {
         commentItem.setHeight(80);
         commentItem.setWidth(300);
 
-        TextAreaItem termsField = new TextAreaItem("terms", "Terms of Use");
-        termsField.setWidth(300);
-        termsField.setHeight(100);
-        termsField.setCanFocus(false);
-        termsField.setValue(getDisclaimer());
+//        TextAreaItem termsField = new TextAreaItem("terms", "Terms of Use");
+//        termsField.setWidth(300);
+//        termsField.setHeight(100);
+//        termsField.setCanFocus(false);
+//        termsField.setValue(getDisclaimer());
 
-        acceptField = new CheckboxItem("acceptTerms", "I accept the terms of use.");
+        acceptField = new CheckboxItem("acceptTerms", "I accept the <a href=\"documentation/terms.html\">terms of use</a>.");
         acceptField.setRequired(true);
         acceptField.setWidth(150);
 
         form = FieldUtil.getForm(firstNameField, lastNameField, emailField,
                 confirmEmailField, institutionField, phoneField, passwordField,
                 confirmPasswordField, accountRadioGroupItem, commentItem,
-                termsField, acceptField);
+                acceptField);
         form.setWidth(500);
         form.setTitleWidth(150);
     }

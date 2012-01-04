@@ -151,7 +151,7 @@ public class SignInTab extends Tab {
 
         LinkItem createAccount = new LinkItem("link");
         createAccount.setShowTitle(false);
-        createAccount.setLinkTitle("New to VIP? Create an account.");
+        createAccount.setLinkTitle("Create an account.");
         createAccount.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
 
             public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
