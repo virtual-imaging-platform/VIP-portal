@@ -57,8 +57,11 @@ public class GateLabModule extends Module {
 
     @Override
     public void load() {
-        
-        CoreModule.addApplicationsTileGrid(new GateLabTileGrid());
+
+        if (CoreModule.user.isSystemAdministrator()
+                || CoreModule.user.hasGroupAccess(GateLabConstants.GROUP_GATELAB)) {
+            CoreModule.addApplicationsTileGrid(new GateLabTileGrid());
+        }
     }
 
     @Override
