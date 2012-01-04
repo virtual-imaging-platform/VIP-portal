@@ -124,7 +124,7 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
 
         try {
             trace(logger, "Sending message '" + subject + "' to '" + Arrays.asList(recipients) + "'.");
-            messageBusiness.sendMessage(getSessionUser().getEmail(), recipients,
+            messageBusiness.sendMessage(getSessionUser(), recipients,
                     subject, message);
 
         } catch (CoreException ex) {

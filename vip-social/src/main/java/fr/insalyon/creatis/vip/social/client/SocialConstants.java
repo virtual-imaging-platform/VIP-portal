@@ -57,7 +57,7 @@ public class SocialConstants {
     public static final String ICON_SOCIAL_NEW = IMG_FOLDER + "icon-social-new.png";
     public static final String ICON_USER = IMG_FOLDER + "icon-user.png";
     // Applications
-    public static final String APP_SOCIAL = "VIP Social";
+    public static final String APP_SOCIAL = "Messages";
     // Application Images
     public static final String APP_IMG_SOCIAL = IMG_FOLDER + "app-social.png";
     // Images
