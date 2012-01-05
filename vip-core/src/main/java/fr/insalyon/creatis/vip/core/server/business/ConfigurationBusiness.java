@@ -365,11 +365,13 @@ public class ConfigurationBusiness {
             User user = getUser(email);
             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
 
+            client.removeOperationsByUser(email);
+            
             client.delete(Server.getInstance().getDataManagerUsersHome() + "/"
                     + user.getFolder(), user.getEmail());
             client.delete(Server.getInstance().getDataManagerUsersHome() + "/"
                     + user.getFolder() + "_" + CoreConstants.FOLDER_TRASH, user.getEmail());
-
+            
             CoreDAOFactory.getDAOFactory().getUserDAO().remove(email);
 
         } catch (DAOException ex) {

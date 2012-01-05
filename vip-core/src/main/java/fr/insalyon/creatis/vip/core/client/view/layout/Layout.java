@@ -43,7 +43,7 @@ import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import fr.insalyon.creatis.vip.core.client.ModulesInit;
+import fr.insalyon.creatis.vip.core.client.Modules;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
@@ -119,7 +119,7 @@ public class Layout {
                     CoreConstants.COOKIES_EXPIRATION_DATE, null, "/", false);
 
             if (user.isConfirmed()) {
-                ModulesInit.getInstance().initializeModules(user);
+                Modules.getInstance().initializeModules(user);
 
             } else {
                 addTab(new ActivationTab());
@@ -152,7 +152,7 @@ public class Layout {
                 }
                 MainToolStrip.getInstance().reset();
                 authenticate(null);
-                ModulesInit.getInstance().finalizeModules();
+                Modules.getInstance().finalizeModules();
             }
         };
         service.signout(callback);

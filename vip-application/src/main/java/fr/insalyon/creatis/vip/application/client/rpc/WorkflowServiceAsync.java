@@ -103,4 +103,6 @@ public interface WorkflowServiceAsync {
     public void getProcessors(String simulationID, AsyncCallback<List<Processor>> asyncCallback);
     
     public void validateInputs(List<String> inputs, AsyncCallback<Void> asyncCallback);
+    
+    public void updateUser(String currentUser, String newUser, AsyncCallback<Void> asyncCallback);
 }

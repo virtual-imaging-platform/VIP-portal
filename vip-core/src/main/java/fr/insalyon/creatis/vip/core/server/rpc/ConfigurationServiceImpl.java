@@ -280,14 +280,18 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     /**
      * 
      * @param email
+     * @return
      * @throws CoreException 
      */
-    public void removeUser(String email) throws CoreException {
+    public User removeUser(String email) throws CoreException {
 
         try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Removing user '" + email + "'.");
+            User user = configurationBusiness.getUser(email);
             configurationBusiness.removeUser(email);
+            
+            return user;
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);

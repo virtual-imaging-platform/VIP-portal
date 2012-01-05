@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.core.client;
 
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,24 +43,32 @@ import java.util.List;
  * @author Rafael Silva
  */
 public abstract class Module {
-   
+
     private List<String> accountTypes = new ArrayList<String>();
-    
+
     public abstract void load();
-    
+
     public abstract void postLoading();
-    
+
     public abstract void terminate();
-    
+
     public abstract boolean parseAccountType(String accountType);
-    
+
     protected void addAccountType(String accountType) {
-        
+
         accountTypes.add(accountType);
     }
-    
+
     public List<String> getAccountTypes() {
-        
+
         return accountTypes;
+    }
+
+    /**
+     * This method is invoked when a user is removed from the platform. Its 
+     * default implementation does nothing. It should be overwritten by a module
+     * if some action should be performed when a user is removed.
+     */
+    public void userRemoved(User user) {
     }
 }

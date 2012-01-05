@@ -601,6 +601,22 @@ public class WorkflowBusiness {
             throw new BusinessException(ex);
         }
     }
+    
+    /**
+     * 
+     * @param currentUser
+     * @param newUser
+     * @throws BusinessException 
+     */
+    public void updateUser(String currentUser, String newUser) throws BusinessException {
+        
+        try {
+            WorkflowDAOFactory.getDAOFactory().getWorkflowDAO().updateUser(currentUser, newUser);
+            
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
 
     private boolean isShiwaPoolID(String simulationID) {
 

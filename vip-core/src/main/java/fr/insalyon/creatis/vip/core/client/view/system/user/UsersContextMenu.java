@@ -41,6 +41,8 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+import fr.insalyon.creatis.vip.core.client.Modules;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -118,15 +120,16 @@ public class UsersContextMenu extends Menu {
 
                 if (value != null && value) {
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-                    final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+                    final AsyncCallback<User> callback = new AsyncCallback<User>() {
 
                         public void onFailure(Throwable caught) {
                             modal.hide();
                             SC.warn("Unable to remove user:<br />" + caught.getMessage());
                         }
 
-                        public void onSuccess(Void result) {
+                        public void onSuccess(User result) {
                             modal.hide();
+                            Modules.getInstance().userRemoved(result);
                             ((ManageUsersTab) Layout.getInstance().
                                     getTab(CoreConstants.TAB_MANAGE_USERS)).loadUsers();
                         }

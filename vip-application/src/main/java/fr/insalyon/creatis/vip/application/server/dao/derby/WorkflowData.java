@@ -580,11 +580,11 @@ public class WorkflowData implements WorkflowDAO {
      * @throws DAOException 
      */
     public String getJobStatuses(List<Simulation> simulationList) throws DAOException {
-        
+
         int completed = 0;
         int cancelled = 0;
         int error = 0;
-        
+
         for (Simulation simulation : simulationList) {
             JobData jobData = new JobData(simulation.getID());
 
@@ -616,5 +616,26 @@ public class WorkflowData implements WorkflowDAO {
         int numberOfJobs = completed + cancelled + error;
         logger.info("Job Statuses: " + Integer.toString(numberOfJobs) + "##" + Integer.toString(completed) + "##" + Integer.toString(cancelled) + "##" + Integer.toString(error));
         return numberOfJobs + "##" + completed + "##" + cancelled + "##" + error;
+    }
+
+    /**
+     * 
+     * @param currentUser
+     * @param newUser
+     * @throws DAOException 
+     */
+    public void updateUser(String currentUser, String newUser) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE Workflows "
+                    + "SET username = ? WHERE username = ?");
+            ps.setString(1, newUser);
+            ps.setString(2, currentUser);
+            ps.executeUpdate();
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
     }
 }

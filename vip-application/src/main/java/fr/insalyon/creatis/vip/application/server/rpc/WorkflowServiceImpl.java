@@ -603,6 +603,25 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
         try {
             workflowBusiness.validateInputs(getSessionUser().getFullName(), inputs);
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param currentUser
+     * @param newUser
+     * @throws ApplicationException 
+     */
+    public void updateUser(String currentUser, String newUser) throws ApplicationException {
+
+        try {
+            trace(logger, "Updating user '" + currentUser + "' to '" + newUser + "'.");
+            workflowBusiness.updateUser(currentUser, newUser);
             
         } catch (CoreException ex) {
             throw new ApplicationException(ex);

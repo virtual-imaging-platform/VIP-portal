@@ -43,7 +43,6 @@ import fr.insalyon.creatis.vip.application.client.bean.Processor;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
-import fr.insalyon.creatis.vip.application.client.bean.Source;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -120,4 +119,6 @@ public interface WorkflowService extends RemoteService {
     public List<Processor> getProcessors(String simulationID) throws ApplicationException;
     
     public void validateInputs(List<String> inputs) throws ApplicationException;
+    
+    public void updateUser(String currentUser, String newUser) throws ApplicationException;
 }

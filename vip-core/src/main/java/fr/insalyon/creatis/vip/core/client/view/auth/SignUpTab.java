@@ -51,7 +51,7 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.ModulesInit;
+import fr.insalyon.creatis.vip.core.client.Modules;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
@@ -248,7 +248,7 @@ public class SignUpTab extends Tab {
 
             public void onSuccess(User result) {
                 modal.hide();
-                ModulesInit.getInstance().parseAccountType(accountRadioGroupItem.getValueAsString());
+                Modules.getInstance().parseAccountType(accountRadioGroupItem.getValueAsString());
                 Layout.getInstance().removeTab(CoreConstants.TAB_SIGNIN);
                 Layout.getInstance().removeTab(CoreConstants.TAB_SIGNUP);
 

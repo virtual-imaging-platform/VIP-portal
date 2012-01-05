@@ -40,7 +40,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.application.client.ApplicationModule;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.ModulesInit;
+import fr.insalyon.creatis.vip.core.client.Modules;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
@@ -64,7 +64,7 @@ public class Main implements EntryPoint {
         Layout.getInstance().getModal().show("Loading VIP " + CoreConstants.VERSION, true);
         
         // Modules
-        ModulesInit modulesInit = ModulesInit.getInstance();
+        Modules modulesInit = Modules.getInstance();
         modulesInit.add(new CoreModule());
         modulesInit.add(new SocialModule());
         modulesInit.add(new DocsModule());

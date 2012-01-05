@@ -55,6 +55,7 @@ import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.core.client.Modules;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
@@ -241,14 +242,15 @@ public class UsersStackSection extends SectionStackSection {
     private void remove(String email) {
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
 
-        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+        final AsyncCallback<User> callback = new AsyncCallback<User>() {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to remove user:<br />" + caught.getMessage());
             }
 
-            public void onSuccess(Void result) {
+            public void onSuccess(User result) {
+                Modules.getInstance().userRemoved(result);
                 modal.hide();
                 SC.say("The user was successfully removed!");
                 loadData();

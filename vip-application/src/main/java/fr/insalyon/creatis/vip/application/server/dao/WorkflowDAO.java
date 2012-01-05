@@ -171,4 +171,12 @@ public interface WorkflowDAO {
      * @throws DAOException 
      */
     public String getJobStatuses(List<Simulation> simulationList) throws DAOException;
+    
+    /**
+     * 
+     * @param currentUser
+     * @param newUser
+     * @throws DAOException 
+     */
+    public void updateUser(String currentUser, String newUser) throws DAOException;
 }

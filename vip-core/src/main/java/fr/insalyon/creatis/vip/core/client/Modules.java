@@ -43,19 +43,19 @@ import java.util.List;
  *
  * @author Rafael Silva
  */
-public class ModulesInit {
+public class Modules {
 
-    private static ModulesInit instance;
+    private static Modules instance;
     private List<Module> modules;
 
-    public static ModulesInit getInstance() {
+    public static Modules getInstance() {
         if (instance == null) {
-            instance = new ModulesInit();
+            instance = new Modules();
         }
         return instance;
     }
 
-    private ModulesInit() {
+    private Modules() {
 
         modules = new ArrayList<Module>();
     }
@@ -101,6 +101,13 @@ public class ModulesInit {
             if (module.parseAccountType(accountType)) {
                 return;
             }
+        }
+    }
+    
+    public void userRemoved(User user) {
+        
+        for (Module module : modules) {
+            module.userRemoved(user);
         }
     }
 } 
