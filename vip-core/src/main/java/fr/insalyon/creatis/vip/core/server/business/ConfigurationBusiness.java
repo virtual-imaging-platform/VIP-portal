@@ -136,8 +136,8 @@ public class ConfigurationBusiness {
         try {
             user.setCode(UUID.randomUUID().toString());
             user.setPassword(MD5.get(user.getPassword()));
-            user.setFolder(user.getFirstName().toLowerCase() + "_"
-                    + user.getLastName().toLowerCase());
+            user.setFolder(user.getFirstName().replaceAll(" ", "_").toLowerCase() + "_"
+                    + user.getLastName().replaceAll(" ", "_").toLowerCase());
             user.setLastLogin(new Date());
 
             CoreDAOFactory.getDAOFactory().getUserDAO().add(user);
@@ -366,12 +366,12 @@ public class ConfigurationBusiness {
             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
 
             client.removeOperationsByUser(email);
-            
+
             client.delete(Server.getInstance().getDataManagerUsersHome() + "/"
                     + user.getFolder(), user.getEmail());
             client.delete(Server.getInstance().getDataManagerUsersHome() + "/"
                     + user.getFolder() + "_" + CoreConstants.FOLDER_TRASH, user.getEmail());
-            
+
             CoreDAOFactory.getDAOFactory().getUserDAO().remove(email);
 
         } catch (DAOException ex) {
@@ -586,29 +586,32 @@ public class ConfigurationBusiness {
 
     /**
      * 
+     * @param oldData
      * @param user
+     * @return
      * @throws BusinessException 
      */
-    public void updateUser(User user) throws BusinessException {
+    public User updateUser(User oldData, User user) throws BusinessException {
 
         try {
 
-            String oldFolder = user.getFolder();
-            user.setFolder(user.getFirstName().toLowerCase() + "_"
-                    + user.getLastName().toLowerCase());
+            user.setFolder(user.getFirstName().replaceAll(" ", "_").toLowerCase() + "_"
+                    + user.getLastName().replaceAll(" ", "_").toLowerCase());
 
             CoreDAOFactory.getDAOFactory().getUserDAO().update(user);
 
-            if (!oldFolder.equals(user.getFolder())) {
+            if (!oldData.getFolder().equals(user.getFolder())) {
                 GRIDAClient client = CoreUtil.getGRIDAClient();
                 client.rename(
-                        Server.getInstance().getDataManagerUsersHome() + "/" + oldFolder,
+                        Server.getInstance().getDataManagerUsersHome() + "/" + oldData.getFolder(),
                         Server.getInstance().getDataManagerUsersHome() + "/" + user.getFolder());
 
                 client.rename(
-                        Server.getInstance().getDataManagerUsersHome() + "/" + oldFolder + "_" + CoreConstants.FOLDER_TRASH,
+                        Server.getInstance().getDataManagerUsersHome() + "/" + oldData.getFolder() + "_" + CoreConstants.FOLDER_TRASH,
                         Server.getInstance().getDataManagerUsersHome() + "/" + user.getFolder() + "_" + CoreConstants.FOLDER_TRASH);
             }
+
+            return user;
 
         } catch (GRIDAClientException ex) {
             logger.error(ex);

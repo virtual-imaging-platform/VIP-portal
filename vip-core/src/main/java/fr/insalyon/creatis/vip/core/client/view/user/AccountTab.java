@@ -43,6 +43,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.user.account.GroupWindow;
 import fr.insalyon.creatis.vip.core.client.view.user.account.PasswordWindow;
 import fr.insalyon.creatis.vip.core.client.view.user.account.PersonalWindow;
+import fr.insalyon.creatis.vip.core.client.view.user.account.RemoveAccountWindow;
 
 /**
  *
@@ -70,6 +71,7 @@ public class AccountTab extends Tab {
 
         leftLayout.addMember(new PersonalWindow());
         leftLayout.addMember(new PasswordWindow());
+        leftLayout.addMember(new RemoveAccountWindow());
 
         // Right column
         VLayout rightLayout = new VLayout(15);

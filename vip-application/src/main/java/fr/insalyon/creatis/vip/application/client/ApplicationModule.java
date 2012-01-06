@@ -161,11 +161,29 @@ public class ApplicationModule extends Module {
 
             public void onFailure(Throwable caught) {
                 SC.say("Unable to anonymize user data:<br />" + caught.getMessage());
-            } 
+            }
 
             public void onSuccess(Void result) {
             }
         };
         service.updateUser(user.getFullName(), "User-" + Random.nextInt(100000), callback);
+    }
+
+    @Override
+    public void userUpdated(User oldUser, User updatedUser) {
+
+        if (!oldUser.getFullName().equals(updatedUser.getFullName())) {
+            WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+            final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                public void onFailure(Throwable caught) {
+                    SC.say("Unable to anonymize user data:<br />" + caught.getMessage());
+                }
+
+                public void onSuccess(Void result) {
+                }
+            };
+            service.updateUser(oldUser.getFullName(), updatedUser.getFullName(), callback);
+        }
     }
 }

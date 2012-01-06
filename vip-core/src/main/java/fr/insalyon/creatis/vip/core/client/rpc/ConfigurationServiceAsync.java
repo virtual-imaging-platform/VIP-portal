@@ -67,6 +67,8 @@ public interface ConfigurationServiceAsync {
     public void updateGroup(String oldName, String newName, AsyncCallback<Void> asyncCallback);
 
     public void removeUser(String email, AsyncCallback<User> asyncCallback);
+    
+    public void removeUser(AsyncCallback<User> asyncCallback);
 
     public void getUserGroups(String email, AsyncCallback<Map<String, CoreConstants.ROLE>> asyncCallback);
     
@@ -78,7 +80,7 @@ public interface ConfigurationServiceAsync {
     
     public void getUserData(AsyncCallback<User> asyncCallback);
     
-    public void updateUser(User user, AsyncCallback<Void> asyncCallback);
+    public void updateUser(User user, AsyncCallback<User> asyncCallback);
     
     public void updateUserPassword(String currentPassword, String newPassword, AsyncCallback<Void> asyncCallback);
     

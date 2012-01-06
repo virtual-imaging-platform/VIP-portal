@@ -85,6 +85,8 @@ public interface ConfigurationService extends RemoteService {
     public List<String> getGroups() throws CoreException;
 
     public User removeUser(String email) throws CoreException;
+    
+    public User removeUser() throws CoreException;
 
     public Map<String, CoreConstants.ROLE> getUserGroups(String email) throws CoreException;
     
@@ -94,7 +96,7 @@ public interface ConfigurationService extends RemoteService {
     
     public User getUserData() throws CoreException;
     
-    public void updateUser(User user) throws CoreException;
+    public User updateUser(User user) throws CoreException;
     
     public void updateUserPassword(String currentPassword, String newPassword) throws CoreException;
     

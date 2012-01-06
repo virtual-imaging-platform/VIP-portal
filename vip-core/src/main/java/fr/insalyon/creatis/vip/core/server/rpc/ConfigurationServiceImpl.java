@@ -297,6 +297,25 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             throw new CoreException(ex);
         }
     }
+    
+    /**
+     * 
+     * @return
+     * @throws CoreException 
+     */
+    public User removeUser() throws CoreException {
+
+        try {
+            User user = getSessionUser();
+            trace(logger, "Removing user '" + user.getEmail() + "'.");
+            configurationBusiness.removeUser(user.getEmail());
+            
+            return user;
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
 
     /**
      * 
@@ -376,11 +395,12 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @param user
      * @throws CoreException 
      */
-    public void updateUser(User user) throws CoreException {
+    public User updateUser(User user) throws CoreException {
 
         try {
             trace(logger, "Updating user data '" + user.getEmail() + "'.");
-            configurationBusiness.updateUser(user);
+            user = configurationBusiness.updateUser(getSessionUser(), user);
+            return setUserSession(user);
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);

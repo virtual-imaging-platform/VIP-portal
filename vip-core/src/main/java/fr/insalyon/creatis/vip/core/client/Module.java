@@ -71,4 +71,13 @@ public abstract class Module {
      */
     public void userRemoved(User user) {
     }
+
+    /**
+     * This method is invoked when a user update her personal information on the 
+     * platform. Its default implementation does nothing. It should be 
+     * overwritten by a module if some action should be performed when a user 
+     * updates her information.
+     */
+    public void userUpdated(User oldUser, User updatedUser) {
+    }
 }

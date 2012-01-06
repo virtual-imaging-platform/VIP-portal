@@ -110,4 +110,11 @@ public class Modules {
             module.userRemoved(user);
         }
     }
+    
+    public void userUpdated(User oldUser, User updatedUser) {
+        
+        for (Module module : modules) {
+            module.userUpdated(oldUser, updatedUser);
+        }
+    }
 } 

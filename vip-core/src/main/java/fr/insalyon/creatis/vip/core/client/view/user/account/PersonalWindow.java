@@ -46,6 +46,8 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.Modules;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
@@ -128,14 +130,16 @@ public class PersonalWindow extends Window {
                     user.setFolder(folder);
                     
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-                    final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+                    final AsyncCallback<User> callback = new AsyncCallback<User>() {
 
                         public void onFailure(Throwable caught) {
                             modal.hide();
                             SC.warn("Unable to save changes:<br />" + caught.getMessage());
                         }
 
-                        public void onSuccess(Void result) {
+                        public void onSuccess(User result) {
+                            Modules.getInstance().userUpdated(CoreModule.user, result);
+                            CoreModule.user = result;
                             modal.hide();
                         }
                     };
