@@ -142,6 +142,7 @@ public class ActivationTab extends Tab {
         LinkItem resendLink = new LinkItem("link");
         resendLink.setShowTitle(false);
         resendLink.setLinkTitle("Lost your code? Click here and we will resend it to you.");
+        resendLink.setWidth(350);
         resendLink.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
 
             public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
