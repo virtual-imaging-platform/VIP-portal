@@ -118,26 +118,20 @@ public class UploadFilesServiceImpl extends HttpServlet {
             }
 
             if (!local) {
-                try {
-                    if (usePool) {
-                        poolClient = CoreUtil.getGRIDAPoolClient();
-                    } else {
-                        client = CoreUtil.getGRIDAClient();
-                    }
+                if (usePool) {
+                    poolClient = CoreUtil.getGRIDAPoolClient();
+                } else {
+                    client = CoreUtil.getGRIDAClient();
+                }
 
-                    if (single || !unzip) {
-                        uploadFile(uploadedFile.getAbsolutePath(), path);
+                if (single || !unzip) {
+                    uploadFile(uploadedFile.getAbsolutePath(), path);
 
-                    } else {
-                        UnZipper.unzip(uploadedFile.getAbsolutePath());
-                        String dir = uploadedFile.getParent();
-                        uploadedFile.delete();
-                        processDir(dir, path);
-                    }
-                } catch (DataManagerException ex) {
-                    logger.error(ex);
-                } catch (GRIDAClientException ex) {
-                    logger.error(ex);
+                } else {
+                    UnZipper.unzip(uploadedFile.getAbsolutePath());
+                    String dir = uploadedFile.getParent();
+                    uploadedFile.delete();
+                    processDir(dir, path);
                 }
             } else {
                 logger.info("(" + email + ") Uploaded local file '" + uploadedFile.getAbsolutePath() + "'.");
@@ -158,6 +152,15 @@ public class UploadFilesServiceImpl extends HttpServlet {
             out.println("</html>");
             out.flush();
 
+        } catch (IOException ex) {
+            logger.error(ex);
+            throw new ServletException(ex);
+        } catch (DataManagerException ex) {
+            logger.error(ex);
+            throw new ServletException(ex);
+        } catch (GRIDAClientException ex) {
+            logger.error(ex);
+            throw new ServletException(ex);
         } catch (DAOException ex) {
             throw new ServletException(ex);
         }
