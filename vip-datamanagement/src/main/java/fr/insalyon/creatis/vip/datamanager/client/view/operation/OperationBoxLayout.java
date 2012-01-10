@@ -330,7 +330,7 @@ public class OperationBoxLayout extends HLayout {
             timer.scheduleRepeating(15000);
 
         } else if (operation.getStatus() == Status.Running) {
-            timer.scheduleRepeating(5000);
+            timer.scheduleRepeating(2500);
         }
     }
 }
