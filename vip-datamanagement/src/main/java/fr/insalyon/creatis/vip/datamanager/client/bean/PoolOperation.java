@@ -60,6 +60,7 @@ public class PoolOperation implements IsSerializable {
     private Type type;
     private Status status;
     private String user;
+    private int progress;
 
     public PoolOperation() {
     }
@@ -75,7 +76,8 @@ public class PoolOperation implements IsSerializable {
      * @param user
      */
     public PoolOperation(String id, Date registration, String parsedResgistration,
-            String source, String dest, Type type, Status status, String user) {
+            String source, String dest, Type type, Status status, String user, 
+            int progress) {
 
         this.id = id;
         this.registration = registration;
@@ -85,6 +87,7 @@ public class PoolOperation implements IsSerializable {
         this.type = type;
         this.status = status;
         this.user = user;
+        this.progress = progress;
     }
 
     public String getDest() {
@@ -117,5 +120,9 @@ public class PoolOperation implements IsSerializable {
 
     public String getParsedRegistration() {
         return parsedRegistration;
+    }
+
+    public int getProgress() {
+        return progress;
     }
 }

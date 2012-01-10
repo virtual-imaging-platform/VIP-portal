@@ -42,7 +42,7 @@ import java.util.Date;
  */
 public class CoreConstants {
 
-    public static final String VERSION = "v0.6";
+    public static final String VERSION = "v0.7";
     public static final String FOLDER_TRASH = "Trash";
     // Tabs
     public static final String TAB_ACCOUNT = "account-tab";

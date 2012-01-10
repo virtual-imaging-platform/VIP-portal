@@ -203,14 +203,18 @@ public class OperationBoxLayout extends HLayout {
             mainLayout.addMember(failedLabel);
 
         } else if (operation.getStatus() == Status.Running) {
-            String text = operation.getType() == Type.Upload ? "Uploading" : "Downloading";
-            Label failedLabel = new Label(
-                    "<font color=\"#1B9406\">" + text + "</font> <font color=\"#666666\">- "
-                    + operation.getParsedRegistration() + "</font>");
-            failedLabel.setHeight(15);
-            mainLayout.addMember(failedLabel);
-//            ProgressBar progressBar = new ProgressBar(10, "#D3E0F2", 30);
-//            mainLayout.addMember(progressBar);
+            if (operation.getType() == Type.Download) {
+                ProgressBar progressBar = new ProgressBar(10, "#D3E0F2", operation.getProgress());
+                mainLayout.addMember(progressBar);
+
+            } else {
+                String text = operation.getType() == Type.Upload ? "Uploading" : "Downloading";
+                Label textLabel = new Label(
+                        "<font color=\"#1B9406\">" + text + "</font> <font color=\"#666666\">- "
+                        + operation.getParsedRegistration() + "</font>");
+                textLabel.setHeight(15);
+                mainLayout.addMember(textLabel);
+            }
         }
 
         this.addMember(mainLayout);
@@ -272,7 +276,7 @@ public class OperationBoxLayout extends HLayout {
                         || operation.getStatus() == Status.Failed) {
 
                     timer.cancel();
-                
+
                 } else {
                     setTimer();
                 }
@@ -320,7 +324,7 @@ public class OperationBoxLayout extends HLayout {
     }
 
     private void setTimer() {
-        
+
         if (operation.getStatus() == Status.Queued
                 || operation.getStatus() == Status.Rescheduled) {
             timer.scheduleRepeating(15000);

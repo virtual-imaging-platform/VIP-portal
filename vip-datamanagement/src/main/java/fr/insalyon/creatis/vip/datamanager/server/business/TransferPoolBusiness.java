@@ -174,8 +174,8 @@ public class TransferPoolBusiness {
         }
 
         return new PoolOperation(operation.getId(), operation.getRegistration(),
-                dateFormat.format(operation.getRegistration()),
-                source, dest, type, status, operation.getUser());
+                dateFormat.format(operation.getRegistration()), source, dest, 
+                type, status, operation.getUser(), operation.getProgress());
     }
 
     /**
