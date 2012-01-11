@@ -53,6 +53,7 @@ import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
@@ -226,14 +227,14 @@ public class InputsStackSection extends SectionStackSection {
                     int i = 0;
                     for (String in : inputs) {
 
-                        if (!in.contains("##")) {
+                        if (!in.contains(ApplicationConstants.SEPARATOR_INPUT)) {
                             in = in.replace("=", " = ");
                         } else {
                             in = in.replace("=", " = Start: ");
                         }
-                        in = in.replace("@@", "; ");
-                        in = in.replaceFirst("##", " - Stop: ");
-                        in = in.replaceFirst("##", " - Step: ");
+                        in = in.replace(ApplicationConstants.SEPARATOR_LIST, "; ");
+                        in = in.replaceFirst(ApplicationConstants.SEPARATOR_INPUT, " - Stop: ");
+                        in = in.replaceFirst(ApplicationConstants.SEPARATOR_INPUT, " - Step: ");
                         values.append(in);
                         values.append("<br />");
                     }

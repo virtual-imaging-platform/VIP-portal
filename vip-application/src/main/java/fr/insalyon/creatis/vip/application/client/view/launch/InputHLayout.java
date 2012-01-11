@@ -44,6 +44,7 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import java.util.ArrayList;
 import java.util.List;
@@ -113,7 +114,7 @@ public class InputHLayout extends VLayout {
     }
 
     private void configureTypeSelectItem() {
-        
+
         selectItem = new SelectItem();
         selectItem.setShowTitle(false);
         selectItem.setValueMap(InputType.valuesAsString());
@@ -133,7 +134,7 @@ public class InputHLayout extends VLayout {
     }
 
     private void setList() {
-        
+
         hLayout.addMember(listLayout);
         hLayout.removeMember(startItemForm);
         hLayout.removeMember(stopItemForm);
@@ -141,7 +142,7 @@ public class InputHLayout extends VLayout {
     }
 
     private void setRange() {
-        
+
         hLayout.removeMember(listLayout);
         hLayout.addMember(startItemForm);
         hLayout.addMember(stopItemForm);
@@ -181,7 +182,7 @@ public class InputHLayout extends VLayout {
                 if (canvas instanceof ListHLayout) {
                     ListHLayout item = (ListHLayout) canvas;
                     if (sb.length() > 0) {
-                        sb.append("@@");
+                        sb.append(ApplicationConstants.SEPARATOR_LIST);
                     }
                     sb.append(item.getValue());
                 }
@@ -189,8 +190,10 @@ public class InputHLayout extends VLayout {
             return sb.toString();
 
         } else {
-            return startItem.getValueAsString().trim() + "##"
-                    + stopItem.getValueAsString().trim() + "##"
+            return startItem.getValueAsString().trim()
+                    + ApplicationConstants.SEPARATOR_INPUT
+                    + stopItem.getValueAsString().trim()
+                    + ApplicationConstants.SEPARATOR_INPUT
                     + stepItem.getValueAsString().trim();
         }
     }
@@ -204,7 +207,7 @@ public class InputHLayout extends VLayout {
             startItem.setValue(v[1].trim());
             stopItem.setValue(v[3].trim());
             stepItem.setValue(v[5].trim());
-        
+
         } else { // List
             selectItem.setValue(InputType.List.name());
             setList();

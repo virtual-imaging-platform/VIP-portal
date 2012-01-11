@@ -44,6 +44,7 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
@@ -80,7 +81,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
 
     /**
      * Loads input values from string.
-     * 
+     *
      * @param values Input values
      */
     public void loadInput(String name, String values) {
@@ -139,14 +140,15 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
     }
 
     /**
-     * Sets a value to an input name. The value should be in the following forms:
-     * 
-     * For single list field: a string
-     * For multiple list fields: strings separated by '; '
-     * For ranges: an string like 'Start: 0 - Stop: 0 - Step: 0'
-     * 
+     * Sets a value to an input name. The value should be in the following
+     * forms:
+     *
+     * For single list field: a string For multiple list fields: strings
+     * separated by '; ' For ranges: an string like 'Start: 0 - Stop: 0 - Step:
+     * 0'
+     *
      * @param inputName
-     * @param value 
+     * @param value
      */
     public void setInputValue(String inputName, String value) {
 
@@ -222,7 +224,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
 
     /**
      * Validates the form before launch a simulation.
-     * 
+     *
      * @return Result of the validation
      */
     @Override
@@ -238,39 +240,6 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
             }
         }
         return valid;
-    }
-
-    /**
-     * Verifies input data existence.
-     */
-    private void verifyData() {
-
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-            public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Error on input data:<br />" + caught.getMessage());
-            }
-
-            public void onSuccess(Void result) {
-                modal.hide();
-                launch();
-            }
-        };
-        modal.show("Verifying input data...", true);
-        List<String> inputData = new ArrayList<String>();
-        for (String input : getParametersMap().values()) {
-            if (input.startsWith(DataManagerConstants.ROOT)) {
-                inputData.add(input);
-            }
-        }
-        if (!inputData.isEmpty()) {
-            service.validateInputs(inputData, callback);
-        } else {
-            modal.hide();
-            launch();
-        }
     }
 
     /**
@@ -296,7 +265,13 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
         List<String> inputData = new ArrayList<String>();
         for (String input : getParametersMap().values()) {
             if (input.startsWith(DataManagerConstants.ROOT)) {
-                inputData.add(input);
+                if (input.contains(ApplicationConstants.SEPARATOR_LIST)) {
+                    for (String i : input.split(ApplicationConstants.SEPARATOR_LIST)) {
+                        inputData.add(i);
+                    }
+                } else {
+                    inputData.add(input);
+                }
             }
         }
         if (!inputData.isEmpty()) {
@@ -328,7 +303,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
 
     /**
      * Gets a map of parameters.
-     * 
+     *
      * @return Map of parameters
      */
     public Map<String, String> getParametersMap() {
