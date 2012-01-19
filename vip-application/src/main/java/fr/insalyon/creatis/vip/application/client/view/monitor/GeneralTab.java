@@ -153,6 +153,7 @@ public class GeneralTab extends Tab {
         inOutTreeGrid.setShowDropIcons(false);
         inOutTreeGrid.setShowHeader(true);
         inOutTreeGrid.setFolderIcon(ApplicationConstants.ICON_TREE_SERVICE);
+        inOutTreeGrid.setCanHover(true);
         inOutTreeGrid.setClosedIconSuffix("");
         inOutTreeGrid.setLoadDataOnDemand(true);
         inOutTreeGrid.setFields(new TreeGridField("name", "In/Output Data"));
