@@ -48,7 +48,7 @@ public class UserRecord extends ListGridRecord {
 
     public UserRecord(String firstName, String lastName, String email,
             String institution, String phone, boolean confirmed, String folder,
-            Date lastLogin) {
+            Date lastLogin, String level) {
 
         setAttribute("firstName", firstName);
         setAttribute("lastName", lastName);
@@ -58,6 +58,7 @@ public class UserRecord extends ListGridRecord {
         setAttribute("confirmed", confirmed);
         setAttribute("folder", folder);
         setAttribute("lastLogin", lastLogin);
+        setAttribute("level", level);
     }
     
     public Date getDate() {

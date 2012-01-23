@@ -89,10 +89,13 @@ public class CoreConstants {
     public static final String SESSION_USER = "vip-user";
     public static final String SESSION_GROUPS = "vip-groups";
     public static final Date COOKIES_EXPIRATION_DATE = new Date(new Date().getTime() + (1000l * 60 * 60 * 24 * 7));
-    // Roles and Groups
-    public static final String GROUP_ADMIN = "Administrator";
-    public static final String GROUP_SUPPORT = "Support";
     // Account Type
     public static final String ACCOUNT_OTHER = "Other";
-    public static enum ROLE { Admin, User };
+    // Roles and Groups
+    public static final String GROUP_SUPPORT = "Support";
+
+    public static enum GROUP_ROLE {
+
+        Admin, User
+    };
 }

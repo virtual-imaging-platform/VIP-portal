@@ -52,7 +52,8 @@ public class UserMenuButton extends ToolStripMenuButton {
 
     public UserMenuButton(User user) {
         
-        this.setTitle(Canvas.imgHTML(CoreConstants.ICON_USER) + " " + user.getFullName());
+        this.setTitle(Canvas.imgHTML(CoreConstants.ICON_USER) + " " 
+                + user.getFullName() + " (" + user.getLevel().name() + ")");
         
         Menu menu = new Menu();
         menu.setWidth(150);

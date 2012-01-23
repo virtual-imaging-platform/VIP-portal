@@ -45,10 +45,10 @@ import fr.insalyon.creatis.vip.core.client.view.contact.ContactTab;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
 import fr.insalyon.creatis.vip.core.client.view.main.GeneralTileGrid;
-import fr.insalyon.creatis.vip.core.client.view.user.UserMenuButton;
 import fr.insalyon.creatis.vip.core.client.view.main.HomeTab;
 import fr.insalyon.creatis.vip.core.client.view.main.SystemParser;
 import fr.insalyon.creatis.vip.core.client.view.main.SystemTileGrid;
+import fr.insalyon.creatis.vip.core.client.view.user.UserMenuButton;
 import java.util.List;
 
 /**
@@ -73,11 +73,10 @@ public class CoreModule extends Module {
 
         // Add tile grids
         homeTab.addTileGrid(generalTileGrid);
-        if (CoreModule.user.isGroupAdmin()) {
+        if (user.isSystemAdministrator() || user.isGroupAdmin()) {
             systemTileGrid.addParser(new SystemParser());
             homeTab.addTileGrid(systemTileGrid);
         }
-
 
         // Configure User's toolstrip        
         MainToolStrip.getInstance().addMenuButton(new UserMenuButton(user));

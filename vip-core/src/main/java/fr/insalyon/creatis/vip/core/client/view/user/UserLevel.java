@@ -32,52 +32,37 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.bean;
+package fr.insalyon.creatis.vip.core.client.view.user;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class News implements IsSerializable {
+public enum UserLevel {
 
-    private String title;
-    private String message;
-    private String posted;
-    private String author;
+    Beginner(1),
+    Advanced(Integer.MAX_VALUE),
+    Administrator(Integer.MAX_VALUE);
+    //
+    private int maxRunningSimulations;
 
-    public News() {
+    private UserLevel(int maxRunningSimulations) {
+        this.maxRunningSimulations = maxRunningSimulations;
     }
 
-    public News(String title, String message) {
-        this(title, message, null, null);
+    public int getMaxRunningSimulations() {
+        return maxRunningSimulations;
     }
 
-    public News(String title, String message, String posted, String author) {
-        this.title = title;
-        this.message = message;
-        this.posted = posted;
-        this.author = author;
-    }
+    public static String[] toStringArray() {
 
-    public String getMessage() {
-        return message;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public String getPosted() {
-        return posted;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
+        List<String> list = new ArrayList<String>();
+        for (UserLevel level : values()) {
+            list.add(level.name());
+        }
+        return list.toArray(new String[]{});
     }
 }

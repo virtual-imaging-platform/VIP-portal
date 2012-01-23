@@ -35,7 +35,10 @@
 package fr.insalyon.creatis.vip.core.client.view.system.user;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.data.Criteria;
+import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.DateDisplayFormat;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SortDirection;
@@ -55,6 +58,8 @@ import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.viewer.DetailViewer;
+import com.smartgwt.client.widgets.viewer.DetailViewerField;
 import fr.insalyon.creatis.vip.core.client.Modules;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
@@ -77,6 +82,7 @@ public class UsersStackSection extends SectionStackSection {
     private ListGrid grid;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
+    private DetailViewer detailViewer;
 
     public UsersStackSection() {
 
@@ -92,7 +98,7 @@ public class UsersStackSection extends SectionStackSection {
         vLayout.setHeight100();
         vLayout.setOverflow(Overflow.AUTO);
         vLayout.addMember(grid);
-        
+
         modal = new ModalWindow(vLayout);
 
         this.addItem(vLayout);
@@ -100,16 +106,17 @@ public class UsersStackSection extends SectionStackSection {
     }
 
     private void configureGrid() {
+
         grid = new ListGrid() {
 
             @Override
             protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
-                
+
                 if (getFieldName(colNum).equals("lastLogin")) {
                     UserRecord userRecord = (UserRecord) record;
                     long oneMonthDate = (new Date()).getTime() - ((long) 30 * 24 * 3600000);
                     long threeMonthsDate = (new Date()).getTime() - ((long) 90 * 24 * 3600000);
-                    
+
                     if (userRecord.getDate().getTime() < threeMonthsDate) {
                         return "color:#D64949;";
                     } else if (userRecord.getDate().getTime() < oneMonthDate) {
@@ -118,7 +125,7 @@ public class UsersStackSection extends SectionStackSection {
                 }
                 return super.getCellCSSText(record, rowNum, colNum);
             }
-            
+
             @Override
             protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
 
@@ -130,15 +137,16 @@ public class UsersStackSection extends SectionStackSection {
                     rollOverCanvas.setWidth(50);
                     rollOverCanvas.setHeight(22);
 
-                    ImgButton loadImg = getImgButton(CoreConstants.ICON_EDIT, "Edit Groups");
+                    ImgButton loadImg = getImgButton(CoreConstants.ICON_EDIT, "Edit User");
                     loadImg.addClickHandler(new ClickHandler() {
 
                         public void onClick(ClickEvent event) {
                             edit(rollOverRecord.getAttribute("email"),
-                                    rollOverRecord.getAttributeAsBoolean("confirmed"));
+                                    rollOverRecord.getAttributeAsBoolean("confirmed"),
+                                    rollOverRecord.getAttribute("level"));
                         }
                     });
-                    ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
+                    ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete User");
                     deleteImg.addClickHandler(new ClickHandler() {
 
                         public void onClick(ClickEvent event) {
@@ -172,6 +180,28 @@ public class UsersStackSection extends SectionStackSection {
                 button.setWidth(16);
                 return button;
             }
+
+            @Override
+            protected Canvas getCellHoverComponent(Record record, Integer rowNum, Integer colNum) {
+
+                detailViewer = new DetailViewer();
+                detailViewer.setWidth(400);
+
+                DetailViewerField levelField = new DetailViewerField("level", "Level");
+                DetailViewerField emailField = new DetailViewerField("email", "Email");
+                DetailViewerField firstNameField = new DetailViewerField("firstName", "First Name");
+                DetailViewerField lastNameField = new DetailViewerField("lastName", "Last Name");
+                DetailViewerField institutionField = new DetailViewerField("institution", "Institution");
+                DetailViewerField phoneField = new DetailViewerField("phone", "Phone");
+                DetailViewerField lastLoginField = new DetailViewerField("lastLogin", "Last Login");
+                lastLoginField.setDateFormatter(DateDisplayFormat.TOUSSHORTDATETIME);
+
+                detailViewer.setFields(levelField, emailField, firstNameField,
+                        lastNameField, institutionField, phoneField, lastLoginField);
+                detailViewer.setData(new Record[]{record});
+
+                return detailViewer;
+            }
         };
         grid.setWidth100();
         grid.setHeight100();
@@ -179,6 +209,9 @@ public class UsersStackSection extends SectionStackSection {
         grid.setShowAllRecords(false);
         grid.setShowEmptyMessage(true);
         grid.setShowRowNumbers(true);
+        grid.setCanHover(true);
+        grid.setShowHover(true);
+        grid.setShowHoverComponents(true);
         grid.setEmptyMessage("<br>No data available.");
 
         ListGridField confirmedField = new ListGridField("confirmed", "Confirmed");
@@ -186,23 +219,22 @@ public class UsersStackSection extends SectionStackSection {
         ListGridField firstNameField = new ListGridField("firstName", "First Name");
         ListGridField lastNameField = new ListGridField("lastName", "Last Name");
         ListGridField emailField = new ListGridField("email", "Email");
-        ListGridField institutionField = new ListGridField("institution", "Institution");
-        ListGridField phoneField = new ListGridField("phone", "Phone");
         ListGridField lastLoginField = FieldUtil.getDateField("lastLogin", "Last Login");
 
-        grid.setFields(confirmedField, firstNameField, lastNameField, emailField, 
-                lastLoginField, institutionField, phoneField);
+        grid.setFields(confirmedField, firstNameField, lastNameField,
+                lastLoginField, emailField);
         grid.setSortField("firstName");
         grid.setSortDirection(SortDirection.ASCENDING);
-        
+
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 edit(event.getRecord().getAttribute("email"),
-                        event.getRecord().getAttributeAsBoolean("confirmed"));
+                        event.getRecord().getAttributeAsBoolean("confirmed"),
+                        event.getRecord().getAttribute("level"));
             }
         });
-        
+
         grid.addRowContextClickHandler(new RowContextClickHandler() {
 
             public void onRowContextClick(RowContextClickEvent event) {
@@ -230,7 +262,8 @@ public class UsersStackSection extends SectionStackSection {
                 for (User u : result) {
                     dataList.add(new UserRecord(u.getFirstName(), u.getLastName(),
                             u.getEmail(), u.getInstitution(), u.getPhone(),
-                            u.isConfirmed(), u.getFolder(), u.getLastLogin()));
+                            u.isConfirmed(), u.getFolder(), u.getLastLogin(),
+                            u.getLevel().name()));
                 }
                 grid.setData(dataList.toArray(new UserRecord[]{}));
             }
@@ -260,9 +293,10 @@ public class UsersStackSection extends SectionStackSection {
         service.removeUser(email, callback);
     }
 
-    private void edit(String email, boolean confirmed) {
+    private void edit(String email, boolean confirmed, String level) {
+
         ManageUsersTab usersTab = (ManageUsersTab) Layout.getInstance().
                 getTab(CoreConstants.TAB_MANAGE_USERS);
-        usersTab.setUser(email, confirmed);
+        usersTab.setUser(email, confirmed, level);
     }
 }

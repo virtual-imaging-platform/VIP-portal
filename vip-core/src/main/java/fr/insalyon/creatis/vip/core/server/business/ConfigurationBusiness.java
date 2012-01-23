@@ -40,18 +40,15 @@ import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.server.business.proxy.ProxyClient;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -64,8 +61,8 @@ public class ConfigurationBusiness {
     private final static Logger logger = Logger.getLogger(ConfigurationBusiness.class);
 
     /**
-     * 
-     * @throws BusinessException 
+     *
+     * @throws BusinessException
      */
     public void configure() throws BusinessException {
 
@@ -83,11 +80,11 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param session
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public boolean validateSession(String email, String session) throws BusinessException {
 
@@ -110,10 +107,10 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
+     *
      * @param email
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public User getUser(String email) throws BusinessException {
 
@@ -126,10 +123,10 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
+     *
      * @param user
      * @param comments
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void signup(User user, String comments) throws BusinessException {
 
@@ -139,6 +136,7 @@ public class ConfigurationBusiness {
             user.setFolder(user.getFirstName().replaceAll(" ", "_").toLowerCase() + "_"
                     + user.getLastName().replaceAll(" ", "_").toLowerCase());
             user.setLastLogin(new Date());
+            user.setLevel(UserLevel.Beginner);
 
             CoreDAOFactory.getDAOFactory().getUserDAO().add(user);
 
@@ -178,7 +176,7 @@ public class ConfigurationBusiness {
                     + "</html>";
 
             List<String> emails = new ArrayList<String>();
-            for (User admin : CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroup(CoreConstants.GROUP_ADMIN)) {
+            for (User admin : CoreDAOFactory.getDAOFactory().getUserDAO().getAdministrators()) {
                 emails.add(admin.getEmail());
             }
 
@@ -197,11 +195,11 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param password
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public User signin(String email, String password) throws BusinessException {
 
@@ -232,9 +230,9 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
+     *
      * @param email
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void signout(String email) throws BusinessException {
 
@@ -248,11 +246,11 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param code
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public User activate(String email, String code) throws BusinessException {
 
@@ -285,9 +283,9 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
+     *
      * @param email
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void activateUser(String email) throws BusinessException {
 
@@ -301,9 +299,9 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
+     *
      * @param email
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void sendActivationCode(String email) throws BusinessException {
 
@@ -332,32 +330,9 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
+     *
      * @param email
-     * @return
-     * @throws BusinessException 
-     */
-    public boolean isSystemAdministrator(String email) throws BusinessException {
-
-        try {
-            Map<String, CoreConstants.ROLE> groups = CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUserGroups(email);
-
-            for (String group : groups.keySet()) {
-                if (group.equals(CoreConstants.GROUP_ADMIN)) {
-                    return true;
-                }
-            }
-            return false;
-
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    /**
-     * 
-     * @param email
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void removeUser(String email) throws BusinessException {
 
@@ -383,9 +358,8 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
-     * @return
-     * @throws BusinessException 
+     *
+     * @return @throws BusinessException
      */
     public List<User> getUsers() throws BusinessException {
 
@@ -398,9 +372,8 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
-     * @return
-     * @throws BusinessException 
+     *
+     * @return @throws BusinessException
      */
     public List<String> getUserNames(String email, boolean validGroup)
             throws BusinessException {
@@ -408,16 +381,7 @@ public class ConfigurationBusiness {
         try {
             if (validGroup) {
 
-                List<String> groups = new ArrayList<String>();
-                Map<String, ROLE> userGroups = CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUserGroups(email);
-
-                for (String groupName : userGroups.keySet()) {
-                    if (!groupName.equals(CoreConstants.GROUP_ADMIN)) {
-                        if (userGroups.get(groupName) == ROLE.Admin) {
-                            groups.add(groupName);
-                        }
-                    }
-                }
+                List<String> groups = CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUserAdminGroups(email);
 
                 if (groups.isEmpty()) {
                     List<String> userNames = new ArrayList<String>();
@@ -442,7 +406,7 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
+     *
      * @param groupName
      * @return
      * @throws BusinessException
@@ -465,7 +429,7 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
+     *
      * @param user
      * @param groupName
      * @throws BusinessException
@@ -487,11 +451,11 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
+     *
      * @param oldName
      * @param newName
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void updateGroup(String oldName, String newName) throws BusinessException {
 
@@ -511,9 +475,8 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
-     * @return
-     * @throws BusinessException 
+     *
+     * @return @throws BusinessException
      */
     public List<String> getGroups() throws BusinessException {
 
@@ -526,12 +489,12 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
+     *
      * @param email
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
-    public Map<String, CoreConstants.ROLE> getUserGroups(String email) throws BusinessException {
+    public Map<String, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws BusinessException {
 
         try {
             return CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUserGroups(email);
@@ -542,23 +505,23 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
+     *
      * @param groups
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
-    public List<String> getUserGroupsName(Map<String, CoreConstants.ROLE> groups) throws BusinessException {
+    public List<String> getUserGroupsName(Map<String, CoreConstants.GROUP_ROLE> groups) throws BusinessException {
 
         return new ArrayList<String>(groups.keySet());
     }
 
     /**
-     * 
+     *
      * @param email
      * @param groups
-     * @throws BusinessException 
+     * @throws BusinessException
      */
-    public void setUserGroups(String email, Map<String, CoreConstants.ROLE> groups)
+    public void setUserGroups(String email, Map<String, CoreConstants.GROUP_ROLE> groups)
             throws BusinessException {
 
         try {
@@ -570,9 +533,9 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
+     *
      * @param email
-     * @return 
+     * @return
      */
     public User getUserData(String email) throws BusinessException {
 
@@ -585,11 +548,11 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
+     *
      * @param oldData
      * @param user
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public User updateUser(User oldData, User user) throws BusinessException {
 
@@ -622,11 +585,11 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param currentPassword
      * @param newPassword
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void updateUserPassword(String email, String currentPassword,
             String newPassword) throws BusinessException {
@@ -649,12 +612,12 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
+     *
      * @param user
      * @param category
      * @param subject
      * @param comment
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void sendContactMail(User user, String category, String subject,
             String comment) throws BusinessException {
@@ -689,9 +652,9 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
+     *
      * @param email
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void updateUserLastLogin(String email) throws BusinessException {
 
@@ -704,15 +667,31 @@ public class ConfigurationBusiness {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param groupName
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void addUserToGroup(String email, String groupName) throws BusinessException {
 
         try {
-            CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().add(email, groupName, ROLE.User);
+            CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().add(email, groupName, GROUP_ROLE.User);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param email
+     * @param level
+     * @throws BusinessException
+     */
+    public void updateUserLevel(String email, UserLevel level) throws BusinessException {
+
+        try {
+            CoreDAOFactory.getDAOFactory().getUserDAO().updateLevel(email, level);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);

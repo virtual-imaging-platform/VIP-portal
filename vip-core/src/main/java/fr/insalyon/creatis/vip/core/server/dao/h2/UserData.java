@@ -35,13 +35,10 @@
 package fr.insalyon.creatis.vip.core.server.dao.h2;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -62,7 +59,7 @@ public class UserData implements UserDAO {
 
     /**
      * Adds a user
-     * 
+     *
      * @param user
      * @param code
      * @return
@@ -73,8 +70,8 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement(
                     "INSERT INTO VIPUsers("
                     + "email, pass, first_name, last_name, institution, phone, "
-                    + "code, confirmed, folder, last_login) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    + "code, confirmed, folder, last_login, level) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getPassword());
@@ -86,6 +83,7 @@ public class UserData implements UserDAO {
             ps.setBoolean(8, user.isConfirmed());
             ps.setString(9, user.getFolder());
             ps.setTimestamp(10, new Timestamp(user.getLastLogin().getTime()));
+            ps.setString(11, user.getLevel().name());
             ps.execute();
 
         } catch (SQLException ex) {
@@ -100,11 +98,11 @@ public class UserData implements UserDAO {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param password
      * @return
-     * @throws DAOException 
+     * @throws DAOException
      */
     public boolean authenticate(String email, String password) throws DAOException {
 
@@ -130,11 +128,11 @@ public class UserData implements UserDAO {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param code
      * @return
-     * @throws DAOException 
+     * @throws DAOException
      */
     public boolean activate(String email, String code) throws DAOException {
 
@@ -168,17 +166,17 @@ public class UserData implements UserDAO {
     }
 
     /**
-     * 
+     *
      * @param email
      * @return
-     * @throws DAOException 
+     * @throws DAOException
      */
     public User getUser(String email) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
-                    + "code, confirmed, folder, session, last_login "
+                    + "code, confirmed, folder, session, last_login, level "
                     + "FROM VIPUsers "
                     + "WHERE email=?");
 
@@ -191,8 +189,9 @@ public class UserData implements UserDAO {
                         rs.getString("email"), rs.getString("institution"),
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"),
-                        rs.getString("session"), 
-                        new Date(rs.getTimestamp("last_login").getTime()));
+                        rs.getString("session"),
+                        new Date(rs.getTimestamp("last_login").getTime()),
+                        UserLevel.valueOf(rs.getString("level")));
             }
 
             logger.error("There is no user registered with the e-mail: " + email);
@@ -205,16 +204,15 @@ public class UserData implements UserDAO {
     }
 
     /**
-     * 
-     * @return
-     * @throws DAOException 
+     *
+     * @return @throws DAOException
      */
     public List<User> getUsers() throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
-                    + "code, confirmed, folder, last_login "
+                    + "code, confirmed, folder, last_login, level "
                     + "FROM VIPUsers ORDER BY first_name, last_name");
 
             ResultSet rs = ps.executeQuery();
@@ -226,7 +224,8 @@ public class UserData implements UserDAO {
                         rs.getString("email"), rs.getString("institution"),
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"), "",
-                        new Date(rs.getTimestamp("last_login").getTime())));
+                        new Date(rs.getTimestamp("last_login").getTime()),
+                        UserLevel.valueOf(rs.getString("level"))));
             }
             return users;
 
@@ -237,9 +236,9 @@ public class UserData implements UserDAO {
     }
 
     /**
-     * 
+     *
      * @param email
-     * @throws DAOException 
+     * @throws DAOException
      */
     public void remove(String email) throws DAOException {
         try {
@@ -256,9 +255,9 @@ public class UserData implements UserDAO {
     }
 
     /**
-     * 
+     *
      * @param user
-     * @throws DAOException 
+     * @throws DAOException
      */
     public void update(User user) throws DAOException {
 
@@ -285,11 +284,11 @@ public class UserData implements UserDAO {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param currentPassword
      * @param newPassword
-     * @throws DAOException 
+     * @throws DAOException
      */
     public void updatePassword(String email, String currentPassword,
             String newPassword) throws DAOException {
@@ -315,10 +314,10 @@ public class UserData implements UserDAO {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param session
-     * @throws DAOException 
+     * @throws DAOException
      */
     public void updateSession(String email, String session) throws DAOException {
 
@@ -338,11 +337,11 @@ public class UserData implements UserDAO {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param session
      * @return
-     * @throws DAOException 
+     * @throws DAOException
      */
     public boolean verifySession(String email, String session) throws DAOException {
 
@@ -366,12 +365,12 @@ public class UserData implements UserDAO {
             throw new DAOException(ex);
         }
     }
-    
+
     /**
-     * 
+     *
      * @param email
      * @param lastLogin
-     * @throws DAOException 
+     * @throws DAOException
      */
     public void updateLastLogin(String email, Date lastLogin) throws DAOException {
 
@@ -391,17 +390,17 @@ public class UserData implements UserDAO {
     }
 
     /**
-     * 
+     *
      * @param session
      * @return
-     * @throws DAOException 
+     * @throws DAOException
      */
     public User getUserBySession(String session) throws DAOException {
-        
+
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
-                    + "code, confirmed, folder, session, last_login "
+                    + "code, confirmed, folder, session, last_login, level "
                     + "FROM VIPUsers "
                     + "WHERE session=?");
 
@@ -414,13 +413,71 @@ public class UserData implements UserDAO {
                         rs.getString("email"), rs.getString("institution"),
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"),
-                        rs.getString("session"), 
-                        new Date(rs.getTimestamp("last_login").getTime()));
+                        rs.getString("session"),
+                        new Date(rs.getTimestamp("last_login").getTime()),
+                        UserLevel.valueOf(rs.getString("level")));
             }
 
             logger.error("There is no user registered with the session: " + session);
             throw new DAOException("There is no user registered with the session: " + session);
 
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @return
+     * @throws DAOException 
+     */
+    public List<User> getAdministrators() throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "email, first_name, last_name, institution, phone, "
+                    + "code, confirmed, folder, last_login, level "
+                    + "FROM VIPUsers ORDER BY first_name, last_name "
+                    + "WHERE level = ?");
+            ps.setString(1, UserLevel.Administrator.name());
+
+            ResultSet rs = ps.executeQuery();
+            List<User> users = new ArrayList<User>();
+
+            while (rs.next()) {
+                users.add(new User(
+                        rs.getString("first_name"), rs.getString("last_name"),
+                        rs.getString("email"), rs.getString("institution"),
+                        "", rs.getString("phone"), rs.getBoolean("confirmed"),
+                        rs.getString("code"), rs.getString("folder"), "",
+                        new Date(rs.getTimestamp("last_login").getTime()),
+                        UserLevel.valueOf(rs.getString("level"))));
+            }
+            return users;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param email
+     * @param level
+     * @throws DAOException 
+     */
+    public void updateLevel(String email, UserLevel level) throws DAOException {
+        
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "VIPUsers SET level = ? WHERE email = ?");
+            ps.setString(1, level.name());
+            ps.setString(2, email);
+            
+            ps.executeUpdate();
+            
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);

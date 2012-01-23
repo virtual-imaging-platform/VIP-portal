@@ -82,7 +82,7 @@ public class ManageUsersTab extends Tab {
         usersStackSection.loadData();
     }
 
-    public void setUser(String email, boolean confirmed) {
-        editStackSection.setUser(email, confirmed);
+    public void setUser(String email, boolean confirmed, String level) {
+        editStackSection.setUser(email, confirmed, level);
     }
 }

@@ -35,7 +35,7 @@
 package fr.insalyon.creatis.vip.core.client.view.user.account;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 
 /**
  *
@@ -46,7 +46,7 @@ public class GroupRecord extends ListGridRecord {
     public GroupRecord() {
     }
 
-    public GroupRecord(String groupName, ROLE role) {
+    public GroupRecord(String groupName, GROUP_ROLE role) {
 
         setAttribute("groupName", groupName);
         setAttribute("role", role);

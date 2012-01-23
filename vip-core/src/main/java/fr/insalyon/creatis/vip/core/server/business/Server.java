@@ -83,7 +83,6 @@ public class Server {
     private int workflowsPort = 1527;
     // Moteur
     private String moteurServer = "https://localhost:443/cgi-bin/moteurServer/moteur_server";
-    private int moteurMaxWorkflows = 5;
     private String truststoreFile = "/usr/local/apache-tomcat-6.0.29/conf/truststore.jks";
     private String truststorePass = "";
     // Apache
@@ -139,7 +138,6 @@ public class Server {
             dataManagerGroupsHome = config.getString("datamanager.groups.home", dataManagerGroupsHome);
 
             moteurServer = config.getString("moteur.host", moteurServer);
-            moteurMaxWorkflows = config.getInt("moteur.max.workflows", moteurMaxWorkflows);
             truststoreFile = config.getString("truststore.file", truststoreFile);
             truststorePass = config.getString("truststore.password", truststorePass);
 
@@ -178,7 +176,6 @@ public class Server {
             config.setProperty("datamanager.users.home", dataManagerUsersHome);
             config.setProperty("datamanager.groups.home", dataManagerGroupsHome);
             config.setProperty("moteur.host", moteurServer);
-            config.setProperty("moteur.max.workflows", moteurMaxWorkflows);
             config.setProperty("truststore.file", truststoreFile);
             config.setProperty("truststore.password", truststorePass);
             config.setProperty("workflows.directory", workflowsPath);
@@ -343,9 +340,5 @@ public class Server {
 
     public String getAdminPhone() {
         return adminPhone;
-    }
-
-    public int getMoteurMaxWorkflows() {
-        return moteurMaxWorkflows;
     }
 }

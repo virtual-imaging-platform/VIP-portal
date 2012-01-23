@@ -35,7 +35,8 @@
 package fr.insalyon.creatis.vip.core.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import java.util.Date;
 import java.util.Map;
 
@@ -56,27 +57,27 @@ public class User implements IsSerializable {
     private String folder;
     private String session;
     private Date lastLogin;
-    private boolean systemAdministrator;
-    private Map<String, ROLE> groups;
+    private UserLevel level;
+    private Map<String, GROUP_ROLE> groups;
 
     public User() {
     }
 
     public User(String firstName, String lastName, String email, String institution,
-            String phone) {
+            String phone, UserLevel level) {
 
-        this(firstName, lastName, email, institution, "", phone, false, "", "", "", null);
+        this(firstName, lastName, email, institution, "", phone, false, "", "", "", null, level);
     }
 
     public User(String firstName, String lastName, String email, String institution,
             String password, String phone) {
 
-        this(firstName, lastName, email, institution, password, phone, false, "", "", "", null);
+        this(firstName, lastName, email, institution, password, phone, false, "", "", "", null, null);
     }
 
     public User(String firstName, String lastName, String email, String institution,
             String password, String phone, boolean confirmed, String code,
-            String folder, String session, Date lastLogin) {
+            String folder, String session, Date lastLogin, UserLevel level) {
 
         this.firstName = firstName;
         this.lastName = lastName;
@@ -89,6 +90,7 @@ public class User implements IsSerializable {
         this.folder = folder;
         this.session = session;
         this.lastLogin = lastLogin;
+        this.level = level;
     }
 
     public boolean isConfirmed() {
@@ -143,12 +145,8 @@ public class User implements IsSerializable {
         return firstName + " " + lastName;
     }
 
-    public void setSystemAdministrator(boolean systemAdministrator) {
-        this.systemAdministrator = systemAdministrator;
-    }
-
     public boolean isSystemAdministrator() {
-        return systemAdministrator;
+        return level == UserLevel.Administrator;
     }
 
     public String getSession() {
@@ -163,7 +161,15 @@ public class User implements IsSerializable {
         this.lastLogin = lastLogin;
     }
 
-    public void setGroups(Map<String, ROLE> groups) {
+    public UserLevel getLevel() {
+        return level;
+    }
+
+    public void setLevel(UserLevel level) {
+        this.level = level;
+    }
+
+    public void setGroups(Map<String, GROUP_ROLE> groups) {
         this.groups = groups;
     }
 
@@ -174,7 +180,7 @@ public class User implements IsSerializable {
     public boolean isGroupAdmin() {
 
         for (String groupName : groups.keySet()) {
-            if (groups.get(groupName) == ROLE.Admin) {
+            if (groups.get(groupName) == GROUP_ROLE.Admin) {
                 return true;
             }
         }
@@ -183,7 +189,7 @@ public class User implements IsSerializable {
 
     public boolean isGroupAdmin(String groupName) {
 
-        if (hasGroupAccess(groupName) && groups.get(groupName) == ROLE.Admin) {
+        if (hasGroupAccess(groupName) && groups.get(groupName) == GROUP_ROLE.Admin) {
             return true;
         }
         return false;

@@ -37,7 +37,7 @@ package fr.insalyon.creatis.vip.core.server.rpc;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
@@ -98,9 +98,9 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
      * @return
      * @throws CoreException 
      */
-    protected Map<String, ROLE> getSessionUserGroups() throws CoreException {
+    protected Map<String, GROUP_ROLE> getSessionUserGroups() throws CoreException {
 
-        Map<String, ROLE> groups = (Map<String, ROLE>) getSession().getAttribute(CoreConstants.SESSION_GROUPS);
+        Map<String, GROUP_ROLE> groups = (Map<String, GROUP_ROLE>) getSession().getAttribute(CoreConstants.SESSION_GROUPS);
         if (groups != null) {
             return groups;
         }

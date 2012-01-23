@@ -37,8 +37,9 @@ package fr.insalyon.creatis.vip.core.server.rpc;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
@@ -79,8 +80,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             if (configurationBusiness.validateSession(email, session)) {
 
                 User user = configurationBusiness.getUser(email);
-                user.setSystemAdministrator(configurationBusiness.isSystemAdministrator(user.getEmail()));
-
                 user = setUserSession(user);
                 configurationBusiness.updateUserLastLogin(email);
                 trace(logger, "Connected.");
@@ -125,8 +124,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             logger.info("Authenticating '" + email + "'.");
             User user = configurationBusiness.signin(email, password);
-            user.setSystemAdministrator(configurationBusiness.isSystemAdministrator(user.getEmail()));
-
             user = setUserSession(user);
             configurationBusiness.updateUserLastLogin(email);
             trace(logger, "Connected.");
@@ -323,7 +320,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @return
      * @throws CoreException 
      */
-    public Map<String, CoreConstants.ROLE> getUserGroups(String email) throws CoreException {
+    public Map<String, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws CoreException {
 
         try {
             if (email != null) {
@@ -360,14 +357,17 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     /**
      * 
      * @param email
+     * @param level
      * @param groups
      * @throws CoreException 
      */
-    public void setUserGroups(String email, Map<String, CoreConstants.ROLE> groups) throws CoreException {
+    public void updateUser(String email, UserLevel level, 
+            Map<String, CoreConstants.GROUP_ROLE> groups) throws CoreException {
 
         try {
             authenticateSystemAdministrator(logger);
-            trace(logger, "Defining groups to '" + email + "'.");
+            trace(logger, "Updating user '" + email + "'.");
+            configurationBusiness.updateUserLevel(email, level);
             configurationBusiness.setUserGroups(email, groups);
 
         } catch (BusinessException ex) {
@@ -452,7 +452,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      */
     private User setUserSession(User user) throws BusinessException {
 
-        Map<String, ROLE> groups = configurationBusiness.getUserGroups(user.getEmail());
+        Map<String, GROUP_ROLE> groups = configurationBusiness.getUserGroups(user.getEmail());
         user.setGroups(groups);
 
         getSession().setAttribute(CoreConstants.SESSION_USER, user);

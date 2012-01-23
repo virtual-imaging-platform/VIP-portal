@@ -185,7 +185,7 @@ public class GroupsStackSection extends SectionStackSection {
      */
     private void remove(final String name) {
 
-        if (name.equals(CoreConstants.GROUP_ADMIN) || name.equals(CoreConstants.GROUP_SUPPORT)) {
+        if (name.equals(CoreConstants.GROUP_SUPPORT)) {
             SC.warn("You can not remove the " + name + " group.");
             return;
         }
@@ -219,7 +219,7 @@ public class GroupsStackSection extends SectionStackSection {
      */
     private void edit(String name) {
 
-        if (name.equals(CoreConstants.GROUP_ADMIN) || name.equals(CoreConstants.GROUP_SUPPORT)) {
+        if (name.equals(CoreConstants.GROUP_SUPPORT)) {
             SC.warn("You can not edit the " + name + " group.");
             return;
         }

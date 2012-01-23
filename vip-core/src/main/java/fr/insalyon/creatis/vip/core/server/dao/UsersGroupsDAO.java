@@ -45,11 +45,13 @@ import java.util.Map;
  */
 public interface UsersGroupsDAO {
 
-    public void add(String email, String groupname, CoreConstants.ROLE role) throws DAOException;
+    public void add(String email, String groupname, CoreConstants.GROUP_ROLE role) throws DAOException;
 
-    public Map<String, CoreConstants.ROLE> getUserGroups(String email) throws DAOException;
+    public Map<String, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws DAOException;
     
-    public void setUserGroups(String email, Map<String, CoreConstants.ROLE> groups) throws DAOException;
+    public List<String> getUserAdminGroups(String email) throws DAOException;
+    
+    public void setUserGroups(String email, Map<String, CoreConstants.GROUP_ROLE> groups) throws DAOException;
     
     public List<String> getUsersFromGroups(List<String> groups) throws DAOException;
     

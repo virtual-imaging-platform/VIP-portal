@@ -36,12 +36,14 @@ package fr.insalyon.creatis.vip.core.server.dao.h2;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 import java.util.UUID;
 import org.apache.log4j.Logger;
 
@@ -84,6 +86,7 @@ public class PlatformConnection {
                     + "folder VARCHAR(100), "
                     + "session VARCHAR(255), "
                     + "last_login TIMESTAMP, "
+                    + "level VARCHAR(50), "
                     + "PRIMARY KEY(email)")) {
 
                 Server server = Server.getInstance();
@@ -98,20 +101,19 @@ public class PlatformConnection {
                             server.getAdminInstitution(),
                             server.getAdminPassword(),
                             server.getAdminPhone(), true,
-                            UUID.randomUUID().toString(), folder, "", null));
+                            UUID.randomUUID().toString(), folder, "",
+                            new Date(), UserLevel.Administrator));
 
                 } catch (DAOException ex) {
                     logger.error(ex);
                 }
             }
-            
+
             if (createTable("VIPGroups",
                     "groupname VARCHAR(50), "
                     + "PRIMARY KEY(groupname)")) {
 
                 try {
-                    CoreDAOFactory.getDAOFactory().getGroupDAO().add(
-                            CoreConstants.GROUP_ADMIN);
                     CoreDAOFactory.getDAOFactory().getGroupDAO().add(
                             CoreConstants.GROUP_SUPPORT);
                 } catch (DAOException ex) {
@@ -128,14 +130,6 @@ public class PlatformConnection {
                     + "ON DELETE CASCADE ON UPDATE RESTRICT, "
                     + "FOREIGN KEY (groupname) REFERENCES VIPGroups(groupname) "
                     + "ON DELETE CASCADE ON UPDATE RESTRICT")) {
-
-                try {
-                    CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().add(
-                            Server.getInstance().getAdminEmail(),
-                            CoreConstants.GROUP_ADMIN, CoreConstants.ROLE.Admin);
-                } catch (DAOException ex) {
-                    logger.error(ex);
-                }
             }
 
             firstExecution = false;
@@ -218,7 +212,7 @@ public class PlatformConnection {
 
     /**
      * Creates a table in the platform database.
-     * 
+     *
      * @param name Table name
      * @param columnsDefinition SQL syntax to define columns
      * @return

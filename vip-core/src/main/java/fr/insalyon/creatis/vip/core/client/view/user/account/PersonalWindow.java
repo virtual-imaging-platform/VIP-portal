@@ -53,6 +53,7 @@ import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 
 /**
@@ -63,6 +64,7 @@ public class PersonalWindow extends Window {
 
     private ModalWindow modal;
     private DynamicForm form;
+    private TextItem levelField;
     private TextItem firstNameField;
     private TextItem lastNameField;
     private TextItem emailField;
@@ -75,7 +77,7 @@ public class PersonalWindow extends Window {
 
         this.setTitle(Canvas.imgHTML(CoreConstants.ICON_PERSONAL) + " Account Settings");
         this.setWidth100();
-        this.setHeight(230);
+        this.setHeight(250);
         this.setShowCloseButton(false);
 
         VLayout vLayout = new VLayout(15);
@@ -100,6 +102,8 @@ public class PersonalWindow extends Window {
 
     private void configureForm() {
 
+        levelField = FieldUtil.getTextItem(150, true, "Level", null);
+        levelField.setDisabled(true);
         emailField = FieldUtil.getTextItem(300, true, "Your Email", null);
         emailField.setDisabled(true);
         firstNameField = FieldUtil.getTextItem(300, true, "First Name", null);
@@ -107,9 +111,9 @@ public class PersonalWindow extends Window {
         institutionField = FieldUtil.getTextItem(300, true, "Institution", null);
         phoneField = FieldUtil.getTextItem(150, true, "Phone", "[0-9\\(\\)\\-+. ]");
 
-        form = FieldUtil.getForm(emailField, firstNameField, lastNameField,
-                institutionField, phoneField);
-        
+        form = FieldUtil.getForm(levelField, emailField, firstNameField,
+                lastNameField, institutionField, phoneField);
+
         form.setWidth(400);
     }
 
@@ -122,13 +126,14 @@ public class PersonalWindow extends Window {
 
                 if (form.validate()) {
                     User user = new User(
-                            firstNameField.getValueAsString().trim(), 
-                            lastNameField.getValueAsString().trim(), 
-                            emailField.getValueAsString().trim(), 
-                            institutionField.getValueAsString().trim(), 
-                            phoneField.getValueAsString().trim());
+                            firstNameField.getValueAsString().trim(),
+                            lastNameField.getValueAsString().trim(),
+                            emailField.getValueAsString(),
+                            institutionField.getValueAsString().trim(),
+                            phoneField.getValueAsString().trim(),
+                            UserLevel.valueOf(levelField.getValueAsString()));
                     user.setFolder(folder);
-                    
+
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
                     final AsyncCallback<User> callback = new AsyncCallback<User>() {
 
@@ -161,6 +166,7 @@ public class PersonalWindow extends Window {
             }
 
             public void onSuccess(User result) {
+                levelField.setValue(result.getLevel().name());
                 emailField.setValue(result.getEmail());
                 firstNameField.setValue(result.getFirstName());
                 lastNameField.setValue(result.getLastName());

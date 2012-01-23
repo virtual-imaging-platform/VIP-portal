@@ -44,7 +44,7 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,14 +94,14 @@ public class GroupWindow extends Window {
     private void loadData() {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<Map<String, ROLE>> callback = new AsyncCallback<Map<String, ROLE>>() {
+        final AsyncCallback<Map<String, GROUP_ROLE>> callback = new AsyncCallback<Map<String, GROUP_ROLE>>() {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.say("Unable to load groups:<br />" + caught.getMessage());
             }
 
-            public void onSuccess(Map<String, ROLE> result) {
+            public void onSuccess(Map<String, GROUP_ROLE> result) {
                 List<GroupRecord> groups = new ArrayList<GroupRecord>();
                 
                 for (String groupName : result.keySet()) {

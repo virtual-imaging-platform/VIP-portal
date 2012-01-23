@@ -40,6 +40,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import java.util.List;
 import java.util.Map;
 
@@ -88,11 +89,11 @@ public interface ConfigurationService extends RemoteService {
     
     public User removeUser() throws CoreException;
 
-    public Map<String, CoreConstants.ROLE> getUserGroups(String email) throws CoreException;
+    public Map<String, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws CoreException;
     
     public List<String> getUserGroups() throws CoreException;
 
-    public void setUserGroups(String email, Map<String, CoreConstants.ROLE> groups) throws CoreException;
+    public void updateUser(String email, UserLevel level, Map<String, CoreConstants.GROUP_ROLE> groups) throws CoreException;
     
     public User getUserData() throws CoreException;
     

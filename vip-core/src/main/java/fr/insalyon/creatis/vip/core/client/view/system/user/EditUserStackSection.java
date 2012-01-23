@@ -50,8 +50,10 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,6 +69,7 @@ public class EditUserStackSection extends SectionStackSection {
     private ModalWindow modal;
     private DynamicForm form;
     private TextItem emailField;
+    private SelectItem levelPickList;
     private SelectItem groupsPickList;
     private CheckboxItem confirmedField;
 
@@ -86,7 +89,7 @@ public class EditUserStackSection extends SectionStackSection {
         vLayout.addMember(form);
 
         modal = new ModalWindow(vLayout);
-        
+
         this.addItem(vLayout);
         loadData();
     }
@@ -99,12 +102,17 @@ public class EditUserStackSection extends SectionStackSection {
         emailField = FieldUtil.getTextItem(350, true, "Email", null);
         emailField.setDisabled(true);
 
+        levelPickList = new SelectItem();
+        levelPickList.setTitle("Level");
+        levelPickList.setWidth(350);
+        levelPickList.setRequired(true);
+
         groupsPickList = new SelectItem();
         groupsPickList.setTitle("Groups");
         groupsPickList.setMultiple(true);
         groupsPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
         groupsPickList.setWidth(350);
-        
+
         confirmedField = new CheckboxItem();
         confirmedField.setTitle("Confirmed");
         confirmedField.setDisabled(true);
@@ -117,69 +125,70 @@ public class EditUserStackSection extends SectionStackSection {
                 if (form.validate()) {
 
                     String[] values = groupsPickList.getValues();
-                    Map<String, CoreConstants.ROLE> map = new HashMap<String, CoreConstants.ROLE>();
+                    Map<String, CoreConstants.GROUP_ROLE> map = new HashMap<String, CoreConstants.GROUP_ROLE>();
 
                     for (String v : values) {
-                        if (v.equals(CoreConstants.GROUP_ADMIN)) {
-                            map.put(v, CoreConstants.ROLE.Admin);
-                            
-                        } else if (v.equals(CoreConstants.GROUP_SUPPORT)) {
-                            map.put(v, CoreConstants.ROLE.User);
-                            
+                        if (v.equals(CoreConstants.GROUP_SUPPORT)) {
+                            map.put(v, CoreConstants.GROUP_ROLE.User);
+
                         } else {
                             String name = v.substring(0, v.indexOf(" ("));
-                            CoreConstants.ROLE role = v.contains("("
-                                    + CoreConstants.ROLE.Admin.name() + ")")
-                                    ? CoreConstants.ROLE.Admin
-                                    : CoreConstants.ROLE.User;
+                            CoreConstants.GROUP_ROLE role = v.contains("("
+                                    + CoreConstants.GROUP_ROLE.Admin.name() + ")")
+                                    ? CoreConstants.GROUP_ROLE.Admin
+                                    : CoreConstants.GROUP_ROLE.User;
 
-                            if (map.get(name) == null || role == CoreConstants.ROLE.Admin) {
+                            if (map.get(name) == null || role == CoreConstants.GROUP_ROLE.Admin) {
                                 map.put(name, role);
                             }
                         }
                     }
-                    save(emailField.getValueAsString().trim(), map);
+                    save(emailField.getValueAsString().trim(),
+                            UserLevel.valueOf(levelPickList.getValueAsString()),
+                            map);
                 }
             }
         });
 
-        form.setFields(emailField, groupsPickList, confirmedField, saveItem);
+        form.setFields(emailField, levelPickList, groupsPickList, confirmedField, saveItem);
     }
 
     /**
      * Sets a user to edit.
-     * 
+     *
      * @param email User's email
      * @param confirmed If the user confirmed his account
+     * @param level User's level
      */
-    public void setUser(String email, boolean confirmed) {
+    public void setUser(String email, boolean confirmed, String level) {
 
         this.emailField.setValue(email);
         this.confirmedField.setValue(confirmed);
+        this.levelPickList.setValue(level);
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<Map<String, CoreConstants.ROLE>> callback = new AsyncCallback<Map<String, CoreConstants.ROLE>>() {
+        final AsyncCallback<Map<String, CoreConstants.GROUP_ROLE>> callback = new AsyncCallback<Map<String, CoreConstants.GROUP_ROLE>>() {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to get list of groups:<br />" + caught.getMessage());
             }
 
-            public void onSuccess(Map<String, ROLE> result) {
+            public void onSuccess(Map<String, GROUP_ROLE> result) {
                 modal.hide();
 
                 List<String> groups = new ArrayList<String>();
                 for (String group : result.keySet()) {
 
-                    if (group.equals(CoreConstants.GROUP_ADMIN) || group.equals(CoreConstants.GROUP_SUPPORT)) {
+                    if (group.equals(CoreConstants.GROUP_SUPPORT)) {
                         groups.add(group);
 
                     } else {
-                        if (result.get(group) == CoreConstants.ROLE.Admin) {
-                            groups.add(group + " (" + CoreConstants.ROLE.Admin.name() + ")");
+                        if (result.get(group) == CoreConstants.GROUP_ROLE.Admin) {
+                            groups.add(group + " (" + CoreConstants.GROUP_ROLE.Admin.name() + ")");
 
                         } else {
-                            groups.add(group + " (" + CoreConstants.ROLE.User.name() + ")");
+                            groups.add(group + " (" + CoreConstants.GROUP_ROLE.User.name() + ")");
                         }
                     }
                 }
@@ -191,35 +200,43 @@ public class EditUserStackSection extends SectionStackSection {
     }
 
     /**
-     * 
+     *
      * @param email User's email
+     * @param level User's level
      * @param groups List of groups
      */
-    private void save(String email, Map<String, CoreConstants.ROLE> groups) {
+    private void save(String email, UserLevel level,
+            Map<String, CoreConstants.GROUP_ROLE> groups) {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to update groups:<br />" + caught.getMessage());
+                SC.warn("Unable to update user:<br />" + caught.getMessage());
             }
 
             public void onSuccess(Void result) {
                 modal.hide();
                 emailField.setValue("");
+                levelPickList.setValues(new String[]{});
                 groupsPickList.setValues(new String[]{});
-                SC.say("User's groups successfully updated.");
+                confirmedField.setValue(false);
+                ((ManageUsersTab) Layout.getInstance().getTab(CoreConstants.TAB_MANAGE_USERS)).loadUsers();
+                SC.say("User successfully updated.");
             }
         };
-        modal.show("Saving user's groups...", true);
-        service.setUserGroups(email, groups, callback);
+        modal.show("Updating user...", true);
+        service.updateUser(email, level, groups, callback);
     }
 
     /**
      * Loads list of groups.
      */
     private void loadData() {
+
+        levelPickList.setValueMap(UserLevel.toStringArray());
+
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
@@ -231,11 +248,11 @@ public class EditUserStackSection extends SectionStackSection {
 
                 List<String> dataList = new ArrayList<String>();
                 for (String g : result) {
-                    if (g.equals(CoreConstants.GROUP_ADMIN) || g.equals(CoreConstants.GROUP_SUPPORT)) {
+                    if (g.equals(CoreConstants.GROUP_SUPPORT)) {
                         dataList.add(g);
                     } else {
-                        dataList.add(g + " (" + CoreConstants.ROLE.Admin.name() + ")");
-                        dataList.add(g + " (" + CoreConstants.ROLE.User.name() + ")");
+                        dataList.add(g + " (" + CoreConstants.GROUP_ROLE.Admin.name() + ")");
+                        dataList.add(g + " (" + CoreConstants.GROUP_ROLE.User.name() + ")");
                     }
                 }
                 groupsPickList.setValueMap(dataList.toArray(new String[]{}));
