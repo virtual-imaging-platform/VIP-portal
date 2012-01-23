@@ -61,6 +61,7 @@ public class CoreConstants {
     public static final String ICON_ACTIVATE = IMG_FOLDER + "icon-select.png";
     public static final String ICON_ADD = IMG_FOLDER + "icon-add.png";
     public static final String ICON_CLEAR = IMG_FOLDER + "icon-clear.png";
+    public static final String ICON_CLOSE = IMG_FOLDER + "icon-close.png";
     public static final String ICON_DELETE = IMG_FOLDER + "icon-delete.png";
     public static final String ICON_EDIT = IMG_FOLDER + "icon-edit.png";
     public static final String ICON_HELP = IMG_FOLDER + "icon-help.png";
@@ -68,11 +69,13 @@ public class CoreConstants {
     public static final String ICON_LOADING = IMG_FOLDER + "icon-loading.gif";
     public static final String ICON_PASSWORD = IMG_FOLDER + "icon-password.png";
     public static final String ICON_PERSONAL = IMG_FOLDER + "icon-personal.png";
+    public static final String ICON_PICKER_QUESTION = IMG_FOLDER + "icon-picker-question.png";
     public static final String ICON_REFRESH = IMG_FOLDER + "icon-refresh.png";
     public static final String ICON_SAVE = IMG_FOLDER + "icon-save.png";
     public static final String ICON_SIGNOUT = IMG_FOLDER + "icon-signout.png";
     public static final String ICON_SYSTEM = IMG_FOLDER + "system/icon-system.png";
     public static final String ICON_USER = IMG_FOLDER + "system/icon-user.png";
+    public static final String ICON_USER_INFO = IMG_FOLDER + "system/icon-user-info.png";
     public static final String ICON_GROUP = IMG_FOLDER + "system/icon-group.png";
     // Application Names
     public static final String APP_ACCOUNT = "My Account";

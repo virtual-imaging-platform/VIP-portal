@@ -51,16 +51,26 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 public class UserMenuButton extends ToolStripMenuButton {
 
     public UserMenuButton(User user) {
-        
-        this.setTitle(Canvas.imgHTML(CoreConstants.ICON_USER) + " " 
+
+        this.setTitle(Canvas.imgHTML(CoreConstants.ICON_USER) + " "
                 + user.getFullName() + " (" + user.getLevel().name() + ")");
-        
+
         Menu menu = new Menu();
         menu.setWidth(150);
         menu.setShowShadow(true);
         menu.setShadowDepth(3);
-        
-        // Account Settings
+
+        // Upgrade level
+        MenuItem upgradeItem = new MenuItem("Upgrade your Account");
+        upgradeItem.setIcon(CoreConstants.ICON_USER_INFO);
+        upgradeItem.addClickHandler(new ClickHandler() {
+
+            public void onClick(MenuItemClickEvent event) {
+                new UpgradeLevelLayout(200, 25).show();
+            }
+        });
+
+        // Account settings
         MenuItem accountItem = new MenuItem("Account Settings");
         accountItem.setIcon(CoreConstants.ICON_ACCOUNT);
         accountItem.addClickHandler(new ClickHandler() {
@@ -69,7 +79,7 @@ public class UserMenuButton extends ToolStripMenuButton {
                 Layout.getInstance().addTab(new AccountTab());
             }
         });
-        
+
         // Sign out
         MenuItem signoutItem = new MenuItem("Sign Out");
         signoutItem.setIcon(CoreConstants.ICON_SIGNOUT);
@@ -79,9 +89,13 @@ public class UserMenuButton extends ToolStripMenuButton {
                 Layout.getInstance().signout();
             }
         });
-        
-        menu.setItems(accountItem, signoutItem);
-        
+
+        if (user.getLevel() == UserLevel.Beginner) {
+            menu.setItems(upgradeItem, accountItem, signoutItem);
+        } else {
+            menu.setItems(accountItem, signoutItem);
+        }
+
         this.setMenu(menu);
     }
 }
