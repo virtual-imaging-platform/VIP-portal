@@ -63,8 +63,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
-     * @throws CoreException 
+     *
+     * @throws CoreException
      */
     public User configure(String email, String session) throws CoreException {
 
@@ -96,10 +96,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
+     *
      * @param user
      * @param comments
-     * @throws CoreException 
+     * @throws CoreException
      */
     public void signup(User user, String comments) throws CoreException {
 
@@ -113,10 +113,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
+     *
      * @param email
      * @param password
-     * @throws CoreException 
+     * @throws CoreException
      * @return
      */
     public User signin(String email, String password) throws CoreException {
@@ -136,8 +136,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
-     * @throws CoreException 
+     *
+     * @throws CoreException
      */
     public void signout() throws CoreException {
 
@@ -153,11 +153,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
+     *
      * @param email
      * @param code
      * @return
-     * @throws CoreException 
+     * @throws CoreException
      */
     public User activate(String code) throws CoreException {
 
@@ -174,9 +174,9 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
+     *
      * @param email
-     * @throws CoreException 
+     * @throws CoreException
      */
     public String sendActivationCode() throws CoreException {
 
@@ -194,8 +194,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     /**
      * Get list of users.
-     * 
-     * @return 
+     *
+     * @return
      */
     public List<User> getUsers() throws CoreException {
 
@@ -209,9 +209,9 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
+     *
      * @param groupName
-     * @throws CoreException 
+     * @throws CoreException
      */
     public void addGroup(String groupName) throws CoreException {
 
@@ -226,10 +226,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
+     *
      * @param oldName
      * @param newName
-     * @throws CoreException 
+     * @throws CoreException
      */
     public void updateGroup(String oldName, String newName) throws CoreException {
         try {
@@ -243,9 +243,9 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
+     *
      * @param groupName
-     * @throws CoreException 
+     * @throws CoreException
      */
     public void removeGroup(String groupName) throws CoreException {
         try {
@@ -259,9 +259,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
-     * @return
-     * @throws CoreException 
+     *
+     * @return @throws CoreException
      */
     public List<String> getGroups() throws CoreException {
 
@@ -275,10 +274,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
+     *
      * @param email
      * @return
-     * @throws CoreException 
+     * @throws CoreException
      */
     public User removeUser(String email) throws CoreException {
 
@@ -287,18 +286,17 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             trace(logger, "Removing user '" + email + "'.");
             User user = configurationBusiness.getUser(email);
             configurationBusiness.removeUser(email);
-            
+
             return user;
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
     }
-    
+
     /**
-     * 
-     * @return
-     * @throws CoreException 
+     *
+     * @return @throws CoreException
      */
     public User removeUser() throws CoreException {
 
@@ -306,7 +304,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             User user = getSessionUser();
             trace(logger, "Removing user '" + user.getEmail() + "'.");
             configurationBusiness.removeUser(user.getEmail());
-            
+
             return user;
 
         } catch (BusinessException ex) {
@@ -315,10 +313,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
+     *
      * @param email
      * @return
-     * @throws CoreException 
+     * @throws CoreException
      */
     public Map<String, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws CoreException {
 
@@ -336,9 +334,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
-     * @return
-     * @throws CoreException 
+     *
+     * @return @throws CoreException
      */
     public List<String> getUserGroups() throws CoreException {
 
@@ -355,13 +352,13 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
+     *
      * @param email
      * @param level
      * @param groups
-     * @throws CoreException 
+     * @throws CoreException
      */
-    public void updateUser(String email, UserLevel level, 
+    public void updateUser(String email, UserLevel level,
             Map<String, CoreConstants.GROUP_ROLE> groups) throws CoreException {
 
         try {
@@ -376,9 +373,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
-     * @return
-     * @throws CoreException 
+     *
+     * @return @throws CoreException
      */
     public User getUserData() throws CoreException {
 
@@ -391,9 +387,9 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
+     *
      * @param user
-     * @throws CoreException 
+     * @throws CoreException
      */
     public User updateUser(User user) throws CoreException {
 
@@ -408,10 +404,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
+     *
      * @param currentPassword
      * @param newPassword
-     * @throws CoreException 
+     * @throws CoreException
      */
     public void updateUserPassword(String currentPassword, String newPassword)
             throws CoreException {
@@ -427,11 +423,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
+     *
      * @param category
      * @param subject
      * @param comment
-     * @throws CoreException 
+     * @throws CoreException
      */
     public void sendContactMail(String category, String subject, String comment)
             throws CoreException {
@@ -445,10 +441,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
+     *
      * @param user
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     private User setUserSession(User user) throws BusinessException {
 
@@ -462,9 +458,9 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
+     *
      * @param email
-     * @throws CoreException 
+     * @throws CoreException
      */
     public void activateUser(String email) throws CoreException {
 
@@ -479,9 +475,9 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
+     *
      * @param groupName
-     * @throws CoreException 
+     * @throws CoreException
      */
     public void addUserToGroup(String groupName) throws CoreException {
 
@@ -495,34 +491,35 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
+     *
      * @param groupName
      * @return
-     * @throws CoreException 
+     * @throws CoreException
      */
     public List<User> getUsersFromGroup(String groupName) throws CoreException {
-        
+
         try {
             authenticateSystemAdministrator(logger);
             return configurationBusiness.getUsersFromGroup(groupName);
-            
+
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
     }
 
     /**
-     * 
+     *
      * @param email
      * @param groupName
-     * @throws CoreException 
+     * @throws CoreException
      */
     public void removeUserFromGroup(String email, String groupName) throws CoreException {
-        
+
         try {
             authenticateSystemAdministrator(logger);
+            trace(logger, "Removing '" + email + "' from group '" + groupName + "'.");
             configurationBusiness.removeUserFromGroup(email, groupName);
-            
+
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
