@@ -32,48 +32,48 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client;
+package fr.insalyon.creatis.vip.datamanager.client.view;
 
+import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.Module;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerHomeParser;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSystemParser;
-import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
-import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DataManagerModule extends Module {
+public class ValidatorUtil {
 
-    public static DataManagerSection dataManagerSection;
+    /**
+     *
+     * @param baseDir
+     * @param errorMessage
+     * @return
+     */
+    public static boolean validateRootPath(String baseDir, String errorMessage) {
 
-    @Override
-    public void load() {
-
-        CoreModule.addGeneralApplicationParser(new DataManagerHomeParser());
-        CoreModule.addSystemApplicationParser(new DataManagerSystemParser());
-
-        dataManagerSection = new DataManagerSection();
-        Layout.getInstance().addMainSection(dataManagerSection);
+        if (baseDir.equals(DataManagerConstants.ROOT)) {
+            SC.warn("You cannot " + errorMessage + " the root folder.");
+            return false;
+        }
+        return true;
     }
 
-    @Override
-    public void terminate() {
-        Layout.getInstance().removeMainSection(DataManagerConstants.SECTION_FILE_TRANSFER);
-        BrowserLayout.terminate();
-        OperationLayout.terminate();
-    }
+    /**
+     * 
+     * @param baseDir
+     * @param errorMessage
+     * @return 
+     */
+    public static boolean validateUserLevel(String baseDir, String errorMessage) {
 
-    @Override
-    public boolean parseAccountType(String accountType) {
-        return false;
-    }
-
-    @Override
-    public void postLoading() {
+        if (baseDir.contains(DataManagerConstants.GROUP_APPEND)
+                && CoreModule.user.getLevel() == UserLevel.Beginner) {
+            SC.warn("You cannot " + errorMessage + " a group folder<br />"
+                    + "since you have 'Beginner' level.");
+            return false;
+        }
+        return true;
     }
 }

@@ -49,6 +49,7 @@ import fr.insalyon.creatis.vip.datamanager.client.DataManagerContext;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.view.ValidatorUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.BasicBrowserToolStrip;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 import java.util.ArrayList;
@@ -75,9 +76,9 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
             public void onClick(ClickEvent event) {
                 String path = pathItem.getValueAsString();
-                if (path.equals(DataManagerConstants.ROOT)) {
-                    SC.warn("You cannot cut a folder from the root folder.");
-                } else {
+                if (ValidatorUtil.validateRootPath(path, "cut from")
+                        && ValidatorUtil.validateUserLevel(path, "cut from")) {
+
                     cut();
                 }
             }
@@ -92,9 +93,9 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
             public void onClick(ClickEvent event) {
                 String path = pathItem.getValueAsString();
-                if (path.equals(DataManagerConstants.ROOT)) {
-                    SC.warn("You cannot paste in the root folder.");
-                } else {
+                if (ValidatorUtil.validateRootPath(path, "paste in")
+                        && ValidatorUtil.validateUserLevel(path, "paste to")) {
+
                     paste(modal, path);
                 }
             }
@@ -109,10 +110,9 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
             public void onClick(ClickEvent event) {
                 String path = pathItem.getValueAsString();
-                if (path.equals(DataManagerConstants.ROOT)) {
-                    SC.warn("You cannot upload a file in the root folder.");
+                if (ValidatorUtil.validateRootPath(path, "upload a file in")
+                        && ValidatorUtil.validateUserLevel(path, "upload a file to")) {
 
-                } else {
                     new FileUploadWindow(modal, path, "dataManagerUploadComplete").show();
                 }
             }
@@ -126,10 +126,9 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
             public void onClick(ClickEvent event) {
                 String path = pathItem.getValueAsString();
-                if (path.equals(DataManagerConstants.ROOT)) {
-                    SC.warn("You cannot upload data in the root folder.");
+                if (ValidatorUtil.validateRootPath(path, "upload data in")
+                        && ValidatorUtil.validateUserLevel(path, "upload data to")) {
 
-                } else {
                     DataUploadWindow window = new DataUploadWindow(modal, path);
                     BrowserLayout.getInstance().setDataUploadWindow(window);
                     window.show();
@@ -156,9 +155,9 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
             public void onClick(ClickEvent event) {
                 String path = pathItem.getValueAsString();
-                if (path.equals(DataManagerConstants.ROOT)) {
-                    SC.warn("You cannot delete a root folder.");
-                } else {
+                if (ValidatorUtil.validateRootPath(path, "delete from")
+                        && ValidatorUtil.validateUserLevel(path, "delete from")) {
+
                     delete();
                 }
             }
@@ -346,7 +345,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                                 BrowserLayout.getInstance().loadData(baseDir, true);
                             }
                         };
-                        modal.show("Deleting files/folders...", true);
+                        modal.show("Moving files/folders to Trash...", true);
                         service.rename(baseDir, paths,
                                 DataManagerConstants.ROOT + "/"
                                 + DataManagerConstants.TRASH_HOME, true, callback);

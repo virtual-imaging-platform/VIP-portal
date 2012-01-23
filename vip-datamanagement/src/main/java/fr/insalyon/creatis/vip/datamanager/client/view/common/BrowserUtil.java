@@ -43,7 +43,6 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
@@ -62,7 +61,7 @@ public class BrowserUtil {
 
     /**
      * Creates an elementary browser list grid.
-     * 
+     *
      * @return Elementary browser list grid
      */
     public static ListGrid getListGrid() {
@@ -90,18 +89,18 @@ public class BrowserUtil {
 
     /**
      * Loads the data from a path to the grid and updates the tool strip.
-     * 
+     *
      * @param modal Modal window object
      * @param grid List grid
      * @param toolStrip Browser tool strip
-     * @param path  Grid path
+     * @param path Grid path
      * @param refresh Not to use cached data
      */
     public static void loadData(final ModalWindow modal, final ListGrid grid,
             final BasicBrowserToolStrip toolStrip, final String path, boolean refresh) {
 
         if (!path.equals(DataManagerConstants.ROOT)) {
-            
+
             DataManagerServiceAsync service = DataManagerService.Util.getInstance();
             AsyncCallback<List<Data>> callback = new AsyncCallback<List<Data>>() {
 
@@ -154,11 +153,9 @@ public class BrowserUtil {
                     records.add(new DataRecord("folder", DataManagerConstants.TRASH_HOME));
 
                     for (String groupName : result) {
-                        if (!groupName.equals(CoreConstants.GROUP_ADMIN)) {
-                            records.add(new DataRecord("folder", groupName 
-                                    + DataManagerConstants.GROUP_APPEND));
-                        }
-                    }                  
+                        records.add(new DataRecord("folder", groupName
+                                + DataManagerConstants.GROUP_APPEND));
+                    }
 
                     if (CoreModule.user.isSystemAdministrator()) {
                         records.add(new DataRecord("folder", DataManagerConstants.BIOMED_HOME));

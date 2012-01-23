@@ -48,6 +48,7 @@ import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerContext;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.view.ValidatorUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,9 +71,9 @@ public class BrowserContextMenu extends Menu {
         uploadItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                if (baseDir.equals(DataManagerConstants.ROOT)) {
-                    SC.warn("You cannot upload a file in the root folder.");
-                } else {
+                if (ValidatorUtil.validateRootPath(baseDir, "upload a file in")
+                        && ValidatorUtil.validateUserLevel(baseDir, "upload a file to")) {
+
                     DataUploadWindow window = new DataUploadWindow(modal, baseDir);
                     BrowserLayout.getInstance().setDataUploadWindow(window);
                     window.show();
@@ -94,9 +95,9 @@ public class BrowserContextMenu extends Menu {
         cutItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                if (baseDir.equals(DataManagerConstants.ROOT)) {
-                    SC.warn("You cannot cut a folder from the root folder.");
-                } else {
+                if (ValidatorUtil.validateRootPath(baseDir, "cut from")
+                        && ValidatorUtil.validateUserLevel(baseDir, "cut from")) {
+
                     DataManagerContext.getInstance().setCutAction(baseDir, data.getName());
                     BrowserLayout.getInstance().getToolStrip().enablePasteButton();
                 }
@@ -108,9 +109,9 @@ public class BrowserContextMenu extends Menu {
         pasteItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                if (baseDir.equals(DataManagerConstants.ROOT)) {
-                    SC.warn("You cannot paste in the root folder.");
-                } else {
+                if (ValidatorUtil.validateRootPath(baseDir, "paste in")
+                        && ValidatorUtil.validateUserLevel(baseDir, "paste to")) {
+
                     paste(modal, baseDir);
                 }
             }
@@ -121,9 +122,9 @@ public class BrowserContextMenu extends Menu {
         renameItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                if (baseDir.equals(DataManagerConstants.ROOT)) {
-                    SC.warn("You cannot rename a folder from the root folder.");
-                } else {
+                if (ValidatorUtil.validateRootPath(baseDir, "rename from")
+                        && ValidatorUtil.validateUserLevel(baseDir, "rename from")) {
+
                     new RenameWindow(modal, baseDir, data.getName()).show();
                 }
             }
@@ -134,9 +135,9 @@ public class BrowserContextMenu extends Menu {
         deleteItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                if (baseDir.equals(DataManagerConstants.ROOT)) {
-                    SC.warn("You cannot delete a folder from the root folder.");
-                } else {
+                if (ValidatorUtil.validateRootPath(baseDir, "delete from")
+                        && ValidatorUtil.validateUserLevel(baseDir, "delete from")) {
+                    
                     delete(modal, baseDir, data.getName());
                 }
             }
@@ -166,10 +167,10 @@ public class BrowserContextMenu extends Menu {
     }
 
     /**
-     * 
+     *
      * @param modal
      * @param baseDir
-     * @param name 
+     * @param name
      */
     private void delete(final ModalWindow modal, final String baseDir, final String name) {
 
@@ -216,7 +217,7 @@ public class BrowserContextMenu extends Menu {
                                 BrowserLayout.getInstance().loadData(baseDir, true);
                             }
                         };
-                        modal.show("Deleting " + name + "...", true);
+                        modal.show("Moving " + name + " to Trash...", true);
                         service.rename(baseDir + "/" + name,
                                 DataManagerConstants.ROOT + "/"
                                 + DataManagerConstants.TRASH_HOME + "/" + name,
@@ -228,10 +229,10 @@ public class BrowserContextMenu extends Menu {
     }
 
     /**
-     * 
+     *
      * @param modal
      * @param baseDir
-     * @param data 
+     * @param data
      */
     private void download(final ModalWindow modal, final String baseDir,
             final DataRecord data) {
@@ -285,9 +286,9 @@ public class BrowserContextMenu extends Menu {
     }
 
     /**
-     * 
+     *
      * @param modal
-     * @param baseDir 
+     * @param baseDir
      */
     private void paste(final ModalWindow modal, final String baseDir) {
 
