@@ -697,4 +697,36 @@ public class ConfigurationBusiness {
             throw new BusinessException(ex);
         }
     }
+    
+    /**
+     * 
+     * @param groupName
+     * @return
+     * @throws BusinessException 
+     */
+    public List<User> getUsersFromGroup(String groupName) throws BusinessException {
+        
+        try {
+            return CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroup(groupName);
+            
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
+    /**
+     * 
+     * @param email
+     * @param groupName
+     * @throws BusinessException 
+     */
+    public void removeUserFromGroup(String email, String groupName) throws BusinessException {
+        
+        try {
+            CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().removeUserFromGroup(email, groupName);
+            
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
 }

@@ -35,13 +35,11 @@
 package fr.insalyon.creatis.vip.core.client.view.system.group;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -56,6 +54,7 @@ import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,36 +100,23 @@ public class GroupsStackSection extends SectionStackSection {
                     rollOverCanvas.setWidth(50);
                     rollOverCanvas.setHeight(22);
 
-                    ImgButton loadImg = getImgButton(CoreConstants.ICON_EDIT, "Edit");
-                    loadImg.addClickHandler(new ClickHandler() {
+                    rollOverCanvas.addMember(FieldUtil.getImgButton(
+                            CoreConstants.ICON_EDIT, "Edit", new ClickHandler() {
 
                         public void onClick(ClickEvent event) {
                             edit(rollOverRecord.getAttribute("name"));
                         }
-                    });
-                    ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
-                    deleteImg.addClickHandler(new ClickHandler() {
+                    }));
+
+                    rollOverCanvas.addMember(FieldUtil.getImgButton(
+                            CoreConstants.ICON_DELETE, "Delete", new ClickHandler() {
 
                         public void onClick(ClickEvent event) {
                             remove(rollOverRecord.getAttribute("name"));
                         }
-                    });
-                    rollOverCanvas.addMember(loadImg);
-                    rollOverCanvas.addMember(deleteImg);
+                    }));
                 }
                 return rollOverCanvas;
-            }
-
-            private ImgButton getImgButton(String imgSrc, String prompt) {
-                ImgButton button = new ImgButton();
-                button.setShowDown(false);
-                button.setShowRollOver(false);
-                button.setLayoutAlign(Alignment.CENTER);
-                button.setSrc(imgSrc);
-                button.setPrompt(prompt);
-                button.setHeight(16);
-                button.setWidth(16);
-                return button;
             }
         };
         grid.setWidth100();
@@ -158,7 +144,7 @@ public class GroupsStackSection extends SectionStackSection {
      * Loads list of groups into grid.
      */
     public void loadData() {
-        
+
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
@@ -180,7 +166,7 @@ public class GroupsStackSection extends SectionStackSection {
 
     /**
      * Removes a group.
-     * 
+     *
      * @param name Group name
      */
     private void remove(final String name) {
@@ -189,10 +175,10 @@ public class GroupsStackSection extends SectionStackSection {
             SC.warn("You can not remove the " + name + " group.");
             return;
         }
-        SC.confirm("Do you really want to remove the group \"" + name + "\"?", new BooleanCallback() {
+        SC.ask("Do you really want to remove the group \"" + name + "\"?", new BooleanCallback() {
 
             public void execute(Boolean value) {
-                if (value != null && value) {
+                if (value) {
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
 
                     final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
@@ -214,7 +200,7 @@ public class GroupsStackSection extends SectionStackSection {
 
     /**
      * Edits a group.
-     * 
+     *
      * @param name Group name
      */
     private void edit(String name) {
@@ -223,8 +209,7 @@ public class GroupsStackSection extends SectionStackSection {
             SC.warn("You can not edit the " + name + " group.");
             return;
         }
-        ManageGroupsTab groupsTab = (ManageGroupsTab) Layout.getInstance().
-                getTab(CoreConstants.TAB_MANAGE_GROUPS);
-        groupsTab.setGroup(name);
+        ((ManageGroupsTab) Layout.getInstance().getTab(
+                CoreConstants.TAB_MANAGE_GROUPS)).setGroup(name);
     }
 }

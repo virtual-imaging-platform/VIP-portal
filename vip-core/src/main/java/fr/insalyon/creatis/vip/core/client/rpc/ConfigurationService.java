@@ -106,4 +106,8 @@ public interface ConfigurationService extends RemoteService {
     public void activateUser(String email) throws CoreException;
     
     public void addUserToGroup(String groupName) throws CoreException;
+    
+    public List<User> getUsersFromGroup(String groupName) throws CoreException;
+    
+    public void removeUserFromGroup(String email, String groupName) throws CoreException;
 }

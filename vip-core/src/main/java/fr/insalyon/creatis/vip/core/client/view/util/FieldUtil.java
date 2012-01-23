@@ -38,6 +38,8 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DateDisplayFormat;
 import com.smartgwt.client.types.ListGridFieldType;
+import com.smartgwt.client.widgets.ImgButton;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -55,11 +57,12 @@ public class FieldUtil {
 
     /**
      * Gets a ListGridField configured to display an icon.
-     * 
+     *
      * @param name Field name
      * @return List grid field
      */
     public static ListGridField getIconGridField(String name) {
+
         ListGridField iconField = new ListGridField(name, " ", 30);
         iconField.setAlign(Alignment.CENTER);
         iconField.setType(ListGridFieldType.IMAGE);
@@ -71,21 +74,23 @@ public class FieldUtil {
 
     /**
      * Gets a ListGridField configured to display dates.
-     * 
+     *
      * @return List grid field
      */
     public static ListGridField getDateField() {
+
         return getDateField("date", "Date");
     }
-    
+
     /**
      * Gets a ListGridField configured to display dates.
-     * 
+     *
      * @param name
      * @param title
-     * @return 
+     * @return
      */
     public static ListGridField getDateField(String name, String title) {
+
         ListGridField dateField = new ListGridField(name, title, 120);
         dateField.setType(ListGridFieldType.DATE);
         dateField.setDateFormatter(DateDisplayFormat.TOUSSHORTDATETIME);
@@ -94,11 +99,12 @@ public class FieldUtil {
 
     /**
      * Gets a DynamicForm with the specified list of items set.
-     * 
+     *
      * @param items List of form items
-     * @return 
+     * @return
      */
     public static DynamicForm getForm(FormItem... items) {
+
         DynamicForm form = new DynamicForm();
         form.setFields(items);
         return form;
@@ -106,12 +112,12 @@ public class FieldUtil {
 
     /**
      * Gets a TextItem configured according to the provided parameters.
-     * 
+     *
      * @param size Field size
      * @param showTitle If title should be displayed
      * @param title Title to be displayed
      * @param keyPressFilter Regular expression filter
-     * @return 
+     * @return
      */
     public static TextItem getTextItem(int size, boolean showTitle, String title,
             String keyPressFilter) {
@@ -135,8 +141,8 @@ public class FieldUtil {
 
     /**
      * Gets a CellFormatter to parse file sizes.
-     * 
-     * @return 
+     *
+     * @return
      */
     public static CellFormatter getSizeCellFormatter() {
 
@@ -164,11 +170,35 @@ public class FieldUtil {
                         }
                     }
                     return size;
-                
+
                 } else {
                     return "";
                 }
             }
         };
+    }
+
+    /**
+     * Gets an ImgButton for RollOverCanvas
+     * 
+     * @param imgSrc
+     * @param prompt
+     * @param clickHandler
+     * @return 
+     */
+    public static ImgButton getImgButton(String imgSrc, String prompt, 
+            ClickHandler clickHandler) {
+
+        ImgButton button = new ImgButton();
+        button.setShowDown(false);
+        button.setShowRollOver(false);
+        button.setLayoutAlign(Alignment.CENTER);
+        button.setSrc(imgSrc);
+        button.setPrompt(prompt);
+        button.setHeight(16);
+        button.setWidth(16);
+        button.addClickHandler(clickHandler);
+        
+        return button;
     }
 }

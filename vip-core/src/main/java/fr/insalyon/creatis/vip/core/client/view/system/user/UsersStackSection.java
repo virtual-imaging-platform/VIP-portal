@@ -35,9 +35,7 @@
 package fr.insalyon.creatis.vip.core.client.view.system.user;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.data.Criteria;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DateDisplayFormat;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.Overflow;
@@ -45,7 +43,6 @@ import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -137,48 +134,34 @@ public class UsersStackSection extends SectionStackSection {
                     rollOverCanvas.setWidth(50);
                     rollOverCanvas.setHeight(22);
 
-                    ImgButton loadImg = getImgButton(CoreConstants.ICON_EDIT, "Edit User");
-                    loadImg.addClickHandler(new ClickHandler() {
+                    rollOverCanvas.addMember(FieldUtil.getImgButton(
+                            CoreConstants.ICON_EDIT, "Edit User", new ClickHandler() {
 
                         public void onClick(ClickEvent event) {
                             edit(rollOverRecord.getAttribute("email"),
                                     rollOverRecord.getAttributeAsBoolean("confirmed"),
                                     rollOverRecord.getAttribute("level"));
                         }
-                    });
-                    ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete User");
-                    deleteImg.addClickHandler(new ClickHandler() {
+                    }));
+
+                    rollOverCanvas.addMember(FieldUtil.getImgButton(
+                            CoreConstants.ICON_DELETE, "Delete User", new ClickHandler() {
 
                         public void onClick(ClickEvent event) {
                             final String email = rollOverRecord.getAttribute("email");
-                            SC.confirm("Do you really want to remove the user \""
+                            SC.ask("Do you really want to remove the user \""
                                     + email + "\"?", new BooleanCallback() {
 
                                 public void execute(Boolean value) {
-                                    if (value != null && value) {
+                                    if (value) {
                                         remove(email);
                                     }
                                 }
                             });
                         }
-                    });
-                    rollOverCanvas.addMember(loadImg);
-                    rollOverCanvas.addMember(deleteImg);
+                    }));
                 }
                 return rollOverCanvas;
-            }
-
-            private ImgButton getImgButton(String imgSrc, String prompt) {
-
-                ImgButton button = new ImgButton();
-                button.setShowDown(false);
-                button.setShowRollOver(false);
-                button.setLayoutAlign(Alignment.CENTER);
-                button.setSrc(imgSrc);
-                button.setPrompt(prompt);
-                button.setHeight(16);
-                button.setWidth(16);
-                return button;
             }
 
             @Override

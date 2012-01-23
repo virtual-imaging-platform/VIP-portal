@@ -242,4 +242,25 @@ public class UsersGroupsData implements UsersGroupsDAO {
             throw new DAOException(ex);
         }
     }
+
+    /**
+     * 
+     * @param email
+     * @param groupName
+     * @throws DAOException 
+     */
+    public void removeUserFromGroup(String email, String groupName) throws DAOException {
+        
+        try {
+            PreparedStatement ps = connection.prepareStatement("DELETE FROM "
+                    + "VIPUsersGroups WHERE email = ? AND groupname = ?");
+            ps.setString(1, email);
+            ps.setString(2, groupName);
+            ps.executeUpdate();
+            
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
 }

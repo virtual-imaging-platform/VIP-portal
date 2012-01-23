@@ -493,4 +493,38 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             throw new CoreException(ex);
         }
     }
+
+    /**
+     * 
+     * @param groupName
+     * @return
+     * @throws CoreException 
+     */
+    public List<User> getUsersFromGroup(String groupName) throws CoreException {
+        
+        try {
+            authenticateSystemAdministrator(logger);
+            return configurationBusiness.getUsersFromGroup(groupName);
+            
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param email
+     * @param groupName
+     * @throws CoreException 
+     */
+    public void removeUserFromGroup(String email, String groupName) throws CoreException {
+        
+        try {
+            authenticateSystemAdministrator(logger);
+            configurationBusiness.removeUserFromGroup(email, groupName);
+            
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
 }

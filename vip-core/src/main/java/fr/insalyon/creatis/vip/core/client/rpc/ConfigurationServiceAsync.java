@@ -90,4 +90,8 @@ public interface ConfigurationServiceAsync {
     public void activateUser(String email, AsyncCallback<Void> asyncCallback);
     
     public void addUserToGroup(String groupName, AsyncCallback<Void> asyncCallback);
+    
+    public void getUsersFromGroup(String groupName, AsyncCallback<List<User>> asyncCallback);
+    
+    public void removeUserFromGroup(String email, String groupName, AsyncCallback<Void> asyncCallback);
 }
