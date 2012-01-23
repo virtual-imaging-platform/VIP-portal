@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.application.client.rpc;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
 import java.util.List;
 
 /**
@@ -72,4 +73,6 @@ public interface ApplicationServiceAsync {
     public void getClass(String className, AsyncCallback<AppClass> asyncCallback);
 
     public void getApplicationsAndUsers(List<String> reservedClasses, AsyncCallback<List<String>[]> asyncCallback);
+    
+    public void getApplicationStatus(AsyncCallback<ApplicationStatus> asyncCallback);
 }

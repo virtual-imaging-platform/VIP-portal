@@ -45,12 +45,7 @@ import fr.insalyon.creatis.vip.application.server.dao.derby.connection.Workflows
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -83,9 +78,9 @@ public class WorkflowData implements WorkflowDAO {
     }
 
     /**
-     * 
+     *
      * @param workflow
-     * @throws DAOException 
+     * @throws DAOException
      */
     public void add(Simulation workflow) throws DAOException {
 
@@ -116,9 +111,9 @@ public class WorkflowData implements WorkflowDAO {
     }
 
     /**
-     * 
+     *
      * @param workflow
-     * @throws DAOException 
+     * @throws DAOException
      */
     public void update(Simulation workflow) throws DAOException {
 
@@ -142,10 +137,10 @@ public class WorkflowData implements WorkflowDAO {
     }
 
     /**
-     * 
+     *
      * @param workflowID
      * @return
-     * @throws DAOException 
+     * @throws DAOException
      */
     public Simulation get(String workflowID) throws DAOException {
 
@@ -233,7 +228,7 @@ public class WorkflowData implements WorkflowDAO {
     }
 
     /**
-     * Gets the list of workflows submitted by a list of users filtered by 
+     * Gets the list of workflows submitted by a list of users filtered by
      * application name, status, start date and/or end date.
      *
      * @param user List of users
@@ -427,11 +422,11 @@ public class WorkflowData implements WorkflowDAO {
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @param type
      * @return
-     * @throws DAOException 
+     * @throws DAOException
      */
     public List<InOutData> getInOutData(String simulationID, String type) throws DAOException {
 
@@ -462,10 +457,10 @@ public class WorkflowData implements WorkflowDAO {
     }
 
     /**
-     * 
+     *
      * @param user
      * @return
-     * @throws DAOException 
+     * @throws DAOException
      */
     public int getRunningWorkflows(String user) throws DAOException {
 
@@ -487,10 +482,32 @@ public class WorkflowData implements WorkflowDAO {
     }
 
     /**
-     * 
+     *
+     * @return @throws DAOException
+     */
+    public List<Simulation> getRunningWorkflows() throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "id, application, username, launched, status, "
+                    + "minor_status, simulation_name "
+                    + "FROM Workflows WHERE status = ?");
+
+            ps.setString(1, SimulationStatus.Running.name());
+
+            return processResultSet(ps.executeQuery());
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    /**
+     *
      * @param simulationID
      * @return
-     * @throws DAOException 
+     * @throws DAOException
      */
     public List<Processor> getProcessors(String simulationID) throws DAOException {
 
@@ -535,10 +552,10 @@ public class WorkflowData implements WorkflowDAO {
     }
 
     /**
-     * 
+     *
      * @param simulationList
      * @return
-     * @throws DAOException 
+     * @throws DAOException
      */
     public String getTimeAnalysis(List<Simulation> simulationList) throws DAOException {
 
@@ -574,10 +591,10 @@ public class WorkflowData implements WorkflowDAO {
     }
 
     /**
-     * 
+     *
      * @param simulationList
      * @return
-     * @throws DAOException 
+     * @throws DAOException
      */
     public String getJobStatuses(List<Simulation> simulationList) throws DAOException {
 
@@ -619,10 +636,10 @@ public class WorkflowData implements WorkflowDAO {
     }
 
     /**
-     * 
+     *
      * @param currentUser
      * @param newUser
-     * @throws DAOException 
+     * @throws DAOException
      */
     public void updateUser(String currentUser, String newUser) throws DAOException {
 

@@ -160,6 +160,20 @@ public class SimulationsToolStrip extends ToolStrip {
             this.addSeparator();
             this.addButton(statsButton);
         }
+        
+        ToolStripButton statusButton = new ToolStripButton();
+        statusButton.setIcon(ApplicationConstants.ICON_STATUS);
+        statusButton.setTitle("System Load");
+        statusButton.setPrompt("Current status of the system.");
+        statusButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                new SystemLoadLayout(event.getX(), event.getY()).show();
+            }
+        });
+        
+        this.addFill();
+        this.addButton(statusButton);
     }
 
     /**

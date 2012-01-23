@@ -35,12 +35,17 @@
 package fr.insalyon.creatis.vip.application.server.rpc;
 
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
+import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
+import fr.insalyon.creatis.vip.application.server.business.JobBusiness;
+import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
@@ -140,7 +145,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             throw new ApplicationException(ex);
         }
     }
-    
+
     public List<Application> getApplications(String className) throws ApplicationException {
 
         try {
@@ -237,7 +242,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             throw new ApplicationException(ex);
         }
     }
-    
+
     public List<String>[] getApplicationsAndUsers(List<String> reservedClasses) throws ApplicationException {
 
         try {
@@ -267,6 +272,31 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             return ApplicationDAOFactory.getDAOFactory().getClassDAO().getClass(className);
         } catch (DAOException ex) {
             return null;
+        }
+    }
+
+    /**
+     * 
+     * @return
+     * @throws ApplicationException 
+     */
+    public ApplicationStatus getApplicationStatus() throws ApplicationException {
+
+        try {
+            WorkflowBusiness workflowBusiness = new WorkflowBusiness();
+            List<Simulation> runningSimulations = workflowBusiness.getRunningSimulations();
+
+            ApplicationStatus status = new ApplicationStatus();
+            status.setRunningWorkflows(runningSimulations.size());
+            
+            JobBusiness jobBusiness = new JobBusiness();
+            status.setRunningTasks(jobBusiness.getNumberOfTasks(runningSimulations, JobStatus.RUNNING));
+            status.setWaitingTasks(jobBusiness.getNumberOfTasks(runningSimulations, JobStatus.QUEUED));
+
+            return status;
+            
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
         }
     }
 }

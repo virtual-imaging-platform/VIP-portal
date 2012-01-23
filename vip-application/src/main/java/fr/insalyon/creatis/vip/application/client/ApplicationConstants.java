@@ -62,6 +62,7 @@ public class ApplicationConstants {
     public static final String ICON_PROCESSOR = IMG_FOLDER + "icon-processor.png";
     public static final String ICON_SEARCH = IMG_FOLDER + "icon-search.png";
     public static final String ICON_SIMULATION_VIEW = IMG_FOLDER + "icon-simulation-view.png";
+    public static final String ICON_STATUS = IMG_FOLDER + "icon-status.png";
     public static final String ICON_SUMMARY = IMG_FOLDER + "icon-summary.png";
     public static final String ICON_TASK_KILL = IMG_FOLDER + "icon-task-kill.png";
     public static final String ICON_TASK_REPLICATE = IMG_FOLDER + "icon-task-replicate.png";

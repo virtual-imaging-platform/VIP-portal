@@ -32,38 +32,44 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.server.dao;
+package fr.insalyon.creatis.vip.application.client.bean;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
-import fr.insalyon.creatis.vip.application.client.bean.Job;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import java.util.List;
-import java.util.Map;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  *
  * @author Rafael Silva
  */
-public interface JobDAO {
+public class ApplicationStatus implements IsSerializable {
 
-    public Map<String, Integer> getStatusMap() throws DAOException;
+    private int runningWorkflows;
+    private int runningTasks;
+    private int waitingTasks;
 
-    public List<Job> getJobs() throws DAOException;
+    public ApplicationStatus() {
+    }
 
-    public List<String> getExecutionPerNumberOfJobs(int binSize) throws DAOException;
+    public int getRunningTasks() {
+        return runningTasks;
+    }
 
-    public List<String> getDownloadPerNumberOfJobs(int binSize) throws DAOException;
+    public void setRunningTasks(int runningTasks) {
+        this.runningTasks = runningTasks;
+    }
 
-    public List<String> getUploadPerNumberOfJobs(int binSize) throws DAOException;
+    public int getRunningWorkflows() {
+        return runningWorkflows;
+    }
 
-    public List<String> getJobsPerTime() throws DAOException;
+    public void setRunningWorkflows(int runningWorkflows) {
+        this.runningWorkflows = runningWorkflows;
+    }
 
-    public List<String> getCkptsPerJob() throws DAOException;
+    public int getWaitingTasks() {
+        return waitingTasks;
+    }
 
-    public void sendSignal(String jobID, JobStatus status) throws DAOException;
-
-    public List<String> getSiteHistogram() throws DAOException;
-
-    public int getNumberOfTasks(ApplicationConstants.JobStatus status) throws DAOException;
+    public void setWaitingTasks(int waitingTasks) {
+        this.waitingTasks = waitingTasks;
+    }
 }

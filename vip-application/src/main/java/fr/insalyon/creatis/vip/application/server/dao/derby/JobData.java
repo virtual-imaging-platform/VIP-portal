@@ -35,16 +35,13 @@
 package fr.insalyon.creatis.vip.application.server.dao.derby;
 
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.server.dao.JobDAO;
 import fr.insalyon.creatis.vip.application.server.dao.derby.connection.JobsConnection;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -365,6 +362,29 @@ public class JobData implements JobDAO {
 
             return list;
 
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param status
+     * @return
+     * @throws DAOException 
+     */
+    public int getNumberOfTasks(JobStatus status) throws DAOException {
+        
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "count(id) AS num FROM Jobs WHERE status = ?");
+            ps.setString(1, status.name());
+            
+            ResultSet rs = ps.executeQuery();
+            
+            return rs.next() ? rs.getInt("num") : 0;
+            
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);

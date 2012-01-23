@@ -150,6 +150,13 @@ public interface WorkflowDAO {
     
     /**
      * 
+     * @return
+     * @throws DAOException 
+     */
+    public List<Simulation> getRunningWorkflows() throws DAOException;
+    
+    /**
+     * 
      * @param simulationID
      * @return
      * @throws DAOException 

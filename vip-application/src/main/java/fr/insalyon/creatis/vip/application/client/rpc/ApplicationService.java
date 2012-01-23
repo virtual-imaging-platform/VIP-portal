@@ -39,6 +39,7 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import java.util.List;
 
@@ -88,4 +89,6 @@ public interface ApplicationService extends RemoteService {
     public AppClass getClass(String className) throws ApplicationException;
 
     public List<String>[] getApplicationsAndUsers(List<String> reservedClasses) throws ApplicationException;
+    
+    public ApplicationStatus getApplicationStatus() throws ApplicationException;
 }
