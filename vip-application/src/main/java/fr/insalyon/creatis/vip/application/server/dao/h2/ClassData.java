@@ -36,7 +36,7 @@ package fr.insalyon.creatis.vip.application.server.dao.h2;
 
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.server.dao.ClassDAO;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.h2.PlatformConnection;
 import java.sql.Connection;
@@ -176,7 +176,7 @@ public class ClassData implements ClassDAO {
 
             ps.setString(1, email);
             if (validAdmin) {
-                ps.setString(2, ROLE.Admin.name());
+                ps.setString(2, GROUP_ROLE.Admin.name());
             }
             
             ResultSet rs = ps.executeQuery();

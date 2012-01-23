@@ -113,7 +113,6 @@ public class EditClassStackSection extends SectionStackSection {
                 if (form.validate()) {
                     List<String> values = new ArrayList<String>();
                     values.addAll(Arrays.asList(groupsPickList.getValues()));
-                    values.add(CoreConstants.GROUP_ADMIN);
 
                     save(new AppClass(nameItem.getValueAsString().trim(),
                             values));
@@ -194,6 +193,7 @@ public class EditClassStackSection extends SectionStackSection {
      * Loads groups list
      */
     private void loadData() {
+        
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
@@ -206,9 +206,7 @@ public class EditClassStackSection extends SectionStackSection {
                 modal.hide();
                 List<String> dataList = new ArrayList<String>();
                 for (String g : result) {
-                    if (!g.equals(CoreConstants.GROUP_ADMIN)) {
                         dataList.add(g);
-                    }
                 }
                 groupsPickList.setValueMap(dataList.toArray(new String[]{}));
             }

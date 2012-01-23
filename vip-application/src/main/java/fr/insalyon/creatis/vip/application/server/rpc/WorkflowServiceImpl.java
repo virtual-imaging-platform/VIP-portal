@@ -35,11 +35,7 @@
 package fr.insalyon.creatis.vip.application.server.rpc;
 
 import fr.insalyon.creatis.devtools.FileUtils;
-import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
-import fr.insalyon.creatis.vip.application.client.bean.InOutData;
-import fr.insalyon.creatis.vip.application.client.bean.Processor;
-import fr.insalyon.creatis.vip.application.client.bean.Simulation;
-import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
+import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.InputBusiness;
@@ -48,8 +44,8 @@ import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.application.server.dao.derby.connection.JobsConnection;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
-import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import java.io.BufferedReader;
@@ -79,10 +75,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param applicationName
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public Descriptor getApplicationDescriptor(String applicationName) throws ApplicationException {
 
@@ -98,11 +94,11 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param parametersMap
      * @param applicationName
      * @param simulationName
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public void launchSimulation(Map<String, String> parametersMap,
             String applicationName, String simulationName) throws ApplicationException {
@@ -110,10 +106,9 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         try {
             trace(logger, "Launching simulation '" + simulationName + "' (" + applicationName + ").");
             User user = getSessionUser();
-            String workflowID = workflowBusiness.launch(user.getFullName(),
+            String workflowID = workflowBusiness.launch(user,
                     new ArrayList<String>(getSessionUserGroups().keySet()),
-                    !user.isSystemAdministrator(), parametersMap, applicationName,
-                    simulationName);
+                    parametersMap, applicationName, simulationName);
 
             trace(logger, "Simulation '" + simulationName + "' launched with ID '" + workflowID + "'.");
 
@@ -125,11 +120,11 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param name
      * @param appName
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public SimulationInput getInputByNameUserApp(String name, String appName)
             throws ApplicationException {
@@ -146,9 +141,9 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param simulationInput
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public void addSimulationInput(SimulationInput simulationInput)
             throws ApplicationException {
@@ -165,9 +160,9 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param simulationInput
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public void updateSimulationInput(SimulationInput simulationInput)
             throws ApplicationException {
@@ -184,9 +179,9 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param fileName
-     * @return 
+     * @return
      */
     public String loadSimulationInput(String fileName) throws ApplicationException {
 
@@ -200,10 +195,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param inputName
      * @param applicationName
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public void removeSimulationInput(String inputName, String applicationName)
             throws ApplicationException {
@@ -220,9 +215,8 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
-     * @return
-     * @throws ApplicationException 
+     *
+     * @return @throws ApplicationException
      */
     public List<SimulationInput> getSimulationInputByUser() throws ApplicationException {
 
@@ -237,9 +231,9 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param simulationIDs
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public void killSimulations(List<String> simulationIDs) throws ApplicationException {
 
@@ -270,9 +264,9 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param simulationIDs
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public void cleanSimulations(List<String> simulationIDs) throws ApplicationException {
 
@@ -305,9 +299,9 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param simulationIDs
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public void purgeSimulations(List<String> simulationIDs) throws ApplicationException {
 
@@ -337,9 +331,9 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param simulationID
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public void killWorkflow(String simulationID) throws ApplicationException {
 
@@ -355,9 +349,9 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param simulationID
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public void cleanWorkflow(String simulationID) throws ApplicationException {
 
@@ -373,9 +367,9 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param simulationID
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public void purgeWorkflow(String simulationID) throws ApplicationException {
 
@@ -391,21 +385,21 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param userName
      * @param application
      * @param status
      * @param startDate
      * @param endDate
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public List<Simulation> getSimulations(String userName, String application,
             String status, Date startDate, Date endDate) throws ApplicationException {
 
         try {
             User user = getSessionUser();
-            if (configurationBusiness.isSystemAdministrator(user.getEmail())) {
+            if (user.isSystemAdministrator()) {
                 return workflowBusiness.getSimulations(userName, application,
                         status, startDate, endDate);
 
@@ -431,10 +425,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public Simulation getSimulation(String simulationID) throws ApplicationException {
 
@@ -500,9 +494,9 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param path
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public void deleteLogData(String path) throws ApplicationException {
 
@@ -530,11 +524,11 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param simulationList
      * @param type
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public String getPerformanceStats(List<Simulation> simulationList, int type) throws ApplicationException {
 
@@ -547,10 +541,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public List<InOutData> getOutputData(String simulationID) throws ApplicationException {
 
@@ -563,10 +557,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public List<InOutData> getInputData(String simulationID) throws ApplicationException {
 
@@ -579,10 +573,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public List<Processor> getProcessors(String simulationID) throws ApplicationException {
 
@@ -595,9 +589,9 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param inputs
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public void validateInputs(List<String> inputs) throws ApplicationException {
 
@@ -612,17 +606,17 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param currentUser
      * @param newUser
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public void updateUser(String currentUser, String newUser) throws ApplicationException {
 
         try {
             trace(logger, "Updating user '" + currentUser + "' to '" + newUser + "'.");
             workflowBusiness.updateUser(currentUser, newUser);
-            
+
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
         } catch (BusinessException ex) {

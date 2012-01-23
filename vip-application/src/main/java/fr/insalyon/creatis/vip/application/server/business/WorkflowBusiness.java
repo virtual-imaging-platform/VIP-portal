@@ -37,24 +37,22 @@ package fr.insalyon.creatis.vip.application.server.business;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.MoteurStatus;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.application.client.bean.InOutData;
-import fr.insalyon.creatis.vip.application.client.bean.Processor;
-import fr.insalyon.creatis.vip.application.client.bean.Simulation;
-import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
+import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.server.business.simulation.MoteurPoolConfig;
 import fr.insalyon.creatis.vip.application.server.business.simulation.MoteurWSConfig;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.GwendiaParser;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.ScuflParser;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
-import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAOFactory;
 import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAO;
-import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAOFactory;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
@@ -62,11 +60,7 @@ import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import javax.xml.rpc.ServiceException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -82,11 +76,11 @@ public class WorkflowBusiness {
     private static final Logger logger = Logger.getLogger(WorkflowBusiness.class);
 
     /**
-     * 
+     *
      * @param user
      * @param applicationName
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public Descriptor getApplicationDescriptor(String user, String applicationName)
             throws BusinessException {
@@ -121,23 +115,22 @@ public class WorkflowBusiness {
     }
 
     /**
-     * 
+     *
      * @param user
      * @param parametersMap
      * @param applicationName
      * @param simulationName
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
-    public String launch(String user, List<String> groups, boolean validParameters,
-            Map<String, String> parametersMap, String applicationName,
-            String simulationName) throws BusinessException {
+    public String launch(User user, List<String> groups, Map<String, String> parametersMap,
+            String applicationName, String simulationName) throws BusinessException {
 
         try {
             WorkflowDAO workflowDAO = WorkflowDAOFactory.getDAOFactory().getWorkflowDAO();
-            int runningWorkflows = workflowDAO.getRunningWorkflows(user);
+            int runningWorkflows = workflowDAO.getRunningWorkflows(user.getFullName());
 
-            if (runningWorkflows >= Server.getInstance().getMoteurMaxWorkflows()) {
+            if (runningWorkflows >= user.getLevel().getMaxRunningSimulations()) {
                 logger.warn("Unable to launch simulation '" + simulationName + "': max "
                         + "number of running workflows reached for user '" + user + "'.");
                 throw new BusinessException("Max number of running simulations reached.<br />You "
@@ -155,8 +148,8 @@ public class WorkflowBusiness {
                 ParameterSweep ps = new ParameterSweep(name);
                 String valuesStr = parametersMap.get(name);
 
-                if (valuesStr.contains("##")) {
-                    String[] values = valuesStr.split("##");
+                if (valuesStr.contains(ApplicationConstants.SEPARATOR_INPUT)) {
+                    String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_INPUT);
                     if (values.length != 3) {
                         throw (new BusinessException("Error in range."));
                     }
@@ -167,19 +160,21 @@ public class WorkflowBusiness {
                     for (double d = start; d <= stop; d += step) {
                         ps.addValue(d + "");
                     }
-                } else if (valuesStr.contains("@@")) {
-                    String[] values = valuesStr.split("@@");
+                    
+                } else if (valuesStr.contains(ApplicationConstants.SEPARATOR_LIST)) {
+                    String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_LIST);
                     for (String v : values) {
-                        String parsedPath = DataManagerUtil.parseBaseDir(user, v.trim());
-                        if (validParameters) {
-                            checkFolderACL(user, groups, parsedPath);
+                        String parsedPath = DataManagerUtil.parseBaseDir(user.getFullName(), v.trim());
+                        if (!user.isSystemAdministrator()) {
+                            checkFolderACL(user.getFullName(), groups, parsedPath);
                         }
                         ps.addValue(parsedPath);
                     }
+                    
                 } else {
-                    String parsedPath = DataManagerUtil.parseBaseDir(user, valuesStr.trim());
-                    if (validParameters) {
-                        checkFolderACL(user, groups, parsedPath);
+                    String parsedPath = DataManagerUtil.parseBaseDir(user.getFullName(), valuesStr.trim());
+                    if (!user.isSystemAdministrator()) {
+                        checkFolderACL(user.getFullName(), groups, parsedPath);
                     }
                     ps.addValue(parsedPath);
                 }
@@ -189,7 +184,7 @@ public class WorkflowBusiness {
             Application app = ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getApplication(applicationName);
 
             DataManagerBusiness dmBusiness = new DataManagerBusiness();
-            String workflowPath = dmBusiness.getRemoteFile(user, app.getLfn(),
+            String workflowPath = dmBusiness.getRemoteFile(user.getEmail(), app.getLfn(),
                     Server.getInstance().getConfigurationFolder() + "workflows/"
                     + FilenameUtils.getName(app.getLfn()));
 
@@ -211,7 +206,7 @@ public class WorkflowBusiness {
             workflowID = ws.substring(ws.lastIndexOf("/") + 1, ws.lastIndexOf("."));
 //            }
 
-            workflowDAO.add(new Simulation(applicationName, workflowID, user,
+            workflowDAO.add(new Simulation(applicationName, workflowID, user.getFullName(),
                     new Date(), simulationName, SimulationStatus.Running.name()));
 
             return workflowID;
@@ -230,7 +225,7 @@ public class WorkflowBusiness {
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @throws BusinessException
      */
@@ -260,10 +255,10 @@ public class WorkflowBusiness {
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @param email
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void clean(String simulationID, String email) throws BusinessException {
 
@@ -299,7 +294,7 @@ public class WorkflowBusiness {
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @throws BusinessException
      */
@@ -319,14 +314,14 @@ public class WorkflowBusiness {
     }
 
     /**
-     * 
+     *
      * @param userName
      * @param application
      * @param status
      * @param startDate
      * @param endDate
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public List<Simulation> getSimulations(String userName, String application,
             String status, Date startDate, Date endDate) throws BusinessException {
@@ -372,14 +367,14 @@ public class WorkflowBusiness {
     }
 
     /**
-     * 
+     *
      * @param users
      * @param application
      * @param status
      * @param startDate
      * @param endDate
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public List<Simulation> getSimulations(List<String> users, String application,
             String status, Date startDate, Date endDate) throws BusinessException {
@@ -425,10 +420,10 @@ public class WorkflowBusiness {
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public Simulation getSimulation(String simulationID) throws BusinessException {
 
@@ -441,9 +436,9 @@ public class WorkflowBusiness {
     }
 
     /**
-     * 
+     *
      * @param simulationID
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public String getStatus(String simulationID) throws BusinessException {
 
@@ -471,10 +466,10 @@ public class WorkflowBusiness {
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public List<InOutData> getOutputData(String simulationID) throws BusinessException {
 
@@ -487,10 +482,10 @@ public class WorkflowBusiness {
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public List<InOutData> getInputData(String simulationID) throws BusinessException {
 
@@ -503,9 +498,9 @@ public class WorkflowBusiness {
     }
 
     /**
-     * 
+     *
      * @param path
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void deleteLogData(String path) throws BusinessException {
 
@@ -527,10 +522,10 @@ public class WorkflowBusiness {
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public List<Processor> getProcessors(String simulationID) throws BusinessException {
 
@@ -543,12 +538,12 @@ public class WorkflowBusiness {
     }
 
     /**
-     * 
+     *
      * @param simulationIDList
      * @param type
      * @param binSize
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public String getPerformanceStats(List<Simulation> simulationIDList, int type)
             throws BusinessException {
@@ -569,10 +564,10 @@ public class WorkflowBusiness {
     }
 
     /**
-     * 
+     *
      * @param user
      * @param inputs
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void validateInputs(String user, List<String> inputs) throws BusinessException {
 
@@ -601,23 +596,38 @@ public class WorkflowBusiness {
             throw new BusinessException(ex);
         }
     }
+
+    /**
+     *
+     * @param currentUser
+     * @param newUser
+     * @throws BusinessException
+     */
+    public void updateUser(String currentUser, String newUser) throws BusinessException {
+
+        try {
+            WorkflowDAOFactory.getDAOFactory().getWorkflowDAO().updateUser(currentUser, newUser);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
     
     /**
      * 
-     * @param currentUser
-     * @param newUser
+     * @return
      * @throws BusinessException 
      */
-    public void updateUser(String currentUser, String newUser) throws BusinessException {
+    public List<Simulation> getRunningSimulations() throws BusinessException {
         
         try {
-            WorkflowDAOFactory.getDAOFactory().getWorkflowDAO().updateUser(currentUser, newUser);
+            return WorkflowDAOFactory.getDAOFactory().getWorkflowDAO().getRunningWorkflows();
             
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
-
+    
     private boolean isShiwaPoolID(String simulationID) {
 
         if (simulationID.startsWith("shiwa-instance")) {

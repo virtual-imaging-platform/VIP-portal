@@ -186,12 +186,10 @@ public class ClassesStackSection extends SectionStackSection {
                 for (AppClass c : result) {
                     StringBuilder sb = new StringBuilder();
                     for (String group : c.getGroups()) {
-                        if (!group.equals(CoreConstants.GROUP_ADMIN)) {
-                            if (sb.length() > 0) {
-                                sb.append(", ");
-                            }
-                            sb.append(group);
+                        if (sb.length() > 0) {
+                            sb.append(", ");
                         }
+                        sb.append(group);
                     }
                     dataList.add(new ClassRecord(c.getName(), sb.toString()));
                 }

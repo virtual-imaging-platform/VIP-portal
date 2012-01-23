@@ -36,12 +36,10 @@ package fr.insalyon.creatis.vip.application.server.business;
 
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants.ROLE;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
