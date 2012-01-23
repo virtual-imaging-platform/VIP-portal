@@ -56,8 +56,7 @@ public class JobRecord extends ListGridRecord {
         setAttribute("exitCode", exitCode);
         setAttribute("siteName", siteName);
         setAttribute("nodeName", nodeName);
-        setAttribute("parameters", "Parameters: <br />"
-                + parameters.replaceAll(" ", "<br />") + "<br />");
+        setAttribute("parameters", parameters.replaceAll(" ", "<br />"));
         setMinorStatus(status, exitCode, minorStatus);
     }
 

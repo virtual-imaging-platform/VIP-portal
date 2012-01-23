@@ -84,5 +84,7 @@ public interface JobService extends RemoteService {
     
     public Node getNode(String simulationID, String siteName, String nodeName) throws ApplicationException ;
     
-    public void sendSignal(String simulationID, String jobID, ApplicationConstants.JobStatus status) throws ApplicationException ;
+    public void sendSignal(String simulationID, String jobID, ApplicationConstants.JobStatus status) throws ApplicationException;
+    
+    public void sendSignal(String simulationID, List<String> jobIDs, ApplicationConstants.JobStatus status) throws ApplicationException;
 }

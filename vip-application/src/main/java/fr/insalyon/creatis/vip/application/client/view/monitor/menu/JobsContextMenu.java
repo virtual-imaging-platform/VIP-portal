@@ -46,8 +46,8 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
-import fr.insalyon.creatis.vip.application.client.view.monitor.ViewerWindow;
 import fr.insalyon.creatis.vip.application.client.view.monitor.NodeInfoWindow;
+import fr.insalyon.creatis.vip.application.client.view.monitor.ViewerWindow;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.JobRecord;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 
@@ -58,10 +58,12 @@ import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 public class JobsContextMenu extends Menu {
 
     private ModalWindow modal;
+    private String simulationID;
 
     public JobsContextMenu(ModalWindow modal, final String simulationID, final JobRecord job) {
 
         this.modal = modal;
+        this.simulationID = simulationID;
         this.setShowShadow(true);
         this.setShadowDepth(10);
         this.setWidth(90);
@@ -125,14 +127,14 @@ public class JobsContextMenu extends Menu {
             }
         });
 
-        MenuItem replicateItem = getSignalItem("Send Replicate Signal", ApplicationConstants.ICON_TASK_REPLICATE,
-                "replicate", simulationID, job.getID(), ApplicationConstants.JobStatus.REPLICATE);
+        MenuItem replicateItem = getSignalItem("Replicate", ApplicationConstants.ICON_TASK_REPLICATE,
+                job.getID(), JobStatus.REPLICATE);
 
-        MenuItem killItem = getSignalItem("Send Kill Signal", ApplicationConstants.ICON_TASK_KILL,
-                "kill", simulationID, job.getID(), ApplicationConstants.JobStatus.KILL);
+        MenuItem killItem = getSignalItem("Kill", ApplicationConstants.ICON_TASK_KILL,
+                job.getID(), JobStatus.KILL);
 
-        MenuItem rescheduleItem = getSignalItem("Send Reschedule Signal", ApplicationConstants.ICON_TASK_RESCHEDULE,
-                "reschedule", simulationID, job.getID(), ApplicationConstants.JobStatus.RESCHEDULE);
+        MenuItem rescheduleItem = getSignalItem("Reschedule", ApplicationConstants.ICON_TASK_RESCHEDULE,
+                job.getID(), JobStatus.RESCHEDULE);
 
         MenuItemSeparator separator = new MenuItemSeparator();
 
@@ -150,19 +152,19 @@ public class JobsContextMenu extends Menu {
         }
     }
 
-    private MenuItem getSignalItem(String title, String icon, final String question,
-            final String simulationID, final String jobID,
-            final ApplicationConstants.JobStatus status) {
+    private MenuItem getSignalItem(final String title, String icon,
+            final String jobID, final JobStatus status) {
 
-        MenuItem menuItem = new MenuItem(title, icon);
+        MenuItem menuItem = new MenuItem("Send " + title + " Signal", icon);
         menuItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                SC.confirm("Do you really want to " + question + " this task?", new BooleanCallback() {
+                SC.ask("Do you really want to " + title.toLowerCase()
+                        + " this task?", new BooleanCallback() {
 
                     public void execute(Boolean value) {
-                        if (value != null && value) {
-                            sendSignal(simulationID, jobID, status);
+                        if (value) {
+                            sendSignal(jobID, status);
                         }
                     }
                 });
@@ -171,8 +173,7 @@ public class JobsContextMenu extends Menu {
         return menuItem;
     }
 
-    private void sendSignal(String simulationID, String jobID,
-            ApplicationConstants.JobStatus status) {
+    private void sendSignal(String jobID, JobStatus status) {
 
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {

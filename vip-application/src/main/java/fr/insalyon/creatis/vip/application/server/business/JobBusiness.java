@@ -39,6 +39,7 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.bean.Node;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
+import fr.insalyon.creatis.vip.application.server.dao.JobDAO;
 import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAOFactory;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
@@ -244,6 +245,27 @@ public class JobBusiness {
         try {
             WorkflowDAOFactory.getDAOFactory().getJobDAO(simulationID).sendSignal(jobID, status);
 
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
+    /**
+     * 
+     * @param simulationID
+     * @param jobIDs
+     * @param status
+     * @throws BusinessException 
+     */
+    public void sendSignal(String simulationID, List<String> jobIDs, 
+            JobStatus status) throws BusinessException {
+        
+        try {
+            JobDAO jobDAO = WorkflowDAOFactory.getDAOFactory().getJobDAO(simulationID);
+            for (String jobID : jobIDs) {
+                jobDAO.sendSignal(jobID, status);
+            }
+            
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

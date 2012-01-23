@@ -39,13 +39,15 @@ import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.VisualizationUtils;
 import com.google.gwt.visualization.client.visualizations.corechart.AxisOptions;
-import com.google.gwt.visualization.client.visualizations.corechart.Options;
 import com.google.gwt.visualization.client.visualizations.corechart.BarChart;
+import com.google.gwt.visualization.client.visualizations.corechart.Options;
 import com.google.gwt.visualization.client.visualizations.corechart.PieChart;
 import com.google.gwt.visualization.client.visualizations.corechart.PieChart.PieOptions;
-import com.smartgwt.client.types.ExpansionMode;
+import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.GroupStartOpen;
 import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.types.SelectionAppearance;
+import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -57,6 +59,8 @@ import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+import com.smartgwt.client.widgets.viewer.DetailViewer;
+import com.smartgwt.client.widgets.viewer.DetailViewerField;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
@@ -98,7 +102,7 @@ public class SummaryTab extends Tab {
         configureSummaryGrid();
         configureDetailGrid();
 
-        VLayout vLayout = new VLayout(10);
+        VLayout vLayout = new VLayout();
         vLayout.setWidth100();
         vLayout.setHeight100();
 
@@ -114,6 +118,8 @@ public class SummaryTab extends Tab {
         vLayout.addMember(summaryLayout);
 
         detailModal = new ModalWindow(detailGrid);
+        
+        vLayout.addMember(new SummaryToolStrip(detailModal, detailGrid, simulationID));
         vLayout.addMember(detailGrid);
 
         this.setPane(vLayout);
@@ -125,11 +131,11 @@ public class SummaryTab extends Tab {
         chartLayout = new VLayout();
         chartLayout.setWidth(600);
         chartLayout.setHeight(300);
-        
+
         innerChartLayout = new VLayout();
         innerChartLayout.setWidth(600);
         innerChartLayout.setHeight(300);
-        
+
         chartLayout.addMember(innerChartLayout);
     }
 
@@ -150,15 +156,35 @@ public class SummaryTab extends Tab {
 
     private void configureDetailGrid() {
 
-        detailGrid = new ListGrid();
+        detailGrid = new ListGrid() {
+
+            @Override
+            protected Canvas getCellHoverComponent(Record record, Integer rowNum, Integer colNum) {
+
+                DetailViewer detailViewer = new DetailViewer();
+                detailViewer.setWidth(400);
+
+                DetailViewerField idField = new DetailViewerField("jobID", "Job ID");
+                DetailViewerField statusField = new DetailViewerField("status", "Status");
+                DetailViewerField parametersField = new DetailViewerField("parameters", "Parameters");
+                
+                detailViewer.setFields(idField, statusField, parametersField);
+                detailViewer.setData(new Record[]{record});
+
+                return detailViewer;
+            }
+        };
         detailGrid.setWidth100();
         detailGrid.setHeight100();
         detailGrid.setShowAllRecords(false);
         detailGrid.setShowRowNumbers(true);
         detailGrid.setShowEmptyMessage(true);
         detailGrid.setEmptyMessage("<br>No data available.");
-        detailGrid.setCanExpandRecords(true);
-        detailGrid.setExpansionMode(ExpansionMode.DETAIL_FIELD);
+        detailGrid.setSelectionType(SelectionStyle.SIMPLE);
+        detailGrid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
+        detailGrid.setCanHover(true);
+        detailGrid.setShowHover(true);
+        detailGrid.setShowHoverComponents(true);
 
         ListGridField jobIDField = new ListGridField("jobID", "Job ID");
         ListGridField statusField = new ListGridField("status", "Status");
@@ -170,7 +196,6 @@ public class SummaryTab extends Tab {
 
         detailGrid.setGroupStartOpen(GroupStartOpen.ALL);
         detailGrid.setGroupByField("command");
-        detailGrid.setDetailField("parameters");
 
         detailGrid.addRowContextClickHandler(new RowContextClickHandler() {
 
@@ -280,11 +305,11 @@ public class SummaryTab extends Tab {
                         options.setFontSize(10);
                         options.setColors("#1A767F", "#FF8575", "#cc9933",
                                 "#E8DD80", "#64A1E8", "#47A259", "#B00504");
-                        
+
                         AxisOptions hAxisOptions = AxisOptions.create();
                         hAxisOptions.setTitle("Number of Jobs");
                         options.setHAxisOptions(hAxisOptions);
-                       
+
                         DataTable dataTable = DataTable.create();
                         dataTable.addColumn(ColumnType.STRING, "Status");
                         for (int i = 0; i < data.length; i++) {

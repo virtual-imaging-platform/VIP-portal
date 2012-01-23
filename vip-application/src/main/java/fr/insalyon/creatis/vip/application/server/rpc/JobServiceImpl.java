@@ -62,10 +62,10 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public Map<String, Integer> getStatusMap(String simulationID) throws ApplicationException {
 
@@ -78,10 +78,10 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public List<Job> getJobsList(String simulationID) throws ApplicationException {
 
@@ -94,13 +94,13 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @param folder
      * @param fileName
      * @param extension
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public String readFile(String simulationID, String folder, String fileName,
             String extension) throws ApplicationException {
@@ -114,11 +114,11 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @param binSize
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public List<String> getExecutionPerNumberOfJobs(String simulationID,
             int binSize) throws ApplicationException {
@@ -132,11 +132,11 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @param binSize
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public List<String> getDownloadPerNumberOfJobs(String simulationID,
             int binSize) throws ApplicationException {
@@ -150,11 +150,11 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @param binSize
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public List<String> getUploadPerNumberOfJobs(String simulationID,
             int binSize) throws ApplicationException {
@@ -168,10 +168,10 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public List<String> getJobFlow(String simulationID) throws ApplicationException {
 
@@ -182,12 +182,12 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
             throw new ApplicationException(ex);
         }
     }
-    
-        /**
-     * 
+
+    /**
+     *
      * @param simulationID
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public List<String> getCkptsPerJob(String simulationID) throws ApplicationException {
 
@@ -197,15 +197,15 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
-    } 
+    }
 
     /**
-     * 
+     *
      * @param simulationID
      * @param siteName
      * @param nodeName
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public Node getNode(String simulationID, String siteName, String nodeName)
             throws ApplicationException {
@@ -219,11 +219,11 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @param jobID
      * @param status
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public void sendSignal(String simulationID, String jobID, JobStatus status)
             throws ApplicationException {
@@ -240,10 +240,39 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
         }
     }
 
+    /**
+     *
+     * @param simulationID
+     * @return
+     * @throws ApplicationException
+     */
     public List<String> getSiteHistogram(String simulationID) throws ApplicationException {
+
         try {
             return jobBusiness.getSiteHistogram(simulationID);
 
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param simulationID
+     * @param jobIDs
+     * @param status
+     * @throws ApplicationException
+     */
+    public void sendSignal(String simulationID, List<String> jobIDs,
+            JobStatus status) throws ApplicationException {
+
+        try {
+            trace(logger, "Sending '" + status.name() + "' signal to '"
+                    + jobIDs.toString() + "' (" + simulationID + ").");
+            jobBusiness.sendSignal(simulationID, jobIDs, status);
+            
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
