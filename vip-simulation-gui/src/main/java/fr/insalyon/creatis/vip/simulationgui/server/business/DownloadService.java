@@ -46,6 +46,7 @@ import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3D;
+import fr.insalyon.creatis.vip.simulationgui.client.view.SimulationGUIException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -70,19 +71,13 @@ public class DownloadService {
     private String returnPath = "null";
     private static Data3D[][] object;
 
-    public DownloadService(String url, String user) {
+    public DownloadService(String url, String user) throws URISyntaxException  {
 
         zipPath = "null";
         finalPath = "null";
         File fb = new File(Server.getInstance().getConfigurationFolder() + "/models");
         fb.mkdirs();
-        try {
-            download(url, user);
-            
-        } catch (URISyntaxException ex) {
-            logger.error(ex);
-        }
-        rebuildObject(finalPath, rdfPath);
+        download(url, user);
     }
 
     public String getPath() {
@@ -178,20 +173,23 @@ public class DownloadService {
         return parent;
     }
 
-    private void rebuildObject(String path, String rdfPath) {
+    public Data3D[][] rebuildObject() throws SimulationGUIException, Exception
+    {
+         return rebuildObject(finalPath, rdfPath);
+    }
+    private Data3D[][] rebuildObject(String path, String rdfPath) throws SimulationGUIException, Exception {
         
         SimulationObjectModel inModel = SimulationObjectModelFactory.rebuildObjectModelFromAnnotationFile(rdfPath, true);
-
         int index = 0;
 
         Timepoint tp = inModel.getTimepoints().get(0);
         Instant it = tp.getInstants().get(0);
         String[][] entry = new String[it.getObjectLayers().size()][1];
         String[] type = new String[it.getObjectLayers().size()];
+        
         for (ObjectLayer ol : it.getObjectLayers()) {
             entry[index] = new String[ol.getLayerParts().size()];
             type[index] = ol.getType().toString();
-            //index++;
             int i = 0;
             for (ObjectLayerPart olp : ol.getLayerParts()) {
                 entry[index][i] = olp.getFileNames().toString();
@@ -204,18 +202,24 @@ public class DownloadService {
             returnPath += entry[0][i] + " ";
         }
         returnPath += " 1 ";
-        for (int i = 0; i < entry[1].length; i++) {
-            returnPath += entry[1][i] + " ";
+        if(entry.length >1)
+        {
+            for (int i = 0; i < entry[1].length; i++) {
+                returnPath += entry[1][i] + " ";
+            }
         }
-        returnPath += " 2 ";
-        for (int i = 0; i < entry[2].length; i++) {
-            returnPath += entry[2][i] + " ";
+        if(entry.length >2 )
+        {
+            returnPath += " 2 ";
+            for (int i = 0; i < entry[2].length; i++) {
+                returnPath += entry[2][i] + " ";
+            }
         }
         returnPath += "  objectListSize :     " + index + " compare to " + it.getObjectLayers().size();
         System.out.println(returnPath);
-
+       
 
         //ObjectFactoryOld objFact=ObjectFactoryOld.getInstance();
-        object = ObjectFactory.buildMulti(path, entry, type);
+        return ObjectFactory.buildMulti(path, entry, type);
     }
 }

@@ -67,7 +67,7 @@ public class VTKEmulator {
     public VTKEmulator(String fileName) {
         
         this.fileName = fileName;
-        if (fileName.endsWith("vtp")) {
+        if (fileName.endsWith("vtp") || fileName.endsWith("vtk")) {
             readVTP();
         } else if (fileName.endsWith("mhd")) {
             readMHD();

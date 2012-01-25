@@ -385,6 +385,7 @@ public class SimulationGUIControlBoxModel extends Portlet {
         String s = " i initial : " + i;
         elementData = new TreeNode[i];
         i = 0;
+
         for (Data3D[] d : DATA) {
             for (Data3D d1 : d) {
                 if (d1.getID().endsWith(".mhd")) {
@@ -396,7 +397,7 @@ public class SimulationGUIControlBoxModel extends Portlet {
         }
         for (Data3D[] d : DATA) {
             for (Data3D d1 : d) {
-                if (d1.getID().endsWith(".vtp")) {
+                if (d1.getID().endsWith(".vtp") || d1.getID().endsWith(".vtk") ) {
                     Canvas canvas = new Canvas();
                     canvas.setBackgroundColor("red");
 

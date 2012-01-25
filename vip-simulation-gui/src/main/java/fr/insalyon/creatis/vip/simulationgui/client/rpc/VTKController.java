@@ -65,5 +65,5 @@ public interface VTKController extends RemoteService {
 
     public Data3D[][] downloadAndUnzipExample(String path) throws SimulationGUIException;
 
-    public Data3D[][] downloadAndUnzipModel(String url) throws SimulationGUIException;
+    public Data3D[][] downloadAndUnzipModel(String url) throws Exception;
 }

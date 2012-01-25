@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.simulationgui.server.business;
 
 import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3D;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.StringTokenizer;
 
@@ -60,15 +61,17 @@ public class ObjectFactory {
 
     public static Data3D[][] buildMulti(String path, String[][] objectList, String[] type) {
 
+      System.out.println("object to create");
         Data3D[][] objectTab = new Data3D[objectList.length][1];
         int i = 0;
         int j = 0;
+
 
         for (String[] st : objectList) {
             j = 0;
             for (String st1d : st) {
                 String tmp = st1d.replace("[", "").replace("]", "");
-                if (tmp.endsWith(".zraw") || tmp.endsWith(".raw")) {
+                if (tmp.endsWith(".zraw") || tmp.endsWith(".raw") || tmp.endsWith(".mhd")) {
                     j--;
                 }
                 j++;
@@ -78,29 +81,50 @@ public class ObjectFactory {
         }
         i = 0;
         for (String[] st : objectList) {
-
+            ArrayList<Data3D> temp = new ArrayList<Data3D>();
             for (String st1d : st) {
                 String tmp = st1d.replace("[", "").replace("]", "");
-                if (tmp.endsWith(".zraw") || tmp.endsWith(".raw")) {
+                if (tmp.endsWith(".zraw") || tmp.endsWith(".raw") || tmp.endsWith(".mhd")) {
                     StringTokenizer st1dTokenize = new StringTokenizer(tmp);
-                    objectTab[i][0] = addMHD(path, st1dTokenize.nextToken(","), type[i]);
+                    temp.add(addMHD(path, st1dTokenize.nextToken(","), type[i]));
                 }
             }
+            double[] box = new double[6];
+            for(Data3D d : temp)
+            {
+                double[] bound_temp = d.getBoundingBox();
+                if(bound_temp[0]< box[0])
+                    box[0] = bound_temp[0];
+                if(bound_temp[1]< box[1])
+                    box[1] = bound_temp[1];
+                if(bound_temp[2]< box[2])
+                    box[2] = bound_temp[2];
+                if(bound_temp[3]> box[3])
+                    box[3] = bound_temp[3];
+                if(bound_temp[4]> box[4])
+                    box[4] = bound_temp[4];
+                if(bound_temp[5]> box[5])
+                    box[5] = bound_temp[5];
+            }
+            objectTab[i][0] = temp.get(0);
+            objectTab[i][0].setBoundingBox(box);
             i++;
         }
         i = 0;
         j = 1;
         for (String[] st2 : objectList) {
             j = 1;
+            
             for (String st2d : st2) {
                 String tmp = st2d.replace("[", "").replace("]", "");
-                if (tmp.endsWith(".vtp")) {
+                if (tmp.endsWith(".vtp") || tmp.endsWith(".vtk")) {
                     objectTab[i][j] = addVTP(path, tmp, type[i], objectTab[i][0].getBoundingBox());
                     j++;
                 }
             }
             i++;
         }
+        System.out.println("object created");
         return objectTab;
     }
 
@@ -112,6 +136,7 @@ public class ObjectFactory {
         if (!vtk.getThereIsAnError()) {
             make(object, null, null, null, vtk.getBounds(), 0, 1.0f);
         }
+        
         return object;
     }
 
@@ -142,7 +167,6 @@ public class ObjectFactory {
             float[] vertex = new float[DATA.getNumberOfPoints() * 3]; // 3 données par points !
             int[] indices = new int[pointOfTriangle]; // 3 données par lignes
             float[] colors = new float[DATA.getNumberOfPoints() * 4]; // 4 données par lignes : RGB et DETH
-
 
             int j = 0; // compteur
             // indices parsor
@@ -178,7 +202,6 @@ public class ObjectFactory {
                 vertex[i + 2] = DATA.getPoints()[i + 2] - zgravit;
                 j++;
             }
-
             // color maker
             for (int i = 0; i < DATA.getNumberOfPoints() * 4; i = i + 4) // pour chaque ligne de vertex on ajoute une couleur !
             {
@@ -188,6 +211,7 @@ public class ObjectFactory {
                 colors[i + 3] = 1.0f;
             }
             bounds = DATA.getBounds();
+
             bounds[0] = bounds[0] - xgravit;
             bounds[1] = bounds[1] - xgravit;
             bounds[2] = bounds[2] - ygravit;

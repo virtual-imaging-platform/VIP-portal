@@ -131,16 +131,18 @@ public class VTKControllerImpl extends AbstractRemoteServiceServlet implements V
 
     }
 
-    public Data3D[][] downloadAndUnzipModel(String url) throws SimulationGUIException {
-
-        try {
+    public Data3D[][] downloadAndUnzipModel(String url) throws Exception {
             User user = getSessionUser();
             DownloadService service = new DownloadService(url, user.getFullName());
-            return service.getObject();
-
-        } catch (CoreException ex) {
-            return null;
-        }
+            Data3D[][] object =  service.rebuildObject();
+            //System.gc ();
+            Runtime.getRuntime().gc();
+            
+            System.out.println("object got and garbage done " + object.length);
+            System.gc();
+            return object;
+            //return service.getObject();
+   
     }
 
     private void addClass(String className) throws SimulationGUIException {

@@ -15,5 +15,4 @@
     <servlet class="fr.insalyon.creatis.vip.models.server.rpc.ModelServiceImpl" path="/modelservice"/>
     <servlet class="fr.insalyon.creatis.vip.application.server.rpc.WorkflowServiceImpl" path="/workflowservice"/>
     <servlet class="fr.insalyon.creatis.vip.application.server.rpc.JobServiceImpl" path="/jobservice"/>
-
 </module>

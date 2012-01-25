@@ -42,11 +42,13 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SimulationGUIException extends Exception implements IsSerializable {
 
+    private int code;
     public SimulationGUIException() {
     }
 
-    public SimulationGUIException(String string) {
-        super(string);
+    public SimulationGUIException(int code, String message) {
+        super("code: " + code+ " " +message );
+        this.code = code;
     }
 
     public SimulationGUIException(Throwable thrwbl) {

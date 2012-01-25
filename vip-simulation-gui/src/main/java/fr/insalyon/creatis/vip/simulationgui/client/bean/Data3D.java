@@ -247,30 +247,31 @@ public class Data3D implements IsSerializable {
                 i2 = getSupIndices()[j + 1];
                 i3 = getSupIndices()[j + 2];
 
-                A.x = getSupVertices()[3 * i1];
-                A.y = getSupVertices()[3 * i1 + 1];
-                A.z = getSupVertices()[3 * i1 + 2];
+                A = generatePoint(i1);
+                B= generatePoint(i2);
+                C = generatePoint(i3);
+                
+                AB = generateVector(A,B);
+                AC = generateVector(A,C);
+                
+                N = generateNormal(AB, AC);
+                
+                if(!determinant(AB,AC, N))
+                {
+                    i1 = getSupIndices()[j];
+                    i2 = getSupIndices()[j + 2];
+                    i3 = getSupIndices()[j + 1];
 
-                B.x = getSupVertices()[3 * i2];
-                B.y = getSupVertices()[3 * i2 + 1];
-                B.z = getSupVertices()[3 * i2 + 2];
+                    A = generatePoint(i1);
+                    B= generatePoint(i2);
+                    C = generatePoint(i3);
 
-                C.x = getSupVertices()[3 * i3];
-                C.y = getSupVertices()[3 * i3 + 1];
-                C.z = getSupVertices()[3 * i3 + 2];
+                    AB = generateVector(A,B);
+                    AC = generateVector(A,C);
 
-                AB.x = B.x - A.x;
-                AB.y = B.y - A.y;
-                AB.z = B.z - A.z;
-
-                AC.x = C.x - A.x;
-                AC.y = C.y - A.y;
-                AC.z = C.z - A.z;
-
-                N.x = (AC.y * AB.z) - (AC.z * AB.y);
-                N.y = (AC.z * AB.x) - (AC.x * AB.z);
-                N.z = (AC.x * AB.y) - (AC.y * AB.x);
-
+                    N = generateNormal(AB, AC);
+                  }
+                
                 normals[3 * i1] += N.x;
                 normals[3 * i1 + 1] += N.y;
                 normals[3 * i1 + 2] += N.z;
@@ -297,6 +298,40 @@ public class Data3D implements IsSerializable {
             }
         }
     }
+     public Vector3 generatePoint(int indice)
+             {
+                 Vector3 A = new Vector3();
+                 A.x = getSupVertices()[3 * indice];
+                 A.y = getSupVertices()[3 * indice + 1];
+                 A.z = getSupVertices()[3 * indice + 2];
+                 return A;
+             }
+             
+    public Vector3 generateVector(Vector3 A, Vector3 B)
+    {
+        Vector3 C = new Vector3();;
+        C.x = B.x - A.x;
+        C.y = B.y - A.y;
+        C.z = B.z - A.z;
+        return C;
+    }
+    public boolean determinant(Vector3 A, Vector3 B, Vector3 C)
+    {
+        boolean bres = true;
+        double det = A.x * (B.y * C.z - B.z *C.y) + A.y * (B.z *C.x - B.x *C.z) + A.z *(B.x * C.y - B.y *C.x);
+        if (det < 0)
+            bres = false;
+        return bres;
+    }
+    public Vector3 generateNormal(Vector3 AB, Vector3 AC)
+    {
+        Vector3 N = new Vector3();;
+         N.x = (AC.y * AB.z) - (AC.z * AB.y);
+                N.y = (AC.z * AB.x) - (AC.x * AB.z);
+                N.z = (AC.x * AB.y) - (AC.y * AB.x);
+        return N;
+    }
+    
 
     public class Vector3 {
 
