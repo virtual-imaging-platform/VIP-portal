@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.simulationgui.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3D;
+import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3Dij;
 
 /**
  *
@@ -48,4 +49,8 @@ public interface VTKControllerAsync {
     public void downloadAndUnzipExample(String path, AsyncCallback<Data3D[][]> callback);
 
     public void downloadAndUnzipModel(String url, AsyncCallback<Data3D[][]> callback);
+    
+    public void UnzipModel(String url, AsyncCallback<int[][]> callback);
+    
+    public void downloadModel(int i, int j, AsyncCallback<Data3Dij> callback);
 }

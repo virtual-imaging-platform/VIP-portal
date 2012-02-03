@@ -50,7 +50,7 @@ public class ObjectFactory {
 
     public static Data3D build(String path) {
 
-        if (path.endsWith(".vtp")) {
+        if (path.endsWith(".vtp") || path.endsWith(".vtk")) {
             return VTPBuilder(path);
         } else if (path.endsWith(".mhd")) {
             return MHDBuilder(path);

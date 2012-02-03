@@ -39,6 +39,7 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3D;
+import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3Dij;
 import fr.insalyon.creatis.vip.simulationgui.client.view.SimulationGUIException;
 
 /**
@@ -66,4 +67,8 @@ public interface VTKController extends RemoteService {
     public Data3D[][] downloadAndUnzipExample(String path) throws SimulationGUIException;
 
     public Data3D[][] downloadAndUnzipModel(String url) throws Exception;
+    
+    public int[][] UnzipModel(String url) throws Exception;
+    
+    public Data3Dij downloadModel(int i, int j) throws Exception;
 }

@@ -62,8 +62,10 @@ import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.Object3D;
 import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.ObjectModel;
 import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.ObjectSimulateur;
 import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.Scene;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -95,6 +97,10 @@ public class SimulationGUIControlBox {
     private LaunchTab launchTab = null;
     private static HashMap<String, SimulationGUIControlBox> instances = new HashMap<String, SimulationGUIControlBox>();
 
+    private String modname = "Model";
+    private String transname = "transformation";
+    private ArrayList<String> names = new ArrayList<String>();
+    
     public static synchronized SimulationGUIControlBox getInstance(String applicationClass) {
 
         SimulationGUIControlBox inst = instances.get(applicationClass);
@@ -274,9 +280,11 @@ public class SimulationGUIControlBox {
             public void onChanged(ChangedEvent event) {
                 Layout.getInstance().removeTab(launchTab);
                 launchTab = new LaunchTab(simulatorSelectItem.getValueAsString());
+                SC.say(simulatorSelectItem.getValueAsString());
+                Layout.getInstance().addTab(launchTab);
                 launchTab.setCanClose(false);
-                Layout.getInstance().addTab(launchTab, false);
                 refreshLaunchTabValue();
+
             }
         });
 
@@ -391,7 +399,7 @@ public class SimulationGUIControlBox {
 
         enable = true;
         if (launchTab != null) {
-            Layout.getInstance().addTab(launchTab, false);
+         //   Layout.getInstance().addTab(launchTab);
             refreshLaunchTabValue();
         }
     }
@@ -435,9 +443,12 @@ public class SimulationGUIControlBox {
                 for (int i = 0; i < result.size(); i++) {
                     dynaStringTab[i] = result.get(i).getName();
                 }
+                 //SC.say(dynaStringTab[0]);
                 simulatorSelectItem.setValueMap(dynaStringTab);
                 simulatorSelectItem.setDefaultToFirstOption(true);
-                launchTab = new LaunchTab(dynaStringTab[0]); //applicationclass a la place de Id si on veut lance que la classe "simulation"
+                //launchTab = new LaunchTab(dynaStringTab[0]); 
+                //Layout.getInstance().addTab(launchTab);//applicationclass a la place de Id si on veut lance que la classe "simulation"
+              //    SC.say("test "+ launchTab.getFieldNames().size());
                 launchTab.setCanClose(false);
                 refreshLaunchTabValue();
             }

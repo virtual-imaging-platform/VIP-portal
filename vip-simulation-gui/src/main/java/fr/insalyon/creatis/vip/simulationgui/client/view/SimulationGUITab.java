@@ -59,6 +59,7 @@ import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIConstants;
 import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3D;
+import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3Dij;
 import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.ObjectModel;
 import fr.insalyon.creatis.vip.simulationgui.client.rpc.VTKController;
 import fr.insalyon.creatis.vip.simulationgui.client.rpc.VTKControllerAsync;
@@ -85,6 +86,9 @@ public class SimulationGUITab extends Tab {
     private ToolStripButton exampleButton = new ToolStripButton("Load example");
     static private String modelStorageURL = "";
     //dans le constructeur, creer les 4 tabs. Les ajouter/enlever du Layout en fonction des cases cochees
+    Data3D[][] res_mod;
+    int mod_const = 0;
+    int mod_lenght = 0;
 
     public SimulationGUITab() {
 
@@ -176,16 +180,64 @@ public class SimulationGUITab extends Tab {
             public void onChange(ChangeEvent event) {
                 String selectedItem = (String) event.getValue();
                 uri = mapNameUri.get(selectedItem);
-                defineSceneSection.showModal("Object downloading ");
+                defineSceneSection.showModal("Object downloading");
                 MAP.rebuildObjectModelFromTripleStore(uri, new AsyncCallback<SimulationObjectModel>() {
 
                     public void onSuccess(final SimulationObjectModel result) {
                         modelStorageURL = result.getStorageURL();
                         defineSceneSection.showModal("Object making");
+                        VTK.UnzipModel(modelStorageURL, new AsyncCallback<int[][]>() {
+                             public void onSuccess(int[][] result2) {
+                                  
+                                  res_mod = null;
+                                   res_mod = new Data3D[result2.length][1];
+                                   for(int k = 0; k < result2.length; k++)
+                                   {
+                                       res_mod[k] = new Data3D[result2[k].length];
+                                       mod_lenght++;
+                                   }
+                                 
+                                 //download data2D object one by one
+                                 for( int i = 0; i <result2.length; i++)
+                                 {
+                                     for(int j = 0; j < result2[i].length; j++)
+                                         VTK.downloadModel(i,j, new AsyncCallback<Data3Dij>(){
+                                             public void onSuccess(Data3Dij obj)
+                                             {
+                                                 defineSceneSection.hideModal();
+                                                 res_mod[obj.i][obj.j] = obj.data;
+                                                 defineSceneSection.showModal(obj.i + "et" + obj.j);
+                                                 mod_const++;
+                                                 if( mod_const == mod_lenght)
+                                                 {
+                                                       defineSceneSection.hideModal();
+                                                       defineSceneSection.showModal("Object making");
+                                                       ObjectModel.getInstance().addModel(res_mod);
+                                                       SimulationGUIControlBoxModel.getInstance().setTreeNode(res_mod);
+                                                       refreshLaunchTabValue();
+                                                 }
+                                             }
+                                              public void onFailure(Throwable caught) {
+                                                    defineSceneSection.hideModal();
+                                                    SC.say("Error during the object download from server");
+                                              }
+                                         });
+                                     
+                                 }
+                            }
+
+                            public void onFailure(Throwable caught) {
+                                // Show the RPC error message to the user
+                                defineSceneSection.hideModal();
+                                SC.say("Error during the object creation");
+                            }
+                        });
+                                /*
                         VTK.downloadAndUnzipModel(modelStorageURL, new AsyncCallback<Data3D[][]>() {
 
                             public void onSuccess(Data3D[][] result2) {
-                                defineSceneSection.hideModal();
+                                 defineSceneSection.hideModal();
+                                 SC.say("coucou");
                                 ObjectModel.getInstance().addModel(result2);
                                 SimulationGUIControlBoxModel.getInstance().setTreeNode(result2);
                                 refreshLaunchTabValue();
@@ -194,9 +246,10 @@ public class SimulationGUITab extends Tab {
                             public void onFailure(Throwable caught) {
                                 // Show the RPC error message to the user
                                 defineSceneSection.hideModal();
-                                SC.say("Error during the making");
+                                SC.say("Error during the making no?" + caught.getMessage());
+                          
                             }
-                        });
+                        }*/
                     }
 
                     public void onFailure(Throwable caught) {

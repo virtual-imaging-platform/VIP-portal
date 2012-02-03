@@ -42,6 +42,7 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIConstants;
 import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3D;
+import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3Dij;
 import fr.insalyon.creatis.vip.simulationgui.client.rpc.VTKController;
 import fr.insalyon.creatis.vip.simulationgui.client.view.SimulationGUIException;
 import fr.insalyon.creatis.vip.simulationgui.server.business.DownloadService;
@@ -56,7 +57,7 @@ import org.apache.log4j.Logger;
 public class VTKControllerImpl extends AbstractRemoteServiceServlet implements VTKController {
 
     private static Logger logger = Logger.getLogger(VTKControllerImpl.class);
-
+ private Data3D[][] object = null;
     public void configure() throws SimulationGUIException {
 
         addClass(SimulationGUIConstants.CLASS_CT);
@@ -144,7 +145,33 @@ public class VTKControllerImpl extends AbstractRemoteServiceServlet implements V
             //return service.getObject();
    
     }
+    
+    
+    
+     public int[][] UnzipModel(String url) throws Exception {
+            User user = getSessionUser();
+            DownloadService service = new DownloadService(url, user.getFullName());
+            object =  service.rebuildObject();
+            //System.gc ();
+            Runtime.getRuntime().gc();
+            
+            System.out.println("object got and garbage done " + object.length);
+            System.gc();
+            int[][] result = new int[object.length][1];
+            for(int i = 0; i < object.length; i++)
+                result[i] = new int[object[i].length];
+            return result;
+            //return service.getObject();
+       }
 
+       public Data3Dij downloadModel(int i, int j) throws Exception {
+          
+           Data3Dij data = new Data3Dij();
+           data.data = object[i][j];
+           data.i = i;
+           data.j = j;
+           return data;
+       }
     private void addClass(String className) throws SimulationGUIException {
 
         try {
