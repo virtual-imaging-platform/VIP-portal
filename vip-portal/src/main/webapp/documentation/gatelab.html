@@ -6,13 +6,38 @@
     </head>
     <body>
         <h1>The GateLab</h1>
-        <h2>Preparing your simulation</h2>
-        <ul>
-            <li>A GATE simulation is composed of several files (macros files, but also data files. Your simulation folder <b>must</b> be organized as followed : all input files must be in a "data" folder, all macro files in a "mac" folder and all output files in a "output" folder. All of these three folders <b>must</b> be in the same parent folder from which GATE will be executed. Your macro files <b>must</b> therefore refer to the inputs as "data/..." to macros as "mac/..." and outputs as "output/...".
-</li><li>Currently, only some types of simulations are possible with the GateLab. It is <b>not</b> possible to submit simulation that use time decomposition (with SetTiimeSlice, SetTimeStart and so on). Examples of possible simulation types include : radiation therapy, radiography imaging, SPECT, simple PET without exponential decay source.
-        </ul>
-            
-            <h2>Launching your simulation</h2>
+		
+		<h2>Preparing your simulation</h2>
+        <p>A GATE simulation is composed of several files (macros files, but also data files. Your simulation folder <b>must</b> be organized as followed : all input files must be in a "data" folder, all macro files in a "mac" folder and all output files in a "output" folder. All of these three folders <b>must</b> be in the same parent folder from which GATE will be executed. Your macro files <b>must</b> therefore refer to the inputs as "data/..." to macros as "mac/..." and outputs as "output/...".</p>
+  
+		
+		<h2>Supported simulation types</h2>
+		
+		<p>Currently, only some types of simulations can be submitted with the GateLab. Remember that a simulation is composed of a (generally large) number of Events (primary particles) that are sequentially tracked. Some simulations also required several Runs, that are "group" of Events : the geometry is rebuild between each Run. Generally, several Runs are used when time is taken into account in the simulation. When a simulation requires more than one Run, it is a little bit less easy to be paralelized.</p>
+
+		<p>To determine if your simulation can be submitted, three cases can be determined </p>
+<ul><li>Case 1. Your simulation contains <b>only one Run and all Events are strictly equivalent</b>, no matter of the order in which there are simulated. Typical examples are in the field of Radiation Therapy.
+	<ul><li>you should use the "dynamic parallelization", this is the most efficient situation. </li></ul>
+</li><li>Case 2a. Your simulation contains <b>only one Run and the order of Events is important, requiring timing information</b>. Typical examples are PET/SPECT simulations with TimeSlice = TimeStop-TimeStart (only one Run).
+	<ul><li>you have to use the "static parallelization"</li></ul>
+</li><li>Case 2b. Your simulation contains <b>several Run and the order of Events is important, requiring timing information</b>. Typical examples are SPECT simulations, but not PET simulation because, in that cases, coincidences will be biased. For typical PET simulation with several Runs, the proper way to split simulation should be to divide the TotalTime into different parts (for a dynamic scan : i frames with Ni processors per frame), each of them being an independent job. This is currently not implemented in the GateLab (mostly because it requires special care when a job fails), but we are working on it. Other examples of simulations falling in that case are Radiation Therapy simulations with motion (IMRT).
+	<ul><li>you have to use the "static parallelization"</li></ul>
+</li><li>Case 3. All other cases.
+	<ul><li>you cannot (yet) use GateLab otherwise your results will be biased. </li></ul>
+</li></ul>
+
+<p>Remember to always use the "setTotalNumberOfPrimaries" macro command, which is the number of the events for PET/SPECT simulations. Just add this command before the commands of setting the TimeSlice, TimeStart and TimeStop.
+eg.</p>
+
+/gate/application/setTotalNumberOfPrimaries 10000000
+/gate/application/setTimeSlice 1 s
+/gate/application/setTimeStart 0 s
+/gate/application/setTimeStop 10 s
+
+
+		
+	          
+        <h2>Launching your simulation</h2>
 
 
         <p>Click on the "GateLab" icon in your Home tab:<br/><img alt="gatelab-icon" src="gatelab.png"/><br/>A new tab opens.</p>
