@@ -61,6 +61,7 @@ public class ObjectFactory {
 
     public static Data3D[][] buildMulti(String path, String[][] objectList, String[] type) {
 
+       boolean[] bbound = new boolean[objectList.length];
       System.out.println("object to create");
         Data3D[][] objectTab = new Data3D[objectList.length][1];
         int i = 0;
@@ -69,6 +70,7 @@ public class ObjectFactory {
 
         for (String[] st : objectList) {
             j = 0;
+            bbound[i] = false;
             for (String st1d : st) {
                 String tmp = st1d.replace("[", "").replace("]", "");
                 if (tmp.endsWith(".zraw") || tmp.endsWith(".raw") || tmp.endsWith(".mhd")) {
@@ -87,8 +89,10 @@ public class ObjectFactory {
                 if (tmp.endsWith(".zraw") || tmp.endsWith(".raw") || tmp.endsWith(".mhd")) {
                     StringTokenizer st1dTokenize = new StringTokenizer(tmp);
                     temp.add(addMHD(path, st1dTokenize.nextToken(","), type[i]));
+                    bbound[i] = true;
                 }
             }
+            
             double[] box = new double[6];
             for(Data3D d : temp)
             {
@@ -118,12 +122,22 @@ public class ObjectFactory {
             for (String st2d : st2) {
                 String tmp = st2d.replace("[", "").replace("]", "");
                 if (tmp.endsWith(".vtp") || tmp.endsWith(".vtk")) {
-                    objectTab[i][j] = addVTP(path, tmp, type[i], objectTab[i][0].getBoundingBox());
+                    objectTab[i][j] = addVTP(path, tmp, type[i], objectTab[i][0].getBoundingBox(), bbound[i]);
                     j++;
                 }
             }
+            
+            // If no mhd in this model on this layer
+            if(!bbound[i])
+            {
+                double[] box = new double[6];
+                findBounds(objectTab[i], box);
+                setBounds(objectTab[i], box);
+            }
             i++;
         }
+        
+
         System.out.println("object created");
         return objectTab;
     }
@@ -140,16 +154,81 @@ public class ObjectFactory {
         return object;
     }
 
-    private static Data3D addVTP(String path, String name, String type, double[] bounds) {
+    /**
+	 * Find the bounding box of Data3D(meshes) list.
+	 * @param list of Data3D object
+	 * @param bounding box
+	 */
+    private static void  findBounds(Data3D[] DATA, double []box)
+    {
+        int i,j;
         
+        for(Data3D data : DATA)
+        {
+            for(i = 0, j = 1; i <6; i+=2, j+=2)
+            {
+                if(box[i] < data.getBoundingBox()[i])
+                    box[i] = data.getBoundingBox()[i];
+                if(box[j] > data.getBoundingBox()[j])
+                    box[j] = data.getBoundingBox()[j];
+            }
+        }
+    }
+    
+    /**
+	 * Set the new bounding box dimensions for each Data3D
+	 * @param list of Data3D
+	 * @param bounding box
+     */
+    private static void setBounds(Data3D[] DATA, double []box)
+    {
+        // center of gravity
+        float[] gravit = new float[3];
+        for(int i = 0; i < 3; i++)
+            gravit[i]= (float) (box[i*2+1] + box[i*2]) / 2;
+        
+        for(Data3D data : DATA)
+        {
+            // set the associated bounding box of data
+            double[] bounds = data.getBoundingBox();
+            for(int i = 0; i < 6; i++)
+                bounds[i]= bounds[i] - gravit[i%2];
+            
+            float l = Math.abs((float) (bounds[1] - bounds[0]));
+            // set the new position of vertices
+            for (int i = 0; i < data.getItemSizeVertex(); i++) {
+                data.getVertices()[i*3] = data.getVertices()[i*3] - gravit[0];
+                data.getVertices()[i*3 + 1] = data.getVertices()[i*3 + 1] - gravit[1];
+                data.getVertices()[i*3 + 2] = data.getVertices()[i*3 + 2] - gravit[2];
+            }
+            data.setBoundingBox(bounds);
+            data.setLenghtInfo(l);
+        }
+    }
+    
+    private static Data3D addVTP(String path, String name, String type, double[] bounds, boolean bbound) {
+        
+        float xgravit = 0;
+        float ygravit = 0;
+        float zgravit = 0;
+         
         Data3D object = new Data3D(name);
         object.setType(type);
 
         VTKEmulator DATA = new VTKEmulator(path + "/" + name);
+        
         if (!DATA.getThereIsAnError()) {
-            float xgravit = (float) (bounds[1] + bounds[0]) / 2;
-            float ygravit = (float) (bounds[3] + bounds[2]) / 2;
-            float zgravit = (float) (bounds[5] + bounds[4]) / 2;
+            // if a mhd image is associated, we take the corresponding bounds
+            if(bbound)
+            {
+                xgravit = (float) (bounds[1] + bounds[0]) / 2;
+                zgravit = (float) (bounds[3] + bounds[2]) / 2;
+                zgravit = (float) (bounds[5] + bounds[4]) / 2;
+            }
+            else
+            {
+                bounds = new double[6];
+            }
 
             Random r = new Random();
             float R = r.nextFloat();//Returns random float >= 0.0 and < 1.0
@@ -212,6 +291,7 @@ public class ObjectFactory {
             }
             bounds = DATA.getBounds();
 
+            // if no mhd image is associated, the bounds are coming from mesh bounds.
             bounds[0] = bounds[0] - xgravit;
             bounds[1] = bounds[1] - xgravit;
             bounds[2] = bounds[2] - ygravit;
