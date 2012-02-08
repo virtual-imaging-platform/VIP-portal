@@ -99,13 +99,13 @@ public class ObjectFactory {
                 double[] bound_temp = d.getBoundingBox();
                 if(bound_temp[0]< box[0])
                     box[0] = bound_temp[0];
-                if(bound_temp[1]< box[1])
+                if(bound_temp[1]> box[1])
                     box[1] = bound_temp[1];
                 if(bound_temp[2]< box[2])
                     box[2] = bound_temp[2];
                 if(bound_temp[3]> box[3])
                     box[3] = bound_temp[3];
-                if(bound_temp[4]> box[4])
+                if(bound_temp[4]< box[4])
                     box[4] = bound_temp[4];
                 if(bound_temp[5]> box[5])
                     box[5] = bound_temp[5];
@@ -115,7 +115,6 @@ public class ObjectFactory {
             i++;
         }
         i = 0;
-        j = 1;
         for (String[] st2 : objectList) {
             j = 1;
             
@@ -192,7 +191,7 @@ public class ObjectFactory {
             // set the associated bounding box of data
             double[] bounds = data.getBoundingBox();
             for(int i = 0; i < 6; i++)
-                bounds[i]= bounds[i] - gravit[i%2];
+                bounds[i]= bounds[i] - gravit[i/2];
             
             float l = Math.abs((float) (bounds[1] - bounds[0]));
             // set the new position of vertices
@@ -222,7 +221,7 @@ public class ObjectFactory {
             if(bbound)
             {
                 xgravit = (float) (bounds[1] + bounds[0]) / 2;
-                zgravit = (float) (bounds[3] + bounds[2]) / 2;
+                ygravit = (float) (bounds[3] + bounds[2]) / 2;
                 zgravit = (float) (bounds[5] + bounds[4]) / 2;
             }
             else
