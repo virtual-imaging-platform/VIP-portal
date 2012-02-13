@@ -5,7 +5,7 @@
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>0.7</version>
+        <version>0.7.1</version>
         <relativePath>..</relativePath>
     </parent>
     <groupId>fr.insalyon.creatis</groupId>
@@ -217,12 +217,12 @@
             </releases>
         </repository>
         <repository>
-            <id>neurolog-thirdparty</id>
+            <id>i3s-thirdparty</id>
             <name>NeuroLOG Third-party Repository</name>
             <url>http://nyx.unice.fr:9007/nexus/content/repositories/thirdparty</url>
         </repository>
         <repository>
-            <id>neurolog-releases</id>
+            <id>i3s-releases</id>
             <name>NeuroLOG Releases Repository</name>
             <url>http://nyx.unice.fr:9007/nexus/content/repositories/releases</url>
         </repository>

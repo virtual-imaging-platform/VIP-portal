@@ -4,16 +4,16 @@
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip</artifactId>
     <packaging>pom</packaging>
-    <version>0.7</version>
+    <version>0.7.1</version>
     <name>VIP</name>
     
     <properties>
-        <vip.core.version>0.7</vip.core.version>
+        <vip.core.version>0.7.1</vip.core.version>
+        <vip.portal.version>0.7.1</vip.portal.version>
         <vip.docs.version>0.6</vip.docs.version>
         <vip.application.version>0.7</vip.application.version>
         <vip.datamanager.version>0.7</vip.datamanager.version>
         <vip.datamanager-applet.version>0.3</vip.datamanager-applet.version>
-        <vip.portal.version>0.7</vip.portal.version>
         <vip.gatelab.version>0.5.3</vip.gatelab.version>
         <vip.gatelab-applet.version>0.2.1</vip.gatelab-applet.version>
         <vip.simulation-gui.version>0.2.6</vip.simulation-gui.version>
@@ -41,7 +41,7 @@
     <developers>
         <developer>
             <id>silva</id>
-            <name>Rafael SILVA</name>
+            <name>Rafael FERREIRA DA SILVA</name>
             <email>rafael.silva@creatis.insa-lyon.fr</email>
             <url>http://www.rafaelsilva.com/</url>
             <organization>Centre National de la Recherche Scientifique</organization>

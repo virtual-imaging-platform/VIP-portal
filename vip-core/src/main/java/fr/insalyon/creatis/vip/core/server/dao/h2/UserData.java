@@ -347,7 +347,7 @@ public class UserData implements UserDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "session FROM VIPUsers WHERE email=?");
+                    + "session FROM VIPUsers WHERE email = ?");
 
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
@@ -402,7 +402,7 @@ public class UserData implements UserDAO {
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, session, last_login, level "
                     + "FROM VIPUsers "
-                    + "WHERE session=?");
+                    + "WHERE session = ?");
 
             ps.setString(1, session);
             ResultSet rs = ps.executeQuery();
@@ -438,8 +438,8 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, last_login, level "
-                    + "FROM VIPUsers ORDER BY first_name, last_name "
-                    + "WHERE level = ?");
+                    + "FROM VIPUsers WHERE level = ? "
+                    + "ORDER BY first_name, last_name");
             ps.setString(1, UserLevel.Administrator.name());
 
             ResultSet rs = ps.executeQuery();
