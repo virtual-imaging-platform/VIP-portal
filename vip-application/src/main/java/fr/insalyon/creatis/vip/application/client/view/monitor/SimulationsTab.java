@@ -183,7 +183,8 @@ public class SimulationsTab extends Tab {
 
                 for (Simulation sim : result) {
                     if (!sim.getMajorStatus().equals(SimulationStatus.Cleaned.name())
-                            || CoreModule.user.isSystemAdministrator()) {
+                            || CoreModule.user.isSystemAdministrator()
+                            || CoreModule.user.isGroupAdmin()) {
 
                         dataList.add(new SimulationRecord(sim.getSimulationName(),
                                 sim.getApplication(), sim.getMajorStatus(), sim.getID(),
