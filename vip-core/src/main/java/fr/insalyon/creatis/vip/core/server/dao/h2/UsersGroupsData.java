@@ -219,7 +219,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
                     + "phone, code, confirmed, folder, last_login, level "
                     + "FROM VIPUsers us, VIPUsersGroups ug "
                     + "WHERE us.email = ug.email AND ug.groupname = ? "
-                    + "ORDER BY first_name, last_name");
+                    + "ORDER BY LOWER(first_name), LOWER(last_name)");
             
             ps.setString(1, groupName);
 

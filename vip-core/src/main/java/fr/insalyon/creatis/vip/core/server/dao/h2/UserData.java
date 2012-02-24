@@ -213,7 +213,8 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, last_login, level "
-                    + "FROM VIPUsers ORDER BY first_name, last_name");
+                    + "FROM VIPUsers "
+                    + "ORDER BY LOWER(first_name), LOWER(last_name)");
 
             ResultSet rs = ps.executeQuery();
             List<User> users = new ArrayList<User>();
@@ -439,7 +440,7 @@ public class UserData implements UserDAO {
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, last_login, level "
                     + "FROM VIPUsers WHERE level = ? "
-                    + "ORDER BY first_name, last_name");
+                    + "ORDER BY LOWER(first_name), LOWER(last_name)");
             ps.setString(1, UserLevel.Administrator.name());
 
             ResultSet rs = ps.executeQuery();
