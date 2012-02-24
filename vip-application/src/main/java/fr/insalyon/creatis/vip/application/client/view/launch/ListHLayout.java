@@ -43,6 +43,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.ValidatorUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.selection.PathSelectionWindow;
 
 /**
@@ -66,6 +67,7 @@ public class ListHLayout extends HLayout {
 
         listItem = FieldUtil.getTextItem(400, false, "", "[0-9.A-Za-z-+/_() ]");
         listItem.setValue(value);
+        listItem.setValidators(ValidatorUtil.getStringValidator());
         
         PickerIcon browsePicker = new PickerIcon(PickerIcon.SEARCH, new FormItemClickHandler() {
 
