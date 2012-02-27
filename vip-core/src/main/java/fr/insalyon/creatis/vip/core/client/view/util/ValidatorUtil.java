@@ -50,7 +50,7 @@ public class ValidatorUtil {
     public static RegExpValidator getEmailValidator() {
         
         RegExpValidator validator = new RegExpValidator();
-        validator.setErrorMessage("Invalid email address");
+        validator.setErrorMessage("Invalid e-mail address");
         validator.setExpression("^([a-zA-Z0-9_.\\-+])+@(([a-zA-Z0-9\\-])+\\.)+[a-zA-Z0-9]{2,4}$");
         return validator;
     }
@@ -78,7 +78,7 @@ public class ValidatorUtil {
         
         RegExpValidator validator = new RegExpValidator();  
         validator.setErrorMessage("Invalid string");  
-        validator.setExpression("^([0-9.A-Za-z-+/_() ])+$"); 
+        validator.setExpression("^([0-9.,A-Za-z-+/_() ])+$"); 
         return validator;
     }
 }
