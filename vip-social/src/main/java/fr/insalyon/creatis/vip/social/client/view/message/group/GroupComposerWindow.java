@@ -32,45 +32,40 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.social.client.view.message;
+package fr.insalyon.creatis.vip.social.client.view.message.group;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Cursor;
-import com.smartgwt.client.types.MultipleAppearance;
-import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.RichTextEditor;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
 import fr.insalyon.creatis.vip.social.client.rpc.SocialService;
 import fr.insalyon.creatis.vip.social.client.rpc.SocialServiceAsync;
 import fr.insalyon.creatis.vip.social.client.view.common.AbstractComposeWindow;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
-public class MessageComposerWindow extends AbstractComposeWindow {
+public class GroupComposerWindow extends AbstractComposeWindow {
 
-    private SelectItem usersPickList;
+    private String groupName;
+    private TextItem groupItem;
     private TextItem subjectItem;
+    
+    public GroupComposerWindow(String groupName) {
 
-    public MessageComposerWindow() {
-
-        super("Compose New Message");
+        super("Compose New Message to '" + groupName + "'");
         
+        this.groupName = groupName;
+
         configureForm();
-        loadUsers();
     }
 
     private void configureForm() {
@@ -81,8 +76,7 @@ public class MessageComposerWindow extends AbstractComposeWindow {
 
             public void onClick(ClickEvent event) {
                 if (form.validate()) {
-                    sendMessage(usersPickList.getValues(),
-                            subjectItem.getValueAsString().trim(),
+                    sendMessage(subjectItem.getValueAsString().trim(),
                             richTextEditor.getValue());
                 }
             }
@@ -90,56 +84,21 @@ public class MessageComposerWindow extends AbstractComposeWindow {
         buttonsLayout.addMember(sendLabel);
         vLayout.addMember(buttonsLayout);
 
-        usersPickList = new SelectItem();
-        usersPickList.setTitle("To");
-        usersPickList.setMultiple(true);
-        usersPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
-        usersPickList.setWidth(350);
-        usersPickList.setRequired(true);
-
+        groupItem = FieldUtil.getTextItem(350, true, "Group", null);
+        groupItem.setValue(groupName);
+        groupItem.setDisabled(true);
+        
         subjectItem = FieldUtil.getTextItem(350, true, "Subject", "[0-9.,A-Za-z-+/_(): ]");
-
-        form = FieldUtil.getForm(usersPickList, subjectItem);
+        
+        form = FieldUtil.getForm(groupItem, subjectItem);
         form.setWidth(500);
         vLayout.addMember(form);
-
-        richTextEditor = new RichTextEditor();
-        richTextEditor.setHeight100();
-        richTextEditor.setOverflow(Overflow.HIDDEN);
-        richTextEditor.setCanDragResize(true);
-        richTextEditor.setShowEdges(true);
-        richTextEditor.setControlGroups("fontControls", "formatControls",
-                "styleControls", "editControls", "colorControls", "insertControls");
+        
         vLayout.addMember(richTextEditor);
     }
-
-    private void loadUsers() {
-
-        SocialServiceAsync service = SocialService.Util.getInstance();
-        AsyncCallback<List<User>> callback = new AsyncCallback<List<User>>() {
-
-            public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to get users list:<br />" + caught.getMessage());
-            }
-
-            public void onSuccess(List<User> result) {
-
-                LinkedHashMap<String, String> usersMap = new LinkedHashMap<String, String>();
-                usersMap.put("All", "All");
-                for (User user : result) {
-                    usersMap.put(user.getEmail(), user.getFullName());
-                }
-                usersPickList.setValueMap(usersMap);
-                modal.hide();
-            }
-        };
-        service.getUsers(callback);
-        modal.show("Loading users list...", true);
-    }
-
-    private void sendMessage(String[] recipients, String subject, String message) {
-
+    
+    private void sendMessage(String subject, String message) {
+        
         SocialServiceAsync service = SocialService.Util.getInstance();
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
@@ -153,7 +112,7 @@ public class MessageComposerWindow extends AbstractComposeWindow {
                 SC.say("Message successfully sent.");
             }
         };
-        service.sendMessage(recipients, subject, message, callback);
-        modal.show("Sending message...", true);
+        service.sendGroupMessage(groupName, subject, message, callback);
+        modal.show("Sending message to '" + groupName + "'...", true);
     }
 }

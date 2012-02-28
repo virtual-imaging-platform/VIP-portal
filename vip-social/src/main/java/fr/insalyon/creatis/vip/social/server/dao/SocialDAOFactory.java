@@ -56,4 +56,6 @@ public abstract class SocialDAOFactory {
     }
     
     public abstract MessageDAO getMessageDAO() throws DAOException;
+    
+    public abstract GroupMessageDAO getGroupMessageDAO() throws DAOException;
 }

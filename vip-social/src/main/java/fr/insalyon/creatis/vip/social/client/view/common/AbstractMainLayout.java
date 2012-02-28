@@ -32,40 +32,29 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.social.client.rpc;
+package fr.insalyon.creatis.vip.social.client.view.common;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.social.client.bean.GroupMessage;
-import fr.insalyon.creatis.vip.social.client.bean.Message;
-import java.util.Date;
-import java.util.List;
+import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
  * @author Rafael Silva
  */
-public interface SocialServiceAsync {
+public abstract class AbstractMainLayout extends VLayout {
 
-    public void getMessagesByUser(Date startDate, AsyncCallback<List<Message>> asyncCallback);
-    
-    public void getSentMessagesByUser(Date startDate, AsyncCallback<List<Message>> asyncCallback);
-    
-    public void getGroupMessages(String groupName, Date startDate, AsyncCallback<List<GroupMessage>> asyncCallback);
-    
-    public void markMessageAsRead(long id, String receiver, AsyncCallback<Void> asyncCallback);
-    
-    public void removeMessage(long id, AsyncCallback<Void> asyncCallback);
-    
-    public void removeMessageByReceiver(long id, AsyncCallback<Void> asyncCallback);
-    
-    public void removeGroupMessage(long id, AsyncCallback<Void> asyncCallback);
-    
-    public void getUsers(AsyncCallback<List<User>> asyncCallback);
-    
-    public void sendMessage(String[] recipients, String subject, String message, AsyncCallback<Void> asyncCallback);
-    
-    public void sendGroupMessage(String groupName, String subject, String message, AsyncCallback<Void> asyncCallback);
-    
-    public void verifyMessages(AsyncCallback<Integer> asyncCallback);
+    public AbstractMainLayout(String title, String icon) {
+
+        this.setWidth100();
+        this.setHeight100();
+        this.setOverflow(Overflow.AUTO);
+        this.setMembersMargin(10);
+        this.setPadding(5);
+
+        this.addMember(WidgetUtil.getLabel("<p style=\"font-size: 13pt\"><strong>"
+                + title + "</strong></p>", icon, 17));
+    }
+
+    public abstract void loadData();
 }

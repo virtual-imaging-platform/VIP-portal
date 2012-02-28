@@ -118,7 +118,7 @@ public class GroupData implements GroupDAO {
             List<String> groups = new ArrayList<String>();
             PreparedStatement stat = null;
             stat = connection.prepareStatement("SELECT groupname FROM "
-                    + "VIPGroups ORDER BY groupname");
+                    + "VIPGroups ORDER BY LOWER(groupname)");
 
             ResultSet rs = stat.executeQuery();
             while (rs.next()) {

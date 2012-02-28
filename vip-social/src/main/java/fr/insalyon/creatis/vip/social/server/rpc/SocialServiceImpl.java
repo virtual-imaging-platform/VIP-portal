@@ -38,6 +38,7 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
+import fr.insalyon.creatis.vip.social.client.bean.GroupMessage;
 import fr.insalyon.creatis.vip.social.client.bean.Message;
 import fr.insalyon.creatis.vip.social.client.rpc.SocialService;
 import fr.insalyon.creatis.vip.social.client.view.SocialException;
@@ -84,6 +85,16 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
             throw new SocialException(ex);
         }
     }
+    
+    public List<GroupMessage> getGroupMessages(String groupName, Date startDate) throws SocialException {
+
+        try {
+            return messageBusiness.getGroupMessages(groupName, startDate);
+
+        } catch (BusinessException ex) {
+            throw new SocialException(ex);
+        }
+    }
 
     public void markMessageAsRead(long id, String receiver) throws SocialException {
 
@@ -116,6 +127,16 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
             throw new SocialException(ex);
         }
     }
+    
+    public void removeGroupMessage(long id) throws SocialException {
+
+        try {
+            messageBusiness.removeGroupMessage(id);
+
+        } catch (BusinessException ex) {
+            throw new SocialException(ex);
+        }
+    }
 
     public List<User> getUsers() throws SocialException {
 
@@ -137,6 +158,21 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         try {
             trace(logger, "Sending message '" + subject + "' to '" + Arrays.asList(recipients) + "'.");
             messageBusiness.sendMessage(getSessionUser(), recipients,
+                    subject, message);
+
+        } catch (CoreException ex) {
+            throw new SocialException(ex);
+        } catch (BusinessException ex) {
+            throw new SocialException(ex);
+        }
+    }
+    
+    public void sendGroupMessage(String groupName, String subject, String message) throws SocialException {
+
+        try {
+            trace(logger, "Sending message '" + subject + "' to group '" + groupName + "'.");
+            messageBusiness.sendGroupMessage(getSessionUser(), groupName,
+                    configurationBusiness.getUsersFromGroup(groupName),
                     subject, message);
 
         } catch (CoreException ex) {

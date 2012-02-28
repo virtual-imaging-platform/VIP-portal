@@ -50,7 +50,7 @@ import fr.insalyon.creatis.vip.social.client.SocialConstants;
 import fr.insalyon.creatis.vip.social.client.bean.Message;
 import fr.insalyon.creatis.vip.social.client.rpc.SocialService;
 import fr.insalyon.creatis.vip.social.client.rpc.SocialServiceAsync;
-import fr.insalyon.creatis.vip.social.client.view.AbstractMainLayout;
+import fr.insalyon.creatis.vip.social.client.view.common.AbstractMainLayout;
 import fr.insalyon.creatis.vip.social.client.view.common.MoreDataBoxLayout;
 import java.util.Date;
 import java.util.List;
@@ -67,15 +67,7 @@ public class SentMessageLayout extends AbstractMainLayout {
 
     public SentMessageLayout() {
 
-        this.setWidth100();
-        this.setHeight100();
-        this.setOverflow(Overflow.AUTO);
-        this.setMembersMargin(10);
-        this.setPadding(5);
-
-        this.addMember(WidgetUtil.getLabel("<p style=\"font-size: 13pt\"><strong>"
-                + SocialConstants.MENU_MESSAGE_SENT + "</strong></p>",
-                SocialConstants.ICON_MESSAGE_SENT, 17));
+        super(SocialConstants.MENU_MESSAGE_SENT, SocialConstants.ICON_MESSAGE_SENT);
 
         configureButtons();
 
@@ -102,11 +94,11 @@ public class SentMessageLayout extends AbstractMainLayout {
     }
 
     public void loadData() {
-        
+
         messagesLayout.removeMembers(messagesLayout.getMembers());
         loadData(new Date());
     }
-    
+
     public void loadData(Date date) {
 
         SocialServiceAsync service = SocialService.Util.getInstance();
@@ -117,7 +109,7 @@ public class SentMessageLayout extends AbstractMainLayout {
             }
 
             public void onSuccess(List<Message> result) {
-               
+
                 if (!result.isEmpty()) {
 
                     for (Message message : result) {

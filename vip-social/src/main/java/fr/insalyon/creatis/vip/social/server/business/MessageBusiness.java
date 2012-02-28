@@ -41,7 +41,9 @@ import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
+import fr.insalyon.creatis.vip.social.client.bean.GroupMessage;
 import fr.insalyon.creatis.vip.social.client.bean.Message;
+import fr.insalyon.creatis.vip.social.server.dao.GroupMessageDAO;
 import fr.insalyon.creatis.vip.social.server.dao.MessageDAO;
 import fr.insalyon.creatis.vip.social.server.dao.SocialDAOFactory;
 import java.util.ArrayList;
@@ -55,11 +57,11 @@ import java.util.List;
 public class MessageBusiness {
 
     /**
-     * 
+     *
      * @param email
      * @param startDate
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public List<Message> getMessagesByUser(String email, Date startDate)
             throws BusinessException {
@@ -74,11 +76,11 @@ public class MessageBusiness {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param startDate
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public List<Message> getSentMessagesByUser(String email, Date startDate)
             throws BusinessException {
@@ -91,12 +93,31 @@ public class MessageBusiness {
             throw new BusinessException(ex);
         }
     }
-
+    
     /**
      * 
+     * @param groupName
+     * @param startDate
+     * @return
+     * @throws BusinessException 
+     */
+    public List<GroupMessage> getGroupMessages(String groupName, Date startDate)
+            throws BusinessException {
+
+        try {
+            return SocialDAOFactory.getDAOFactory().getGroupMessageDAO().getMessageByGroup(
+                    groupName, SocialConstants.MESSAGE_MAX_DISPLAY, startDate);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     *
      * @param id
      * @param receiver
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void markAsRead(long id, String receiver) throws BusinessException {
 
@@ -109,9 +130,9 @@ public class MessageBusiness {
     }
 
     /**
-     * 
+     *
      * @param id
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void remove(long id) throws BusinessException {
 
@@ -124,10 +145,10 @@ public class MessageBusiness {
     }
 
     /**
-     * 
+     *
      * @param id
      * @param receiver
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void removeByReceiver(long id, String receiver) throws BusinessException {
 
@@ -138,14 +159,29 @@ public class MessageBusiness {
             throw new BusinessException(ex);
         }
     }
+    
+    /**
+     *
+     * @param id
+     * @throws BusinessException
+     */
+    public void removeGroupMessage(long id) throws BusinessException {
+
+        try {
+            SocialDAOFactory.getDAOFactory().getGroupMessageDAO().remove(id);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
 
     /**
-     * 
+     *
      * @param user
      * @param recipients
      * @param subject
      * @param message
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void sendMessage(User user, String[] recipients,
             String subject, String message) throws BusinessException {
@@ -190,10 +226,51 @@ public class MessageBusiness {
     }
 
     /**
-     * 
+     *
+     * @param user
+     * @param groupName
+     * @param subject
+     * @param message
+     * @throws BusinessException
+     */
+    public void sendGroupMessage(User user, String groupName, List<User> users,
+            String subject, String message) throws BusinessException {
+
+        try {
+            GroupMessageDAO groupMessageDAO = SocialDAOFactory.getDAOFactory().getGroupMessageDAO();
+            groupMessageDAO.add(user.getEmail(), groupName, subject, message);
+            
+            String emailContent = "<html>"
+                    + "<head></head>"
+                    + "<body>"
+                    + "<p>Hello,</p>"
+                    + "<p><b>" + user.getFullName() + "</b> sent a message to "
+                    + "the group '" + groupName + "' on VIP:</p>"
+                    + "<p style=\"background-color: #F2F2F2\"><br />"
+                    + "<b>Subject:</b> " + subject + "<br />"
+                    + "<em>" + message + "</em><br /></p>"
+                    + "<p>Best Regards,</p>"
+                    + "<p>VIP Team</p>"
+                    + "</body>"
+                    + "</html>";
+
+            for (User u : users) {
+                if (!u.getEmail().equals(user.getEmail())) {
+                    CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
+                            "VIP: Message sent to " + groupName + " group",
+                            emailContent, new String[]{u.getEmail()});
+                }
+            }
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     *
      * @param email
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public int verifyMessages(String email) throws BusinessException {
 

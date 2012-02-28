@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.social.server.dao;
 
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.h2.PlatformConnection;
+import fr.insalyon.creatis.vip.social.server.dao.h2.GroupMessageData;
 import fr.insalyon.creatis.vip.social.server.dao.h2.MessageData;
 import org.apache.log4j.Logger;
 
@@ -78,6 +79,18 @@ public class H2DAOFactory extends SocialDAOFactory {
                     + "ON DELETE CASCADE ON UPDATE RESTRICT, "
                     + "FOREIGN KEY (message_id) REFERENCES VIPSocialMessage(id) "
                     + "ON DELETE CASCADE ON UPDATE RESTRICT");
+            
+            PlatformConnection.getInstance().createTable("VIPSocialGroupMessage", 
+                    "id IDENTITY PRIMARY KEY, "
+                    + "sender VARCHAR(255), "
+                    + "groupname VARCHAR(255), "
+                    + "title VARCHAR(255), "
+                    + "message CLOB, "
+                    + "posted TIMESTAMP, "
+                    + "FOREIGN KEY (sender) REFERENCES VIPUsers(email) "
+                    + "ON DELETE CASCADE ON UPDATE RESTRICT, "
+                    + "FOREIGN KEY(groupname) REFERENCES VIPGroups(groupname) "
+                    + "ON DELETE CASCADE ON UPDATE RESTRICT");
 
         } catch (DAOException ex) {
             logger.error(ex);
@@ -87,5 +100,10 @@ public class H2DAOFactory extends SocialDAOFactory {
     @Override
     public MessageDAO getMessageDAO() throws DAOException {
         return new MessageData();
+    }
+
+    @Override
+    public GroupMessageDAO getGroupMessageDAO() throws DAOException {
+        return new GroupMessageData();
     }
 }

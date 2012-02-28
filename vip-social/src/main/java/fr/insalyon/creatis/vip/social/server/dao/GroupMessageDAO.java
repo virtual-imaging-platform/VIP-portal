@@ -32,12 +32,11 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.social.client.rpc;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+package fr.insalyon.creatis.vip.social.server.dao;
+
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.social.client.bean.GroupMessage;
-import fr.insalyon.creatis.vip.social.client.bean.Message;
 import java.util.Date;
 import java.util.List;
 
@@ -45,27 +44,11 @@ import java.util.List;
  *
  * @author Rafael Silva
  */
-public interface SocialServiceAsync {
-
-    public void getMessagesByUser(Date startDate, AsyncCallback<List<Message>> asyncCallback);
+public interface GroupMessageDAO {
     
-    public void getSentMessagesByUser(Date startDate, AsyncCallback<List<Message>> asyncCallback);
+    public long add(String sender, String groupName, String title, String message) throws DAOException;
     
-    public void getGroupMessages(String groupName, Date startDate, AsyncCallback<List<GroupMessage>> asyncCallback);
+    public void remove(long id) throws DAOException;
     
-    public void markMessageAsRead(long id, String receiver, AsyncCallback<Void> asyncCallback);
-    
-    public void removeMessage(long id, AsyncCallback<Void> asyncCallback);
-    
-    public void removeMessageByReceiver(long id, AsyncCallback<Void> asyncCallback);
-    
-    public void removeGroupMessage(long id, AsyncCallback<Void> asyncCallback);
-    
-    public void getUsers(AsyncCallback<List<User>> asyncCallback);
-    
-    public void sendMessage(String[] recipients, String subject, String message, AsyncCallback<Void> asyncCallback);
-    
-    public void sendGroupMessage(String groupName, String subject, String message, AsyncCallback<Void> asyncCallback);
-    
-    public void verifyMessages(AsyncCallback<Integer> asyncCallback);
+    public List<GroupMessage> getMessageByGroup(String groupName, int limit, Date startDate) throws DAOException;
 }

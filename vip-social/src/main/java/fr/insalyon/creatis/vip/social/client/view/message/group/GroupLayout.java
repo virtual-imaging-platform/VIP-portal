@@ -32,7 +32,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.social.client.view.message;
+package fr.insalyon.creatis.vip.social.client.view.message.group;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Cursor;
@@ -47,10 +47,9 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
-import fr.insalyon.creatis.vip.social.client.bean.Message;
+import fr.insalyon.creatis.vip.social.client.bean.GroupMessage;
 import fr.insalyon.creatis.vip.social.client.rpc.SocialService;
 import fr.insalyon.creatis.vip.social.client.rpc.SocialServiceAsync;
-import fr.insalyon.creatis.vip.social.client.view.common.AbstractMainLayout;
 import fr.insalyon.creatis.vip.social.client.view.common.MoreDataBoxLayout;
 import java.util.Date;
 import java.util.List;
@@ -59,15 +58,27 @@ import java.util.List;
  *
  * @author Rafael Silva
  */
-public class MessageLayout extends AbstractMainLayout {
+public class GroupLayout extends VLayout {
 
+    private String groupName;
     private VLayout messagesLayout;
     private Date lastDate;
     private MoreDataBoxLayout moreDataBoxLayout;
 
-    public MessageLayout() {
+    public GroupLayout(String groupName) {
 
-        super(SocialConstants.MENU_MESSAGE, SocialConstants.ICON_MESSAGE);
+        this.groupName = groupName;
+
+        this.setWidth100();
+        this.setHeight100();
+        this.setPadding(5);
+        this.setMembersMargin(10);
+        this.setOverflow(Overflow.AUTO);
+        this.setAlign(VerticalAlignment.TOP);
+        this.setBackgroundColor("#F2F2F2");
+
+        this.addMember(WidgetUtil.getLabel("<p style=\"font-size: 13pt\">Group: "
+                + "<strong>" + groupName + "</strong></p>", null, 15));
 
         configureButtons();
 
@@ -102,18 +113,18 @@ public class MessageLayout extends AbstractMainLayout {
     private void loadData(Date date) {
 
         SocialServiceAsync service = SocialService.Util.getInstance();
-        AsyncCallback<List<Message>> callback = new AsyncCallback<List<Message>>() {
+        AsyncCallback<List<GroupMessage>> callback = new AsyncCallback<List<GroupMessage>>() {
 
             public void onFailure(Throwable caught) {
                 SC.warn("Unable to get list of messages:<br />" + caught.getMessage());
             }
 
-            public void onSuccess(List<Message> result) {
+            public void onSuccess(List<GroupMessage> result) {
 
                 if (!result.isEmpty()) {
 
-                    for (Message message : result) {
-                        messagesLayout.addMember(new MessageBoxLayout(message));
+                    for (GroupMessage message : result) {
+                        messagesLayout.addMember(new GroupMessageBoxLayout(message));
                         lastDate = message.getPostedDate();
                     }
                     if (result.size() == SocialConstants.MESSAGE_MAX_DISPLAY) {
@@ -122,7 +133,7 @@ public class MessageLayout extends AbstractMainLayout {
                 }
             }
         };
-        service.getMessagesByUser(date, callback);
+        service.getGroupMessages(groupName, date, callback);
     }
 
     private void configureButtons() {
@@ -136,12 +147,12 @@ public class MessageLayout extends AbstractMainLayout {
             composeLabel.addClickHandler(new ClickHandler() {
 
                 public void onClick(ClickEvent event) {
-                    new MessageComposerWindow().show();
+                    new GroupComposerWindow(groupName).show();
                 }
             });
             buttonsLayout.addMember(composeLabel);
         }
-        
+
         Label refreshLabel = WidgetUtil.getLabel("Refresh", SocialConstants.ICON_REFRESH, 15, Cursor.HAND);
         refreshLabel.addClickHandler(new ClickHandler() {
 

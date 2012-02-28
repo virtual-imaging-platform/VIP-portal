@@ -38,6 +38,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.social.client.bean.GroupMessage;
 import fr.insalyon.creatis.vip.social.client.bean.Message;
 import fr.insalyon.creatis.vip.social.client.view.SocialException;
 import java.util.Date;
@@ -66,15 +67,21 @@ public interface SocialService extends RemoteService {
     
     public List<Message> getSentMessagesByUser(Date startDate) throws SocialException;
     
+    public List<GroupMessage> getGroupMessages(String groupName, Date startDate) throws SocialException;
+    
     public void markMessageAsRead(long id, String receiver) throws SocialException;
     
     public void removeMessage(long id) throws SocialException;
     
     public void removeMessageByReceiver(long id) throws SocialException;
     
+    public void removeGroupMessage(long id) throws SocialException;
+    
     public List<User> getUsers() throws SocialException;
     
     public void sendMessage(String[] recipients, String subject, String message) throws SocialException;
+    
+    public void sendGroupMessage(String groupName, String subject, String message) throws SocialException;
     
     public int verifyMessages() throws SocialException;
 }

@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.social.client.view;
 
+import fr.insalyon.creatis.vip.social.client.view.common.AbstractMainLayout;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.Overflow;
@@ -47,6 +48,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
 import fr.insalyon.creatis.vip.social.client.view.message.MessageLayout;
+import fr.insalyon.creatis.vip.social.client.view.message.group.GroupsLayout;
 import fr.insalyon.creatis.vip.social.client.view.message.sent.SentMessageLayout;
 
 /**
@@ -75,17 +77,14 @@ public class MenuLayout extends VLayout {
 
         VLayout menuLayout = new VLayout(5);
 
-//        Label feedLabel = getLabel(SocialConstants.ICON_FEED, SocialConstants.MENU_FEED);
-//        menuLayout.addMember(feedLabel);
-
         menuLayout.addMember(getLabel(SocialConstants.ICON_MESSAGE,
                 SocialConstants.MENU_MESSAGE, new MessageLayout()));
 
         menuLayout.addMember(getLabel(SocialConstants.ICON_MESSAGE_SENT,
                 SocialConstants.MENU_MESSAGE_SENT, new SentMessageLayout()));
 
-//        Label groupsLabel = getLabel(SocialConstants.ICON_GROUP, SocialConstants.MENU_GROUP);
-//        menuLayout.addMember(groupsLabel);
+        menuLayout.addMember(getLabel(SocialConstants.ICON_GROUP, 
+                SocialConstants.MENU_GROUP, new GroupsLayout()));
 
         this.addMember(menuLayout);
     }
