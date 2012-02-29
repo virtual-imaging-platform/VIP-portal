@@ -54,6 +54,7 @@ import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.general.*;
 import fr.insalyon.creatis.vip.application.client.view.monitor.menu.InOutContextMenu;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import java.util.List;
 
@@ -96,14 +97,17 @@ public class GeneralTab extends Tab {
 
         generalWindow = new GeneralInformationWindow(simulationID);
         leftLayout.addMember(generalWindow);
-        
+
         locationWindow = new LocationWindow(simulationID);
         leftLayout.addMember(locationWindow);
 
         processorsWindow = new ProcessorsWindow(simulationID);
         leftLayout.addMember(processorsWindow);
-        
-        leftLayout.addMember(new LogsWindow(simulationID));
+
+        if (CoreModule.user.isSystemAdministrator()
+                || CoreModule.user.isGroupAdmin()) {
+            leftLayout.addMember(new LogsWindow(simulationID));
+        }
 
         // Right column
         VLayout rightLayout = new VLayout(15);

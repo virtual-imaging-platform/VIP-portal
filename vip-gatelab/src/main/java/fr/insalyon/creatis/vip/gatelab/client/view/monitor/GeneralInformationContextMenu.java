@@ -46,8 +46,8 @@ import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
-import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
+import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 
 /**
@@ -56,15 +56,11 @@ import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout
  */
 public class GeneralInformationContextMenu extends Menu {
 
-    private String simulationID;
-    private PropertyRecord record;
-    //private String value;
     private ModalWindow modal;
 
-    public GeneralInformationContextMenu(String simulationID, final PropertyRecord record, ModalWindow modal) {
+    public GeneralInformationContextMenu(String simulationID, 
+            final PropertyRecord record, ModalWindow modal) {
 
-        this.simulationID = simulationID;
-        this.record = record;
         this.modal = modal;
 
         this.setShowShadow(true);
@@ -91,10 +87,11 @@ public class GeneralInformationContextMenu extends Menu {
               }
         });
 
-        if (record.getProperty().equals("Input") || record.getProperty().equals("Output") || record.getProperty().equals("Gate Release")) {
+        if (record.getProperty().equals("Input") 
+                || record.getProperty().equals("Output") 
+                || record.getProperty().equals("Gate Release")) {
 
             this.setItems(downloadFileItem, jumpToItem);
-
         }
     }
 
@@ -105,7 +102,7 @@ public class GeneralInformationContextMenu extends Menu {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to download file: " + caught.getMessage());
+                SC.warn("Unable to download file:<br />" + caught.getMessage());
             }
 
             public void onSuccess(Void result) {
@@ -115,9 +112,6 @@ public class GeneralInformationContextMenu extends Menu {
             }
         };
         modal.show("Adding file to transfer queue...", true);
-        //Context context = Context.getInstance();
         service.downloadFile(path, callback);
     }
-
-
 }

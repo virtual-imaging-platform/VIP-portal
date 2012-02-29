@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -53,8 +53,8 @@ import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
 import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabService;
 import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabServiceAsync;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -118,16 +118,13 @@ public class GateLabGeneralTab extends Tab {
             }
         });
         /*
-        grid.addCellClickHandler(new CellClickHandler() {
-        
-        public void onCellClick(CellClickEvent event) {
-        if (event.getRowNum() == 6 || event.getRowNum() == 7) {
-        String path = event.getRecord().getAttributeAsString("value");
-        BrowserLayout.getInstance().loadData(path, false);
-        }
-        }
-        });
-         * 
+         * grid.addCellClickHandler(new CellClickHandler() {
+         *
+         * public void onCellClick(CellClickEvent event) { if (event.getRowNum()
+         * == 6 || event.getRowNum() == 7) { String path =
+         * event.getRecord().getAttributeAsString("value");
+         * BrowserLayout.getInstance().loadData(path, false); } } });
+         *
          */
     }
 
@@ -139,7 +136,7 @@ public class GateLabGeneralTab extends Tab {
         final AsyncCallback<Map<String, String>> callback = new AsyncCallback<Map<String, String>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get simulation data\n" + caught.getMessage());
+                SC.warn("Error executing get simulation data:<br />" + caught.getMessage());
             }
 
             public void onSuccess(Map<String, String> result) {
@@ -163,7 +160,7 @@ public class GateLabGeneralTab extends Tab {
                 AsyncCallback<List<InOutData>> callbackOut = new AsyncCallback<List<InOutData>>() {
 
                     public void onFailure(Throwable caught) {
-                        SC.warn("Error executing get simulation output\n" + caught.getMessage());
+                        SC.warn("Error executing get simulation output:<br />" + caught.getMessage());
                     }
 
                     public void onSuccess(List<InOutData> result) {
@@ -180,7 +177,5 @@ public class GateLabGeneralTab extends Tab {
             }
         };
         gatelabservice.getGatelabWorkflowInputs(simulationID, callback);
-
-
     }
 }

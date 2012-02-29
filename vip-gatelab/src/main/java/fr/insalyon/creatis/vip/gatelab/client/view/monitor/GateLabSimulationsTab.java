@@ -63,6 +63,5 @@ public class GateLabSimulationsTab extends SimulationsTab {
                 }
             }
         });
-        
     }
 }

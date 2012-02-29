@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -43,6 +43,7 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabService;
 import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabServiceAsync;
 import java.util.Date;
@@ -58,10 +59,14 @@ public class GateLabSimulationToolStrip extends ToolStrip {
     private Label lastUpdated;
 
     public GateLabSimulationToolStrip(String simulationID, boolean completed) {
-        this.setWidth100();
 
+        this.setWidth100();
         this.setPadding(2);
-        this.addMenuButton(new LogsMenuButton(simulationID));
+
+        if (CoreModule.user.isSystemAdministrator()
+                || CoreModule.user.isGroupAdmin()) {
+            this.addMenuButton(new LogsMenuButton(simulationID));
+        }
         configure();
 
         this.simulationID = simulationID;
@@ -70,7 +75,6 @@ public class GateLabSimulationToolStrip extends ToolStrip {
         }
     }
 
-
     protected void configure() {
 
         stopButton = new ToolStripButton();
@@ -78,10 +82,11 @@ public class GateLabSimulationToolStrip extends ToolStrip {
         stopButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                SC.confirm("Do you really want to Stop and merge the simulation \"" + simulationID + "\"?", new BooleanCallback() {
+                SC.ask("Do you really want to Stop and merge the simulation \""
+                        + simulationID + "\"?", new BooleanCallback() {
 
                     public void execute(Boolean value) {
-                        if (value != null && value) {
+                        if (value) {
                             stopSimulation();
                             stopButton.setDisabled(true);
                         }
@@ -97,8 +102,6 @@ public class GateLabSimulationToolStrip extends ToolStrip {
         lastUpdated.setAlign(Alignment.RIGHT);
         this.updateDate();
         this.addMember(lastUpdated);
-
-
     }
 
     public void updateDate() {
@@ -113,7 +116,7 @@ public class GateLabSimulationToolStrip extends ToolStrip {
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing stop and merge\n" + caught.getMessage());
+                SC.warn("Error executing stop and merge:<br />" + caught.getMessage());
             }
 
             public void onSuccess(Void result) {
