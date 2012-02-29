@@ -38,8 +38,8 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
@@ -53,6 +53,7 @@ public class GateLabInputs {
     private String inputfile;
 
     public GateLabInputs(String workflowID) {
+
         inputsMap = new HashMap<String, String>();
         inputfile = Server.getInstance().getWorkflowsPath() + "/" + workflowID + "/input-m2.xml";
         GateLabInputsParser in = new GateLabInputsParser();
@@ -60,52 +61,43 @@ public class GateLabInputs {
     }
 
     public Map<String, String> getWorkflowInputs() throws BusinessException {
-        
+
         try {
             String input = inputsMap.get("GateInput");
-/*
-            int ind = input.lastIndexOf("/");
-            String inputlink = input.substring(0, ind);
-
-            String application_name = "unknown";
-
-            if (input.indexOf(".zip") > 0) {
-                application_name = input.substring(ind + 1, input.indexOf(".zip"));
-                
-            } else if (input.indexOf(".tgz") > 0) {
-                application_name = input.substring(ind + 1, input.indexOf(".tgz"));
-                
-            } else if (input.indexOf(".tar.gz") > 0) {
-                application_name = input.substring(ind + 1, input.indexOf(".tar.gz"));
-                
-            } else if (input.indexOf(".zip") > 0) {
-                application_name = input.substring(ind + 1, input.indexOf(".zip"));
-            }
-
-            String outputlink = inputlink + "/output";
-*/
+            /*
+             * int ind = input.lastIndexOf("/"); String inputlink =
+             * input.substring(0, ind);
+             *
+             * String application_name = "unknown";
+             *
+             * if (input.indexOf(".zip") > 0) { application_name =
+             * input.substring(ind + 1, input.indexOf(".zip"));
+             *
+             * } else if (input.indexOf(".tgz") > 0) { application_name =
+             * input.substring(ind + 1, input.indexOf(".tgz"));
+             *
+             * } else if (input.indexOf(".tar.gz") > 0) { application_name =
+             * input.substring(ind + 1, input.indexOf(".tar.gz"));
+             *
+             * } else if (input.indexOf(".zip") > 0) { application_name =
+             * input.substring(ind + 1, input.indexOf(".zip")); }
+             *
+             * String outputlink = inputlink + "/output";
+             */
             String release = inputsMap.get("GateRelease");
-            //int ind = release.lastIndexOf("/") + 1;
-            //release = release.substring(ind, release.indexOf(".tar.gz"));
-
             String particles = inputsMap.get("NumberOfParticles");
-
-            String simtype = inputsMap.get("ParallelizationType");
-            if (simtype.equals("dyn")) {
-                simtype = "Dynamic";
-            } else {
-                simtype = "Static";
-            }
+            String simtype = inputsMap.get("ParallelizationType").equals("dyn") ?
+                    "Dynamic" : "Static";
 
             Map<String, String> inputMap = new HashMap<String, String>();
             inputMap.put("inputlink", DataManagerUtil.parseRealDir(input));
             //inputMap.put("outputlink", DataManagerUtil.parseRealDir(outputlink));
-            inputMap.put("gate_version", release);
+            inputMap.put("gate_version", DataManagerUtil.parseRealDir(release));
             inputMap.put("particles", particles);
             inputMap.put("simulation", simtype);
 
             return inputMap;
-            
+
         } catch (DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);

@@ -40,6 +40,7 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -96,7 +97,28 @@ public class GateLabGeneralTab extends Tab {
 
     private void configureGrid() {
 
-        grid = new ListGrid();
+        grid = new ListGrid() {
+
+            @Override
+            protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
+
+                if (getFieldName(colNum).equals("value")) {
+                    PropertyRecord propertyRecord = (PropertyRecord) record;
+                    SimulationStatus status = SimulationStatus.valueOf(propertyRecord.getValue());
+
+                    if (status == SimulationStatus.Running) {
+                        return "font-weight:bold; color:#009900;";
+
+                    } else if (status == SimulationStatus.Completed) {
+                        return "font-weight:bold; color:#287fd6;";
+
+                    } else if (status == SimulationStatus.Killed) {
+                        return "font-weight:bold; color:#d64949;";
+                    }
+                }
+                return super.getCellCSSText(record, rowNum, colNum);
+            }
+        };
         grid.setWidth100();
         grid.setHeight(210);
         grid.setShowAllRecords(true);
