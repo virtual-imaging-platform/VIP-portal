@@ -186,9 +186,10 @@ public class UsersGroupsData implements UsersGroupsDAO {
                 sb.append("groupname = '").append(groupName).append("'");
             }
             PreparedStatement ps = connection.prepareStatement("SELECT DISTINCT "
-                    + "first_name, last_name "
+                    + "first_name, last_name, LOWER(first_name), LOWER(last_name) "
                     + "FROM VIPUsers vu, VIPUsersGroups vg "
-                    + "WHERE vu.email = vg.email AND (" + sb.toString() + ")");
+                    + "WHERE vu.email = vg.email AND (" + sb.toString() + ") "
+                    + "ORDER BY LOWER(first_name), LOWER(last_name)");
 
             ResultSet rs = ps.executeQuery();
             List<String> users = new ArrayList<String>();
