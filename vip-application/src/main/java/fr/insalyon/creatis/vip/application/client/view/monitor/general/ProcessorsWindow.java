@@ -70,6 +70,7 @@ public class ProcessorsWindow extends Window {
         this.setWidth100();
         this.setHeight(220);
         this.setShowCloseButton(false);
+        this.setMinimized(true);
 
         configureGrid();
         modal = new ModalWindow(grid);

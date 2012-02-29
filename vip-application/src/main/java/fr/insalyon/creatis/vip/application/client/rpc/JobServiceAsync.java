@@ -71,4 +71,6 @@ public interface JobServiceAsync {
     public void sendSignal(String simulationID, String jobID, ApplicationConstants.JobStatus status, AsyncCallback<Void> asyncCallback);
     
     public void sendSignal(String simulationID, List<String> jobIDs, ApplicationConstants.JobStatus status, AsyncCallback<Void> asyncCallback);
+    
+    public void getCountriesMap(String simulationID, AsyncCallback<Map<String, Integer>> asyncCallback);
 }

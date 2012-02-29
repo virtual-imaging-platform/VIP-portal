@@ -47,6 +47,7 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
@@ -296,6 +297,43 @@ public class JobBusiness {
             }
             return tasks;
 
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
+    /**
+     * 
+     * @param simulationID
+     * @return
+     * @throws BusinessException 
+     */
+    public Map<String, Integer> getCountriesMap(String simulationID) throws BusinessException {
+        
+        try {
+            Map<String, Integer> nodes = WorkflowDAOFactory.getDAOFactory().getJobDAO(simulationID).getNodesMap();
+            Map<String, Integer> map = new HashMap<String, Integer>();
+            
+            for (String node : nodes.keySet()) {
+                String code = node.substring(node.lastIndexOf(".") + 1, node.length());
+                if (code.length() == 2) {
+                    if (map.containsKey(code)) {
+                        map.put(code, map.get(code) + nodes.get(node));
+                    } else {
+                        map.put(code, nodes.get(node));
+                    }
+                    
+                } else {
+                    if (map.containsKey("_world")) {
+                        map.put("_world", map.get("_world") + nodes.get(node));
+                    } else {
+                        map.put("_world", nodes.get(node));
+                    }
+                }
+            }
+            
+            return map;
+            
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

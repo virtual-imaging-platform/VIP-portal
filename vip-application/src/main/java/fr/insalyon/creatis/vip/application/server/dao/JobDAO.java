@@ -66,4 +66,6 @@ public interface JobDAO {
     public List<String> getSiteHistogram() throws DAOException;
 
     public int getNumberOfTasks(ApplicationConstants.JobStatus status) throws DAOException;
+    
+    public Map<String, Integer> getNodesMap() throws DAOException;
 }

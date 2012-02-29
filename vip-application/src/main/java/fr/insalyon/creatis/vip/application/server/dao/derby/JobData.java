@@ -64,14 +64,14 @@ public class JobData implements JobDAO {
 
     /**
      * Gets a map with the status of the jobs.
-     * 
+     *
      * @return Jobs status map
-     * @throws DAOException 
+     * @throws DAOException
      */
     public Map<String, Integer> getStatusMap() throws DAOException {
 
         Map<String, Integer> statusMap = new HashMap<String, Integer>();
-        
+
         try {
             Statement stat = connection.createStatement();
             ResultSet rs = stat.executeQuery("SELECT "
@@ -93,15 +93,15 @@ public class JobData implements JobDAO {
 
     /**
      * Gets a list of all jobs.
-     * 
+     *
      * @return List of jobs
-     * @throws DAOException 
+     * @throws DAOException
      */
     public List<Job> getJobs() throws DAOException {
-        
+
         List<Job> jobsList = new ArrayList<Job>();
-        
-        try {   
+
+        try {
             ResultSet rs = connection.getMetaData().getTables(null, null, "%", null);
             boolean hasMinorStatus = false;
             while (rs.next()) {
@@ -159,13 +159,13 @@ public class JobData implements JobDAO {
     }
 
     /**
-     * 
+     *
      * @param binSize
      * @return
-     * @throws DAOException 
+     * @throws DAOException
      */
     public List<String> getExecutionPerNumberOfJobs(int binSize) throws DAOException {
-        
+
         try {
             List<String> list = new ArrayList<String>();
             Statement stat = connection.createStatement();
@@ -194,13 +194,13 @@ public class JobData implements JobDAO {
     }
 
     /**
-     * 
+     *
      * @param binSize
      * @return
-     * @throws DAOException 
+     * @throws DAOException
      */
     public List<String> getDownloadPerNumberOfJobs(int binSize) throws DAOException {
-        
+
         try {
             List<String> list = new ArrayList<String>();
             Statement stat = connection.createStatement();
@@ -229,13 +229,13 @@ public class JobData implements JobDAO {
     }
 
     /**
-     * 
+     *
      * @param binSize
      * @return
-     * @throws DAOException 
+     * @throws DAOException
      */
     public List<String> getUploadPerNumberOfJobs(int binSize) throws DAOException {
-        
+
         try {
             List<String> list = new ArrayList<String>();
             Statement stat = connection.createStatement();
@@ -263,12 +263,11 @@ public class JobData implements JobDAO {
     }
 
     /**
-     * 
-     * @return
-     * @throws DAOException 
+     *
+     * @return @throws DAOException
      */
     public List<String> getJobsPerTime() throws DAOException {
-        
+
         try {
             List<String> list = new ArrayList<String>();
             Statement stat = connection.createStatement();
@@ -299,13 +298,12 @@ public class JobData implements JobDAO {
         }
     }
 
-      /**
-     * 
-     * @return
-     * @throws DAOException 
+    /**
+     *
+     * @return @throws DAOException
      */
     public List<String> getCkptsPerJob() throws DAOException {
-        
+
         try {
             List<String> list = new ArrayList<String>();
             Statement stat = connection.createStatement();
@@ -328,10 +326,9 @@ public class JobData implements JobDAO {
         }
     }
 
-    
-    public void sendSignal(String jobID, ApplicationConstants.JobStatus status) 
+    public void sendSignal(String jobID, ApplicationConstants.JobStatus status)
             throws DAOException {
-        
+
         try {
             PreparedStatement ps = connection.prepareStatement(
                     "UPDATE Jobs SET status = ? WHERE id = ?");
@@ -350,14 +347,14 @@ public class JobData implements JobDAO {
         return this.connection;
     }
 
-    public List<String> getSiteHistogram() throws DAOException{
-         try {
+    public List<String> getSiteHistogram() throws DAOException {
+        try {
             List<String> list = new ArrayList<String>();
             Statement stat = connection.createStatement();
             ResultSet rs = stat.executeQuery("select count(id) as num,node_site as site from jobs group by node_site order by num desc");
-            int count=0;
+            int count = 0;
             while (rs.next()) {
-                list.add(+(count++)+"##"+rs.getString("num")+"##-1##-1##-1##"+ rs.getString("site"));
+                list.add(+(count++) + "##" + rs.getString("num") + "##-1##-1##-1##" + rs.getString("site"));
             }
 
             return list;
@@ -369,22 +366,51 @@ public class JobData implements JobDAO {
     }
 
     /**
-     * 
+     *
      * @param status
      * @return
-     * @throws DAOException 
+     * @throws DAOException
      */
     public int getNumberOfTasks(JobStatus status) throws DAOException {
-        
+
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "count(id) AS num FROM Jobs WHERE status = ?");
             ps.setString(1, status.name());
-            
+
             ResultSet rs = ps.executeQuery();
-            
+
             return rs.next() ? rs.getInt("num") : 0;
-            
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    /**
+     *
+     * @return @throws DAOException
+     */
+    public Map<String, Integer> getNodesMap() throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "node_name,  COUNT(id) AS num "
+                    + "FROM Jobs WHERE status = ? GROUP BY node_name");
+            ps.setString(1, JobStatus.COMPLETED.name());
+            ResultSet rs = ps.executeQuery();
+
+            Map<String, Integer> map = new HashMap<String, Integer>();
+            while (rs.next()) {
+                String name = rs.getString("node_name");
+                if (name != null && !name.isEmpty()) {
+                    map.put(name, rs.getInt("num"));
+                }
+            }
+
+            return map;
+
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);

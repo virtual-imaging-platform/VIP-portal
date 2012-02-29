@@ -277,4 +277,20 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
             throw new ApplicationException(ex);
         }
     }
+
+    /**
+     * 
+     * @param simulationID
+     * @return
+     * @throws ApplicationException 
+     */
+    public Map<String, Integer> getCountriesMap(String simulationID) throws ApplicationException {
+        
+        try {
+            return jobBusiness.getCountriesMap(simulationID);
+            
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
 }
