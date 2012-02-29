@@ -42,8 +42,7 @@ import java.util.Date;
  */
 public class CoreConstants {
 
-    public static final String VERSION = "v0.7.1";
-    public static final String FOLDER_TRASH = "Trash";
+    public static final String VERSION = "v0.7.2";
     // Tabs
     public static final String TAB_ACCOUNT = "account-tab";
     public static final String TAB_ACTIVATION = "activation-tab";
@@ -77,6 +76,10 @@ public class CoreConstants {
     public static final String ICON_USER = IMG_FOLDER + "system/icon-user.png";
     public static final String ICON_USER_INFO = IMG_FOLDER + "system/icon-user-info.png";
     public static final String ICON_GROUP = IMG_FOLDER + "system/icon-group.png";
+    public static final String ICON_WORLD = IMG_FOLDER + "flags/_world.png";
+    // Folders
+    public static final String FOLDER_TRASH = "Trash";
+    public static final String FOLDER_FLAGS = IMG_FOLDER + "flags/";
     // Application Names
     public static final String APP_ACCOUNT = "My Account";
     public static final String APP_GROUP = "Groups";
