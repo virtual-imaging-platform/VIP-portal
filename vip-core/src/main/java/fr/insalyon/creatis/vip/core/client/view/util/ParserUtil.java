@@ -65,6 +65,8 @@ public class ParserUtil {
             return "Italy";
         } else if (countryCode.equals("nl")) {
             return "Netherlands";
+        } else if (countryCode.equals("pl")) {
+            return "Poland";
         } else if (countryCode.equals("pt")) {
             return "Portugal";
         } else if (countryCode.equals("uk")) {
