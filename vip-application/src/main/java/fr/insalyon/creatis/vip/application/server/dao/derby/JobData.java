@@ -412,6 +412,9 @@ public class JobData implements JobDAO {
             return map;
 
         } catch (SQLException ex) {
+            if (ex.getMessage().contains("Table/View 'JOBS' does not exist")) {
+                return new HashMap<String, Integer>();
+            }
             logger.error(ex);
             throw new DAOException(ex);
         }
