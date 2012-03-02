@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Gallery - PET</title>
+        <link rel="StyleSheet" href="../css/doc_main.css" type="text/css" />
+    </head>
+    <body>
+        <h1>Gallery > PET</h1>
+
+        <h2>Simulation of the XCAT model with SORTEO</h2>
+<p>
+Contact: <a href="mailto:carole.lartizien@creatis.insa-lyon.fr">Carole Lartizien</a>.
+</p>
+<p>
+A whole-body PET acquisition was simulated using SORTEO. The anatomical and activity distribution models
+were constructed from the XCAT phantom which was fitted to a specific patient anatomy. In addition to the main organs, XCAT includes the vessels and the airway tree which are necessary for high resolution simulations such as CT. The PET acquisition protocol consisted of a static 224s
+acquisition and was described <a href="http://www.creatis.insa-lyon.fr/site/en/publications/MARA-11">here</a>. The scanner geometry was that of the PET/CT Philips GEMINI system (Philips Healthcare, Cleveland, OH). The 18F-FDG activity distribution was obtained from <a href="http://www.creatis.insa-lyon.fr/site/en/publications/TOME-10">here</a>. Three bed fields were used to cover thorax and abdomen. Each bed field had the dimension of the axial field of view (FoV) of the scanner, i.e, 47 cm. The overlap between beds was set to 50% of the axial FoV to compensate for the sensitivity loss on both extremities of the axial FoV. List-mode data were reconstructed with one-pass list-mode EM using 5 iterations and 8 subsets, resulting
+in 128x128x81 images of 4 mm isotropic voxels.
+</p>
+
+
+                   <TABLE BORDER="0" CELLPADDING="20">
+                 <CAPTION> Simulated whole-body static 3D 224s FDG-PET acquisition (coronal slice).</CAPTION>
+                 <TR>
+                 <TD> <img src="img/che_elo_PET_coro1.jpg" width="300" /> </TD>
+ <!--                <TD> <img src="img/short_axis_adam03.png" width="300" /> </TD>
+                 <TD> <img src="img/short_axis_adam06.png" width="300" /> </TD>-->
+                 </TR>
+                </TABLE>
+
+        <h2>Simulation of the ADAM cardiac model with SORTEO</h2>
+<p>
+Contact: <a href="mailto:patrick.clarysse@creatis.insa-lyon.fr">Patrick Clarysse</a>, <a href="mailto:frederic.cervenansky@creatis.insa-lyon.fr">Fr&eacute;d&eacute;ric Cervenansky</a>..
+</p>
+<p>
+Total CPU time: 91 hours. Best execution time in VIP: 39 hours.
+</p>
+<p>
+Two FDG-PET acquisitions (a healthy one and a patho-
+logical one) were simulated with ADAM using SORTEO. The scanner geometry of the ECAT EXACT HR+
+(CTI/Siemens Knoxville) was used, and 18F-FDG was the
+radiotracer to study glucose metabolism during one cardiac
+Two FDG-PET acquisitions (a healthy one and a patho-
+logical one) were also simulated with ADAM using SOR-
+TEO. The scanner geometry of the ECAT EXACT HR+
+(CTI/Siemens Knoxville) was used, and 18F-FDG was the
+radiotracer to study glucose metabolism during one cardiac
+Two FDG-PET acquisitions (a healthy one and a patho-
+logical one) were also simulated with ADAM using SOR-
+TEO. The scanner geometry of the ECAT EXACT HR+
+(CTI/Siemens Knoxville) was used, and 18F-FDG was the
+radiotracer to study glucose metabolism during one cardiac
+cycle. The simulated activities were respectively 45.1 MBq
+for the healthy case and 43.8 MBq for the pathological case
+as used <a href="http://www.creatis.insa-lyon.fr/site/en/publications/HADD-07b">here</a>. The raw data was corrected from attenuation
+and reconstructed using a standard 3D filtered backprojection
+algorithm resulting in a 128x128x63 3D image with a voxel
+size of 5.15x5.15x2.42 mm.
+The
+appearance is close to a real cardiac FDG-PET image with
+high homogeneous FDG capture in the healthy myocardium
+and lower fixations for the pathological case.
+
+</p>
+<p>
+                   <TABLE BORDER="0" CELLPADDING="20">
+                 <CAPTION>Simulated cardiac FDG-PET, healthy case (transverse, coronal).</CAPTION>
+                 <TR>
+                 <TD> <img src="img/adam_sain_trans.png" width="300" /> </TD>
+                 <TD> <img src="img/adam_sain_cor.png" width="300" /> </TD>
+ <!--                <TD> <img src="img/short_axis_adam03.png" width="300" /> </TD>
+                 <TD> <img src="img/short_axis_adam06.png" width="300" /> </TD>-->
+                 </TR></p>
+</TABLE>
+<p>
+<TABLE>  
+                 <CAPTION>Simulated cardiac FDG-PET, pathological case (transverse, coronal).</CAPTION>
+                 <TR>
+                 <TD> <img src="img/adam_patho_trans.png" width="300" /> </TD>
+                 <TD> <img src="img/adam_patho_cor.png" width="300" /> </TD>
+ <!--                <TD> <img src="img/short_axis_adam03.png" width="300" /> </TD>
+                 <TD> <img src="img/short_axis_adam06.png" width="300" /> </TD>-->
+                 </TR>
+                </TABLE>
+</p>
+
+    </body>
+</html>
