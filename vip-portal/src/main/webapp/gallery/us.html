@@ -7,8 +7,41 @@
     <body>
         <h1>Gallery > Ultrasound</h1>
 
-        <h2>Simulations of the ADAM model</h2>
-                <p>Apical 4 chamber view.</p>
+<h2>Image-based simulation of an echocardiographic sequence (parasternal short-axis view)</h2>
+
+<p>
+Simulation, text and images courtesy of <a href="http://www.creatis.insa-lyon.fr/us-tagging/news">ANR project US-Tagging</a>.<br/> Contact: <a href="mailto:olivier.bernard@creatis.insa-lyon.f">O. Bernard</a>, <a href="mailto:martino.alessandrini@gmail.com">M. Alessandrini</a>.
+</p>
+<p>
+Total CPU time: 42h. Best execution time obtained in VIP: 4h.<br/>
+</p>
+<p>
+A 2D+t echocardiographic sequence was simulated
+with an image-based approach. It was obtained by deforming
+a scattering map with a known motion model. The acquisition
+was simulated with FIELD-II using a 64-element sectorial
+probe at 3.75MHz. A sampling frequency of 40MHz was
+set. The view angle was 66 degrees and the pitch was set to half
+of the wavelength to avoid grating lobes effects. Both visual
+appearance and motion are very realistic due to the use of
+a real sequence as a template. As the true motion for the
+synthetic sequences is known, this sequence can be used as
+benchmark for the evaluation of myocardium motion estima-
+tion algorithms. 
+</p>
+<table>
+<tr><th>Real sequence</th><th>Simulation</th></tr>
+<td><img src="img/PASA_real.gif" alt="real" /></td>
+<td><img src="img/PASA_simulated.gif" alt="simulated"/></td>
+</table>
+<h2>Simulations of the ADAM cardiac model</h2>
+<p>
+Contact: <a href="mailto:liebgott@creatis.insa-lyon.fr">H. Liebgott</a>, <a href="mailto:adrien.marion@creatis.insa-lyon.fr">A. Marion</a>.
+</p>
+<p>
+See description in T. Glatard, A. Marion, H. Benoit-Cattin, S. Camarasu-Pop, P. Clarysse, R. Ferreira da Silva, G. Forestier, B. Gibaud, C. Lartizien, H. Liebgott, et al., "Multi-modality image simulation with the virtual imaging platform: Illustration on cardiac MRI and echography", IEEE International Symposium on Biomedical Imaging (ISBI), Barcelona, Spain, in press, 2012 (<a href="img/isbi.pdf">pdf</a>)
+</p>
+             <p>Apical 4 chamber view.</p>
                 <img src="img/simu_subsetHeartLungsThorax.gif" width="400" />
                 <br /> <br /> <br /> <br /> <br />
 
@@ -39,6 +72,7 @@
                  <TD> <img src="img/pasa_dias.png" width="400" /> </TD>
                  </TR>
                 </TABLE>
+		
 
 
     </body>
