@@ -111,13 +111,19 @@ public class UsersStackSection extends SectionStackSection {
 
                 if (getFieldName(colNum).equals("lastLogin")) {
                     UserRecord userRecord = (UserRecord) record;
-                    long oneMonthDate = (new Date()).getTime() - ((long) 30 * 24 * 3600000);
-                    long threeMonthsDate = (new Date()).getTime() - ((long) 90 * 24 * 3600000);
+                    long now = new Date().getTime();
+                    long halfMonthDate = now - ((long) 15 * 24 * 3600000);
+                    long oneMonthDate = now - ((long) 30 * 24 * 3600000);
+                    long threeMonthsDate = now - ((long) 90 * 24 * 3600000);                   
 
                     if (userRecord.getDate().getTime() < threeMonthsDate) {
                         return "color:#D64949;";
                     } else if (userRecord.getDate().getTime() < oneMonthDate) {
                         return "color:#D68E63;";
+                    } else if (userRecord.getDate().getTime() < halfMonthDate) {
+                        return "color:#66CC66;";
+                    } else {
+                        return "color:#339900;";
                     }
                 }
                 return super.getCellCSSText(record, rowNum, colNum);
