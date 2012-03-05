@@ -285,7 +285,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             authenticateSystemAdministrator(logger);
             trace(logger, "Removing user '" + email + "'.");
             User user = configurationBusiness.getUser(email);
-            configurationBusiness.removeUser(email);
+            configurationBusiness.removeUser(email, false);
 
             return user;
 
@@ -296,14 +296,15 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     /**
      *
-     * @return @throws CoreException
+     * @return 
+     * @throws CoreException
      */
     public User removeUser() throws CoreException {
 
         try {
             User user = getSessionUser();
             trace(logger, "Removing user '" + user.getEmail() + "'.");
-            configurationBusiness.removeUser(user.getEmail());
+            configurationBusiness.removeUser(user.getEmail(), true);
 
             return user;
 

@@ -175,13 +175,8 @@ public class ConfigurationBusiness {
                     + "</body>"
                     + "</html>";
 
-            List<String> emails = new ArrayList<String>();
-            for (User admin : CoreDAOFactory.getDAOFactory().getUserDAO().getAdministrators()) {
-                emails.add(admin.getEmail());
-            }
-
             CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
-                    "[VIP Admin] Account Requested", adminsEmailContents, emails.toArray(new String[]{}));
+                    "[VIP Admin] Account Requested", adminsEmailContents, getAdministratorsEmails());
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -332,9 +327,10 @@ public class ConfigurationBusiness {
     /**
      *
      * @param email
+     * @param sendNotificationEmail
      * @throws BusinessException
      */
-    public void removeUser(String email) throws BusinessException {
+    public void removeUser(String email, boolean sendNotificationEmail) throws BusinessException {
 
         try {
             User user = getUser(email);
@@ -349,6 +345,27 @@ public class ConfigurationBusiness {
 
             CoreDAOFactory.getDAOFactory().getUserDAO().remove(email);
 
+            if (sendNotificationEmail) {
+
+                String adminsEmailContents = "<html>"
+                        + "<head></head>"
+                        + "<body>"
+                        + "<p>Dear Administrators,</p>"
+                        + "<p>The following user removed her/his account:</p>"
+                        + "<p><b>First Name:</b> " + user.getFirstName() + "</p>"
+                        + "<p><b>Last Name:</b> " + user.getLastName() + "</p>"
+                        + "<p><b>Email:</b> " + user.getEmail() + "</p>"
+                        + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
+                        + "<p><b>Phone:</b> " + user.getPhone() + "</p>"
+                        + "<p>&nbsp;</p>"
+                        + "<p>Best Regards,</p>"
+                        + "<p>VIP Team</p>"
+                        + "</body>"
+                        + "</html>";
+
+                CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
+                        "[VIP Admin] Account Removed", adminsEmailContents, getAdministratorsEmails());
+            }
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
@@ -697,36 +714,51 @@ public class ConfigurationBusiness {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
-     * 
+     *
      * @param groupName
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public List<User> getUsersFromGroup(String groupName) throws BusinessException {
-        
+
         try {
             return CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroup(groupName);
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
-     * 
+     *
      * @param email
      * @param groupName
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void removeUserFromGroup(String email, String groupName) throws BusinessException {
-        
+
         try {
             CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().removeUserFromGroup(email, groupName);
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
+    }
+
+    /**
+     * Gets an array of administrator's e-mails
+     * 
+     * @return
+     * @throws DAOException 
+     */
+    private String[] getAdministratorsEmails() throws DAOException {
+
+        List<String> emails = new ArrayList<String>();
+        for (User admin : CoreDAOFactory.getDAOFactory().getUserDAO().getAdministrators()) {
+            emails.add(admin.getEmail());
+        }
+        return emails.toArray(new String[]{});
     }
 }
