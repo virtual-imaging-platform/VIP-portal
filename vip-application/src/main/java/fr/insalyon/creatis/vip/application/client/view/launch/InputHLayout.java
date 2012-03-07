@@ -34,9 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -68,6 +66,7 @@ public class InputHLayout extends VLayout {
         }
     };
     private String name;
+    private String comment;
     private HLayout hLayout;
     private SelectItem selectItem;
     // List items
@@ -83,16 +82,10 @@ public class InputHLayout extends VLayout {
     public InputHLayout(String name, String comment) {
 
         this.name = name;
+        this.comment = comment;
+        this.setAutoWidth();
 
         hLayout = new HLayout(3);
-        Label label = new Label(name + ":");
-        label.setWidth(150);
-        label.setAlign(Alignment.RIGHT);
-        if (comment != null) {
-            label.setTooltip(comment);
-            label.setHoverWidth(500);
-        }
-        hLayout.addMember(label);
 
         configureTypeSelectItem();
         hLayout.addMember(FieldUtil.getForm(selectItem));
@@ -119,7 +112,6 @@ public class InputHLayout extends VLayout {
         selectItem.setShowTitle(false);
         selectItem.setValueMap(InputType.valuesAsString());
         selectItem.setValue(InputType.List.name());
-        selectItem.setWidth(70);
         selectItem.addChangedHandler(new ChangedHandler() {
 
             public void onChanged(ChangedEvent event) {
@@ -153,6 +145,10 @@ public class InputHLayout extends VLayout {
         return name;
     }
 
+    public String getComment() {
+        return comment;
+    }
+
     public boolean validate() {
 
         InputType type = InputType.valueOf(selectItem.getValueAsString());
@@ -169,7 +165,7 @@ public class InputHLayout extends VLayout {
             return valid;
 
         } else {
-            return startItem.validate() && stopItem.validate() && stepItem.validate();
+            return startItem.validate() & stopItem.validate() & stepItem.validate();
         }
     }
 

@@ -120,10 +120,15 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
         });
         return saveButton;
     }
-    
+
+    protected String getSimulationName() {
+        
+        return simulationNameItem.getValueAsString().trim();
+    }
+
     /**
      * Validates the form before launch a simulation.
-     * 
+     *
      * @return Result of the validation
      */
     protected abstract boolean validate();
@@ -144,7 +149,7 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
 
             public void onSuccess(SimulationInput result) {
                 modal.hide();
-                SC.ask("A simulation entitled \"" + simulationNameItem.getValueAsString() + "\" "
+                SC.ask("A simulation entitled \"" + getSimulationName() + "\" "
                         + "already exists. <br />Do you want to ovewrite the input data?", new BooleanCallback() {
 
                     public void execute(Boolean value) {
@@ -156,8 +161,7 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
             }
         };
         modal.show("Verifying simulation name...", true);
-        service.getInputByNameUserApp(simulationNameItem.getValueAsString().trim(),
-                applicationName, callback);
+        service.getInputByNameUserApp(getSimulationName(), applicationName, callback);
     }
 
     private void saveInputs(boolean update) {
@@ -204,6 +208,6 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
         }
 
         return new SimulationInput(applicationName,
-                simulationNameItem.getValueAsString().trim(), sb.toString());
+                getSimulationName(), sb.toString());
     }
 }

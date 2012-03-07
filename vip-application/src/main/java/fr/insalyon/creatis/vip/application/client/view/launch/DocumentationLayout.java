@@ -34,46 +34,58 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
-import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
+import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.Cursor;
+import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.widgets.HTMLPane;
+import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 
 /**
  *
  * @author Rafael Silva
  */
-public class LaunchTab extends AbstractLaunchTab {
+public class DocumentationLayout extends VLayout {
 
-    public LaunchTab(String applicationName) {
+    public DocumentationLayout(int x, int y, String contents) {
 
-        super(applicationName);
+        this.setWidth(650);
+        this.setHeight(350);
+        this.setMembersMargin(5);
+        this.setPadding(5);
+        this.setBackgroundColor("#FFFFFF");
+        this.setBorder("1px solid #CCCCCC");
+        this.setOpacity(90);
+        this.moveTo(x, y + 20);
 
-        sectionStack.clear();
+        Label titleLabel = new Label("<b>Documentation and Terms of Use</b>");
+        titleLabel.setIcon(CoreConstants.ICON_INFORMATION);
+        titleLabel.setHeight(30);
+        this.addMember(titleLabel);
 
-        addLaunchSection(applicationName);
-        addInputsSection();
-    }
+        HTMLPane pane = new HTMLPane();
+        pane.setWidth100();
+        pane.setHeight100();
+        pane.setOverflow(Overflow.AUTO);
+        pane.setContents(contents);
+        this.addMember(pane);
 
-    /**
-     * Sets a value to an input name. The value should be in the following forms:
-     * 
-     * For single list field: a string
-     * For multiple list fields: strings separated by '; '
-     * For ranges: an string like 'Start: 0 - Stop: 0 - Step: 0'
-     * 
-     * @param inputName
-     * @param value 
-     */
-    public void setInputValue(String inputName, String value) {
-        
-        ((LaunchStackSection) launchSection).setInputValue(inputName, value);
-    }
+        Label closeLabel = new Label("Close");
+        closeLabel.setIcon(CoreConstants.ICON_CLOSE);
+        closeLabel.setHeight(25);
+        closeLabel.setWidth100();
+        closeLabel.setAlign(Alignment.RIGHT);
+        closeLabel.setCursor(Cursor.HAND);
+        closeLabel.addClickHandler(new ClickHandler() {
 
-    /**
-     * 
-     * @param applicationName 
-     */
-    private void addLaunchSection(String applicationName) {
-        
-        launchSection = new LaunchStackSection(applicationName);
-        sectionStack.addSection(launchSection);
+            public void onClick(ClickEvent event) {
+                destroy();
+            }
+        });
+
+        this.addMember(closeLabel);
     }
 }

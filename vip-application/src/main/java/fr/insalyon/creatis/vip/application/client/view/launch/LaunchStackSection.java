@@ -35,28 +35,18 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.layout.HLayout;
-import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchStackSection;
-import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -64,18 +54,11 @@ import java.util.Map;
  */
 public class LaunchStackSection extends AbstractLaunchStackSection {
 
-    private VLayout formLayout, inputs;
-    private String tabID;
+    private LaunchFormLayout launchFormLayout;
 
-    public LaunchStackSection(String applicationName, String tabId) {
+    public LaunchStackSection(String applicationName) {
 
         super(applicationName);
-
-        this.tabID = tabId;
-        formLayout = new VLayout(3);
-        formLayout.setAutoHeight();
-        vLayout.addMember(formLayout);
-
         loadData();
     }
 
@@ -86,57 +69,14 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
      */
     public void loadInput(String name, String values) {
 
-        simulationNameItem.setValue(name);
         Map<String, String> valuesMap = new HashMap<String, String>();
-        final Map<String, String> conflictMap = new HashMap<String, String>();
 
         for (String input : values.split("<br />")) {
             String[] s = input.split(" = ");
             valuesMap.put(s[0], s[1] != null ? s[1] : "");
         }
 
-        StringBuilder sb = new StringBuilder();
-        for (Canvas canvas : inputs.getMembers()) {
-            if (canvas instanceof InputHLayout) {
-                final InputHLayout input = (InputHLayout) canvas;
-                final String inputValue = valuesMap.get(input.getName());
-
-                if (inputValue != null) {
-                    if (input.getValue() == null || input.getValue().isEmpty()) {
-                        input.setValue(inputValue);
-
-                    } else {
-                        conflictMap.put(input.getName(), inputValue);
-                    }
-                } else {
-                    sb.append("Could not find value for parameter \"");
-                    sb.append(input.getName()).append("\".<br />");
-                }
-            }
-        }
-        if (!conflictMap.isEmpty()) {
-            SC.ask("The following fields already have a value.<br />"
-                    + "Do you want to replace them?<br />"
-                    + "Fields: " + conflictMap.keySet(), new BooleanCallback() {
-
-                public void execute(Boolean value) {
-                    if (value) {
-                        for (Canvas canvas : inputs.getMembers()) {
-                            if (canvas instanceof InputHLayout) {
-                                final InputHLayout input = (InputHLayout) canvas;
-                                final String inputValue = conflictMap.get(input.getName());
-                                if (inputValue != null) {
-                                    input.setValue(inputValue);
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        if (sb.length() > 0) {
-            SC.warn(sb.toString());
-        }
+        launchFormLayout.loadInputs(name, valuesMap);
     }
 
     /**
@@ -152,22 +92,13 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
      */
     public void setInputValue(String inputName, String value) {
 
-        for (Canvas canvas : formLayout.getMembers()) {
-            if (canvas instanceof InputHLayout) {
-                InputHLayout input = (InputHLayout) canvas;
-                if (input.getName().equals(inputName)) {
-                    input.setValue(value);
-                }
-            }
-        }
+        launchFormLayout.setInputValue(inputName, value);
     }
 
     /**
      * Loads simulation sources list.
      */
     protected void loadData() {
-
-        formLayout.removeMembers(formLayout.getMembers());
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Descriptor> callback = new AsyncCallback<Descriptor>() {
@@ -177,32 +108,14 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
                 SC.warn("Unable to download application source file:<br />" + caught.getMessage());
             }
 
-            public void onSuccess(Descriptor d) {
-                AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().getTab(tabID);
-                launchTab.getDescriptionSection().setContents(d.getDescription());
-                List<Source> sources = d.getSources();
+            public void onSuccess(Descriptor descriptor) {
 
+                launchFormLayout = new LaunchFormLayout(applicationName, null, descriptor.getDescription());
+                vLayout.addMember(launchFormLayout);
 
-                formLayout.addMember(getSimulatioNameLayout());
-
-                HLayout inputLayout = new HLayout(5);
-                inputLayout.setMargin(20);
-
-                inputs = new VLayout(3);
-                inputs.setAutoHeight();
-                for (Source source : sources) {
-                    inputs.addMember(new InputHLayout(source.getName(), source.getDescription()));
+                for (Source source : descriptor.getSources()) {
+                    launchFormLayout.addSource(new InputHLayout(source.getName(), source.getDescription()));
                 }
-                HLayout inputsLayout = new HLayout(5);
-                inputsLayout.setAlign(VerticalAlignment.CENTER);
-                inputsLayout.setMargin(20);
-                inputsLayout.addMember(inputs);
-                formLayout.addMember(inputsLayout);
-
-                HLayout buttonsLayout = new HLayout(5);
-                buttonsLayout.setAlign(VerticalAlignment.CENTER);
-                buttonsLayout.setMargin(20);
-                formLayout.addMember(buttonsLayout);
 
                 IButton launchButton = new IButton("Launch");
                 launchButton.addClickHandler(new ClickHandler() {
@@ -213,9 +126,10 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
                         }
                     }
                 });
-                buttonsLayout.addMember(launchButton);
-                buttonsLayout.addMember(getSaveInputsButton());
+                launchFormLayout.addButtons(launchButton, getSaveInputsButton());
+
                 modal.hide();
+                modal = launchFormLayout.getModal();
             }
         };
         modal.show("Loading launch panel...", true);
@@ -230,16 +144,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
     @Override
     protected boolean validate() {
 
-        boolean valid = simulationNameItem.validate();
-        for (Canvas canvas : inputs.getMembers()) {
-            if (canvas instanceof InputHLayout) {
-                InputHLayout input = (InputHLayout) canvas;
-                if (!input.validate()) {
-                    valid = false;
-                }
-            }
-        }
-        return valid;
+        return launchFormLayout.validate();
     }
 
     /**
@@ -247,41 +152,42 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
      */
     private void launch() {
 
-        modal.show("Launching simulation '" + simulationNameItem.getValueAsString()
-                + "'...", true);
+        modal.show("Launching simulation '" + getSimulationName() + "'...", true);
 
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-            public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Error on input data:<br />" + caught.getMessage());
-            }
-
-            public void onSuccess(Void result) {
-                submitWorkflow();
-            }
-        };
+        // Input data verification
         List<String> inputData = new ArrayList<String>();
         for (String input : getParametersMap().values()) {
             if (input.startsWith(DataManagerConstants.ROOT)) {
                 if (input.contains(ApplicationConstants.SEPARATOR_LIST)) {
-                    for (String i : input.split(ApplicationConstants.SEPARATOR_LIST)) {
-                        inputData.add(i);
-                    }
+                    inputData.addAll(Arrays.asList(input.split(ApplicationConstants.SEPARATOR_LIST)));
                 } else {
                     inputData.add(input);
                 }
             }
         }
         if (!inputData.isEmpty()) {
+            WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+            final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+                public void onFailure(Throwable caught) {
+                    modal.hide();
+                    SC.warn("Error on input data:<br />" + caught.getMessage());
+                }
+
+                public void onSuccess(Void result) {
+                    submit();
+                }
+            };
             service.validateInputs(inputData, callback);
         } else {
-            submitWorkflow();
+            submit();
         }
     }
 
-    private void submitWorkflow() {
+    /**
+     * Submits a simulation to the workflow engine.
+     */
+    private void submit() {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
@@ -293,29 +199,22 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
 
             public void onSuccess(Void result) {
                 modal.hide();
-                SC.say("Simulation '" + simulationNameItem.getValueAsString()
-                        + "' successfully launched.");
+                SC.say("Simulation '" + getSimulationName() + "' successfully launched.");
             }
         };
         service.launchSimulation(getParametersMap(), applicationName,
-                simulationNameItem.getValueAsString().trim(), callback);
+                getSimulationName(), callback);
     }
 
-    /**
-     * Gets a map of parameters.
-     *
-     * @return Map of parameters
-     */
-    public Map<String, String> getParametersMap() {
+    @Override
+    protected Map<String, String> getParametersMap() {
 
-        Map<String, String> paramsMap = new HashMap<String, String>();
+        return launchFormLayout.getParametersMap();
+    }
 
-        for (Canvas canvas : inputs.getMembers()) {
-            if (canvas instanceof InputHLayout) {
-                InputHLayout input = (InputHLayout) canvas;
-                paramsMap.put(input.getName(), input.getValue());
-            }
-        }
-        return paramsMap;
+    @Override
+    protected String getSimulationName() {
+
+        return launchFormLayout.getSimulationName();
     }
 }
