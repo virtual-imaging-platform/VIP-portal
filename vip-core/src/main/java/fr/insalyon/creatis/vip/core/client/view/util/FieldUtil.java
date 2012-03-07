@@ -42,6 +42,7 @@ import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItem;
+import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
@@ -114,6 +115,32 @@ public class FieldUtil {
      * Gets a TextItem configured according to the provided parameters.
      *
      * @param size Field size
+     * @param keyPressFilter Regular expression filter
+     * @return
+     */
+    public static TextItem getTextItem(int size, String keyPressFilter) {
+
+        return getTextItem(size, false, "", keyPressFilter, false);
+    }
+
+    /**
+     * Gets a TextItem configured according to the provided parameters.
+     *
+     * @param size Field size
+     * @param keyPressFilter Regular expression filter
+     * @param disabled Whether the text item is disabled
+     * @return
+     */
+    public static TextItem getTextItem(int size, String keyPressFilter,
+            boolean disabled) {
+
+        return getTextItem(size, false, "", keyPressFilter, disabled);
+    }
+
+    /**
+     * Gets a TextItem configured according to the provided parameters.
+     *
+     * @param size Field size
      * @param showTitle If title should be displayed
      * @param title Title to be displayed
      * @param keyPressFilter Regular expression filter
@@ -122,6 +149,22 @@ public class FieldUtil {
     public static TextItem getTextItem(int size, boolean showTitle, String title,
             String keyPressFilter) {
 
+        return getTextItem(size, showTitle, title, keyPressFilter, false);
+    }
+
+    /**
+     * Gets a TextItem configured according to the provided parameters.
+     *
+     * @param size Field size
+     * @param showTitle If title should be displayed
+     * @param title Title to be displayed
+     * @param keyPressFilter Regular expression filter
+     * @param disabled Whether the text item is disabled
+     * @return
+     */
+    public static TextItem getTextItem(int size, boolean showTitle, String title,
+            String keyPressFilter, boolean disabled) {
+
         TextItem textItem = new TextItem();
         textItem.setTitle(title);
         textItem.setShowTitle(showTitle);
@@ -129,6 +172,7 @@ public class FieldUtil {
         textItem.setKeyPressFilter(keyPressFilter);
         textItem.setAlign(Alignment.LEFT);
         textItem.setRequired(true);
+        textItem.setDisabled(disabled);
         textItem.addChangedHandler(new ChangedHandler() {
 
             public void onChanged(ChangedEvent event) {
@@ -137,6 +181,26 @@ public class FieldUtil {
         });
 
         return textItem;
+    }
+
+    /**
+     * Gets a PasswordItem configured according to the provided parameters.
+     * 
+     * @param name Field name
+     * @param title Title to be displayed
+     * @param width Field size
+     * @param length Field maximum length
+     * @return 
+     */
+    public static PasswordItem getPasswordItem(int width, int length) {
+
+        PasswordItem passwordItem = new PasswordItem();
+        passwordItem.setWidth(width);
+        passwordItem.setLength(length);
+        passwordItem.setShowTitle(false);
+        passwordItem.setRequired(true);
+
+        return passwordItem;
     }
 
     /**
@@ -180,13 +244,13 @@ public class FieldUtil {
 
     /**
      * Gets an ImgButton for RollOverCanvas
-     * 
+     *
      * @param imgSrc
      * @param prompt
      * @param clickHandler
-     * @return 
+     * @return
      */
-    public static ImgButton getImgButton(String imgSrc, String prompt, 
+    public static ImgButton getImgButton(String imgSrc, String prompt,
             ClickHandler clickHandler) {
 
         ImgButton button = new ImgButton();
@@ -198,7 +262,7 @@ public class FieldUtil {
         button.setHeight(16);
         button.setWidth(16);
         button.addClickHandler(clickHandler);
-        
+
         return button;
     }
 }

@@ -42,12 +42,7 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.CheckboxItem;
-import com.smartgwt.client.widgets.form.fields.PasswordItem;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
-import com.smartgwt.client.widgets.form.fields.TextAreaItem;
-import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.*;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
@@ -57,9 +52,10 @@ import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
-import fr.insalyon.creatis.vip.core.client.view.util.ValidatorUtil;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.ValidatorUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
@@ -68,7 +64,7 @@ import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 public class SignUpTab extends Tab {
 
     private ModalWindow modal;
-    private DynamicForm form;
+    private VLayout signupLayout;
     private TextItem firstNameField;
     private TextItem lastNameField;
     private TextItem emailField;
@@ -78,7 +74,7 @@ public class SignUpTab extends Tab {
     private PasswordItem passwordField;
     private PasswordItem confirmPasswordField;
     private RadioGroupItem accountRadioGroupItem;
-    private TextAreaItem commentItem;
+    private TextAreaItem commentsItem;
     private CheckboxItem acceptField;
     private IButton signupButton;
 
@@ -97,109 +93,69 @@ public class SignUpTab extends Tab {
 
         modal = new ModalWindow(vLayout);
 
-        configureForm();
-        configureButton();
-
-        vLayout.addMember(form);
-        vLayout.addMember(signupButton);
+        configureSignupLayout();
+        vLayout.addMember(signupLayout);
 
         this.setPane(vLayout);
     }
 
-    private void configureForm() {
+    private void configureSignupLayout() {
 
-        firstNameField = FieldUtil.getTextItem(300, true, "First Name", null);
-        lastNameField = FieldUtil.getTextItem(300, true, "Last Name", null);
+        firstNameField = FieldUtil.getTextItem(300, false, "", null);
+        lastNameField = FieldUtil.getTextItem(300, false, "", null);
 
-        emailField = FieldUtil.getTextItem(300, true, "Your Email", "[a-zA-Z0-9_.\\-+@]");
+        emailField = FieldUtil.getTextItem(300, false, "", "[a-zA-Z0-9_.\\-+@]");
         emailField.setName("email");
-        confirmEmailField = FieldUtil.getTextItem(300, true, "Re-enter Email", "[a-zA-Z0-9_.\\-+@]");
+        confirmEmailField = FieldUtil.getTextItem(300, false, "", "[a-zA-Z0-9_.\\-+@]");
 
         emailField.setValidators(ValidatorUtil.getEmailValidator());
-        confirmEmailField.setValidators(
-                ValidatorUtil.getEmailValidator(),
-                ValidatorUtil.getMatchesValidator("email", "Emails do not match"));
+        confirmEmailField.setValidators(ValidatorUtil.getEmailValidator());
 
-        institutionField = FieldUtil.getTextItem(300, true, "Institution", null);
-        phoneField = FieldUtil.getTextItem(150, true, "Phone", "[0-9\\(\\)\\-+. ]");
+        institutionField = FieldUtil.getTextItem(300, false, "", null);
+        phoneField = FieldUtil.getTextItem(150, false, "", "[0-9\\(\\)\\-+. ]");
 
-        passwordField = new PasswordItem("password", "Password");
-        passwordField.setWidth(150);
-        passwordField.setLength(32);
-        passwordField.setRequired(true);
-
-        confirmPasswordField = new PasswordItem("confPassword", "Re-enter Password");
-        confirmPasswordField.setWidth(150);
-        confirmPasswordField.setRequired(true);
-        confirmPasswordField.setValidators(
-                ValidatorUtil.getMatchesValidator("password", "Passwords do not match"));
+        passwordField = FieldUtil.getPasswordItem(150, 32);
+        confirmPasswordField = FieldUtil.getPasswordItem(150, 32);
 
         accountRadioGroupItem = new RadioGroupItem();
-        accountRadioGroupItem.setTitle("Account Type");
+        accountRadioGroupItem.setShowTitle(false);
         accountRadioGroupItem.setVertical(false);
         accountRadioGroupItem.setValueMap(CoreModule.accountTypes.toArray(new String[]{}));
         accountRadioGroupItem.setRequired(true);
+        accountRadioGroupItem.setWidth(300);
 
-        commentItem = new TextAreaItem("comment", "Comments");
-        commentItem.setHeight(80);
-        commentItem.setWidth(300);
-
-//        TextAreaItem termsField = new TextAreaItem("terms", "Terms of Use");
-//        termsField.setWidth(300);
-//        termsField.setHeight(100);
-//        termsField.setCanFocus(false);
-//        termsField.setValue(getDisclaimer());
+        commentsItem = new TextAreaItem("comment", "");
+        commentsItem.setHeight(80);
+        commentsItem.setWidth(300);
+        commentsItem.setShowTitle(false);
 
         acceptField = new CheckboxItem("acceptTerms", "I accept the <a href=\"documentation/terms.html\">terms of use</a>.");
         acceptField.setRequired(true);
-        acceptField.setWidth(150);
-
-        form = FieldUtil.getForm(firstNameField, lastNameField, emailField,
-                confirmEmailField, institutionField, phoneField, passwordField,
-                confirmPasswordField, accountRadioGroupItem, commentItem,
-                acceptField);
-        form.setWidth(500);
-        form.setTitleWidth(150);
-    }
-
-    private String getDisclaimer() {
-
-        return "-- VIP Terms of Use --\n\n"
-                + "This portal is exclusively dedicated to non-commercial academic use. "
-                + "It can be accessed free of charge but it is provided \"as is\" without warranty of any kind."
-                + "The entire risk as to the quality and performance of the program is with you. VIP can only be used to process and store scientific data using applications registered in the VIP platform. \n\n"
-                + "The simulators integrated in the platform must be acknowledged "
-                + " as follows:\n\n"
-                + "Field II is citationware. If you are publishing any work, "
-                + "where this program has been used, please remember that it was "
-                + "obtained free of charge. You must reference the two papers "
-                + "shown below and the name of the program Field II must be "
-                + "mentioned in the publication.\n\n"
-                + "[1] J.A.Jensen: Field: A Program for Simulating Ultrasound "
-                + "Systems, Paper presented at the 10th Nordic-Baltic Conference "
-                + "on Biomedical Imaging Published in Medical & Biological "
-                + "Engineering & Computing, pp. 351-353, Volume 34, Supplement 1, "
-                + "Part 1, 1996.\n\n"
-                + "[2] J.A.Jensen and N.B.Svendsen: Calculation of pressure fields "
-                + "from arbitrarily shaped, apodized, and excited ultrasound "
-                + "transducers, IEEE Trans.Ultrason., Ferroelec., Freq.Contr., 39, "
-                + "pp. 262-267, 1992.\n\n"
-                + "Sindbad is developed at CEA-LETI-MINATEC. Access to the simulator has to be specifically requested to Joachim Tabary (joachim.tabary@cea.fr).\n\n"
-                + "PET-SORTEO is citationware. If you are publishing any work, where"
-                + "this program has been used, please remember that it was obtained free of charge."
-                + "You must reference the paper shown below and the name of the program PET-SORTEO must be mentioned in the publication.\n\n"
-                + "A. Reilhac, C. Lartizien, N. Costes, S. Sans, C. Comtat, R. Gunn, A. Evans. PET-SORTEO: A Monte Carlo-based simulator with high count rate capabilities. IEEE Transactions on Nuclear Science, 5: 46-52, 2004.\n\n"
-                + "If you are publishing any work, where SIMRI has been used, you must reference the paper shown below and the name of the program SIMRI must be mentioned in the publication. You can also mention the SIMRI web site (http://simri.org) and that SIMRI is distributed under the free software CeCiLL license."
-                + "\n\nH. Benoit-Cattin, G. Collewet, B. Belaroussi, H. Saint-Jalmes, and C. Odet, \"The SIMRI project: A versatile and interactive MRI simulator\", Journal of Magnetic Resonance, vol. 173, pp. 97-115, 2005.";
-    }
-
-    private void configureButton() {
+        acceptField.setWidth(300);
+        acceptField.setAlign(Alignment.LEFT);
 
         signupButton = new IButton("Sign Up");
         signupButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                if (form.validate()) {
+
+                if (firstNameField.validate() & lastNameField.validate()
+                        & emailField.validate() & confirmEmailField.validate()
+                        & institutionField.validate() & phoneField.validate()
+                        & passwordField.validate() & confirmPasswordField.validate()
+                        & accountRadioGroupItem.validate() & acceptField.validate()) {
+
+                    if (!emailField.getValueAsString().equals(confirmEmailField.getValueAsString())) {
+                        SC.warn("E-mails do not match. Please verify the entered e-mail.");
+                        emailField.focusInItem();
+                        return;
+                    }
+
+                    if (!passwordField.getValueAsString().equals(confirmPasswordField.getValueAsString())) {
+                        SC.warn("Passwords do not match. Please verify the entered password.");
+                        passwordField.focusInItem();
+                        return;
+                    }
 
                     User user = new User(
                             firstNameField.getValueAsString().trim(),
@@ -226,14 +182,35 @@ public class SignUpTab extends Tab {
                         }
                     };
                     modal.show("Signing up...", true);
-                    service.signup(user, commentItem.getValueAsString(), callback);
+                    service.signup(user, commentsItem.getValueAsString(),
+                            accountRadioGroupItem.getValueAsString(), callback);
                 }
             }
         });
+
+        signupLayout = WidgetUtil.getVIPLayout(320);
+        addField("First Name", firstNameField);
+        addField("Last Name", lastNameField);
+        addField("E-mail", emailField);
+        addField("Re-enter E-mail", confirmEmailField);
+        addField("Institution", institutionField);
+        addField("Phone", phoneField);
+        addField("Password", passwordField);
+        addField("Re-enter Password", confirmPasswordField);
+        addField("Account Type", accountRadioGroupItem);
+        addField("Comments", commentsItem);
+        signupLayout.addMember(FieldUtil.getForm(acceptField));
+        signupLayout.addMember(signupButton);
+    }
+    
+    private void addField(String title, FormItem item) {
+        
+        signupLayout.addMember(WidgetUtil.getLabel("<b>" + title + "</b>", 15));
+        signupLayout.addMember(FieldUtil.getForm(item));
     }
 
     private void signin() {
-        
+
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<User> callback = new AsyncCallback<User>() {
 

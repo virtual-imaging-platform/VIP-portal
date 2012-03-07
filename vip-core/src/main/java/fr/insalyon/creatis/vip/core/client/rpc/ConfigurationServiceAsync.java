@@ -49,7 +49,7 @@ public interface ConfigurationServiceAsync {
 
     public void configure(String email, String session, AsyncCallback<User> asyncCallback);
 
-    public void signup(User user, String comments, AsyncCallback<Void> asyncCallback);
+    public void signup(User user, String comments, String accountType, AsyncCallback<Void> asyncCallback);
 
     public void signin(String email, String password, AsyncCallback<User> asyncCallback);
 

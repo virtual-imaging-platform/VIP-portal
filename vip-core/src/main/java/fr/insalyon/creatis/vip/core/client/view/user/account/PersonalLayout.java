@@ -35,24 +35,18 @@
 package fr.insalyon.creatis.vip.core.client.view.user.account;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Modules;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 
@@ -60,10 +54,8 @@ import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
  *
  * @author Rafael Silva
  */
-public class PersonalWindow extends Window {
+public class PersonalLayout extends AbstractFormLayout {
 
-    private ModalWindow modal;
-    private DynamicForm form;
     private TextItem levelField;
     private TextItem firstNameField;
     private TextItem lastNameField;
@@ -73,58 +65,32 @@ public class PersonalWindow extends Window {
     private String folder;
     private IButton saveButton;
 
-    public PersonalWindow() {
+    public PersonalLayout() {
 
-        this.setTitle(Canvas.imgHTML(CoreConstants.ICON_PERSONAL) + " Account Settings");
-        this.setWidth100();
-        this.setHeight(250);
-        this.setShowCloseButton(false);
+        super(330, 390);
+        addTitle("Account Settings", CoreConstants.ICON_PERSONAL);
 
-        VLayout vLayout = new VLayout(15);
-        vLayout.setWidth100();
-        vLayout.setHeight100();
-        vLayout.setPadding(10);
-        vLayout.setOverflow(Overflow.AUTO);
-        vLayout.setDefaultLayoutAlign(Alignment.CENTER);
-
-        modal = new ModalWindow(vLayout);
-
-        configureForm();
-        configureButton();
-
-        vLayout.addMember(form);
-        vLayout.addMember(saveButton);
-
-        this.addItem(vLayout);
-
+        configure();
         loadData();
     }
 
-    private void configureForm() {
+    private void configure() {
 
-        levelField = FieldUtil.getTextItem(150, true, "Level", null);
-        levelField.setDisabled(true);
-        emailField = FieldUtil.getTextItem(300, true, "Your Email", null);
-        emailField.setDisabled(true);
-        firstNameField = FieldUtil.getTextItem(300, true, "First Name", null);
-        lastNameField = FieldUtil.getTextItem(300, true, "Last Name", null);
-        institutionField = FieldUtil.getTextItem(300, true, "Institution", null);
-        phoneField = FieldUtil.getTextItem(150, true, "Phone", "[0-9\\(\\)\\-+. ]");
-
-        form = FieldUtil.getForm(levelField, emailField, firstNameField,
-                lastNameField, institutionField, phoneField);
-
-        form.setWidth(400);
-    }
-
-    private void configureButton() {
+        levelField = FieldUtil.getTextItem(300, null, true);
+        emailField = FieldUtil.getTextItem(300, null, true);
+        firstNameField = FieldUtil.getTextItem(300, null);
+        lastNameField = FieldUtil.getTextItem(300, null);
+        institutionField = FieldUtil.getTextItem(300, null);
+        phoneField = FieldUtil.getTextItem(150, "[0-9\\(\\)\\-+. ]");
 
         saveButton = new IButton("Save Changes");
         saveButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
 
-                if (form.validate()) {
+                if (firstNameField.validate() & lastNameField.validate()
+                        & institutionField.validate() & phoneField.validate()) {
+
                     User user = new User(
                             firstNameField.getValueAsString().trim(),
                             lastNameField.getValueAsString().trim(),
@@ -153,6 +119,14 @@ public class PersonalWindow extends Window {
                 }
             }
         });
+
+        addField("Level", levelField);
+        addField("E-mail", emailField);
+        addField("First Name", firstNameField);
+        addField("Last Name", lastNameField);
+        addField("Institution", institutionField);
+        addField("Phone", phoneField);
+        this.addMember(saveButton);
     }
 
     private void loadData() {
@@ -166,6 +140,7 @@ public class PersonalWindow extends Window {
             }
 
             public void onSuccess(User result) {
+
                 levelField.setValue(result.getLevel().name());
                 emailField.setValue(result.getEmail());
                 firstNameField.setValue(result.getFirstName());

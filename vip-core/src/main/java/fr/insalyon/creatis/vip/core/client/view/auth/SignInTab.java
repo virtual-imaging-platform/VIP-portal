@@ -58,6 +58,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
@@ -66,7 +67,7 @@ import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 public class SignInTab extends Tab {
 
     private ModalWindow modal;
-    private DynamicForm signinForm;
+    private VLayout signinLayout;
     private DynamicForm newForm;
     private TextItem emailField;
     private PasswordItem passwordField;
@@ -88,20 +89,18 @@ public class SignInTab extends Tab {
 
         modal = new ModalWindow(vLayout);
 
-        configureSigninForm();
-        configureSigninButton();
+        configureSigninLayout();
         configureNewForm();
 
-        vLayout.addMember(signinForm);
-        vLayout.addMember(signinButton);
+        vLayout.addMember(signinLayout);
         vLayout.addMember(newForm);
 
         this.setPane(vLayout);
     }
 
-    private void configureSigninForm() {
+    private void configureSigninLayout() {
 
-        emailField = FieldUtil.getTextItem(300, true, "Your Email", "[a-zA-Z0-9_.\\-+@]");
+        emailField = FieldUtil.getTextItem(230, false, "", "[a-zA-Z0-9_.\\-+@]");
         emailField.addKeyPressHandler(new KeyPressHandler() {
 
             public void onKeyPress(KeyPressEvent event) {
@@ -111,9 +110,10 @@ public class SignInTab extends Tab {
             }
         });
 
-        passwordField = new PasswordItem("password", "Password");
-        passwordField.setWidth(150);
+        passwordField = new PasswordItem("password", "");
+        passwordField.setWidth(230);
         passwordField.setLength(32);
+        passwordField.setShowTitle(false);
         passwordField.setRequired(true);
         passwordField.addKeyPressHandler(new KeyPressHandler() {
 
@@ -123,20 +123,11 @@ public class SignInTab extends Tab {
                 }
             }
         });
-        
-        remembermeField = new CheckboxItem("rememberme", "Keep me logged in");
-        remembermeField.setWidth(150);
-        remembermeField.setValue(false);
 
-        signinForm = FieldUtil.getForm(emailField, passwordField, remembermeField);
-        signinForm.setWidth(500);
-        signinForm.setTitleWidth(150);
-        signinForm.setBorder("1px solid #F6F6F6");
-        signinForm.setBackgroundColor("#EBEEFF");
-        signinForm.setPadding(5);
-    }
-
-    private void configureSigninButton() {
+        remembermeField = new CheckboxItem("rememberme", "<font color=\"#808080\">Keep me logged in</font>");
+        remembermeField.setWidth(230);
+        remembermeField.setValue(true);
+        remembermeField.setAlign(Alignment.LEFT);
 
         signinButton = new IButton("Sign in");
         signinButton.addClickHandler(new ClickHandler() {
@@ -145,6 +136,14 @@ public class SignInTab extends Tab {
                 signin();
             }
         });
+
+        signinLayout = WidgetUtil.getVIPLayout(250, 150);
+        signinLayout.addMember(WidgetUtil.getLabel("<b>E-mail</b>", 15));
+        signinLayout.addMember(FieldUtil.getForm(emailField));
+        signinLayout.addMember(WidgetUtil.getLabel("<b>Password</b>", 15));
+        signinLayout.addMember(FieldUtil.getForm(passwordField));
+        signinLayout.addMember(FieldUtil.getForm(remembermeField));
+        signinLayout.addMember(signinButton);
     }
 
     private void configureNewForm() {
@@ -160,12 +159,12 @@ public class SignInTab extends Tab {
         });
 
         newForm = FieldUtil.getForm(createAccount);
-        newForm.setWidth(500);
+        newForm.setWidth(250);
     }
 
     private void signin() {
-        
-        if (signinForm.validate()) {
+
+        if (emailField.validate() & passwordField.validate()) {
 
             ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
             final AsyncCallback<User> callback = new AsyncCallback<User>() {
@@ -183,26 +182,26 @@ public class SignInTab extends Tab {
                     modal.hide();
                     Layout.getInstance().removeTab(CoreConstants.TAB_SIGNIN);
                     Layout.getInstance().removeTab(CoreConstants.TAB_SIGNUP);
-                    
+
                     if (remembermeField.getValueAsBoolean()) {
-                        
-                        Cookies.setCookie(CoreConstants.COOKIES_USER, 
+
+                        Cookies.setCookie(CoreConstants.COOKIES_USER,
                                 result.getEmail(), CoreConstants.COOKIES_EXPIRATION_DATE,
                                 null, "/", false);
-                        Cookies.setCookie(CoreConstants.COOKIES_SESSION, 
+                        Cookies.setCookie(CoreConstants.COOKIES_SESSION,
                                 result.getSession(), CoreConstants.COOKIES_EXPIRATION_DATE,
                                 null, "/", false);
-                    
+
                     } else {
-                        
-                        Cookies.setCookie(CoreConstants.COOKIES_USER, 
+
+                        Cookies.setCookie(CoreConstants.COOKIES_USER,
                                 null, CoreConstants.COOKIES_EXPIRATION_DATE,
                                 null, "/", false);
-                        Cookies.setCookie(CoreConstants.COOKIES_SESSION, 
+                        Cookies.setCookie(CoreConstants.COOKIES_SESSION,
                                 null, CoreConstants.COOKIES_EXPIRATION_DATE,
                                 null, "/", false);
                     }
-                    
+
                     Layout.getInstance().authenticate(result);
                 }
             };

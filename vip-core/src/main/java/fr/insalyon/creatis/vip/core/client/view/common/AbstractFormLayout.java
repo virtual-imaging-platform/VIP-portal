@@ -32,57 +32,53 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.user;
+package fr.insalyon.creatis.vip.core.client.view.common;
 
-import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.tab.Tab;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.user.account.GroupWindow;
-import fr.insalyon.creatis.vip.core.client.view.user.account.PasswordLayout;
-import fr.insalyon.creatis.vip.core.client.view.user.account.PersonalLayout;
-import fr.insalyon.creatis.vip.core.client.view.user.account.RemoveAccountLayout;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
  * @author Rafael Silva
  */
-public class AccountTab extends Tab {
+public abstract class AbstractFormLayout extends VLayout {
 
-    public AccountTab() {
+    protected ModalWindow modal;
 
-        this.setTitle(Canvas.imgHTML(CoreConstants.ICON_ACCOUNT) + " "
-                + CoreConstants.APP_ACCOUNT);
-        this.setID(CoreConstants.TAB_ACCOUNT);
-        this.setCanClose(true);
+    public AbstractFormLayout(int width, int height) {
 
-        HLayout hLayout = new HLayout(15);
-        hLayout.setWidth100();
-        hLayout.setHeight100();
-        hLayout.setOverflow(Overflow.AUTO);
-        hLayout.setPadding(10);
+        this(Integer.toString(width), Integer.toString(height));
+    }
 
-        // Left column
-        VLayout leftLayout = new VLayout(15);
-        leftLayout.setWidth(350);
-        leftLayout.setHeight100();
+    public AbstractFormLayout(String width, String height) {
 
-        leftLayout.addMember(new PersonalLayout());
-        leftLayout.addMember(new PasswordLayout());
-
-        // Right column
-        VLayout rightLayout = new VLayout(15);
-        rightLayout.setWidth("*");
-        rightLayout.setHeight100();
+        this.setWidth(width);
+        this.setHeight(height);
+        this.setBorder("1px solid #C0C0C0");
+        this.setBackgroundColor("#F5F5F5");
+        this.setPadding(10);
+        this.setMembersMargin(5);
         
-        rightLayout.addMember(new GroupWindow());
-        rightLayout.addMember(new RemoveAccountLayout());
+        modal = new ModalWindow(this);
+    }
 
-        hLayout.addMember(leftLayout);
-        hLayout.addMember(rightLayout);
+    protected void addTitle(String title, String icon) {
 
-        this.setPane(hLayout);
+        Label label = WidgetUtil.getLabel("<b>" + title + "</b>",
+                icon, 15);
+        label.setWidth100();
+        label.setAlign(Alignment.LEFT);
+        this.addMember(label);
+    }
+    
+    protected void addField(String title, FormItem item) {
+        
+        this.addMember(WidgetUtil.getLabel("<b>" + title + "</b>", 15));
+        this.addMember(FieldUtil.getForm(item));
     }
 }

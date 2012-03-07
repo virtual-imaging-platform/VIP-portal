@@ -35,94 +35,55 @@
 package fr.insalyon.creatis.vip.core.client.view.user.account;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
-import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
-import fr.insalyon.creatis.vip.core.client.view.util.ValidatorUtil;
 
 /**
  *
  * @author Rafael Silva
  */
-public class PasswordWindow extends Window {
+public class PasswordLayout extends AbstractFormLayout {
 
-    private ModalWindow modal;
-    private DynamicForm form;
     private PasswordItem currentPasswordField;
     private PasswordItem newPasswordField;
     private PasswordItem confirmPasswordField;
     private IButton saveButton;
 
-    public PasswordWindow() {
+    public PasswordLayout() {
 
-        this.setTitle(Canvas.imgHTML(CoreConstants.ICON_PASSWORD) + " Password");
-        this.setWidth100();
-        this.setHeight(180);
-        this.setShowCloseButton(false);
+        super(330, 240);
+        addTitle("Password", CoreConstants.ICON_PASSWORD);
 
-        VLayout vLayout = new VLayout(15);  
-        vLayout.setWidth100();
-        vLayout.setHeight100();
-        vLayout.setPadding(10);
-        vLayout.setOverflow(Overflow.AUTO);
-        vLayout.setDefaultLayoutAlign(Alignment.CENTER);
-
-        modal = new ModalWindow(vLayout);
-
-        configureForm();
-        configureButton();
-
-        vLayout.addMember(form);
-        vLayout.addMember(saveButton);
-
-        this.addItem(vLayout);
+        configure();
     }
 
-    private void configureForm() {
+    private void configure() {
 
-        currentPasswordField = new PasswordItem("currentPassword", "Current");
-        currentPasswordField.setWidth(150);
-        currentPasswordField.setLength(32);
-        currentPasswordField.setRequired(true);
-
-        newPasswordField = new PasswordItem("newPassword", "New");
-        newPasswordField.setWidth(150);
-        newPasswordField.setLength(32);
-        newPasswordField.setRequired(true);
-
-        confirmPasswordField = new PasswordItem("confPassword", "Re-type new");
-        confirmPasswordField.setWidth(150);
-        confirmPasswordField.setRequired(true);
-        confirmPasswordField.setValidators(
-                ValidatorUtil.getMatchesValidator("newPassword", "Passwords do not match"));
-
-        form = FieldUtil.getForm(currentPasswordField, newPasswordField,
-                confirmPasswordField);
-
-        form.setWidth(300);
-    }
-
-    private void configureButton() {
+        currentPasswordField = FieldUtil.getPasswordItem(150, 32);
+        newPasswordField = FieldUtil.getPasswordItem(150, 32);
+        confirmPasswordField = FieldUtil.getPasswordItem(150, 32);
 
         saveButton = new IButton("Save Changes");
         saveButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
 
-                if (form.validate()) {
+                if (currentPasswordField.validate() & newPasswordField.validate()
+                        & confirmPasswordField.validate()) {
+                    
+                    if (!newPasswordField.getValueAsString().equals(confirmPasswordField.getValueAsString())) {
+                        SC.warn("Passwords do not match. Please verify the entered password.");
+                        newPasswordField.focusInItem();
+                        return;
+                    }
 
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
                     final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
@@ -141,10 +102,15 @@ public class PasswordWindow extends Window {
                     };
                     modal.show("Saving changes...", true);
                     service.updateUserPassword(
-                            currentPasswordField.getValueAsString(), 
+                            currentPasswordField.getValueAsString(),
                             newPasswordField.getValueAsString(), callback);
                 }
             }
         });
+
+        addField("Current", currentPasswordField);
+        addField("New", newPasswordField);
+        addField("Re-type new", confirmPasswordField);
+        this.addMember(saveButton);
     }
 }

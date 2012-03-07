@@ -53,6 +53,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
@@ -61,7 +62,7 @@ import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 public class ActivationTab extends Tab {
 
     private ModalWindow modal;
-    private DynamicForm validateForm;
+    private VLayout validateLayout;
     private DynamicForm resendForm;
     private TextItem codeField;
     private IButton validateButton;
@@ -81,36 +82,26 @@ public class ActivationTab extends Tab {
 
         modal = new ModalWindow(vLayout);
 
-        configureValidateForm();
-        configureValidateButton();
+        configureValidateLayout();
         configureResendForm();
 
-        vLayout.addMember(validateForm);
-        vLayout.addMember(validateButton);
+        vLayout.addMember(validateLayout);
         vLayout.addMember(resendForm);
 
         this.setPane(vLayout);
     }
 
-    private void configureValidateForm() {
+    private void configureValidateLayout() {
 
-        codeField = FieldUtil.getTextItem(350, true, "Activation Code", "[a-zA-Z0-9\\-]");
+        validateLayout = WidgetUtil.getVIPLayout(300, 120);
 
-        validateForm = FieldUtil.getForm(codeField);
-        validateForm.setWidth(500);
-        validateForm.setTitleWidth(150);
-        validateForm.setBorder("1px solid #F6F6F6");
-        validateForm.setBackgroundColor("#EBEEFF");
-        validateForm.setPadding(5);
-    }
-
-    private void configureValidateButton() {
+        codeField = FieldUtil.getTextItem(280, false, "", "[a-zA-Z0-9\\-]");
 
         validateButton = new IButton("Activate");
         validateButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                if (validateForm.validate()) {
+                if (codeField.validate()) {
 
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
                     final AsyncCallback<User> callback = new AsyncCallback<User>() {
@@ -135,6 +126,10 @@ public class ActivationTab extends Tab {
                 }
             }
         });
+
+        validateLayout.addMember(WidgetUtil.getLabel("<b>Activation Code</b>", 15));
+        validateLayout.addMember(FieldUtil.getForm(codeField));
+        validateLayout.addMember(validateButton);
     }
 
     private void configureResendForm() {
@@ -142,7 +137,7 @@ public class ActivationTab extends Tab {
         LinkItem resendLink = new LinkItem("link");
         resendLink.setShowTitle(false);
         resendLink.setLinkTitle("Lost your code? Click here and we will resend it to you.");
-        resendLink.setWidth(350);
+        resendLink.setWidth(300);
         resendLink.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
 
             public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
@@ -165,6 +160,6 @@ public class ActivationTab extends Tab {
         });
 
         resendForm = FieldUtil.getForm(resendLink);
-        resendForm.setWidth(500);
+        resendForm.setWidth(300);
     }
 }

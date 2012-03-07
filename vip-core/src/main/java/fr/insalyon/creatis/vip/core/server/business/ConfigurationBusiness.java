@@ -123,12 +123,13 @@ public class ConfigurationBusiness {
     }
 
     /**
-     *
+     * 
      * @param user
      * @param comments
-     * @throws BusinessException
+     * @param accountType
+     * @throws BusinessException 
      */
-    public void signup(User user, String comments) throws BusinessException {
+    public void signup(User user, String comments, String accountType) throws BusinessException {
 
         try {
             user.setCode(UUID.randomUUID().toString());
@@ -168,6 +169,7 @@ public class ConfigurationBusiness {
                     + "<p><b>Email:</b> " + user.getEmail() + "</p>"
                     + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
                     + "<p><b>Phone:</b> " + user.getPhone() + "</p>"
+                    + "<p><b>Account Type:</b> " + accountType + "</p>" 
                     + "<p><b>Comments:</b><br />" + comments + "</p>"
                     + "<p>&nbsp;</p>"
                     + "<p>Best Regards,</p>"

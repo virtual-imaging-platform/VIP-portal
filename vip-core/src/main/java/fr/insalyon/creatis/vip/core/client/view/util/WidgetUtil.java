@@ -34,61 +34,107 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.util;
 
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
  *
  * @author Rafael Silva
  */
 public class WidgetUtil {
- 
+
     /**
-     * 
+     *
      * @param contents
      * @param height
-     * @return 
+     * @return
      */
     public static Label getLabel(String contents, int height) {
         return getLabel(contents, null, height);
     }
-    
+
     /**
-     * 
+     *
      * @param contents
      * @param icon
      * @param height
-     * @return 
+     * @return
      */
     public static Label getLabel(String contents, String icon, int height) {
         return getLabel(contents, icon, height, Cursor.ARROW);
     }
-    
+
     /**
-     * 
+     *
      * @param contents
      * @param height
      * @param cursor
-     * @return 
+     * @return
      */
     public static Label getLabel(String contents, int height, Cursor cursor) {
         return getLabel(contents, null, height, cursor);
     }
-    
+
     /**
-     * 
+     *
      * @param contents
      * @param icon
      * @param height
      * @param cursor
-     * @return 
+     * @return
      */
     public static Label getLabel(String contents, String icon, int height, Cursor cursor) {
-        
+
         Label label = new Label(contents);
         label.setIcon(icon);
         label.setHeight(height);
         label.setCursor(cursor);
         return label;
+    }
+    
+    /**
+     * 
+     * @param width
+     * @return 
+     */
+    public static VLayout getVIPLayout(int width) {
+        
+        return getVIPLayout(width, "100%");
+    }
+
+    /**
+     * 
+     * @param width
+     * @param height
+     * @return 
+     */
+    public static VLayout getVIPLayout(int width, int height) {
+        
+        return getVIPLayout(width, Integer.toString(height));
+    }
+    
+    /**
+     * 
+     * @param width
+     * @param height
+     * @return 
+     */
+    public static VLayout getVIPLayout(int width, String height) {
+
+        VLayout layout = new VLayout(5);
+        layout.setWidth(width);
+        layout.setHeight(height);
+        layout.setBorder("1px solid #C0C0C0");
+        layout.setBackgroundColor("#F5F5F5");
+        layout.setPadding(10);
+
+        Label vipLabel = getLabel("<font color=\"#C0C0C0\"><b>Virtual Imaging Platform</b></font>", 15);
+        vipLabel.setWidth100();
+        vipLabel.setAlign(Alignment.RIGHT);
+        layout.addMember(vipLabel);
+
+        return layout;
     }
 }

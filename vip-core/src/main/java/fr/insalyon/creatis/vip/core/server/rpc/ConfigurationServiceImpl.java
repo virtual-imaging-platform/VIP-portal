@@ -63,8 +63,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     *
-     * @throws CoreException
+     * 
+     * @param email
+     * @param session
+     * @return
+     * @throws CoreException 
      */
     public User configure(String email, String session) throws CoreException {
 
@@ -96,16 +99,17 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     *
-     * @param user
-     * @param comments
-     * @throws CoreException
+     * 
+     * @param user User bean object
+     * @param comments User's comments
+     * @param accountType User's account type
+     * @throws CoreException 
      */
-    public void signup(User user, String comments) throws CoreException {
+    public void signup(User user, String comments, String accountType) throws CoreException {
 
         try {
             logger.info("Sign up request from '" + user.getEmail() + "'.");
-            configurationBusiness.signup(user, comments);
+            configurationBusiness.signup(user, comments, accountType);
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);

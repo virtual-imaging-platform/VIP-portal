@@ -42,7 +42,7 @@ import java.util.Date;
  */
 public class CoreConstants {
 
-    public static final String VERSION = "v0.7.2";
+    public static final String VERSION = "v0.7.3";
     // Tabs
     public static final String TAB_ACCOUNT = "account-tab";
     public static final String TAB_ACTIVATION = "activation-tab";
@@ -89,6 +89,8 @@ public class CoreConstants {
     public static final String APP_IMG_GROUP = IMG_FOLDER + "system/app-group.png";
     public static final String APP_IMG_NEWS = IMG_FOLDER + "system/app-news.png";
     public static final String APP_IMG_USER = IMG_FOLDER + "system/app-user.png";
+    // Background Images
+    public static final String BKG_SIGNIN = IMG_FOLDER + "/bkg-signin.png";
     // Session Attributes
     public static final String COOKIES_USER = "vip-cookie-user";
     public static final String COOKIES_SESSION = "vip-cookie-session";

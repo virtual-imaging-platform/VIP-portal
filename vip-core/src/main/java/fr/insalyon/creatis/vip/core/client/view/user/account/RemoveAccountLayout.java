@@ -36,87 +36,77 @@ package fr.insalyon.creatis.vip.core.client.view.user.account;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import fr.insalyon.creatis.vip.core.client.Modules;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
  * @author Rafael Silva
  */
-public class RemoveAccountWindow extends Window {
+public class RemoveAccountLayout extends AbstractFormLayout {
 
-    private ModalWindow modal;
+    private CheckboxItem confirmField;
     private IButton removeButton;
 
-    public RemoveAccountWindow() {
+    public RemoveAccountLayout() {
 
-        this.setTitle(Canvas.imgHTML(CoreConstants.ICON_ACCOUNT_REMOVE) + " Delete Account");
-        this.setWidth100();
-        this.setHeight(80);
-        this.setShowCloseButton(false);
+        super(300, 120);
+        addTitle("Delete Account", CoreConstants.ICON_ACCOUNT_REMOVE);
 
-        VLayout vLayout = new VLayout(15);
-        vLayout.setWidth100();
-        vLayout.setHeight100();
-        vLayout.setPadding(10);
-        vLayout.setOverflow(Overflow.AUTO);
-        vLayout.setDefaultLayoutAlign(Alignment.CENTER);
-
-        modal = new ModalWindow(vLayout);
-
-        configureButton();
-
-        vLayout.addMember(removeButton);
-
-        this.addItem(vLayout);
+        configure();
     }
 
-    private void configureButton() {
+    private void configure() {
 
-        removeButton = new IButton("Delete Account");
+        this.addMember(WidgetUtil.getLabel("Removing your account will remove "
+                + "all your personal data and simulations", 20));
+
+        confirmField = new CheckboxItem("confirm", "<font color=\"#808080\">Yes, I want to delete my account</font>");
+        confirmField.setRequired(true);
+        confirmField.setWidth(300);
+        confirmField.setAlign(Alignment.LEFT);
+        
+        this.addMember(FieldUtil.getForm(confirmField));
+
+        removeButton = new IButton("Delete VIP Account");
         removeButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                SC.ask("Do you really want to delete your account?<br />"
-                        + "Note: All data will be erased.", new BooleanCallback() {
 
-                    public void execute(Boolean value) {
-                        if (value) {
-                            ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-                            final AsyncCallback<User> callback = new AsyncCallback<User>() {
+                if (confirmField.validate()) {
+                    ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+                    final AsyncCallback<User> callback = new AsyncCallback<User>() {
 
-                                public void onFailure(Throwable caught) {
-                                    modal.hide();
-                                    SC.say("Unable to delete account:<br />" + caught.getMessage());
-                                }
-
-                                public void onSuccess(User result) {
-                                    Modules.getInstance().userRemoved(result);
-                                    modal.hide();
-                                    Layout.getInstance().signout();
-                                    SC.say("Your account was successfully deleted.");
-                                }
-                            };
-                            service.removeUser(callback);
-                            modal.show("Removing account...", true);
+                        public void onFailure(Throwable caught) {
+                            modal.hide();
+                            SC.say("Unable to delete account:<br />" + caught.getMessage());
                         }
-                    }
-                });
+
+                        public void onSuccess(User result) {
+                            Modules.getInstance().userRemoved(result);
+                            modal.hide();
+                            Layout.getInstance().signout();
+                            SC.say("Your account was successfully deleted.");
+                        }
+                    };
+                    service.removeUser(callback);
+                    modal.show("Removing account...", true);
+                }
             }
         });
+
+        this.addMember(removeButton);
     }
 }
