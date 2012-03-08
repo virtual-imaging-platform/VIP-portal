@@ -42,7 +42,7 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -54,6 +54,7 @@ import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.LinkedHashMap;
 
 /**
@@ -63,7 +64,7 @@ import java.util.LinkedHashMap;
 public class ContactTab extends Tab {
 
     private ModalWindow modal;
-    private DynamicForm form;
+    private VLayout contactLayout;
     private TextItem nameField;
     private TextItem emailField;
     private SelectItem categoryItem;
@@ -84,53 +85,41 @@ public class ContactTab extends Tab {
         vLayout.setOverflow(Overflow.AUTO);
         vLayout.setDefaultLayoutAlign(Alignment.CENTER);
 
-        modal = new ModalWindow(vLayout);
-
-        configureForm();
-        configureButton();
-
-        vLayout.addMember(form);
-        vLayout.addMember(submitButton);
+        configure();
+        vLayout.addMember(contactLayout);
+        modal = new ModalWindow(contactLayout);
 
         this.setPane(vLayout);
     }
 
-    private void configureForm() {
+    private void configure() {
 
-        nameField = FieldUtil.getTextItem(300, true, "Name", null);
-        nameField.setDisabled(true);
+        nameField = FieldUtil.getTextItem(300, null, true);
         nameField.setValue(CoreModule.user.getFullName());
 
-        emailField = FieldUtil.getTextItem(300, true, "Email", null);
-        emailField.setDisabled(true);
+        emailField = FieldUtil.getTextItem(300, null, true);
         emailField.setValue(CoreModule.user.getEmail());
 
         categoryItem = new SelectItem("category", "Category");
         LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
         map.put("General question", "General question");
         map.put("Report bug", "Report bug");
-        map.put("Report missing term in ontologies","Report missing term in ontologies");
+        map.put("Report missing term in ontologies", "Report missing term in ontologies");
         categoryItem.setValueMap(map);
         categoryItem.setValue("General Contact");
+        categoryItem.setShowTitle(false);
 
-        subjectField = FieldUtil.getTextItem(300, true, "Subject", null);
+        subjectField = FieldUtil.getTextItem(300, null);
 
-        commentItem = new TextAreaItem("comment", "Comments");
+        commentItem = new TextAreaItem("comment");
         commentItem.setWidth(300);
-
-        form = FieldUtil.getForm(nameField, emailField, categoryItem,
-                subjectField, commentItem);
-        form.setWidth(500);
-        form.setTitleWidth(150);
-    }
-
-    private void configureButton() {
+        commentItem.setShowTitle(false);
 
         submitButton = new IButton("Submit");
         submitButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                if (form.validate()) {
+                if (subjectField.validate()) {
 
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
                     final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
@@ -147,11 +136,25 @@ public class ContactTab extends Tab {
                     };
                     modal.show("Sending contact messsage...", true);
                     service.sendContactMail(
-                            categoryItem.getValueAsString(), 
-                            subjectField.getValueAsString().trim(), 
+                            categoryItem.getValueAsString(),
+                            subjectField.getValueAsString().trim(),
                             commentItem.getValueAsString(), callback);
                 }
             }
         });
+
+        contactLayout = WidgetUtil.getVIPLayout(330, 370);
+        addField("Name", nameField);
+        addField("E-mail", emailField);
+        addField("Category", categoryItem);
+        addField("Subject", subjectField);
+        addField("Comments", commentItem);
+        contactLayout.addMember(submitButton);
+    }
+
+    private void addField(String title, FormItem item) {
+
+        contactLayout.addMember(WidgetUtil.getLabel("<b>" + title + "</b>", 15));
+        contactLayout.addMember(FieldUtil.getForm(item));
     }
 }
