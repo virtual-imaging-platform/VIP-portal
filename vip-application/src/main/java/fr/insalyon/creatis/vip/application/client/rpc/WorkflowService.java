@@ -37,11 +37,7 @@ package fr.insalyon.creatis.vip.application.client.rpc;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
-import fr.insalyon.creatis.vip.application.client.bean.InOutData;
-import fr.insalyon.creatis.vip.application.client.bean.Processor;
-import fr.insalyon.creatis.vip.application.client.bean.Simulation;
-import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
+import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import java.util.Date;
 import java.util.List;
@@ -82,6 +78,12 @@ public interface WorkflowService extends RemoteService {
 
     public List<SimulationInput> getSimulationInputByUser() throws ApplicationException;
 
+    public void saveInputsAsExamples(SimulationInput simulationInput) throws ApplicationException;
+
+    public List<SimulationInput> getSimulationInputExamples() throws ApplicationException;
+
+    public void removeSimulationInputExample(String inputName, String applicationName) throws ApplicationException;
+
     public void killSimulations(List<String> simulationIDs) throws ApplicationException;
 
     public void cleanSimulations(List<String> simulationIDs) throws ApplicationException;
@@ -95,7 +97,7 @@ public interface WorkflowService extends RemoteService {
     public void purgeWorkflow(String simulationID) throws ApplicationException;
 
     public List<Simulation> getSimulations(String user, String application, String status, Date startDate, Date endDate) throws ApplicationException;
-    
+
     public Simulation getSimulation(String simulationID) throws ApplicationException;
 
     public void closeConnection(String workflowID);
@@ -115,10 +117,10 @@ public interface WorkflowService extends RemoteService {
     public List<InOutData> getOutputData(String simulationID) throws ApplicationException;
 
     public List<InOutData> getInputData(String simulationID) throws ApplicationException;
-    
+
     public List<Processor> getProcessors(String simulationID) throws ApplicationException;
-    
+
     public void validateInputs(List<String> inputs) throws ApplicationException;
-    
+
     public void updateUser(String currentUser, String newUser) throws ApplicationException;
 }

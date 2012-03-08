@@ -54,6 +54,7 @@ public class ApplicationConstants {
     public static final String ICON_CLEAN = IMG_FOLDER + "icon-clean.png";
     public static final String ICON_GENERAL = IMG_FOLDER + "icon-general.png";
     public static final String ICON_KILL = IMG_FOLDER + "icon-kill.png";
+    public static final String ICON_LAUNCH = IMG_FOLDER + "icon-launch.png";
     public static final String ICON_LOG = IMG_FOLDER + "icon-log.png";
     public static final String ICON_MONITOR = IMG_FOLDER + "icon-monitor.png";
     public static final String ICON_PICKER_MORE = IMG_FOLDER + "icon-picker-more.png";

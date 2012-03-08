@@ -106,10 +106,27 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
         return simulationLayout;
     }
 
+    protected IButton getLaunchButton() {
+
+        IButton launchButton = new IButton("Launch");
+        launchButton.setIcon(ApplicationConstants.ICON_LAUNCH);
+        launchButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                if (validate()) {
+                    launch();
+                } else {
+                    SC.warn("Cannot launch. Some inputs are not valid.");
+                }
+            }
+        });
+        return launchButton;
+    }
+
     protected IButton getSaveInputsButton() {
 
         IButton saveButton = new IButton("Save Inputs");
-        saveButton.setIcon(CoreConstants.ICON_SAVE);
+        saveButton.setIcon(CoreConstants.ICON_SAVED);
         saveButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
@@ -121,8 +138,26 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
         return saveButton;
     }
 
+    protected IButton getSaveAsExampleButton() {
+
+        IButton saveButton = new IButton("Save as Example");
+        saveButton.setIcon(CoreConstants.ICON_EXAMPLE);
+        saveButton.setWidth(120);
+        saveButton.setPrompt("Save the inputs as a featured example that will "
+                + "be available for all users.");
+        saveButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                if (validate()) {
+                    saveInputsAsExample();
+                }
+            }
+        });
+        return saveButton;
+    }
+
     protected String getSimulationName() {
-        
+
         return simulationNameItem.getValueAsString().trim();
     }
 
@@ -133,6 +168,14 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
      */
     protected abstract boolean validate();
 
+    /**
+     * Launches a simulation.
+     */
+    protected abstract void launch();
+
+    /**
+     * Verifies if the simulation name already exists.
+     */
     private void verifySimulationName() {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
@@ -189,6 +232,28 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
         } else {
             service.addSimulationInput(getSimulationInput(), callback);
         }
+    }
+
+    private void saveInputsAsExample() {
+
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Unable to save simulation inputs:<br />" + caught.getMessage());
+            }
+
+            public void onSuccess(Void result) {
+                AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().
+                        getTab(ApplicationConstants.getLaunchTabID(applicationName));
+                launchTab.loadInputsList();
+                modal.hide();
+                SC.say("Input values were succesfully saved!");
+            }
+        };
+        modal.show("Saving example inputs...", true);
+        service.saveInputsAsExamples(getSimulationInput(), callback);
     }
 
     private SimulationInput getSimulationInput() {

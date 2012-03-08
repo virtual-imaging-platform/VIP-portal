@@ -37,7 +37,6 @@ package fr.insalyon.creatis.vip.application.server.business;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputParser;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
-import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAOFactory;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
@@ -51,12 +50,12 @@ import java.util.List;
 public class InputBusiness {
 
     /**
-     * 
+     *
      * @param email
      * @param name
      * @param appName
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public SimulationInput getInputByUserAndName(String email, String name,
             String appName) throws BusinessException {
@@ -70,10 +69,10 @@ public class InputBusiness {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param simulationInput
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void addSimulationInput(String email, SimulationInput simulationInput)
             throws BusinessException {
@@ -87,10 +86,10 @@ public class InputBusiness {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param simulationInput
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void updateSimulationInput(String email, SimulationInput simulationInput)
             throws BusinessException {
@@ -104,10 +103,26 @@ public class InputBusiness {
     }
 
     /**
-     * 
+     *
+     * @param simulationInput
+     * @throws BusinessException
+     */
+    public void saveSimulationInputAsExample(SimulationInput simulationInput)
+            throws BusinessException {
+
+        try {
+            ApplicationDAOFactory.getDAOFactory().getApplicationInputDAO().saveSimulationInputAsExample(simulationInput);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     *
      * @param fileName
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public String loadSimulationInput(String fileName) throws BusinessException {
 
@@ -118,11 +133,11 @@ public class InputBusiness {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param inputName
      * @param applicationName
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void removeSimulationInput(String email, String inputName,
             String applicationName) throws BusinessException {
@@ -137,15 +152,46 @@ public class InputBusiness {
 
     /**
      * 
-     * @param email
-     * @return
+     * @param inputName
+     * @param applicationName
      * @throws BusinessException 
      */
-    public List<SimulationInput> getSimulationInputByUser(String email) 
+    public void removeSimulationInputExample(String inputName, 
+            String applicationName) throws BusinessException {
+
+        try {
+            ApplicationDAOFactory.getDAOFactory().getApplicationInputDAO().removeSimulationInputExample(inputName, applicationName);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param email
+     * @return
+     * @throws BusinessException
+     */
+    public List<SimulationInput> getSimulationInputByUser(String email)
             throws BusinessException {
 
         try {
             return ApplicationDAOFactory.getDAOFactory().getApplicationInputDAO().getSimulationInputByUser(email);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     *
+     * @return @throws BusinessException
+     */
+    public List<SimulationInput> getSimulationInputExamples() throws BusinessException {
+
+        try {
+            return ApplicationDAOFactory.getDAOFactory().getApplicationInputDAO().getSimulationInputExamples();
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);

@@ -34,18 +34,19 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
+import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.form.fields.LinkItem;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
@@ -59,7 +60,6 @@ import java.util.Map;
  */
 public class LaunchFormLayout extends AbstractFormLayout {
 
-    private ModalWindow modal;
     private TextItem simulationNameItem;
     private VLayout sourcesLayout;
 
@@ -68,18 +68,15 @@ public class LaunchFormLayout extends AbstractFormLayout {
         super("600", "*");
         addTitle(title, icon);
 
-        LinkItem documentationLink = new LinkItem("link");
-        documentationLink.setShowTitle(false);
-        documentationLink.setLinkTitle("Documentation and Terms of Use");
-        documentationLink.setWidth(300);
-        documentationLink.addClickHandler(new ClickHandler() {
+        Label docLabel = WidgetUtil.getLabel("Documentation and Terms of Use", 
+                CoreConstants.ICON_INFORMATION, 30, Cursor.HAND);
+        docLabel.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                new DocumentationLayout(event.getItem().getPageLeft(),
-                        event.getItem().getPageTop(), description).show();
+                new DocumentationLayout(event.getX(), event.getY(), description).show();
             }
         });
-        this.addMember(FieldUtil.getForm(documentationLink));
+        this.addMember(docLabel);
 
         simulationNameItem = FieldUtil.getTextItem(400, "[0-9A-Za-z-_ ]");
         addField("Simulation Name", simulationNameItem);

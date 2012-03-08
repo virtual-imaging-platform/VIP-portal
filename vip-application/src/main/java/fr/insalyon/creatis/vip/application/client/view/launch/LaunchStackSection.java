@@ -36,15 +36,14 @@ package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.layout.HLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchStackSection;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import java.util.*;
 
@@ -54,11 +53,23 @@ import java.util.*;
  */
 public class LaunchStackSection extends AbstractLaunchStackSection {
 
+    private String tabID;
+    private HLayout hLayout;
     private LaunchFormLayout launchFormLayout;
+    private InputsLayout inputsLayout;
 
-    public LaunchStackSection(String applicationName) {
+    public LaunchStackSection(String applicationName, String tabID) {
 
         super(applicationName);
+        
+        this.tabID = tabID;
+        
+        hLayout = new HLayout(10);
+        hLayout.setWidth100();
+        hLayout.setHeight100();
+        
+        vLayout.addMember(hLayout);
+        
         loadData();
     }
 
@@ -111,25 +122,24 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
             public void onSuccess(Descriptor descriptor) {
 
                 launchFormLayout = new LaunchFormLayout(applicationName, null, descriptor.getDescription());
-                vLayout.addMember(launchFormLayout);
+                hLayout.addMember(launchFormLayout);
 
                 for (Source source : descriptor.getSources()) {
                     launchFormLayout.addSource(new InputHLayout(source.getName(), source.getDescription()));
                 }
 
-                IButton launchButton = new IButton("Launch");
-                launchButton.addClickHandler(new ClickHandler() {
-
-                    public void onClick(ClickEvent event) {
-                        if (validate()) {
-                            launch();
-                        }
-                    }
-                });
-                launchFormLayout.addButtons(launchButton, getSaveInputsButton());
+                if (CoreModule.user.isSystemAdministrator() || CoreModule.user.isGroupAdmin()) {
+                    launchFormLayout.addButtons(getLaunchButton(), getSaveInputsButton(),
+                            getSaveAsExampleButton());
+                } else {
+                    launchFormLayout.addButtons(getLaunchButton(), getSaveInputsButton());
+                }
 
                 modal.hide();
                 modal = launchFormLayout.getModal();
+                
+                inputsLayout = new InputsLayout(tabID);
+                hLayout.addMember(inputsLayout);
             }
         };
         modal.show("Loading launch panel...", true);
@@ -150,7 +160,8 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
     /**
      * Launches a simulation.
      */
-    private void launch() {
+    @Override
+    protected void launch() {
 
         modal.show("Launching simulation '" + getSimulationName() + "'...", true);
 
@@ -216,5 +227,10 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
     protected String getSimulationName() {
 
         return launchFormLayout.getSimulationName();
+    }
+    
+    public void loadInputsList() {
+        
+        inputsLayout.loadData();
     }
 }

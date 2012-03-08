@@ -34,52 +34,55 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
-import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
+import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.Cursor;
+import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
  * @author Rafael Silva
  */
-public class LaunchTab extends AbstractLaunchTab {
+public abstract class AbstractInputsLayout extends VLayout {
 
-    public LaunchTab(String applicationName) {
+    protected ModalWindow modal;
+    protected String tabID;
 
-        super(applicationName);
+    public AbstractInputsLayout(String tabID, String title, String icon) {
 
-        sectionStack.clear();
+        this.tabID = tabID;
 
-        addLaunchSection(applicationName);
+        this.setWidth100();
+        this.setHeight100();
+        this.setBorder("1px solid #C0C0C0");
+        this.setBackgroundColor("#F5F5F5");
+        this.setPadding(10);
+        this.setMembersMargin(5);
+
+        Label titleLabel = WidgetUtil.getLabel("<b>" + title + "</b>", icon, 15);
+        titleLabel.setWidth100();
+        titleLabel.setAlign(Alignment.LEFT);
+
+        Label closeLabel = WidgetUtil.getLabel("<font color=\"#B0B0B0\">Close</font>", CoreConstants.ICON_CLOSE, 15, Cursor.HAND);
+        closeLabel.setWidth(50);
+        closeLabel.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                destroy();
+            }
+        });
+
+        HLayout titleLayout = new HLayout(5);
+        titleLayout.addMember(titleLabel);
+        titleLayout.addMember(closeLabel);
+        this.addMember(titleLayout);
     }
 
-    /**
-     * Sets a value to an input name. The value should be in the following
-     * forms:
-     *
-     * For single list field: a string For multiple list fields: strings
-     * separated by '; ' For ranges: an string like 'Start: 0 - Stop: 0 - Step:
-     * 0'
-     *
-     * @param inputName
-     * @param value
-     */
-    public void setInputValue(String inputName, String value) {
-
-        ((LaunchStackSection) launchSection).setInputValue(inputName, value);
-    }
-
-    /**
-     *
-     * @param applicationName
-     */
-    private void addLaunchSection(String applicationName) {
-
-        launchSection = new LaunchStackSection(applicationName, this.getID());
-        sectionStack.addSection(launchSection);
-    }
-
-    @Override
-    public void loadInputsList() {
-        
-        ((LaunchStackSection) launchSection).loadInputsList();
-    }
+    public abstract void loadData();
 }

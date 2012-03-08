@@ -34,21 +34,21 @@
  */
 package fr.insalyon.creatis.vip.gatelab.client.view.launch;
 
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchStackSection;
-import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -207,11 +207,12 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
     }
 
     /**
-     * Sets a value to an input name. The value should be in the following forms:
+     * Sets a value to an input name. The value should be in the following
+     * forms:
      *
-     * For single list field: a string
-     * For multiple list fields: strings separated by '; '
-     * For ranges: an string like 'Start: 0 - Stop: 0 - Step: 0'
+     * For single list field: a string For multiple list fields: strings
+     * separated by '; ' For ranges: an string like 'Start: 0 - Stop: 0 - Step:
+     * 0'
      *
      * @param inputName
      * @param value
@@ -284,19 +285,8 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
                     buttonsLayout.setMargin(20);
                     inputsLayout.addMember(buttonsLayout);
 
-                    IButton launchButton = new IButton("Launch");
-                    launchButton.addClickHandler(new ClickHandler() {
-
-                        public void onClick(ClickEvent event) {
-                            if (validate()) {
-                                launch();
-                            } else {
-                                SC.warn("Cannot launch. Some inputs are not valid.");
-                            }
-                        }
-                    });
-                    buttonsLayout.addMember(launchButton);
-                    buttonsLayout.addMember(getSaveInputsButton());
+                    buttonsLayout.addMember(getLaunchButton());
+                    buttonsLayout.addMember(getSaveInputsButton());                   
                     modal.hide();
 
                 } else {
@@ -329,7 +319,8 @@ public class GateLabLaunchStackSection extends AbstractLaunchStackSection {
     /**
      * Launches a simulation.
      */
-    private void launch() {
+    @Override
+    protected void launch() {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {

@@ -63,6 +63,7 @@ public class CoreConstants {
     public static final String ICON_CLOSE = IMG_FOLDER + "icon-close.png";
     public static final String ICON_DELETE = IMG_FOLDER + "icon-delete.png";
     public static final String ICON_EDIT = IMG_FOLDER + "icon-edit.png";
+    public static final String ICON_EXAMPLE = IMG_FOLDER + "icon-example.png";
     public static final String ICON_HELP = IMG_FOLDER + "icon-help.png";
     public static final String ICON_HOME = IMG_FOLDER + "icon-home.png";
     public static final String ICON_INFORMATION = IMG_FOLDER + "icon-information.png";
@@ -72,6 +73,7 @@ public class CoreConstants {
     public static final String ICON_PICKER_QUESTION = IMG_FOLDER + "icon-picker-question.png";
     public static final String ICON_REFRESH = IMG_FOLDER + "icon-refresh.png";
     public static final String ICON_SAVE = IMG_FOLDER + "icon-save.png";
+    public static final String ICON_SAVED = IMG_FOLDER + "icon-saved.png";
     public static final String ICON_SIGNOUT = IMG_FOLDER + "icon-signout.png";
     public static final String ICON_SYSTEM = IMG_FOLDER + "system/icon-system.png";
     public static final String ICON_USER = IMG_FOLDER + "system/icon-user.png";

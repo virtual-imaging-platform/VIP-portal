@@ -35,11 +35,7 @@
 package fr.insalyon.creatis.vip.application.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
-import fr.insalyon.creatis.vip.application.client.bean.InOutData;
-import fr.insalyon.creatis.vip.application.client.bean.Processor;
-import fr.insalyon.creatis.vip.application.client.bean.Simulation;
-import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
+import fr.insalyon.creatis.vip.application.client.bean.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +61,12 @@ public interface WorkflowServiceAsync {
     public void removeSimulationInput(String inputName, String applicationName, AsyncCallback<Void> asyncCallback);
 
     public void getSimulationInputByUser(AsyncCallback<List<SimulationInput>> asyncCallback);
+    
+    public void saveInputsAsExamples(SimulationInput simulationInput, AsyncCallback<Void> asyncCallback);
+    
+    public void getSimulationInputExamples(AsyncCallback<List<SimulationInput>> asyncCallback);
+    
+    public void removeSimulationInputExample(String inputName, String applicationName, AsyncCallback<Void> asyncCallback);
 
     public void killSimulations(List<String> simulationIDs, AsyncCallback<Void> asyncCallback);
 

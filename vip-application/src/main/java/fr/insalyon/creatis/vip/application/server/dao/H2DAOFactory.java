@@ -97,10 +97,13 @@ public class H2DAOFactory extends ApplicationDAOFactory {
                     + "inputs VARCHAR(32000), "
                     + "PRIMARY KEY (email, application, name), "
                     + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
-                    + "ON DELETE CASCADE ON UPDATE RESTRICT, "
-                    + "FOREIGN KEY (application) REFERENCES VIPApplications(name) "
                     + "ON DELETE CASCADE ON UPDATE RESTRICT");
-
+            
+            PlatformConnection.getInstance().createTable("VIPAppExamples",
+                    "application VARCHAR(255), "
+                    + "name VARCHAR(255), "
+                    + "inputs VARCHAR(32000), "
+                    + "PRIMARY KEY (application, name)");
 
         } catch (DAOException ex) {
             logger.error(ex);

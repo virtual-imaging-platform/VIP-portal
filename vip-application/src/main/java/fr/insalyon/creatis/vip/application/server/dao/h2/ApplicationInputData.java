@@ -56,19 +56,19 @@ public class ApplicationInputData implements ApplicationInputDAO {
     private Connection connection;
 
     public ApplicationInputData() throws DAOException {
-        
+
         connection = PlatformConnection.getInstance().getConnection();
     }
 
     /**
-     * 
+     *
      * @param email
      * @param SimulationInput
-     * @throws DAOException 
+     * @throws DAOException
      */
-    public void addSimulationInput(String email, SimulationInput SimulationInput) 
+    public void addSimulationInput(String email, SimulationInput SimulationInput)
             throws DAOException {
-        
+
         try {
             PreparedStatement ps = connection.prepareStatement(
                     "INSERT INTO VIPAppInputs(email, application, name, inputs) "
@@ -92,15 +92,15 @@ public class ApplicationInputData implements ApplicationInputDAO {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param inputName
      * @param application
-     * @throws DAOException 
+     * @throws DAOException
      */
-    public void removeSimulationInput(String email, String inputName, 
+    public void removeSimulationInput(String email, String inputName,
             String application) throws DAOException {
-        
+
         try {
             PreparedStatement stat = connection.prepareStatement("DELETE "
                     + "FROM VIPAppInputs WHERE email=? AND name=? AND application=?");
@@ -117,14 +117,14 @@ public class ApplicationInputData implements ApplicationInputDAO {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param SimulationInput
-     * @throws DAOException 
+     * @throws DAOException
      */
-    public void updateSimulationInput(String email, SimulationInput SimulationInput) 
+    public void updateSimulationInput(String email, SimulationInput SimulationInput)
             throws DAOException {
-        
+
         try {
             PreparedStatement ps = connection.prepareStatement(
                     "UPDATE VIPAppInputs SET inputs=? "
@@ -142,11 +142,11 @@ public class ApplicationInputData implements ApplicationInputDAO {
         }
     }
 
-    public List<SimulationInput> getSimulationInputByUser(String email) 
+    public List<SimulationInput> getSimulationInputByUser(String email)
             throws DAOException {
-        
+
         try {
-            
+
             PreparedStatement stat = connection.prepareStatement("SELECT "
                     + "application, name, inputs "
                     + "FROM VIPAppInputs WHERE email=? "
@@ -199,12 +199,12 @@ public class ApplicationInputData implements ApplicationInputDAO {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param name
      * @param appName
      * @return
-     * @throws DAOException 
+     * @throws DAOException
      */
     public SimulationInput getInputByNameUserApp(String email, String name,
             String appName) throws DAOException {
@@ -226,6 +226,89 @@ public class ApplicationInputData implements ApplicationInputDAO {
                     rs.getString("application"),
                     rs.getString("name"),
                     rs.getString("inputs"));
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param SimulationInput
+     * @throws DAOException
+     */
+    public void saveSimulationInputAsExample(SimulationInput SimulationInput) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO VIPAppExamples(application, name, inputs) "
+                    + "VALUES (?, ?, ?)");
+
+            ps.setString(1, SimulationInput.getApplication());
+            ps.setString(2, SimulationInput.getName());
+            ps.setString(3, SimulationInput.getInputs());
+            ps.execute();
+
+        } catch (SQLException ex) {
+            if (ex.getMessage().contains("Unique index or primary key violation")) {
+                logger.error("An input named \"" + SimulationInput.getName() + "\" already exists.");
+                throw new DAOException("An input named \"" + SimulationInput.getName() + "\" already exists.");
+            } else {
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
+        }
+    }
+
+    /**
+     * 
+     * @return
+     * @throws DAOException 
+     */
+    public List<SimulationInput> getSimulationInputExamples() throws DAOException {
+
+        try {
+
+            PreparedStatement stat = connection.prepareStatement("SELECT "
+                    + "application, name, inputs "
+                    + "FROM VIPAppExamples "
+                    + "ORDER BY application, name");
+
+            ResultSet rs = stat.executeQuery();
+            List<SimulationInput> inputs = new ArrayList<SimulationInput>();
+
+            while (rs.next()) {
+                inputs.add(new SimulationInput(
+                        rs.getString("application"),
+                        rs.getString("name"),
+                        rs.getString("inputs")));
+            }
+
+            return inputs;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+    
+    /**
+     * 
+     * @param inputName
+     * @param application
+     * @throws DAOException 
+     */
+    public void removeSimulationInputExample(String inputName, String application) 
+            throws DAOException {
+
+        try {
+            PreparedStatement stat = connection.prepareStatement("DELETE "
+                    + "FROM VIPAppExamples WHERE name=? AND application=?");
+
+            stat.setString(1, inputName);
+            stat.setString(2, application);
+            stat.execute();
 
         } catch (SQLException ex) {
             logger.error(ex);

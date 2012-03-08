@@ -215,6 +215,23 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
+     * 
+     * @param inputName
+     * @param applicationName
+     * @throws ApplicationException 
+     */
+    public void removeSimulationInputExample(String inputName, String applicationName)
+            throws ApplicationException {
+
+        try {
+            inputBusiness.removeSimulationInputExample(inputName, applicationName);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
      *
      * @return @throws ApplicationException
      */
@@ -225,6 +242,35 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param simulationInput
+     * @throws ApplicationException
+     */
+    public void saveInputsAsExamples(SimulationInput simulationInput) throws ApplicationException {
+
+        try {
+            inputBusiness.saveSimulationInputAsExample(simulationInput);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     *
+     * @return @throws ApplicationException
+     */
+    public List<SimulationInput> getSimulationInputExamples() throws ApplicationException {
+
+        try {
+            return inputBusiness.getSimulationInputExamples();
+
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
