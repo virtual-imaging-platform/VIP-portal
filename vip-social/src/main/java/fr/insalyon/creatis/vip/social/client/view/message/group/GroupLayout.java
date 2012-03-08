@@ -45,6 +45,7 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
 import fr.insalyon.creatis.vip.social.client.bean.GroupMessage;
@@ -139,7 +140,7 @@ public class GroupLayout extends VLayout {
     private void configureButtons() {
 
         HLayout buttonsLayout = new HLayout(5);
-        if (CoreModule.user.isSystemAdministrator()) {
+        if (CoreModule.user.getLevel() != UserLevel.Beginner) {
 
             buttonsLayout.setWidth100();
 
