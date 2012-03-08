@@ -18,7 +18,7 @@
         <vip.gatelab-applet.version>0.2.2</vip.gatelab-applet.version>
         <vip.simulation-gui.version>0.2.6</vip.simulation-gui.version>
         <vip.models.version>0.3.2</vip.models.version>
-        <vip.social.version>0.3</vip.social.version>
+        <vip.social.version>0.3.1</vip.social.version>
         <vip.provenance.version>0.1.2</vip.provenance.version>
         <vip.physical-properties.version>0.1</vip.physical-properties.version>
     </properties>

@@ -216,7 +216,7 @@ public class MessageBusiness {
                         + "</html>";
 
                 CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
-                        "VIP: Message from " + user.getFullName(), emailContent,
+                        "VIP Message: " + subject + " (" + user.getFullName() + ")", emailContent,
                         new String[]{recipient});
             }
 
@@ -257,7 +257,7 @@ public class MessageBusiness {
             for (User u : users) {
                 if (!u.getEmail().equals(user.getEmail())) {
                     CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
-                            "VIP: Message sent to " + groupName + " group",
+                            "VIP Message: " + subject + " (" + groupName + ")",
                             emailContent, new String[]{u.getEmail()});
                 }
             }
