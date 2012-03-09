@@ -45,11 +45,8 @@ import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.*;
+import java.text.Normalizer;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -181,6 +178,13 @@ public class UploadFilesServiceImpl extends HttpServlet {
 
     private void uploadFile(String fileName, String dir)
             throws GRIDAClientException, DataManagerException {
+
+        String parsed = fileName.trim().replaceAll(" ", "_");
+        parsed = Normalizer.normalize(parsed, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        if (!parsed.equals(fileName)) {
+            new File(fileName).renameTo(new File(parsed));
+            fileName = parsed;
+        }
 
         logger.info("(" + email + ") Uploading '" + fileName + "' to '" + dir + "'.");
         if (usePool) {
