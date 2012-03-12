@@ -440,7 +440,9 @@ public class ObjectModel extends Object3D {
     }
 
     public void reconstructor() {
-
+        makeLabel(multiModel);
+        model = multiparsor(multiModel);
+        model.enable();
         /*  float[]tmp=null;
         float[]tmp2=null;
         int[]tmp3=null;
@@ -466,8 +468,7 @@ public class ObjectModel extends Object3D {
         model.setNormals(tmp4);
         model.setNumItemIndex(tmp5);*/
 
-        makeLabel(multiModel);
-        model = multiparsor(multiModel);
+    
         /* int[]tmp3=null;
         int tmp5=0;
         for(int j=0;j<multiModel.length;j++)
@@ -483,7 +484,7 @@ public class ObjectModel extends Object3D {
         }
         model.setNumItemIndex(tmp5);
         model.setIndices(tmp3); */
-        model.enable();
+
     }
 
     public void addModel(Data3D[][] DATA) {
@@ -494,14 +495,13 @@ public class ObjectModel extends Object3D {
         enableAndMapAllElement();
         buildNormalsMultiModel();
         reconstructor();
-        model.enable();
         box.disable();
         setBoundingBox(DATA[0][0].getBoundingBox());
         Scene.getInstance().refreshBuffer();
         Scene.getInstance().changeCameraView(DATA[0][0].getBoundingBox());
         Scene.getInstance().refreshScreen();
         SimulationGUIControlBoxModel.getInstance().uncheckBoxBox();
-        SC.say("Load succes ! </br> This is an example of model for the simulation gui.</br> You can open the model and the simulator controller with the check box on the top right.</br>In the model controller you have a tree of layout, in each layout you can enable/disable an object or change the color of this object with a double-click on his name");
+     //   SC.say("Load succes ! </br> This is an example of model for the simulation gui.</br> You can open the model and the simulator controller with the check box on the top right.</br>In the model controller you have a tree of layout, in each layout you can enable/disable an object or change the color of this object with a double-click on his name");
 
     }
 
@@ -516,7 +516,7 @@ public class ObjectModel extends Object3D {
         Scene.getInstance().changeCameraView(DATA.getBoundingBox());
         Scene.getInstance().refreshScreen();
         SimulationGUIControlBoxModel.getInstance().uncheckBoxBox();
-        SC.say("load succes, number of vertex : " + model.getNumItemIndex() + " [x min : " + model.getBoundingBox()[0] + "mm x max : " + model.getBoundingBox()[1] + "mm] [y min : " + model.getBoundingBox()[2] + "mm y max : " + model.getBoundingBox()[3] + "mm] [z min : " + model.getBoundingBox()[4] + "mm z max : " + model.getBoundingBox()[5] + "mm]");
+        //SC.say("load succes, number of vertex : " + model.getNumItemIndex() + " [x min : " + model.getBoundingBox()[0] + "mm x max : " + model.getBoundingBox()[1] + "mm] [y min : " + model.getBoundingBox()[2] + "mm y max : " + model.getBoundingBox()[3] + "mm] [z min : " + model.getBoundingBox()[4] + "mm z max : " + model.getBoundingBox()[5] + "mm]");
 
     }
 
@@ -604,7 +604,7 @@ public class ObjectModel extends Object3D {
             }
         }
         reconstructor();
-        model.enable();
+        //model.enable();
         Scene.getInstance().refreshBuffer();
         Scene.getInstance().refreshScreen();
     }
@@ -668,6 +668,8 @@ public class ObjectModel extends Object3D {
             }
         }
 
+        
+        
         float[] c = new float[tailleC];
         float[] v = new float[tailleV];
         float[] n = new float[tailleN];
@@ -676,6 +678,12 @@ public class ObjectModel extends Object3D {
         String s = "";
         for (int i = 0; i < size; i++) {
             Data3D d1 = opaqueMap.get(i);
+//            for (int j = 0 ; j < d1.getVertices().length; j++)
+//            {
+//                if (j%333 ==0 )
+//                s += d1.getVertices()[j] + "   ";
+//            }
+            
             s += " " + i + " " + d1.getID() + " " + d1.getLenghtInfo() + "</br>";
             if (d1.isEnable() && d1.getColors() != null && d1.getVertices() != null && d1.getNormals() != null) {
                 System.arraycopy(d1.getColors(), 0, c, posC, d1.getColors().length);

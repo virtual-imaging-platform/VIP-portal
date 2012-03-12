@@ -136,11 +136,9 @@ public class VTKControllerImpl extends AbstractRemoteServiceServlet implements V
             User user = getSessionUser();
             DownloadService service = new DownloadService(url, user.getFullName());
             Data3D[][] object =  service.rebuildObject();
-            //System.gc ();
-            Runtime.getRuntime().gc();
+
             
             System.out.println("object got and garbage done " + object.length);
-            System.gc();
             return object;
             //return service.getObject();
    
@@ -152,14 +150,15 @@ public class VTKControllerImpl extends AbstractRemoteServiceServlet implements V
             User user = getSessionUser();
             DownloadService service = new DownloadService(url, user.getFullName());
             object =  service.rebuildObject();
-            //System.gc ();
-            Runtime.getRuntime().gc();
             
             System.out.println("object got and garbage done " + object.length);
-            System.gc();
+        
             int[][] result = new int[object.length][1];
             for(int i = 0; i < object.length; i++)
+            {
                 result[i] = new int[object[i].length];
+                System.out.println("for "+ i +  object[i].length + " objets");
+            }
             return result;
             //return service.getObject();
        }
@@ -170,6 +169,7 @@ public class VTKControllerImpl extends AbstractRemoteServiceServlet implements V
            data.data = object[i][j];
            data.i = i;
            data.j = j;
+           System.out.println("Download "+ i +  " et " + j + " size :" + data.data.getItemSizeVertex());
            return data;
        }
     private void addClass(String className) throws SimulationGUIException {

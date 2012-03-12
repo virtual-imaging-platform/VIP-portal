@@ -141,6 +141,7 @@ public class SimulationGUITab extends Tab {
                     public void onSuccess(Data3D[][] result) {
                         defineSceneSection.hideModal();
                         SimulationGUIControlBoxModel.getInstance().setTreeNode(result);
+                        
                         ObjectModel.getInstance().addModel(result);
                     }
 
@@ -186,7 +187,7 @@ public class SimulationGUITab extends Tab {
                     public void onSuccess(final SimulationObjectModel result) {
                         modelStorageURL = result.getStorageURL();
                         defineSceneSection.showModal("Object making");
-                        VTK.UnzipModel(modelStorageURL, new AsyncCallback<int[][]>() {
+                        /*VTK.UnzipModel(modelStorageURL, new AsyncCallback<int[][]>() {
                              public void onSuccess(int[][] result2) {
                                   
                                   res_mod = null;
@@ -231,13 +232,12 @@ public class SimulationGUITab extends Tab {
                                 defineSceneSection.hideModal();
                                 SC.say("Error during the object creation");
                             }
-                        });
-                                /*
+                        });*/
+                                
                         VTK.downloadAndUnzipModel(modelStorageURL, new AsyncCallback<Data3D[][]>() {
 
                             public void onSuccess(Data3D[][] result2) {
-                                 defineSceneSection.hideModal();
-                                 SC.say("coucou");
+                                defineSceneSection.hideModal();
                                 ObjectModel.getInstance().addModel(result2);
                                 SimulationGUIControlBoxModel.getInstance().setTreeNode(result2);
                                 refreshLaunchTabValue();
@@ -249,7 +249,8 @@ public class SimulationGUITab extends Tab {
                                 SC.say("Error during the making no?" + caught.getMessage());
                           
                             }
-                        }*/
+                        });
+                        
                     }
 
                     public void onFailure(Throwable caught) {

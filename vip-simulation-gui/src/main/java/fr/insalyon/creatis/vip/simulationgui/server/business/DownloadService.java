@@ -125,6 +125,7 @@ public class DownloadService {
 
     private String unzip(String path) throws FileNotFoundException, IOException, URISyntaxException {
 
+        System.out.println(path);
         String parent = new File(path).getParent();
         ZipInputStream zipinputstream = null;
         ZipEntry zipentry;
@@ -197,27 +198,11 @@ public class DownloadService {
             }
             index++;
         }
-        returnPath = " 0 ";
-        for (int i = 0; i < entry[0].length; i++) {
-            returnPath += entry[0][i] + " ";
-        }
-        returnPath += " 1 ";
-        if(entry.length >1)
-        {
-            for (int i = 0; i < entry[1].length; i++) {
-                returnPath += entry[1][i] + " ";
-            }
-        }
-        if(entry.length >2 )
-        {
-            returnPath += " 2 ";
-            for (int i = 0; i < entry[2].length; i++) {
-                returnPath += entry[2][i] + " ";
-            }
-        }
-        returnPath += "  objectListSize :     " + index + " compare to " + it.getObjectLayers().size();
-        System.out.println(returnPath);
-       
+//        returnPath = " 0 ";
+//    
+//        returnPath += "  objectListSize :     " + index + " compare to " + it.getObjectLayers().size();
+//        System.out.println(returnPath);
+//       
 
         //ObjectFactoryOld objFact=ObjectFactoryOld.getInstance();
         return ObjectFactory.buildMulti(path, entry, type);

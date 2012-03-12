@@ -410,7 +410,7 @@ public class SimulationGUIControlBoxModel extends Portlet {
         }
 
 
-        SC.say(s);
+
         /* ColorPickerItem colorPicker = new ColorPickerItem();  
         colorPicker.setTitle("Color Picker");  
         colorPicker.setWidth(85);  */
