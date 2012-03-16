@@ -32,7 +32,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client.view.cache;
+package fr.insalyon.creatis.vip.datamanager.client.view.zombie;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.BooleanCallback;
@@ -55,9 +55,9 @@ import java.util.List;
  *
  * @author Rafael Silva
  */
-public class ManageCachedFilesToolStrip extends ToolStrip {
+public class ManageZombieFilesToolStrip extends ToolStrip {
 
-    public ManageCachedFilesToolStrip(final ModalWindow modal) {
+    public ManageZombieFilesToolStrip(final ModalWindow modal) {
 
         this.setWidth100();
 
@@ -66,28 +66,28 @@ public class ManageCachedFilesToolStrip extends ToolStrip {
         refreshButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                ManageCachedFilesTab tab = (ManageCachedFilesTab) Layout.getInstance().getTab(DataManagerConstants.TAB_MANAGE_CACHED_FILES);
+                ManageZombieFilesTab tab = (ManageZombieFilesTab) Layout.getInstance().getTab(DataManagerConstants.TAB_MANAGE_ZOMBIE_FILES);
                 tab.loadData();
             }
         });
         this.addButton(refreshButton);
 
-        ToolStripButton deleteSelectedFiles = new ToolStripButton("Delete Selected Files");
+        ToolStripButton deleteSelectedFiles = new ToolStripButton("Delete Selected SURLs");
         deleteSelectedFiles.setIcon(CoreConstants.ICON_DELETE);
         deleteSelectedFiles.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                SC.ask("Do you really want to delete all selected files?", new BooleanCallback() {
+                SC.ask("Do you really want to delete all selected SURLs?", new BooleanCallback() {
 
                     public void execute(Boolean value) {
-
-                        if (value) {
-                            final ManageCachedFilesTab tab = (ManageCachedFilesTab) Layout.getInstance().getTab(DataManagerConstants.TAB_MANAGE_CACHED_FILES);
-                            List<String> paths = new ArrayList<String>();
+                        
+                        if (value) {    
+                            final ManageZombieFilesTab tab = (ManageZombieFilesTab) Layout.getInstance().getTab(DataManagerConstants.TAB_MANAGE_ZOMBIE_FILES);
+                            List<String> surls = new ArrayList<String>();
 
                             for (ListGridRecord record : tab.getGridSelection()) {
-                                CachedFileRecord cf = (CachedFileRecord) record;
-                                paths.add(cf.getPath());
+                                ZombieFileRecord zf = (ZombieFileRecord) record;
+                                surls.add(zf.getSURL());
                             }
 
                             DataManagerServiceAsync service = DataManagerService.Util.getInstance();
@@ -95,7 +95,7 @@ public class ManageCachedFilesToolStrip extends ToolStrip {
 
                                 public void onFailure(Throwable caught) {
                                     modal.hide();
-                                    SC.warn("Unable to delete cached files:<br />" + caught.getMessage());
+                                    SC.warn("Unable to delete SURLs:<br />" + caught.getMessage());
                                 }
 
                                 public void onSuccess(Void result) {
@@ -103,8 +103,8 @@ public class ManageCachedFilesToolStrip extends ToolStrip {
                                     tab.loadData();
                                 }
                             };
-                            modal.show("Deleting cached files...", true);
-                            service.deleteCachedFiles(paths, callback);
+                            modal.show("Deleting SURLs...", true);
+                            service.deleteZombieFiles(surls, callback);
                         }
                     }
                 });

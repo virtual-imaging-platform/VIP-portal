@@ -40,6 +40,7 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
+import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
@@ -101,7 +102,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             trace(logger, "Deleting: " + paths);
             User user = getSessionUser();
-            transferPoolBusiness.delete(user.getFullName(), user.getEmail(), 
+            transferPoolBusiness.delete(user.getFullName(), user.getEmail(),
                     paths.toArray(new String[]{}));
 
         } catch (CoreException ex) {
@@ -165,11 +166,16 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
+    /**
+     * 
+     * @param cachedFiles
+     * @throws DataManagerException 
+     */
     public void deleteCachedFiles(List<String> cachedFiles) throws DataManagerException {
 
         try {
             authenticateSystemAdministrator(logger);
-            trace(logger, "Removing files: " + cachedFiles);
+            trace(logger, "Removing chached files: " + cachedFiles);
             dataManagerBusiness.deleteCachedFiles(cachedFiles);
 
         } catch (CoreException ex) {
@@ -190,7 +196,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             throw new DataManagerException(ex);
         }
     }
-    
+
     public List<PoolOperation> getPoolOperationsByUserAndDate(Date startDate) throws DataManagerException {
 
         try {
@@ -215,12 +221,12 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             throw new DataManagerException(ex);
         }
     }
-    
+
     public PoolOperation getPoolOperationById(String operationId) throws DataManagerException {
-        
+
         try {
             return transferPoolBusiness.getOperationById(operationId);
-            
+
         } catch (BusinessException ex) {
             throw new DataManagerException(ex);
         }
@@ -311,7 +317,16 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
-    public void uploadFile(String localFile, String remoteName, String remoteDir) throws DataManagerException {
+    /**
+     * 
+     * @param localFile
+     * @param remoteName
+     * @param remoteDir
+     * @throws DataManagerException 
+     */
+    public void uploadFile(String localFile, String remoteName, 
+            String remoteDir) throws DataManagerException {
+        
         File f = new File(Server.getInstance().getDataManagerPath()
                 + "/uploads/" + localFile);
         f.renameTo(new File(Server.getInstance().getDataManagerPath()
@@ -346,5 +361,38 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             throw new DataManagerException(ex);
         }
 
+    }
+
+    /**
+     * 
+     * @return
+     * @throws DataManagerException 
+     */
+    public List<DMZombieFile> getZombieFiles() throws DataManagerException {
+
+        try {
+            return dataManagerBusiness.getZombieFiles();
+        } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
+        }
+    }
+    
+    /**
+     * 
+     * @param surls
+     * @throws DataManagerException 
+     */
+    public void deleteZombieFiles(List<String> surls) throws DataManagerException {
+
+        try {
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Removing zombie files: " + surls);
+            dataManagerBusiness.deleteZombieFiles(surls);
+
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
+        }
     }
 }

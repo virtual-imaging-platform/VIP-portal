@@ -43,6 +43,7 @@ public class DataManagerConstants {
     // Tabs
     public final static String TAB_MANAGE_OPERATIONS = "manage-operations-tab";
     public final static String TAB_MANAGE_CACHED_FILES = "manage-cached-files-tab";
+    public final static String TAB_MANAGE_ZOMBIE_FILES = "manage-zombie-files-tab";
     // Sections
     public final static String SECTION_FILE_TRANSFER = "file-transfer-section";
     // Layouts
@@ -69,10 +70,12 @@ public class DataManagerConstants {
     public final static String APP_CACHED_FILES = "Cached Files";
     public final static String APP_FILE_TRANSFER = "File Transfer";
     public final static String APP_OPERATIONS = "Operations";
+    public final static String APP_ZOMBIE_FILES = "Zombie Files";
     // Application Images
     public static final String APP_IMG_CACHED_FILES = IMG_FOLDER + "app-cache.png";
     public static final String APP_IMG_FILE_TRANSFER = IMG_FOLDER + "app-file-transfer.png";
     public static final String APP_IMG_OPERATIONS = IMG_FOLDER + "app-operation.png";
+    public static final String APP_IMG_ZOMBIE_FILES = IMG_FOLDER + "app-file-zombie.png";
     // Operation
     private static final String OP_FOLDER = IMG_FOLDER + "operation/";
     public static final String OP_DOWNLOAD = OP_FOLDER + "img-download.png";

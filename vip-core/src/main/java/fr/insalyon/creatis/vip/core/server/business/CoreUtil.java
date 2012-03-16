@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.core.server.business;
 import fr.insalyon.creatis.grida.client.GRIDACacheClient;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
+import fr.insalyon.creatis.grida.client.GRIDAZombieClient;
 import java.io.UnsupportedEncodingException;
 import java.security.Security;
 import java.util.Date;
@@ -108,9 +109,8 @@ public class CoreUtil {
     }
 
     /**
-     * 
-     * @param proxyFileName
-     * @return 
+     *
+     * @return
      */
     public static GRIDAClient getGRIDAClient() {
 
@@ -121,9 +121,8 @@ public class CoreUtil {
     }
 
     /**
-     * 
-     * @param proxyFileName
-     * @return 
+     *
+     * @return
      */
     public static GRIDAPoolClient getGRIDAPoolClient() {
 
@@ -132,15 +131,26 @@ public class CoreUtil {
                 Server.getInstance().getGRIDAPort(),
                 Server.getInstance().getServerProxy());
     }
-    
+
     /**
-     * 
-     * @param proxyFileName
-     * @return 
+     *
+     * @return
      */
     public static GRIDACacheClient getGRIDACacheClient() {
 
         return new GRIDACacheClient(
+                Server.getInstance().getGRIDAHost(),
+                Server.getInstance().getGRIDAPort(),
+                Server.getInstance().getServerProxy());
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static GRIDAZombieClient getGRIDAZombieClient() {
+
+        return new GRIDAZombieClient(
                 Server.getInstance().getGRIDAHost(),
                 Server.getInstance().getGRIDAPort(),
                 Server.getInstance().getServerProxy());

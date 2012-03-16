@@ -37,10 +37,13 @@ package fr.insalyon.creatis.vip.datamanager.server.business;
 import fr.insalyon.creatis.devtools.FileUtils;
 import fr.insalyon.creatis.grida.client.GRIDACacheClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.grida.client.GRIDAZombieClient;
 import fr.insalyon.creatis.grida.common.bean.CachedFile;
+import fr.insalyon.creatis.grida.common.bean.ZombieFile;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
+import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.io.File;
@@ -103,12 +106,12 @@ public class DataManagerBusiness {
     }
 
     /**
-     * 
+     *
      * @param user
      * @param remoteFile
      * @param localDir
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public String getRemoteFile(String user, String remoteFile, String localDir)
             throws BusinessException {
@@ -116,10 +119,51 @@ public class DataManagerBusiness {
         try {
             return CoreUtil.getGRIDAClient().getRemoteFile(
                     DataManagerUtil.parseBaseDir(user, remoteFile), localDir);
-            
+
         } catch (DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
+        } catch (GRIDAClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     * Gets the list of zombie files.
+     * 
+     * @return
+     * @throws BusinessException 
+     */
+    public List<DMZombieFile> getZombieFiles() throws BusinessException {
+        
+        try {
+            List<DMZombieFile> list = new ArrayList<DMZombieFile>();
+            for (ZombieFile zf : CoreUtil.getGRIDAZombieClient().getList()) {
+                list.add(new DMZombieFile(zf.getSurl(), zf.getRegistration()));
+            }
+            return list;
+            
+        } catch (GRIDAClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+    
+    /**
+     * Deletes a list of zombie files.
+     * 
+     * @param surls List of zombie SURLs
+     * @throws BusinessException 
+     */
+    public void deleteZombieFiles(List<String> surls) throws BusinessException {
+
+        try {
+            GRIDAZombieClient client = CoreUtil.getGRIDAZombieClient();
+
+            for (String surl : surls) {
+                client.delete(surl);
+            }
         } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);

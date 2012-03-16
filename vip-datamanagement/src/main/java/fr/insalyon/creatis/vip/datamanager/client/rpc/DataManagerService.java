@@ -38,6 +38,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
+import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
@@ -80,28 +81,32 @@ public interface DataManagerService extends RemoteService {
     public void deleteCachedFiles(List<String> cachedFiles) throws DataManagerException;
 
     public List<PoolOperation> getPoolOperationsByUser() throws DataManagerException;
-    
+
     public List<PoolOperation> getPoolOperationsByUserAndDate(Date startDate) throws DataManagerException;
 
     public List<PoolOperation> getPoolOperations() throws DataManagerException;
-    
+
     public PoolOperation getPoolOperationById(String operationId) throws DataManagerException;
 
     public void removeOperations(List<String> ids) throws DataManagerException;
-    
+
     public void removeUserOperations() throws DataManagerException;
 
     public void removeOperationById(String id) throws DataManagerException;
 
     public void downloadFile(String remoteFile) throws DataManagerException;
-    
+
     public void downloadFiles(List<String> remoteFiles, String packName) throws DataManagerException;
 
     public void downloadFolder(String remoteFolder) throws DataManagerException;
-    
+
     public void uploadFile(String localFile, String remoteName, String remoteDir) throws DataManagerException;
-    
+
     public void uploadFile(String localFile, String remoteFile) throws DataManagerException;
 
     public boolean exists(String remoteFile) throws DataManagerException;
-    }
+
+    public List<DMZombieFile> getZombieFiles() throws DataManagerException;
+    
+    public void deleteZombieFiles(List<String> surls) throws DataManagerException;
+}

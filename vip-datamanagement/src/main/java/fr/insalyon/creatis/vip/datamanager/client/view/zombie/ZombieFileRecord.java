@@ -32,48 +32,31 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client.view;
+package fr.insalyon.creatis.vip.datamanager.client.view.zombie;
 
-import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import fr.insalyon.creatis.vip.datamanager.client.view.cache.ManageCachedFilesTab;
-import fr.insalyon.creatis.vip.datamanager.client.view.operation.manage.ManageOperationsTab;
-import fr.insalyon.creatis.vip.datamanager.client.view.zombie.ManageZombieFilesTab;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
+import java.util.Date;
 
 /**
  *
  * @author Rafael Silva
  */
-public class DataManagerSystemParser extends ApplicationParser {
+public class ZombieFileRecord extends ListGridRecord {
 
-    @Override
-    public void loadApplications() {
-
-        if (CoreModule.user.isSystemAdministrator()) {
-            addApplication(DataManagerConstants.APP_OPERATIONS, DataManagerConstants.APP_IMG_OPERATIONS);
-            addApplication(DataManagerConstants.APP_CACHED_FILES, DataManagerConstants.APP_IMG_CACHED_FILES);
-            addApplication(DataManagerConstants.APP_ZOMBIE_FILES, DataManagerConstants.APP_IMG_ZOMBIE_FILES);
-        }
+    public ZombieFileRecord() {
     }
-
-    @Override
-    public boolean parse(String applicationName) {
-
-        if (applicationName.equals(DataManagerConstants.APP_OPERATIONS)) {
-            Layout.getInstance().addTab(new ManageOperationsTab());
-            return true;
-
-        } else if (applicationName.equals(DataManagerConstants.APP_CACHED_FILES)) {
-            Layout.getInstance().addTab(new ManageCachedFilesTab());
-            return true;
-
-        } else if (applicationName.equals(DataManagerConstants.APP_ZOMBIE_FILES)) {
-            Layout.getInstance().addTab(new ManageZombieFilesTab());
-            return true;
-
-        }
-        return false;
+ 
+    public ZombieFileRecord(String surl, Date registration) {
+        
+        setAttribute("surl", surl);
+        setAttribute("date", registration);
+    }
+    
+    public String getSURL() {
+        return getAttributeAsString("surl");
+    }
+       
+    public Date getRegistration() {
+        return getAttributeAsDate("date");
     }
 }
