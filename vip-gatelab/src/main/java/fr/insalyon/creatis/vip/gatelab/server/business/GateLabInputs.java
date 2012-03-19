@@ -60,7 +60,13 @@ public class GateLabInputs {
         inputsMap = in.parse(inputfile);
     }
 
-    public Map<String, String> getWorkflowInputs() throws BusinessException {
+    /**
+     * 
+     * @param currentUserFolder
+     * @return
+     * @throws BusinessException 
+     */
+    public Map<String, String> getWorkflowInputs(String currentUserFolder) throws BusinessException {
 
         try {
             String input = inputsMap.get("GateInput");
@@ -90,9 +96,9 @@ public class GateLabInputs {
                     "Dynamic" : "Static";
 
             Map<String, String> inputMap = new HashMap<String, String>();
-            inputMap.put("inputlink", DataManagerUtil.parseRealDir(input));
+            inputMap.put("inputlink", DataManagerUtil.parseRealDir(input, currentUserFolder));
             //inputMap.put("outputlink", DataManagerUtil.parseRealDir(outputlink));
-            inputMap.put("gate_version", DataManagerUtil.parseRealDir(release));
+            inputMap.put("gate_version", DataManagerUtil.parseRealDir(release, currentUserFolder));
             inputMap.put("particles", particles);
             inputMap.put("simulation", simtype);
 

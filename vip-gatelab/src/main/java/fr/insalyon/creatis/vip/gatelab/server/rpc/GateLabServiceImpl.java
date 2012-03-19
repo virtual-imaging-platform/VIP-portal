@@ -45,8 +45,8 @@ import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabService;
 import fr.insalyon.creatis.vip.gatelab.client.view.GateLabException;
 import fr.insalyon.creatis.vip.gatelab.server.business.GateLabBusiness;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
@@ -70,10 +70,10 @@ public class GateLabServiceImpl extends AbstractRemoteServiceServlet implements 
         try {
             User user = getSessionUser();
             List<String> classes = classBusiness.getUserClassesName(user.getEmail(), false);
-            
-            if (user.isSystemAdministrator() || 
-                    classes.contains(GateLabConstants.GATELAB_CLASS)) {
-                
+
+            if (user.isSystemAdministrator()
+                    || classes.contains(GateLabConstants.GATELAB_CLASS)) {
+
                 return gatelabBusiness.getApplications();
             }
             return new ArrayList<Application>();
@@ -88,8 +88,10 @@ public class GateLabServiceImpl extends AbstractRemoteServiceServlet implements 
     public Map<String, String> getGatelabWorkflowInputs(String simulationID) throws GateLabException {
 
         try {
-            return gatelabBusiness.getGatelabWorkflowInputs(simulationID);
+            return gatelabBusiness.getGatelabWorkflowInputs(simulationID, getSessionUser().getFolder());
 
+        } catch (CoreException ex) {
+            throw new GateLabException(ex);
         } catch (BusinessException ex) {
             throw new GateLabException(ex);
         }

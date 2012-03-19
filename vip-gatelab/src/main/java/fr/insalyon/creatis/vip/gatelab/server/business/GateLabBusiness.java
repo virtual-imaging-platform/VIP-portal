@@ -43,7 +43,6 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.gatelab.client.GateLabConstants;
 import fr.insalyon.creatis.vip.gatelab.server.dao.DAOFactory;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
@@ -84,16 +83,16 @@ public class GateLabBusiness {
     /**
      * 
      * @param workflowID
+     * @param currentUserFolder
      * @return
      * @throws BusinessException 
      */
-    public Map<String, String> getGatelabWorkflowInputs(String workflowID) throws BusinessException {
+    public Map<String, String> getGatelabWorkflowInputs(String workflowID, 
+            String currentUserFolder) throws BusinessException {
 
         try {
-            Map<String, String> inputMap = new HashMap<String, String>();
-
             GateLabInputs gateinputs = new GateLabInputs(workflowID);
-            inputMap = gateinputs.getWorkflowInputs();
+            Map<String, String> inputMap = gateinputs.getWorkflowInputs(currentUserFolder);
 
             long nb = DAOFactory.getDAOFactory().getGatelabDAO(workflowID).getNumberParticles();
             inputMap.put("runnedparticles", "" + nb);

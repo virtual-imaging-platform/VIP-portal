@@ -215,10 +215,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * 
+     *
      * @param inputName
      * @param applicationName
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     public void removeSimulationInputExample(String inputName, String applicationName)
             throws ApplicationException {
@@ -593,11 +593,14 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @return
      * @throws ApplicationException
      */
+    @Override
     public List<InOutData> getOutputData(String simulationID) throws ApplicationException {
 
         try {
-            return workflowBusiness.getOutputData(simulationID);
+            return workflowBusiness.getOutputData(simulationID, getSessionUser().getFolder());
 
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
@@ -609,11 +612,14 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @return
      * @throws ApplicationException
      */
+    @Override
     public List<InOutData> getInputData(String simulationID) throws ApplicationException {
 
         try {
-            return workflowBusiness.getInputData(simulationID);
+            return workflowBusiness.getInputData(simulationID, getSessionUser().getFolder());
 
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }

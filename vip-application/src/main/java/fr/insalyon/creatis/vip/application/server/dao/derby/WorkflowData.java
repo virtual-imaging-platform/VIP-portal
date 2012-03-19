@@ -429,6 +429,7 @@ public class WorkflowData implements WorkflowDAO {
      * @return
      * @throws DAOException
      */
+    @Override
     public List<InOutData> getInOutData(String simulationID, String type) throws DAOException {
 
         try {
@@ -440,14 +441,10 @@ public class WorkflowData implements WorkflowDAO {
             ResultSet rs = stat.executeQuery();
 
             while (rs.next()) {
-                try {
-                    data.add(new InOutData(
-                            DataManagerUtil.parseRealDir(rs.getString("path")),
-                            rs.getString("processor"),
-                            rs.getString("type")));
-                } catch (DataManagerException ex) {
-                    logger.warn(ex);
-                }
+                data.add(new InOutData(
+                        rs.getString("path"),
+                        rs.getString("processor"),
+                        rs.getString("type")));
             }
             return data;
 

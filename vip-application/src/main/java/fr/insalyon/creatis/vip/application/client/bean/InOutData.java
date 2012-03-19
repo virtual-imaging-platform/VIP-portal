@@ -59,6 +59,10 @@ public class InOutData implements IsSerializable {
         return path;
     }
 
+    public void setPath(String path) {
+        this.path = path;
+    }
+
     public String getType() {
         return type;
     }

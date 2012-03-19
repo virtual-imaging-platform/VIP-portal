@@ -5,7 +5,7 @@
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>0.7.3</version>
+        <version>0.7.4</version>
         <relativePath>..</relativePath>
     </parent>
     

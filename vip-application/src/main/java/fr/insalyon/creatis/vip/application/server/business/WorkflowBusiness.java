@@ -160,7 +160,7 @@ public class WorkflowBusiness {
                     for (double d = start; d <= stop; d += step) {
                         ps.addValue(d + "");
                     }
-                    
+
                 } else if (valuesStr.contains(ApplicationConstants.SEPARATOR_LIST)) {
                     String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_LIST);
                     for (String v : values) {
@@ -170,7 +170,7 @@ public class WorkflowBusiness {
                         }
                         ps.addValue(parsedPath);
                     }
-                    
+
                 } else {
                     String parsedPath = DataManagerUtil.parseBaseDir(user.getFullName(), valuesStr.trim());
                     if (!user.isSystemAdministrator()) {
@@ -457,30 +457,45 @@ public class WorkflowBusiness {
     /**
      *
      * @param simulationID
+     * @param currentUserFolder
      * @return
      * @throws BusinessException
      */
-    public List<InOutData> getOutputData(String simulationID) throws BusinessException {
+    public List<InOutData> getOutputData(String simulationID,
+            String currentUserFolder) throws BusinessException {
 
         try {
-            return WorkflowDAOFactory.getDAOFactory().getWorkflowDAO().getInOutData(simulationID, "Outputs");
+            List<InOutData> list = WorkflowDAOFactory.getDAOFactory().getWorkflowDAO().getInOutData(simulationID, "Outputs");
+            for (InOutData data : list) {
+                data.setPath(DataManagerUtil.parseRealDir(data.getPath(), currentUserFolder));
+            }
+            return list;
 
+        } catch (DataManagerException ex) {
+            throw new BusinessException(ex);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
     /**
-     *
+     * 
      * @param simulationID
+     * @param currentUserFolder
      * @return
-     * @throws BusinessException
+     * @throws BusinessException 
      */
-    public List<InOutData> getInputData(String simulationID) throws BusinessException {
+    public List<InOutData> getInputData(String simulationID, String currentUserFolder) throws BusinessException {
 
         try {
-            return WorkflowDAOFactory.getDAOFactory().getWorkflowDAO().getInOutData(simulationID, "Inputs");
+            List<InOutData> list = WorkflowDAOFactory.getDAOFactory().getWorkflowDAO().getInOutData(simulationID, "Inputs");
+            for (InOutData data : list) {
+                data.setPath(DataManagerUtil.parseRealDir(data.getPath(), currentUserFolder));
+            }
+            return list;
 
+        } catch (DataManagerException ex) {
+            throw new BusinessException(ex);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -601,22 +616,21 @@ public class WorkflowBusiness {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
-     * 
-     * @return
-     * @throws BusinessException 
+     *
+     * @return @throws BusinessException
      */
     public List<Simulation> getRunningSimulations() throws BusinessException {
-        
+
         try {
             return WorkflowDAOFactory.getDAOFactory().getWorkflowDAO().getRunningWorkflows();
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
-    
+
     private boolean isShiwaPoolID(String simulationID) {
 
         if (simulationID.startsWith("shiwa-instance")) {
