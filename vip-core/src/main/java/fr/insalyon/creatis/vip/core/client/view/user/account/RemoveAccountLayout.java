@@ -83,17 +83,20 @@ public class RemoveAccountLayout extends AbstractFormLayout {
         removeButton = new IButton("Delete VIP Account");
         removeButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
 
-                if (confirmField.validate()) {
+                if (confirmField.validate() && confirmField.getValueAsBoolean()) {
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
                     final AsyncCallback<User> callback = new AsyncCallback<User>() {
 
+                        @Override
                         public void onFailure(Throwable caught) {
                             modal.hide();
                             SC.say("Unable to delete account:<br />" + caught.getMessage());
                         }
 
+                        @Override
                         public void onSuccess(User result) {
                             Modules.getInstance().userRemoved(result);
                             modal.hide();

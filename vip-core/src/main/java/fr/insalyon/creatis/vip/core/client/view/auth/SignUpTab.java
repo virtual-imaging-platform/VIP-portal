@@ -137,13 +137,15 @@ public class SignUpTab extends Tab {
         signupButton = new IButton("Sign Up");
         signupButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
 
                 if (firstNameField.validate() & lastNameField.validate()
                         & emailField.validate() & confirmEmailField.validate()
                         & institutionField.validate() & phoneField.validate()
                         & passwordField.validate() & confirmPasswordField.validate()
-                        & accountRadioGroupItem.validate() & acceptField.validate()) {
+                        & accountRadioGroupItem.validate() & acceptField.validate()
+                        & acceptField.getValueAsBoolean()) {
 
                     if (!emailField.getValueAsString().equals(confirmEmailField.getValueAsString())) {
                         SC.warn("E-mails do not match. Please verify the entered e-mail.");
@@ -168,11 +170,13 @@ public class SignUpTab extends Tab {
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
                     final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+                        @Override
                         public void onFailure(Throwable caught) {
                             modal.hide();
                             SC.warn("Unable to signing up:<br />" + caught.getMessage());
                         }
 
+                        @Override
                         public void onSuccess(Void result) {
                             modal.hide();
                             SC.say("Your membership request was successfully processed.\n"
@@ -214,6 +218,7 @@ public class SignUpTab extends Tab {
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<User> callback = new AsyncCallback<User>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 if (caught.getMessage().contains("Authentication failed")) {
@@ -223,6 +228,7 @@ public class SignUpTab extends Tab {
                 }
             }
 
+            @Override
             public void onSuccess(User result) {
                 modal.hide();
                 Modules.getInstance().parseAccountType(accountRadioGroupItem.getValueAsString());
