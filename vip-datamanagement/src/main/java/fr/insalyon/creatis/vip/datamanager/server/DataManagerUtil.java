@@ -41,7 +41,6 @@ import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import java.io.File;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  *
@@ -50,11 +49,11 @@ import java.net.URISyntaxException;
 public class DataManagerUtil {
 
     /**
-     * 
+     *
      * @param user
      * @param baseDir
      * @return
-     * @throws DataManagerException 
+     * @throws DataManagerException
      */
     public static String parseBaseDir(String user, String baseDir) throws DataManagerException {
 
@@ -66,6 +65,9 @@ public class DataManagerUtil {
                 Server.getInstance().getDataManagerUsersHome()
                 + "/" + user.replaceAll(" ", "_").toLowerCase()
                 + "_" + DataManagerConstants.TRASH_HOME);
+
+        baseDir = parsePath(baseDir, DataManagerConstants.USERS_FOLDER,
+                Server.getInstance().getDataManagerUsersHome());
 
         baseDir = parsePath(baseDir, DataManagerConstants.BIOMED_HOME,
                 "/grid/biomed");
@@ -90,11 +92,11 @@ public class DataManagerUtil {
     }
 
     /**
-     * 
+     *
      * @param baseDir
      * @param pattern
      * @param toReplace
-     * @return 
+     * @return
      */
     private static String parsePath(String baseDir, String pattern, String toReplace) {
         pattern = DataManagerConstants.ROOT + "/" + pattern;
@@ -105,29 +107,38 @@ public class DataManagerUtil {
     }
 
     /**
-     * 
+     *
      * @param baseDir
+     * @param currentUserFolder
      * @return
-     * @throws DataManagerException 
+     * @throws DataManagerException
      */
-    public static String parseRealDir(String baseDir) throws DataManagerException {
+    public static String parseRealDir(String baseDir, String currentUserFolder)
+            throws DataManagerException {
+
         if (baseDir.startsWith("lfn://")) {
-            try {
-                baseDir = new URI(baseDir).getPath();
-            } catch (URISyntaxException ex) {
-                throw new DataManagerException(ex);
-            }
+            baseDir = URI.create(baseDir).getPath();
         }
 
         if (baseDir.contains(Server.getInstance().getDataManagerUsersHome())) {
             baseDir = baseDir.replace(Server.getInstance().getDataManagerUsersHome() + "/", "");
-            if (baseDir.indexOf("/") != -1) {
-                baseDir = baseDir.substring(baseDir.indexOf("/"), baseDir.length());
+
+            int index = baseDir.indexOf("/");
+
+            if (index != -1) {
+                if (baseDir.substring(0, index).equals(currentUserFolder)) {
+                    return DataManagerConstants.ROOT + "/"
+                            + DataManagerConstants.USERS_HOME
+                            + baseDir.substring(index, baseDir.length());
+                } else {
+                    return DataManagerConstants.ROOT + "/"
+                            + DataManagerConstants.USERS_FOLDER + "/"
+                            + baseDir;
+                }
             } else {
-                baseDir = "";
+                return DataManagerConstants.ROOT + "/"
+                        + DataManagerConstants.USERS_HOME;
             }
-            baseDir = DataManagerConstants.ROOT + "/"
-                    + DataManagerConstants.USERS_HOME + baseDir;
         }
 
         try {
@@ -149,9 +160,9 @@ public class DataManagerUtil {
     }
 
     /**
-     * 
+     *
      * @param local
-     * @return 
+     * @return
      */
     public static String getUploadRootDirectory(boolean local) {
 

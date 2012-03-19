@@ -85,6 +85,7 @@ public class DataManagerConstants {
     // Configuration Constants
     public final static String ROOT = "/vip";
     public final static String USERS_HOME = "Home";
+    public final static String USERS_FOLDER = "Users";
     public final static String TRASH_HOME = "Trash";
     public final static String BIOMED_HOME = "Biomed";
     public final static String GROUP_APPEND = " (group)";

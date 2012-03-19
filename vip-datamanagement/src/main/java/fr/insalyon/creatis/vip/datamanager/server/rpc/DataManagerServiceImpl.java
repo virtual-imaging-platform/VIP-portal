@@ -167,9 +167,9 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     /**
-     * 
+     *
      * @param cachedFiles
-     * @throws DataManagerException 
+     * @throws DataManagerException
      */
     public void deleteCachedFiles(List<String> cachedFiles) throws DataManagerException {
 
@@ -185,10 +185,12 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
+    @Override
     public List<PoolOperation> getPoolOperationsByUser() throws DataManagerException {
 
         try {
-            return transferPoolBusiness.getOperations(getSessionUser().getEmail(), new Date());
+            User user = getSessionUser();
+            return transferPoolBusiness.getOperations(user.getEmail(), new Date(), user.getFolder());
 
         } catch (CoreException ex) {
             throw new DataManagerException(ex);
@@ -197,10 +199,12 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
+    @Override
     public List<PoolOperation> getPoolOperationsByUserAndDate(Date startDate) throws DataManagerException {
 
         try {
-            return transferPoolBusiness.getOperations(getSessionUser().getEmail(), startDate);
+            User user = getSessionUser();
+            return transferPoolBusiness.getOperations(user.getEmail(), startDate, user.getFolder());
 
         } catch (CoreException ex) {
             throw new DataManagerException(ex);
@@ -209,11 +213,12 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
+    @Override
     public List<PoolOperation> getPoolOperations() throws DataManagerException {
 
         try {
             authenticateSystemAdministrator(logger);
-            return transferPoolBusiness.getOperations();
+            return transferPoolBusiness.getOperations(getSessionUser().getFolder());
 
         } catch (CoreException ex) {
             throw new DataManagerException(ex);
@@ -222,11 +227,14 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
+    @Override
     public PoolOperation getPoolOperationById(String operationId) throws DataManagerException {
 
         try {
-            return transferPoolBusiness.getOperationById(operationId);
+            return transferPoolBusiness.getOperationById(operationId, getSessionUser().getFolder());
 
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
         } catch (BusinessException ex) {
             throw new DataManagerException(ex);
         }
@@ -318,15 +326,15 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     /**
-     * 
+     *
      * @param localFile
      * @param remoteName
      * @param remoteDir
-     * @throws DataManagerException 
+     * @throws DataManagerException
      */
-    public void uploadFile(String localFile, String remoteName, 
+    public void uploadFile(String localFile, String remoteName,
             String remoteDir) throws DataManagerException {
-        
+
         File f = new File(Server.getInstance().getDataManagerPath()
                 + "/uploads/" + localFile);
         f.renameTo(new File(Server.getInstance().getDataManagerPath()
@@ -364,9 +372,8 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     /**
-     * 
-     * @return
-     * @throws DataManagerException 
+     *
+     * @return @throws DataManagerException
      */
     public List<DMZombieFile> getZombieFiles() throws DataManagerException {
 
@@ -376,11 +383,11 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             throw new DataManagerException(ex);
         }
     }
-    
+
     /**
-     * 
+     *
      * @param surls
-     * @throws DataManagerException 
+     * @throws DataManagerException
      */
     public void deleteZombieFiles(List<String> surls) throws DataManagerException {
 

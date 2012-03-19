@@ -37,9 +37,9 @@ package fr.insalyon.creatis.vip.datamanager.server.business;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.grida.common.bean.Operation;
-import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
@@ -69,10 +69,13 @@ public class TransferPoolBusiness {
     /**
      * 
      * @param email
+     * @param date
+     * @param currentUserFolder
      * @return
      * @throws BusinessException 
      */
-    public List<PoolOperation> getOperations(String email, Date date) throws BusinessException {
+    public List<PoolOperation> getOperations(String email, Date date, 
+            String currentUserFolder) throws BusinessException {
 
         try {
             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
@@ -81,7 +84,7 @@ public class TransferPoolBusiness {
             for (Operation operation : client.getOperationsLimitedListByUserAndDate(email, operationsLimit, date)) {
                 
                 if (operation.getType() != Operation.Type.Delete) {
-                    poolOperations.add(processOperation(operation));
+                    poolOperations.add(processOperation(operation, currentUserFolder));
                 }
             }
             return poolOperations;
@@ -97,17 +100,18 @@ public class TransferPoolBusiness {
 
     /**
      * 
+     * @param currentUserFolder
      * @return
      * @throws BusinessException 
      */
-    public List<PoolOperation> getOperations() throws BusinessException {
+    public List<PoolOperation> getOperations(String currentUserFolder) throws BusinessException {
 
         try {
             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
             List<PoolOperation> poolOperations = new ArrayList<PoolOperation>();
 
             for (Operation operation : client.getAllOperations()) {
-                poolOperations.add(processOperation(operation));
+                poolOperations.add(processOperation(operation, currentUserFolder));
             }
 
             return poolOperations;
@@ -124,14 +128,16 @@ public class TransferPoolBusiness {
     /**
      * 
      * @param operationId
+     * @param currentUserFolder
      * @return
      * @throws BusinessException 
      */
-    public PoolOperation getOperationById(String operationId) throws BusinessException {
+    public PoolOperation getOperationById(String operationId, 
+            String currentUserFolder) throws BusinessException {
 
         try {
             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
-            return processOperation(client.getOperationById(operationId));
+            return processOperation(client.getOperationById(operationId), currentUserFolder);
 
         } catch (DataManagerException ex) {
             logger.error(ex);
@@ -145,10 +151,12 @@ public class TransferPoolBusiness {
     /**
      * 
      * @param operation
+     * @param currentUserFolder
      * @return
      * @throws DataManagerException 
      */
-    private PoolOperation processOperation(Operation operation) throws DataManagerException {
+    private PoolOperation processOperation(Operation operation, 
+            String currentUserFolder) throws DataManagerException {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy HH:mm");
         String source = "";
@@ -159,17 +167,17 @@ public class TransferPoolBusiness {
         if (operation.getType() == Operation.Type.Upload) {
             type = PoolOperation.Type.Upload;
             source = FilenameUtils.getName(operation.getSource());
-            dest = DataManagerUtil.parseRealDir(operation.getDest());
+            dest = DataManagerUtil.parseRealDir(operation.getDest(), currentUserFolder);
 
         } else if (operation.getType() == Operation.Type.Delete) {
             type = PoolOperation.Type.Delete;
-            source = DataManagerUtil.parseRealDir(operation.getSource());
+            source = DataManagerUtil.parseRealDir(operation.getSource(), currentUserFolder);
 
         } else {
             type = PoolOperation.Type.Download;
             dest = "Platform";
             source = operation.getType() == Operation.Type.Download
-                    ? DataManagerUtil.parseRealDir(operation.getSource())
+                    ? DataManagerUtil.parseRealDir(operation.getSource(), currentUserFolder)
                     : FilenameUtils.getBaseName(operation.getDest());
         }
 
