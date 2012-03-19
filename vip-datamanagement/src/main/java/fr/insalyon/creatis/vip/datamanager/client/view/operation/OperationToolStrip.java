@@ -41,9 +41,9 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
-import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
@@ -64,37 +64,40 @@ public class OperationToolStrip extends ToolStrip {
         this.addMember(titleLabel);
         this.addSeparator();
 
-        ToolStripButton refreshButton = new ToolStripButton();
-        refreshButton.setIcon(CoreConstants.ICON_REFRESH);
-        refreshButton.setPrompt("Refresh");
-        refreshButton.addClickHandler(new ClickHandler() {
+        // Refresh Button
+        this.addButton(WidgetUtil.getToolStripButton(
+                CoreConstants.ICON_REFRESH, "Refresh", new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 OperationLayout.getInstance().loadData();
             }
-        });
-        this.addButton(refreshButton);
+        }));
 
+        // Clear Button
         this.addFill();
-        ToolStripButton clearButton = new ToolStripButton("Clear List");
-        clearButton.setIcon(DataManagerConstants.OP_ICON_CLEAR);
-        clearButton.setPrompt("Remove all operations from this list");
-        clearButton.addClickHandler(new ClickHandler() {
+        this.addButton(WidgetUtil.getToolStripButton("Clear List",
+                DataManagerConstants.OP_ICON_CLEAR, 
+                "Remove all operations from this list", new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
-                SC.confirm("Do you want to clear all operations?", new BooleanCallback() {
+                SC.ask("Do you want to clear all operations?", new BooleanCallback() {
 
+                    @Override
                     public void execute(Boolean value) {
-                        
-                        if (value != null && value) {
+
+                        if (value) {
                             DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+                                @Override
                                 public void onFailure(Throwable caught) {
                                     modal.hide();
                                     SC.warn("Unable to remove operations:<br />" + caught.getMessage());
                                 }
 
+                                @Override
                                 public void onSuccess(Void result) {
                                     modal.hide();
                                     OperationLayout.getInstance().loadData();
@@ -106,7 +109,6 @@ public class OperationToolStrip extends ToolStrip {
                     }
                 });
             }
-        });
-        this.addButton(clearButton);
+        }));
     }
 }

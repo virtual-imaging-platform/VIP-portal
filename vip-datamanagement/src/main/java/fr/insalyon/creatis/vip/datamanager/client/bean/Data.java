@@ -44,8 +44,11 @@ import java.util.List;
  */
 public class Data implements IsSerializable {
 
+    public enum Type {
+        folder, file
+    };
     private String name;
-    private String type;
+    private Type type;
     private long length;
     private String modificationDate;
     private List<String> replicas;
@@ -54,12 +57,13 @@ public class Data implements IsSerializable {
     public Data() {
     }
 
-    public Data(String name, String type, String permissions) {
+    public Data(String name, Type type, String permissions) {
         this(name, type, 0, "", new ArrayList<String>(), permissions);
     }
 
-    public Data(String name, String type, long length, String modificationDate,
+    public Data(String name, Type type, long length, String modificationDate,
             List<String> replicas, String permissions) {
+        
         this.name = name;
         this.type = type;
         this.length = length;
@@ -67,12 +71,14 @@ public class Data implements IsSerializable {
         this.replicas = replicas;
         this.permissions = permissions;
     }
+    
+    
 
     public String getName() {
         return name;
     }
 
-    public String getType() {
+    public Type getType() {
         return type;
     }
 

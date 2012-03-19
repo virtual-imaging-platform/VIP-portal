@@ -36,12 +36,14 @@ package fr.insalyon.creatis.vip.datamanager.client.view.common;
 
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
-import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.AddFolderWindow;
 
@@ -60,7 +62,7 @@ public class BasicBrowserToolStrip extends ToolStrip {
         this.modal = modal;
         this.toolStrip = this;
         this.setWidth100();
-        
+
         Label titleLabel = new Label("&nbsp;&nbsp;Platform Files");
         titleLabel.setWidth(75);
         this.addMember(titleLabel);
@@ -72,49 +74,46 @@ public class BasicBrowserToolStrip extends ToolStrip {
         pathItem.setValue(DataManagerConstants.ROOT);
         this.addFormItem(pathItem);
 
-        ToolStripButton folderUpButton = new ToolStripButton();
-        folderUpButton.setIcon(DataManagerConstants.ICON_FOLDER_UP);
-        folderUpButton.setPrompt("Folder up");
-        folderUpButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
+        // Folder Up Button
+        this.addButton(WidgetUtil.getToolStripButton(
+                DataManagerConstants.ICON_FOLDER_UP, "Folder up", new ClickHandler() {
 
-            public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
+            @Override
+            public void onClick(ClickEvent event) {
                 if (!pathItem.getValueAsString().equals(DataManagerConstants.ROOT)) {
                     String newPath = pathItem.getValueAsString();
                     BrowserUtil.loadData(modal, grid, toolStrip,
                             newPath.substring(0, newPath.lastIndexOf("/")), false);
                 }
             }
-        });
-        this.addButton(folderUpButton);
-        
-        ToolStripButton refreshButton = new ToolStripButton();
-        refreshButton.setIcon(CoreConstants.ICON_REFRESH);
-        refreshButton.setPrompt("Refresh");
-        refreshButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
+        }));
 
-            public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
+        // Refresh Button
+        this.addButton(WidgetUtil.getToolStripButton(
+                CoreConstants.ICON_REFRESH, "Refresh", new ClickHandler() {
+
+            @Override
+            public void onClick(ClickEvent event) {
                 BrowserUtil.loadData(modal, grid, toolStrip, pathItem.getValueAsString(), true);
             }
-        });
-        this.addButton(refreshButton);
-        
-        ToolStripButton homeButton = new ToolStripButton();
-        homeButton.setIcon(CoreConstants.ICON_HOME);
-        homeButton.setPrompt("Home");
-        homeButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
+        }));
 
-            public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
+        // Home Button
+        this.addButton(WidgetUtil.getToolStripButton(
+                CoreConstants.ICON_HOME, "Home", new ClickHandler() {
+
+            @Override
+            public void onClick(ClickEvent event) {
                 BrowserUtil.loadData(modal, grid, toolStrip, DataManagerConstants.ROOT, false);
             }
-        });
-        this.addButton(homeButton);
-        
-        ToolStripButton addFolderButton = new ToolStripButton();
-        addFolderButton.setIcon(DataManagerConstants.ICON_FOLDER_ADD);
-        addFolderButton.setPrompt("Create Folder");
-        addFolderButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
+        }));
 
-            public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
+        // Add Folder Button
+        this.addButton(WidgetUtil.getToolStripButton(
+                DataManagerConstants.ICON_FOLDER_ADD, "Create Folder", new ClickHandler() {
+
+            @Override
+            public void onClick(ClickEvent event) {
                 String path = toolStrip.getPath();
                 if (path.equals(DataManagerConstants.ROOT)) {
                     SC.warn("You cannot create a folder in the root folder.");
@@ -122,8 +121,7 @@ public class BasicBrowserToolStrip extends ToolStrip {
                     new AddFolderWindow(modal, path).show();
                 }
             }
-        });
-        this.addButton(addFolderButton);
+        }));
     }
 
     public String getPath() {

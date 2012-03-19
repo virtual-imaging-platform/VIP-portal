@@ -74,12 +74,12 @@ public class LFCBusiness {
             for (GridData data : list) {
                 if (data.getType() == GridData.Type.Folder) {
                     dataList.add(new Data(data.getName(),
-                            Data.Type.valueOf(data.getType().name()), 
+                            Data.Type.valueOf(data.getType().name().toLowerCase()), 
                             data.getPermissions()));
 
                 } else {
                     dataList.add(new Data(data.getName(), 
-                            Data.Type.valueOf(data.getType().name()),
+                            Data.Type.valueOf(data.getType().name().toLowerCase()),
                             data.getLength(), data.getModificationDate(),
                             data.getReplicas(), data.getPermissions()));
                 }

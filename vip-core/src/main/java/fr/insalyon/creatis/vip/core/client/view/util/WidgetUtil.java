@@ -37,7 +37,9 @@ package fr.insalyon.creatis.vip.core.client.view.util;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
  *
@@ -93,33 +95,33 @@ public class WidgetUtil {
         label.setCursor(cursor);
         return label;
     }
-    
+
     /**
-     * 
+     *
      * @param width
-     * @return 
+     * @return
      */
     public static VLayout getVIPLayout(int width) {
-        
+
         return getVIPLayout(width, "100%");
     }
 
     /**
-     * 
+     *
      * @param width
      * @param height
-     * @return 
+     * @return
      */
     public static VLayout getVIPLayout(int width, int height) {
-        
+
         return getVIPLayout(width, Integer.toString(height));
     }
-    
+
     /**
-     * 
+     *
      * @param width
      * @param height
-     * @return 
+     * @return
      */
     public static VLayout getVIPLayout(int width, String height) {
 
@@ -136,5 +138,40 @@ public class WidgetUtil {
         layout.addMember(vipLabel);
 
         return layout;
+    }
+
+    /**
+     * Gets a ToolStrip configured to display an icon and a prompt, and to 
+     * perform an action.
+     *
+     * @param icon Icon to be displayed
+     * @param prompt Prompt message
+     * @param clickHandler Action to be performed
+     * @return
+     */
+    public static ToolStripButton getToolStripButton(String icon, String prompt,
+            ClickHandler clickHandler) {
+        
+        return getToolStripButton(null, icon, prompt, clickHandler);
+    }
+    
+    /**
+     * Gets a ToolStrip configured to display a title, an icon and a prompt, 
+     * and to perform an action.
+     *
+     * @param title Button title
+     * @param icon Button icon
+     * @param prompt Prompt message
+     * @param clickHandler Action to be performed
+     * @return
+     */
+    public static ToolStripButton getToolStripButton(String title, String icon, String prompt,
+            ClickHandler clickHandler) {
+
+        ToolStripButton button = title == null ? new ToolStripButton() : new ToolStripButton(title);
+        button.setIcon(icon);
+        button.setPrompt(prompt);
+        button.addClickHandler(clickHandler);
+        return button;
     }
 }

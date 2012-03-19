@@ -46,6 +46,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerContext;
+import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.ValidatorUtil;
@@ -70,6 +71,7 @@ public class BrowserContextMenu extends Menu {
         uploadItem.setIcon(DataManagerConstants.ICON_UPLOAD);
         uploadItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 if (ValidatorUtil.validateRootPath(baseDir, "upload a file in")
                         && ValidatorUtil.validateUserLevel(baseDir, "upload a file to")) {
@@ -85,6 +87,7 @@ public class BrowserContextMenu extends Menu {
         downloadItem.setIcon(DataManagerConstants.ICON_DOWNLOAD);
         downloadItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 download(modal, baseDir, data);
             }
@@ -94,6 +97,7 @@ public class BrowserContextMenu extends Menu {
         cutItem.setIcon(DataManagerConstants.ICON_CUT);
         cutItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 if (ValidatorUtil.validateRootPath(baseDir, "cut from")
                         && ValidatorUtil.validateUserLevel(baseDir, "cut from")) {
@@ -108,6 +112,7 @@ public class BrowserContextMenu extends Menu {
         pasteItem.setIcon(DataManagerConstants.ICON_PASTE);
         pasteItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 if (ValidatorUtil.validateRootPath(baseDir, "paste in")
                         && ValidatorUtil.validateUserLevel(baseDir, "paste to")) {
@@ -121,6 +126,7 @@ public class BrowserContextMenu extends Menu {
         renameItem.setIcon(CoreConstants.ICON_EDIT);
         renameItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 if (ValidatorUtil.validateRootPath(baseDir, "rename from")
                         && ValidatorUtil.validateUserLevel(baseDir, "rename from")) {
@@ -134,6 +140,7 @@ public class BrowserContextMenu extends Menu {
         deleteItem.setIcon(CoreConstants.ICON_DELETE);
         deleteItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 if (ValidatorUtil.validateRootPath(baseDir, "delete from")
                         && ValidatorUtil.validateUserLevel(baseDir, "delete from")) {
@@ -146,6 +153,7 @@ public class BrowserContextMenu extends Menu {
         MenuItem propertiesItem = new MenuItem("Properties");
         propertiesItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 if (baseDir.equals(DataManagerConstants.ROOT)) {
                     SC.warn("There are no properties for root folders.");
@@ -177,17 +185,20 @@ public class BrowserContextMenu extends Menu {
         final DataManagerServiceAsync service = DataManagerService.Util.getInstance();
 
         if (baseDir.startsWith(DataManagerConstants.ROOT + "/" + DataManagerConstants.TRASH_HOME)) {
-            SC.confirm("Do you really want to permanently delete \"" + name + "\"?", new BooleanCallback() {
+            SC.ask("Do you really want to permanently delete \"" + name + "\"?", new BooleanCallback() {
 
+                @Override
                 public void execute(Boolean value) {
-                    if (value != null && value) {
+                    if (value) {
                         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+                            @Override
                             public void onFailure(Throwable caught) {
                                 modal.hide();
                                 SC.warn("Unable to delete file/folder:<br />" + caught.getMessage());
                             }
 
+                            @Override
                             public void onSuccess(Void result) {
                                 modal.hide();
                                 SC.say("The file/folder was successfully scheduled to be permanentely deleted.");
@@ -201,17 +212,20 @@ public class BrowserContextMenu extends Menu {
             });
 
         } else {
-            SC.confirm("Do you really want to delete \"" + name + "\"?", new BooleanCallback() {
+            SC.ask("Do you really want to delete \"" + name + "\"?", new BooleanCallback() {
 
+                @Override
                 public void execute(Boolean value) {
-                    if (value != null && value) {
+                    if (value) {
                         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+                            @Override
                             public void onFailure(Throwable caught) {
                                 modal.hide();
                                 SC.warn("Unable to delete file/folder:<br />" + caught.getMessage());
                             }
 
+                            @Override
                             public void onSuccess(Void result) {
                                 modal.hide();
                                 BrowserLayout.getInstance().loadData(baseDir, true);
@@ -237,10 +251,11 @@ public class BrowserContextMenu extends Menu {
     private void download(final ModalWindow modal, final String baseDir,
             final DataRecord data) {
 
-        if (data.getType().contains("file")) {
+        if (data.getType() == Data.Type.file) {
             DataManagerServiceAsync service = DataManagerService.Util.getInstance();
             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+                @Override
                 public void onFailure(Throwable caught) {
                     modal.hide();
                     if (caught.getMessage().contains("No such file or directory")
@@ -252,6 +267,7 @@ public class BrowserContextMenu extends Menu {
                     }
                 }
 
+                @Override
                 public void onSuccess(Void result) {
                     modal.hide();
                     OperationLayout.getInstance().loadData();
@@ -264,6 +280,7 @@ public class BrowserContextMenu extends Menu {
             DataManagerServiceAsync service = DataManagerService.Util.getInstance();
             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+                @Override
                 public void onFailure(Throwable caught) {
                     modal.hide();
                     if (caught.getMessage().contains("No such file or directory")
@@ -275,6 +292,7 @@ public class BrowserContextMenu extends Menu {
                     }
                 }
 
+                @Override
                 public void onSuccess(Void result) {
                     modal.hide();
                     OperationLayout.getInstance().loadData();
@@ -295,11 +313,13 @@ public class BrowserContextMenu extends Menu {
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to paste file/folder:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
                 modal.hide();
                 DataManagerContext.getInstance().resetCutAction();

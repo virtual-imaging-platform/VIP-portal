@@ -104,11 +104,13 @@ public class BrowserUtil {
             DataManagerServiceAsync service = DataManagerService.Util.getInstance();
             AsyncCallback<List<Data>> callback = new AsyncCallback<List<Data>>() {
 
+                @Override
                 public void onFailure(Throwable caught) {
                     modal.hide();
                     SC.warn("Unable to get list of files:<br />" + caught.getMessage());
                 }
 
+                @Override
                 public void onSuccess(List<Data> result) {
                     List<DataRecord> dataList = new ArrayList<DataRecord>();
                     for (Data data : result) {
@@ -120,7 +122,7 @@ public class BrowserUtil {
                             replicas += replica;
                         }
                         dataList.add(new DataRecord(
-                                data.getType().toLowerCase(),
+                                data.getType(),
                                 data.getName(),
                                 (long) data.getLength(),
                                 data.getModificationDate(),
@@ -140,25 +142,28 @@ public class BrowserUtil {
             ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
             AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
+                @Override
                 public void onFailure(Throwable caught) {
                     modal.hide();
                     SC.warn("Error executing get files list: " + caught.getMessage());
                 }
 
+                @Override
                 public void onSuccess(List<String> result) {
                     toolStrip.setPath(path);
 
                     List<DataRecord> records = new ArrayList<DataRecord>();
-                    records.add(new DataRecord("folder", DataManagerConstants.USERS_HOME));
-                    records.add(new DataRecord("folder", DataManagerConstants.TRASH_HOME));
+                    records.add(new DataRecord(Data.Type.folder, DataManagerConstants.USERS_HOME));
+                    records.add(new DataRecord(Data.Type.folder, DataManagerConstants.TRASH_HOME));
 
                     for (String groupName : result) {
-                        records.add(new DataRecord("folder", groupName
+                        records.add(new DataRecord(Data.Type.folder, groupName
                                 + DataManagerConstants.GROUP_APPEND));
                     }
 
                     if (CoreModule.user.isSystemAdministrator()) {
-                        records.add(new DataRecord("folder", DataManagerConstants.BIOMED_HOME));
+                        records.add(new DataRecord(Data.Type.folder, DataManagerConstants.USERS_FOLDER));
+                        records.add(new DataRecord(Data.Type.folder, DataManagerConstants.BIOMED_HOME));
                     }
 
                     grid.setData(records.toArray(new DataRecord[]{}));

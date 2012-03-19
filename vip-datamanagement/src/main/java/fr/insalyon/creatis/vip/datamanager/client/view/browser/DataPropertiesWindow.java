@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.datamanager.client.view.browser;
 
 import fr.insalyon.creatis.vip.core.client.view.property.AbstractPropertyWindow;
 import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
+import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,16 +53,16 @@ public class DataPropertiesWindow extends AbstractPropertyWindow {
         List<PropertyRecord> data = new ArrayList<PropertyRecord>();
         data.add(new PropertyRecord("Folder", baseDir));
         data.add(new PropertyRecord("Name", record.getName()));
-        data.add(new PropertyRecord("Type", record.getType()));
+        data.add(new PropertyRecord("Type", record.getType().name()));
         
-        if (record.getType().equals("file")) {
+        if (record.getType() == Data.Type.file) {
             data.add(new PropertyRecord("Size", record.getLength()));
             data.add(new PropertyRecord("Modification Date", record.getModificationDate()));
         }
         
         data.add(new PropertyRecord("Permissions", record.getPermissions()));
         
-        if (record.getType().equals("file")) {
+        if (record.getType() == Data.Type.file) {
             data.add(new PropertyRecord("Replicas", record.getReplicas()));
         }
 

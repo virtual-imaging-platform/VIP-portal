@@ -41,7 +41,6 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
-import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
@@ -51,6 +50,7 @@ import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,118 +67,111 @@ public class SimulationsToolStrip extends ToolStrip {
         this.modal = modal;
         this.setWidth100();
 
-        ToolStripButton refreshButton = new ToolStripButton();
-        refreshButton.setIcon(CoreConstants.ICON_REFRESH);
-        refreshButton.setTitle("Refresh");
-        refreshButton.addClickHandler(new ClickHandler() {
+        // Refresh Button
+        this.addButton(WidgetUtil.getToolStripButton("Refresh",
+                CoreConstants.ICON_REFRESH, null, new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 getSimulationsTab().loadData();
             }
-        });
-        this.addButton(refreshButton);
+        }));
 
-        ToolStripButton searchButton = new ToolStripButton();
-        searchButton.setIcon(ApplicationConstants.ICON_SEARCH);
-        searchButton.setTitle("Search");
-        searchButton.addClickHandler(new ClickHandler() {
+        // Search Button
+        this.addButton(WidgetUtil.getToolStripButton("Search",
+                ApplicationConstants.ICON_SEARCH, null, new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 getSimulationsTab().expandSearchSection();
             }
-        });
-        this.addButton(searchButton);
+        }));
 
-        ToolStripButton killButton = new ToolStripButton();
-        killButton.setIcon(ApplicationConstants.ICON_KILL);
-        killButton.setTitle("Kill Simulations");
-        killButton.addClickHandler(new ClickHandler() {
+        //Kill Simulations Button
+        this.addButton(WidgetUtil.getToolStripButton("Kill Simulations",
+                ApplicationConstants.ICON_KILL, null, new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
-                SC.confirm("Do you really want to kill the selected running simulations?", new BooleanCallback() {
+                SC.ask("Do you really want to kill the selected running simulations?", new BooleanCallback() {
 
+                    @Override
                     public void execute(Boolean value) {
-                        if (value != null && value) {
+                        if (value) {
                             killSimulations();
                         }
                     }
                 });
             }
-        });
-        this.addButton(killButton);
+        }));
 
-        ToolStripButton cleanButton = new ToolStripButton();
-        cleanButton.setIcon(ApplicationConstants.ICON_CLEAN);
-        cleanButton.setTitle("Clean Simulations");
-        cleanButton.addClickHandler(new ClickHandler() {
+        // Clean Simulations Button
+        this.addButton(WidgetUtil.getToolStripButton("Clean Simulations",
+                ApplicationConstants.ICON_CLEAN, null, new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 SC.confirm("Do you really want to clean the selected completed/killed simulations?", new BooleanCallback() {
 
+                    @Override
                     public void execute(Boolean value) {
-                        if (value != null && value) {
+                        if (value) {
                             cleanSimulations();
                         }
                     }
                 });
             }
-        });
-        this.addButton(cleanButton);
+        }));
 
         if (CoreModule.user.isSystemAdministrator()) {
-            
-            ToolStripButton purgeButton = new ToolStripButton();
-            purgeButton.setIcon(CoreConstants.ICON_CLEAR);
-            purgeButton.setTitle("Purge Simulations");
-            purgeButton.addClickHandler(new ClickHandler() {
 
+            // Purge Simulations
+            this.addButton(WidgetUtil.getToolStripButton("Purge Simulations",
+                    CoreConstants.ICON_CLEAR, null, new ClickHandler() {
+
+                @Override
                 public void onClick(ClickEvent event) {
-                    SC.confirm("Do you really want to purge the selected cleaned simulations?", new BooleanCallback() {
+                    SC.ask("Do you really want to purge the selected cleaned simulations?", new BooleanCallback() {
 
+                        @Override
                         public void execute(Boolean value) {
-                            if (value != null && value) {
+                            if (value) {
                                 purgeSimulations();
                             }
                         }
                     });
                 }
-            });
-            this.addButton(purgeButton);
+            }));
 
-            ToolStripButton statsButton = new ToolStripButton();
-            statsButton.setIcon(ApplicationConstants.ICON_CHART);
-            statsButton.setTitle("Performance Statistics");
-            statsButton.addClickHandler(new ClickHandler() {
+            // Stats Button
+            this.addSeparator();
+            this.addButton(WidgetUtil.getToolStripButton("Performance Statistics",
+                    ApplicationConstants.ICON_CHART, null, new ClickHandler() {
 
+                @Override
                 public void onClick(ClickEvent event) {
                     Layout.getInstance().addTab(new StatsTab());
                     StatsTab statsTab = (StatsTab) Layout.getInstance().getTab(ApplicationConstants.TAB_STATS);
                     statsTab.setSimulationsList(getSimulationsTab().getSimulationsList());
                 }
-            });
-
-            this.addSeparator();
-            this.addButton(statsButton);
+            }));
         }
-        
-        ToolStripButton statusButton = new ToolStripButton();
-        statusButton.setIcon(ApplicationConstants.ICON_STATUS);
-        statusButton.setTitle("System Load");
-        statusButton.setPrompt("Current status of the system.");
-        statusButton.addClickHandler(new ClickHandler() {
 
+        // Status Button
+        this.addFill();
+        this.addButton(WidgetUtil.getToolStripButton("System Load",
+                ApplicationConstants.ICON_STATUS, "Current status of the system.", new ClickHandler() {
+
+            @Override
             public void onClick(ClickEvent event) {
                 new SystemLoadLayout(event.getX(), event.getY()).show();
             }
-        });
-        
-        this.addFill();
-        this.addButton(statusButton);
+        }));
     }
 
     /**
      * Sends a request to kill the selected running simulations
-     * 
+     *
      */
     private void killSimulations() {
 
@@ -188,7 +181,7 @@ public class SimulationsToolStrip extends ToolStrip {
         for (ListGridRecord record : records) {
             SimulationRecord data = (SimulationRecord) record;
             SimulationStatus status = SimulationStatus.valueOf(data.getStatus());
-            
+
             if (status == SimulationStatus.Running) {
                 simulationIDs.add(data.getSimulationId());
             }
@@ -197,11 +190,13 @@ public class SimulationsToolStrip extends ToolStrip {
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to kill simulations:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
                 modal.hide();
                 getSimulationsTab().loadData();
@@ -213,7 +208,7 @@ public class SimulationsToolStrip extends ToolStrip {
 
     /**
      * Sends a request to clean the selected completed/killed simulations
-     * 
+     *
      */
     private void cleanSimulations() {
 
@@ -223,8 +218,8 @@ public class SimulationsToolStrip extends ToolStrip {
         for (ListGridRecord record : records) {
             SimulationRecord data = (SimulationRecord) record;
             SimulationStatus status = SimulationStatus.valueOf(data.getStatus());
-            
-            if (status == SimulationStatus.Completed 
+
+            if (status == SimulationStatus.Completed
                     || status == SimulationStatus.Killed) {
 
                 simulationIDs.add(data.getSimulationId());
@@ -234,11 +229,13 @@ public class SimulationsToolStrip extends ToolStrip {
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to clean simulations:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
                 modal.hide();
                 getSimulationsTab().loadData();
@@ -250,7 +247,7 @@ public class SimulationsToolStrip extends ToolStrip {
 
     /**
      * Sends a request to purge the selected cleaned simulations
-     * 
+     *
      */
     private void purgeSimulations() {
 
@@ -260,7 +257,7 @@ public class SimulationsToolStrip extends ToolStrip {
         for (ListGridRecord record : records) {
             SimulationRecord data = (SimulationRecord) record;
             SimulationStatus status = SimulationStatus.valueOf(data.getStatus());
-            
+
             if (status == SimulationStatus.Cleaned) {
                 simulationIDs.add(data.getSimulationId());
             }
@@ -269,11 +266,13 @@ public class SimulationsToolStrip extends ToolStrip {
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to purge simulations:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
                 modal.hide();
                 getSimulationsTab().loadData();
@@ -282,7 +281,7 @@ public class SimulationsToolStrip extends ToolStrip {
         service.purgeSimulations(simulationIDs, callback);
         modal.show("Purging selected simulations...", true);
     }
-    
+
     private SimulationsTab getSimulationsTab() {
         return (SimulationsTab) Layout.getInstance().getTab(ApplicationConstants.TAB_MONITOR);
     }
