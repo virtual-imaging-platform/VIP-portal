@@ -387,6 +387,7 @@ public class WorkflowData implements WorkflowDAO {
         }
     }
 
+    @Override
     public void cleanWorkflow(String workflowID) throws DAOException {
         try {
             PreparedStatement stat = connection.prepareStatement("DELETE "

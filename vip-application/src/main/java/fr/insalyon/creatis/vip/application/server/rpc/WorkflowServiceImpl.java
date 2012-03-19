@@ -314,6 +314,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param simulationIDs
      * @throws ApplicationException
      */
+    @Override
     public void cleanSimulations(List<String> simulationIDs) throws ApplicationException {
 
         try {

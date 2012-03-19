@@ -265,18 +265,7 @@ public class WorkflowBusiness {
         try {
             WorkflowDAO workflowDAO = WorkflowDAOFactory.getDAOFactory().getWorkflowDAO();
             workflowDAO.updateStatus(simulationID, SimulationStatus.Cleaned.name());
-            String simulationsPath = Server.getInstance().getWorkflowsPath();
-            File workflowDir = new File(simulationsPath + "/" + simulationID);
 
-            for (File file : workflowDir.listFiles()) {
-                if (!file.getName().equals("jobs.db")
-                        && !file.getName().equals("workflow.out")
-                        && !file.getName().equals("workflow.err")
-                        && !file.getName().equals("gasw.log")) {
-
-                    FileUtils.deleteQuietly(file);
-                }
-            }
             List<String> outputs = workflowDAO.getOutputs(simulationID);
             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
 
