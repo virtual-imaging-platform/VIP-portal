@@ -103,6 +103,7 @@ public class SignInTab extends Tab {
         emailField = FieldUtil.getTextItem(230, false, "", "[a-zA-Z0-9_.\\-+@]");
         emailField.addKeyPressHandler(new KeyPressHandler() {
 
+            @Override
             public void onKeyPress(KeyPressEvent event) {
                 if (event.getKeyName().equals("Enter")) {
                     signin();
@@ -117,6 +118,7 @@ public class SignInTab extends Tab {
         passwordField.setRequired(true);
         passwordField.addKeyPressHandler(new KeyPressHandler() {
 
+            @Override
             public void onKeyPress(KeyPressEvent event) {
                 if (event.getKeyName().equals("Enter")) {
                     signin();
@@ -132,33 +134,40 @@ public class SignInTab extends Tab {
         signinButton = new IButton("Sign in");
         signinButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 signin();
             }
         });
 
         signinLayout = WidgetUtil.getVIPLayout(250, 150);
-        signinLayout.addMember(WidgetUtil.getLabel("<b>E-mail</b>", 15));
-        signinLayout.addMember(FieldUtil.getForm(emailField));
-        signinLayout.addMember(WidgetUtil.getLabel("<b>Password</b>", 15));
-        signinLayout.addMember(FieldUtil.getForm(passwordField));
+        WidgetUtil.addFieldToVIPLayout(signinLayout, "Email", emailField);
+        WidgetUtil.addFieldToVIPLayout(signinLayout, "Password", passwordField);
         signinLayout.addMember(FieldUtil.getForm(remembermeField));
         signinLayout.addMember(signinButton);
     }
 
     private void configureNewForm() {
 
-        LinkItem createAccount = new LinkItem("link");
-        createAccount.setShowTitle(false);
-        createAccount.setLinkTitle("Create an account.");
-        createAccount.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
+        LinkItem createAccount = FieldUtil.getLinkItem("link_create", "Create an account.",
+                new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
 
-            public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-                Layout.getInstance().addTab(new SignUpTab());
-            }
-        });
+                    @Override
+                    public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
+                        Layout.getInstance().addTab(new SignUpTab());
+                    }
+                });
 
-        newForm = FieldUtil.getForm(createAccount);
+        LinkItem recoverAccount = FieldUtil.getLinkItem("link_reset", "Can't access your account?",
+                new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
+
+                    @Override
+                    public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
+                        Layout.getInstance().addTab(new RecoveryTab());
+                    }
+                });
+
+        newForm = FieldUtil.getForm(createAccount, recoverAccount);
         newForm.setWidth(250);
     }
 

@@ -72,4 +72,8 @@ public interface UserDAO {
     public List<User> getAdministrators() throws DAOException;
     
     public void updateLevel(String email, UserLevel level) throws DAOException;
+    
+    public void updateCode(String email, String code) throws DAOException;
+    
+    public void resetPassword(String email, String newPassword) throws DAOException;
 }

@@ -38,6 +38,8 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.form.fields.FormItem;
+import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -138,6 +140,19 @@ public class WidgetUtil {
         layout.addMember(vipLabel);
 
         return layout;
+    }
+    
+    /**
+     * Adds a FormItem to a VIP Layout.
+     * 
+     * @param layout VIP Layout
+     * @param title Field title
+     * @param item  Field object
+     */
+    public static void addFieldToVIPLayout(Layout layout, String title, FormItem item) {
+
+        layout.addMember(getLabel("<b>" + title + "</b>", 15));
+        layout.addMember(FieldUtil.getForm(item));
     }
 
     /**

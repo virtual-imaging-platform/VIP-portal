@@ -74,6 +74,8 @@ public interface ConfigurationService extends RemoteService {
     public User activate(String code) throws CoreException;
 
     public String sendActivationCode() throws CoreException;
+    
+    public void sendResetCode(String email) throws CoreException;
 
     public List<User> getUsers() throws CoreException;
 
@@ -110,4 +112,6 @@ public interface ConfigurationService extends RemoteService {
     public List<User> getUsersFromGroup(String groupName) throws CoreException;
     
     public void removeUserFromGroup(String email, String groupName) throws CoreException;
+    
+    public void resetPassword(String email, String code, String password) throws CoreException;
 }

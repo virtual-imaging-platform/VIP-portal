@@ -100,12 +100,14 @@ public class ActivationTab extends Tab {
         validateButton = new IButton("Activate");
         validateButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 if (codeField.validate()) {
 
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
                     final AsyncCallback<User> callback = new AsyncCallback<User>() {
 
+                        @Override
                         public void onFailure(Throwable caught) {
                             modal.hide();
                             if (caught.getMessage().contains("Activation failed")) {
@@ -115,6 +117,7 @@ public class ActivationTab extends Tab {
                             }
                         }
 
+                        @Override
                         public void onSuccess(User result) {
                             modal.hide();
                             Layout.getInstance().removeTab(CoreConstants.TAB_ACTIVATION);
@@ -127,37 +130,38 @@ public class ActivationTab extends Tab {
             }
         });
 
-        validateLayout.addMember(WidgetUtil.getLabel("<b>Activation Code</b>", 15));
-        validateLayout.addMember(FieldUtil.getForm(codeField));
+        WidgetUtil.addFieldToVIPLayout(validateLayout, "Activation Code", codeField);
         validateLayout.addMember(validateButton);
     }
 
     private void configureResendForm() {
 
-        LinkItem resendLink = new LinkItem("link");
-        resendLink.setShowTitle(false);
-        resendLink.setLinkTitle("Lost your code? Click here and we will resend it to you.");
+        LinkItem resendLink = FieldUtil.getLinkItem("link_resend",
+                "Lost your code? Click here and we will resend it to you.",
+                new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
+
+                    @Override
+                    public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
+                        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+                        final AsyncCallback<String> callback = new AsyncCallback<String>() {
+
+                            @Override
+                            public void onFailure(Throwable caught) {
+                                modal.hide();
+                                SC.warn("Unable to resend activation code:\n" + caught.getMessage());
+                            }
+
+                            @Override
+                            public void onSuccess(String result) {
+                                modal.hide();
+                                SC.say("An activation code was sent to:\n" + result);
+                            }
+                        };
+                        modal.show("Resending activation code...", true);
+                        service.sendActivationCode(callback);
+                    }
+                });
         resendLink.setWidth(300);
-        resendLink.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-
-            public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-                ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-                final AsyncCallback<String> callback = new AsyncCallback<String>() {
-
-                    public void onFailure(Throwable caught) {
-                        modal.hide();
-                        SC.warn("Unable to resend activation code:\n" + caught.getMessage());
-                    }
-
-                    public void onSuccess(String result) {
-                        modal.hide();
-                        SC.say("An activation code was sent to:\n" + result);
-                    }
-                };
-                modal.show("Resending activation code...", true);
-                service.sendActivationCode(callback);
-            }
-        });
 
         resendForm = FieldUtil.getForm(resendLink);
         resendForm.setWidth(300);

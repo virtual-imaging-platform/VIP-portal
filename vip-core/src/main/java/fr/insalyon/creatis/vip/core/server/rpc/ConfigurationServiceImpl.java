@@ -63,11 +63,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
+     *
      * @param email
      * @param session
      * @return
-     * @throws CoreException 
+     * @throws CoreException
      */
     public User configure(String email, String session) throws CoreException {
 
@@ -99,11 +99,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     * 
+     *
      * @param user User bean object
      * @param comments User's comments
      * @param accountType User's account type
-     * @throws CoreException 
+     * @throws CoreException
      */
     public void signup(User user, String comments, String accountType) throws CoreException {
 
@@ -182,6 +182,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @param email
      * @throws CoreException
      */
+    @Override
     public String sendActivationCode() throws CoreException {
 
         try {
@@ -190,6 +191,23 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             configurationBusiness.sendActivationCode(user.getEmail());
 
             return user.getEmail();
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param email
+     * @throws CoreException
+     */
+    @Override
+    public void sendResetCode(String email) throws CoreException {
+
+        try {
+            logger.info("(" + email + ") Requested to reset the password.");
+            configurationBusiness.sendResetCode(email);
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
@@ -300,8 +318,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     /**
      *
-     * @return 
-     * @throws CoreException
+     * @return @throws CoreException
      */
     public User removeUser() throws CoreException {
 
@@ -525,6 +542,25 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             trace(logger, "Removing '" + email + "' from group '" + groupName + "'.");
             configurationBusiness.removeUserFromGroup(email, groupName);
 
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param email
+     * @param code
+     * @param password
+     * @throws CoreException 
+     */
+    @Override
+    public void resetPassword(String email, String code, String password) throws CoreException {
+
+        try {
+            logger.info("(" + email + ") Reseting password.");
+            configurationBusiness.resetPassword(email, code, password);
+            
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }

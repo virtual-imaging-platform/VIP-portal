@@ -429,9 +429,8 @@ public class UserData implements UserDAO {
     }
 
     /**
-     * 
-     * @return
-     * @throws DAOException 
+     *
+     * @return @throws DAOException
      */
     public List<User> getAdministrators() throws DAOException {
 
@@ -464,21 +463,67 @@ public class UserData implements UserDAO {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param level
-     * @throws DAOException 
+     * @throws DAOException
      */
     public void updateLevel(String email, UserLevel level) throws DAOException {
-        
+
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
                     + "VIPUsers SET level = ? WHERE email = ?");
             ps.setString(1, level.name());
             ps.setString(2, email);
-            
+
             ps.executeUpdate();
-            
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param email
+     * @param code
+     * @throws DAOException
+     */
+    @Override
+    public void updateCode(String email, String code) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "VIPUsers SET code = ? WHERE email = ?");
+            ps.setString(1, code);
+            ps.setString(2, email);
+
+            ps.executeUpdate();
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param email
+     * @param newPassword
+     * @throws DAOException 
+     */
+    @Override
+    public void resetPassword(String email, String newPassword) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "VIPUsers SET pass = ? WHERE email = ?");
+
+            ps.setString(1, newPassword);
+            ps.setString(2, email);
+            ps.executeUpdate();
+
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);

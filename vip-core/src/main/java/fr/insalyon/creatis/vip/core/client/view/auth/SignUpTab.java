@@ -193,26 +193,20 @@ public class SignUpTab extends Tab {
         });
 
         signupLayout = WidgetUtil.getVIPLayout(320);
-        addField("First Name", firstNameField);
-        addField("Last Name", lastNameField);
-        addField("E-mail", emailField);
-        addField("Re-enter E-mail", confirmEmailField);
-        addField("Institution", institutionField);
-        addField("Phone", phoneField);
-        addField("Password", passwordField);
-        addField("Re-enter Password", confirmPasswordField);
-        addField("Account Type", accountRadioGroupItem);
-        addField("Comments", commentsItem);
+        WidgetUtil.addFieldToVIPLayout(signupLayout, "First Name", firstNameField);
+        WidgetUtil.addFieldToVIPLayout(signupLayout, "Last Name", lastNameField);
+        WidgetUtil.addFieldToVIPLayout(signupLayout, "E-mail", emailField);
+        WidgetUtil.addFieldToVIPLayout(signupLayout, "Re-enter E-mail", confirmEmailField);
+        WidgetUtil.addFieldToVIPLayout(signupLayout, "Institution", institutionField);
+        WidgetUtil.addFieldToVIPLayout(signupLayout, "Phone", phoneField);
+        WidgetUtil.addFieldToVIPLayout(signupLayout, "Password", passwordField);
+        WidgetUtil.addFieldToVIPLayout(signupLayout, "Re-enter Password", confirmPasswordField);
+        WidgetUtil.addFieldToVIPLayout(signupLayout, "Account Type", accountRadioGroupItem);
+        WidgetUtil.addFieldToVIPLayout(signupLayout, "Comments", commentsItem);
         signupLayout.addMember(FieldUtil.getForm(acceptField));
         signupLayout.addMember(signupButton);
     }
     
-    private void addField(String title, FormItem item) {
-        
-        signupLayout.addMember(WidgetUtil.getLabel("<b>" + title + "</b>", 15));
-        signupLayout.addMember(FieldUtil.getForm(item));
-    }
-
     private void signin() {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();

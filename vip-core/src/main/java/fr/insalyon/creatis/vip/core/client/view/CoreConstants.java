@@ -48,6 +48,7 @@ public class CoreConstants {
     public static final String TAB_ACTIVATION = "activation-tab";
     public static final String TAB_CONTACT = "contact-tab";
     public static final String TAB_HOME = "home-tab";
+    public static final String TAB_RECOVERY = "recovery-tab";
     public static final String TAB_SIGNIN = "signin-tab";
     public static final String TAB_SIGNUP = "signup-tab";
     public static final String TAB_SYSTEM = "system-tab";

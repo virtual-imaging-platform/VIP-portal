@@ -42,6 +42,7 @@ import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItem;
+import com.smartgwt.client.widgets.form.fields.LinkItem;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -175,6 +176,7 @@ public class FieldUtil {
         textItem.setDisabled(disabled);
         textItem.addChangedHandler(new ChangedHandler() {
 
+            @Override
             public void onChanged(ChangedEvent event) {
                 event.getItem().validate();
             }
@@ -212,6 +214,7 @@ public class FieldUtil {
 
         return new CellFormatter() {
 
+            @Override
             public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
 
                 if (value == null) {
@@ -264,5 +267,23 @@ public class FieldUtil {
         button.addClickHandler(clickHandler);
 
         return button;
+    }
+    
+    /**
+     * Gets a Link Item according to the provided parameters.
+     * 
+     * @param name
+     * @param title
+     * @param clickHandler
+     * @return 
+     */
+    public static LinkItem getLinkItem(String name, String title, 
+            com.smartgwt.client.widgets.form.fields.events.ClickHandler clickHandler) {
+        
+        LinkItem link = new LinkItem(name);
+        link.setShowTitle(false);
+        link.setLinkTitle(title);
+        link.addClickHandler(clickHandler);
+        return link;
     }
 }

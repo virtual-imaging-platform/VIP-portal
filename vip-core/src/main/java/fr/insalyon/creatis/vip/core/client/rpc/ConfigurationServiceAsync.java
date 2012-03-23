@@ -58,6 +58,8 @@ public interface ConfigurationServiceAsync {
     public void activate(String code, AsyncCallback<User> asyncCallback);
 
     public void sendActivationCode(AsyncCallback<String> asyncCallback);
+    
+    public void sendResetCode(String email, AsyncCallback<Void> asyncCallback);
 
     public void addGroup(String groupName, AsyncCallback<Void> asyncCallback);
 
@@ -94,4 +96,6 @@ public interface ConfigurationServiceAsync {
     public void getUsersFromGroup(String groupName, AsyncCallback<List<User>> asyncCallback);
     
     public void removeUserFromGroup(String email, String groupName, AsyncCallback<Void> asyncCallback);
+    
+    public void resetPassword(String email, String code, String password, AsyncCallback<Void> asyncCallback);
 }
