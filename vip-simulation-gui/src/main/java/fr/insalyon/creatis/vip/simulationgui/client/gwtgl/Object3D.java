@@ -35,7 +35,7 @@
 package fr.insalyon.creatis.vip.simulationgui.client.gwtgl;
 
 import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3D;
-
+import com.smartgwt.client.util.SC;
 /**
  *
  * @author Kevin Moulin
@@ -365,6 +365,7 @@ public class Object3D {
     }
 
     protected float weighting() {
+       
         float maxx = (float) boundingBox[1];
         float minx = (float) boundingBox[0];
         float maxy = (float) boundingBox[3];
@@ -373,7 +374,9 @@ public class Object3D {
         float minz = (float) boundingBox[4];
         float tmp = maxx - minx;
         float tmp2 = maxy - miny;
-        if (tmp >= tmp2) {
+    //    SC.say("maxx : "+ maxx + " minx :" +minx + " maxy:" + maxy + " miny:" + miny + " maxz:" + maxz + " minz:" + minz);
+         return (maxx - minx);
+     /*   if (tmp >= tmp2) {
             tmp2 = maxz - minz;
             if (tmp >= tmp2) {
                 if (tmp != 0) {
@@ -403,6 +406,6 @@ public class Object3D {
                     return 1;
                 }
             }
-        }
+        }*/
     }
 }

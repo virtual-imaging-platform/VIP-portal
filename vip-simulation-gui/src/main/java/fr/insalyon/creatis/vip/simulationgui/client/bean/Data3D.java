@@ -151,7 +151,7 @@ public class Data3D implements IsSerializable {
         return type;
     }
 
-    public float getAlphaInfo() {
+public float getAlphaInfo() {
         return alphaInfo;
     }
 

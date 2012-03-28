@@ -121,6 +121,7 @@ public class ObjectFactory {
             for (String st2d : st2) {
                 String tmp = st2d.replace("[", "").replace("]", "");
                 if (tmp.endsWith(".vtp") || tmp.endsWith(".vtk")) {
+                    System.out.println("object" + i + " " + j + " created");
                     objectTab[i][j] = addVTP(path, tmp, type[i], objectTab[i][0].getBoundingBox(), bbound[i]);
                     j++;
                 }
@@ -218,8 +219,15 @@ public class ObjectFactory {
         
         if (!DATA.getThereIsAnError()) {
             // if a mhd image is associated, we take the corresponding bounds
+            //System.out.println(i + " x:" + vertex[i]+" y:"+ vertex[i + 1]+ " z:"+vertex[i + 2]);
             if(bbound)
             {
+                System.out.println(" 0 : " + bounds[0] 
+                        +" 1 : " + bounds[1] 
+                        +" 2 : " + bounds[2] 
+                        +" 3 : " + bounds[3] 
+                        +" 4 : " + bounds[4] 
+                        +" 5 : " + bounds[5] );
                 xgravit = (float) (bounds[1] + bounds[0]) / 2;
                 ygravit = (float) (bounds[3] + bounds[2]) / 2;
                 zgravit = (float) (bounds[5] + bounds[4]) / 2;
@@ -274,6 +282,7 @@ public class ObjectFactory {
 
             // vertex parsor
             j = 0;
+            System.out.println(DATA.getNumberOfPoints());
             for (int i = 0; i < DATA.getNumberOfPoints() * 3; i = i + 3) {
                 vertex[i] = DATA.getPoints()[i] - xgravit;
                 vertex[i + 1] = DATA.getPoints()[i + 1] - ygravit;
@@ -297,6 +306,7 @@ public class ObjectFactory {
             bounds[3] = bounds[3] - ygravit;
             bounds[4] = bounds[4] - zgravit;
             bounds[5] = bounds[5] - zgravit;
+            System.out.println(bounds);
             make(object, colors, indices, vertex, bounds, indices.length, 1.0f);
         }
         return object;

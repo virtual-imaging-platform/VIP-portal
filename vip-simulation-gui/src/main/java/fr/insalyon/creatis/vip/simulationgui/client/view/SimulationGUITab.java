@@ -230,7 +230,7 @@ public class SimulationGUITab extends Tab {
                             public void onFailure(Throwable caught) {
                                 // Show the RPC error message to the user
                                 defineSceneSection.hideModal();
-                                SC.say("Error during the object creation");
+                        SC.say("Error during the object creation");
                             }
                         });*/
                                 

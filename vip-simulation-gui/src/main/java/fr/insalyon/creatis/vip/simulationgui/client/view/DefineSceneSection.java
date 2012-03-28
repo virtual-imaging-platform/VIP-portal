@@ -219,6 +219,7 @@ public class DefineSceneSection extends SectionStackSection {
                     compteur--;
                 } else {
                     boxUs.enableView();
+                   
                     sceneDraw.addObject(boxUs.getObjectSimulateur(), 1);
                     portalLayout1.addPortlet(boxUs.getControlPortlet(), compteur % 2, 0);
                     compteur++;

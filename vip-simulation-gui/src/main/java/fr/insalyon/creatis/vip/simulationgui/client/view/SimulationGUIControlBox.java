@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.simulationgui.client.view;
 
+
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
@@ -186,8 +187,6 @@ public class SimulationGUIControlBox {
         logger = Logger.getLogger("Simulation-gui");
         loadFormSimulator();
         setControl();
-        Event e = null;
-        simulatorSelectItem.fireEvent(new ChangedEvent(e));
 
           
     }
