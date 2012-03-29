@@ -61,7 +61,7 @@ public abstract class ApplicationsTileGrid extends TileGrid {
         this.setShowAllRecords(true);
         this.setAnimateTileChange(true);
         this.setShowEdges(false);
-
+        
         DetailViewerField imageField = new DetailViewerField("picture");
         imageField.setType("image");
         DetailViewerField commonNameField = new DetailViewerField("commonName");
@@ -71,6 +71,7 @@ public abstract class ApplicationsTileGrid extends TileGrid {
 
         this.addRecordClickHandler(new RecordClickHandler() {
 
+            @Override
             public void onRecordClick(RecordClickEvent event) {
                 ApplicationTileRecord record = (ApplicationTileRecord) event.getRecord();
                 parse(record.getName());

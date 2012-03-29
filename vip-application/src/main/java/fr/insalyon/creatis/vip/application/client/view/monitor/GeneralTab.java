@@ -52,7 +52,10 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
-import fr.insalyon.creatis.vip.application.client.view.monitor.general.*;
+import fr.insalyon.creatis.vip.application.client.view.monitor.general.GeneralInformationLayout;
+import fr.insalyon.creatis.vip.application.client.view.monitor.general.InOutTreeNode;
+import fr.insalyon.creatis.vip.application.client.view.monitor.general.LocationLayout;
+import fr.insalyon.creatis.vip.application.client.view.monitor.general.LogsLayout;
 import fr.insalyon.creatis.vip.application.client.view.monitor.menu.InOutContextMenu;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
@@ -71,9 +74,8 @@ public class GeneralTab extends Tab {
     private Tree inOutTree;
     private InOutTreeNode inputs;
     private InOutTreeNode outputs;
-    private GeneralInformationWindow generalWindow;
-    private LocationWindow locationWindow;
-    private ProcessorsWindow processorsWindow;
+    private GeneralInformationLayout generalWindow;
+    private LocationLayout locationWindow;
 
     public GeneralTab(String simulationID, String simulationName) {
 
@@ -95,18 +97,15 @@ public class GeneralTab extends Tab {
         leftLayout.setHeight100();
         leftLayout.setOverflow(Overflow.AUTO);
 
-        generalWindow = new GeneralInformationWindow(simulationID);
+        generalWindow = new GeneralInformationLayout(simulationID);
         leftLayout.addMember(generalWindow);
 
-        locationWindow = new LocationWindow(simulationID);
+        locationWindow = new LocationLayout(simulationID);
         leftLayout.addMember(locationWindow);
-
-        processorsWindow = new ProcessorsWindow(simulationID);
-        leftLayout.addMember(processorsWindow);
 
         if (CoreModule.user.isSystemAdministrator()
                 || CoreModule.user.isGroupAdmin()) {
-            leftLayout.addMember(new LogsWindow(simulationID));
+            leftLayout.addMember(new LogsLayout(simulationID));
         }
 
         // Right column
@@ -132,7 +131,6 @@ public class GeneralTab extends Tab {
         loadTreeData(outputs, InOutTreeNode.Icon.Output);
         generalWindow.loadData();
         locationWindow.loadData();
-        processorsWindow.loadData();
     }
 
     private void configureTreeGrid() {
@@ -166,6 +164,7 @@ public class GeneralTab extends Tab {
         inOutTreeGrid.setFields(new TreeGridField("name", "In/Output Data"));
         inOutTreeGrid.addNodeContextClickHandler(new NodeContextClickHandler() {
 
+            @Override
             public void onNodeContextClick(NodeContextClickEvent event) {
                 event.cancel();
                 InOutTreeNode node = (InOutTreeNode) event.getNode();
@@ -180,11 +179,13 @@ public class GeneralTab extends Tab {
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         AsyncCallback<List<InOutData>> callback = new AsyncCallback<List<InOutData>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 inOutTreeModal.hide();
                 SC.warn("Unable to load data:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<InOutData> result) {
 
                 for (InOutData data : result) {

@@ -32,20 +32,20 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.user.account;
+package fr.insalyon.creatis.vip.application.client.view.monitor.general;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.SortDirection;
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
-import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
-import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
+import fr.insalyon.creatis.vip.application.client.rpc.JobService;
+import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
+import fr.insalyon.creatis.vip.application.client.view.monitor.record.LocationRecord;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,64 +54,66 @@ import java.util.Map;
  *
  * @author Rafael Silva
  */
-public class GroupWindow extends Window {
+public class LocationLayout extends AbstractFormLayout {
 
-    private ModalWindow modal;
+    private String simulationID;
     private ListGrid grid;
 
-    public GroupWindow() {
+    public LocationLayout(String simulationID) {
 
-        this.setTitle(Canvas.imgHTML(CoreConstants.ICON_GROUP) + " Groups");
-        this.setWidth100();
-        this.setHeight(150);
-        this.setShowCloseButton(false);
-
+        super("100%", "180px");
+        addTitle("Simulation Execution Location", CoreConstants.ICON_WORLD);
+        this.simulationID = simulationID;
+               
         configureGrid();
         modal = new ModalWindow(grid);
-
-        this.addItem(grid);
-
-        loadData();
     }
-
+    
     private void configureGrid() {
-
+        
         grid = new ListGrid();
         grid.setWidth100();
         grid.setHeight100();
-        grid.setShowAllRecords(false);
+        grid.setShowAllRecords(true);
         grid.setShowEmptyMessage(true);
         grid.setEmptyMessage("<br>No data available.");
-
-        ListGridField nameField = new ListGridField("groupName", "Group");
-        ListGridField roleField = new ListGridField("role", "Role");
-
-        grid.setFields(nameField, roleField);
-        grid.setSortField("groupName");
-        grid.setSortDirection(SortDirection.ASCENDING);
+        
+        ListGridField icoField = FieldUtil.getIconGridField("icon");
+        ListGridField nameField = new ListGridField("country", "Country");
+        ListGridField jobsField = new ListGridField("jobs", "Tasks");
+        jobsField.setWidth(70);
+        jobsField.setAlign(Alignment.RIGHT);
+        
+        grid.setFields(icoField, nameField, jobsField);
+        grid.setSortField("country");
+        
+        this.addMember(grid);
     }
+    
+    public void loadData() {
+        
+        JobServiceAsync service = JobService.Util.getInstance();
+        AsyncCallback<Map<String, Integer>> callback = new AsyncCallback<Map<String, Integer>>() {
 
-    private void loadData() {
-
-        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<Map<String, GROUP_ROLE>> callback = new AsyncCallback<Map<String, GROUP_ROLE>>() {
-
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.say("Unable to load groups:<br />" + caught.getMessage());
+                SC.warn("Unable to load locations:<br />" + caught.getMessage());
             }
 
-            public void onSuccess(Map<String, GROUP_ROLE> result) {
-                List<GroupRecord> groups = new ArrayList<GroupRecord>();
-                
-                for (String groupName : result.keySet()) {
-                    groups.add(new GroupRecord(groupName, result.get(groupName)));
-                }
-                grid.setData(groups.toArray(new GroupRecord[]{}));
+            @Override
+            public void onSuccess(Map<String, Integer> result) {
                 modal.hide();
+                
+                List<LocationRecord> data = new ArrayList<LocationRecord>();
+                
+                for (String code : result.keySet()) {
+                    data.add(new LocationRecord(code, result.get(code)));
+                }
+                grid.setData(data.toArray(new LocationRecord[]{}));
             }
         };
-        modal.show("Loading groups...", true);
-        service.getUserGroups(null, callback);
+        modal.show("Loading locations...", true);
+        service.getCountriesMap(simulationID, callback);
     }
 }

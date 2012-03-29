@@ -66,10 +66,10 @@ public class HomeTab extends Tab {
    
     public void addTileGrid(ApplicationsTileGrid tileGrid) {
         
-        Label tileName = new Label(tileGrid.getTileName());
+        Label tileName = new Label("<b>" + tileGrid.getTileName() + "</b>");
         tileName.setAlign(Alignment.LEFT);
         tileName.setWidth100();
-        tileName.setHeight(15);
+        tileName.setHeight(20);
         tileName.setBackgroundColor("#F2F2F2");
         
         vLayout.addMember(tileName);

@@ -40,7 +40,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.user.account.GroupWindow;
+import fr.insalyon.creatis.vip.core.client.view.user.account.GroupLayout;
 import fr.insalyon.creatis.vip.core.client.view.user.account.PasswordLayout;
 import fr.insalyon.creatis.vip.core.client.view.user.account.PersonalLayout;
 import fr.insalyon.creatis.vip.core.client.view.user.account.RemoveAccountLayout;
@@ -58,7 +58,7 @@ public class AccountTab extends Tab {
         this.setID(CoreConstants.TAB_ACCOUNT);
         this.setCanClose(true);
 
-        HLayout hLayout = new HLayout(15);
+        HLayout hLayout = new HLayout(10);
         hLayout.setWidth100();
         hLayout.setHeight100();
         hLayout.setOverflow(Overflow.AUTO);
@@ -77,7 +77,7 @@ public class AccountTab extends Tab {
         rightLayout.setWidth("*");
         rightLayout.setHeight100();
         
-        rightLayout.addMember(new GroupWindow());
+        rightLayout.addMember(new GroupLayout());
         rightLayout.addMember(new RemoveAccountLayout());
 
         hLayout.addMember(leftLayout);

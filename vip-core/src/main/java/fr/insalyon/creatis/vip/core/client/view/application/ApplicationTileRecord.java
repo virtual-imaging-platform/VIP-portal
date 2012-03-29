@@ -42,7 +42,7 @@ import com.smartgwt.client.widgets.tile.TileRecord;
  */
 public class ApplicationTileRecord extends TileRecord {
 
-    public ApplicationTileRecord() {
+    public ApplicationTileRecord() {       
     }
 
     public ApplicationTileRecord(String name, String icon) {

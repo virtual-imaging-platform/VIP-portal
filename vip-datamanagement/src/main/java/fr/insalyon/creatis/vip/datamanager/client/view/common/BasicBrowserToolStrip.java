@@ -34,7 +34,6 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.common;
 
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -45,6 +44,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.client.view.ValidatorUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.AddFolderWindow;
 
 /**
@@ -115,9 +115,8 @@ public class BasicBrowserToolStrip extends ToolStrip {
             @Override
             public void onClick(ClickEvent event) {
                 String path = toolStrip.getPath();
-                if (path.equals(DataManagerConstants.ROOT)) {
-                    SC.warn("You cannot create a folder in the root folder.");
-                } else {
+                if (ValidatorUtil.validateRootPath(path, "create a folder in")
+                        && ValidatorUtil.validateUserLevel(path, "create a folder in")) {
                     new AddFolderWindow(modal, path).show();
                 }
             }

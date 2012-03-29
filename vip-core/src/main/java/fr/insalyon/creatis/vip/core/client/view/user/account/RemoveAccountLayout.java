@@ -41,6 +41,8 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import fr.insalyon.creatis.vip.core.client.Modules;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
@@ -62,7 +64,7 @@ public class RemoveAccountLayout extends AbstractFormLayout {
 
     public RemoveAccountLayout() {
 
-        super(300, 120);
+        super(350, 120);
         addTitle("Delete Account", CoreConstants.ICON_ACCOUNT_REMOVE);
 
         configure();
@@ -77,10 +79,23 @@ public class RemoveAccountLayout extends AbstractFormLayout {
         confirmField.setRequired(true);
         confirmField.setWidth(300);
         confirmField.setAlign(Alignment.LEFT);
+        confirmField.addChangedHandler(new ChangedHandler() {
+
+            @Override
+            public void onChanged(ChangedEvent event) {
+                
+                if (confirmField.getValueAsBoolean()) {
+                    removeButton.setDisabled(false);
+                } else {
+                    removeButton.setDisabled(true);
+                }
+            }
+        });
         
         this.addMember(FieldUtil.getForm(confirmField));
 
         removeButton = new IButton("Delete VIP Account");
+        removeButton.setDisabled(true);
         removeButton.addClickHandler(new ClickHandler() {
 
             @Override

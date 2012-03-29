@@ -86,6 +86,7 @@ public class PersonalLayout extends AbstractFormLayout {
         saveButton = new IButton("Save Changes");
         saveButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
 
                 if (firstNameField.validate() & lastNameField.validate()
@@ -103,11 +104,13 @@ public class PersonalLayout extends AbstractFormLayout {
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
                     final AsyncCallback<User> callback = new AsyncCallback<User>() {
 
+                        @Override
                         public void onFailure(Throwable caught) {
                             modal.hide();
                             SC.warn("Unable to save changes:<br />" + caught.getMessage());
                         }
 
+                        @Override
                         public void onSuccess(User result) {
                             Modules.getInstance().userUpdated(CoreModule.user, result);
                             CoreModule.user = result;
@@ -134,11 +137,13 @@ public class PersonalLayout extends AbstractFormLayout {
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<User> callback = new AsyncCallback<User>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to get user data:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(User result) {
 
                 levelField.setValue(result.getLevel().name());

@@ -36,8 +36,6 @@ package fr.insalyon.creatis.vip.application.client.view.monitor.general;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -47,31 +45,27 @@ import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
 
 /**
  *
  * @author Rafael Silva
  */
-public class GeneralInformationWindow extends Window {
+public class GeneralInformationLayout extends AbstractFormLayout {
 
     private String simulationID;
     private ListGrid grid;
-    private ModalWindow modal;
 
-    public GeneralInformationWindow(String simulationID) {
+    public GeneralInformationLayout(String simulationID) {
 
+        super("100%", "200px");
+        addTitle("General Information", ApplicationConstants.ICON_GENERAL);
+        
         this.simulationID = simulationID;
-
-        this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_GENERAL) + " General Information");
-        this.setWidth100();
-        this.setHeight(190);
-        this.setShowCloseButton(false);
 
         configureGrid();
         modal = new ModalWindow(grid);
-        
-        this.addItem(grid);
     }
 
     private void configureGrid() {
@@ -108,6 +102,8 @@ public class GeneralInformationWindow extends Window {
         ListGridField valueField = new ListGridField("value", "Value");
 
         grid.setFields(propertyField, valueField);
+        
+        this.addMember(grid);
     }
 
     public void loadData() {
@@ -115,11 +111,13 @@ public class GeneralInformationWindow extends Window {
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Simulation> callback = new AsyncCallback<Simulation>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to load general information:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Simulation result) {
                 modal.hide();
                 grid.setData(new PropertyRecord[]{

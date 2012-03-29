@@ -34,8 +34,6 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor.general;
 
-import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.tile.TileGrid;
 import com.smartgwt.client.widgets.tile.events.RecordClickEvent;
 import com.smartgwt.client.widgets.tile.events.RecordClickHandler;
@@ -43,27 +41,24 @@ import com.smartgwt.client.widgets.viewer.DetailViewerField;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.view.monitor.ViewerWindow;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationTileRecord;
+import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 
 /**
  *
  * @author Rafael Silva
  */
-public class LogsWindow extends Window {
+public class LogsLayout extends AbstractFormLayout {
 
     private String simulationID;
     private TileGrid tileGrid;
 
-    public LogsWindow(String simulationID) {
+    public LogsLayout(String simulationID) {
+
+        super("100%", "155px");
+        addTitle("Simulation Logs", ApplicationConstants.ICON_LOG);
 
         this.simulationID = simulationID;
-
-        this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_LOG) + " Simulation Logs");
-        this.setWidth100();
-        this.setHeight(140);
-        this.setShowCloseButton(false);
-
         configureTileGrid();
-        this.addItem(tileGrid);
     }
 
     private void configureTileGrid() {
@@ -73,6 +68,7 @@ public class LogsWindow extends Window {
         tileGrid.setHeight100();
         tileGrid.setTileWidth(110);
         tileGrid.setTileHeight(100);
+        tileGrid.setBackgroundColor("#F5F5F5");
 
         tileGrid.setCanReorderTiles(true);
         tileGrid.setShowAllRecords(true);
@@ -87,6 +83,7 @@ public class LogsWindow extends Window {
 
         tileGrid.addRecordClickHandler(new RecordClickHandler() {
 
+            @Override
             public void onRecordClick(RecordClickEvent event) {
                 ApplicationTileRecord record = (ApplicationTileRecord) event.getRecord();
                 parse(record.getName());
@@ -96,6 +93,8 @@ public class LogsWindow extends Window {
                     new ApplicationTileRecord(ApplicationConstants.APP_SIMULATION_OUT, ApplicationConstants.APP_IMG_SIMULATION_OUT),
                     new ApplicationTileRecord(ApplicationConstants.APP_SIMULATION_ERROR, ApplicationConstants.APP_IMG_SIMULATION_ERROR)
                 });
+        
+        this.addMember(tileGrid);
     }
 
     private void parse(String applicationName) {
