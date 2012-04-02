@@ -411,8 +411,16 @@ public class SimulationGUIControlBox {
     public void enableView() {
 
         enable = true;
+//        if(simulatorSelectItem.getValueAsString() != "")
+//        {
+     //     launchTab = new LaunchTab(simulatorSelectItem.getValueAsString());
+//        }
+//        JavaScriptObject jsObj;
+//        ChangedEvent event = new ChangedEvent(jsObj);
+//        addChangedHandler(event);
         if (launchTab != null) {
-            Layout.getInstance().addTab(launchTab);
+         
+             Layout.getInstance().addTab(launchTab);
             refreshLaunchTabValue();
         }
     }
@@ -452,19 +460,25 @@ public class SimulationGUIControlBox {
 
             public void onSuccess(List<Application> result) {
 
-                String dynaStringTab[] = new String[result.size()];
+                String dynaStringTab[] = new String[result.size()+1];
+                dynaStringTab[0] =""; //To allow a first simulator selection
                 for (int i = 0; i < result.size(); i++) {
-                    dynaStringTab[i] = result.get(i).getName();
+                    dynaStringTab[i+1] = result.get(i).getName();
+                  //  logger.log(Level.SEVERE, result.get(i).getName());
                 }
-                 logger.log(Level.SEVERE, simulatorSelectItem.getName());
+                
+                // logger.log(Level.SEVERE, simulatorSelectItem.getName());
                 simulatorSelectItem.setValueMap(dynaStringTab);
                 simulatorSelectItem.setDefaultToFirstOption(true);
-                //launchTab = new LaunchTab(dynaStringTab[0]); 
-                //Layout.getInstance().addTab(launchTab);//applicationclass a la place de Id si on veut lance que la classe "simulation"
-                launchTab.setCanClose(false);
-                refreshLaunchTabValue();
+            //   launchTab = new LaunchTab(dynaStringTab[0]); 
+              //  Layout.getInstance().addTab(launchTab);//applicationclass a la place de Id si on veut lance que la classe "simulation"
+               // launchTab.setCanClose(false);
+                //refreshLaunchTabValue();
+                 launchTab = null;
             }
         };
         service.getApplicationsByClass(applicationClass, callback);
     }
+                 
+  
 }

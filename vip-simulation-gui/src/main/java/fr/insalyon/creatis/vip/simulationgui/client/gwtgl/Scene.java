@@ -64,6 +64,12 @@ import com.smartgwt.client.widgets.Canvas;
 import fr.insalyon.creatis.vip.simulationgui.client.util.math.FloatMatrix4x4;
 import fr.insalyon.creatis.vip.simulationgui.client.util.math.MatrixUtil;
 
+import java.util.ArrayList;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Kevin Moulin
@@ -74,10 +80,14 @@ public class Scene extends Canvas {
     private int vertexPositionAttribute[] = new int[6];
     private int vertexColorAttribute[] = new int[6];
     private int vertexNormalAttribute[] = new int[6];
-    private WebGLBuffer vertexBuffer[] = new WebGLBuffer[6];
+   private WebGLBuffer vertexBuffer[] = new WebGLBuffer[6];
     private WebGLBuffer indexBuffer[] = new WebGLBuffer[6];
     private WebGLBuffer colorBuffer[] = new WebGLBuffer[6];
-    private WebGLBuffer normalBuffer[] = new WebGLBuffer[6];
+   private WebGLBuffer normalBuffer[] = new WebGLBuffer[6];
+   // private WebGLBuffer vertexBuffer[];// = new WebGLBuffer[6];
+   // private WebGLBuffer indexBuffer[]; //= new WebGLBuffer[6];
+   // private WebGLBuffer colorBuffer[]; //= new WebGLBuffer[6];
+   // private WebGLBuffer normalBuffer[]; //= new WebGLBuffer[6];
     private WebGLUniformLocation projectionNormalUniform;
     private WebGLUniformLocation projectionMatrixUniform; //projection matrix
     private WebGLCanvas webGLCanvas = new WebGLCanvas("500px", "500px");
@@ -98,9 +108,11 @@ public class Scene extends Canvas {
     boolean checkMouse = false;
     // Minimun of object : camera and models
     private ObjectModel mod;
+    private ArrayList<ObjectModel> mods;
     private Camera cam;
     private int NUM_OBJECT = 5;
     private static Scene instance;
+    private Logger logger = null;
 
     public static Scene getInstance() {
 
@@ -114,6 +126,11 @@ public class Scene extends Canvas {
 
         cam = Camera.getInstance();
         mod = ObjectModel.getInstance();
+       
+//         vertexBuffer =  new WebGLBuffer[4 + mod.getChild() ];
+//      indexBuffer =  new WebGLBuffer[4 + mod.getChild() ];
+//     colorBuffer =  new WebGLBuffer[4 + mod.getChild() ];
+//     normalBuffer=  new WebGLBuffer[4 + mod.getChild() ];
 
         object[4] = mod;
         object[1] = object[2] = object[3] = object[0] = null;
@@ -128,7 +145,7 @@ public class Scene extends Canvas {
     }
 
     private void init() {
-
+         logger = Logger.getLogger("Simulation-gui");
         createShaderProgram();
         initParams();
         initBuffers();
@@ -162,6 +179,7 @@ public class Scene extends Canvas {
         checkErrors();
     }
 
+
     private void initBuffers() {
 
         // refresh the height context to the simulator child !
@@ -171,8 +189,10 @@ public class Scene extends Canvas {
                 // create the vertexBuffer
                 vertexBuffer[i] = glContext.createBuffer();
                 glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vertexBuffer[i]);
-
-
+                
+                float [] parser = object[i].getVertices();
+                logger.log(Level.SEVERE, String.valueOf(parser.length));
+                
                 glContext.bufferData(WebGLRenderingContext.ARRAY_BUFFER,
                         Float32Array.create(object[i].getVertices()),
                         WebGLRenderingContext.STATIC_DRAW);
@@ -202,8 +222,57 @@ public class Scene extends Canvas {
                 checkErrors();
             }
         }
+//        initModBuffers();
     }
 
+    
+//    
+//     private void initModBuffers() {
+//
+//        // refresh the height context to the simulator child !
+//        changeHeighContext(ObjectModel.getInstance().getBoundingBox());
+//        for (int i = 0; i <= mod.getChild(); i++) {
+//            if (mod.getObject(i) != null) {
+//                // create the vertexBuffer
+//                vertexBuffer[4 + i] = glContext.createBuffer();
+//                glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vertexBuffer[4+i]);
+//                
+//                float [] parser = mod.getObject(i).getVertices();
+//                logger.log(Level.SEVERE, String.valueOf(parser.length));
+//                
+//                glContext.bufferData(WebGLRenderingContext.ARRAY_BUFFER,
+//                        Float32Array.create(mod.getObject(i).getVertices()),
+//                        WebGLRenderingContext.STATIC_DRAW);
+//
+//                // create the colorBuffer
+//                colorBuffer[4 + i] = glContext.createBuffer();
+//                glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, colorBuffer[4 + i]);
+//
+//                glContext.bufferData(WebGLRenderingContext.ARRAY_BUFFER,
+//                        Float32Array.create(mod.getObject(i).getColors()),
+//                        WebGLRenderingContext.STATIC_DRAW);
+//
+//                // create the indexBuffer
+//                indexBuffer[4+i] = glContext.createBuffer();
+//                glContext.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, indexBuffer[4+i]);
+//
+//                glContext.bufferData(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER,
+//                        Uint16Array.create(mod.getObject(i).getIndices()),
+//                        WebGLRenderingContext.STATIC_DRAW);
+//                normalBuffer[4+i] = glContext.createBuffer();
+//                glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, normalBuffer[4+i]);
+//
+//                glContext.bufferData(WebGLRenderingContext.ARRAY_BUFFER,
+//                        Float32Array.create(mod.getObject(i).getNormals()),
+//                        WebGLRenderingContext.STATIC_DRAW);
+//
+//                checkErrors();
+//            }
+//        }
+//    }
+//    
+    
+    
     private void initControls() {
         
         // Handle keyboard input
@@ -377,8 +446,10 @@ public class Scene extends Canvas {
         
         // Create the Shader
         WebGLShader fragmentShader = getShader(WebGLRenderingContext.FRAGMENT_SHADER, Shader.INSTANCE.fragmentShader().getText());
-        log("Created fragment shader");
+        logger.info("Created fragment shader");
+        GWT.log("Created fragment shader", null);
 
+        logger.log(Level.SEVERE, "this message should get logged");        
         WebGLShader vertexShader = getShader(WebGLRenderingContext.VERTEX_SHADER, Shader.INSTANCE.vertexShader().getText());
         log("Created vertex shader");
         if (vertexShader == null || fragmentShader == null) {
