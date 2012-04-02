@@ -79,6 +79,8 @@ public interface WorkflowServiceAsync {
     public void cleanWorkflow(String simulationID, AsyncCallback<Void> asyncCallback);
 
     public void purgeWorkflow(String simulationID, AsyncCallback<Void> asyncCallback);
+    
+    public void relaunchSimulation(String simulationID, AsyncCallback<Map<String, String>> asyncCallback);
 
     public void getSimulations(String user, String application, String status, Date startDate, Date endDate, AsyncCallback<List<Simulation>> asyncCallback);
     

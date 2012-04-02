@@ -86,8 +86,6 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
 
     public abstract void loadInput(String name, String values);
 
-    protected abstract void loadData();
-
     protected abstract Map<String, String> getParametersMap();
 
     protected HLayout getSimulatioNameLayout() {
@@ -112,6 +110,7 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
         launchButton.setIcon(ApplicationConstants.ICON_LAUNCH);
         launchButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 if (validate()) {
                     launch();
@@ -129,6 +128,7 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
         saveButton.setIcon(CoreConstants.ICON_SAVED);
         saveButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 if (validate()) {
                     verifySimulationName();
@@ -147,6 +147,7 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
                 + "be available for all users.");
         saveButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 if (validate()) {
                     saveInputsAsExample();
@@ -181,6 +182,7 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<SimulationInput> callback = new AsyncCallback<SimulationInput>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 if (!caught.getMessage().contains("No data is available")) {
@@ -190,13 +192,15 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
                 }
             }
 
+            @Override
             public void onSuccess(SimulationInput result) {
                 modal.hide();
                 SC.ask("A simulation entitled \"" + getSimulationName() + "\" "
                         + "already exists. <br />Do you want to ovewrite the input data?", new BooleanCallback() {
 
+                    @Override
                     public void execute(Boolean value) {
-                        if (value != null && value) {
+                        if (value) {
                             saveInputs(true);
                         }
                     }
@@ -212,11 +216,13 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to save simulation inputs:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
                 AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().
                         getTab(ApplicationConstants.getLaunchTabID(applicationName));
@@ -239,11 +245,13 @@ public abstract class AbstractLaunchStackSection extends SectionStackSection {
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to save simulation inputs:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
                 AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().
                         getTab(ApplicationConstants.getLaunchTabID(applicationName));

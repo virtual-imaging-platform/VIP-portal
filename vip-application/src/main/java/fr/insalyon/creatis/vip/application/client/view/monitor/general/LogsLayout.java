@@ -54,7 +54,7 @@ public class LogsLayout extends AbstractFormLayout {
 
     public LogsLayout(String simulationID) {
 
-        super("100%", "155px");
+        super("100%", "145px");
         addTitle("Simulation Logs", ApplicationConstants.ICON_LOG);
 
         this.simulationID = simulationID;
@@ -67,7 +67,7 @@ public class LogsLayout extends AbstractFormLayout {
         tileGrid.setWidth100();
         tileGrid.setHeight100();
         tileGrid.setTileWidth(110);
-        tileGrid.setTileHeight(100);
+        tileGrid.setTileHeight(90);
         tileGrid.setBackgroundColor("#F5F5F5");
 
         tileGrid.setCanReorderTiles(true);

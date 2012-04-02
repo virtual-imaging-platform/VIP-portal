@@ -418,12 +418,33 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param simulationID
      * @throws ApplicationException
      */
+    @Override
     public void purgeWorkflow(String simulationID) throws ApplicationException {
 
         try {
             trace(logger, "Purging simulation '" + simulationID + "'.");
             workflowBusiness.purge(simulationID);
 
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+    
+    /**
+     * 
+     * @param simulationID
+     * @return
+     * @throws ApplicationException 
+     */
+    @Override
+    public Map<String, String> relaunchSimulation(String simulationID) throws ApplicationException {
+        
+        try {
+            trace(logger, "Relaunching simulation '" + simulationID + "'.");
+            return workflowBusiness.relaunch(simulationID, getSessionUser().getFolder());
+            
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
         } catch (BusinessException ex) {
@@ -441,6 +462,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @return
      * @throws ApplicationException
      */
+    @Override
     public List<Simulation> getSimulations(String userName, String application,
             String status, Date startDate, Date endDate) throws ApplicationException {
 

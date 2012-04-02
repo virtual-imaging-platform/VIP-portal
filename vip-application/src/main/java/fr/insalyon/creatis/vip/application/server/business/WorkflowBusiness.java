@@ -45,6 +45,7 @@ import fr.insalyon.creatis.vip.application.server.business.simulation.MoteurPool
 import fr.insalyon.creatis.vip.application.server.business.simulation.MoteurWSConfig;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.GwendiaParser;
+import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputM2Parser;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.ScuflParser;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAO;
@@ -304,6 +305,21 @@ public class WorkflowBusiness {
 
     /**
      *
+     * @param simulationID
+     * @param currentUserFolder
+     * @return
+     * @throws BusinessException
+     */
+    public Map<String, String> relaunch(String simulationID, String currentUserFolder) throws BusinessException {
+
+        Map<String, String> inputs = new InputM2Parser(currentUserFolder).parse(
+                Server.getInstance().getWorkflowsPath() + "/" + simulationID + "/input-m2.xml");
+
+        return inputs;
+    }
+
+    /**
+     *
      * @param userName
      * @param application
      * @param status
@@ -479,11 +495,11 @@ public class WorkflowBusiness {
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @param currentUserFolder
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public List<InOutData> getInputData(String simulationID, String currentUserFolder) throws BusinessException {
 

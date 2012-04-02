@@ -141,19 +141,22 @@ public class SimulationsTab extends Tab {
 
         rowContextClickHandler = grid.addRowContextClickHandler(new RowContextClickHandler() {
 
+            @Override
             public void onRowContextClick(RowContextClickEvent event) {
                 event.cancel();
                 String simulationId = event.getRecord().getAttribute("simulationId");
                 String title = event.getRecord().getAttribute("simulationName");
+                String applicationName = event.getRecord().getAttribute("application");
                 SimulationStatus status = SimulationStatus.valueOf(
                         event.getRecord().getAttribute("status"));
                 
                 new SimulationsContextMenu(modal, simulationId, title, 
-                        status).showContextMenu();
+                        status, applicationName).showContextMenu();
             }
         });
         rowMouseDownHandler = grid.addRowMouseDownHandler(new RowMouseDownHandler() {
 
+            @Override
             public void onRowMouseDown(RowMouseDownEvent event) {
                 if (event.getColNum() != 1) {
                     String simulationID = event.getRecord().getAttribute("simulationId");
@@ -173,10 +176,12 @@ public class SimulationsTab extends Tab {
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<List<Simulation>> callback = new AsyncCallback<List<Simulation>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 SC.warn("Unable to get simulations list:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<Simulation> result) {
 
                 List<SimulationRecord> dataList = new ArrayList<SimulationRecord>();

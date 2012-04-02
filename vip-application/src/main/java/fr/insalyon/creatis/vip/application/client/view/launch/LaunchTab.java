@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
+import java.util.Map;
 
 /**
  *
@@ -44,11 +45,16 @@ public class LaunchTab extends AbstractLaunchTab {
 
     public LaunchTab(String applicationName) {
 
+        this(applicationName, null, null);
+    }
+    
+    public LaunchTab(String applicationName, String simulationName, Map<String, String> inputs) {
+        
         super(applicationName);
-
+        
         sectionStack.clear();
-
-        addLaunchSection(applicationName);
+        
+        addLaunchSection(applicationName, simulationName, inputs);
     }
 
     /**
@@ -68,12 +74,16 @@ public class LaunchTab extends AbstractLaunchTab {
     }
 
     /**
-     *
+     * 
      * @param applicationName
+     * @param simulationName
+     * @param inputs 
      */
-    private void addLaunchSection(String applicationName) {
+    private void addLaunchSection(String applicationName, String simulationName, 
+            Map<String, String> inputs) {
 
-        launchSection = new LaunchStackSection(applicationName, this.getID());
+        launchSection = new LaunchStackSection(applicationName, this.getID(), 
+                simulationName, inputs);
         sectionStack.addSection(launchSection);
     }
 

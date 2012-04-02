@@ -58,19 +58,20 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
     private LaunchFormLayout launchFormLayout;
     private InputsLayout inputsLayout;
 
-    public LaunchStackSection(String applicationName, String tabID) {
+    public LaunchStackSection(String applicationName, String tabID,
+            String simulationName, Map<String, String> inputs) {
 
         super(applicationName);
-        
+
         this.tabID = tabID;
-        
+
         hLayout = new HLayout(10);
         hLayout.setWidth100();
         hLayout.setHeight100();
-        
+
         vLayout.addMember(hLayout);
-        
-        loadData();
+
+        loadData(simulationName, inputs);
     }
 
     /**
@@ -78,6 +79,7 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
      *
      * @param values Input values
      */
+    @Override
     public void loadInput(String name, String values) {
 
         Map<String, String> valuesMap = new HashMap<String, String>();
@@ -109,16 +111,18 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
     /**
      * Loads simulation sources list.
      */
-    protected void loadData() {
+    protected void loadData(final String simulationName, final Map<String, String> inputs) {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Descriptor> callback = new AsyncCallback<Descriptor>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to download application source file:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Descriptor descriptor) {
 
                 launchFormLayout = new LaunchFormLayout(applicationName, null, descriptor.getDescription());
@@ -137,9 +141,13 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
 
                 modal.hide();
                 modal = launchFormLayout.getModal();
-                
+
                 inputsLayout = new InputsLayout(tabID);
                 hLayout.addMember(inputsLayout);
+                
+                if (simulationName != null) {
+                    launchFormLayout.loadInputs(simulationName, inputs);
+                }
             }
         };
         modal.show("Loading launch panel...", true);
@@ -180,11 +188,13 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
             WorkflowServiceAsync service = WorkflowService.Util.getInstance();
             final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+                @Override
                 public void onFailure(Throwable caught) {
                     modal.hide();
                     SC.warn("Error on input data:<br />" + caught.getMessage());
                 }
 
+                @Override
                 public void onSuccess(Void result) {
                     submit();
                 }
@@ -203,11 +213,13 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to launch the simulation:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
                 modal.hide();
                 SC.say("Simulation '" + getSimulationName() + "' successfully launched.");
@@ -228,9 +240,9 @@ public class LaunchStackSection extends AbstractLaunchStackSection {
 
         return launchFormLayout.getSimulationName();
     }
-    
+
     public void loadInputsList() {
-        
+
         inputsLayout.loadData();
     }
 }
