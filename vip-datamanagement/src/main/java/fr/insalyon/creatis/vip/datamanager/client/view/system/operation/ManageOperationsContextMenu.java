@@ -32,21 +32,18 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client.view.operation;
+package fr.insalyon.creatis.vip.datamanager.client.view.system.operation;
 
-import fr.insalyon.creatis.vip.datamanager.client.view.system.operation.OperationRecord;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
@@ -55,36 +52,13 @@ import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
  *
  * @author Rafael Silva
  */
-public class OperationContextMenu extends Menu {
+public class ManageOperationsContextMenu extends Menu {
 
-    public OperationContextMenu(final ModalWindow modal, final OperationRecord operation) {
+    public ManageOperationsContextMenu(final ModalWindow modal, final OperationRecord operation) {
 
         this.setShowShadow(true);
         this.setShadowDepth(10);
         this.setWidth(90);
-
-        MenuItem downloadItem = new MenuItem("Download");
-        downloadItem.setIcon(DataManagerConstants.ICON_DOWNLOAD);
-        downloadItem.addClickHandler(new ClickHandler() {
-
-            public void onClick(MenuItemClickEvent event) {
-                if (operation.getStatus().equals("Done")) {
-                    Window.open(
-                            GWT.getModuleBaseURL()
-                            + "/filedownloadservice?operationid="
-                            + operation.getId(),
-                            "", "");
-                }
-            }
-        });
-
-        MenuItem viewItem = new MenuItem("View Details");
-        viewItem.addClickHandler(new ClickHandler() {
-
-            public void onClick(MenuItemClickEvent event) {
-                new OperationDetailsWindow(operation).show();
-            }
-        });
 
         MenuItem clearItem = new MenuItem("Clear Operation");
         clearItem.setIcon(CoreConstants.ICON_CLEAR);
@@ -95,35 +69,27 @@ public class OperationContextMenu extends Menu {
 
                     public void execute(Boolean value) {
                         if (value != null && value) {
-                            if (!operation.getStatus().equals("Running")) {
-                                DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-                                AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+                            DataManagerServiceAsync service = DataManagerService.Util.getInstance();
+                            AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
-                                    public void onFailure(Throwable caught) {
-                                        modal.hide();
-                                        SC.warn("Unable to clear operations:<br />" + caught.getMessage());
-                                    }
+                                public void onFailure(Throwable caught) {
+                                    modal.hide();
+                                    SC.warn("Error executing clear operations: " + caught.getMessage());
+                                }
 
-                                    public void onSuccess(Void result) {
-                                        modal.hide();
-                                        OperationLayout.getInstance().loadData();
-                                    }
-                                };
-                                modal.show("Clearing operation...", true);
-                                service.removeOperationById(operation.getId(), callback);
-                            }
+                                public void onSuccess(Void result) {
+                                    modal.hide();
+                                    ManageOperationsTab tab = (ManageOperationsTab) Layout.getInstance().getTab(DataManagerConstants.TAB_MANAGE_OPERATIONS);
+                                    tab.loadData();
+                                }
+                            };
+                            modal.show("Clearing operation...", true);
+                            service.removeOperationById(operation.getId(), callback);
                         }
                     }
                 });
             }
         });
-
-        MenuItemSeparator separator = new MenuItemSeparator();
-
-        if (operation.getType().equals("Download") && operation.getStatus().equals("Done")) {
-            this.setItems(downloadItem, separator, viewItem, clearItem);
-        } else {
-            this.setItems(viewItem, clearItem);
-        }
+        this.setItems(clearItem);
     }
 }

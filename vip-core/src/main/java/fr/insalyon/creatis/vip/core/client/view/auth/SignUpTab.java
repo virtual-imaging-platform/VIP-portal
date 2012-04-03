@@ -53,6 +53,7 @@ import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.ValidatorUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
@@ -71,6 +72,7 @@ public class SignUpTab extends Tab {
     private TextItem confirmEmailField;
     private TextItem institutionField;
     private TextItem phoneField;
+    private SelectItem countryField;
     private PasswordItem passwordField;
     private PasswordItem confirmPasswordField;
     private RadioGroupItem accountRadioGroupItem;
@@ -113,6 +115,14 @@ public class SignUpTab extends Tab {
 
         institutionField = FieldUtil.getTextItem(300, false, "", null);
         phoneField = FieldUtil.getTextItem(150, false, "", "[0-9\\(\\)\\-+. ]");
+        
+        countryField = new SelectItem();
+        countryField.setShowTitle(false);
+        countryField.setValueMap(CountryCode.getCountriesMap());
+        countryField.setValueIcons(CountryCode.getCodesMap());
+        countryField.setImageURLPrefix(CoreConstants.FOLDER_FLAGS);  
+        countryField.setImageURLSuffix(".png");
+        countryField.setRequired(true);
 
         passwordField = FieldUtil.getPasswordItem(150, 32);
         confirmPasswordField = FieldUtil.getPasswordItem(150, 32);
@@ -143,6 +153,7 @@ public class SignUpTab extends Tab {
                 if (firstNameField.validate() & lastNameField.validate()
                         & emailField.validate() & confirmEmailField.validate()
                         & institutionField.validate() & phoneField.validate()
+                        & countryField.validate()
                         & passwordField.validate() & confirmPasswordField.validate()
                         & accountRadioGroupItem.validate() & acceptField.validate()
                         & acceptField.getValueAsBoolean()) {
@@ -165,7 +176,8 @@ public class SignUpTab extends Tab {
                             emailField.getValueAsString().trim(),
                             institutionField.getValueAsString().trim(),
                             passwordField.getValueAsString(),
-                            phoneField.getValueAsString().trim());
+                            phoneField.getValueAsString().trim(),
+                            CountryCode.valueOf(countryField.getValueAsString()));
 
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
                     final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
@@ -199,6 +211,7 @@ public class SignUpTab extends Tab {
         WidgetUtil.addFieldToVIPLayout(signupLayout, "Re-enter E-mail", confirmEmailField);
         WidgetUtil.addFieldToVIPLayout(signupLayout, "Institution", institutionField);
         WidgetUtil.addFieldToVIPLayout(signupLayout, "Phone", phoneField);
+        WidgetUtil.addFieldToVIPLayout(signupLayout, "Country", countryField);
         WidgetUtil.addFieldToVIPLayout(signupLayout, "Password", passwordField);
         WidgetUtil.addFieldToVIPLayout(signupLayout, "Re-enter Password", confirmPasswordField);
         WidgetUtil.addFieldToVIPLayout(signupLayout, "Account Type", accountRadioGroupItem);

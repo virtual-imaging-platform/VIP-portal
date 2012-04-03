@@ -35,54 +35,45 @@
 package fr.insalyon.creatis.vip.core.client.view.system.user;
 
 import com.smartgwt.client.types.VisibilityMode;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.SectionStack;
-import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
 
 /**
  *
  * @author Rafael Silva
  */
-public class ManageUsersTab extends Tab {
+public class ManageUsersTab extends AbstractManageTab {
 
-    private ToolStrip toolStrip;
     private UsersStackSection usersStackSection;
     private EditUserStackSection editStackSection;
 
     public ManageUsersTab() {
 
-        this.setTitle(Canvas.imgHTML(CoreConstants.ICON_USER) + " " + CoreConstants.APP_USER);
-        this.setID(CoreConstants.TAB_MANAGE_USERS);
-        this.setCanClose(true);
-        this.setIcon(CoreConstants.ICON_USER);
-
-        VLayout vLayout = new VLayout();
+        super(CoreConstants.ICON_USER, CoreConstants.APP_USER, CoreConstants.TAB_MANAGE_USERS);
 
         toolStrip = new ManageUsersToolStrip();
         vLayout.addMember(toolStrip);
+
+        usersStackSection = new UsersStackSection();
+        editStackSection = new EditUserStackSection();
 
         SectionStack sectionStack = new SectionStack();
         sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
         sectionStack.setAnimateSections(true);
         sectionStack.setCanResizeSections(true);
-
-        usersStackSection = new UsersStackSection();
-        editStackSection = new EditUserStackSection();
-
         sectionStack.setSections(usersStackSection, editStackSection);
+        
         vLayout.addMember(sectionStack);
-
-        this.setPane(vLayout);
     }
 
     public void loadUsers() {
         usersStackSection.loadData();
     }
 
-    public void setUser(String email, boolean confirmed, String level) {
-        editStackSection.setUser(email, confirmed, level);
+    public void setUser(String email, boolean confirmed, String level, 
+            String countryCode) {
+        
+        editStackSection.setUser(email, confirmed, level, countryCode);
     }
 }

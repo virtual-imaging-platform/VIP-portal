@@ -36,7 +36,7 @@ package fr.insalyon.creatis.vip.application.client.view.monitor.record;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.util.ParserUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 
 /**
  *
@@ -54,8 +54,13 @@ public class LocationRecord extends ListGridRecord {
     public LocationRecord(String icon, int jobs) {
 
         setAttribute(ATT_ICON, CoreConstants.FOLDER_FLAGS + icon);
-        setAttribute(ATT_COUNTRY, ParserUtil.parseLocation(icon));
         setAttribute(ATT_JOBS, jobs);
+        
+        try {
+            setAttribute(ATT_COUNTRY, CountryCode.valueOf(icon).getCountryName());
+        } catch (IllegalArgumentException ex) {
+            setAttribute(ATT_COUNTRY, "Unknown");
+        }
     }
 
     public String getCountry() {

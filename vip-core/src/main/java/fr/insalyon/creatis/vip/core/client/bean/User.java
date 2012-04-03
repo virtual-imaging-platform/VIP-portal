@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.core.client.bean;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import java.util.Date;
 import java.util.Map;
 
@@ -58,26 +59,30 @@ public class User implements IsSerializable {
     private String session;
     private Date lastLogin;
     private UserLevel level;
+    private CountryCode countryCode;
     private Map<String, GROUP_ROLE> groups;
 
     public User() {
     }
 
     public User(String firstName, String lastName, String email, String institution,
-            String phone, UserLevel level) {
+            String phone, UserLevel level, CountryCode countryCode) {
 
-        this(firstName, lastName, email, institution, "", phone, false, "", "", "", null, level);
+        this(firstName, lastName, email, institution, "", phone, false, "", "",
+                "", null, level, countryCode);
     }
 
     public User(String firstName, String lastName, String email, String institution,
-            String password, String phone) {
+            String password, String phone, CountryCode countryCode) {
 
-        this(firstName, lastName, email, institution, password, phone, false, "", "", "", null, null);
+        this(firstName, lastName, email, institution, password, phone, false,
+                "", "", "", null, null, countryCode);
     }
 
-    public User(String firstName, String lastName, String email, String institution,
-            String password, String phone, boolean confirmed, String code,
-            String folder, String session, Date lastLogin, UserLevel level) {
+    public User(String firstName, String lastName, String email,
+            String institution, String password, String phone, boolean confirmed,
+            String code, String folder, String session, Date lastLogin,
+            UserLevel level, CountryCode countryCode) {
 
         this.firstName = firstName;
         this.lastName = lastName;
@@ -91,6 +96,7 @@ public class User implements IsSerializable {
         this.session = session;
         this.lastLogin = lastLogin;
         this.level = level;
+        this.countryCode = countryCode;
     }
 
     public boolean isConfirmed() {
@@ -167,6 +173,14 @@ public class User implements IsSerializable {
 
     public void setLevel(UserLevel level) {
         this.level = level;
+    }
+
+    public CountryCode getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(CountryCode countryCode) {
+        this.countryCode = countryCode;
     }
 
     public void setGroups(Map<String, GROUP_ROLE> groups) {

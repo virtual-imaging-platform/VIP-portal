@@ -32,28 +32,31 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client.view.operation;
+package fr.insalyon.creatis.vip.datamanager.client.view.system.zombie;
 
-import fr.insalyon.creatis.vip.datamanager.client.view.system.operation.OperationRecord;
-import fr.insalyon.creatis.vip.core.client.view.property.AbstractPropertyWindow;
-import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
+import java.util.Date;
 
 /**
  *
  * @author Rafael Silva
  */
-public class OperationDetailsWindow extends AbstractPropertyWindow {
+public class ZombieFileRecord extends ListGridRecord {
 
-    public OperationDetailsWindow(OperationRecord operation) {
-
-        super("Operation Details", 550, 200);
-
-        grid.setData(new PropertyRecord[]{
-            new PropertyRecord("Type", operation.getType()),
-            new PropertyRecord("Status", operation.getStatus()),
-            new PropertyRecord("Source", operation.getSource()),
-            new PropertyRecord("Destination", operation.getDestination()),
-            new PropertyRecord("Date", operation.getDate())
-        });
+    public ZombieFileRecord() {
+    }
+ 
+    public ZombieFileRecord(String surl, Date registration) {
+        
+        setAttribute("surl", surl);
+        setAttribute("date", registration);
+    }
+    
+    public String getSURL() {
+        return getAttributeAsString("surl");
+    }
+       
+    public Date getRegistration() {
+        return getAttributeAsDate("date");
     }
 }

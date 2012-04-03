@@ -32,28 +32,15 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client.view.operation;
 
-import fr.insalyon.creatis.vip.datamanager.client.view.system.operation.OperationRecord;
-import fr.insalyon.creatis.vip.core.client.view.property.AbstractPropertyWindow;
-import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
+package fr.insalyon.creatis.vip.core.client.view.system.tip;
+
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
 
 /**
  *
  * @author Rafael Silva
  */
-public class OperationDetailsWindow extends AbstractPropertyWindow {
+public class ManageTipsToolStrip extends ToolStrip {
 
-    public OperationDetailsWindow(OperationRecord operation) {
-
-        super("Operation Details", 550, 200);
-
-        grid.setData(new PropertyRecord[]{
-            new PropertyRecord("Type", operation.getType()),
-            new PropertyRecord("Status", operation.getStatus()),
-            new PropertyRecord("Source", operation.getSource()),
-            new PropertyRecord("Destination", operation.getDestination()),
-            new PropertyRecord("Date", operation.getDate())
-        });
-    }
 }

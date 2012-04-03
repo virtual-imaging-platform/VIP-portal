@@ -32,28 +32,20 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client.view.operation;
+package fr.insalyon.creatis.vip.core.client.view.system.tip;
 
-import fr.insalyon.creatis.vip.datamanager.client.view.system.operation.OperationRecord;
-import fr.insalyon.creatis.vip.core.client.view.property.AbstractPropertyWindow;
-import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
 
 /**
  *
  * @author Rafael Silva
  */
-public class OperationDetailsWindow extends AbstractPropertyWindow {
+public class ManageTipsTab extends AbstractManageTab {
 
-    public OperationDetailsWindow(OperationRecord operation) {
+    public ManageTipsTab() {
 
-        super("Operation Details", 550, 200);
-
-        grid.setData(new PropertyRecord[]{
-            new PropertyRecord("Type", operation.getType()),
-            new PropertyRecord("Status", operation.getStatus()),
-            new PropertyRecord("Source", operation.getSource()),
-            new PropertyRecord("Destination", operation.getDestination()),
-            new PropertyRecord("Date", operation.getDate())
-        });
+        super(CoreConstants.ICON_TIP, CoreConstants.APP_TIP, CoreConstants.TAB_MANAGE_TIPS);
+        
     }
 }

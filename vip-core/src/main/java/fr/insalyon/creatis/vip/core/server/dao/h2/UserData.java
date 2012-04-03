@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.core.server.dao.h2;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import java.sql.*;
@@ -64,14 +65,15 @@ public class UserData implements UserDAO {
      * @param code
      * @return
      */
+    @Override
     public void add(User user) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement(
                     "INSERT INTO VIPUsers("
                     + "email, pass, first_name, last_name, institution, phone, "
-                    + "code, confirmed, folder, last_login, level) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    + "code, confirmed, folder, last_login, level, country_code) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getPassword());
@@ -84,6 +86,7 @@ public class UserData implements UserDAO {
             ps.setString(9, user.getFolder());
             ps.setTimestamp(10, new Timestamp(user.getLastLogin().getTime()));
             ps.setString(11, user.getLevel().name());
+            ps.setString(12, user.getCountryCode().name());
             ps.execute();
 
         } catch (SQLException ex) {
@@ -104,6 +107,7 @@ public class UserData implements UserDAO {
      * @return
      * @throws DAOException
      */
+    @Override
     public boolean authenticate(String email, String password) throws DAOException {
 
         try {
@@ -134,6 +138,7 @@ public class UserData implements UserDAO {
      * @return
      * @throws DAOException
      */
+    @Override
     public boolean activate(String email, String code) throws DAOException {
 
         try {
@@ -171,12 +176,14 @@ public class UserData implements UserDAO {
      * @return
      * @throws DAOException
      */
+    @Override
     public User getUser(String email) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
-                    + "code, confirmed, folder, session, last_login, level "
+                    + "code, confirmed, folder, session, last_login, level, "
+                    + "country_code "
                     + "FROM VIPUsers "
                     + "WHERE email=?");
 
@@ -191,7 +198,8 @@ public class UserData implements UserDAO {
                         rs.getString("code"), rs.getString("folder"),
                         rs.getString("session"),
                         new Date(rs.getTimestamp("last_login").getTime()),
-                        UserLevel.valueOf(rs.getString("level")));
+                        UserLevel.valueOf(rs.getString("level")),
+                        CountryCode.valueOf(rs.getString("country_code")));
             }
 
             logger.error("There is no user registered with the e-mail: " + email);
@@ -207,12 +215,14 @@ public class UserData implements UserDAO {
      *
      * @return @throws DAOException
      */
+    @Override
     public List<User> getUsers() throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
-                    + "code, confirmed, folder, last_login, level "
+                    + "code, confirmed, folder, last_login, level, "
+                    + "country_code "
                     + "FROM VIPUsers "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
 
@@ -226,7 +236,8 @@ public class UserData implements UserDAO {
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"), "",
                         new Date(rs.getTimestamp("last_login").getTime()),
-                        UserLevel.valueOf(rs.getString("level"))));
+                        UserLevel.valueOf(rs.getString("level")),
+                        CountryCode.valueOf(rs.getString("country_code"))));
             }
             return users;
 
@@ -241,6 +252,7 @@ public class UserData implements UserDAO {
      * @param email
      * @throws DAOException
      */
+    @Override
     public void remove(String email) throws DAOException {
         try {
             PreparedStatement ps = connection.prepareStatement("DELETE "
@@ -260,13 +272,14 @@ public class UserData implements UserDAO {
      * @param user
      * @throws DAOException
      */
+    @Override
     public void update(User user) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
                     + "VIPUsers SET "
                     + "first_name = ?, last_name = ?, institution = ?, "
-                    + "phone = ?, folder = ? "
+                    + "phone = ?, folder = ?, country_code = ? "
                     + "WHERE email = ?");
 
             ps.setString(1, user.getFirstName());
@@ -274,7 +287,8 @@ public class UserData implements UserDAO {
             ps.setString(3, user.getInstitution());
             ps.setString(4, user.getPhone());
             ps.setString(5, user.getFolder());
-            ps.setString(6, user.getEmail());
+            ps.setString(6, user.getCountryCode().name());
+            ps.setString(7, user.getEmail());
 
             ps.executeUpdate();
 
@@ -291,6 +305,7 @@ public class UserData implements UserDAO {
      * @param newPassword
      * @throws DAOException
      */
+    @Override
     public void updatePassword(String email, String currentPassword,
             String newPassword) throws DAOException {
 
@@ -320,6 +335,7 @@ public class UserData implements UserDAO {
      * @param session
      * @throws DAOException
      */
+    @Override
     public void updateSession(String email, String session) throws DAOException {
 
         try {
@@ -344,6 +360,7 @@ public class UserData implements UserDAO {
      * @return
      * @throws DAOException
      */
+    @Override
     public boolean verifySession(String email, String session) throws DAOException {
 
         try {
@@ -373,6 +390,7 @@ public class UserData implements UserDAO {
      * @param lastLogin
      * @throws DAOException
      */
+    @Override
     public void updateLastLogin(String email, Date lastLogin) throws DAOException {
 
         try {
@@ -396,12 +414,14 @@ public class UserData implements UserDAO {
      * @return
      * @throws DAOException
      */
+    @Override
     public User getUserBySession(String session) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
-                    + "code, confirmed, folder, session, last_login, level "
+                    + "code, confirmed, folder, session, last_login, level, "
+                    + "country_code "
                     + "FROM VIPUsers "
                     + "WHERE session = ?");
 
@@ -416,7 +436,8 @@ public class UserData implements UserDAO {
                         rs.getString("code"), rs.getString("folder"),
                         rs.getString("session"),
                         new Date(rs.getTimestamp("last_login").getTime()),
-                        UserLevel.valueOf(rs.getString("level")));
+                        UserLevel.valueOf(rs.getString("level")),
+                        CountryCode.valueOf(rs.getString("country_code")));
             }
 
             logger.error("There is no user registered with the session: " + session);
@@ -432,12 +453,14 @@ public class UserData implements UserDAO {
      *
      * @return @throws DAOException
      */
+    @Override
     public List<User> getAdministrators() throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
-                    + "code, confirmed, folder, last_login, level "
+                    + "code, confirmed, folder, last_login, level, "
+                    + "country_code "
                     + "FROM VIPUsers WHERE level = ? "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
             ps.setString(1, UserLevel.Administrator.name());
@@ -452,7 +475,8 @@ public class UserData implements UserDAO {
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"), "",
                         new Date(rs.getTimestamp("last_login").getTime()),
-                        UserLevel.valueOf(rs.getString("level"))));
+                        UserLevel.valueOf(rs.getString("level")),
+                        CountryCode.valueOf("country_code")));
             }
             return users;
 
@@ -466,15 +490,19 @@ public class UserData implements UserDAO {
      *
      * @param email
      * @param level
+     * @param countryCode
      * @throws DAOException
      */
-    public void updateLevel(String email, UserLevel level) throws DAOException {
+    @Override
+    public void update(String email, UserLevel level, CountryCode countryCode) 
+            throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
-                    + "VIPUsers SET level = ? WHERE email = ?");
+                    + "VIPUsers SET level = ?, country_code = ? WHERE email = ?");
             ps.setString(1, level.name());
-            ps.setString(2, email);
+            ps.setString(2, countryCode.name());
+            ps.setString(3, email);
 
             ps.executeUpdate();
 

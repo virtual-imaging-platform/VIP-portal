@@ -42,6 +42,7 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.proxy.ProxyClient;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
@@ -169,6 +170,7 @@ public class ConfigurationBusiness {
                     + "<p><b>Email:</b> " + user.getEmail() + "</p>"
                     + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
                     + "<p><b>Phone:</b> " + user.getPhone() + "</p>"
+                    + "<p><b>Country:</b> " + user.getCountryCode().getCountryName() + "</p>"
                     + "<p><b>Account Type:</b> " + accountType + "</p>"
                     + "<p><b>Comments:</b><br />" + comments + "</p>"
                     + "<p>&nbsp;</p>"
@@ -739,12 +741,13 @@ public class ConfigurationBusiness {
      *
      * @param email
      * @param level
+     * @param countryCode
      * @throws BusinessException
      */
-    public void updateUserLevel(String email, UserLevel level) throws BusinessException {
+    public void updateUser(String email, UserLevel level, CountryCode countryCode) throws BusinessException {
         
         try {
-            CoreDAOFactory.getDAOFactory().getUserDAO().updateLevel(email, level);
+            CoreDAOFactory.getDAOFactory().getUserDAO().update(email, level, countryCode);
             
         } catch (DAOException ex) {
             throw new BusinessException(ex);

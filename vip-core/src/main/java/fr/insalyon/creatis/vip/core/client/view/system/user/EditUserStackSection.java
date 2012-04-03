@@ -54,6 +54,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,6 +72,7 @@ public class EditUserStackSection extends SectionStackSection {
     private TextItem emailField;
     private SelectItem levelPickList;
     private SelectItem groupsPickList;
+    private SelectItem countryPickList;
     private CheckboxItem confirmedField;
 
     public EditUserStackSection() {
@@ -113,6 +115,14 @@ public class EditUserStackSection extends SectionStackSection {
         groupsPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
         groupsPickList.setWidth(350);
 
+        countryPickList = new SelectItem();
+        countryPickList.setTitle("Country");
+        countryPickList.setValueMap(CountryCode.getCountriesMap());
+        countryPickList.setValueIcons(CountryCode.getCodesMap());
+        countryPickList.setImageURLPrefix(CoreConstants.FOLDER_FLAGS);
+        countryPickList.setImageURLSuffix(".png");
+        countryPickList.setRequired(true);
+        
         confirmedField = new CheckboxItem();
         confirmedField.setTitle("Confirmed");
         confirmedField.setDisabled(true);
@@ -121,6 +131,7 @@ public class EditUserStackSection extends SectionStackSection {
         saveItem.setWidth(50);
         saveItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 if (form.validate()) {
 
@@ -145,12 +156,14 @@ public class EditUserStackSection extends SectionStackSection {
                     }
                     save(emailField.getValueAsString().trim(),
                             UserLevel.valueOf(levelPickList.getValueAsString()),
+                            CountryCode.valueOf(countryPickList.getValueAsString()),
                             map);
                 }
             }
         });
 
-        form.setFields(emailField, levelPickList, groupsPickList, confirmedField, saveItem);
+        form.setFields(emailField, levelPickList, groupsPickList, countryPickList, 
+                confirmedField, saveItem);
     }
 
     /**
@@ -159,21 +172,25 @@ public class EditUserStackSection extends SectionStackSection {
      * @param email User's email
      * @param confirmed If the user confirmed his account
      * @param level User's level
+     * @param countryCode User's country code
      */
-    public void setUser(String email, boolean confirmed, String level) {
+    public void setUser(String email, boolean confirmed, String level, String countryCode) {
 
         this.emailField.setValue(email);
         this.confirmedField.setValue(confirmed);
         this.levelPickList.setValue(level);
+        this.countryPickList.setValue(countryCode);
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<Map<String, CoreConstants.GROUP_ROLE>> callback = new AsyncCallback<Map<String, CoreConstants.GROUP_ROLE>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to get list of groups:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Map<String, GROUP_ROLE> result) {
                 modal.hide();
 
@@ -205,29 +222,32 @@ public class EditUserStackSection extends SectionStackSection {
      * @param level User's level
      * @param groups List of groups
      */
-    private void save(String email, UserLevel level,
+    private void save(String email, UserLevel level, CountryCode countryCode,
             Map<String, CoreConstants.GROUP_ROLE> groups) {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to update user:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
                 modal.hide();
                 emailField.setValue("");
                 levelPickList.setValues(new String[]{});
                 groupsPickList.setValues(new String[]{});
+                countryPickList.setValues(new String[]{});
                 confirmedField.setValue(false);
                 ((ManageUsersTab) Layout.getInstance().getTab(CoreConstants.TAB_MANAGE_USERS)).loadUsers();
                 SC.say("User successfully updated.");
             }
         };
         modal.show("Updating user...", true);
-        service.updateUser(email, level, groups, callback);
+        service.updateUser(email, level, countryCode, groups, callback);
     }
 
     /**
@@ -240,10 +260,12 @@ public class EditUserStackSection extends SectionStackSection {
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 SC.warn("Unable to get groups list:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<String> result) {
 
                 List<String> dataList = new ArrayList<String>();

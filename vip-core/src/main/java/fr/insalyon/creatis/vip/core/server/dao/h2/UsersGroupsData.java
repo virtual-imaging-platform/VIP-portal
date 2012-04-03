@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.core.server.dao.h2;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UsersGroupsDAO;
 import java.sql.Connection;
@@ -59,6 +60,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
         connection = PlatformConnection.getInstance().getConnection();
     }
 
+    @Override
     public void add(String email, String groupname, CoreConstants.GROUP_ROLE role)
             throws DAOException {
 
@@ -84,6 +86,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
      * @return
      * @throws DAOException 
      */
+    @Override
     public Map<String, CoreConstants.GROUP_ROLE> getUserGroups(String email)
             throws DAOException {
 
@@ -117,6 +120,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
      * @return
      * @throws DAOException 
      */
+    @Override
     public List<String> getUserAdminGroups(String email) throws DAOException {
         
         try {
@@ -147,6 +151,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
      * @param groups
      * @throws DAOException 
      */
+    @Override
     public void setUserGroups(String email, Map<String, CoreConstants.GROUP_ROLE> groups)
             throws DAOException {
 
@@ -174,6 +179,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
      * @return
      * @throws DAOException
      */
+    @Override
     public List<String> getUsersFromGroups(List<String> groups) throws DAOException {
 
         try {
@@ -212,12 +218,14 @@ public class UsersGroupsData implements UsersGroupsDAO {
      * @return
      * @throws DAOException 
      */
+    @Override
     public List<User> getUsersFromGroup(String groupName) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "us.email AS uemail, first_name, last_name, institution, "
-                    + "phone, code, confirmed, folder, last_login, level "
+                    + "phone, code, confirmed, folder, last_login, level, "
+                    + "country_code "
                     + "FROM VIPUsers us, VIPUsersGroups ug "
                     + "WHERE us.email = ug.email AND ug.groupname = ? "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
@@ -234,7 +242,8 @@ public class UsersGroupsData implements UsersGroupsDAO {
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"), "",
                         new Date(rs.getTimestamp("last_login").getTime()),
-                        UserLevel.valueOf(rs.getString("level"))));
+                        UserLevel.valueOf(rs.getString("level")),
+                        CountryCode.valueOf(rs.getString("country_code"))));
             }
             return users;
 
@@ -250,6 +259,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
      * @param groupName
      * @throws DAOException 
      */
+    @Override
     public void removeUserFromGroup(String email, String groupName) throws DAOException {
         
         try {

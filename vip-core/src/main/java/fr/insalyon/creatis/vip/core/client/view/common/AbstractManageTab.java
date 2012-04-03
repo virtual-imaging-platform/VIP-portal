@@ -32,49 +32,34 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.util;
+package fr.insalyon.creatis.vip.core.client.view.common;
+
+import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.tab.Tab;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
 
 /**
  *
  * @author Rafael Silva
  */
-public class ParserUtil {
+public class AbstractManageTab extends Tab {
 
-    public static String parseLocation(String countryCode) {
+    protected ToolStrip toolStrip;
+    protected VLayout vLayout;
 
+    public AbstractManageTab(String icon, String title, String tabID) {
 
-        if (countryCode.equals("bg")) {
-            return "Bulgaria";
-        } else if (countryCode.equals("br")) {
-            return "Brazil";
-        } else if (countryCode.equals("co")) {
-            return "Colombia";
-        } else if (countryCode.equals("cl")) {
-            return "Chile";
-        } else if (countryCode.equals("de")) {
-            return "Germany";
-        } else if (countryCode.equals("es")) {
-            return "Spain";
-        } else if (countryCode.equals("fr")) {
-            return "France";
-        } else if (countryCode.equals("gr")) {
-            return "Greece";
-        } else if (countryCode.equals("ie")) {
-            return "Ireland";
-        } else if (countryCode.equals("it")) {
-            return "Italy";
-        } else if (countryCode.equals("nl")) {
-            return "Netherlands";
-        } else if (countryCode.equals("pl")) {
-            return "Poland";
-        } else if (countryCode.equals("pt")) {
-            return "Portugal";
-        } else if (countryCode.equals("ru")) {
-            return "Russia";
-        } else if (countryCode.equals("uk")) {
-            return "United Kingdom";
-        }
+        this.setTitle(Canvas.imgHTML(icon) + " " + title);
+        this.setID(tabID);
+        this.setCanClose(true);
 
-        return "Unknown";
+        vLayout = new VLayout();
+        vLayout.setWidth100();
+        vLayout.setHeight100();
+        vLayout.setOverflow(Overflow.AUTO);
+
+        this.setPane(vLayout);
     }
 }

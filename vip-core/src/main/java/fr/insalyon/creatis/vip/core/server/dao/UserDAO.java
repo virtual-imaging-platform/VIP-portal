@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.core.server.dao;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import java.util.Date;
 import java.util.List;
 
@@ -71,7 +72,7 @@ public interface UserDAO {
     
     public List<User> getAdministrators() throws DAOException;
     
-    public void updateLevel(String email, UserLevel level) throws DAOException;
+    public void update(String email, UserLevel level, CountryCode countryCode) throws DAOException;
     
     public void updateCode(String email, String code) throws DAOException;
     

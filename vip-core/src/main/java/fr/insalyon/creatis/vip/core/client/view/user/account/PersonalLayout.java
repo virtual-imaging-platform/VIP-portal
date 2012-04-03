@@ -39,6 +39,7 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Modules;
@@ -48,6 +49,7 @@ import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 
 /**
@@ -62,12 +64,13 @@ public class PersonalLayout extends AbstractFormLayout {
     private TextItem emailField;
     private TextItem institutionField;
     private TextItem phoneField;
+    private SelectItem countryField;
     private String folder;
     private IButton saveButton;
 
     public PersonalLayout() {
 
-        super(330, 390);
+        super(330, 430);
         addTitle("Account Settings", CoreConstants.ICON_PERSONAL);
 
         configure();
@@ -83,6 +86,14 @@ public class PersonalLayout extends AbstractFormLayout {
         institutionField = FieldUtil.getTextItem(300, null);
         phoneField = FieldUtil.getTextItem(150, "[0-9\\(\\)\\-+. ]");
 
+        countryField = new SelectItem();
+        countryField.setShowTitle(false);
+        countryField.setValueMap(CountryCode.getCountriesMap());
+        countryField.setValueIcons(CountryCode.getCodesMap());
+        countryField.setImageURLPrefix(CoreConstants.FOLDER_FLAGS);
+        countryField.setImageURLSuffix(".png");
+        countryField.setRequired(true);
+
         saveButton = new IButton("Save Changes");
         saveButton.addClickHandler(new ClickHandler() {
 
@@ -90,7 +101,8 @@ public class PersonalLayout extends AbstractFormLayout {
             public void onClick(ClickEvent event) {
 
                 if (firstNameField.validate() & lastNameField.validate()
-                        & institutionField.validate() & phoneField.validate()) {
+                        & institutionField.validate() & phoneField.validate()
+                        & countryField.validate()) {
 
                     User user = new User(
                             firstNameField.getValueAsString().trim(),
@@ -98,7 +110,8 @@ public class PersonalLayout extends AbstractFormLayout {
                             emailField.getValueAsString(),
                             institutionField.getValueAsString().trim(),
                             phoneField.getValueAsString().trim(),
-                            UserLevel.valueOf(levelField.getValueAsString()));
+                            UserLevel.valueOf(levelField.getValueAsString()),
+                            CountryCode.valueOf(countryField.getValueAsString()));
                     user.setFolder(folder);
 
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
@@ -129,6 +142,7 @@ public class PersonalLayout extends AbstractFormLayout {
         addField("Last Name", lastNameField);
         addField("Institution", institutionField);
         addField("Phone", phoneField);
+        addField("Country", countryField);
         this.addMember(saveButton);
     }
 
@@ -152,6 +166,7 @@ public class PersonalLayout extends AbstractFormLayout {
                 lastNameField.setValue(result.getLastName());
                 institutionField.setValue(result.getInstitution());
                 phoneField.setValue(result.getPhone());
+                countryField.setValue(result.getCountryCode().name());
                 folder = result.getFolder();
                 modal.hide();
             }

@@ -38,9 +38,9 @@ import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import fr.insalyon.creatis.vip.datamanager.client.view.cache.ManageCachedFilesTab;
-import fr.insalyon.creatis.vip.datamanager.client.view.operation.manage.ManageOperationsTab;
-import fr.insalyon.creatis.vip.datamanager.client.view.zombie.ManageZombieFilesTab;
+import fr.insalyon.creatis.vip.datamanager.client.view.system.cache.ManageCachedFilesTab;
+import fr.insalyon.creatis.vip.datamanager.client.view.system.operation.ManageOperationsTab;
+import fr.insalyon.creatis.vip.datamanager.client.view.system.zombie.ManageZombieFilesTab;
 
 /**
  *

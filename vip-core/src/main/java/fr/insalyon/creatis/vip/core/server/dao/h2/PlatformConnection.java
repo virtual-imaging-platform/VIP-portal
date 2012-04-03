@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.core.server.dao.h2;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
@@ -87,6 +88,7 @@ public class PlatformConnection {
                     + "session VARCHAR(255), "
                     + "last_login TIMESTAMP, "
                     + "level VARCHAR(50), "
+                    + "country_code VARCHAR(2), "
                     + "PRIMARY KEY(email)")) {
 
                 Server server = Server.getInstance();
@@ -102,7 +104,8 @@ public class PlatformConnection {
                             server.getAdminPassword(),
                             server.getAdminPhone(), true,
                             UUID.randomUUID().toString(), folder, "",
-                            new Date(), UserLevel.Administrator));
+                            new Date(), UserLevel.Administrator,
+                            CountryCode.fr));
 
                 } catch (DAOException ex) {
                     logger.error(ex);

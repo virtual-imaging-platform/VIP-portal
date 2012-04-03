@@ -143,21 +143,25 @@ public class UsersStackSection extends SectionStackSection {
                     rollOverCanvas.addMember(FieldUtil.getImgButton(
                             CoreConstants.ICON_EDIT, "Edit User", new ClickHandler() {
 
+                        @Override
                         public void onClick(ClickEvent event) {
                             edit(rollOverRecord.getAttribute("email"),
                                     rollOverRecord.getAttributeAsBoolean("confirmed"),
-                                    rollOverRecord.getAttribute("level"));
+                                    rollOverRecord.getAttribute("level"),
+                                    rollOverRecord.getAttribute("countryCode"));
                         }
                     }));
 
                     rollOverCanvas.addMember(FieldUtil.getImgButton(
                             CoreConstants.ICON_DELETE, "Delete User", new ClickHandler() {
 
+                        @Override
                         public void onClick(ClickEvent event) {
                             final String email = rollOverRecord.getAttribute("email");
                             SC.ask("Do you really want to remove the user \""
                                     + email + "\"?", new BooleanCallback() {
 
+                                @Override
                                 public void execute(Boolean value) {
                                     if (value) {
                                         remove(email);
@@ -182,11 +186,13 @@ public class UsersStackSection extends SectionStackSection {
                 DetailViewerField lastNameField = new DetailViewerField("lastName", "Last Name");
                 DetailViewerField institutionField = new DetailViewerField("institution", "Institution");
                 DetailViewerField phoneField = new DetailViewerField("phone", "Phone");
+                DetailViewerField countryField = new DetailViewerField("countryName", "Country");
                 DetailViewerField lastLoginField = new DetailViewerField("lastLogin", "Last Login");
                 lastLoginField.setDateFormatter(DateDisplayFormat.TOUSSHORTDATETIME);
 
                 detailViewer.setFields(levelField, emailField, firstNameField,
-                        lastNameField, institutionField, phoneField, lastLoginField);
+                        lastNameField, institutionField, phoneField, countryField, 
+                        lastLoginField);
                 detailViewer.setData(new Record[]{record});
 
                 return detailViewer;
@@ -217,15 +223,18 @@ public class UsersStackSection extends SectionStackSection {
 
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 
+            @Override
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 edit(event.getRecord().getAttribute("email"),
                         event.getRecord().getAttributeAsBoolean("confirmed"),
-                        event.getRecord().getAttribute("level"));
+                        event.getRecord().getAttribute("level"),
+                        event.getRecord().getAttribute("countryCode"));
             }
         });
 
         grid.addRowContextClickHandler(new RowContextClickHandler() {
 
+            @Override
             public void onRowContextClick(RowContextClickEvent event) {
                 event.cancel();
                 new UsersContextMenu(modal, event.getRecord().getAttribute("email"),
@@ -239,11 +248,13 @@ public class UsersStackSection extends SectionStackSection {
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<List<User>> callback = new AsyncCallback<List<User>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to get users list:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<User> result) {
                 modal.hide();
                 List<UserRecord> dataList = new ArrayList<UserRecord>();
@@ -252,7 +263,8 @@ public class UsersStackSection extends SectionStackSection {
                     dataList.add(new UserRecord(u.getFirstName(), u.getLastName(),
                             u.getEmail(), u.getInstitution(), u.getPhone(),
                             u.isConfirmed(), u.getFolder(), u.getLastLogin(),
-                            u.getLevel().name()));
+                            u.getLevel().name(), u.getCountryCode().name(),
+                            u.getCountryCode().getCountryName()));
                 }
                 grid.setData(dataList.toArray(new UserRecord[]{}));
             }
@@ -266,11 +278,13 @@ public class UsersStackSection extends SectionStackSection {
 
         final AsyncCallback<User> callback = new AsyncCallback<User>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to remove user:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(User result) {
                 Modules.getInstance().userRemoved(result);
                 modal.hide();
@@ -282,10 +296,10 @@ public class UsersStackSection extends SectionStackSection {
         service.removeUser(email, callback);
     }
 
-    private void edit(String email, boolean confirmed, String level) {
+    private void edit(String email, boolean confirmed, String level, String countryCode) {
 
         ManageUsersTab usersTab = (ManageUsersTab) Layout.getInstance().
                 getTab(CoreConstants.TAB_MANAGE_USERS);
-        usersTab.setUser(email, confirmed, level);
+        usersTab.setUser(email, confirmed, level, countryCode);
     }
 }

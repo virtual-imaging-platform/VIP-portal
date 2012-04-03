@@ -107,6 +107,7 @@ public class EditGroupStackSection extends SectionStackSection {
 
         IButton saveButton = new IButton("Save", new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 if (form.validate()) {
                     save(nameItem.getValueAsString().trim());
@@ -118,6 +119,7 @@ public class EditGroupStackSection extends SectionStackSection {
 
         removeButton = new IButton("Remove", new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 remove(nameItem.getValueAsString().trim());
             }
@@ -159,11 +161,13 @@ public class EditGroupStackSection extends SectionStackSection {
                             CoreConstants.ICON_DELETE, "Remove user from this group",
                             new ClickHandler() {
 
+                                @Override
                                 public void onClick(ClickEvent event) {
                                     final String email = rollOverRecord.getAttribute("email");
                                     SC.ask("Do you really want to remove the user \""
                                             + email + "\" from this group?", new BooleanCallback() {
 
+                                        @Override
                                         public void execute(Boolean value) {
                                             if (value) {
                                                 removeUserFromGroup(email);
@@ -189,8 +193,9 @@ public class EditGroupStackSection extends SectionStackSection {
 
         ListGridField firstNameField = new ListGridField("firstName", "First Name");
         ListGridField lastNameField = new ListGridField("lastName", "Last Name");
+        ListGridField countryField = FieldUtil.getIconGridField("countryCodeIcon");
 
-        grid.setFields(firstNameField, lastNameField);
+        grid.setFields(countryField, firstNameField, lastNameField);
         grid.setSortField("firstName");
         grid.setSortDirection(SortDirection.ASCENDING);
 
@@ -246,6 +251,7 @@ public class EditGroupStackSection extends SectionStackSection {
         }
         SC.ask("Do you really want to remove the group \"" + name + "\"?", new BooleanCallback() {
 
+            @Override
             public void execute(Boolean value) {
                 if (value) {
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
@@ -260,11 +266,13 @@ public class EditGroupStackSection extends SectionStackSection {
 
         return new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to " + text + " group:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
                 modal.hide();
                 setGroup(null);
@@ -279,11 +287,13 @@ public class EditGroupStackSection extends SectionStackSection {
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<List<User>> callback = new AsyncCallback<List<User>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 gridModal.hide();
                 SC.warn("Unable to load users:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<User> result) {
                 gridModal.hide();
                 List<UserRecord> dataList = new ArrayList<UserRecord>();
@@ -292,7 +302,8 @@ public class EditGroupStackSection extends SectionStackSection {
                     dataList.add(new UserRecord(u.getFirstName(), u.getLastName(),
                             u.getEmail(), u.getInstitution(), u.getPhone(),
                             u.isConfirmed(), u.getFolder(), u.getLastLogin(),
-                            u.getLevel().name()));
+                            u.getLevel().name(), u.getCountryCode().name(),
+                            u.getCountryCode().getCountryName()));
                 }
                 grid.setData(dataList.toArray(new UserRecord[]{}));
             }
@@ -306,11 +317,13 @@ public class EditGroupStackSection extends SectionStackSection {
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 gridModal.hide();
                 SC.warn("Unable to remove user:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
                 gridModal.hide();
                 loadUsers();

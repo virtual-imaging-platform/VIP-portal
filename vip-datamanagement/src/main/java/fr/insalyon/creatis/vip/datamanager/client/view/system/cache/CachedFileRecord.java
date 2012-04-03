@@ -32,28 +32,47 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client.view.operation;
+package fr.insalyon.creatis.vip.datamanager.client.view.system.cache;
 
-import fr.insalyon.creatis.vip.datamanager.client.view.system.operation.OperationRecord;
-import fr.insalyon.creatis.vip.core.client.view.property.AbstractPropertyWindow;
-import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
+import java.util.Date;
 
 /**
  *
  * @author Rafael Silva
  */
-public class OperationDetailsWindow extends AbstractPropertyWindow {
+public class CachedFileRecord extends ListGridRecord {
 
-    public OperationDetailsWindow(OperationRecord operation) {
-
-        super("Operation Details", 550, 200);
-
-        grid.setData(new PropertyRecord[]{
-            new PropertyRecord("Type", operation.getType()),
-            new PropertyRecord("Status", operation.getStatus()),
-            new PropertyRecord("Source", operation.getSource()),
-            new PropertyRecord("Destination", operation.getDestination()),
-            new PropertyRecord("Date", operation.getDate())
-        });
+    public CachedFileRecord() {
+    }
+ 
+    public CachedFileRecord(String path, String name, String size, 
+            int frequency, Date lastUsage) {
+        
+        setAttribute("path", path);
+        setAttribute("name", name);
+        setAttribute("size", size);
+        setAttribute("frequency", frequency);
+        setAttribute("date", lastUsage);
+    }
+    
+    public String getPath() {
+        return getAttributeAsString("path");
+    }
+    
+    public String getName() {
+        return getAttributeAsString("name");
+    }
+    
+    public String getSize() {
+        return getAttributeAsString("size");
+    }
+    
+    public int getFrequency() {
+        return getAttributeAsInt("frequency");
+    }
+    
+    public Date getLastUsage() {
+        return getAttributeAsDate("date");
     }
 }

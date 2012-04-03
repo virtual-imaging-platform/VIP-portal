@@ -52,8 +52,9 @@ public class CoreConstants {
     public static final String TAB_SIGNIN = "signin-tab";
     public static final String TAB_SIGNUP = "signup-tab";
     public static final String TAB_SYSTEM = "system-tab";
-    public static final String TAB_MANAGE_USERS = "manage-users-tab";
     public static final String TAB_MANAGE_GROUPS = "manage-groups-tab";
+    public static final String TAB_MANAGE_TIPS = "manage-tips-tab";
+    public static final String TAB_MANAGE_USERS = "manage-users-tab";
     // Icons
     private static final String IMG_FOLDER = "core/";
     public static final String ICON_ACCOUNT = IMG_FOLDER + "icon-account.png";
@@ -77,6 +78,7 @@ public class CoreConstants {
     public static final String ICON_SAVED = IMG_FOLDER + "icon-saved.png";
     public static final String ICON_SIGNOUT = IMG_FOLDER + "icon-signout.png";
     public static final String ICON_SYSTEM = IMG_FOLDER + "system/icon-system.png";
+    public static final String ICON_TIP = IMG_FOLDER + "icon-tip.png";
     public static final String ICON_USER = IMG_FOLDER + "system/icon-user.png";
     public static final String ICON_USER_INFO = IMG_FOLDER + "system/icon-user-info.png";
     public static final String ICON_GROUP = IMG_FOLDER + "system/icon-group.png";
@@ -87,11 +89,12 @@ public class CoreConstants {
     // Application Names
     public static final String APP_ACCOUNT = "My Account";
     public static final String APP_GROUP = "Groups";
+    public static final String APP_TIP = "Tips";
     public static final String APP_USER = "Users";
     // Application Images
     public static final String APP_IMG_ACCOUNT = IMG_FOLDER + "app-account.png";
     public static final String APP_IMG_GROUP = IMG_FOLDER + "system/app-group.png";
-    public static final String APP_IMG_NEWS = IMG_FOLDER + "system/app-news.png";
+    public static final String APP_IMG_TIP = IMG_FOLDER + "system/app-tip.png";
     public static final String APP_IMG_USER = IMG_FOLDER + "system/app-user.png";
     // Session Attributes
     public static final String COOKIES_USER = "vip-cookie-user";

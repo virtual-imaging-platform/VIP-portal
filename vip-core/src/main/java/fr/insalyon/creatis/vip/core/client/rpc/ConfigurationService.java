@@ -41,6 +41,7 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import java.util.List;
 import java.util.Map;
 
@@ -95,7 +96,7 @@ public interface ConfigurationService extends RemoteService {
     
     public List<String> getUserGroups() throws CoreException;
 
-    public void updateUser(String email, UserLevel level, Map<String, CoreConstants.GROUP_ROLE> groups) throws CoreException;
+    public void updateUser(String email, UserLevel level, CountryCode countryCode, Map<String, CoreConstants.GROUP_ROLE> groups) throws CoreException;
     
     public User getUserData() throws CoreException;
     

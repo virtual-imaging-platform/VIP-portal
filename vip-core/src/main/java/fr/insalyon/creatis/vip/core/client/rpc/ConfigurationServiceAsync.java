@@ -38,6 +38,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import java.util.List;
 import java.util.Map;
 
@@ -77,7 +78,7 @@ public interface ConfigurationServiceAsync {
     
     public void getUserGroups(AsyncCallback<List<String>> asyncCallback);
 
-    public void updateUser(String email, UserLevel level, Map<String, CoreConstants.GROUP_ROLE> groups, AsyncCallback<Void> asyncCallback);
+    public void updateUser(String email, UserLevel level, CountryCode countryCode, Map<String, CoreConstants.GROUP_ROLE> groups, AsyncCallback<Void> asyncCallback);
 
     public void getUsers(AsyncCallback<List<User>> asyncCallback);
     

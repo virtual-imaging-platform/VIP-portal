@@ -32,28 +32,58 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client.view.operation;
+package fr.insalyon.creatis.vip.datamanager.client.view.system.operation;
 
-import fr.insalyon.creatis.vip.datamanager.client.view.system.operation.OperationRecord;
-import fr.insalyon.creatis.vip.core.client.view.property.AbstractPropertyWindow;
-import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
+import java.util.Date;
 
 /**
  *
  * @author Rafael Silva
  */
-public class OperationDetailsWindow extends AbstractPropertyWindow {
+public class OperationRecord extends ListGridRecord {
 
-    public OperationDetailsWindow(OperationRecord operation) {
-
-        super("Operation Details", 550, 200);
-
-        grid.setData(new PropertyRecord[]{
-            new PropertyRecord("Type", operation.getType()),
-            new PropertyRecord("Status", operation.getStatus()),
-            new PropertyRecord("Source", operation.getSource()),
-            new PropertyRecord("Destination", operation.getDestination()),
-            new PropertyRecord("Date", operation.getDate())
-        });
+    public OperationRecord() {
+    }
+    
+    public OperationRecord(String id, String type, String status, String source, 
+            String destination, Date date, String owner) {
+        
+        if (type.equals("Download_Files")) {
+            type = "Download";
+        }
+        setAttribute("typeIcon", "datamanager/icon-" + type.toLowerCase());
+        setAttribute("statusIcon", "datamanager/operation/icon-" + status.toLowerCase());
+        setAttribute("operationId", id);
+        setAttribute("type", type);
+        setAttribute("status", status);
+        setAttribute("name", source);
+        setAttribute("destination", destination);
+        setAttribute("date", date);
+        setAttribute("owner", owner);
+    }
+    
+    public String getId() {
+        return getAttributeAsString("operationId");
+    }
+    
+    public String getType() {
+        return getAttributeAsString("type");
+    }
+    
+    public String getStatus() {
+        return getAttributeAsString("status");
+    }
+    
+    public String getSource() {
+        return getAttributeAsString("name");
+    }
+    
+    public String getDestination() {
+        return getAttributeAsString("destination");
+    }
+    
+    public String getDate() {
+        return getAttributeAsString("date");
     }
 }

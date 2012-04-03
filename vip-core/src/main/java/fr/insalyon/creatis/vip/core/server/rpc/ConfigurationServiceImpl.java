@@ -40,6 +40,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
@@ -357,8 +358,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     /**
      *
-     * @return @throws CoreException
+     * @return 
+     * @throws CoreException
      */
+    @Override
     public List<String> getUserGroups() throws CoreException {
 
         try {
@@ -377,16 +380,18 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      *
      * @param email
      * @param level
+     * @param countryCode
      * @param groups
      * @throws CoreException
      */
-    public void updateUser(String email, UserLevel level,
+    @Override
+    public void updateUser(String email, UserLevel level, CountryCode countryCode, 
             Map<String, CoreConstants.GROUP_ROLE> groups) throws CoreException {
 
         try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Updating user '" + email + "'.");
-            configurationBusiness.updateUserLevel(email, level);
+            configurationBusiness.updateUser(email, level, countryCode);
             configurationBusiness.setUserGroups(email, groups);
 
         } catch (BusinessException ex) {
@@ -398,6 +403,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      *
      * @return @throws CoreException
      */
+    @Override
     public User getUserData() throws CoreException {
 
         try {
@@ -413,6 +419,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @param user
      * @throws CoreException
      */
+    @Override
     public User updateUser(User user) throws CoreException {
 
         try {
