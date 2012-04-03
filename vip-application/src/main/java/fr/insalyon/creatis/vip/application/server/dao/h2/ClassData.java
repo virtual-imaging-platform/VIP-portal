@@ -60,6 +60,7 @@ public class ClassData implements ClassDAO {
         connection = PlatformConnection.getInstance().getConnection();
     }
 
+    @Override
     public void add(AppClass c) throws DAOException {
 
         try {
@@ -74,7 +75,6 @@ public class ClassData implements ClassDAO {
 
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Unique index or primary key violation")) {
-                logger.error("A class named \"" + c.getName() + "\" already exists.");
                 throw new DAOException("A class named \"" + c.getName() + "\" already exists.");
             } else {
                 logger.error(ex);
@@ -83,6 +83,7 @@ public class ClassData implements ClassDAO {
         }
     }
 
+    @Override
     public void update(AppClass c) throws DAOException {
 
         try {
@@ -95,6 +96,7 @@ public class ClassData implements ClassDAO {
         }
     }
 
+    @Override
     public void remove(String className) throws DAOException {
 
         try {
@@ -110,6 +112,7 @@ public class ClassData implements ClassDAO {
         }
     }
 
+    @Override
     public List<AppClass> getClasses() throws DAOException {
 
         try {
@@ -140,6 +143,7 @@ public class ClassData implements ClassDAO {
         }
     }
 
+    @Override
     public AppClass getClass(String className) throws DAOException {
 
         try {
@@ -165,6 +169,7 @@ public class ClassData implements ClassDAO {
         }
     }
 
+    @Override
     public List<AppClass> getUserClasses(String email, boolean validAdmin) throws DAOException {
 
         try {
