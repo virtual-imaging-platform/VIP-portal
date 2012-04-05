@@ -476,7 +476,7 @@ public class UserData implements UserDAO {
                         rs.getString("code"), rs.getString("folder"), "",
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
-                        CountryCode.valueOf("country_code")));
+                        CountryCode.valueOf(rs.getString("country_code"))));
             }
             return users;
 

@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.util;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
@@ -41,7 +42,7 @@ import java.util.TreeMap;
  *
  * @author Rafael Silva
  */
-public enum CountryCode {
+public enum CountryCode implements IsSerializable {
 
     ad("Andorra"),
     ae("United Arab Emirates"),
@@ -298,10 +299,10 @@ public enum CountryCode {
         for (CountryCode cc : CountryCode.values()) {
             treeMap.put(cc.getCountryName(), cc.name());
         }
-        
-        
+
+
         LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-        
+
         for (String s : treeMap.keySet()) {
             map.put(treeMap.get(s), s);
         }
@@ -310,7 +311,7 @@ public enum CountryCode {
     }
 
     public static LinkedHashMap<String, String> getCodesMap() {
-        
+
         LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 
         for (CountryCode cc : CountryCode.values()) {
