@@ -66,6 +66,7 @@ public class Server {
     private int myProxyPort = 7211;
     private String myProxyUser = "";
     private String myProxyPass = "";
+    private String myProxyLifeTime = "43200";
     // Mail
     private String mailHost = "";
     private String mailTransportProtocol = "";
@@ -126,6 +127,7 @@ public class Server {
             myProxyPort = config.getInt("myproxy.port", myProxyPort);
             myProxyUser = config.getString("myproxy.user", myProxyUser);
             myProxyPass = config.getString("myproxy.pass", myProxyPass);
+            myProxyLifeTime = config.getString("myproxy.lifetime", myProxyLifeTime);
 
             mailHost = config.getString("mail.host", mailHost);
             mailTransportProtocol = config.getString("mail.transport.protocol", mailTransportProtocol);
@@ -156,8 +158,8 @@ public class Server {
             provenanceDBUser = config.getString("provenance.db.user", provenanceDBUser);
             provenanceDBPass = config.getString("provenance.db.pass", provenanceDBPass);
             provenanceDBURL = config.getString("provenance.db.url", provenanceDBURL);
-            
-            
+
+
             config.setProperty("admin.first.name", adminFirstName);
             config.setProperty("admin.last.name", adminLastName);
             config.setProperty("admin.email", adminEmail);
@@ -168,6 +170,7 @@ public class Server {
             config.setProperty("myproxy.port", myProxyPort);
             config.setProperty("myproxy.user", myProxyUser);
             config.setProperty("myproxy.pass", myProxyPass);
+            config.setProperty("myproxy.lifetime", myProxyLifeTime);
             config.setProperty("mail.host", mailHost);
             config.setProperty("mail.transport.protocol", mailTransportProtocol);
             config.setProperty("mail.from", mailFrom);
@@ -228,6 +231,10 @@ public class Server {
 
     public String getMyProxyUser() {
         return myProxyUser;
+    }
+
+    public String getMyProxyLifeTime() {
+        return myProxyLifeTime;
     }
 
     public String getMoteurServer() {

@@ -38,50 +38,15 @@
  */
 package fr.insalyon.creatis.vip.core.server.business.proxy;
 
-import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.ProtocolException;
-import java.security.GeneralSecurityException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
-import java.security.SecureRandom;
-import java.security.cert.CertPath;
-import java.security.cert.CertPathValidator;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.PKIXParameters;
-import java.security.cert.TrustAnchor;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import java.security.*;
+import java.security.cert.*;
+import java.util.*;
+import javax.net.ssl.*;
 import javax.security.auth.login.FailedLoginException;
 import org.apache.log4j.Logger;
 import org.bouncycastle.asn1.ASN1InputStream;
@@ -110,7 +75,7 @@ public class ProxyClient {
     private final String GETCOMMAND = "COMMAND=0";
     private final String USERNAME = "USERNAME=";
     private final String PASSPHRASE = "PASSPHRASE=";
-    private final String LIFETIME = "LIFETIME=43200"; // 12 hours
+    private final String LIFETIME = "LIFETIME=";
     private final String RESPONSE = "RESPONSE=";
     private final String ERROR = "ERROR=";
 
@@ -191,11 +156,12 @@ public class ProxyClient {
         logger.info("Adding VOMS Extension to server proxy.");
         // Voms Extension
         Server serverConf = Server.getInstance();
+        long hours = Long.parseLong(serverConf.getMyProxyLifeTime()) / 24;
         String command = "voms-proxy-init --voms biomed"
                 + " -cert " + serverConf.getServerProxy()
                 + " -key " + serverConf.getServerProxy()
                 + " -out " + serverConf.getServerProxy()
-                + " -noregen -valid 12:00";
+                + " -noregen -valid " + hours + ":00";
         Process process = Runtime.getRuntime().exec(command);
 
         BufferedReader r = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -248,7 +214,7 @@ public class ProxyClient {
         this.socketOut.write('\n');
         this.socketOut.write((PASSPHRASE + Server.getInstance().getMyProxyPass()).getBytes());
         this.socketOut.write('\n');
-        this.socketOut.write(LIFETIME.getBytes());
+        this.socketOut.write((LIFETIME + Server.getInstance().getMyProxyLifeTime()).getBytes());
         this.socketOut.write('\n');
         this.socketOut.flush();
 
@@ -411,6 +377,7 @@ public class ProxyClient {
 
     private class MyTrustManager implements X509TrustManager {
 
+        @Override
         public X509Certificate[] getAcceptedIssuers() {
             X509Certificate[] issuers = null;
             String certDirPath = getExistingTrustRootPath();
@@ -443,12 +410,14 @@ public class ProxyClient {
             return issuers;
         }
 
+        @Override
         public void checkClientTrusted(X509Certificate[] certs, String authType)
                 throws CertificateException {
             throw new CertificateException(
                     "checkClientTrusted not implemented by edu.uiuc.ncsa.MyProxy.MyProxyLogon.MyTrustManager");
         }
 
+        @Override
         public void checkServerTrusted(X509Certificate[] certs, String authType)
                 throws CertificateException {
             checkServerCertPath(certs);
