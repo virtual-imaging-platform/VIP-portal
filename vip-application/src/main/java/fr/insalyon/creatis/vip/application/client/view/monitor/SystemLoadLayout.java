@@ -97,6 +97,7 @@ public class SystemLoadLayout extends VLayout {
         closeLabel.setCursor(Cursor.HAND);
         closeLabel.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 timer.cancel();
                 destroy();
@@ -120,11 +121,13 @@ public class SystemLoadLayout extends VLayout {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<ApplicationStatus> callback = new AsyncCallback<ApplicationStatus>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 
                 SC.warn("Unable to update system load:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(ApplicationStatus result) {
                 
                 workflowsLabel.setContents("Running Simulations: " + result.getRunningWorkflows());

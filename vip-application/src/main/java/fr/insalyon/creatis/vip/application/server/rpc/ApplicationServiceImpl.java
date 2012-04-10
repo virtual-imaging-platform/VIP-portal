@@ -266,6 +266,12 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
+    /**
+     * 
+     * @param className
+     * @return 
+     */
+    @Override
     public AppClass getClass(String className) {
 
         try {
@@ -280,6 +286,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
      * @return
      * @throws ApplicationException 
      */
+    @Override
     public ApplicationStatus getApplicationStatus() throws ApplicationException {
 
         try {

@@ -63,11 +63,21 @@ public class JobData implements JobDAO {
     }
 
     /**
+     * Gets the database connection of a workflow.
+     * 
+     * @return 
+     */
+    public Connection getConnection() {
+        return this.connection;
+    }
+
+    /**
      * Gets a map with the status of the jobs.
      *
      * @return Jobs status map
      * @throws DAOException
      */
+    @Override
     public Map<String, Integer> getStatusMap() throws DAOException {
 
         Map<String, Integer> statusMap = new HashMap<String, Integer>();
@@ -97,6 +107,7 @@ public class JobData implements JobDAO {
      * @return List of jobs
      * @throws DAOException
      */
+    @Override
     public List<Job> getJobs() throws DAOException {
 
         List<Job> jobsList = new ArrayList<Job>();
@@ -164,6 +175,7 @@ public class JobData implements JobDAO {
      * @return
      * @throws DAOException
      */
+    @Override
     public List<String> getExecutionPerNumberOfJobs(int binSize) throws DAOException {
 
         try {
@@ -174,7 +186,6 @@ public class JobData implements JobDAO {
                     + "count(id) as num, min(running) as mini, "
                     + "max(running) as maxi, sum(running) "
                     + "as som FROM jobs "
-                    //+ "WHERE status='COMPLETED' "
                     + "GROUP BY running/" + binSize + "*" + binSize);
 
             while (rs.next()) {
@@ -184,7 +195,6 @@ public class JobData implements JobDAO {
                         + "##" + rs.getString("maxi")
                         + "##" + rs.getString("som"));
             }
-
             return list;
 
         } catch (SQLException ex) {
@@ -199,6 +209,7 @@ public class JobData implements JobDAO {
      * @return
      * @throws DAOException
      */
+    @Override
     public List<String> getDownloadPerNumberOfJobs(int binSize) throws DAOException {
 
         try {
@@ -209,7 +220,6 @@ public class JobData implements JobDAO {
                     + "count(id) as num, min(download) as mini, "
                     + "max(download) as maxi, sum(download) "
                     + "as som FROM jobs "
-                    //+ "WHERE status='COMPLETED' "
                     + "GROUP BY download/" + binSize + "*" + binSize);
 
             while (rs.next()) {
@@ -234,6 +244,7 @@ public class JobData implements JobDAO {
      * @return
      * @throws DAOException
      */
+    @Override
     public List<String> getUploadPerNumberOfJobs(int binSize) throws DAOException {
 
         try {
@@ -243,7 +254,6 @@ public class JobData implements JobDAO {
                     + "upload/" + binSize + "*" + binSize + " as execut, "
                     + "count(id) as num, min(upload) as mini, "
                     + "max(upload) as maxi, sum(upload) as som FROM jobs "
-                    //+ "WHERE status='COMPLETED' "
                     + "GROUP BY upload/" + binSize + "*" + binSize);
 
             while (rs.next()) {
@@ -263,9 +273,11 @@ public class JobData implements JobDAO {
     }
 
     /**
-     *
-     * @return @throws DAOException
+     * 
+     * @return
+     * @throws DAOException 
      */
+    @Override
     public List<String> getJobsPerTime() throws DAOException {
 
         try {
@@ -275,7 +287,6 @@ public class JobData implements JobDAO {
                     + "status, creation, queued, download, running, upload, "
                     + "checkpoint_init, checkpoint_upload, end_e "
                     + "FROM jobs "
-                    //+ "WHERE status='COMPLETED' OR status='ERROR' "
                     + "ORDER BY id");
 
             while (rs.next()) {
@@ -343,10 +354,6 @@ public class JobData implements JobDAO {
         }
     }
 
-    public Connection getConnection() {
-        return this.connection;
-    }
-
     public List<String> getSiteHistogram() throws DAOException {
         try {
             List<String> list = new ArrayList<String>();
@@ -366,11 +373,13 @@ public class JobData implements JobDAO {
     }
 
     /**
+     * Gets the number of tasks according to a status.
      *
      * @param status
      * @return
      * @throws DAOException
      */
+    @Override
     public int getNumberOfTasks(JobStatus status) throws DAOException {
 
         try {
@@ -383,8 +392,12 @@ public class JobData implements JobDAO {
             return rs.next() ? rs.getInt("num") : 0;
 
         } catch (SQLException ex) {
-            logger.error(ex);
-            throw new DAOException(ex);
+            if (ex.getMessage().contains("Table/View 'JOBS' does not exist")) {
+                return 0;
+            } else {
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
         }
     }
 
@@ -392,6 +405,7 @@ public class JobData implements JobDAO {
      *
      * @return @throws DAOException
      */
+    @Override
     public Map<String, Integer> getNodesMap() throws DAOException {
 
         try {
