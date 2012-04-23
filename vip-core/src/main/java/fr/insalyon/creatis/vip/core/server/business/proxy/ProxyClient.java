@@ -109,7 +109,7 @@ public class ProxyClient {
                     X509Certificate certificate = (X509Certificate) cf.generateCertificate(is);
                     Calendar currentDate = Calendar.getInstance();
                     currentDate.setTime(new Date());
-                    currentDate.add(Calendar.HOUR, 2);
+                    currentDate.add(Calendar.HOUR, Server.getInstance().getMyProxyMinHours());
                     try {
                         certificate.checkValidity(currentDate.getTime());
                         if (endDate != null && certificate.getNotAfter().getTime() < endDate.getTime()) {

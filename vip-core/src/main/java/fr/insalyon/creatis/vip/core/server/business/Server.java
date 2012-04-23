@@ -66,7 +66,8 @@ public class Server {
     private int myProxyPort = 7211;
     private String myProxyUser = "";
     private String myProxyPass = "";
-    private String myProxyLifeTime = "43200";
+    private String myProxyLifeTime = "86400";
+    private int myProxyMinHours = 12;
     // Mail
     private String mailHost = "";
     private String mailTransportProtocol = "";
@@ -128,6 +129,7 @@ public class Server {
             myProxyUser = config.getString("myproxy.user", myProxyUser);
             myProxyPass = config.getString("myproxy.pass", myProxyPass);
             myProxyLifeTime = config.getString("myproxy.lifetime", myProxyLifeTime);
+            myProxyMinHours = config.getInt("myproxy.min.hours", myProxyMinHours);
 
             mailHost = config.getString("mail.host", mailHost);
             mailTransportProtocol = config.getString("mail.transport.protocol", mailTransportProtocol);
@@ -171,6 +173,7 @@ public class Server {
             config.setProperty("myproxy.user", myProxyUser);
             config.setProperty("myproxy.pass", myProxyPass);
             config.setProperty("myproxy.lifetime", myProxyLifeTime);
+            config.setProperty("myproxy.min.hours", myProxyMinHours);
             config.setProperty("mail.host", mailHost);
             config.setProperty("mail.transport.protocol", mailTransportProtocol);
             config.setProperty("mail.from", mailFrom);
@@ -235,6 +238,10 @@ public class Server {
 
     public String getMyProxyLifeTime() {
         return myProxyLifeTime;
+    }
+
+    public int getMyProxyMinHours() {
+        return myProxyMinHours;
     }
 
     public String getMoteurServer() {
