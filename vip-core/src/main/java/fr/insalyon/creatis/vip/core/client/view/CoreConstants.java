@@ -43,6 +43,29 @@ import java.util.Date;
 public class CoreConstants {
 
     public static final String VERSION = "v0.7.6";
+    // Configuration Labels
+    public static final String LAB_ADMIN_FIRST_NAME = "admin.first.name";
+    public static final String LAB_ADMIN_LAST_NAME = "admin.last.name";
+    public static final String LAB_ADMIN_EMAIL = "admin.email";
+    public static final String LAB_ADMIN_INSTITUTION = "admin.institution";
+    public static final String LAB_ADMIN_PHONE = "admin.phone";
+    public static final String LAB_ADMIN_PASS = "admin.pass";
+    public static final String LAB_MYPROXY_HOST = "myproxy.host";
+    public static final String LAB_MYPROXY_PORT = "myproxy.port";
+    public static final String LAB_MYPROXY_USER = "myproxy.user";
+    public static final String LAB_MYPROXY_PASS = "myproxy.pass";
+    public static final String LAB_MYPROXY_LIFETIME = "myproxy.lifetime";
+    public static final String LAB_MYPROXY_MIN_HOURS = "myproxy.min.hours";
+    public static final String LAB_MAIL_HOST = "mail.host";
+    public static final String LAB_MAIL_PROTOCOL = "mail.transport.protocol";
+    public static final String LAB_MAIL_FROM = "mail.from";
+    public static final String LAB_GRIDA_HOST = "grida.server.host";
+    public static final String LAB_GRIDA_PORT = "grida.server.port";
+    public static final String LAB_DATA_USERS_HOME = "datamanager.users.home";
+    public static final String LAB_DATA_GROUPS_HOME = "datamanager.groups.home";
+    public static final String LAB_DATA_PATH = "datamanager.path";
+    public static final String LAB_DATA_LFC_HOST = "datamanager.lfc.host";
+    public static final String LAB_DATA_LFC_PORT = "datamanager.lfc.port";
     // Tabs
     public static final String TAB_ACCOUNT = "account-tab";
     public static final String TAB_ACTIVATION = "activation-tab";

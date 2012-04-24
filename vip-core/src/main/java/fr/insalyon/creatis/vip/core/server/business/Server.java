@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.core.server.business;
 
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import java.io.File;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -55,29 +56,32 @@ public class Server {
     private String configurationFolder;
     private String serverProxy;
     // Admin
-    private String adminFirstName = "Administrator";
-    private String adminLastName = "";
-    private String adminEmail = "admin@vip.creatis.insa-lyon.fr";
-    private String adminInstitution = "";
-    private String adminPhone = "";
-    private String adminPassword = "admin";
+    private String adminFirstName;
+    private String adminLastName;
+    private String adminEmail;
+    private String adminInstitution;
+    private String adminPhone;
+    private String adminPassword;
     // MyProxy
-    private String myProxyHost = "localhost";
-    private int myProxyPort = 7211;
-    private String myProxyUser = "";
-    private String myProxyPass = "";
-    private String myProxyLifeTime = "86400";
-    private int myProxyMinHours = 12;
+    private String myProxyHost;
+    private int myProxyPort;
+    private String myProxyUser;
+    private String myProxyPass;
+    private String myProxyLifeTime;
+    private int myProxyMinHours;
     // Mail
-    private String mailHost = "";
-    private String mailTransportProtocol = "";
-    private String mailFrom = "";
+    private String mailHost;
+    private String mailTransportProtocol;
+    private String mailFrom;
     // GRIDA server
-    private String gridaHost = "localhost";
-    private int gridaPort = 9006;
+    private String gridaHost;
+    private int gridaPort;
     // Data Manager
-    private String dataManagerUsersHome = "/users";
-    private String dataManagerGroupsHome = "/groups";
+    private String dataManagerUsersHome;
+    private String dataManagerGroupsHome;
+    private String dataManagerPath;
+    private String dataManagerLFCHost;
+    private int dataManagerLFCPort;
     // Workflows
     private String workflowsPath = "/var/www/html/workflows";
     private String workflowsDB = "/var/www/workflows.db";
@@ -90,10 +94,6 @@ public class Server {
     // Apache
     private String apacheHost = "localhost";
     private int apacheSSLPort = 80;
-    // Data Manager
-    private String dataManagerPath = "/tmp";
-    private String dataManagerLFCHost = "lfc-biomed.in2p3.fr";
-    private int dataManagerLFCPort = 5010;
     // Provenance
     private String provenanceDBUser = "vip";
     private String provenanceDBPass = "";
@@ -117,29 +117,32 @@ public class Server {
             String confFilePath = configurationFolder + CONF_FILE;
             PropertiesConfiguration config = new PropertiesConfiguration(confFilePath);
 
-            adminFirstName = config.getString("admin.first.name", adminFirstName);
-            adminLastName = config.getString("admin.last.name", adminLastName);
-            adminEmail = config.getString("admin.email", adminEmail);
-            adminInstitution = config.getString("admin.institution", adminInstitution);
-            adminPhone = config.getString("admin.phone", adminPhone);
-            adminPassword = config.getString("admin.pass", adminPassword);
+            adminFirstName = config.getString(CoreConstants.LAB_ADMIN_FIRST_NAME, "Administrator");
+            adminLastName = config.getString(CoreConstants.LAB_ADMIN_LAST_NAME, "");
+            adminEmail = config.getString(CoreConstants.LAB_ADMIN_EMAIL, "admin@vip.creatis.insa-lyon.fr");
+            adminInstitution = config.getString(CoreConstants.LAB_ADMIN_INSTITUTION, "");
+            adminPhone = config.getString(CoreConstants.LAB_ADMIN_PHONE, "");
+            adminPassword = config.getString(CoreConstants.LAB_ADMIN_PASS, "admin");
 
-            myProxyHost = config.getString("myproxy.host", myProxyHost);
-            myProxyPort = config.getInt("myproxy.port", myProxyPort);
-            myProxyUser = config.getString("myproxy.user", myProxyUser);
-            myProxyPass = config.getString("myproxy.pass", myProxyPass);
-            myProxyLifeTime = config.getString("myproxy.lifetime", myProxyLifeTime);
-            myProxyMinHours = config.getInt("myproxy.min.hours", myProxyMinHours);
+            myProxyHost = config.getString(CoreConstants.LAB_MYPROXY_HOST, "localhost");
+            myProxyPort = config.getInt(CoreConstants.LAB_MYPROXY_PORT, 7211);
+            myProxyUser = config.getString(CoreConstants.LAB_MYPROXY_USER, "");
+            myProxyPass = config.getString(CoreConstants.LAB_MYPROXY_PASS, "");
+            myProxyLifeTime = config.getString(CoreConstants.LAB_MYPROXY_LIFETIME, "86400");
+            myProxyMinHours = config.getInt(CoreConstants.LAB_MYPROXY_MIN_HOURS, 12);
 
-            mailHost = config.getString("mail.host", mailHost);
-            mailTransportProtocol = config.getString("mail.transport.protocol", mailTransportProtocol);
-            mailFrom = config.getString("mail.from", mailFrom);
+            mailHost = config.getString(CoreConstants.LAB_MAIL_HOST, "");
+            mailTransportProtocol = config.getString(CoreConstants.LAB_MAIL_PROTOCOL, "");
+            mailFrom = config.getString(CoreConstants.LAB_MAIL_FROM, "");
 
-            gridaHost = config.getString("grida.server.host", gridaHost);
-            gridaPort = config.getInt("grida.server.port", gridaPort);
+            gridaHost = config.getString(CoreConstants.LAB_GRIDA_HOST, "localhost");
+            gridaPort = config.getInt(CoreConstants.LAB_GRIDA_PORT, 9006);
 
-            dataManagerUsersHome = config.getString("datamanager.users.home", dataManagerUsersHome);
-            dataManagerGroupsHome = config.getString("datamanager.groups.home", dataManagerGroupsHome);
+            dataManagerUsersHome = config.getString(CoreConstants.LAB_DATA_USERS_HOME, "/users");
+            dataManagerGroupsHome = config.getString(CoreConstants.LAB_DATA_GROUPS_HOME, "/groups");
+            dataManagerPath = config.getString(CoreConstants.LAB_DATA_PATH, "/tmp");
+            dataManagerLFCHost = config.getString(CoreConstants.LAB_DATA_LFC_HOST, "lfc-biomed.in2p3.fr");
+            dataManagerLFCPort = config.getInt(CoreConstants.LAB_DATA_LFC_PORT, 5010);
 
             moteurServer = config.getString("moteur.host", moteurServer);
             truststoreFile = config.getString("truststore.file", truststoreFile);
@@ -153,34 +156,33 @@ public class Server {
             apacheHost = config.getString("apache.host", apacheHost);
             apacheSSLPort = config.getInt("apache.ssl.port", apacheSSLPort);
 
-            dataManagerPath = config.getString("datamanager.path", dataManagerPath);
-            dataManagerLFCHost = config.getString("datamanager.lfc.host", dataManagerLFCHost);
-            dataManagerLFCPort = config.getInt("datamanager.lfc.port", dataManagerLFCPort);
-
             provenanceDBUser = config.getString("provenance.db.user", provenanceDBUser);
             provenanceDBPass = config.getString("provenance.db.pass", provenanceDBPass);
             provenanceDBURL = config.getString("provenance.db.url", provenanceDBURL);
 
 
-            config.setProperty("admin.first.name", adminFirstName);
-            config.setProperty("admin.last.name", adminLastName);
-            config.setProperty("admin.email", adminEmail);
-            config.setProperty("admin.institution", adminInstitution);
-            config.setProperty("admin.phone", adminPhone);
-            config.setProperty("admin.pass", adminPassword);
-            config.setProperty("myproxy.host", myProxyHost);
-            config.setProperty("myproxy.port", myProxyPort);
-            config.setProperty("myproxy.user", myProxyUser);
-            config.setProperty("myproxy.pass", myProxyPass);
-            config.setProperty("myproxy.lifetime", myProxyLifeTime);
-            config.setProperty("myproxy.min.hours", myProxyMinHours);
-            config.setProperty("mail.host", mailHost);
-            config.setProperty("mail.transport.protocol", mailTransportProtocol);
-            config.setProperty("mail.from", mailFrom);
-            config.setProperty("grida.server.host", gridaHost);
-            config.setProperty("grida.server.port", gridaPort);
-            config.setProperty("datamanager.users.home", dataManagerUsersHome);
-            config.setProperty("datamanager.groups.home", dataManagerGroupsHome);
+            config.setProperty(CoreConstants.LAB_ADMIN_FIRST_NAME, adminFirstName);
+            config.setProperty(CoreConstants.LAB_ADMIN_LAST_NAME, adminLastName);
+            config.setProperty(CoreConstants.LAB_ADMIN_EMAIL, adminEmail);
+            config.setProperty(CoreConstants.LAB_ADMIN_INSTITUTION, adminInstitution);
+            config.setProperty(CoreConstants.LAB_ADMIN_PHONE, adminPhone);
+            config.setProperty(CoreConstants.LAB_ADMIN_PASS, adminPassword);
+            config.setProperty(CoreConstants.LAB_MYPROXY_HOST, myProxyHost);
+            config.setProperty(CoreConstants.LAB_MYPROXY_PORT, myProxyPort);
+            config.setProperty(CoreConstants.LAB_MYPROXY_USER, myProxyUser);
+            config.setProperty(CoreConstants.LAB_MYPROXY_PASS, myProxyPass);
+            config.setProperty(CoreConstants.LAB_MYPROXY_LIFETIME, myProxyLifeTime);
+            config.setProperty(CoreConstants.LAB_MYPROXY_MIN_HOURS, myProxyMinHours);
+            config.setProperty(CoreConstants.LAB_MAIL_HOST, mailHost);
+            config.setProperty(CoreConstants.LAB_MAIL_PROTOCOL, mailTransportProtocol);
+            config.setProperty(CoreConstants.LAB_MAIL_FROM, mailFrom);
+            config.setProperty(CoreConstants.LAB_GRIDA_HOST, gridaHost);
+            config.setProperty(CoreConstants.LAB_GRIDA_PORT, gridaPort);
+            config.setProperty(CoreConstants.LAB_DATA_USERS_HOME, dataManagerUsersHome);
+            config.setProperty(CoreConstants.LAB_DATA_GROUPS_HOME, dataManagerGroupsHome);
+            config.setProperty(CoreConstants.LAB_DATA_PATH, dataManagerPath);
+            config.setProperty(CoreConstants.LAB_DATA_LFC_HOST, dataManagerLFCHost);
+            config.setProperty(CoreConstants.LAB_DATA_LFC_PORT, dataManagerLFCPort);
             config.setProperty("moteur.host", moteurServer);
             config.setProperty("truststore.file", truststoreFile);
             config.setProperty("truststore.password", truststorePass);
@@ -190,9 +192,6 @@ public class Server {
             config.setProperty("workflows.db.port", workflowsPort);
             config.setProperty("apache.host", apacheHost);
             config.setProperty("apache.ssl.port", apacheSSLPort);
-            config.setProperty("datamanager.path", dataManagerPath);
-            config.setProperty("datamanager.lfc.host", dataManagerLFCHost);
-            config.setProperty("datamanager.lfc.port", dataManagerLFCPort);
             config.setProperty("provenance.db.user", provenanceDBUser);
             config.setProperty("provenance.db.pass", provenanceDBPass);
             config.setProperty("provenance.db.url", provenanceDBURL);

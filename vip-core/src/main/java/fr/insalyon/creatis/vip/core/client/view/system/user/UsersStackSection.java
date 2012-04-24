@@ -114,7 +114,7 @@ public class UsersStackSection extends SectionStackSection {
                     long now = new Date().getTime();
                     long halfMonthDate = now - ((long) 15 * 24 * 3600000);
                     long oneMonthDate = now - ((long) 30 * 24 * 3600000);
-                    long threeMonthsDate = now - ((long) 90 * 24 * 3600000);                   
+                    long threeMonthsDate = now - ((long) 90 * 24 * 3600000);
 
                     if (userRecord.getDate().getTime() < threeMonthsDate) {
                         return "color:#D64949;";
@@ -191,7 +191,7 @@ public class UsersStackSection extends SectionStackSection {
                 lastLoginField.setDateFormatter(DateDisplayFormat.TOUSSHORTDATETIME);
 
                 detailViewer.setFields(levelField, emailField, firstNameField,
-                        lastNameField, institutionField, phoneField, countryField, 
+                        lastNameField, institutionField, phoneField, countryField,
                         lastLoginField);
                 detailViewer.setData(new Record[]{record});
 
@@ -211,13 +211,14 @@ public class UsersStackSection extends SectionStackSection {
 
         ListGridField confirmedField = new ListGridField("confirmed", "Confirmed");
         confirmedField.setType(ListGridFieldType.BOOLEAN);
+        ListGridField countryField = FieldUtil.getIconGridField("countryCodeIcon");
         ListGridField firstNameField = new ListGridField("firstName", "First Name");
         ListGridField lastNameField = new ListGridField("lastName", "Last Name");
         ListGridField emailField = new ListGridField("email", "Email");
         ListGridField lastLoginField = FieldUtil.getDateField("lastLogin", "Last Login");
 
-        grid.setFields(confirmedField, firstNameField, lastNameField,
-                lastLoginField, emailField);
+        grid.setFields(confirmedField, countryField, firstNameField,
+                lastNameField, lastLoginField, emailField);
         grid.setSortField("firstName");
         grid.setSortDirection(SortDirection.ASCENDING);
 

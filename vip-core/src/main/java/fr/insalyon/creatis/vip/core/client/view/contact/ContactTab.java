@@ -118,17 +118,20 @@ public class ContactTab extends Tab {
         submitButton = new IButton("Submit");
         submitButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 if (subjectField.validate()) {
 
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
                     final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+                        @Override
                         public void onFailure(Throwable caught) {
                             modal.hide();
                             SC.warn("Unable to send contact email:<br />" + caught.getMessage());
                         }
 
+                        @Override
                         public void onSuccess(Void result) {
                             modal.hide();
                             SC.say("Contact successfully sent.");

@@ -38,13 +38,13 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.ButtonItem;
+import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
@@ -56,6 +56,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,8 +69,8 @@ import java.util.Map;
 public class EditUserStackSection extends SectionStackSection {
 
     private ModalWindow modal;
-    private DynamicForm form;
-    private TextItem emailField;
+    private VLayout editUserLayout;
+    private Label emailLabel;
     private SelectItem levelPickList;
     private SelectItem groupsPickList;
     private SelectItem countryPickList;
@@ -77,63 +78,62 @@ public class EditUserStackSection extends SectionStackSection {
 
     public EditUserStackSection() {
 
-        this.setTitle("Edit User's Groups");
+        this.setTitle("Edit User");
         this.setCanCollapse(true);
         this.setExpanded(true);
         this.setResizeable(true);
-
-        configureForm();
 
         VLayout vLayout = new VLayout(15);
         vLayout.setHeight100();
         vLayout.setOverflow(Overflow.AUTO);
         vLayout.setMargin(5);
-        vLayout.addMember(form);
 
-        modal = new ModalWindow(vLayout);
+        configure();
+
+        vLayout.addMember(editUserLayout);
+        modal = new ModalWindow(editUserLayout);
 
         this.addItem(vLayout);
         loadData();
     }
 
-    private void configureForm() {
+    private void configure() {
 
-        form = new DynamicForm();
-        form.setWidth(500);
-
-        emailField = FieldUtil.getTextItem(350, true, "Email", null);
-        emailField.setDisabled(true);
-
+        emailLabel = WidgetUtil.getLabel("", 15);
+        emailLabel.setCanSelectText(true);
+        
         levelPickList = new SelectItem();
-        levelPickList.setTitle("Level");
+        levelPickList.setShowTitle(false);
         levelPickList.setWidth(350);
         levelPickList.setRequired(true);
 
         groupsPickList = new SelectItem();
-        groupsPickList.setTitle("Groups");
+        groupsPickList.setShowTitle(false);
         groupsPickList.setMultiple(true);
         groupsPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
         groupsPickList.setWidth(350);
 
         countryPickList = new SelectItem();
-        countryPickList.setTitle("Country");
+        countryPickList.setShowTitle(false);
         countryPickList.setValueMap(CountryCode.getCountriesMap());
         countryPickList.setValueIcons(CountryCode.getCodesMap());
         countryPickList.setImageURLPrefix(CoreConstants.FOLDER_FLAGS);
         countryPickList.setImageURLSuffix(".png");
         countryPickList.setRequired(true);
-        
+        countryPickList.setWidth(350);
+
         confirmedField = new CheckboxItem();
         confirmedField.setTitle("Confirmed");
         confirmedField.setDisabled(true);
+        confirmedField.setWidth(350);
 
-        ButtonItem saveItem = new ButtonItem("Save");
-        saveItem.setWidth(50);
-        saveItem.addClickHandler(new ClickHandler() {
+        IButton saveButton = new IButton("Save");
+        saveButton.setWidth(70);
+        saveButton.addClickHandler(new ClickHandler() {
 
             @Override
             public void onClick(ClickEvent event) {
-                if (form.validate()) {
+                if (levelPickList.validate() & countryPickList.validate()) {
 
                     String[] values = groupsPickList.getValues();
                     Map<String, CoreConstants.GROUP_ROLE> map = new HashMap<String, CoreConstants.GROUP_ROLE>();
@@ -154,7 +154,7 @@ public class EditUserStackSection extends SectionStackSection {
                             }
                         }
                     }
-                    save(emailField.getValueAsString().trim(),
+                    save(emailLabel.getContents(),
                             UserLevel.valueOf(levelPickList.getValueAsString()),
                             CountryCode.valueOf(countryPickList.getValueAsString()),
                             map);
@@ -162,8 +162,20 @@ public class EditUserStackSection extends SectionStackSection {
             }
         });
 
-        form.setFields(emailField, levelPickList, groupsPickList, countryPickList, 
-                confirmedField, saveItem);
+        editUserLayout = WidgetUtil.getVIPLayout(380, 300);
+        editUserLayout.addMember(WidgetUtil.getLabel("<b>Email</b>", 15));
+        editUserLayout.addMember(emailLabel);
+        addField("Level", levelPickList);
+        addField("Groups", groupsPickList);
+        addField("Country", countryPickList);
+        editUserLayout.addMember(FieldUtil.getForm(confirmedField));
+        editUserLayout.addMember(saveButton);
+    }
+
+    private void addField(String title, FormItem item) {
+
+        editUserLayout.addMember(WidgetUtil.getLabel("<b>" + title + "</b>", 15));
+        editUserLayout.addMember(FieldUtil.getForm(item));
     }
 
     /**
@@ -176,7 +188,7 @@ public class EditUserStackSection extends SectionStackSection {
      */
     public void setUser(String email, boolean confirmed, String level, String countryCode) {
 
-        this.emailField.setValue(email);
+        this.emailLabel.setContents(email);
         this.confirmedField.setValue(confirmed);
         this.levelPickList.setValue(level);
         this.countryPickList.setValue(countryCode);
@@ -237,7 +249,7 @@ public class EditUserStackSection extends SectionStackSection {
             @Override
             public void onSuccess(Void result) {
                 modal.hide();
-                emailField.setValue("");
+                emailLabel.setContents("");
                 levelPickList.setValues(new String[]{});
                 groupsPickList.setValues(new String[]{});
                 countryPickList.setValues(new String[]{});
