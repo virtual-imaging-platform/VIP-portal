@@ -35,8 +35,10 @@
 package fr.insalyon.creatis.vip.core.client.view.user.account;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -48,9 +50,11 @@ import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
+import fr.insalyon.creatis.vip.core.client.view.user.UpgradeLevelLayout;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
@@ -58,10 +62,10 @@ import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
  */
 public class PersonalLayout extends AbstractFormLayout {
 
-    private TextItem levelField;
+    private Label levelLabel;
+    private Label emailLabel;
     private TextItem firstNameField;
     private TextItem lastNameField;
-    private TextItem emailField;
     private TextItem institutionField;
     private TextItem phoneField;
     private SelectItem countryField;
@@ -79,8 +83,8 @@ public class PersonalLayout extends AbstractFormLayout {
 
     private void configure() {
 
-        levelField = FieldUtil.getTextItem(300, null, true);
-        emailField = FieldUtil.getTextItem(300, null, true);
+        levelLabel = WidgetUtil.getLabel("", 15);
+        emailLabel = WidgetUtil.getLabel("", 15);
         firstNameField = FieldUtil.getTextItem(300, null);
         lastNameField = FieldUtil.getTextItem(300, null);
         institutionField = FieldUtil.getTextItem(300, null);
@@ -107,10 +111,10 @@ public class PersonalLayout extends AbstractFormLayout {
                     User user = new User(
                             firstNameField.getValueAsString().trim(),
                             lastNameField.getValueAsString().trim(),
-                            emailField.getValueAsString(),
+                            emailLabel.getContents(),
                             institutionField.getValueAsString().trim(),
                             phoneField.getValueAsString().trim(),
-                            UserLevel.valueOf(levelField.getValueAsString()),
+                            UserLevel.valueOf(levelLabel.getContents()),
                             CountryCode.valueOf(countryField.getValueAsString()));
                     user.setFolder(folder);
 
@@ -136,8 +140,10 @@ public class PersonalLayout extends AbstractFormLayout {
             }
         });
 
-        addField("Level", levelField);
-        addField("E-mail", emailField);
+        this.addMember(WidgetUtil.getLabel("<b>Level</b>", 15));
+        this.addMember(levelLabel);
+        this.addMember(WidgetUtil.getLabel("<b>Email</b>", 15));
+        this.addMember(emailLabel);
         addField("First Name", firstNameField);
         addField("Last Name", lastNameField);
         addField("Institution", institutionField);
@@ -160,8 +166,19 @@ public class PersonalLayout extends AbstractFormLayout {
             @Override
             public void onSuccess(User result) {
 
-                levelField.setValue(result.getLevel().name());
-                emailField.setValue(result.getEmail());
+                levelLabel.setContents(result.getLevel().name());
+                if (result.getLevel() == UserLevel.Beginner) {
+                    levelLabel.addClickHandler(new ClickHandler() {
+
+                        @Override
+                        public void onClick(ClickEvent event) {
+                            new UpgradeLevelLayout(event.getX(), event.getY()).show();
+                        }
+                    });
+                    levelLabel.setPrompt("Upgrade your Account!");
+                    levelLabel.setCursor(Cursor.HAND);
+                }
+                emailLabel.setContents(result.getEmail());
                 firstNameField.setValue(result.getFirstName());
                 lastNameField.setValue(result.getLastName());
                 institutionField.setValue(result.getInstitution());

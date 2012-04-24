@@ -83,6 +83,7 @@ public class UpgradeLevelLayout extends VLayout {
         closeLabel.setCursor(Cursor.HAND);
         closeLabel.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 destroy();
             }
