@@ -8,7 +8,7 @@
         <h1>The GateLab</h1>
 		
 		<h2>Preparing your simulation</h2>
-        <p>A GATE simulation is composed of several files (macros files, but also data files. Your simulation folder <b>must</b> be organized as followed : all input files must be in a "data" folder, all macro files in a "mac" folder and all output files in a "output" folder. All of these three folders <b>must</b> be in the same parent folder from which GATE will be executed. Your macro files <b>must</b> therefore refer to the inputs as "data/..." to macros as "mac/..." and outputs as "output/...".</p>
+        <p>A GATE simulation is composed of several files (macros files, but also data files. Your simulation folder <b>must</b> be organized as followed : all input files (including the GateMaterials.db file) must be in a "data" folder, all macro files in a "mac" folder and all output files in a "output" folder. All of these three folders <b>must</b> be in the same parent folder from which GATE will be executed. Your macro files <b>must</b> therefore refer to the inputs as "data/..." to macros as "mac/..." and outputs as "output/...". Note that your GateMaterials.db file has to be present in your data folder.</p>
   
 		
 		<h2>Supported simulation types</h2>
@@ -66,8 +66,7 @@ eg.</p>
 
         <h3>Important Remarks</h3>
         <ul>
-            <li>Please note that in order for the parsing to be accurate, all input files must be in a "data" folder, all macro files in a "mac" folder and all output files in a 
-                "output" folder, and all of these folders must be in the same parent folder from which GATE will be executed. 
+            <li>Please note that in order for the parsing to be accurate, all input files (including your GateMaterials.db file) must be in a "data" folder, all macro files in a "mac" folder and all output files in a "output" folder, and all of these folders must be in the same parent folder from which GATE will be executed. 
                 Your macro files should therefore refer to the inputs as "data/..." to macros as "mac/..." and outputs as "output/..."</li>
             <li>If you have header-file inputs (e.g. hdr/img hdr/bin file "couples") the data file must have the same name as the header file (for ex: input1.hdr and input1.img)</li>
             <li>The initialization line "/gate/application/setTotalNumberOfPrimaries" must be present in the submitted macro file.</li>
