@@ -35,23 +35,16 @@
 package fr.insalyon.creatis.vip.simulationgui.server.business;
 
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectModelFactory;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Instant;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectLayer;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectLayerPart;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Timepoint;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.*;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3D;
 import fr.insalyon.creatis.vip.simulationgui.client.view.SimulationGUIException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.zip.ZipEntry;
@@ -71,7 +64,7 @@ public class DownloadService {
     private String returnPath = "null";
     private static Data3D[][] object;
 
-    public DownloadService(String url, String user) throws URISyntaxException  {
+    public DownloadService(String url, User user) throws URISyntaxException  {
 
         zipPath = "null";
         finalPath = "null";
@@ -88,9 +81,9 @@ public class DownloadService {
         return object;
     }
 
-    private void download(String url, String user) throws URISyntaxException {
+    private void download(String url, User user) throws URISyntaxException {
         try {
-            zipPath = vletAgentConnexion(url, user);
+            zipPath = gridaConnexion(url, user);
 
         } catch (DataManagerException ex) {
             logger.error(ex);
@@ -112,7 +105,7 @@ public class DownloadService {
         }
     }
 
-    private String vletAgentConnexion(String url, String user) throws GRIDAClientException, URISyntaxException, DataManagerException {
+    private String gridaConnexion(String url, User user) throws GRIDAClientException, URISyntaxException, DataManagerException {
 
         URI URL = new URI(url);
         String path = "null2";

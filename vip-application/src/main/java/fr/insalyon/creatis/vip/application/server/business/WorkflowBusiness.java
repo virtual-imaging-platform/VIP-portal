@@ -83,7 +83,7 @@ public class WorkflowBusiness {
      * @return
      * @throws BusinessException
      */
-    public Descriptor getApplicationDescriptor(String user, String applicationName)
+    public Descriptor getApplicationDescriptor(User user, String applicationName)
             throws BusinessException {
 
         try {
@@ -165,7 +165,7 @@ public class WorkflowBusiness {
                 } else if (valuesStr.contains(ApplicationConstants.SEPARATOR_LIST)) {
                     String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_LIST);
                     for (String v : values) {
-                        String parsedPath = DataManagerUtil.parseBaseDir(user.getFullName(), v.trim());
+                        String parsedPath = DataManagerUtil.parseBaseDir(user, v.trim());
                         if (!user.isSystemAdministrator()) {
                             checkFolderACL(user.getFullName(), groups, parsedPath);
                         }
@@ -173,7 +173,7 @@ public class WorkflowBusiness {
                     }
 
                 } else {
-                    String parsedPath = DataManagerUtil.parseBaseDir(user.getFullName(), valuesStr.trim());
+                    String parsedPath = DataManagerUtil.parseBaseDir(user, valuesStr.trim());
                     if (!user.isSystemAdministrator()) {
                         checkFolderACL(user.getFullName(), groups, parsedPath);
                     }
@@ -185,7 +185,7 @@ public class WorkflowBusiness {
             Application app = ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getApplication(applicationName);
 
             DataManagerBusiness dmBusiness = new DataManagerBusiness();
-            String workflowPath = dmBusiness.getRemoteFile(user.getEmail(), app.getLfn(),
+            String workflowPath = dmBusiness.getRemoteFile(user, app.getLfn(),
                     Server.getInstance().getConfigurationFolder() + "workflows/"
                     + FilenameUtils.getName(app.getLfn()));
 
@@ -589,7 +589,7 @@ public class WorkflowBusiness {
      * @param inputs
      * @throws BusinessException
      */
-    public void validateInputs(String user, List<String> inputs) throws BusinessException {
+    public void validateInputs(User user, List<String> inputs) throws BusinessException {
 
         try {
             GRIDAClient client = CoreUtil.getGRIDAClient();

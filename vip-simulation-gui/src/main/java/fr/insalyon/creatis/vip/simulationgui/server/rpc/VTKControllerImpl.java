@@ -36,8 +36,6 @@ package fr.insalyon.creatis.vip.simulationgui.server.rpc;
 
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIConstants;
@@ -57,7 +55,9 @@ import org.apache.log4j.Logger;
 public class VTKControllerImpl extends AbstractRemoteServiceServlet implements VTKController {
 
     private static Logger logger = Logger.getLogger(VTKControllerImpl.class);
- private Data3D[][] object = null;
+    private Data3D[][] object = null;
+
+    @Override
     public void configure() throws SimulationGUIException {
 
         addClass(SimulationGUIConstants.CLASS_CT);
@@ -66,6 +66,7 @@ public class VTKControllerImpl extends AbstractRemoteServiceServlet implements V
         addClass(SimulationGUIConstants.CLASS_US);
     }
 
+    @Override
     public Data3D[][] downloadAndUnzipExample(String path) {
 
         String[][] entry = new String[3][3];
@@ -132,46 +133,46 @@ public class VTKControllerImpl extends AbstractRemoteServiceServlet implements V
 
     }
 
+    @Override
     public Data3D[][] downloadAndUnzipModel(String url) throws Exception {
-            User user = getSessionUser();
-            DownloadService service = new DownloadService(url, user.getFullName());
-            Data3D[][] object =  service.rebuildObject();
 
-            
-            System.out.println("object got and garbage done " + object.length);
-            return object;
-            //return service.getObject();
-   
+        DownloadService service = new DownloadService(url, getSessionUser());
+        Data3D[][] object = service.rebuildObject();
+
+
+        System.out.println("object got and garbage done " + object.length);
+        return object;
+        //return service.getObject();
     }
-    
-    
-    
-     public int[][] UnzipModel(String url) throws Exception {
-            User user = getSessionUser();
-            DownloadService service = new DownloadService(url, user.getFullName());
-            object =  service.rebuildObject();
-            
-            System.out.println("object got and garbage done " + object.length);
-        
-            int[][] result = new int[object.length][1];
-            for(int i = 0; i < object.length; i++)
-            {
-                result[i] = new int[object[i].length];
-                System.out.println("for "+ i +  object[i].length + " objets");
-            }
-            return result;
-            //return service.getObject();
-       }
 
-       public Data3Dij downloadModel(int i, int j) throws Exception {
-          
-           Data3Dij data = new Data3Dij();
-           data.data = object[i][j];
-           data.i = i;
-           data.j = j;
-           System.out.println("Download "+ i +  " et " + j + " size :" + data.data.getItemSizeVertex());
-           return data;
-       }
+    @Override
+    public int[][] UnzipModel(String url) throws Exception {
+
+        DownloadService service = new DownloadService(url, getSessionUser());
+        object = service.rebuildObject();
+
+        System.out.println("object got and garbage done " + object.length);
+
+        int[][] result = new int[object.length][1];
+        for (int i = 0; i < object.length; i++) {
+            result[i] = new int[object[i].length];
+            System.out.println("for " + i + object[i].length + " objets");
+        }
+        return result;
+        //return service.getObject();
+    }
+
+    @Override
+    public Data3Dij downloadModel(int i, int j) throws Exception {
+
+        Data3Dij data = new Data3Dij();
+        data.data = object[i][j];
+        data.i = i;
+        data.j = j;
+        System.out.println("Download " + i + " et " + j + " size :" + data.data.getItemSizeVertex());
+        return data;
+    }
+
     private void addClass(String className) throws SimulationGUIException {
 
         try {

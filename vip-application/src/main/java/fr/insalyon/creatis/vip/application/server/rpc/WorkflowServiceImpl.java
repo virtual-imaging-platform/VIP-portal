@@ -80,11 +80,12 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @return
      * @throws ApplicationException
      */
+    @Override
     public Descriptor getApplicationDescriptor(String applicationName) throws ApplicationException {
 
         try {
             return workflowBusiness.getApplicationDescriptor(
-                    getSessionUser().getFullName(), applicationName);
+                    getSessionUser(), applicationName);
 
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
@@ -668,10 +669,11 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param inputs
      * @throws ApplicationException
      */
+    @Override
     public void validateInputs(List<String> inputs) throws ApplicationException {
 
         try {
-            workflowBusiness.validateInputs(getSessionUser().getFullName(), inputs);
+            workflowBusiness.validateInputs(getSessionUser(), inputs);
 
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
