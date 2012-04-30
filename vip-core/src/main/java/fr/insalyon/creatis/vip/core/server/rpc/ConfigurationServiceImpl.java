@@ -164,6 +164,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @return
      * @throws CoreException
      */
+    @Override
     public User activate(String code) throws CoreException {
 
         try {

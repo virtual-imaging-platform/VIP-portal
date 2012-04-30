@@ -40,6 +40,7 @@ import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAZombieClient;
 import fr.insalyon.creatis.grida.common.bean.CachedFile;
 import fr.insalyon.creatis.grida.common.bean.ZombieFile;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
@@ -113,7 +114,7 @@ public class DataManagerBusiness {
      * @return
      * @throws BusinessException
      */
-    public String getRemoteFile(String user, String remoteFile, String localDir)
+    public String getRemoteFile(User user, String remoteFile, String localDir)
             throws BusinessException {
 
         try {

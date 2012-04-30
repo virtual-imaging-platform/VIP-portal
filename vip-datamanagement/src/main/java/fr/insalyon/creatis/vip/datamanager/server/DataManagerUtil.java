@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server;
 
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
@@ -55,15 +56,15 @@ public class DataManagerUtil {
      * @return
      * @throws DataManagerException
      */
-    public static String parseBaseDir(String user, String baseDir) throws DataManagerException {
+    public static String parseBaseDir(User user, String baseDir) throws DataManagerException {
 
         baseDir = parsePath(baseDir, DataManagerConstants.USERS_HOME,
                 Server.getInstance().getDataManagerUsersHome()
-                + "/" + user.replaceAll(" ", "_").toLowerCase());
+                + "/" + user.getFolder());
 
         baseDir = parsePath(baseDir, DataManagerConstants.TRASH_HOME,
                 Server.getInstance().getDataManagerUsersHome()
-                + "/" + user.replaceAll(" ", "_").toLowerCase()
+                + "/" + user.getFolder()
                 + "_" + DataManagerConstants.TRASH_HOME);
 
         baseDir = parsePath(baseDir, DataManagerConstants.USERS_FOLDER,

@@ -62,8 +62,7 @@ public class UploadFilesServiceImpl extends HttpServlet {
     private static Logger logger = Logger.getLogger(UploadFilesServiceImpl.class);
     private GRIDAClient client;
     private GRIDAPoolClient poolClient;
-    private String userName;
-    private String email;
+    private User user;
     private String path;
     private boolean usePool;
 
@@ -77,11 +76,9 @@ public class UploadFilesServiceImpl extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            User user = CoreDAOFactory.getDAOFactory().getUserDAO().getUserBySession(req.getHeader(CoreConstants.COOKIES_SESSION));
+            user = CoreDAOFactory.getDAOFactory().getUserDAO().getUserBySession(req.getHeader(CoreConstants.COOKIES_SESSION));
 
             boolean overwrite = true;
-            userName = user.getFullName();
-            email = user.getEmail();
             path = req.getHeader("path");
             String fileName = req.getHeader("fileName");
             boolean single = Boolean.valueOf(req.getHeader("single"));
@@ -131,7 +128,7 @@ public class UploadFilesServiceImpl extends HttpServlet {
                     processDir(dir, path);
                 }
             } else {
-                logger.info("(" + email + ") Uploaded local file '" + uploadedFile.getAbsolutePath() + "'.");
+                logger.info("(" + user.getEmail() + ") Uploaded local file '" + uploadedFile.getAbsolutePath() + "'.");
             }
 
             response.setContentType("text/html");
@@ -186,12 +183,12 @@ public class UploadFilesServiceImpl extends HttpServlet {
             fileName = parsed;
         }
 
-        logger.info("(" + email + ") Uploading '" + fileName + "' to '" + dir + "'.");
+        logger.info("(" + user.getEmail() + ") Uploading '" + fileName + "' to '" + dir + "'.");
         if (usePool) {
             poolClient.uploadFile(fileName,
-                    DataManagerUtil.parseBaseDir(userName, dir), email);
+                    DataManagerUtil.parseBaseDir(user, dir), user.getEmail());
         } else {
-            client.uploadFile(fileName, DataManagerUtil.parseBaseDir(userName, dir));
+            client.uploadFile(fileName, DataManagerUtil.parseBaseDir(user, dir));
         }
     }
 }

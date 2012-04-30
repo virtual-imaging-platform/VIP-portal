@@ -49,6 +49,7 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.text.Normalizer;
 import java.util.*;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -135,8 +136,10 @@ public class ConfigurationBusiness {
         try {
             user.setCode(UUID.randomUUID().toString());
             user.setPassword(MD5.get(user.getPassword()));
-            user.setFolder(user.getFirstName().replaceAll(" ", "_").toLowerCase() + "_"
-                    + user.getLastName().replaceAll(" ", "_").toLowerCase());
+            String folder = user.getFirstName().replaceAll(" ", "_").toLowerCase() + "_"
+                    + user.getLastName().replaceAll(" ", "_").toLowerCase();
+            folder = Normalizer.normalize(folder, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+            user.setFolder(folder);
             user.setLastLogin(new Date());
             user.setLevel(UserLevel.Beginner);
             

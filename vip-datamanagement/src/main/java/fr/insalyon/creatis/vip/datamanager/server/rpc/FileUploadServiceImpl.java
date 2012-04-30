@@ -111,7 +111,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
                             client.uploadFile(
                                     uploadedFile.getAbsolutePath(),
-                                    DataManagerUtil.parseBaseDir(user.getFullName(), path),
+                                    DataManagerUtil.parseBaseDir(user, path),
                                     user.getEmail());
 
                         } else {

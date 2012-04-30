@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.datamanager.server.business;
 
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.common.bean.GridData;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
@@ -63,7 +64,7 @@ public class LFCBusiness {
      * @return
      * @throws BusinessException 
      */
-    public List<Data> listDir(String user, String baseDir, boolean refresh) 
+    public List<Data> listDir(User user, String baseDir, boolean refresh) 
             throws BusinessException {
 
         try {
@@ -102,7 +103,7 @@ public class LFCBusiness {
      * @param name
      * @throws BusinessException 
      */
-    public void createDir(String user, String baseDir, String name) throws BusinessException {
+    public void createDir(User user, String baseDir, String name) throws BusinessException {
 
         try {
             CoreUtil.getGRIDAClient().createFolder(
@@ -125,7 +126,7 @@ public class LFCBusiness {
      * @param extendPath
      * @throws BusinessException 
      */
-    public void rename(String user, String oldPath, String newPath,
+    public void rename(User user, String oldPath, String newPath,
             boolean extendPath) throws BusinessException {
 
         try {
@@ -159,7 +160,7 @@ public class LFCBusiness {
      * @param extendPath
      * @throws BusinessException 
      */
-    public void rename(String user, String baseDir, List<String> paths,
+    public void rename(User user, String baseDir, List<String> paths,
             String newBaseDir, boolean extendPath) throws BusinessException {
 
         for (String name : paths) {
@@ -174,7 +175,7 @@ public class LFCBusiness {
      * @return
      * @throws BusinessException 
      */
-    public boolean exists(String user, String path) throws BusinessException {
+    public boolean exists(User user, String path) throws BusinessException {
 
         try {
             return CoreUtil.getGRIDAClient().exist(DataManagerUtil.parseBaseDir(user, path));
@@ -195,7 +196,7 @@ public class LFCBusiness {
      * @return
      * @throws BusinessException 
      */
-    public long getModificationDate(String user, String path) throws BusinessException {
+    public long getModificationDate(User user, String path) throws BusinessException {
 
         try {
             return CoreUtil.getGRIDAClient().
@@ -217,7 +218,7 @@ public class LFCBusiness {
      * @return
      * @throws BusinessException 
      */
-    public List<Long> getModificationDate(String user, List<String> paths)
+    public List<Long> getModificationDate(User user, List<String> paths)
             throws BusinessException {
         try {
             List<String> parsedPaths = new ArrayList<String>();

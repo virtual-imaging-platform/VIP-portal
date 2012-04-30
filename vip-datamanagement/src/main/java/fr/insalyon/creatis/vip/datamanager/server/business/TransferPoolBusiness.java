@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.datamanager.server.business;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.grida.common.bean.Operation;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
@@ -242,22 +243,22 @@ public class TransferPoolBusiness {
 
     /**
      * 
-     * @param userName
+     * @param user
      * @param email
      * @param remoteFile
      * @throws BusinessException 
      */
-    public void downloadFile(String userName, String email, String remoteFile) throws BusinessException {
+    public void downloadFile(User user, String remoteFile) throws BusinessException {
 
         try {
-            lfcBusiness.getModificationDate(userName, remoteFile);
+            lfcBusiness.getModificationDate(user, remoteFile);
             GRIDAPoolClient poolClient = CoreUtil.getGRIDAPoolClient();
 
-            String remotePath = DataManagerUtil.parseBaseDir(userName, remoteFile);
+            String remotePath = DataManagerUtil.parseBaseDir(user, remoteFile);
             String localDirPath = serverConfiguration.getDataManagerPath()
                     + "/downloads" + FilenameUtils.getFullPath(remotePath);
 
-            poolClient.downloadFile(remotePath, localDirPath, email);
+            poolClient.downloadFile(remotePath, localDirPath, user.getEmail());
 
         } catch (DataManagerException ex) {
             logger.error(ex);
@@ -270,27 +271,26 @@ public class TransferPoolBusiness {
 
     /**
      * 
-     * @param userName
-     * @param email
+     * @param user
      * @param remoteFiles
      * @param packName
      * @throws BusinessException 
      */
-    public void downloadFiles(String userName, String email, List<String> remoteFiles,
+    public void downloadFiles(User user, List<String> remoteFiles,
             String packName) throws BusinessException {
 
         try {
-            lfcBusiness.getModificationDate(userName, remoteFiles);
+            lfcBusiness.getModificationDate(user, remoteFiles);
             GRIDAPoolClient poolClient = CoreUtil.getGRIDAPoolClient();
 
             List<String> remotePaths = new ArrayList<String>();
             for (String remoteFile : remoteFiles) {
-                remotePaths.add(DataManagerUtil.parseBaseDir(userName, remoteFile));
+                remotePaths.add(DataManagerUtil.parseBaseDir(user, remoteFile));
             }
             String localDirPath = serverConfiguration.getDataManagerPath()
                     + "/downloads/" + packName;
 
-            poolClient.downloadFiles(remotePaths.toArray(new String[]{}), localDirPath, email);
+            poolClient.downloadFiles(remotePaths.toArray(new String[]{}), localDirPath, user.getEmail());
 
         } catch (DataManagerException ex) {
             logger.error(ex);
@@ -303,22 +303,20 @@ public class TransferPoolBusiness {
 
     /**
      * 
-     * @param userName
-     * @param email
+     * @param user
      * @param remoteFolder
      * @throws BusinessException 
      */
-    public void downloadFolder(String userName, String email,
-            String remoteFolder) throws BusinessException {
+    public void downloadFolder(User user, String remoteFolder) throws BusinessException {
 
         try {
-            lfcBusiness.getModificationDate(userName, remoteFolder);
+            lfcBusiness.getModificationDate(user, remoteFolder);
             GRIDAPoolClient poolClient = CoreUtil.getGRIDAPoolClient();
 
-            String remotePath = DataManagerUtil.parseBaseDir(userName, remoteFolder);
+            String remotePath = DataManagerUtil.parseBaseDir(user, remoteFolder);
             String localDirPath = serverConfiguration.getDataManagerPath()
                     + "/downloads" + remotePath;
-            poolClient.downloadFolder(remotePath, localDirPath, email);
+            poolClient.downloadFolder(remotePath, localDirPath, user.getEmail());
 
         } catch (DataManagerException ex) {
             logger.error(ex);
@@ -331,21 +329,20 @@ public class TransferPoolBusiness {
 
     /**
      * 
-     * @param userName
-     * @param email
+     * @param user
      * @param localFile
      * @param remoteFile
      * @throws BusinessException 
      */
-    public void uploadFile(String userName, String email, String localFile,
-            String remoteFile) throws BusinessException {
+    public void uploadFile(User user, String localFile, String remoteFile) 
+            throws BusinessException {
 
         try {
             GRIDAPoolClient poolClient = CoreUtil.getGRIDAPoolClient();
             String localPath = serverConfiguration.getDataManagerPath()
                     + "/uploads/" + localFile;
-            String remotePath = DataManagerUtil.parseBaseDir(userName, remoteFile);
-            poolClient.uploadFile(localPath, remotePath, email);
+            String remotePath = DataManagerUtil.parseBaseDir(user, remoteFile);
+            poolClient.uploadFile(localPath, remotePath, user.getEmail());
 
         } catch (DataManagerException ex) {
             logger.error(ex);
@@ -358,19 +355,18 @@ public class TransferPoolBusiness {
 
     /**
      * 
-     * @param userName
-     * @param email
+     * @param user
      * @param paths
      * @throws BusinessException 
      */
-    public void delete(String userName, String email, String... paths) throws BusinessException {
+    public void delete(User user, String... paths) throws BusinessException {
 
         try {
             GRIDAPoolClient poolClient = CoreUtil.getGRIDAPoolClient();
 
             for (String path : paths) {
-                String remotePath = DataManagerUtil.parseBaseDir(userName, path);
-                poolClient.delete(remotePath, email);
+                String remotePath = DataManagerUtil.parseBaseDir(user, path);
+                poolClient.delete(remotePath, user.getEmail());
             }
 
         } catch (DataManagerException ex) {
