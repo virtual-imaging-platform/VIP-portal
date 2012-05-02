@@ -236,7 +236,7 @@ public class ChartsTab extends Tab {
 
             @Override
             public void onSuccess(List<String> result) {
-                JobFlowChart.build(result, rightVLayout, grid);
+                new JobFlowChart(result, rightVLayout, grid).build();
                 modal.hide();
             }
         };
@@ -257,7 +257,7 @@ public class ChartsTab extends Tab {
 
             @Override
             public void onSuccess(List<String> result) {
-                CheckpointChart.build(result, rightVLayout, grid);
+                new CheckpointChart(result, rightVLayout, grid).build();
                 modal.hide();
             }
         };
@@ -282,7 +282,7 @@ public class ChartsTab extends Tab {
 
             @Override
             public void onSuccess(List<String> result) {
-                GeneralBarChart.build(result, rightVLayout, grid, "Execution Time (sec)", "#00aa00", binSize);
+                new GeneralBarChart(result, rightVLayout, grid).build("Execution Time (sec)", "#00aa00", binSize);
                 modal.hide();
             }
         };
@@ -307,7 +307,7 @@ public class ChartsTab extends Tab {
 
             @Override
             public void onSuccess(List<String> result) {
-                GeneralBarChart.build(result, rightVLayout, grid, "Download Time (sec)", "#6699CC", binSize);
+                new GeneralBarChart(result, rightVLayout, grid).build("Download Time (sec)", "#6699CC", binSize);
                 modal.hide();
             }
         };
@@ -332,7 +332,7 @@ public class ChartsTab extends Tab {
 
             @Override
             public void onSuccess(List<String> result) {
-                GeneralBarChart.build(result, rightVLayout, grid, "Upload Time (sec)", "#CC9966", binSize);
+                new GeneralBarChart(result, rightVLayout, grid).build("Upload Time (sec)", "#CC9966", binSize);
                 modal.hide();
             }
         };
@@ -353,7 +353,7 @@ public class ChartsTab extends Tab {
 
             @Override
             public void onSuccess(List<String> result) {
-                SitesBarChart.build(result, rightVLayout, grid);
+                new SitesBarChart(result, rightVLayout, grid).build();
                 modal.hide();
             }
         };

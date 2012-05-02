@@ -51,7 +51,11 @@ import java.util.List;
  */
 public class SitesBarChart extends AbstractChart {
 
-    public static void build(List<String> data, VLayout chartLayout, ListGrid grid) {
+    public SitesBarChart(List<String> data, VLayout chartLayout, ListGrid grid) {
+        super(data, chartLayout, grid);
+    }
+
+    public void build() {
 
         chartLayout.removeMembers(chartLayout.getMembers());
 
@@ -85,6 +89,7 @@ public class SitesBarChart extends AbstractChart {
         int row = 0;
 
         for (String values : data) {
+            addRowData(values);
             String[] res = values.split("##");
             series.add(new DataPoint(row, Integer.parseInt(res[1])));
             row++;
@@ -94,7 +99,9 @@ public class SitesBarChart extends AbstractChart {
         SimplePlot plot = new SimplePlot(model, plotOptions);
         plot.setWidth(700);
         plot.setHeight(400);
+        
         chartLayout.addMember(plot);
+        chartLayout.addMember(getRowDataImg());
 
         grid.setData(new PropertyRecord[]{});
     }

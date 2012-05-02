@@ -50,7 +50,11 @@ import java.util.List;
  */
 public class JobFlowChart extends AbstractChart {
 
-    public static void build(List<String> data, VLayout chartLayout, ListGrid grid) {
+    public JobFlowChart(List<String> data, VLayout chartLayout, ListGrid grid) {
+        super(data, chartLayout, grid);
+    }
+
+    public void build() {
 
         chartLayout.removeMembers(chartLayout.getMembers());
 
@@ -107,6 +111,7 @@ public class JobFlowChart extends AbstractChart {
 
         for (String values : data) {
 
+            addRowData(values);
             String[] v = values.split("##");
             JobStatus status = JobStatus.valueOf(v[0]);
 
@@ -153,7 +158,9 @@ public class JobFlowChart extends AbstractChart {
         SimplePlot plot = new SimplePlot(model, plotOptions);
         plot.setWidth(700);
         plot.setHeight(400);
+        
         chartLayout.addMember(plot);
+        chartLayout.addMember(getRowDataImg());
 
         grid.setData(new PropertyRecord[]{
                     new PropertyRecord("Makespan (s)", max + ""),

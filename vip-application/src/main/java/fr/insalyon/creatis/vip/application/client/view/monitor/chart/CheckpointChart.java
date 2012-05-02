@@ -50,7 +50,11 @@ import java.util.List;
  */
 public class CheckpointChart extends AbstractChart {
 
-    public static void build(List<String> data, VLayout chartLayout, ListGrid grid) {
+    public CheckpointChart(List<String> data, VLayout chartLayout, ListGrid grid) {
+        super(data, chartLayout, grid);
+    }
+
+    public void build() {
 
         chartLayout.removeMembers(chartLayout.getMembers());
 
@@ -104,6 +108,7 @@ public class CheckpointChart extends AbstractChart {
 
         for (String values : data) {
 
+            addRowData(values);
             String[] v = values.split("##");
             JobStatus status = JobStatus.valueOf(v[0]);
             int nb_occ = Integer.parseInt(v[1]);
@@ -144,7 +149,9 @@ public class CheckpointChart extends AbstractChart {
         SimplePlot plot = new SimplePlot(model, plotOptions);
         plot.setWidth(700);
         plot.setHeight(400);
+        
         chartLayout.addMember(plot);
+        chartLayout.addMember(getRowDataImg());
 
         grid.setData(new PropertyRecord[]{
                     new PropertyRecord("Ckpts for Completed Jobs", occCompleted + ""),

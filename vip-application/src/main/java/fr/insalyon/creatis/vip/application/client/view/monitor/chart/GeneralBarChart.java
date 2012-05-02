@@ -47,10 +47,13 @@ import java.util.List;
  *
  * @author Rafael Silva
  */
-public class GeneralBarChart {
+public class GeneralBarChart extends AbstractChart {
 
-    public static void build(List<String> data, VLayout chartLayout, ListGrid grid,
-            String caption, String color, int binSize) {
+    public GeneralBarChart(List<String> data, VLayout chartLayout, ListGrid grid) {
+        super(data, chartLayout, grid);
+    }
+
+    public void build(String caption, String color, int binSize) {
 
         chartLayout.removeMembers(chartLayout.getMembers());
 
@@ -91,6 +94,8 @@ public class GeneralBarChart {
         final List<Integer> rangesList = new ArrayList<Integer>();
 
         for (String values : data) {
+            
+            addRowData(values);
             String[] res = values.split("##");
             int range = Integer.parseInt(res[0]);
 
@@ -146,7 +151,9 @@ public class GeneralBarChart {
         SimplePlot plot = new SimplePlot(model, plotOptions);
         plot.setWidth(700);
         plot.setHeight(400);
+        
         chartLayout.addMember(plot);
+        chartLayout.addMember(getRowDataImg());
 
         grid.setData(new PropertyRecord[]{
                     new PropertyRecord("Min (s)", min + ""),
