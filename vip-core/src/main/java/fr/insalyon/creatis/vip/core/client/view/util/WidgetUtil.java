@@ -105,7 +105,7 @@ public class WidgetUtil {
      */
     public static VLayout getVIPLayout(int width) {
 
-        return getVIPLayout(width, "100%");
+        return getVIPLayout(width, "100%", true);
     }
 
     /**
@@ -116,16 +116,39 @@ public class WidgetUtil {
      */
     public static VLayout getVIPLayout(int width, int height) {
 
-        return getVIPLayout(width, Integer.toString(height));
+        return getVIPLayout(width, Integer.toString(height), true);
     }
 
+    /**
+     * 
+     * @param width
+     * @param height
+     * @return 
+     */
+    public static VLayout getVIPLayout(int width, String height) {
+        
+        return getVIPLayout(width, height, true);
+    }
+    
+    /**
+     * 
+     * @param width
+     * @param height
+     * @param showTitle
+     * @return 
+     */
+    public static VLayout getVIPLayout(int width, int height, boolean showTitle) {
+        
+        return getVIPLayout(width, Integer.toString(height), showTitle);
+    }
+    
     /**
      *
      * @param width
      * @param height
      * @return
      */
-    public static VLayout getVIPLayout(int width, String height) {
+    public static VLayout getVIPLayout(int width, String height, boolean showTitle) {
 
         VLayout layout = new VLayout(5);
         layout.setWidth(width);
@@ -134,20 +157,22 @@ public class WidgetUtil {
         layout.setBackgroundColor("#F5F5F5");
         layout.setPadding(10);
 
-        Label vipLabel = getLabel("<font color=\"#C0C0C0\"><b>Virtual Imaging Platform</b></font>", 15);
-        vipLabel.setWidth100();
-        vipLabel.setAlign(Alignment.RIGHT);
-        layout.addMember(vipLabel);
+        if (showTitle) {
+            Label vipLabel = getLabel("<font color=\"#C0C0C0\"><b>Virtual Imaging Platform</b></font>", 15);
+            vipLabel.setWidth100();
+            vipLabel.setAlign(Alignment.RIGHT);
+            layout.addMember(vipLabel);
+        }
 
         return layout;
     }
-    
+
     /**
      * Adds a FormItem to a VIP Layout.
-     * 
+     *
      * @param layout VIP Layout
      * @param title Field title
-     * @param item  Field object
+     * @param item Field object
      */
     public static void addFieldToVIPLayout(Layout layout, String title, FormItem item) {
 
@@ -156,7 +181,7 @@ public class WidgetUtil {
     }
 
     /**
-     * Gets a ToolStrip configured to display an icon and a prompt, and to 
+     * Gets a ToolStrip configured to display an icon and a prompt, and to
      * perform an action.
      *
      * @param icon Icon to be displayed
@@ -166,13 +191,13 @@ public class WidgetUtil {
      */
     public static ToolStripButton getToolStripButton(String icon, String prompt,
             ClickHandler clickHandler) {
-        
+
         return getToolStripButton(null, icon, prompt, clickHandler);
     }
-    
+
     /**
-     * Gets a ToolStrip configured to display a title, an icon and a prompt, 
-     * and to perform an action.
+     * Gets a ToolStrip configured to display a title, an icon and a prompt, and
+     * to perform an action.
      *
      * @param title Button title
      * @param icon Button icon

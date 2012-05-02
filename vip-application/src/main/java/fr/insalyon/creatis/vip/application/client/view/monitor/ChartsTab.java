@@ -34,46 +34,36 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor;
 
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.rednels.ofcgwt.client.ChartWidget;
-import com.rednels.ofcgwt.client.model.ChartData;
-import com.rednels.ofcgwt.client.model.Text;
-import com.rednels.ofcgwt.client.model.ToolTip;
-import com.rednels.ofcgwt.client.model.ToolTip.MouseStyle;
-import com.rednels.ofcgwt.client.model.axis.Keys;
-import com.rednels.ofcgwt.client.model.axis.Label;
-import com.rednels.ofcgwt.client.model.axis.XAxis;
-import com.rednels.ofcgwt.client.model.axis.YAxis;
-import com.rednels.ofcgwt.client.model.elements.BarChart;
-import com.rednels.ofcgwt.client.model.elements.BarChart.BarStyle;
-import com.rednels.ofcgwt.client.model.elements.StackedBarChart;
-import com.rednels.ofcgwt.client.model.elements.StackedBarChart.Stack;
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.ButtonItem;
+import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
+import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tile.TileGrid;
-import com.smartgwt.client.widgets.tile.events.RecordClickEvent;
-import com.smartgwt.client.widgets.tile.events.RecordClickHandler;
-import com.smartgwt.client.widgets.viewer.DetailViewerField;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
+import fr.insalyon.creatis.vip.application.client.view.monitor.chart.CheckpointChart;
+import fr.insalyon.creatis.vip.application.client.view.monitor.chart.GeneralBarChart;
+import fr.insalyon.creatis.vip.application.client.view.monitor.chart.JobFlowChart;
+import fr.insalyon.creatis.vip.application.client.view.monitor.chart.SitesBarChart;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
-import fr.insalyon.creatis.vip.core.client.view.application.ApplicationTileRecord;
-import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
-import java.util.ArrayList;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -83,16 +73,13 @@ import java.util.List;
  */
 public class ChartsTab extends Tab {
 
-    private ModalWindow modal;
     private String simulationID;
-    private DynamicForm form;
+    private ModalWindow modal;
+    private VLayout leftVLayout;
+    private VLayout rightVLayout;
     private SelectItem chartsItem;
     private TextItem binItem;
-    private VLayout vLayout;
-    private ChartWidget chart;
     private ListGrid grid;
-    private TileGrid tileGrid;
-    private String data;
 
     public ChartsTab(String simulationID) {
 
@@ -100,42 +87,51 @@ public class ChartsTab extends Tab {
         this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_CHART));
         this.setPrompt("Performance Statistics");
 
-        this.data = "";
+        leftVLayout = new VLayout(15);
+        leftVLayout.setWidth(280);
+        leftVLayout.setHeight100();
+        leftVLayout.setOverflow(Overflow.AUTO);
+
+        rightVLayout = new VLayout(15);
+        rightVLayout.setWidth100();
+        rightVLayout.setHeight(600);
+        rightVLayout.setOverflow(Overflow.AUTO);
+        rightVLayout.setPadding(10);
 
         configureForm();
+        configureGrid();
 
-        vLayout = new VLayout(15);
-        vLayout.setHeight100();
-        vLayout.setOverflow(Overflow.AUTO);
-        vLayout.setPadding(10);
-        vLayout.addMember(form);
+        HLayout hLayout = new HLayout(10);
+        hLayout.setWidth100();
+        hLayout.setHeight100();
+        hLayout.setOverflow(Overflow.AUTO);
+        hLayout.addMember(leftVLayout);
+        hLayout.addMember(rightVLayout);
 
-        modal = new ModalWindow(vLayout);
-
-        this.setPane(vLayout);
+        modal = new ModalWindow(hLayout);
+        this.setPane(hLayout);
     }
 
     private void configureForm() {
 
-        form = new DynamicForm();
-        form.setWidth(500);
-        form.setNumCols(5);
-
         LinkedHashMap<String, String> chartsMap = new LinkedHashMap<String, String>();
         chartsMap.put("1", "Job Flow");
-        chartsMap.put("2", "Checkpoints per job");
-        chartsMap.put("3", "Histogram of Execution Times");
-        chartsMap.put("4", "Histogram of Download Times");
-        chartsMap.put("5", "Histogram of Upload Times");
-        chartsMap.put("6", "Site histogram");
-        chartsItem = new SelectItem("charts", "Chart");
+        chartsMap.put("2", "Checkpoints per Job");
+        chartsMap.put("3", "Execution Times Histogram");
+        chartsMap.put("4", "Download Times Histogram");
+        chartsMap.put("5", "Upload Times Histogram");
+        chartsMap.put("6", "Sites Histogram");
+        chartsItem = new SelectItem();
+        chartsItem.setShowTitle(false);
+        chartsItem.setWidth(250);
         chartsItem.setValueMap(chartsMap);
         chartsItem.setEmptyDisplayValue("Select a chart...");
         chartsItem.addChangedHandler(new ChangedHandler() {
 
+            @Override
             public void onChanged(ChangedEvent event) {
                 int value = new Integer(chartsItem.getValueAsString());
-                if (value == 1) {
+                if (value == 1 || value == 2 || value == 6) {
                     binItem.setDisabled(true);
                 } else {
                     binItem.setDisabled(false);
@@ -143,29 +139,67 @@ public class ChartsTab extends Tab {
             }
         });
 
-        binItem = new TextItem("bin", "Bin Size");
-        binItem.setWidth(50);
+        binItem = FieldUtil.getTextItem(50, false, "", "[0-9.]");
         binItem.setValue("100");
-        binItem.setKeyPressFilter("[0-9.]");
 
-        ButtonItem generateButtonItem = new ButtonItem("generateChart", " Generate Chart ");
-        generateButtonItem.addClickHandler(new ClickHandler() {
+        IButton generateButton = new IButton("Generate Chart");
+        generateButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 generateChart();
             }
         });
-        generateButtonItem.setStartRow(false);
 
-        form.setItems(chartsItem, binItem, generateButtonItem);
+        VLayout formLayout = WidgetUtil.getVIPLayout(280, 185, false);
+        formLayout.addMember(WidgetUtil.getLabel("<b>Performance Statistics</b>", ApplicationConstants.ICON_CHART, 30));
+        WidgetUtil.addFieldToVIPLayout(formLayout, "Chart", chartsItem);
+        WidgetUtil.addFieldToVIPLayout(formLayout, "Bin Size", binItem);
+        formLayout.addMember(generateButton);
+
+        leftVLayout.addMember(formLayout);
+    }
+
+    private void configureGrid() {
+
+        grid = new ListGrid();
+        grid.setWidth(280);
+        grid.setHeight(145);
+        grid.setShowAllRecords(true);
+        grid.setShowEmptyMessage(true);
+        grid.setEmptyMessage("<br>No data available.");
+
+        ListGridField propertyField = new ListGridField("property", "Properties");
+        ListGridField valueField = new ListGridField("value", "Value");
+        valueField.setAlign(Alignment.RIGHT);
+        valueField.setCellFormatter(new CellFormatter() {
+
+            @Override
+            public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+
+                if (value == null) {
+                    return null;
+                }
+                try {
+                    NumberFormat nf = NumberFormat.getDecimalFormat();
+                    return nf.format(Double.parseDouble((String) value));
+                } catch (Exception e) {
+                    return value.toString();
+                }
+            }
+        });
+
+        grid.setFields(propertyField, valueField);
+
+        leftVLayout.addMember(grid);
     }
 
     private void generateChart() {
 
-        int value = new Integer(chartsItem.getValueAsString());
+        int value = Integer.parseInt(chartsItem.getValueAsString());
         int binSize = 100;
-        if (binItem.getValueAsString() != null && !binItem.getValueAsString().equals("")) {
-            binSize = new Integer(binItem.getValueAsString().trim());
+        if (binItem.getValueAsString() != null && !binItem.getValueAsString().isEmpty()) {
+            binSize = Integer.parseInt(binItem.getValueAsString().trim());
         }
 
         switch (value) {
@@ -184,10 +218,8 @@ public class ChartsTab extends Tab {
             case 5:
                 plotUploadPerNumberOfJobs(binSize);
                 break;
-
             case 6:
                 plotSiteHistogram();
-                break;
         }
     }
 
@@ -196,17 +228,19 @@ public class ChartsTab extends Tab {
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to get chart data:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<String> result) {
-                buildStackChart(result);
+                JobFlowChart.build(result, rightVLayout, grid);
                 modal.hide();
             }
         };
-        modal.show("Building chart...", true);
+        modal.show("Building job flow chart...", true);
         service.getJobFlow(simulationID, callback);
     }
 
@@ -215,13 +249,15 @@ public class ChartsTab extends Tab {
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to get chart data:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<String> result) {
-                buildCkptChart(result);
+                CheckpointChart.build(result, rightVLayout, grid);
                 modal.hide();
             }
         };
@@ -230,7 +266,7 @@ public class ChartsTab extends Tab {
     }
 
     /**
-     * 
+     *
      * @param binSize Size of the group
      */
     private void plotExecutionPerNumberOfJobs(final int binSize) {
@@ -238,14 +274,16 @@ public class ChartsTab extends Tab {
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to get chart data:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<String> result) {
+                GeneralBarChart.build(result, rightVLayout, grid, "Execution Time (sec)", "#00aa00", binSize);
                 modal.hide();
-                buildBarChartAndGrid(result, "Execution Time (sec)", "#00aa00", binSize);
             }
         };
         modal.show("Building chart...", true);
@@ -253,7 +291,7 @@ public class ChartsTab extends Tab {
     }
 
     /**
-     * 
+     *
      * @param binSize
      */
     private void plotDownloadPerNumberOfJobs(final int binSize) {
@@ -261,14 +299,16 @@ public class ChartsTab extends Tab {
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to get chart data:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<String> result) {
+                GeneralBarChart.build(result, rightVLayout, grid, "Download Time (sec)", "#6699CC", binSize);
                 modal.hide();
-                buildBarChartAndGrid(result, "Download Time (sec)", "#6699CC", binSize);
             }
         };
         modal.show("Building chart...", true);
@@ -276,7 +316,7 @@ public class ChartsTab extends Tab {
     }
 
     /**
-     * 
+     *
      * @param binSize
      */
     private void plotUploadPerNumberOfJobs(final int binSize) {
@@ -284,14 +324,16 @@ public class ChartsTab extends Tab {
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to get chart data:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<String> result) {
+                GeneralBarChart.build(result, rightVLayout, grid, "Upload Time (sec)", "#CC9966", binSize);
                 modal.hide();
-                buildBarChartAndGrid(result, "Upload Time (sec)", "#CC9966", binSize);
             }
         };
         modal.show("Building chart...", true);
@@ -299,371 +341,23 @@ public class ChartsTab extends Tab {
     }
 
     private void plotSiteHistogram() {
+
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to get chart data:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<String> result) {
+                SitesBarChart.build(result, rightVLayout, grid);
                 modal.hide();
-                buildBarChartAndGrid(result, "Site", "#FF0000", 1);
             }
         };
         modal.show("Building chart...", true);
         service.getSiteHistogram(simulationID, callback);
-    }
-
-    private void buildCkptChart(List<String> result) {
-
-        ChartData chartData = new ChartData();
-        chartData.setBackgroundColour("#ffffff");
-
-        StackedBarChart stack = new StackedBarChart();
-        int max = 0;
-        int occ_completed = 0;
-        int occ_error = 0;
-        int occ_stalled = 0;
-        int occ_cancelled = 0;
-        int nb_jobs = 0;
-        int failed_jobs = 0;
-
-
-        this.data = "";
-        for (String values : result) {
-            this.data = this.data + "\n" + values;
-            Stack s = new Stack();
-            String[] v = values.split("##");
-
-            int nb_occ = new Integer(v[1]);
-
-            if (v[0].equals("COMPLETED")) {
-                s.addStackValues(new StackedBarChart.StackValue(nb_occ, "#009966"));
-                occ_completed = occ_completed + nb_occ;
-                nb_jobs++;
-            } else {
-                if (v[0].equals("ERROR")) {
-                    s.addStackValues(new StackedBarChart.StackValue(nb_occ, "#CC0033"));
-                    occ_error = occ_error + nb_occ;
-                    failed_jobs++;
-                    nb_jobs++;
-                } else {
-                    if (v[0].equals("STALLED")) {
-                        s.addStackValues(new StackedBarChart.StackValue(nb_occ, "#663366"));
-                        occ_stalled = occ_stalled + nb_occ;
-                        nb_jobs++;
-                        failed_jobs++;
-                    } else {
-                        if (v[0].equals("CANCELLED")) {
-                            s.addStackValues(new StackedBarChart.StackValue(nb_occ, "#FF9933"));
-                            occ_cancelled = occ_cancelled + nb_occ;
-                            nb_jobs++;
-                        }
-                    }
-                }
-            }
-            stack.addStack(s);
-
-            if (nb_occ > max) {
-                max = nb_occ;
-            }
-        }
-
-        stack.setKeys(
-                new Keys("Completed", "#009966", 9),
-                new Keys("Error", "#CC0033", 9),
-                new Keys("Stalled", "#663366", 9),
-                new Keys("Cancelled", "#FF9933", 9));
-
-
-        chartData.addElements(stack);
-
-        XAxis xa = new XAxis();
-        xa.setRange(0, nb_jobs, (nb_jobs / 10));
-        chartData.setXAxis(xa);
-        chartData.setXLegend(new Text("Jobs", "{font-size: 10px; color: #000000}"));
-
-        YAxis ya = new YAxis();
-        ya.setRange(0, max, (max / 10));
-        chartData.setYAxis(ya);
-        chartData.setYLegend(new Text("Number of checkpoints", "{font-size: 10px; color: #000000}"));
-
-        if (chart == null) {
-            configureChartAndGrid();
-        }
-
-        PropertyRecord[] data = new PropertyRecord[]{
-            new PropertyRecord("Total ckpts for completed jobs", occ_completed + ""),
-            new PropertyRecord("Total ckpts for error jobs", occ_error + ""),
-            new PropertyRecord("Total ckpts for stalled jobs", occ_stalled + ""),
-            new PropertyRecord("Total ckpts for cancelled jobs", occ_cancelled + ""),
-            new PropertyRecord("Failure rate", (failed_jobs / (float) nb_jobs) + "")
-        };
-
-        grid.setData(data);
-        chart.setChartData(chartData);
-    }
-
-    private void buildStackChart(List<String> result) {
-
-        ChartData chartData = new ChartData();
-        chartData.setBackgroundColour("#ffffff");
-
-        StackedBarChart stack = new StackedBarChart();
-        int max = 0;
-        int nbJobs = 0;
-        long cpuTime = 0;
-        long waitingTime = 0;
-        long sequentialTime = 0;
-        this.data = "";
-        for (String values : result) {
-            this.data = this.data + "\n" + values;
-            Stack s = new Stack();
-            String[] v = values.split("##");
-
-            int creation = new Integer(v[1]);
-            int queued = new Integer(v[2]);
-            int input = new Integer(v[3]) >= 0 ? new Integer(v[3]) : 0;
-            int execution = new Integer(v[4]) >= 0 ? new Integer(v[4]) : 0;
-            int output = new Integer(v[5]) >= 0 ? new Integer(v[5]) : 0;
-            int checkpointInit = new Integer(v[6]) >= 0 ? new Integer(v[6]) : 0;
-            int checkpointUpload = new Integer(v[7]) >= 0 ? new Integer(v[7]) : 0;
-            int failedTime = new Integer(v[8]) >= 0 ? new Integer(v[8]) : 0;
-
-            int count = creation + queued + input + execution + output
-                    + checkpointInit + checkpointUpload;
-            cpuTime += execution;
-            sequentialTime += input + execution + output;
-            nbJobs++;
-            waitingTime += queued;
-            
-            s.addStackValues(new StackedBarChart.StackValue(creation, "#996633"));
-            s.addStackValues(new StackedBarChart.StackValue(queued, "#FF9933"));
-
-           // if (v[0].equals("COMPLETED") || checkpointUpload!=0 ) {          
-                s.addStackValues(new StackedBarChart.StackValue(input, "#3366FF"));
-                s.addStackValues(new StackedBarChart.StackValue(execution, "#009966"));
-                s.addStackValues(new StackedBarChart.StackValue(output, "#663366"));
-                s.addStackValues(new StackedBarChart.StackValue(checkpointInit, "#E8830C"));
-                s.addStackValues(new StackedBarChart.StackValue(checkpointUpload, "#E82E0C"));
-
-            //} 
-            s.addStackValues(new StackedBarChart.StackValue(failedTime, "#CC0033"));  
-            
-            stack.addStack(s);
-
-            if (count > max) {
-                max = count;
-            }
-        }
-
-        stack.setKeys(
-                new Keys("Submitted", "#996633", 9),
-                new Keys("Queued", "#FF9933", 9),
-                new Keys("Input", "#3366FF", 9),
-                new Keys("Execution", "#009966", 9),
-                new Keys("Output", "#663366", 9),
-                new Keys("Checkpoint Init", "#E8830C", 9),
-                new Keys("Checkpoint Upload", "#E82E0C", 9),
-                new Keys("Error", "#CC0033", 9));
-
-        chartData.addElements(stack);
-
-        XAxis xa = new XAxis();
-        xa.setLabels("");
-        chartData.setXAxis(xa);
-        chartData.setXLegend(new Text("Jobs", "{font-size: 10px; color: #000000}"));
-
-        YAxis ya = new YAxis();
-        ya.setRange(0, max, (max / 10));
-        chartData.setYAxis(ya);
-        chartData.setYLegend(new Text("Time (sec)", "{font-size: 10px; color: #000000}"));
-
-        if (chart == null) {
-            configureChartAndGrid();
-        }
-
-        PropertyRecord[] data = new PropertyRecord[]{
-            new PropertyRecord("Makespan (s)", max + ""),
-            new PropertyRecord("Cumulated CPU time (s)", cpuTime + ""),
-            new PropertyRecord("Speed-up", (cpuTime / (float) max) + ""),
-            new PropertyRecord("Efficiency", (cpuTime / (float) sequentialTime) + ""),
-            new PropertyRecord("Mean waiting time", (waitingTime / (float) nbJobs) + "")
-        };
-
-        grid.setData(data);
-        chart.setChartData(chartData);
-    }
-
-    /**
-     * 
-     * @param result
-     * @param xAxis
-     * @param color
-     */
-    private void buildBarChartAndGrid(List<String> result, String xAxis, String color, int binSize) {
-
-        List<Integer> rangesList = new ArrayList<Integer>();
-        List<Integer> numJobsList = new ArrayList<Integer>();
-        int maxRange = 0;
-        int maxNumJobs = 0;
-        int min = Integer.MAX_VALUE;
-        int max = 0;
-        int sum = 0;
-        int count = 0;
-        this.data = "";
-        for (String s : result) {
-            this.data = this.data + "\n" + s;
-            String[] res = s.split("##");
-            int range = new Integer(res[0]);
-            rangesList.add(range);
-            if (range > maxRange) {
-                maxRange = range;
-            }
-            if (res.length > 1) {
-                int numJobs = new Integer(res[1]);
-                numJobsList.add(numJobs);
-                if (numJobs > maxNumJobs) {
-                    maxNumJobs = numJobs;
-                }
-                if (res.length > 2) {
-                    if (new Integer(res[2]) < min) {
-                        min = new Integer(res[2]);
-                    }
-                    if (res.length > 3) {
-                        if (new Integer(res[3]) > max) {
-                            max = new Integer(res[3]);
-                        }
-                        if (res.length > 4) {
-                            sum += new Integer(res[4]);
-                        }
-                    }
-                }
-                count += new Integer(res[1]);
-            }
-        }
-
-        ChartData chartData = new ChartData();
-        chartData.setBackgroundColour("#ffffff");
-
-        // XAxis
-        XAxis xa = new XAxis();
-        int rangeLabel = 0;
-        int index = 0;
-        List<Integer> indexesList = new ArrayList<Integer>();
-        for (Integer i : rangesList) {
-            while (rangeLabel < i) {
-                xa.addLabels(new Label(rangeLabel + "", 45));
-                indexesList.add(index++);
-                rangeLabel += binSize;
-            }
-            if (rangeLabel == i) {
-                xa.addLabels(new Label(i + "", 45));
-                index++;
-                rangeLabel += binSize;
-            }
-        }
-        chartData.setXAxis(xa);
-        chartData.setXLegend(new Text(xAxis, "{font-size: 10px; color: #000000}"));
-
-        // YAxis
-        YAxis ya = new YAxis();
-        ya.setSteps(maxNumJobs / 10);
-        ya.setMax(maxNumJobs);
-        chartData.setYAxis(ya);
-        chartData.setYLegend(new Text("Number of Jobs", "{font-size: 10px; color: #000000}"));
-
-        BarChart bchart = new BarChart(BarStyle.GLASS);
-        bchart.setBarwidth(.5);
-        bchart.setColour(color);
-        bchart.setTooltip("#val# jobs");
-        int j = 0;
-        for (int i = 0; i < index; i++) {
-            if (indexesList.contains(i)) {
-                bchart.addValues(0);
-            } else {
-                bchart.addValues(numJobsList.get(j++));
-            }
-        }
-        chartData.addElements(bchart);
-        chartData.setTooltipStyle(new ToolTip(MouseStyle.FOLLOW));
-
-        PropertyRecord[] data;
-        if (result.size() > 0) {
-            data = new PropertyRecord[]{
-                new PropertyRecord("Min (s)", min + ""),
-                new PropertyRecord("Max (s)", max + ""),
-                new PropertyRecord("Cumulated (s)", sum + ""),
-                new PropertyRecord("Average (s)", (sum / (float) count) + "")
-            };
-        } else {
-            data = new PropertyRecord[]{
-                new PropertyRecord("Min (s)", "0"),
-                new PropertyRecord("Max (s)", "0"),
-                new PropertyRecord("Cumulated (s)", "0"),
-                new PropertyRecord("Average (s)", "0")
-            };
-        }
-
-        if (chart == null) {
-            configureChartAndGrid();
-        }
-        grid.setData(data);
-        chart.setChartData(chartData);
-
-
-    }
-
-    private void configureChartAndGrid() {
-
-        chart = new ChartWidget();
-        chart.setSize("700", "370");
-
-        grid = new ListGrid();
-        grid.setWidth(300);
-        grid.setHeight(130);
-        grid.setShowAllRecords(true);
-        grid.setShowEmptyMessage(true);
-        grid.setEmptyMessage("<br>No data available.");
-
-        ListGridField propertyField = new ListGridField("property", "Properties");
-        ListGridField valueField = new ListGridField("value", "Value");
-
-        grid.setFields(propertyField, valueField);
-
-        tileGrid = new TileGrid();
-        tileGrid.setWidth100();
-        tileGrid.setHeight100();
-        tileGrid.setTileWidth(110);
-        tileGrid.setTileHeight(80);
-
-        tileGrid.setCanReorderTiles(true);
-        tileGrid.setShowAllRecords(true);
-        tileGrid.setAnimateTileChange(true);
-        tileGrid.setShowEdges(false);
-
-        DetailViewerField pictureField = new DetailViewerField("picture");
-        pictureField.setType("image");
-        DetailViewerField commonNameField = new DetailViewerField("commonName");
-
-        tileGrid.setFields(pictureField, commonNameField);
-
-        tileGrid.addRecordClickHandler(new RecordClickHandler() {
-
-            public void onRecordClick(RecordClickEvent event) {
-                new ViewerWindow("Data", simulationID,
-                        data).show();
-            }
-        });
-        tileGrid.setData(new ApplicationTileRecord[]{
-                    new ApplicationTileRecord("Data", ApplicationConstants.APP_IMG_SIMULATION_OUT),});
-
-
-
-        vLayout.addMember(chart);
-        vLayout.addMember(grid);
-        vLayout.addMember(tileGrid);
     }
 }

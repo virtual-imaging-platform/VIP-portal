@@ -4,7 +4,7 @@
     <inherits name='fr.insalyon.creatis.vip.core.Core'/>
     <inherits name='fr.insalyon.creatis.vip.datamanager.DataManager'/>
 <!--    <inherits name='fr.insalyon.creatis.vip.provenance.Provenance'/>-->
-    <inherits name='com.rednels.ofcgwt.OFCGWT'/>
+    <inherits name='ca.nanometrics.gflot.GFlot'/>
     <inherits name='com.google.gwt.visualization.Visualization'/>
 
     <!-- Servlets -->
