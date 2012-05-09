@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.models.client.view;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.DateChooser;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -43,6 +44,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelUtil;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Timepoint;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
@@ -68,7 +70,7 @@ public class ModelDisplay extends VLayout {
     private ToolStripButton download, upload;
     ModelTreeGrid modelTreeGrid;
     private String zipFile;
-
+    
     ModelDisplay(String uri) {
         super();
         buildModel(uri);
@@ -87,9 +89,20 @@ public class ModelDisplay extends VLayout {
     private void init() {
         toolStrip = new ToolStrip();
         toolStrip.setWidth100();
+        
+        ToolStripButton addTimepoint = new ToolStripButton("Add timepoint");
+        
+        addTimepoint.addClickHandler(new ClickHandler(){
+
+            public void onClick(ClickEvent event) {
+                addTimePoint((new DateChooser()).getData());
+            }
+        });
+        
+        toolStrip.addButton(addTimepoint);
+        
         addMember(toolStrip);
-        modelTreeGrid = new ModelTreeGrid(model);
-        addMember(modelTreeGrid);
+        updateTreeGrid();
         if (model != null) {
             enableDownload();
             checkModel(model);
@@ -101,6 +114,22 @@ public class ModelDisplay extends VLayout {
             upload.hide();
     }
 
+    private void updateTreeGrid(){
+        if(model != null && this.contains(modelTreeGrid))
+            this.removeMember(modelTreeGrid);
+            
+            modelTreeGrid = new ModelTreeGrid(model);
+            addMember(modelTreeGrid);
+        
+    }
+    
+    private void addTimePoint(Date d){
+        Timepoint tp = new Timepoint();
+        tp.setStartingDate(d);
+        model.addTimepoint(tp);
+        updateTreeGrid();
+    }
+    
     public void enableCommit() {
         upload = new ToolStripButton("Commit model");
         upload.setIcon(DataManagerConstants.ICON_UPLOAD);
