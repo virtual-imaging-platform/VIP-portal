@@ -223,6 +223,9 @@ public class ChartsTab extends Tab {
         }
     }
 
+    /**
+     * 
+     */
     private void plotJobsPerTime() {
 
         JobServiceAsync service = JobService.Util.getInstance();
@@ -244,6 +247,9 @@ public class ChartsTab extends Tab {
         service.getJobFlow(simulationID, callback);
     }
 
+    /**
+     * 
+     */
     private void plotCkptsPerJob() {
 
         JobServiceAsync service = JobService.Util.getInstance();
@@ -340,6 +346,9 @@ public class ChartsTab extends Tab {
         service.getUploadPerNumberOfJobs(simulationID, binSize, callback);
     }
 
+    /**
+     * 
+     */
     private void plotSiteHistogram() {
 
         JobServiceAsync service = JobService.Util.getInstance();

@@ -208,4 +208,9 @@ public class User implements IsSerializable {
         }
         return false;
     }
+
+    @Override
+    public String toString() {
+        return email;
+    }
 }

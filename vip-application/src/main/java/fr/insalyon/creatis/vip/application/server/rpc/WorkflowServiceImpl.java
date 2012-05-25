@@ -95,12 +95,14 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     *
-     * @param parametersMap
-     * @param applicationName
-     * @param simulationName
+     * Launches a simulation.
+     * 
+     * @param parametersMap Simulation parameters map
+     * @param applicationName Application name
+     * @param simulationName Simulation name
      * @throws ApplicationException
      */
+    @Override
     public void launchSimulation(Map<String, String> parametersMap,
             String applicationName, String simulationName) throws ApplicationException {
 

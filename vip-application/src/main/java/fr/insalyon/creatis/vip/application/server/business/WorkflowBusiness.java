@@ -124,8 +124,9 @@ public class WorkflowBusiness {
      * @return
      * @throws BusinessException
      */
-    public String launch(User user, List<String> groups, Map<String, String> parametersMap,
-            String applicationName, String simulationName) throws BusinessException {
+    public synchronized String launch(User user, List<String> groups,
+            Map<String, String> parametersMap, String applicationName, 
+            String simulationName) throws BusinessException {
 
         try {
             WorkflowDAO workflowDAO = WorkflowDAOFactory.getDAOFactory().getWorkflowDAO();

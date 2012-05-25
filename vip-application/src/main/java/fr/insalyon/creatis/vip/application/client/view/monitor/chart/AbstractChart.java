@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor.chart;
 
+import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -81,7 +82,8 @@ public abstract class AbstractChart {
         Img img = new Img(ApplicationConstants.APP_IMG_SIMULATION_OUT);
         img.setWidth(48);
         img.setHeight(48);
-        img.setTitle("Row Data");
+        img.setPrompt("Row Data");
+        img.setCursor(Cursor.HAND);
         img.addClickHandler(new ClickHandler() {
 
             @Override
