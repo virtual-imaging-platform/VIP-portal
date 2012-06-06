@@ -86,8 +86,8 @@ public class ApplicationConstants {
     public static final String APP_IMG_SIMULATION_ERROR = IMG_FOLDER + "app-simulation-error.png";
     public static final String APP_IMG_SIMULATION_OUT = IMG_FOLDER + "app-simulation-out.png";
     // Configuration
-    public static final String ACCOUNT_VIP = "VIP";
-    public static final String GROUP_VIP = "VIP";
+    public static final String ACCOUNT_VIP = "Image simulators";
+    public static final String GROUP_VIP = "Demo";
     public static final String SESSION_CLASSES = "vip-classes";
     public static final String SEPARATOR_INPUT = "##";
     public static final String SEPARATOR_LIST = "@@";
