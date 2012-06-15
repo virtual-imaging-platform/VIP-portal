@@ -78,6 +78,7 @@ public abstract class AbstractSimulationTab extends Tab {
         if (!completed) {
             timer = new Timer() {
 
+                @Override
                 public void run() {
                     updateData();
                 }
@@ -87,6 +88,7 @@ public abstract class AbstractSimulationTab extends Tab {
 
         this.addTabDeselectedHandler(new TabDeselectedHandler() {
 
+            @Override
             public void onTabDeselected(TabDeselectedEvent event) {
                 if (!completed) {
                     timer.cancel();
@@ -95,6 +97,7 @@ public abstract class AbstractSimulationTab extends Tab {
         });
         this.addTabSelectedHandler(new TabSelectedHandler() {
 
+            @Override
             public void onTabSelected(TabSelectedEvent event) {
                 if (!completed) {
                     updateData();
