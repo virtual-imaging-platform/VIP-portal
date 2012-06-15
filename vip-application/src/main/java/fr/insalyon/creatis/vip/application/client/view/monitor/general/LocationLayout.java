@@ -35,19 +35,18 @@
 package fr.insalyon.creatis.vip.application.client.view.monitor.general;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.Alignment;
+import com.google.gwt.visualization.client.AbstractDataTable;
+import com.google.gwt.visualization.client.DataTable;
+import com.google.gwt.visualization.client.VisualizationUtils;
+import com.google.gwt.visualization.client.visualizations.GeoMap;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.grid.ListGrid;
-import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
-import fr.insalyon.creatis.vip.application.client.view.monitor.record.LocationRecord;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
-import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
-import java.util.ArrayList;
-import java.util.List;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import java.util.Map;
 
 /**
@@ -57,41 +56,35 @@ import java.util.Map;
 public class LocationLayout extends AbstractFormLayout {
 
     private String simulationID;
-    private ListGrid grid;
+    private VLayout chartLayout;
+    private VLayout innerChartLayout;
 
     public LocationLayout(String simulationID) {
 
-        super("100%", "180px");
+        super("100%", "250px");
         addTitle("Simulation Execution Location", CoreConstants.ICON_WORLD);
         this.simulationID = simulationID;
-               
-        configureGrid();
-        modal = new ModalWindow(grid);
+
+        configureChart();
+        modal = new ModalWindow(chartLayout);
     }
-    
-    private void configureGrid() {
-        
-        grid = new ListGrid();
-        grid.setWidth100();
-        grid.setHeight100();
-        grid.setShowAllRecords(true);
-        grid.setShowEmptyMessage(true);
-        grid.setEmptyMessage("<br>No data available.");
-        
-        ListGridField icoField = FieldUtil.getIconGridField("icon");
-        ListGridField nameField = new ListGridField("country", "Country");
-        ListGridField jobsField = new ListGridField("jobs", "Tasks");
-        jobsField.setWidth(70);
-        jobsField.setAlign(Alignment.RIGHT);
-        
-        grid.setFields(icoField, nameField, jobsField);
-        grid.setSortField("country");
-        
-        this.addMember(grid);
+
+    private void configureChart() {
+
+        chartLayout = new VLayout();
+        chartLayout.setWidth("100%");
+        chartLayout.setHeight("100%");
+
+        innerChartLayout = new VLayout();
+        innerChartLayout.setWidth("100%");
+        innerChartLayout.setHeight("100%");
+
+        chartLayout.addMember(innerChartLayout);
+        this.addMember(chartLayout);
     }
-    
+
     public void loadData() {
-        
+
         JobServiceAsync service = JobService.Util.getInstance();
         AsyncCallback<Map<String, Integer>> callback = new AsyncCallback<Map<String, Integer>>() {
 
@@ -104,16 +97,45 @@ public class LocationLayout extends AbstractFormLayout {
             @Override
             public void onSuccess(Map<String, Integer> result) {
                 modal.hide();
-                
-                List<LocationRecord> data = new ArrayList<LocationRecord>();
-                
-                for (String code : result.keySet()) {
-                    data.add(new LocationRecord(code, result.get(code)));
-                }
-                grid.setData(data.toArray(new LocationRecord[]{}));
+                VisualizationUtils.loadVisualizationApi(getGeoMapRunnable(result), GeoMap.PACKAGE);
             }
         };
         modal.show("Loading locations...", true);
         service.getCountriesMap(simulationID, callback);
+    }
+
+    private Runnable getGeoMapRunnable(final Map<String, Integer> data) {
+
+        return new Runnable() {
+
+            @Override
+            public void run() {
+
+                GeoMap.Options options = GeoMap.Options.create();
+                options.setWidth("100%");
+                options.setHeight("100%");
+
+                DataTable dataTable = DataTable.create();
+                dataTable.addColumn(AbstractDataTable.ColumnType.STRING, "Country");
+                dataTable.addColumn(AbstractDataTable.ColumnType.NUMBER, "Simulated Jobs");
+                dataTable.addRows(data.size());
+
+                int i = 0;
+                for (String country : data.keySet()) {
+                    dataTable.setValue(i, 0, CountryCode.valueOf(country).getCountryName());
+                    dataTable.setValue(i, 1, data.get(country));
+                    i++;
+                }
+                
+                GeoMap geoMap = new GeoMap(dataTable, options);
+
+                chartLayout.removeMember(innerChartLayout);
+                innerChartLayout = new VLayout();
+                innerChartLayout.setWidth("100%");
+                innerChartLayout.setHeight("100%");
+                innerChartLayout.addMember(geoMap);
+                chartLayout.addMember(innerChartLayout);
+            }
+        };
     }
 }
