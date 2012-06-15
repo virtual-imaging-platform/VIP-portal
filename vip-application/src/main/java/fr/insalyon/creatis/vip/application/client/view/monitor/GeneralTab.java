@@ -100,9 +100,6 @@ public class GeneralTab extends Tab {
         generalWindow = new GeneralInformationLayout(simulationID);
         leftLayout.addMember(generalWindow);
 
-        locationWindow = new LocationLayout(simulationID);
-        leftLayout.addMember(locationWindow);
-
         if (CoreModule.user.isSystemAdministrator()
                 || CoreModule.user.isGroupAdmin()) {
             leftLayout.addMember(new LogsLayout(simulationID));
@@ -117,6 +114,9 @@ public class GeneralTab extends Tab {
         configureTreeGrid();
         inOutTreeModal = new ModalWindow(inOutTreeGrid);
         rightLayout.addMember(inOutTreeGrid);
+
+        locationWindow = new LocationLayout(simulationID);
+        rightLayout.addMember(locationWindow);
 
         hLayout.addMember(leftLayout);
         hLayout.addMember(rightLayout);
