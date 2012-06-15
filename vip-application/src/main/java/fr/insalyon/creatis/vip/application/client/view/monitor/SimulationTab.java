@@ -67,6 +67,7 @@ public class SimulationTab extends AbstractSimulationTab {
         }
     }
 
+    @Override
     protected void updateData() {
 
         summaryTab.loadData();
