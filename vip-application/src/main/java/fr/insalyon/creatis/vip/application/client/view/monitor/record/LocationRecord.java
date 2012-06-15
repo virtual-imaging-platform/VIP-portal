@@ -53,13 +53,14 @@ public class LocationRecord extends ListGridRecord {
 
     public LocationRecord(String icon, int jobs) {
 
-        setAttribute(ATT_ICON, CoreConstants.FOLDER_FLAGS + icon);
         setAttribute(ATT_JOBS, jobs);
         
         try {
             setAttribute(ATT_COUNTRY, CountryCode.valueOf(icon).getCountryName());
+            setAttribute(ATT_ICON, CoreConstants.FOLDER_FLAGS + icon);
         } catch (IllegalArgumentException ex) {
             setAttribute(ATT_COUNTRY, "Unknown");
+            setAttribute(ATT_ICON, CoreConstants.FOLDER_FLAGS + "_world");
         }
     }
 
