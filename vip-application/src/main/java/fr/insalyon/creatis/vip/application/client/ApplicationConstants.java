@@ -95,8 +95,9 @@ public class ApplicationConstants {
 
     public static enum JobStatus {
 
-        REPLICATE, KILL, RESCHEDULE, ERROR, COMPLETED, RUNNING, STALLED,
-        CANCELLED, CANCELLED_REPLICA, QUEUED, SUCCESSFULLY_SUBMITTED
+        SUCCESSFULLY_SUBMITTED, QUEUED, RUNNING, COMPLETED,
+        CANCELLED, CANCELLED_REPLICA, ERROR, STALLED,
+        REPLICATE, KILL, RESCHEDULE
     };
 
     public static enum SimulationStatus {
