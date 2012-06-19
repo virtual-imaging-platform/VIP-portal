@@ -132,23 +132,20 @@ public class UsersStackSection extends SectionStackSection {
             @Override
             protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
 
-                rollOverRecord = this.getRecord(rowNum);
-
                 if (rollOverCanvas == null) {
+
+                    rollOverRecord = this.getRecord(rowNum);
+
                     rollOverCanvas = new HLayout(3);
                     rollOverCanvas.setSnapTo("TR");
                     rollOverCanvas.setWidth(50);
                     rollOverCanvas.setHeight(22);
-
                     rollOverCanvas.addMember(FieldUtil.getImgButton(
                             CoreConstants.ICON_EDIT, "Edit User", new ClickHandler() {
 
                         @Override
                         public void onClick(ClickEvent event) {
-                            edit(rollOverRecord.getAttribute("email"),
-                                    rollOverRecord.getAttributeAsBoolean("confirmed"),
-                                    rollOverRecord.getAttribute("level"),
-                                    rollOverRecord.getAttribute("countryCode"));
+                            edit(rollOverRecord);
                         }
                     }));
 
@@ -182,17 +179,15 @@ public class UsersStackSection extends SectionStackSection {
 
                 DetailViewerField levelField = new DetailViewerField("level", "Level");
                 DetailViewerField emailField = new DetailViewerField("email", "Email");
-                DetailViewerField firstNameField = new DetailViewerField("firstName", "First Name");
-                DetailViewerField lastNameField = new DetailViewerField("lastName", "Last Name");
+                DetailViewerField nameField = new DetailViewerField("username", "Name");
                 DetailViewerField institutionField = new DetailViewerField("institution", "Institution");
                 DetailViewerField phoneField = new DetailViewerField("phone", "Phone");
                 DetailViewerField countryField = new DetailViewerField("countryName", "Country");
                 DetailViewerField lastLoginField = new DetailViewerField("lastLogin", "Last Login");
                 lastLoginField.setDateFormatter(DateDisplayFormat.TOUSSHORTDATETIME);
 
-                detailViewer.setFields(levelField, emailField, firstNameField,
-                        lastNameField, institutionField, phoneField, countryField,
-                        lastLoginField);
+                detailViewer.setFields(levelField, emailField, nameField,
+                        institutionField, phoneField, countryField, lastLoginField);
                 detailViewer.setData(new Record[]{record});
 
                 return detailViewer;
@@ -212,13 +207,12 @@ public class UsersStackSection extends SectionStackSection {
         ListGridField confirmedField = new ListGridField("confirmed", "Confirmed");
         confirmedField.setType(ListGridFieldType.BOOLEAN);
         ListGridField countryField = FieldUtil.getIconGridField("countryCodeIcon");
-        ListGridField firstNameField = new ListGridField("firstName", "First Name");
-        ListGridField lastNameField = new ListGridField("lastName", "Last Name");
+        ListGridField nameField = new ListGridField("username", "Name");
         ListGridField emailField = new ListGridField("email", "Email");
         ListGridField lastLoginField = FieldUtil.getDateField("lastLogin", "Last Login");
 
-        grid.setFields(confirmedField, countryField, firstNameField,
-                lastNameField, lastLoginField, emailField);
+        grid.setFields(confirmedField, countryField, nameField,
+                lastLoginField, emailField);
         grid.setSortField("firstName");
         grid.setSortDirection(SortDirection.ASCENDING);
 
@@ -226,10 +220,7 @@ public class UsersStackSection extends SectionStackSection {
 
             @Override
             public void onCellDoubleClick(CellDoubleClickEvent event) {
-                edit(event.getRecord().getAttribute("email"),
-                        event.getRecord().getAttributeAsBoolean("confirmed"),
-                        event.getRecord().getAttribute("level"),
-                        event.getRecord().getAttribute("countryCode"));
+                edit(event.getRecord());
             }
         });
 
@@ -275,8 +266,8 @@ public class UsersStackSection extends SectionStackSection {
     }
 
     private void remove(String email) {
-        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
 
+        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<User> callback = new AsyncCallback<User>() {
 
             @Override
@@ -297,10 +288,22 @@ public class UsersStackSection extends SectionStackSection {
         service.removeUser(email, callback);
     }
 
-    private void edit(String email, boolean confirmed, String level, String countryCode) {
+    /**
+     *
+     * @param name
+     * @param email
+     * @param confirmed
+     * @param level
+     * @param countryCode
+     */
+    private void edit(ListGridRecord record) {
 
         ManageUsersTab usersTab = (ManageUsersTab) Layout.getInstance().
                 getTab(CoreConstants.TAB_MANAGE_USERS);
-        usersTab.setUser(email, confirmed, level, countryCode);
+        usersTab.setUser(record.getAttribute("username"),
+                record.getAttribute("email"),
+                record.getAttributeAsBoolean("confirmed"),
+                record.getAttribute("level"),
+                record.getAttribute("countryCode"));
     }
 }

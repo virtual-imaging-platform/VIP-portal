@@ -70,6 +70,7 @@ public class EditUserStackSection extends SectionStackSection {
 
     private ModalWindow modal;
     private VLayout editUserLayout;
+    private Label nameLabel;
     private Label emailLabel;
     private SelectItem levelPickList;
     private SelectItem groupsPickList;
@@ -99,6 +100,9 @@ public class EditUserStackSection extends SectionStackSection {
 
     private void configure() {
 
+        nameLabel = WidgetUtil.getLabel("", 15);
+        nameLabel.setCanSelectText(true);
+        
         emailLabel = WidgetUtil.getLabel("", 15);
         emailLabel.setCanSelectText(true);
         
@@ -163,7 +167,7 @@ public class EditUserStackSection extends SectionStackSection {
         });
 
         editUserLayout = WidgetUtil.getVIPLayout(380, 300);
-        editUserLayout.addMember(WidgetUtil.getLabel("<b>Email</b>", 15));
+        editUserLayout.addMember(nameLabel);
         editUserLayout.addMember(emailLabel);
         addField("Level", levelPickList);
         addField("Groups", groupsPickList);
@@ -181,13 +185,16 @@ public class EditUserStackSection extends SectionStackSection {
     /**
      * Sets a user to edit.
      *
+     * @param name User's name
      * @param email User's email
      * @param confirmed If the user confirmed his account
      * @param level User's level
      * @param countryCode User's country code
      */
-    public void setUser(String email, boolean confirmed, String level, String countryCode) {
+    public void setUser(String name, String email, boolean confirmed, 
+            String level, String countryCode) {
 
+        this.nameLabel.setContents(name);
         this.emailLabel.setContents(email);
         this.confirmedField.setValue(confirmed);
         this.levelPickList.setValue(level);
@@ -249,6 +256,7 @@ public class EditUserStackSection extends SectionStackSection {
             @Override
             public void onSuccess(Void result) {
                 modal.hide();
+                nameLabel.setContents("");
                 emailLabel.setContents("");
                 levelPickList.setValues(new String[]{});
                 groupsPickList.setValues(new String[]{});

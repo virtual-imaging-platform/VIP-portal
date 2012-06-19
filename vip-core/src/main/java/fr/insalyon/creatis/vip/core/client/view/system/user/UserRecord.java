@@ -50,8 +50,7 @@ public class UserRecord extends ListGridRecord {
             String institution, String phone, boolean confirmed, String folder,
             Date lastLogin, String level, String countryCode, String countryName) {
 
-        setAttribute("firstName", firstName);
-        setAttribute("lastName", lastName);
+        setAttribute("username", firstName + " " + lastName.toUpperCase());
         setAttribute("email", email);
         setAttribute("institution", institution);
         setAttribute("phone", phone);

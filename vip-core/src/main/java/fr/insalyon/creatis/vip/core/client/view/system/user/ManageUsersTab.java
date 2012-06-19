@@ -63,7 +63,7 @@ public class ManageUsersTab extends AbstractManageTab {
         sectionStack.setAnimateSections(true);
         sectionStack.setCanResizeSections(true);
         sectionStack.setSections(usersStackSection, editStackSection);
-        
+
         vLayout.addMember(sectionStack);
     }
 
@@ -71,9 +71,9 @@ public class ManageUsersTab extends AbstractManageTab {
         usersStackSection.loadData();
     }
 
-    public void setUser(String email, boolean confirmed, String level, 
-            String countryCode) {
-        
-        editStackSection.setUser(email, confirmed, level, countryCode);
+    public void setUser(String name, String email, boolean confirmed,
+            String level, String countryCode) {
+
+        editStackSection.setUser(name, email, confirmed, level, countryCode);
     }
 }
