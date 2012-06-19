@@ -84,6 +84,7 @@ public class UploadFilesServiceImpl extends HttpServlet {
             boolean single = Boolean.valueOf(req.getHeader("single"));
             boolean unzip = Boolean.valueOf(req.getHeader("unzip"));
             this.usePool = Boolean.valueOf(req.getHeader("pool"));
+            String operationID = "no-id";
 
             boolean local = path.equals("local") ? true : false;
             String rootDirectory = DataManagerUtil.getUploadRootDirectory(local);
@@ -119,13 +120,13 @@ public class UploadFilesServiceImpl extends HttpServlet {
                 }
 
                 if (single || !unzip) {
-                    uploadFile(uploadedFile.getAbsolutePath(), path);
+                    operationID = uploadFile(uploadedFile.getAbsolutePath(), path);
 
                 } else {
                     UnZipper.unzip(uploadedFile.getAbsolutePath());
                     String dir = uploadedFile.getParent();
                     uploadedFile.delete();
-                    processDir(dir, path);
+                    operationID = processDir(dir, path);
                 }
             } else {
                 logger.info("(" + user.getEmail() + ") Uploaded local file '" + uploadedFile.getAbsolutePath() + "'.");
@@ -140,8 +141,9 @@ public class UploadFilesServiceImpl extends HttpServlet {
             out.println("<body>");
             out.println("<script type=\"text/javascript\">");
             out.println("if (parent.uploadComplete) parent.uploadComplete('"
-                    + fileName + "');");
+                    + operationID + "');");
             out.println("</script>");
+            out.println("id=" + operationID);
             out.println("</body>");
             out.println("</html>");
             out.flush();
@@ -160,20 +162,22 @@ public class UploadFilesServiceImpl extends HttpServlet {
         }
     }
 
-    private void processDir(String dir, String baseDir)
+    private String processDir(String dir, String baseDir)
             throws GRIDAClientException, DataManagerException {
 
-        File d = new File(dir);
-        for (File f : d.listFiles()) {
+        StringBuilder ids = new StringBuilder();
+        for (File f : new File(dir).listFiles()) {
             if (f.isDirectory()) {
-                processDir(f.getAbsolutePath(), baseDir + "/" + f.getName());
+                ids.append(processDir(f.getAbsolutePath(), baseDir + "/" + f.getName()));
             } else {
-                uploadFile(f.getAbsolutePath(), baseDir);
+                ids.append(uploadFile(f.getAbsolutePath(), baseDir));
             }
+            ids.append("##");
         }
+        return ids.toString();
     }
 
-    private void uploadFile(String fileName, String dir)
+    private String uploadFile(String fileName, String dir)
             throws GRIDAClientException, DataManagerException {
 
         String parsed = fileName.trim().replaceAll(" ", "_");
@@ -185,10 +189,11 @@ public class UploadFilesServiceImpl extends HttpServlet {
 
         logger.info("(" + user.getEmail() + ") Uploading '" + fileName + "' to '" + dir + "'.");
         if (usePool) {
-            poolClient.uploadFile(fileName,
+            return poolClient.uploadFile(fileName,
                     DataManagerUtil.parseBaseDir(user, dir), user.getEmail());
         } else {
             client.uploadFile(fileName, DataManagerUtil.parseBaseDir(user, dir));
+            return "no-id";
         }
     }
 }

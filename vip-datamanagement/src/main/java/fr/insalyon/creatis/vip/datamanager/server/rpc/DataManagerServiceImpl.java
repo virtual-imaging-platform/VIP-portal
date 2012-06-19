@@ -285,12 +285,12 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public void downloadFile(String remoteFile) throws DataManagerException {
+    public String downloadFile(String remoteFile) throws DataManagerException {
 
         try {
             trace(logger, "Adding file to transfer queue: " + remoteFile);
             User user = getSessionUser();
-            transferPoolBusiness.downloadFile(user, remoteFile);
+            return transferPoolBusiness.downloadFile(user, remoteFile);
 
         } catch (CoreException ex) {
             throw new DataManagerException(ex);
@@ -300,13 +300,13 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public void downloadFiles(List<String> remoteFiles, String packName)
+    public String downloadFiles(List<String> remoteFiles, String packName)
             throws DataManagerException {
 
         try {
             trace(logger, "Adding files to transfer queue: " + remoteFiles);
             User user = getSessionUser();
-            transferPoolBusiness.downloadFiles(user, remoteFiles, packName);
+            return transferPoolBusiness.downloadFiles(user, remoteFiles, packName);
 
         } catch (CoreException ex) {
             throw new DataManagerException(ex);
@@ -316,12 +316,12 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public void downloadFolder(String remoteFolder) throws DataManagerException {
+    public String downloadFolder(String remoteFolder) throws DataManagerException {
 
         try {
             trace(logger, "Adding folder to transfer queue: " + remoteFolder);
             User user = getSessionUser();
-            transferPoolBusiness.downloadFolder(user, remoteFolder);
+            return transferPoolBusiness.downloadFolder(user, remoteFolder);
 
         } catch (CoreException ex) {
             throw new DataManagerException(ex);

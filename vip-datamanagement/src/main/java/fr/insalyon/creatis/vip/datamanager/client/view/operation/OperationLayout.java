@@ -42,6 +42,7 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
@@ -60,7 +61,6 @@ public class OperationLayout extends VLayout {
     private VLayout operationsLayout;
     private Date lastDate;
     private MoreOperationsBoxLayout loadMoreDataBoxLayout;
-    private NoOperationsBoxLayout noMoreDataBoxLayout;
 
     public static OperationLayout getInstance() {
         if (instance == null) {
@@ -97,34 +97,38 @@ public class OperationLayout extends VLayout {
         loadMoreDataBoxLayout = new MoreOperationsBoxLayout();
         loadMoreDataBoxLayout.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 loadMoreData();
             }
         });
-        noMoreDataBoxLayout = new NoOperationsBoxLayout();
 
         loadData();
     }
 
-    public void loadData() {
+    private void loadData() {
 
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<List<PoolOperation>> callback = new AsyncCallback<List<PoolOperation>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 SC.warn("Unable to get list of operations:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<PoolOperation> result) {
 
                 operationsLayout.removeMembers(operationsLayout.getMembers());
 
                 if (!result.isEmpty()) {
                     for (PoolOperation operation : result) {
-                        operationsLayout.addMember(new OperationBoxLayout(modal, operation));
+                        operationsLayout.addMember(new OperationBoxLayout(operation));
                         lastDate = operation.getRegistration();
                     }
-                    operationsLayout.addMember(loadMoreDataBoxLayout);
+                    if (result.size() == DataManagerConstants.MAX_OPERATIONS_LIMIT) {
+                        operationsLayout.addMember(loadMoreDataBoxLayout);
+                    }
                 }
                 modal.hide();
             }
@@ -132,16 +136,18 @@ public class OperationLayout extends VLayout {
         modal.show("Loading operations...", true);
         service.getPoolOperationsByUser(callback);
     }
-        
+
     private void loadMoreData() {
 
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<List<PoolOperation>> callback = new AsyncCallback<List<PoolOperation>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 SC.warn("Unable to get list of operations:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<PoolOperation> result) {
 
                 operationsLayout.removeMember(loadMoreDataBoxLayout);
@@ -149,19 +155,46 @@ public class OperationLayout extends VLayout {
                 if (!result.isEmpty()) {
 
                     for (PoolOperation operation : result) {
-                        operationsLayout.addMember(new OperationBoxLayout(modal, operation));
+                        operationsLayout.addMember(new OperationBoxLayout(operation));
                         lastDate = operation.getRegistration();
                     }
-                    operationsLayout.addMember(loadMoreDataBoxLayout);
-
-                } else {
-                    operationsLayout.addMember(noMoreDataBoxLayout);
+                    if (result.size() == DataManagerConstants.MAX_OPERATIONS_LIMIT) {
+                        operationsLayout.addMember(loadMoreDataBoxLayout);
+                    }
                 }
-
-                modal.hide();
             }
         };
-        modal.show("Loading more operations...", true);
         service.getPoolOperationsByUserAndDate(lastDate, callback);
+    }
+
+    /**
+     * Adds an operation to the list of operations.
+     *
+     * @param operationID
+     */
+    public void addOperation(final String operationID) {
+
+        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
+        AsyncCallback<PoolOperation> asyncCallback = new AsyncCallback<PoolOperation>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                SC.warn(operationID + "<br />Unable to get operation data:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(PoolOperation result) {
+                operationsLayout.addMember(new OperationBoxLayout(result), 0);
+            }
+        };
+        service.getPoolOperationById(operationID, asyncCallback);
+    }
+
+    /**
+     * Removes all operations from the list.
+     */
+    public void clearOperations() {
+
+        operationsLayout.removeMembers(operationsLayout.getMembers());
     }
 }

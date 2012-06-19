@@ -87,6 +87,7 @@ public class FileUploadWindow extends Window {
         ButtonItem uploadButton = new ButtonItem("Upload");
         uploadButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent e) {
                 if (form.validate()) {
                     modal.show("Uploading file...", true);

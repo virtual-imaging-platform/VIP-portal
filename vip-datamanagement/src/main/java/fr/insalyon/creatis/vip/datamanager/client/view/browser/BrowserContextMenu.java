@@ -253,7 +253,7 @@ public class BrowserContextMenu extends Menu {
 
         if (data.getType() == Data.Type.file) {
             DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-            AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            AsyncCallback<String> callback = new AsyncCallback<String>() {
 
                 @Override
                 public void onFailure(Throwable caught) {
@@ -268,9 +268,9 @@ public class BrowserContextMenu extends Menu {
                 }
 
                 @Override
-                public void onSuccess(Void result) {
+                public void onSuccess(String result) {
                     modal.hide();
-                    OperationLayout.getInstance().loadData();
+                    OperationLayout.getInstance().addOperation(result);
                 }
             };
             modal.show("Adding file to transfer queue...", true);
@@ -278,7 +278,7 @@ public class BrowserContextMenu extends Menu {
 
         } else {
             DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-            AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            AsyncCallback<String> callback = new AsyncCallback<String>() {
 
                 @Override
                 public void onFailure(Throwable caught) {
@@ -293,9 +293,9 @@ public class BrowserContextMenu extends Menu {
                 }
 
                 @Override
-                public void onSuccess(Void result) {
+                public void onSuccess(String result) {
                     modal.hide();
-                    OperationLayout.getInstance().loadData();
+                    OperationLayout.getInstance().addOperation(result);
                 }
             };
             modal.show("Adding folder to transfer queue...", true);

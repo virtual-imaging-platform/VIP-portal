@@ -98,16 +98,16 @@ public class GeneralInformationContextMenu extends Menu {
     private void downloadFile(String path) {
 
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+        AsyncCallback<String> callback = new AsyncCallback<String>() {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to download file:<br />" + caught.getMessage());
             }
 
-            public void onSuccess(Void result) {
+            public void onSuccess(String result) {
                 modal.hide();
-                OperationLayout.getInstance().loadData();
+                OperationLayout.getInstance().addOperation(result);
                 ((DataManagerSection)Layout.getInstance().getMainSection(DataManagerConstants.SECTION_FILE_TRANSFER)).expand();
             }
         };

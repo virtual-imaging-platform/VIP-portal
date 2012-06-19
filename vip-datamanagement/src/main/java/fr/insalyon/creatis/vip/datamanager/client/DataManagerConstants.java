@@ -83,10 +83,11 @@ public class DataManagerConstants {
     public static final String OP_ICON_DOWNLOAD = OP_FOLDER + "icon-download.png";
     public static final String OP_ICON_CLEAR = OP_FOLDER + "icon-clear.png";
     // Configuration Constants
-    public final static String ROOT = "/vip";
-    public final static String USERS_HOME = "Home";
-    public final static String USERS_FOLDER = "Users";
-    public final static String TRASH_HOME = "Trash";
-    public final static String BIOMED_HOME = "Biomed";
-    public final static String GROUP_APPEND = " (group)";
+    public static final String ROOT = "/vip";
+    public static final String USERS_HOME = "Home";
+    public static final String USERS_FOLDER = "Users";
+    public static final String TRASH_HOME = "Trash";
+    public static final String BIOMED_HOME = "Biomed";
+    public static final String GROUP_APPEND = " (group)";
+    public static final int MAX_OPERATIONS_LIMIT = 10;
 }

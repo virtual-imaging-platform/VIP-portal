@@ -34,22 +34,16 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.operation;
 
-import fr.insalyon.creatis.vip.datamanager.client.view.system.operation.OperationRecord;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.BooleanCallback;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.view.system.operation.OperationRecord;
 
 /**
  *
@@ -67,6 +61,7 @@ public class OperationContextMenu extends Menu {
         downloadItem.setIcon(DataManagerConstants.ICON_DOWNLOAD);
         downloadItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 if (operation.getStatus().equals("Done")) {
                     Window.open(
@@ -81,49 +76,18 @@ public class OperationContextMenu extends Menu {
         MenuItem viewItem = new MenuItem("View Details");
         viewItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 new OperationDetailsWindow(operation).show();
-            }
-        });
-
-        MenuItem clearItem = new MenuItem("Clear Operation");
-        clearItem.setIcon(CoreConstants.ICON_CLEAR);
-        clearItem.addClickHandler(new ClickHandler() {
-
-            public void onClick(MenuItemClickEvent event) {
-                SC.confirm("Do you want to clear this operation?", new BooleanCallback() {
-
-                    public void execute(Boolean value) {
-                        if (value != null && value) {
-                            if (!operation.getStatus().equals("Running")) {
-                                DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-                                AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-                                    public void onFailure(Throwable caught) {
-                                        modal.hide();
-                                        SC.warn("Unable to clear operations:<br />" + caught.getMessage());
-                                    }
-
-                                    public void onSuccess(Void result) {
-                                        modal.hide();
-                                        OperationLayout.getInstance().loadData();
-                                    }
-                                };
-                                modal.show("Clearing operation...", true);
-                                service.removeOperationById(operation.getId(), callback);
-                            }
-                        }
-                    }
-                });
             }
         });
 
         MenuItemSeparator separator = new MenuItemSeparator();
 
         if (operation.getType().equals("Download") && operation.getStatus().equals("Done")) {
-            this.setItems(downloadItem, separator, viewItem, clearItem);
+            this.setItems(downloadItem, separator, viewItem);
         } else {
-            this.setItems(viewItem, clearItem);
+            this.setItems(viewItem);
         }
     }
 }

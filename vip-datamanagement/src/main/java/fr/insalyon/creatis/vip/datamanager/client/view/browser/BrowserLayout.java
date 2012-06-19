@@ -34,7 +34,6 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.browser;
 
-import fr.insalyon.creatis.vip.datamanager.client.view.common.BrowserUtil;
 import com.google.gwt.user.client.ui.NamedFrame;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SelectionAppearance;
@@ -48,6 +47,7 @@ import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.client.view.common.BrowserUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 
 /**
@@ -68,9 +68,9 @@ public class BrowserLayout extends VLayout {
         }
         return instance;
     }
-    
+
     public static void terminate() {
-        
+
         instance = null;
     }
 
@@ -106,6 +106,7 @@ public class BrowserLayout extends VLayout {
 
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 
+            @Override
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 String type = event.getRecord().getAttributeAsString("icon");
                 if (type.contains("folder") || type.contains("trash")) {
@@ -117,6 +118,7 @@ public class BrowserLayout extends VLayout {
         });
         grid.addCellContextClickHandler(new CellContextClickHandler() {
 
+            @Override
             public void onCellContextClick(CellContextClickEvent event) {
                 event.cancel();
                 if (event.getColNum() != 0) {
@@ -147,18 +149,23 @@ public class BrowserLayout extends VLayout {
     public void setDataUploadWindow(DataUploadWindow dataUploadWindow) {
         this.dataUploadWindow = dataUploadWindow;
     }
-    
+
     public BrowserToolStrip getToolStrip() {
         return toolStrip;
     }
 
-    public void uploadComplete(String fileName) {
+    public void uploadComplete(String result) {
+        
         if (dataUploadWindow != null) {
             dataUploadWindow.destroy();
             dataUploadWindow = null;
         }
         modal.hide();
-        OperationLayout.getInstance().loadData();
+        for (String operationID : result.split("##")) {
+            if (!operationID.isEmpty()) {
+                OperationLayout.getInstance().addOperation(operationID);
+            }
+        }
     }
 
     private native void initComplete(BrowserLayout upload) /*-{

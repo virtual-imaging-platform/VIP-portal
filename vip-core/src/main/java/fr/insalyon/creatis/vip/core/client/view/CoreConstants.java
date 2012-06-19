@@ -42,7 +42,7 @@ import java.util.Date;
  */
 public class CoreConstants {
 
-    public static final String VERSION = "v0.7.7";
+    public static final String VERSION = "v0.7.8";
     // Configuration Labels
     public static final String LAB_ADMIN_FIRST_NAME = "admin.first.name";
     public static final String LAB_ADMIN_LAST_NAME = "admin.last.name";

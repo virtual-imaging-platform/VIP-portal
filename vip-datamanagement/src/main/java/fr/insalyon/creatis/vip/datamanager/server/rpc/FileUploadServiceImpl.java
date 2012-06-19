@@ -80,6 +80,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                 FileItem fileItem = null;
                 String path = null;
                 String target = "uploadComplete";
+                String operationID = "no-id";
 
                 while (iter.hasNext()) {
                     FileItem item = (FileItem) iter.next();
@@ -109,7 +110,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                             // GRIDA Pool Client
                             logger.info("(" + user.getEmail() + ") Uploading '" + uploadedFile.getAbsolutePath() + "' to '" + path + "'.");
                             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
-                            client.uploadFile(
+                            operationID = client.uploadFile(
                                     uploadedFile.getAbsolutePath(),
                                     DataManagerUtil.parseBaseDir(user, path),
                                     user.getEmail());
@@ -131,7 +132,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                 out.println("<body>");
                 out.println("<script type=\"text/javascript\">");
                 out.println("if (parent." + target + ") parent." + target + "('"
-                        + fileName + "');");
+                        + operationID + "');");
                 out.println("</script>");
                 out.println("</body>");
                 out.println("</html>");

@@ -191,7 +191,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
             if (data.getType() == Data.Type.file) {
                 DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-                AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+                AsyncCallback<String> callback = new AsyncCallback<String>() {
 
                     @Override
                     public void onFailure(Throwable caught) {
@@ -200,9 +200,9 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                     }
 
                     @Override
-                    public void onSuccess(Void result) {
+                    public void onSuccess(String result) {
                         modal.hide();
-                        OperationLayout.getInstance().loadData();
+                        OperationLayout.getInstance().addOperation(result);
                     }
                 };
                 modal.show("Adding file to transfer queue...", true);
@@ -212,7 +212,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
             } else {
                 DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-                AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+                AsyncCallback<String> callback = new AsyncCallback<String>() {
 
                     @Override
                     public void onFailure(Throwable caught) {
@@ -221,9 +221,9 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                     }
 
                     @Override
-                    public void onSuccess(Void result) {
+                    public void onSuccess(String result) {
                         modal.hide();
-                        OperationLayout.getInstance().loadData();
+                        OperationLayout.getInstance().addOperation(result);
                     }
                 };
                 modal.show("Adding folder to transfer queue...", true);

@@ -41,7 +41,6 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
@@ -60,19 +59,8 @@ public class OperationToolStrip extends ToolStrip {
         this.setPadding(2);
 
         Label titleLabel = new Label("Pool of Transfers");
-        titleLabel.setWidth(90);
+        titleLabel.setWidth(150);
         this.addMember(titleLabel);
-        this.addSeparator();
-
-        // Refresh Button
-        this.addButton(WidgetUtil.getToolStripButton(
-                CoreConstants.ICON_REFRESH, "Refresh", new ClickHandler() {
-
-            @Override
-            public void onClick(ClickEvent event) {
-                OperationLayout.getInstance().loadData();
-            }
-        }));
 
         // Clear Button
         this.addFill();
@@ -100,7 +88,7 @@ public class OperationToolStrip extends ToolStrip {
                                 @Override
                                 public void onSuccess(Void result) {
                                     modal.hide();
-                                    OperationLayout.getInstance().loadData();
+                                    OperationLayout.getInstance().clearOperations();
                                 }
                             };
                             modal.show("Removing operations...", true);

@@ -41,6 +41,7 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
@@ -60,7 +61,6 @@ public class TransferPoolBusiness {
     private static Logger logger = Logger.getLogger(TransferPoolBusiness.class);
     private Server serverConfiguration = Server.getInstance();
     private LFCBusiness lfcBusiness;
-    private int operationsLimit = 10;
 
     public TransferPoolBusiness() {
 
@@ -82,7 +82,8 @@ public class TransferPoolBusiness {
             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
             List<PoolOperation> poolOperations = new ArrayList<PoolOperation>();
 
-            for (Operation operation : client.getOperationsLimitedListByUserAndDate(email, operationsLimit, date)) {
+            for (Operation operation : client.getOperationsLimitedListByUserAndDate(
+                    email, DataManagerConstants.MAX_OPERATIONS_LIMIT, date)) {
                 
                 if (operation.getType() != Operation.Type.Delete) {
                     poolOperations.add(processOperation(operation, currentUserFolder));
@@ -246,9 +247,10 @@ public class TransferPoolBusiness {
      * @param user
      * @param email
      * @param remoteFile
+     * @return Operation ID
      * @throws BusinessException 
      */
-    public void downloadFile(User user, String remoteFile) throws BusinessException {
+    public String downloadFile(User user, String remoteFile) throws BusinessException {
 
         try {
             lfcBusiness.getModificationDate(user, remoteFile);
@@ -258,7 +260,7 @@ public class TransferPoolBusiness {
             String localDirPath = serverConfiguration.getDataManagerPath()
                     + "/downloads" + FilenameUtils.getFullPath(remotePath);
 
-            poolClient.downloadFile(remotePath, localDirPath, user.getEmail());
+            return poolClient.downloadFile(remotePath, localDirPath, user.getEmail());
 
         } catch (DataManagerException ex) {
             logger.error(ex);
@@ -274,9 +276,10 @@ public class TransferPoolBusiness {
      * @param user
      * @param remoteFiles
      * @param packName
+     * @return Operation ID
      * @throws BusinessException 
      */
-    public void downloadFiles(User user, List<String> remoteFiles,
+    public String downloadFiles(User user, List<String> remoteFiles,
             String packName) throws BusinessException {
 
         try {
@@ -290,7 +293,8 @@ public class TransferPoolBusiness {
             String localDirPath = serverConfiguration.getDataManagerPath()
                     + "/downloads/" + packName;
 
-            poolClient.downloadFiles(remotePaths.toArray(new String[]{}), localDirPath, user.getEmail());
+            return poolClient.downloadFiles(remotePaths.toArray(new String[]{}), 
+                    localDirPath, user.getEmail());
 
         } catch (DataManagerException ex) {
             logger.error(ex);
@@ -305,9 +309,10 @@ public class TransferPoolBusiness {
      * 
      * @param user
      * @param remoteFolder
+     * @return Operation ID
      * @throws BusinessException 
      */
-    public void downloadFolder(User user, String remoteFolder) throws BusinessException {
+    public String downloadFolder(User user, String remoteFolder) throws BusinessException {
 
         try {
             lfcBusiness.getModificationDate(user, remoteFolder);
@@ -316,7 +321,7 @@ public class TransferPoolBusiness {
             String remotePath = DataManagerUtil.parseBaseDir(user, remoteFolder);
             String localDirPath = serverConfiguration.getDataManagerPath()
                     + "/downloads" + remotePath;
-            poolClient.downloadFolder(remotePath, localDirPath, user.getEmail());
+            return poolClient.downloadFolder(remotePath, localDirPath, user.getEmail());
 
         } catch (DataManagerException ex) {
             logger.error(ex);
@@ -332,9 +337,10 @@ public class TransferPoolBusiness {
      * @param user
      * @param localFile
      * @param remoteFile
+     * @return Operation ID
      * @throws BusinessException 
      */
-    public void uploadFile(User user, String localFile, String remoteFile) 
+    public String uploadFile(User user, String localFile, String remoteFile) 
             throws BusinessException {
 
         try {
@@ -342,7 +348,7 @@ public class TransferPoolBusiness {
             String localPath = serverConfiguration.getDataManagerPath()
                     + "/uploads/" + localFile;
             String remotePath = DataManagerUtil.parseBaseDir(user, remoteFile);
-            poolClient.uploadFile(localPath, remotePath, user.getEmail());
+            return poolClient.uploadFile(localPath, remotePath, user.getEmail());
 
         } catch (DataManagerException ex) {
             logger.error(ex);

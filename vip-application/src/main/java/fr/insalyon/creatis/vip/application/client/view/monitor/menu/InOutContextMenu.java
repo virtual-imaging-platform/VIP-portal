@@ -79,6 +79,7 @@ public class InOutContextMenu extends Menu {
         downloadFilesItem.setIcon(DataManagerConstants.ICON_DOWNLOAD);
         downloadFilesItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 download();
             }
@@ -88,6 +89,7 @@ public class InOutContextMenu extends Menu {
         downloadFileItem.setIcon(DataManagerConstants.ICON_DOWNLOAD);
         downloadFileItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 downloadFile(node.getName());
             }
@@ -97,6 +99,7 @@ public class InOutContextMenu extends Menu {
         jumpToItem.setIcon(DataManagerConstants.ICON_JUMPTO);
         jumpToItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 String folder = node.getName().substring(0, node.getName().lastIndexOf("/"));
                 BrowserLayout.getInstance().loadData(folder, false);
@@ -116,16 +119,18 @@ public class InOutContextMenu extends Menu {
     private void downloadFile(String path) {
 
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+        AsyncCallback<String> callback = new AsyncCallback<String>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to download file: " + caught.getMessage());
             }
 
-            public void onSuccess(Void result) {
+            @Override
+            public void onSuccess(String result) {
                 modal.hide();
-                OperationLayout.getInstance().loadData();
+                OperationLayout.getInstance().addOperation(result);
                 DataManagerModule.dataManagerSection.expand();
             }
         };
@@ -153,16 +158,18 @@ public class InOutContextMenu extends Menu {
     private void downloadFiles(List<String> paths, String packName) {
 
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+        AsyncCallback<String> callback = new AsyncCallback<String>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to download files: " + caught.getMessage());
             }
 
-            public void onSuccess(Void result) {
+            @Override
+            public void onSuccess(String result) {
                 modal.hide();
-                OperationLayout.getInstance().loadData();
+                OperationLayout.getInstance().addOperation(result);
                 DataManagerModule.dataManagerSection.expand();
             }
         };

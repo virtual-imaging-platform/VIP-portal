@@ -36,7 +36,6 @@ package fr.insalyon.creatis.vip.models.client.view;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.DateChooser;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -44,7 +43,6 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelUtil;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Timepoint;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
@@ -70,7 +68,7 @@ public class ModelDisplay extends VLayout {
     private ToolStripButton download, upload;
     ModelTreeGrid modelTreeGrid;
     private String zipFile;
-    
+
     ModelDisplay(String uri) {
         super();
         buildModel(uri);
@@ -89,20 +87,9 @@ public class ModelDisplay extends VLayout {
     private void init() {
         toolStrip = new ToolStrip();
         toolStrip.setWidth100();
-        
-        ToolStripButton addTimepoint = new ToolStripButton("Add timepoint");
-        
-        addTimepoint.addClickHandler(new ClickHandler(){
-
-            public void onClick(ClickEvent event) {
-                addTimePoint((new DateChooser()).getData());
-            }
-        });
-        
-        toolStrip.addButton(addTimepoint);
-        
         addMember(toolStrip);
-        updateTreeGrid();
+        modelTreeGrid = new ModelTreeGrid(model);
+        addMember(modelTreeGrid);
         if (model != null) {
             enableDownload();
             checkModel(model);
@@ -114,27 +101,12 @@ public class ModelDisplay extends VLayout {
             upload.hide();
     }
 
-    private void updateTreeGrid(){
-        if(model != null && this.contains(modelTreeGrid))
-            this.removeMember(modelTreeGrid);
-            
-            modelTreeGrid = new ModelTreeGrid(model);
-            addMember(modelTreeGrid);
-        
-    }
-    
-    private void addTimePoint(Date d){
-        Timepoint tp = new Timepoint();
-        tp.setStartingDate(d);
-        model.addTimepoint(tp);
-        updateTreeGrid();
-    }
-    
     public void enableCommit() {
         upload = new ToolStripButton("Commit model");
         upload.setIcon(DataManagerConstants.ICON_UPLOAD);
         upload.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
 
                 if (zipFile == null) {
@@ -156,20 +128,24 @@ public class ModelDisplay extends VLayout {
                 ModelServiceAsync ssu = ModelService.Util.getInstance();
                 AsyncCallback<SimulationObjectModel> cbssu = new AsyncCallback<SimulationObjectModel>() {
 
+                    @Override
                     public void onFailure(Throwable caught) {
                         SC.warn("Cannot set the model storage URL");
                     }
 
+                    @Override
                     public void onSuccess(SimulationObjectModel result) {
                         final String uri = result.getURI();
                         ModelServiceAsync mms = ModelService.Util.getInstance();
                         AsyncCallback<Void> callback1 = new AsyncCallback<Void>() {
 
+                            @Override
                             public void onFailure(Throwable caught) {
                                 modal.hide();
                                 SC.warn("Cannot commit model to the Triple Store");
                             }
 
+                            @Override
                             public void onSuccess(Void result) {
                                 modal.hide();
                                 SC.say("Model successfully comitted to the Triple Store (" + uri + ")");
@@ -177,7 +153,6 @@ public class ModelDisplay extends VLayout {
                                 if (modelsTab != null) {
                                     modelsTab.loadModels();
                                 }
-                                OperationLayout.getInstance().loadData();
                             }
                         };
                         mms.completeModel(result, callback1);
@@ -210,10 +185,12 @@ public class ModelDisplay extends VLayout {
         //uploading zip file
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 SC.warn("Cannot upload zip file");
             }
 
+            @Override
             public void onSuccess(Void result) {
                 SC.say("Added zip file to the upload pool");
                 ((DataManagerSection) Layout.getInstance().getMainSection(DataManagerConstants.SECTION_FILE_TRANSFER)).expand();
@@ -248,11 +225,13 @@ public class ModelDisplay extends VLayout {
 
         AsyncCallback<Boolean> callback = new AsyncCallback<Boolean>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 disableDownload(lfn,false);
             }
 
+            @Override
             public void onSuccess(Boolean result) {
                 modal.hide();
             }
@@ -290,13 +269,16 @@ public class ModelDisplay extends VLayout {
     private void downloadModel(final String lfnModel) {
 
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+        AsyncCallback<String> callback = new AsyncCallback<String>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 SC.warn("Cannot download model file.");
             }
 
-            public void onSuccess(Void result) {
+            @Override
+            public void onSuccess(String result) {
+                OperationLayout.getInstance().addOperation(result);
                 SC.say("Model file download is in progress.");
                 ((DataManagerSection) Layout.getInstance().getMainSection(DataManagerConstants.SECTION_FILE_TRANSFER)).expand();
             }
@@ -320,11 +302,13 @@ public class ModelDisplay extends VLayout {
         ModelServiceAsync ms = ModelService.Util.getInstance();
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.say("Cannot load model (" + uri + ")");
             }
 
+            @Override
             public void onSuccess(SimulationObjectModel result) {
                 modal.hide();
                 if (result != null) {

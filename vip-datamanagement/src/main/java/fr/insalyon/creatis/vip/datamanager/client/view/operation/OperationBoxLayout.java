@@ -49,7 +49,6 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Status;
@@ -63,16 +62,14 @@ import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
  */
 public class OperationBoxLayout extends HLayout {
 
-    private ModalWindow modal;
     private PoolOperation operation;
     private Timer timer;
     private VLayout imgLayout;
     private VLayout mainLayout;
     private VLayout actionLayout;
 
-    public OperationBoxLayout(ModalWindow modal, PoolOperation operation) {
+    public OperationBoxLayout(PoolOperation operation) {
 
-        this.modal = modal;
         this.operation = operation;
 
         this.setMembersMargin(2);
@@ -102,6 +99,7 @@ public class OperationBoxLayout extends HLayout {
 
         timer = new Timer() {
 
+            @Override
             public void run() {
                 loadData();
             }
@@ -125,6 +123,7 @@ public class OperationBoxLayout extends HLayout {
                 icon.setCursor(Cursor.HAND);
                 icon.addClickHandler(new ClickHandler() {
 
+                    @Override
                     public void onClick(ClickEvent event) {
                         download();
                     }
@@ -176,6 +175,7 @@ public class OperationBoxLayout extends HLayout {
                 downloadLabel.setCursor(Cursor.HAND);
                 downloadLabel.addClickHandler(new ClickHandler() {
 
+                    @Override
                     public void onClick(ClickEvent event) {
                         download();
                     }
@@ -233,6 +233,7 @@ public class OperationBoxLayout extends HLayout {
             removeImg.setPrompt("Remove");
             removeImg.addClickHandler(new ClickHandler() {
 
+                @Override
                 public void onClick(ClickEvent event) {
                     remove();
                 }
@@ -246,6 +247,7 @@ public class OperationBoxLayout extends HLayout {
             downloadImg.setPrompt("Download");
             downloadImg.addClickHandler(new ClickHandler() {
 
+                @Override
                 public void onClick(ClickEvent event) {
                     download();
                 }
@@ -261,10 +263,12 @@ public class OperationBoxLayout extends HLayout {
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<PoolOperation> asyncCallback = new AsyncCallback<PoolOperation>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 SC.warn("Unable to update operation data:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(PoolOperation result) {
 
                 operation = result;
@@ -292,22 +296,22 @@ public class OperationBoxLayout extends HLayout {
 
         SC.confirm("Do you want to remove this operation?", new BooleanCallback() {
 
+            @Override
             public void execute(Boolean value) {
                 if (value != null && value) {
                     DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                     AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+                        @Override
                         public void onFailure(Throwable caught) {
-                            modal.hide();
                             SC.warn("Unable to remove operation:<br />" + caught.getMessage());
                         }
 
+                        @Override
                         public void onSuccess(Void result) {
-                            modal.hide();
                             destroy();
                         }
                     };
-                    modal.show("Removing operation...", true);
                     service.removeOperationById(operation.getId(), callback);
                 }
             }
