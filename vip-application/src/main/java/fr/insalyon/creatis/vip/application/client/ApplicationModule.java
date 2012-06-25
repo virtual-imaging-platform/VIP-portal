@@ -70,6 +70,7 @@ public class ApplicationModule extends Module {
 
         reservedClasses = new ArrayList<String>();
         addAccountType(ApplicationConstants.ACCOUNT_VIP);
+        addAccountType(ApplicationConstants.ACCOUNT_NEUROIMAGING);
     }
 
     @Override
@@ -120,21 +121,34 @@ public class ApplicationModule extends Module {
     public boolean parseAccountType(String accountType) {
 
         if (accountType.equals(ApplicationConstants.ACCOUNT_VIP)) {
-            ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-            AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-                public void onFailure(Throwable caught) {
-                    SC.say("Unable to add user to group '" + ApplicationConstants.GROUP_VIP
-                            + "':<br />" + caught.getMessage());
-                }
-
-                public void onSuccess(Void result) {
-                }
-            };
-            service.addUserToGroup(ApplicationConstants.GROUP_VIP, callback);
+            addUserToGroup(ApplicationConstants.GROUP_VIP);
+            return true;
+        } else if (accountType.equals(ApplicationConstants.ACCOUNT_NEUROIMAGING)) {
+            addUserToGroup(ApplicationConstants.GROUP_NEUROIMAGING);
             return true;
         }
+
         return false;
+    }
+
+    /**
+     * 
+     * @param groupName 
+     */
+    private void addUserToGroup(final String groupName) {
+
+        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            public void onFailure(Throwable caught) {
+                SC.say("Unable to add user to group '" + groupName
+                        + "':<br />" + caught.getMessage());
+            }
+
+            public void onSuccess(Void result) {
+            }
+        };
+        service.addUserToGroup(groupName, callback);
     }
 
     @Override
