@@ -190,13 +190,9 @@ public class EditGroupStackSection extends SectionStackSection {
         grid.setShowHover(true);
         grid.setShowHoverComponents(true);
         grid.setEmptyMessage("<br>No data available.");
-
-        ListGridField firstNameField = new ListGridField("firstName", "First Name");
-        ListGridField lastNameField = new ListGridField("lastName", "Last Name");
-        ListGridField countryField = FieldUtil.getIconGridField("countryCodeIcon");
-
-        grid.setFields(countryField, firstNameField, lastNameField);
-        grid.setSortField("firstName");
+        grid.setFields(FieldUtil.getIconGridField("countryCodeIcon"),
+                new ListGridField("username", "Name"));
+        grid.setSortField("username");
         grid.setSortDirection(SortDirection.ASCENDING);
 
         vLayout.addMember(grid);
@@ -298,12 +294,8 @@ public class EditGroupStackSection extends SectionStackSection {
                 gridModal.hide();
                 List<UserRecord> dataList = new ArrayList<UserRecord>();
 
-                for (User u : result) {
-                    dataList.add(new UserRecord(u.getFirstName(), u.getLastName(),
-                            u.getEmail(), u.getInstitution(), u.getPhone(),
-                            u.isConfirmed(), u.getFolder(), u.getLastLogin(),
-                            u.getLevel().name(), u.getCountryCode().name(),
-                            u.getCountryCode().getCountryName()));
+                for (User user : result) {
+                    dataList.add(new UserRecord(user));
                 }
                 grid.setData(dataList.toArray(new UserRecord[]{}));
             }

@@ -93,6 +93,7 @@ public class CoreModule extends Module {
         helpButton.setIcon(CoreConstants.ICON_HELP);
         helpButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 Layout.getInstance().addTab(new ContactTab());
             }
@@ -105,9 +106,6 @@ public class CoreModule extends Module {
     @Override
     public boolean parseAccountType(String accountType) {
 
-        if (accountType.equals(CoreConstants.ACCOUNT_OTHER)) {
-            return true;
-        }
         return false;
     }
 

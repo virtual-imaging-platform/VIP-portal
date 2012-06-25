@@ -132,10 +132,9 @@ public class UsersStackSection extends SectionStackSection {
             @Override
             protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
 
+                rollOverRecord = this.getRecord(rowNum);
+
                 if (rollOverCanvas == null) {
-
-                    rollOverRecord = this.getRecord(rowNum);
-
                     rollOverCanvas = new HLayout(3);
                     rollOverCanvas.setSnapTo("TR");
                     rollOverCanvas.setWidth(50);
@@ -145,7 +144,11 @@ public class UsersStackSection extends SectionStackSection {
 
                         @Override
                         public void onClick(ClickEvent event) {
-                            edit(rollOverRecord);
+                            edit(rollOverRecord.getAttribute("username"),
+                                    rollOverRecord.getAttribute("email"),
+                                    rollOverRecord.getAttributeAsBoolean("confirmed"),
+                                    rollOverRecord.getAttribute("level"),
+                                    rollOverRecord.getAttribute("countryCode"));
                         }
                     }));
 
@@ -174,20 +177,19 @@ public class UsersStackSection extends SectionStackSection {
             @Override
             protected Canvas getCellHoverComponent(Record record, Integer rowNum, Integer colNum) {
 
-                detailViewer = new DetailViewer();
-                detailViewer.setWidth(400);
-
-                DetailViewerField levelField = new DetailViewerField("level", "Level");
-                DetailViewerField emailField = new DetailViewerField("email", "Email");
-                DetailViewerField nameField = new DetailViewerField("username", "Name");
-                DetailViewerField institutionField = new DetailViewerField("institution", "Institution");
-                DetailViewerField phoneField = new DetailViewerField("phone", "Phone");
-                DetailViewerField countryField = new DetailViewerField("countryName", "Country");
                 DetailViewerField lastLoginField = new DetailViewerField("lastLogin", "Last Login");
                 lastLoginField.setDateFormatter(DateDisplayFormat.TOUSSHORTDATETIME);
 
-                detailViewer.setFields(levelField, emailField, nameField,
-                        institutionField, phoneField, countryField, lastLoginField);
+                detailViewer = new DetailViewer();
+                detailViewer.setWidth(400);
+                detailViewer.setFields(
+                        new DetailViewerField("level", "Level"),
+                        new DetailViewerField("email", "Email"),
+                        new DetailViewerField("username", "Name"),
+                        new DetailViewerField("institution", "Institution"),
+                        new DetailViewerField("phone", "Phone"),
+                        new DetailViewerField("countryName", "Country"),
+                        lastLoginField);
                 detailViewer.setData(new Record[]{record});
 
                 return detailViewer;
@@ -206,13 +208,12 @@ public class UsersStackSection extends SectionStackSection {
 
         ListGridField confirmedField = new ListGridField("confirmed", "Confirmed");
         confirmedField.setType(ListGridFieldType.BOOLEAN);
-        ListGridField countryField = FieldUtil.getIconGridField("countryCodeIcon");
-        ListGridField nameField = new ListGridField("username", "Name");
-        ListGridField emailField = new ListGridField("email", "Email");
-        ListGridField lastLoginField = FieldUtil.getDateField("lastLogin", "Last Login");
 
-        grid.setFields(confirmedField, countryField, nameField,
-                lastLoginField, emailField);
+        grid.setFields(confirmedField,
+                FieldUtil.getIconGridField("countryCodeIcon"),
+                new ListGridField("username", "Name"),
+                FieldUtil.getDateField("lastLogin", "Last Login"),
+                new ListGridField("email", "Email"));
         grid.setSortField("firstName");
         grid.setSortDirection(SortDirection.ASCENDING);
 
@@ -220,7 +221,13 @@ public class UsersStackSection extends SectionStackSection {
 
             @Override
             public void onCellDoubleClick(CellDoubleClickEvent event) {
-                edit(event.getRecord());
+
+                ListGridRecord record = event.getRecord();
+                edit(record.getAttribute("username"),
+                        record.getAttribute("email"),
+                        record.getAttributeAsBoolean("confirmed"),
+                        record.getAttribute("level"),
+                        record.getAttribute("countryCode"));
             }
         });
 
@@ -251,12 +258,8 @@ public class UsersStackSection extends SectionStackSection {
                 modal.hide();
                 List<UserRecord> dataList = new ArrayList<UserRecord>();
 
-                for (User u : result) {
-                    dataList.add(new UserRecord(u.getFirstName(), u.getLastName(),
-                            u.getEmail(), u.getInstitution(), u.getPhone(),
-                            u.isConfirmed(), u.getFolder(), u.getLastLogin(),
-                            u.getLevel().name(), u.getCountryCode().name(),
-                            u.getCountryCode().getCountryName()));
+                for (User user : result) {
+                    dataList.add(new UserRecord(user));
                 }
                 grid.setData(dataList.toArray(new UserRecord[]{}));
             }
@@ -296,14 +299,11 @@ public class UsersStackSection extends SectionStackSection {
      * @param level
      * @param countryCode
      */
-    private void edit(ListGridRecord record) {
+    private void edit(String userName, String email, boolean confirmed,
+            String level, String countryCode) {
 
         ManageUsersTab usersTab = (ManageUsersTab) Layout.getInstance().
                 getTab(CoreConstants.TAB_MANAGE_USERS);
-        usersTab.setUser(record.getAttribute("username"),
-                record.getAttribute("email"),
-                record.getAttributeAsBoolean("confirmed"),
-                record.getAttribute("level"),
-                record.getAttribute("countryCode"));
+        usersTab.setUser(userName, email, confirmed, level, countryCode);
     }
 }

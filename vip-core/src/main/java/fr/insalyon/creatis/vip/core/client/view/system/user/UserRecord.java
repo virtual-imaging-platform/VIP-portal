@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.core.client.view.system.user;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import java.util.Date;
 
 /**
@@ -46,21 +47,19 @@ public class UserRecord extends ListGridRecord {
     public UserRecord() {
     }
 
-    public UserRecord(String firstName, String lastName, String email,
-            String institution, String phone, boolean confirmed, String folder,
-            Date lastLogin, String level, String countryCode, String countryName) {
+    public UserRecord(User u) {
 
-        setAttribute("username", firstName + " " + lastName.toUpperCase());
-        setAttribute("email", email);
-        setAttribute("institution", institution);
-        setAttribute("phone", phone);
-        setAttribute("confirmed", confirmed);
-        setAttribute("folder", folder);
-        setAttribute("lastLogin", lastLogin);
-        setAttribute("level", level);
-        setAttribute("countryCode", countryCode);
-        setAttribute("countryCodeIcon", "core/flags/" + countryCode);
-        setAttribute("countryName", countryName);
+        setAttribute("username", u.getFirstName() + " " + u.getLastName().toUpperCase());
+        setAttribute("email", u.getEmail());
+        setAttribute("institution", u.getInstitution());
+        setAttribute("phone", u.getPhone());
+        setAttribute("confirmed", u.isConfirmed());
+        setAttribute("folder", u.getFolder());
+        setAttribute("lastLogin", u.getLastLogin());
+        setAttribute("level", u.getLevel().name());
+        setAttribute("countryCode", u.getCountryCode().name());
+        setAttribute("countryCodeIcon", "core/flags/" + u.getCountryCode().name());
+        setAttribute("countryName", u.getCountryCode().getCountryName());
     }
     
     public Date getDate() {

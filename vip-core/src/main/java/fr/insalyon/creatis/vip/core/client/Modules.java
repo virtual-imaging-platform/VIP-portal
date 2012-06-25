@@ -91,8 +91,6 @@ public class Modules {
         for (Module module : modules) {
             CoreModule.accountTypes.addAll(module.getAccountTypes());
         }
-        
-        CoreModule.accountTypes.add(CoreConstants.ACCOUNT_OTHER);
     }
     
     public void parseAccountType(String accountType) {
