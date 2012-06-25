@@ -38,12 +38,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.ButtonItem;
+import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
@@ -54,6 +54,7 @@ import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -65,10 +66,10 @@ import java.util.List;
 public class EditApplicationStackSection extends SectionStackSection {
 
     private ModalWindow modal;
+    private VLayout editAppLayout;
     private boolean newApplication = true;
-    private DynamicForm form;
-    private TextItem nameItem;
-    private TextItem lfnItem;
+    private TextItem nameField;
+    private TextItem lfnField;
     private SelectItem classesPickList;
 
     public EditApplicationStackSection() {
@@ -78,74 +79,83 @@ public class EditApplicationStackSection extends SectionStackSection {
         this.setExpanded(true);
         this.setResizeable(true);
 
-        configureForm();
-
         VLayout vLayout = new VLayout(15);
         vLayout.setHeight100();
         vLayout.setOverflow(Overflow.AUTO);
         vLayout.setMargin(5);
-        vLayout.addMember(form);
 
-        modal = new ModalWindow(vLayout);
+        configure();
+
+        vLayout.addMember(editAppLayout);
+        modal = new ModalWindow(editAppLayout);
 
         this.addItem(vLayout);
         loadData();
     }
 
-    private void configureForm() {
+    private void configure() {
 
-        form = new DynamicForm();
-        form.setWidth(500);
-
-        nameItem = FieldUtil.getTextItem(450, true, "Name", null);
-        lfnItem = FieldUtil.getTextItem(450, true, "LFN", null);
+        nameField = FieldUtil.getTextItem(450, null);
+        lfnField = FieldUtil.getTextItem(450, null);
 
         classesPickList = new SelectItem();
-        classesPickList.setTitle("Classes");
+        classesPickList.setShowTitle(false);
         classesPickList.setMultiple(true);
         classesPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
         classesPickList.setWidth(450);
 
-        ButtonItem saveItem = new ButtonItem("Save");
-        saveItem.setWidth(50);
-        saveItem.addClickHandler(new ClickHandler() {
+        IButton saveButton = new IButton("Save");
+        saveButton.setWidth(70);
+        saveButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
-                if (form.validate()) {
+                if (nameField.validate() & lfnField.validate() & classesPickList.validate()) {
+
                     List<String> values = new ArrayList<String>();
                     values.addAll(Arrays.asList(classesPickList.getValues()));
 
-                    save(new Application(nameItem.getValueAsString().trim(),
-                            lfnItem.getValueAsString().trim(), values));
+                    save(new Application(nameField.getValueAsString().trim(),
+                            lfnField.getValueAsString().trim(), values));
                 }
             }
         });
 
-        form.setFields(nameItem, lfnItem, classesPickList, saveItem);
+        editAppLayout = WidgetUtil.getVIPLayout(480, 180);
+        addField("Name", nameField);
+        addField("LFN", lfnField);
+        addField("Classes", classesPickList);
+        editAppLayout.addMember(saveButton);
+    }
+
+    private void addField(String title, FormItem item) {
+
+        editAppLayout.addMember(WidgetUtil.getLabel("<b>" + title + "</b>", 15));
+        editAppLayout.addMember(FieldUtil.getForm(item));
     }
 
     /**
      * Sets an application to edit or creates a blank form.
-     * 
+     *
      * @param name Class name
      * @param lfn Application LFN
      * @param groups Class groups
      */
     public void setApplication(String name, String lfn, String classes) {
-        
+
         if (name != null) {
             this.setTitle("Editing Application: " + name);
-            this.nameItem.setValue(name);
-            this.nameItem.setDisabled(true);
-            this.lfnItem.setValue(lfn);
+            this.nameField.setValue(name);
+            this.nameField.setDisabled(true);
+            this.lfnField.setValue(lfn);
             this.classesPickList.setValues(classes.split(", "));
             this.newApplication = false;
-            
+
         } else {
             this.setTitle("Add Application");
-            this.nameItem.setValue("");
-            this.nameItem.setDisabled(false);
-            this.lfnItem.setValue("");
+            this.nameField.setValue("");
+            this.nameField.setDisabled(false);
+            this.lfnField.setValue("");
             this.classesPickList.setValues(new String[]{});
             this.newApplication = true;
         }
@@ -158,11 +168,13 @@ public class EditApplicationStackSection extends SectionStackSection {
         if (newApplication) {
             final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+                @Override
                 public void onFailure(Throwable caught) {
                     modal.hide();
                     SC.warn("Unable to add application:<br />" + caught.getMessage());
                 }
 
+                @Override
                 public void onSuccess(Void result) {
                     modal.hide();
                     ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
@@ -177,11 +189,13 @@ public class EditApplicationStackSection extends SectionStackSection {
         } else {
             final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+                @Override
                 public void onFailure(Throwable caught) {
                     modal.hide();
                     SC.warn("Unable to update application:<br />" + caught.getMessage());
                 }
 
+                @Override
                 public void onSuccess(Void result) {
                     modal.hide();
                     ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
@@ -203,11 +217,13 @@ public class EditApplicationStackSection extends SectionStackSection {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<List<AppClass>> callback = new AsyncCallback<List<AppClass>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to get list of classes:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<AppClass> result) {
                 modal.hide();
                 List<String> dataList = new ArrayList<String>();
