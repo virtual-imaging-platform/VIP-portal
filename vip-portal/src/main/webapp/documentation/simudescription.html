@@ -68,7 +68,7 @@
                     </ul>
 
         <A NAME="simri"> </A>
-        <h2>Simri</h2>
+        <h2>SIMRI</h2>
         <p>Simri (http://www.simri.org/) is a 3D MRI simulator based on the Bloch equation.  It takes into account the main static field value and enables realistic simulations of the chemical shift artifact, including             off-resonance phenomena. It also simulates the artifacts linked to the static field inhomogeneity like those induced by susceptibility variation within an object. </p>
         <p>Simri has 2 inputs:
         <ul>
@@ -85,23 +85,16 @@
 
         <A NAME="sindbad"> </A>
         <h2>Sindbad</h2>
-        Sindbad has 6 inputs:
-        <ul>
-            <li>"scan_file" contains the definition of the scanner</li>
-            <li>"chain" is a .mdf file containing simulation parameters. If more than 1 file are needed to run the simulation, use a zip or tar.gz or bz2 file containing: (i) a .conf file (<a href="./chaineGXL_0.conf">example</a>) specifying the mdf files to be used for each part of the simulation and (ii) the mdf files (max 3 .mdf files). Note that the program will always do analytic and Monte-Carlo simulations separately, even with a single mdf input.</li>
-            <li>"phantom" contains the object model as a .g file (brlcad phantom file). If you are using voxel phantoms, then use a zip or tar.gz or bz2 file containing: (i) a .conf (<a href="./modelGXL_0.conf">example</a>) filespecifying the sindbad options to be used for each part of the simulation and (ii) the phantom files (e.g. 1 .g file, 1 .sdt and 1 .spr files with same names and 1 labels reference (.dat) file).</li>
-            <li>"geo" is a .geo file(geometry specific parameters). If more than 1 file are needed to run the simulation, use a zip or tar.gz or bz2 file containing: (i) a .conf file (<a href="geoGXL_1.conf">example</a>) specifying the geometry to be used for each part of the simulation and (ii) the .geo files (max 3 .geo files).</li>
-            <li>"pegs4dat" is a file containing pegs4 materials.</li>
-            <li>"result_directory" is the output directory where the simulation results will be stored (a unique directory will be created).</li>
-        </ul>
+
+	See documentation available in Sindbad application: in Home, click on "Sindbad v[x]", then "Documentation and terms of use" and/or move the pointer over the simulator inputs:<br/>
+<img src="doc-sindbad.png" alt="screenshot-doc-sindbad"/>
 
         <A NAME="sorteo"> </A>
         <h2>PET-Sorteo</h2>
-        PET-Sorteo has 3 inputs:
-         <ul>
-            <li>"text_protocol" is a text file containing the acquisition parameters. More information about the available parameters is found in the <a href="manual-sorteo.pdf">PET-Sorteo manual</a>.</li>
-            <li>"fantome_v" is a v file containing the labeled object model used in the simulation or an archive (zip, gz or tgz) containing all the v files involved in the simulation.</li>
-            <li>"result_directory" is the output directory where the simulation results will be stored (a unique directory will be created)</li>
+
+	See documentation available in PET-Sorteo application: in Home, click on "PET-Sorteo v[x]", then "Documentation and terms of use" and/or move the pointer over the simulator inputs:<br/>
+<img src="doc-sorteo.png" alt="screenshot-doc-sorteo"/>
+
             
         </ul>
 
