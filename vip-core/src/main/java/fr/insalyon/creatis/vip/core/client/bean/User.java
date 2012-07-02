@@ -57,10 +57,11 @@ public class User implements IsSerializable {
     private String code;
     private String folder;
     private String session;
+    private Date registration;
     private Date lastLogin;
     private UserLevel level;
     private CountryCode countryCode;
-    private Map<String, GROUP_ROLE> groups;
+    private Map<Group, GROUP_ROLE> groups;
 
     public User() {
     }
@@ -69,20 +70,20 @@ public class User implements IsSerializable {
             String phone, UserLevel level, CountryCode countryCode) {
 
         this(firstName, lastName, email, institution, "", phone, false, "", "",
-                "", null, level, countryCode);
+                "", null, null, level, countryCode);
     }
 
     public User(String firstName, String lastName, String email, String institution,
             String password, String phone, CountryCode countryCode) {
 
         this(firstName, lastName, email, institution, password, phone, false,
-                "", "", "", null, null, countryCode);
+                "", "", "", new Date(), new Date(), null, countryCode);
     }
 
     public User(String firstName, String lastName, String email,
             String institution, String password, String phone, boolean confirmed,
-            String code, String folder, String session, Date lastLogin,
-            UserLevel level, CountryCode countryCode) {
+            String code, String folder, String session, Date registration,
+            Date lastLogin, UserLevel level, CountryCode countryCode) {
 
         this.firstName = firstName;
         this.lastName = lastName;
@@ -94,6 +95,7 @@ public class User implements IsSerializable {
         this.code = code;
         this.folder = folder;
         this.session = session;
+        this.registration = registration;
         this.lastLogin = lastLogin;
         this.level = level;
         this.countryCode = countryCode;
@@ -183,18 +185,32 @@ public class User implements IsSerializable {
         this.countryCode = countryCode;
     }
 
-    public void setGroups(Map<String, GROUP_ROLE> groups) {
+    public Date getRegistration() {
+        return registration;
+    }
+
+    public void setRegistration(Date registration) {
+        this.registration = registration;
+    }
+
+    public void setGroups(Map<Group, GROUP_ROLE> groups) {
         this.groups = groups;
     }
 
     public boolean hasGroupAccess(String groupName) {
-        return groups.containsKey(groupName);
+
+        for (Group group : groups.keySet()) {
+            if (group.getName().equals(groupName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean isGroupAdmin() {
 
-        for (String groupName : groups.keySet()) {
-            if (groups.get(groupName) == GROUP_ROLE.Admin) {
+        for (GROUP_ROLE role : groups.values()) {
+            if (role == GROUP_ROLE.Admin) {
                 return true;
             }
         }
@@ -203,8 +219,11 @@ public class User implements IsSerializable {
 
     public boolean isGroupAdmin(String groupName) {
 
-        if (hasGroupAccess(groupName) && groups.get(groupName) == GROUP_ROLE.Admin) {
-            return true;
+        for (Group group : groups.keySet()) {
+            if (group.getName().equals(groupName)
+                    && groups.get(group) == GROUP_ROLE.Admin) {
+                return true;
+            }
         }
         return false;
     }

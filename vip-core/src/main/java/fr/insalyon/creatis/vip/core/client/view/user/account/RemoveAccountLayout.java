@@ -77,7 +77,7 @@ public class RemoveAccountLayout extends AbstractFormLayout {
 
         confirmField = new CheckboxItem("confirm", "<font color=\"#808080\">Yes, I want to delete my account</font>");
         confirmField.setRequired(true);
-        confirmField.setWidth(300);
+        confirmField.setWidth(320);
         confirmField.setAlign(Alignment.LEFT);
         confirmField.addChangedHandler(new ChangedHandler() {
 

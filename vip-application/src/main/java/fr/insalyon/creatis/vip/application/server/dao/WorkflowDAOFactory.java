@@ -42,22 +42,10 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
  */
 public abstract class WorkflowDAOFactory {
 
-    public static final int DERBY = 1;
-    public static int factory = DERBY;
-
     public static WorkflowDAOFactory getDAOFactory() {
 
-        switch (factory) {
-            case DERBY:
-                return DerbyDAOFactory.getInstance();
-            default:
-                return null;
-        }
+        return DerbyDAOFactory.getInstance();
     }
 
     public abstract WorkflowDAO getWorkflowDAO() throws DAOException;
-
-    public abstract JobDAO getJobDAO(String workflowID) throws DAOException;
-
-    public abstract NodeDAO getNodeDAO(String workflowID) throws DAOException;
 }

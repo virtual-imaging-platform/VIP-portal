@@ -42,22 +42,18 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
  */
 public abstract class ApplicationDAOFactory {
 
-    public static final int H2 = 1;
-    public static int factory = H2;
-
     public static ApplicationDAOFactory getDAOFactory() {
 
-        switch (factory) {
-            case H2:
-                return H2DAOFactory.getInstance();
-            default:
-                return null;
-        }
+        return H2DAOFactory.getInstance();
     }
 
     public abstract ApplicationDAO getApplicationDAO() throws DAOException;
 
     public abstract ClassDAO getClassDAO() throws DAOException;
-    
+
     public abstract ApplicationInputDAO getApplicationInputDAO() throws DAOException;
+
+    public abstract SimulationDAO getSimulationDAO(String dbPath) throws DAOException;
+
+    public abstract ExecutionNodeDAO getExecutionNodeDAO(String dbPath) throws DAOException;
 }

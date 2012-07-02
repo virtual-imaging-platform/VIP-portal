@@ -72,8 +72,9 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement(
                     "INSERT INTO VIPUsers("
                     + "email, pass, first_name, last_name, institution, phone, "
-                    + "code, confirmed, folder, last_login, level, country_code) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    + "code, confirmed, folder, registration, last_login, level, "
+                    + "country_code) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getPassword());
@@ -84,10 +85,12 @@ public class UserData implements UserDAO {
             ps.setString(7, user.getCode());
             ps.setBoolean(8, user.isConfirmed());
             ps.setString(9, user.getFolder());
-            ps.setTimestamp(10, new Timestamp(user.getLastLogin().getTime()));
-            ps.setString(11, user.getLevel().name());
-            ps.setString(12, user.getCountryCode().name());
+            ps.setTimestamp(10, new Timestamp(user.getRegistration().getTime()));
+            ps.setTimestamp(11, new Timestamp(user.getLastLogin().getTime()));
+            ps.setString(12, user.getLevel().name());
+            ps.setString(13, user.getCountryCode().name());
             ps.execute();
+            ps.close();
 
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Unique index or primary key violation")) {
@@ -119,6 +122,7 @@ public class UserData implements UserDAO {
 
             if (rs.next()) {
                 String pass = rs.getString("pass");
+                ps.close();
                 if (pass.equals(password)) {
                     return true;
                 }
@@ -158,6 +162,7 @@ public class UserData implements UserDAO {
                     ps.setBoolean(1, true);
                     ps.setString(2, email);
                     ps.executeUpdate();
+                    ps.close();
 
                     return true;
                 }
@@ -182,8 +187,8 @@ public class UserData implements UserDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
-                    + "code, confirmed, folder, session, last_login, level, "
-                    + "country_code "
+                    + "code, confirmed, folder, session, registration, "
+                    + "last_login, level, country_code "
                     + "FROM VIPUsers "
                     + "WHERE email=?");
 
@@ -191,15 +196,19 @@ public class UserData implements UserDAO {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                return new User(
+                 User user = new User(
                         rs.getString("first_name"), rs.getString("last_name"),
                         rs.getString("email"), rs.getString("institution"),
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"),
                         rs.getString("session"),
+                        new Date(rs.getTimestamp("registration").getTime()),
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")));
+                 
+                 ps.close();
+                 return user;
             }
 
             logger.error("There is no user registered with the e-mail: " + email);
@@ -221,8 +230,8 @@ public class UserData implements UserDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
-                    + "code, confirmed, folder, last_login, level, "
-                    + "country_code "
+                    + "code, confirmed, folder, registration, last_login, "
+                    + "level, country_code "
                     + "FROM VIPUsers "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
 
@@ -235,10 +244,12 @@ public class UserData implements UserDAO {
                         rs.getString("email"), rs.getString("institution"),
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"), "",
+                        new Date(rs.getTimestamp("registration").getTime()),
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code"))));
             }
+            ps.close();
             return users;
 
         } catch (SQLException ex) {
@@ -260,6 +271,7 @@ public class UserData implements UserDAO {
 
             ps.setString(1, email);
             ps.execute();
+            ps.close();
 
         } catch (SQLException ex) {
             logger.error(ex);
@@ -291,6 +303,7 @@ public class UserData implements UserDAO {
             ps.setString(7, user.getEmail());
 
             ps.executeUpdate();
+            ps.close();
 
         } catch (SQLException ex) {
             logger.error(ex);
@@ -318,6 +331,7 @@ public class UserData implements UserDAO {
                 ps.setString(2, email);
 
                 ps.executeUpdate();
+                ps.close();
 
             } catch (SQLException ex) {
                 logger.error(ex);
@@ -346,6 +360,7 @@ public class UserData implements UserDAO {
             ps.setString(2, email);
 
             ps.executeUpdate();
+            ps.close();
 
         } catch (SQLException ex) {
             logger.error(ex);
@@ -401,6 +416,7 @@ public class UserData implements UserDAO {
             ps.setString(2, email);
 
             ps.executeUpdate();
+            ps.close();
 
         } catch (SQLException ex) {
             logger.error(ex);
@@ -420,8 +436,8 @@ public class UserData implements UserDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
-                    + "code, confirmed, folder, session, last_login, level, "
-                    + "country_code "
+                    + "code, confirmed, folder, session, registration, "
+                    + "last_login, level, country_code "
                     + "FROM VIPUsers "
                     + "WHERE session = ?");
 
@@ -429,15 +445,18 @@ public class UserData implements UserDAO {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                return new User(
+                User user = new User(
                         rs.getString("first_name"), rs.getString("last_name"),
                         rs.getString("email"), rs.getString("institution"),
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"),
                         rs.getString("session"),
+                        new Date(rs.getTimestamp("registration").getTime()),
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")));
+                ps.close();
+                return user;
             }
 
             logger.error("There is no user registered with the session: " + session);
@@ -459,8 +478,8 @@ public class UserData implements UserDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
-                    + "code, confirmed, folder, last_login, level, "
-                    + "country_code "
+                    + "code, confirmed, folder, registration, last_login, "
+                    + "level, country_code "
                     + "FROM VIPUsers WHERE level = ? "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
             ps.setString(1, UserLevel.Administrator.name());
@@ -474,10 +493,12 @@ public class UserData implements UserDAO {
                         rs.getString("email"), rs.getString("institution"),
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"), "",
+                        new Date(rs.getTimestamp("registration").getTime()),
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code"))));
             }
+            ps.close();
             return users;
 
         } catch (SQLException ex) {
@@ -505,6 +526,7 @@ public class UserData implements UserDAO {
             ps.setString(3, email);
 
             ps.executeUpdate();
+            ps.close();
 
         } catch (SQLException ex) {
             logger.error(ex);
@@ -528,6 +550,7 @@ public class UserData implements UserDAO {
             ps.setString(2, email);
 
             ps.executeUpdate();
+            ps.close();
 
         } catch (SQLException ex) {
             logger.error(ex);
@@ -551,6 +574,7 @@ public class UserData implements UserDAO {
             ps.setString(1, newPassword);
             ps.setString(2, email);
             ps.executeUpdate();
+            ps.close();
 
         } catch (SQLException ex) {
             logger.error(ex);

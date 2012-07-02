@@ -34,8 +34,7 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.system.group;
 
-import com.smartgwt.client.types.VisibilityMode;
-import com.smartgwt.client.widgets.layout.SectionStack;
+import com.smartgwt.client.widgets.layout.HLayout;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
 
@@ -45,33 +44,28 @@ import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
  */
 public class ManageGroupsTab extends AbstractManageTab {
 
-    private GroupsStackSection groupsStackSection;
-    private EditGroupStackSection editStackSection;
-    
+    private GroupsLayout groupsLayout;
+    private EditGroupLayout editLayout;
+
     public ManageGroupsTab() {
 
         super(CoreConstants.ICON_GROUP, CoreConstants.APP_GROUP, CoreConstants.TAB_MANAGE_GROUPS);
+
+        groupsLayout = new GroupsLayout();
+        editLayout = new EditGroupLayout();
         
-        toolStrip = new ManageGroupsToolStrip();
-        vLayout.addMember(toolStrip);
+        HLayout hLayout = new HLayout(5);
+        hLayout.addMember(groupsLayout);
+        hLayout.addMember(editLayout);
         
-        groupsStackSection = new GroupsStackSection();
-        editStackSection = new EditGroupStackSection();
-        
-        SectionStack sectionStack = new SectionStack();
-        sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
-        sectionStack.setAnimateSections(true);
-        sectionStack.setCanResizeSections(true);
-        sectionStack.setSections(groupsStackSection, editStackSection);
-        
-        vLayout.addMember(sectionStack);
+        vLayout.addMember(hLayout);
     }
-    
+
     public void loadGroups() {
-        groupsStackSection.loadData();
+        groupsLayout.loadData();
     }
-    
-    public void setGroup(String name) {
-        editStackSection.setGroup(name);
+
+    public void setGroup(String name, boolean isPublic) {
+        editLayout.setGroup(name, isPublic);
     }
 }

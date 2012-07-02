@@ -34,8 +34,9 @@
  */
 package fr.insalyon.creatis.vip.core.server.dao.h2;
 
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
@@ -61,7 +62,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
     }
 
     @Override
-    public void add(String email, String groupname, CoreConstants.GROUP_ROLE role)
+    public void add(String email, String groupname, GROUP_ROLE role)
             throws DAOException {
 
         try {
@@ -73,6 +74,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             ps.setString(2, groupname);
             ps.setString(3, role.name());
             ps.execute();
+            ps.close();
 
         } catch (SQLException ex) {
             logger.error(ex);
@@ -81,31 +83,34 @@ public class UsersGroupsData implements UsersGroupsDAO {
     }
 
     /**
-     * 
+     *
      * @param email
      * @return
-     * @throws DAOException 
+     * @throws DAOException
      */
     @Override
-    public Map<String, CoreConstants.GROUP_ROLE> getUserGroups(String email)
+    public Map<Group, GROUP_ROLE> getUserGroups(String email)
             throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "groupname, role "
-                    + "FROM VIPUsersGroups "
-                    + "WHERE email=?");
-
+            PreparedStatement ps = connection.prepareStatement(
+                    "SELECT g.groupname, g.public, role "
+                    + "FROM VIPGroups g LEFT JOIN VIPUsersGroups ug "
+                    + "ON g.groupname = ug.groupname AND email = ?");
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
 
-            Map<String, CoreConstants.GROUP_ROLE> groups = new HashMap<String, CoreConstants.GROUP_ROLE>();
+            Map<Group, GROUP_ROLE> groups = new HashMap<Group, GROUP_ROLE>();
 
             while (rs.next()) {
-                groups.put(rs.getString("groupname"),
-                        CoreConstants.GROUP_ROLE.valueOf(rs.getString("role")));
+                String role = rs.getString("role");
+                if (role == null || role.isEmpty() || role.equals("null")) {
+                    role = "None";
+                }
+                groups.put(new Group(rs.getString("groupname"), rs.getBoolean("public")),
+                        GROUP_ROLE.valueOf(role));
             }
-
+            ps.close();
             return groups;
 
         } catch (SQLException ex) {
@@ -113,32 +118,32 @@ public class UsersGroupsData implements UsersGroupsDAO {
             throw new DAOException(ex);
         }
     }
-    
+
     /**
-     * 
+     *
      * @param email
      * @return
-     * @throws DAOException 
+     * @throws DAOException
      */
     @Override
     public List<String> getUserAdminGroups(String email) throws DAOException {
-        
+
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "groupname FROM VIPUsersGroups "
                     + "WHERE email = ? AND role = ?");
             ps.setString(1, email);
-            ps.setString(2, CoreConstants.GROUP_ROLE.Admin.name());
-            
+            ps.setString(2, GROUP_ROLE.Admin.name());
+
             ResultSet rs = ps.executeQuery();
             List<String> groupsName = new ArrayList<String>();
-            
+
             while (rs.next()) {
                 groupsName.add(rs.getString("groupname"));
             }
-            
+            ps.close();
             return groupsName;
-            
+
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
@@ -146,13 +151,13 @@ public class UsersGroupsData implements UsersGroupsDAO {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param groups
-     * @throws DAOException 
+     * @throws DAOException
      */
     @Override
-    public void setUserGroups(String email, Map<String, CoreConstants.GROUP_ROLE> groups)
+    public void setUserGroups(String email, Map<String, GROUP_ROLE> groups)
             throws DAOException {
 
         try {
@@ -162,6 +167,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
 
             ps.setString(1, email);
             ps.execute();
+            ps.close();
 
             for (String group : groups.keySet()) {
                 add(email, group, groups.get(group));
@@ -174,7 +180,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
     }
 
     /**
-     * 
+     *
      * @param groups
      * @return
      * @throws DAOException
@@ -204,7 +210,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
                 users.add(rs.getString("first_name") + " "
                         + rs.getString("last_name"));
             }
-
+            ps.close();
             return users;
 
         } catch (SQLException ex) {
@@ -214,9 +220,8 @@ public class UsersGroupsData implements UsersGroupsDAO {
     }
 
     /**
-     * 
-     * @return
-     * @throws DAOException 
+     *
+     * @return @throws DAOException
      */
     @Override
     public List<User> getUsersFromGroup(String groupName) throws DAOException {
@@ -224,12 +229,12 @@ public class UsersGroupsData implements UsersGroupsDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "us.email AS uemail, first_name, last_name, institution, "
-                    + "phone, code, confirmed, folder, last_login, level, "
-                    + "country_code "
+                    + "phone, code, confirmed, folder, registration, last_login, "
+                    + "level, country_code "
                     + "FROM VIPUsers us, VIPUsersGroups ug "
                     + "WHERE us.email = ug.email AND ug.groupname = ? "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
-            
+
             ps.setString(1, groupName);
 
             ResultSet rs = ps.executeQuery();
@@ -241,10 +246,12 @@ public class UsersGroupsData implements UsersGroupsDAO {
                         rs.getString("uemail"), rs.getString("institution"),
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"), "",
+                        new Date(rs.getTimestamp("registration").getTime()),
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code"))));
             }
+            ps.close();
             return users;
 
         } catch (SQLException ex) {
@@ -254,21 +261,22 @@ public class UsersGroupsData implements UsersGroupsDAO {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param groupName
-     * @throws DAOException 
+     * @throws DAOException
      */
     @Override
     public void removeUserFromGroup(String email, String groupName) throws DAOException {
-        
+
         try {
             PreparedStatement ps = connection.prepareStatement("DELETE FROM "
                     + "VIPUsersGroups WHERE email = ? AND groupname = ?");
             ps.setString(1, email);
             ps.setString(2, groupName);
             ps.executeUpdate();
-            
+            ps.close();
+
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);

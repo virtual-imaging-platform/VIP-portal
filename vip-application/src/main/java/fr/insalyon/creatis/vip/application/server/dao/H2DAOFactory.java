@@ -34,9 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao;
 
-import fr.insalyon.creatis.vip.application.server.dao.h2.ApplicationData;
-import fr.insalyon.creatis.vip.application.server.dao.h2.ApplicationInputData;
-import fr.insalyon.creatis.vip.application.server.dao.h2.ClassData;
+import fr.insalyon.creatis.vip.application.server.dao.h2.*;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.h2.PlatformConnection;
 import org.apache.log4j.Logger;
@@ -98,7 +96,7 @@ public class H2DAOFactory extends ApplicationDAOFactory {
                     + "PRIMARY KEY (email, application, name), "
                     + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
                     + "ON DELETE CASCADE ON UPDATE RESTRICT");
-            
+
             PlatformConnection.getInstance().createTable("VIPAppExamples",
                     "application VARCHAR(255), "
                     + "name VARCHAR(255), "
@@ -123,5 +121,15 @@ public class H2DAOFactory extends ApplicationDAOFactory {
     @Override
     public ApplicationInputDAO getApplicationInputDAO() throws DAOException {
         return new ApplicationInputData();
+    }
+
+    @Override
+    public SimulationDAO getSimulationDAO(String dbPath) throws DAOException {
+        return new SimulationData(dbPath);
+    }
+
+    @Override
+    public ExecutionNodeDAO getExecutionNodeDAO(String dbPath) throws DAOException {
+        return new ExecutionNodeData(dbPath);
     }
 }

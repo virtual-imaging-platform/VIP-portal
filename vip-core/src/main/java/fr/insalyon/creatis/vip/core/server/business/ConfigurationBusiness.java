@@ -38,6 +38,7 @@ import fr.insalyon.creatis.devtools.MD5;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
@@ -51,6 +52,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.text.Normalizer;
 import java.util.*;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -59,7 +61,7 @@ import org.apache.log4j.PropertyConfigurator;
  * @author Rafael Silva
  */
 public class ConfigurationBusiness {
-    
+
     private final static Logger logger = Logger.getLogger(ConfigurationBusiness.class);
 
     /**
@@ -67,14 +69,14 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public void configure() throws BusinessException {
-        
+
         PropertyConfigurator.configure(ConfigurationBusiness.class.getClassLoader().getResource("vipLog4j.properties"));
-        
+
         try {
             logger.info("Configuring VIP server proxy.");
             ProxyClient myproxy = new ProxyClient();
             myproxy.getProxy();
-            
+
         } catch (Exception ex) {
             logger.error(ex);
             throw new BusinessException(ex);
@@ -89,20 +91,20 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public boolean validateSession(String email, String session) throws BusinessException {
-        
+
         try {
             if (email != null && session != null) {
                 UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
-                
+
                 if (userDAO.verifySession(email, session)) {
                     String newSession = UUID.randomUUID().toString();
                     userDAO.updateSession(email, newSession);
-                    
+
                     return true;
                 }
             }
             return false;
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -115,10 +117,10 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public User getUser(String email) throws BusinessException {
-        
+
         try {
             return CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -132,19 +134,24 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public void signup(User user, String comments, String accountType) throws BusinessException {
-        
+
         try {
             user.setCode(UUID.randomUUID().toString());
             user.setPassword(MD5.get(user.getPassword()));
             String folder = user.getFirstName().replaceAll(" ", "_").toLowerCase() + "_"
                     + user.getLastName().replaceAll(" ", "_").toLowerCase();
             folder = Normalizer.normalize(folder, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+
+            GRIDAClient client = CoreUtil.getGRIDAClient();
+            while (client.exist(Server.getInstance().getDataManagerUsersHome() + "/" + folder)) {
+                folder += "_" + new Random().nextInt(10000);
+            }
+
             user.setFolder(folder);
-            user.setLastLogin(new Date());
             user.setLevel(UserLevel.Beginner);
-            
+
             CoreDAOFactory.getDAOFactory().getUserDAO().add(user);
-            
+
             String emailContent = "<html>"
                     + "<head></head>"
                     + "<body>"
@@ -158,11 +165,11 @@ public class ConfigurationBusiness {
                     + "<p>VIP Team</p>"
                     + "</body>"
                     + "</html>";
-            
+
             logger.info("Sending confirmation email to '" + user.getEmail() + "'.");
             CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
                     "VIP account details", emailContent, new String[]{user.getEmail()});
-            
+
             String adminsEmailContents = "<html>"
                     + "<head></head>"
                     + "<body>"
@@ -181,10 +188,13 @@ public class ConfigurationBusiness {
                     + "<p>VIP Team</p>"
                     + "</body>"
                     + "</html>";
-            
+
             CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
                     "[VIP Admin] Account Requested", adminsEmailContents, getAdministratorsEmails());
-            
+
+        } catch (GRIDAClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (NoSuchAlgorithmException ex) {
@@ -204,18 +214,18 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public User signin(String email, String password) throws BusinessException {
-        
+
         try {
             password = MD5.get(password);
             UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
-            
+
             if (userDAO.authenticate(email, password)) {
-                
+
                 String session = UUID.randomUUID().toString();
                 userDAO.updateSession(email, session);
-                
+
                 return userDAO.getUser(email);
-                
+
             } else {
                 logger.error("Authentication failed to '" + email + "' (email or password incorrect).");
                 throw new BusinessException("Authentication failed (email or password incorrect).");
@@ -237,11 +247,11 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public void signout(String email) throws BusinessException {
-        
+
         try {
             String session = UUID.randomUUID().toString();
             CoreDAOFactory.getDAOFactory().getUserDAO().updateSession(email, session);
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -255,27 +265,27 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public User activate(String email, String code) throws BusinessException {
-        
+
         try {
             UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
             if (userDAO.activate(email, code)) {
-                
+
                 User user = userDAO.getUser(email);
-                
+
                 GRIDAClient client = CoreUtil.getGRIDAClient();
                 client.createFolder(Server.getInstance().getDataManagerUsersHome(),
                         user.getFolder());
-                
+
                 client.createFolder(Server.getInstance().getDataManagerUsersHome(),
                         user.getFolder() + "_" + CoreConstants.FOLDER_TRASH);
-                
+
                 return user;
-                
+
             } else {
                 logger.error("Activation failed to '" + email + "' (wrong code).");
                 throw new BusinessException("Activation failed.");
             }
-            
+
         } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
@@ -290,11 +300,11 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public void activateUser(String email) throws BusinessException {
-        
+
         try {
             User user = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
             activate(email, user.getCode());
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -306,10 +316,10 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public void sendActivationCode(String email) throws BusinessException {
-        
+
         try {
             User user = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
-            
+
             String emailContent = "<html>"
                     + "<head></head>"
                     + "<body>"
@@ -321,11 +331,11 @@ public class ConfigurationBusiness {
                     + "<p>VIP Team</p>"
                     + "</body>"
                     + "</html>";
-            
+
             CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
                     "VIP activation code (reminder)", emailContent,
                     new String[]{user.getEmail()});
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -337,13 +347,13 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public void sendResetCode(String email) throws BusinessException {
-        
+
         try {
             User user = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
-            
+
             String code = UUID.randomUUID().toString();
             CoreDAOFactory.getDAOFactory().getUserDAO().updateCode(email, code);
-            
+
             String emailContent = "<html>"
                     + "<head></head>"
                     + "<body>"
@@ -355,11 +365,11 @@ public class ConfigurationBusiness {
                     + "<p>VIP Team</p>"
                     + "</body>"
                     + "</html>";
-            
+
             CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
                     "Code to reset your VIP password", emailContent,
                     new String[]{user.getEmail()});
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -372,22 +382,22 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public void removeUser(String email, boolean sendNotificationEmail) throws BusinessException {
-        
+
         try {
             User user = getUser(email);
             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
-            
+
             client.removeOperationsByUser(email);
-            
+
             client.delete(Server.getInstance().getDataManagerUsersHome() + "/"
                     + user.getFolder(), user.getEmail());
             client.delete(Server.getInstance().getDataManagerUsersHome() + "/"
                     + user.getFolder() + "_" + CoreConstants.FOLDER_TRASH, user.getEmail());
-            
+
             CoreDAOFactory.getDAOFactory().getUserDAO().remove(email);
-            
+
             if (sendNotificationEmail) {
-                
+
                 String adminsEmailContents = "<html>"
                         + "<head></head>"
                         + "<body>"
@@ -403,7 +413,7 @@ public class ConfigurationBusiness {
                         + "<p>VIP Team</p>"
                         + "</body>"
                         + "</html>";
-                
+
                 CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
                         "[VIP Admin] Account Removed", adminsEmailContents, getAdministratorsEmails());
             }
@@ -420,10 +430,10 @@ public class ConfigurationBusiness {
      * @return @throws BusinessException
      */
     public List<User> getUsers() throws BusinessException {
-        
+
         try {
             return CoreDAOFactory.getDAOFactory().getUserDAO().getUsers();
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -435,27 +445,27 @@ public class ConfigurationBusiness {
      */
     public List<String> getUserNames(String email, boolean validGroup)
             throws BusinessException {
-        
+
         try {
             if (validGroup) {
-                
+
                 List<String> groups = CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUserAdminGroups(email);
-                
+
                 if (groups.isEmpty()) {
                     List<String> userNames = new ArrayList<String>();
                     userNames.add(CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email).getFullName());
                     return userNames;
-                    
+
                 } else {
                     return CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroups(groups);
                 }
-                
+
             } else {
                 List<String> userNames = new ArrayList<String>();
                 for (User user : getUsers()) {
                     userNames.add(user.getFullName());
                 }
-                
+
                 return userNames;
             }
         } catch (DAOException ex) {
@@ -465,19 +475,19 @@ public class ConfigurationBusiness {
 
     /**
      *
-     * @param groupName
+     * @param group
      * @return
      * @throws BusinessException
      */
-    public void addGroup(String groupName) throws BusinessException {
-        
+    public void addGroup(Group group) throws BusinessException {
+
         try {
             GRIDAClient client = CoreUtil.getGRIDAClient();
             client.createFolder(Server.getInstance().getDataManagerGroupsHome(),
-                    groupName.replaceAll(" ", "_"));
-            
-            CoreDAOFactory.getDAOFactory().getGroupDAO().add(groupName);
-            
+                    group.getName().replaceAll(" ", "_"));
+
+            CoreDAOFactory.getDAOFactory().getGroupDAO().add(group);
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
@@ -493,13 +503,13 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public void removeGroup(String user, String groupName) throws BusinessException {
-        
+
         try {
             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
             client.delete(Server.getInstance().getDataManagerGroupsHome() + "/"
                     + groupName.replaceAll(" ", "_"), user);
             CoreDAOFactory.getDAOFactory().getGroupDAO().remove(groupName);
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
@@ -510,20 +520,21 @@ public class ConfigurationBusiness {
 
     /**
      *
-     * @param oldName
-     * @param newName
-     * @return
+     * @param name
+     * @param group
      * @throws BusinessException
      */
-    public void updateGroup(String oldName, String newName) throws BusinessException {
-        
+    public void updateGroup(String name, Group group) throws BusinessException {
+
         try {
             GRIDAClient client = CoreUtil.getGRIDAClient();
-            client.rename(Server.getInstance().getDataManagerGroupsHome()
-                    + "/" + oldName.replaceAll(" ", "_"), newName.replaceAll(" ", "_"));
-            
-            CoreDAOFactory.getDAOFactory().getGroupDAO().update(oldName, newName);
-            
+            if (!name.equals(group.getName())) {
+                client.rename(Server.getInstance().getDataManagerGroupsHome()
+                        + "/" + name.replaceAll(" ", "_"), group.getName().replaceAll(" ", "_"));
+            }
+
+            CoreDAOFactory.getDAOFactory().getGroupDAO().update(name, group);
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
@@ -536,11 +547,11 @@ public class ConfigurationBusiness {
      *
      * @return @throws BusinessException
      */
-    public List<String> getGroups() throws BusinessException {
-        
+    public List<Group> getGroups() throws BusinessException {
+
         try {
             return CoreDAOFactory.getDAOFactory().getGroupDAO().getGroups();
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -552,11 +563,11 @@ public class ConfigurationBusiness {
      * @return
      * @throws BusinessException
      */
-    public Map<String, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws BusinessException {
-        
+    public Map<Group, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws BusinessException {
+
         try {
             return CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUserGroups(email);
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -569,7 +580,7 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public List<String> getUserGroupsName(Map<String, CoreConstants.GROUP_ROLE> groups) throws BusinessException {
-        
+
         return new ArrayList<String>(groups.keySet());
     }
 
@@ -581,10 +592,10 @@ public class ConfigurationBusiness {
      */
     public void setUserGroups(String email, Map<String, CoreConstants.GROUP_ROLE> groups)
             throws BusinessException {
-        
+
         try {
             CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().setUserGroups(email, groups);
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -596,10 +607,10 @@ public class ConfigurationBusiness {
      * @return
      */
     public User getUserData(String email) throws BusinessException {
-        
+
         try {
             return CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -613,27 +624,27 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public User updateUser(User oldData, User user) throws BusinessException {
-        
+
         try {
-            
+
             user.setFolder(user.getFirstName().replaceAll(" ", "_").toLowerCase() + "_"
                     + user.getLastName().replaceAll(" ", "_").toLowerCase());
-            
+
             CoreDAOFactory.getDAOFactory().getUserDAO().update(user);
-            
+
             if (!oldData.getFolder().equals(user.getFolder())) {
                 GRIDAClient client = CoreUtil.getGRIDAClient();
                 client.rename(
                         Server.getInstance().getDataManagerUsersHome() + "/" + oldData.getFolder(),
                         Server.getInstance().getDataManagerUsersHome() + "/" + user.getFolder());
-                
+
                 client.rename(
                         Server.getInstance().getDataManagerUsersHome() + "/" + oldData.getFolder() + "_" + CoreConstants.FOLDER_TRASH,
                         Server.getInstance().getDataManagerUsersHome() + "/" + user.getFolder() + "_" + CoreConstants.FOLDER_TRASH);
             }
-            
+
             return user;
-            
+
         } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
@@ -651,13 +662,13 @@ public class ConfigurationBusiness {
      */
     public void updateUserPassword(String email, String currentPassword,
             String newPassword) throws BusinessException {
-        
+
         try {
             currentPassword = MD5.get(currentPassword);
             newPassword = MD5.get(newPassword);
             CoreDAOFactory.getDAOFactory().getUserDAO().updatePassword(
                     email, currentPassword, newPassword);
-            
+
         } catch (NoSuchAlgorithmException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
@@ -679,7 +690,7 @@ public class ConfigurationBusiness {
      */
     public void sendContactMail(User user, String category, String subject,
             String comment) throws BusinessException {
-        
+
         try {
             String emailContent = "<html>"
                     + "<head></head>"
@@ -695,15 +706,15 @@ public class ConfigurationBusiness {
                     + "<p>" + comment + "</p>"
                     + "</body>"
                     + "</html>";
-            
+
             List<String> emails = new ArrayList<String>();
             for (User u : CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
                 emails.add(u.getEmail());
             }
-            
+
             CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
                     "[VIP Contact] " + category, emailContent, emails.toArray(new String[]{}));
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -715,10 +726,10 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public void updateUserLastLogin(String email) throws BusinessException {
-        
+
         try {
             CoreDAOFactory.getDAOFactory().getUserDAO().updateLastLogin(email, new Date());
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -731,10 +742,10 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public void addUserToGroup(String email, String groupName) throws BusinessException {
-        
+
         try {
             CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().add(email, groupName, GROUP_ROLE.User);
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -748,10 +759,10 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public void updateUser(String email, UserLevel level, CountryCode countryCode) throws BusinessException {
-        
+
         try {
             CoreDAOFactory.getDAOFactory().getUserDAO().update(email, level, countryCode);
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -764,10 +775,10 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public List<User> getUsersFromGroup(String groupName) throws BusinessException {
-        
+
         try {
             return CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroup(groupName);
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -780,10 +791,10 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public void removeUserFromGroup(String email, String groupName) throws BusinessException {
-        
+
         try {
             CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().removeUserFromGroup(email, groupName);
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -797,13 +808,13 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public void resetPassword(String email, String code, String password) throws BusinessException {
-        
+
         try {
             User user = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
-            
+
             if (code.equals(user.getCode())) {
                 CoreDAOFactory.getDAOFactory().getUserDAO().resetPassword(email, MD5.get(password));
-                
+
             } else {
                 throw new BusinessException("Wrong reset code.");
             }
@@ -825,7 +836,7 @@ public class ConfigurationBusiness {
      * @throws DAOException
      */
     private String[] getAdministratorsEmails() throws DAOException {
-        
+
         List<String> emails = new ArrayList<String>();
         for (User admin : CoreDAOFactory.getDAOFactory().getUserDAO().getAdministrators()) {
             emails.add(admin.getEmail());

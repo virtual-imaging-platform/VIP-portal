@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.core.client.rpc;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
@@ -80,19 +81,19 @@ public interface ConfigurationService extends RemoteService {
 
     public List<User> getUsers() throws CoreException;
 
-    public void addGroup(String groupName) throws CoreException;
+    public void addGroup(Group group) throws CoreException;
 
-    public void updateGroup(String oldName, String newName) throws CoreException;
+    public void updateGroup(String name, Group group) throws CoreException;
 
     public void removeGroup(String groupName) throws CoreException;
 
-    public List<String> getGroups() throws CoreException;
+    public List<Group> getGroups() throws CoreException;
 
     public User removeUser(String email) throws CoreException;
     
     public User removeUser() throws CoreException;
 
-    public Map<String, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws CoreException;
+    public Map<Group, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws CoreException;
     
     public List<String> getUserGroups() throws CoreException;
 

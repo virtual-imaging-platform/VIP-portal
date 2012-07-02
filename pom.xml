@@ -4,17 +4,17 @@
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip</artifactId>
     <packaging>pom</packaging>
-    <version>0.7.8</version>
+    <version>0.8</version>
     <name>VIP</name>
     
     <properties>
-        <vip.core.version>0.7.8</vip.core.version>
-        <vip.portal.version>0.7.8</vip.portal.version>
+        <vip.core.version>0.8</vip.core.version>
+        <vip.portal.version>0.8</vip.portal.version>
         <vip.docs.version>0.6</vip.docs.version>
-        <vip.application.version>0.7.8</vip.application.version>
-        <vip.datamanager.version>0.7.5</vip.datamanager.version>
+        <vip.application.version>0.8</vip.application.version>
+        <vip.datamanager.version>0.8</vip.datamanager.version>
         <vip.datamanager-applet.version>0.3.1</vip.datamanager-applet.version>
-        <vip.gatelab.version>0.5.7</vip.gatelab.version>
+        <vip.gatelab.version>0.5.8</vip.gatelab.version>
         <vip.gatelab-applet.version>0.2.4</vip.gatelab-applet.version>
         <vip.simulation-gui.version>0.2.9</vip.simulation-gui.version>
         <vip.models.version>0.3.3</vip.models.version>
@@ -65,28 +65,34 @@
     </modules>
     
     <repositories>
+        
         <repository>
             <id>creatis-releases</id>
             <name>Creatis Insa Lyon repository [creatis]</name>
             <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/releases</url>
         </repository>
+        
         <repository>
             <id>creatis-thirdparty</id>
             <name>Creatis Insa Lyon repository [creatis]</name>
             <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/thirdparty</url>
         </repository>
+        
     </repositories>
     
     <distributionManagement>
+        
         <repository>
-            <id>releases</id>
+            <id>creatis-releases</id>
             <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/releases</url>
         </repository>
+        
         <snapshotRepository>
-            <id>snapshots</id>
+            <id>creatis-snapshots</id>
             <name>Internal Snapshots</name>
             <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/snapshots</url>
         </snapshotRepository>
+        
     </distributionManagement>
     
     <scm>

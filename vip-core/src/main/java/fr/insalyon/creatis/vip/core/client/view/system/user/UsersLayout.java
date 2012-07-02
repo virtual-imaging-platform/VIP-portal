@@ -53,7 +53,6 @@ import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
-import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.viewer.DetailViewer;
 import com.smartgwt.client.widgets.viewer.DetailViewerField;
@@ -73,7 +72,7 @@ import java.util.List;
  *
  * @author Rafael Silva
  */
-public class UsersStackSection extends SectionStackSection {
+public class UsersLayout extends VLayout {
 
     private ModalWindow modal;
     private ListGrid grid;
@@ -81,24 +80,18 @@ public class UsersStackSection extends SectionStackSection {
     private ListGridRecord rollOverRecord;
     private DetailViewer detailViewer;
 
-    public UsersStackSection() {
+    public UsersLayout() {
 
-        this.setTitle("Users");
-        this.setCanCollapse(true);
-        this.setExpanded(true);
-        this.setResizeable(true);
+        this.setWidth100();
+        this.setHeight100();
+        this.setOverflow(Overflow.AUTO);
 
         configureGrid();
+        modal = new ModalWindow(grid);
 
-        VLayout vLayout = new VLayout();
-        vLayout.setMaxHeight(400);
-        vLayout.setHeight100();
-        vLayout.setOverflow(Overflow.AUTO);
-        vLayout.addMember(grid);
+        this.addMember(new UsersToolStrip());
+        this.addMember(grid);
 
-        modal = new ModalWindow(vLayout);
-
-        this.addItem(vLayout);
         loadData();
     }
 
@@ -177,6 +170,9 @@ public class UsersStackSection extends SectionStackSection {
             @Override
             protected Canvas getCellHoverComponent(Record record, Integer rowNum, Integer colNum) {
 
+                DetailViewerField registrationField = new DetailViewerField("registration", "Registration");
+                registrationField.setDateFormatter(DateDisplayFormat.TOUSSHORTDATETIME);
+
                 DetailViewerField lastLoginField = new DetailViewerField("lastLogin", "Last Login");
                 lastLoginField.setDateFormatter(DateDisplayFormat.TOUSSHORTDATETIME);
 
@@ -189,7 +185,7 @@ public class UsersStackSection extends SectionStackSection {
                         new DetailViewerField("institution", "Institution"),
                         new DetailViewerField("phone", "Phone"),
                         new DetailViewerField("countryName", "Country"),
-                        lastLoginField);
+                        registrationField, lastLoginField);
                 detailViewer.setData(new Record[]{record});
 
                 return detailViewer;

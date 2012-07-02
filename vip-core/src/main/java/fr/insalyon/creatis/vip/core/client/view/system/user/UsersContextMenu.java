@@ -70,6 +70,7 @@ public class UsersContextMenu extends Menu {
         activateItem.setIcon(CoreConstants.ICON_ACTIVATE);
         activateItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 activate();
             }
@@ -79,6 +80,7 @@ public class UsersContextMenu extends Menu {
         removeItem.setIcon(CoreConstants.ICON_DELETE);
         removeItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 remove();
             }
@@ -96,11 +98,13 @@ public class UsersContextMenu extends Menu {
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to activate user:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
                 modal.hide();
                 ((ManageUsersTab) Layout.getInstance().
@@ -116,17 +120,20 @@ public class UsersContextMenu extends Menu {
         SC.confirm("Do you really want to remove the user \""
                 + email + "\"?", new BooleanCallback() {
 
+            @Override
             public void execute(Boolean value) {
 
                 if (value != null && value) {
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
                     final AsyncCallback<User> callback = new AsyncCallback<User>() {
 
+                        @Override
                         public void onFailure(Throwable caught) {
                             modal.hide();
                             SC.warn("Unable to remove user:<br />" + caught.getMessage());
                         }
 
+                        @Override
                         public void onSuccess(User result) {
                             modal.hide();
                             Modules.getInstance().userRemoved(result);

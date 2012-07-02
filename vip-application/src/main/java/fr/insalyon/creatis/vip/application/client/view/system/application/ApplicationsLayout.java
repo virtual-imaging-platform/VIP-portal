@@ -50,7 +50,6 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
-import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
@@ -66,34 +65,30 @@ import java.util.List;
  *
  * @author Rafael Silva
  */
-public class ApplicationsStackSection extends SectionStackSection {
+public class ApplicationsLayout extends VLayout {
 
     private ModalWindow modal;
     private ListGrid grid;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
 
-    public ApplicationsStackSection() {
+    public ApplicationsLayout() {
 
-        this.setTitle("Applications");
-        this.setCanCollapse(true);
-        this.setExpanded(true);
-        this.setResizeable(true);
+        this.setWidth100();
+        this.setHeight100();
+        this.setOverflow(Overflow.AUTO);
 
         configureGrid();
         modal = new ModalWindow(grid);
 
-        VLayout vLayout = new VLayout();
-        vLayout.setMaxHeight(400);
-        vLayout.setHeight100();
-        vLayout.setOverflow(Overflow.AUTO);
-        vLayout.addMember(grid);
+        this.addMember(new ApplicationsToolStrip());
+        this.addMember(grid);
 
-        this.addItem(vLayout);
         loadData();
     }
 
     private void configureGrid() {
+
         grid = new ListGrid() {
 
             @Override
@@ -109,6 +104,7 @@ public class ApplicationsStackSection extends SectionStackSection {
                     ImgButton loadImg = getImgButton(CoreConstants.ICON_EDIT, "Edit");
                     loadImg.addClickHandler(new ClickHandler() {
 
+                        @Override
                         public void onClick(ClickEvent event) {
                             edit(rollOverRecord.getAttribute("name"),
                                     rollOverRecord.getAttribute("lfn"),
@@ -118,11 +114,13 @@ public class ApplicationsStackSection extends SectionStackSection {
                     ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
                     deleteImg.addClickHandler(new ClickHandler() {
 
+                        @Override
                         public void onClick(ClickEvent event) {
                             final String name = rollOverRecord.getAttribute("name");
                             SC.confirm("Do you really want to remove the application \""
                                     + name + "\"?", new BooleanCallback() {
 
+                                @Override
                                 public void execute(Boolean value) {
                                     if (value != null && value) {
                                         remove(name);
@@ -165,6 +163,7 @@ public class ApplicationsStackSection extends SectionStackSection {
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 
+            @Override
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 edit(event.getRecord().getAttribute("name"),
                         event.getRecord().getAttribute("lfn"),
@@ -177,11 +176,13 @@ public class ApplicationsStackSection extends SectionStackSection {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to get list of applications:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<Application> result) {
                 modal.hide();
                 List<ApplicationRecord> dataList = new ArrayList<ApplicationRecord>();
@@ -208,11 +209,13 @@ public class ApplicationsStackSection extends SectionStackSection {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to remove application:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
                 modal.hide();
                 SC.say("The application was successfully removed!");

@@ -561,25 +561,25 @@ public class WorkflowData implements WorkflowDAO {
         int numberOfJobs = 0;
 
         for (Simulation simulation : simulationList) {
-            JobData jobData = new JobData(simulation.getID());
-
-            try {
-                PreparedStatement ps = jobData.getConnection().prepareStatement(
-                        "SELECT SUM(download) AS downl, SUM(running) "
-                        + "AS exect, SUM(upload) AS upl, COUNT(id) AS num "
-                        + "FROM Jobs WHERE status = ?");
-                ps.setString(1, JobStatus.COMPLETED.name());
-                ResultSet rs = ps.executeQuery();
-
-                if (rs.next()) {
-                    executionTime += rs.getInt("exect");
-                    uploadTime += rs.getInt("upl");
-                    downloadTime += rs.getInt("downl");
-                    numberOfJobs += rs.getInt("num");
-                }
-            } catch (SQLException ex) {
-                logger.error(ex);
-            }
+//            JobData jobData = new JobData(simulation.getID());
+//
+//            try {
+//                PreparedStatement ps = jobData.getConnection().prepareStatement(
+//                        "SELECT SUM(download) AS downl, SUM(running) "
+//                        + "AS exect, SUM(upload) AS upl, COUNT(id) AS num "
+//                        + "FROM Jobs WHERE status = ?");
+//                ps.setString(1, JobStatus.COMPLETED.name());
+//                ResultSet rs = ps.executeQuery();
+//
+//                if (rs.next()) {
+//                    executionTime += rs.getInt("exect");
+//                    uploadTime += rs.getInt("upl");
+//                    downloadTime += rs.getInt("downl");
+//                    numberOfJobs += rs.getInt("num");
+//                }
+//            } catch (SQLException ex) {
+//                logger.error(ex);
+//            }
         }
 
         logger.info("Time Analysis: " + numberOfJobs + "##" + executionTime + "##" + uploadTime + "##" + downloadTime);
@@ -599,31 +599,31 @@ public class WorkflowData implements WorkflowDAO {
         int error = 0;
 
         for (Simulation simulation : simulationList) {
-            JobData jobData = new JobData(simulation.getID());
-
-            try {
-                PreparedStatement ps = jobData.getConnection().prepareStatement(
-                        "SELECT status, count(id) AS num "
-                        + "FROM Jobs GROUP BY status");
-                ResultSet rs = ps.executeQuery();
-
-                while (rs.next()) {
-
-                    JobStatus status = JobStatus.valueOf(rs.getString("status"));
-
-                    if (status == JobStatus.COMPLETED) {
-                        completed += rs.getInt("num");
-
-                    } else if (status == JobStatus.CANCELLED) {
-                        cancelled += rs.getInt("num");
-
-                    } else if (status == JobStatus.ERROR) {
-                        error += rs.getInt("num");
-                    }
-                }
-            } catch (SQLException ex) {
-                logger.error(ex);
-            }
+//            JobData jobData = new JobData(simulation.getID());
+//
+//            try {
+//                PreparedStatement ps = jobData.getConnection().prepareStatement(
+//                        "SELECT status, count(id) AS num "
+//                        + "FROM Jobs GROUP BY status");
+//                ResultSet rs = ps.executeQuery();
+//
+//                while (rs.next()) {
+//
+//                    JobStatus status = JobStatus.valueOf(rs.getString("status"));
+//
+//                    if (status == JobStatus.COMPLETED) {
+//                        completed += rs.getInt("num");
+//
+//                    } else if (status == JobStatus.CANCELLED) {
+//                        cancelled += rs.getInt("num");
+//
+//                    } else if (status == JobStatus.ERROR) {
+//                        error += rs.getInt("num");
+//                    }
+//                }
+//            } catch (SQLException ex) {
+//                logger.error(ex);
+//            }
         }
 
         int numberOfJobs = completed + cancelled + error;

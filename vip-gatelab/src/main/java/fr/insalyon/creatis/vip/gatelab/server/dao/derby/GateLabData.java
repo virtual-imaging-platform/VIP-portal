@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -34,46 +34,62 @@
  */
 package fr.insalyon.creatis.vip.gatelab.server.dao.derby;
 
-import fr.insalyon.creatis.vip.application.server.dao.derby.connection.JobsConnection;
-import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.application.server.dao.h2.AbstractJobData;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.gatelab.server.dao.GateLabDAO;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import org.apache.log4j.Logger;
 
 /**
  * 
  * @author Ibrahim Kallel, Rafael Silva
  */
-public class GateLabData implements GateLabDAO {
+public class GateLabData extends AbstractJobData implements GateLabDAO {
 
-    private Connection connection;
-
-    public GateLabData(String workflowID) throws DAOException {
-        connection = JobsConnection.getInstance().connect(
-                Server.getInstance().getWorkflowsPath() + "/" + workflowID + "/jobs.db");
+    private static final Logger logger = Logger.getLogger(GateLabData.class);
+    
+    public GateLabData(String dbPath) throws DAOException {
+        
+        super(dbPath);
     }
 
+    /**
+     * 
+     * @return
+     * @throws DAOException 
+     */
     public long getNumberParticles() throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT somme FROM somme ");
             ResultSet rs = ps.executeQuery();
             rs.next();
-            return rs.getLong("somme");
+            
+            long sum = rs.getLong("somme");
+            
+            ps.close();
+            return sum;
 
         } catch (SQLException ex) {
             return 0;
-//            throw new DAOException(ex);
+        } finally {
+            close(logger);
         }
     }
 
+    /**
+     * 
+     * @throws DAOException 
+     */
     public void StopWorkflowSimulation() throws DAOException {
+        
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE somme SET simulation = 'true' ");
             ps.execute();
+            ps.close();
+            
         } catch (SQLException ex) {
             throw new DAOException(ex);
         }

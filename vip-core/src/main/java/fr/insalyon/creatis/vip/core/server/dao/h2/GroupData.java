@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.core.server.dao.h2;
 
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
 import java.sql.Connection;
@@ -58,22 +59,25 @@ public class GroupData implements GroupDAO {
     }
 
     /**
-     * 
+     *
      * @param groupName
-     * @throws DAOException 
+     * @throws DAOException
      */
-    public void add(String groupName) throws DAOException {
+    @Override
+    public void add(Group group) throws DAOException {
+
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO VIPGroups(groupname) VALUES(?)");
-
-            ps.setString(1, groupName);
+                    "INSERT INTO VIPGroups(groupname, public) VALUES(?, ?)");
+            ps.setString(1, group.getName());
+            ps.setBoolean(2, group.isPublicGroup());
             ps.execute();
+            ps.close();
 
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Unique index or primary key violation")) {
-                logger.error("A group named \"" + groupName + "\" already exists.");
-                throw new DAOException("A group named \"" + groupName + "\" already exists.");
+                logger.error("A group named \"" + group.getName() + "\" already exists.");
+                throw new DAOException("A group named \"" + group.getName() + "\" already exists.");
             } else {
                 logger.error(ex);
                 throw new DAOException(ex);
@@ -81,13 +85,15 @@ public class GroupData implements GroupDAO {
         }
     }
 
+    @Override
     public void remove(String groupName) throws DAOException {
         try {
-            PreparedStatement stat = connection.prepareStatement("DELETE "
+            PreparedStatement ps = connection.prepareStatement("DELETE "
                     + "FROM VIPGroups WHERE groupname=?");
 
-            stat.setString(1, groupName);
-            stat.execute();
+            ps.setString(1, groupName);
+            ps.execute();
+            ps.close();
 
         } catch (SQLException ex) {
             logger.error(ex);
@@ -95,16 +101,19 @@ public class GroupData implements GroupDAO {
         }
     }
 
-    public void update(String oldName, String newName) throws DAOException {
+    @Override
+    public void update(String name, Group group) throws DAOException {
         try {
-            PreparedStatement stat = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
                     + "VIPGroups "
-                    + "SET groupname=? "
+                    + "SET groupname=?, public=? "
                     + "WHERE groupname=?");
 
-            stat.setString(1, newName);
-            stat.setString(2, oldName);
-            stat.executeUpdate();
+            ps.setString(1, group.getName());
+            ps.setBoolean(2, group.isPublicGroup());
+            ps.setString(3, name);
+            ps.executeUpdate();
+            ps.close();
 
         } catch (SQLException ex) {
             logger.error(ex);
@@ -112,18 +121,21 @@ public class GroupData implements GroupDAO {
         }
     }
 
-    public List<String> getGroups() throws DAOException {
+    @Override
+    public List<Group> getGroups() throws DAOException {
         try {
 
-            List<String> groups = new ArrayList<String>();
-            PreparedStatement stat = null;
-            stat = connection.prepareStatement("SELECT groupname FROM "
+            List<Group> groups = new ArrayList<Group>();
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "groupname, public FROM "
                     + "VIPGroups ORDER BY LOWER(groupname)");
 
-            ResultSet rs = stat.executeQuery();
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                groups.add(rs.getString("groupname"));
+                groups.add(new Group(rs.getString("groupname"),
+                        rs.getBoolean("public")));
             }
+            ps.close();
             return groups;
 
         } catch (SQLException ex) {

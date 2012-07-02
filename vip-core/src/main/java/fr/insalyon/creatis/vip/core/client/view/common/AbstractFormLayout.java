@@ -35,8 +35,10 @@
 package fr.insalyon.creatis.vip.core.client.view.common;
 
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.fields.FormItem;
+import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
@@ -55,6 +57,11 @@ public abstract class AbstractFormLayout extends VLayout {
         this(Integer.toString(width), Integer.toString(height));
     }
 
+    public AbstractFormLayout(int width, String height) {
+
+        this(Integer.toString(width), height);
+    }
+
     public AbstractFormLayout(String width, String height) {
 
         this.setWidth(width);
@@ -63,10 +70,16 @@ public abstract class AbstractFormLayout extends VLayout {
         this.setBackgroundColor("#F5F5F5");
         this.setPadding(10);
         this.setMembersMargin(5);
-        
+
         modal = new ModalWindow(this);
     }
 
+    /**
+     * Adds a title to the form.
+     * 
+     * @param title
+     * @param icon 
+     */
     protected void addTitle(String title, String icon) {
 
         Label label = WidgetUtil.getLabel("<b>" + title + "</b>",
@@ -75,10 +88,32 @@ public abstract class AbstractFormLayout extends VLayout {
         label.setAlign(Alignment.LEFT);
         this.addMember(label);
     }
-    
+
+    /**
+     * Adds a field to the form.
+     * 
+     * @param title
+     * @param item 
+     */
     protected void addField(String title, FormItem item) {
-        
+
         this.addMember(WidgetUtil.getLabel("<b>" + title + "</b>", 15));
         this.addMember(FieldUtil.getForm(item));
+    }
+    
+    /**
+     * Adds a set of buttons displayed in line.
+     * 
+     * @param buttons 
+     */
+    protected void addButtons(IButton... buttons) {
+        
+        HLayout hLayout = new HLayout(5);
+        hLayout.setWidth100();
+        
+        for (IButton button : buttons) {
+            hLayout.addMember(button);
+        }
+        this.addMember(hLayout);
     }
 }

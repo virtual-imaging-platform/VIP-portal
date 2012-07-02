@@ -4,7 +4,7 @@
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>0.7.8</version>
+        <version>0.8</version>
         <relativePath>..</relativePath>
     </parent>
     <groupId>fr.insalyon.creatis</groupId>
@@ -41,7 +41,7 @@
             <version>${vip.provenance.version}</version>
             <scope>provided</scope>
         </dependency>-->
-                        
+                    
         <dependency>
             <groupId>com.googlecode.gflot</groupId>
             <artifactId>gflot</artifactId>
@@ -53,7 +53,7 @@
             <artifactId>gwt-visualization</artifactId>
             <version>1.1.2</version>
         </dependency>
-        
+                
         <dependency>
             <groupId>globus-common</groupId>
             <artifactId>jaxrpc</artifactId>

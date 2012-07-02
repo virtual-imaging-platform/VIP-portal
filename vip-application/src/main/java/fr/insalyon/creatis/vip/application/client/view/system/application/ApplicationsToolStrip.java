@@ -32,23 +32,50 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.user.account;
+package fr.insalyon.creatis.vip.application.client.view.system.application;
 
-import com.smartgwt.client.widgets.grid.ListGridRecord;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
  *
  * @author Rafael Silva
  */
-public class GroupRecord extends ListGridRecord {
+public class ApplicationsToolStrip extends ToolStrip {
 
-    public GroupRecord() {
-    }
+    public ApplicationsToolStrip() {
+        
+        this.setWidth100();
 
-    public GroupRecord(String groupName, GROUP_ROLE role) {
+        ToolStripButton addButton = new ToolStripButton("Add Application");
+        addButton.setIcon(CoreConstants.ICON_ADD);
+        addButton.addClickHandler(new ClickHandler() {
 
-        setAttribute("groupName", groupName);
-        setAttribute("role", role);
+            @Override
+            public void onClick(ClickEvent event) {
+                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
+                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
+                appsTab.setApplication(null, null, null);
+            }
+        });
+        this.addButton(addButton);
+
+        ToolStripButton refreshButton = new ToolStripButton("Refresh");
+        refreshButton.setIcon(CoreConstants.ICON_REFRESH);
+        refreshButton.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(ClickEvent event) {
+                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
+                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
+                appsTab.loadApplications();
+            }
+        });
+        this.addButton(refreshButton);
     }
 }

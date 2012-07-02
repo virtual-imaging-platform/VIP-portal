@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.core.client.view.system.group;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
@@ -48,11 +49,12 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
-import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import java.util.ArrayList;
@@ -62,28 +64,25 @@ import java.util.List;
  *
  * @author Rafael Silva
  */
-public class GroupsStackSection extends SectionStackSection {
+public class GroupsLayout extends VLayout {
 
+    private ModalWindow modal;
     private ListGrid grid;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
 
-    public GroupsStackSection() {
+    public GroupsLayout() {
 
-        this.setTitle("Groups");
-        this.setCanCollapse(true);
-        this.setExpanded(true);
-        this.setResizeable(true);
-
+        this.setWidth100();
+        this.setHeight100();
+        this.setOverflow(Overflow.AUTO);
+        
         configureGrid();
+        this.addMember(new GroupsToolStrip());
+        this.addMember(grid);
 
-        VLayout vLayout = new VLayout();
-        vLayout.setMaxHeight(400);
-        vLayout.setHeight100();
-        vLayout.setOverflow(Overflow.AUTO);
-        vLayout.addMember(grid);
+        modal = new ModalWindow(grid);
 
-        this.addItem(vLayout);
         loadData();
     }
 
@@ -103,14 +102,17 @@ public class GroupsStackSection extends SectionStackSection {
                     rollOverCanvas.addMember(FieldUtil.getImgButton(
                             CoreConstants.ICON_EDIT, "Edit", new ClickHandler() {
 
+                        @Override
                         public void onClick(ClickEvent event) {
-                            edit(rollOverRecord.getAttribute("name"));
+                            edit(rollOverRecord.getAttribute("name"),
+                                    rollOverRecord.getAttributeAsBoolean("isPublic"));
                         }
                     }));
 
                     rollOverCanvas.addMember(FieldUtil.getImgButton(
                             CoreConstants.ICON_DELETE, "Delete", new ClickHandler() {
 
+                        @Override
                         public void onClick(ClickEvent event) {
                             remove(rollOverRecord.getAttribute("name"));
                         }
@@ -127,15 +129,18 @@ public class GroupsStackSection extends SectionStackSection {
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
 
-        ListGridField nameField = new ListGridField("name", "Group Name");
-
-        grid.setFields(nameField);
+        ListGridField isPublicField = new ListGridField("isPublic", "Public");
+        isPublicField.setType(ListGridFieldType.BOOLEAN);
+        
+        grid.setFields(isPublicField, new ListGridField("name", "Group Name"));
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 
+            @Override
             public void onCellDoubleClick(CellDoubleClickEvent event) {
-                edit(event.getRecord().getAttribute("name"));
+                edit(event.getRecord().getAttribute("name"),
+                        event.getRecord().getAttributeAsBoolean("isPublic"));
             }
         });
     }
@@ -146,17 +151,19 @@ public class GroupsStackSection extends SectionStackSection {
     public void loadData() {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+        final AsyncCallback<List<Group>> callback = new AsyncCallback<List<Group>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 SC.warn("Unable to get groups list:<br />" + caught.getMessage());
             }
 
-            public void onSuccess(List<String> result) {
+            @Override
+            public void onSuccess(List<Group> result) {
                 List<GroupRecord> dataList = new ArrayList<GroupRecord>();
 
-                for (String g : result) {
-                    dataList.add(new GroupRecord(g));
+                for (Group group : result) {
+                    dataList.add(new GroupRecord(group));
                 }
                 grid.setData(dataList.toArray(new GroupRecord[]{}));
             }
@@ -172,21 +179,24 @@ public class GroupsStackSection extends SectionStackSection {
     private void remove(final String name) {
 
         if (name.equals(CoreConstants.GROUP_SUPPORT)) {
-            SC.warn("You can not remove the " + name + " group.");
+            SC.warn("You cannot remove " + name + " group.");
             return;
         }
-        SC.ask("Do you really want to remove the group \"" + name + "\"?", new BooleanCallback() {
+        SC.ask("Do you really want to remove \"" + name + "\" group?", new BooleanCallback() {
 
+            @Override
             public void execute(Boolean value) {
                 if (value) {
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
 
                     final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+                        @Override
                         public void onFailure(Throwable caught) {
                             SC.warn("Unable to remove group:<br />" + caught.getMessage());
                         }
 
+                        @Override
                         public void onSuccess(Void result) {
                             SC.say("The group was successfully removed!");
                             loadData();
@@ -202,14 +212,15 @@ public class GroupsStackSection extends SectionStackSection {
      * Edits a group.
      *
      * @param name Group name
+     * @param isPublic Whether the group if public or not
      */
-    private void edit(String name) {
+    private void edit(String name, boolean isPublic) {
 
         if (name.equals(CoreConstants.GROUP_SUPPORT)) {
-            SC.warn("You can not edit the " + name + " group.");
+            SC.warn("You cannot edit " + name + " group.");
             return;
         }
         ((ManageGroupsTab) Layout.getInstance().getTab(
-                CoreConstants.TAB_MANAGE_GROUPS)).setGroup(name);
+                CoreConstants.TAB_MANAGE_GROUPS)).setGroup(name, isPublic);
     }
 }

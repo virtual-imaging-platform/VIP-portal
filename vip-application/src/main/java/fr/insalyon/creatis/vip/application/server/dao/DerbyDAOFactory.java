@@ -34,8 +34,6 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao;
 
-import fr.insalyon.creatis.vip.application.server.dao.derby.JobData;
-import fr.insalyon.creatis.vip.application.server.dao.derby.NodeData;
 import fr.insalyon.creatis.vip.application.server.dao.derby.WorkflowData;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 
@@ -61,15 +59,5 @@ public class DerbyDAOFactory extends WorkflowDAOFactory {
     @Override
     public WorkflowDAO getWorkflowDAO() throws DAOException {
         return WorkflowData.getInstance();
-    }
-
-    @Override
-    public JobDAO getJobDAO(String workflowID) throws DAOException {
-        return new JobData(workflowID);
-    }
-
-    @Override
-    public NodeDAO getNodeDAO(String workflowID) throws DAOException {
-        return new NodeData(workflowID);
     }
 }

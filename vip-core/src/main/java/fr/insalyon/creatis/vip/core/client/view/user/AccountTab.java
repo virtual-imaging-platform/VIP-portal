@@ -58,7 +58,7 @@ public class AccountTab extends Tab {
         this.setID(CoreConstants.TAB_ACCOUNT);
         this.setCanClose(true);
 
-        HLayout hLayout = new HLayout(10);
+        HLayout hLayout = new HLayout(5);
         hLayout.setWidth100();
         hLayout.setHeight100();
         hLayout.setOverflow(Overflow.AUTO);

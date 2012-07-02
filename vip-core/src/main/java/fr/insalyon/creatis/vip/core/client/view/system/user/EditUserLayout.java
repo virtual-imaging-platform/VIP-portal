@@ -36,22 +36,19 @@ package fr.insalyon.creatis.vip.core.client.view.system.user;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.MultipleAppearance;
-import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
-import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.layout.SectionStackSection;
-import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
@@ -66,35 +63,22 @@ import java.util.Map;
  *
  * @author Rafael Silva
  */
-public class EditUserStackSection extends SectionStackSection {
+public class EditUserLayout extends AbstractFormLayout {
 
-    private ModalWindow modal;
-    private VLayout editUserLayout;
     private Label nameLabel;
     private Label emailLabel;
     private SelectItem levelPickList;
     private SelectItem groupsPickList;
     private SelectItem countryPickList;
     private CheckboxItem confirmedField;
+    private IButton saveButton;
 
-    public EditUserStackSection() {
+    public EditUserLayout() {
 
-        this.setTitle("Edit User");
-        this.setCanCollapse(true);
-        this.setExpanded(true);
-        this.setResizeable(true);
-
-        VLayout vLayout = new VLayout(15);
-        vLayout.setHeight100();
-        vLayout.setOverflow(Overflow.AUTO);
-        vLayout.setMargin(5);
+        super(380, 300);
+        addTitle("Edit User", CoreConstants.ICON_PERSONAL);
 
         configure();
-
-        vLayout.addMember(editUserLayout);
-        modal = new ModalWindow(editUserLayout);
-
-        this.addItem(vLayout);
         loadData();
     }
 
@@ -102,10 +86,10 @@ public class EditUserStackSection extends SectionStackSection {
 
         nameLabel = WidgetUtil.getLabel("", 15);
         nameLabel.setCanSelectText(true);
-        
+
         emailLabel = WidgetUtil.getLabel("", 15);
         emailLabel.setCanSelectText(true);
-        
+
         levelPickList = new SelectItem();
         levelPickList.setShowTitle(false);
         levelPickList.setWidth(350);
@@ -131,8 +115,9 @@ public class EditUserStackSection extends SectionStackSection {
         confirmedField.setDisabled(true);
         confirmedField.setWidth(350);
 
-        IButton saveButton = new IButton("Save");
+        saveButton = new IButton("Save");
         saveButton.setWidth(70);
+        saveButton.setDisabled(true);
         saveButton.addClickHandler(new ClickHandler() {
 
             @Override
@@ -166,20 +151,13 @@ public class EditUserStackSection extends SectionStackSection {
             }
         });
 
-        editUserLayout = WidgetUtil.getVIPLayout(380, 300);
-        editUserLayout.addMember(nameLabel);
-        editUserLayout.addMember(emailLabel);
+        this.addMember(nameLabel);
+        this.addMember(emailLabel);
         addField("Level", levelPickList);
         addField("Groups", groupsPickList);
         addField("Country", countryPickList);
-        editUserLayout.addMember(FieldUtil.getForm(confirmedField));
-        editUserLayout.addMember(saveButton);
-    }
-
-    private void addField(String title, FormItem item) {
-
-        editUserLayout.addMember(WidgetUtil.getLabel("<b>" + title + "</b>", 15));
-        editUserLayout.addMember(FieldUtil.getForm(item));
+        this.addMember(FieldUtil.getForm(confirmedField));
+        this.addMember(saveButton);
     }
 
     /**
@@ -191,7 +169,7 @@ public class EditUserStackSection extends SectionStackSection {
      * @param level User's level
      * @param countryCode User's country code
      */
-    public void setUser(String name, String email, boolean confirmed, 
+    public void setUser(String name, String email, boolean confirmed,
             String level, String countryCode) {
 
         this.nameLabel.setContents(name);
@@ -201,7 +179,7 @@ public class EditUserStackSection extends SectionStackSection {
         this.countryPickList.setValue(countryCode);
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<Map<String, CoreConstants.GROUP_ROLE>> callback = new AsyncCallback<Map<String, CoreConstants.GROUP_ROLE>>() {
+        final AsyncCallback<Map<Group, GROUP_ROLE>> callback = new AsyncCallback<Map<Group, GROUP_ROLE>>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -210,25 +188,21 @@ public class EditUserStackSection extends SectionStackSection {
             }
 
             @Override
-            public void onSuccess(Map<String, GROUP_ROLE> result) {
+            public void onSuccess(Map<Group, GROUP_ROLE> result) {
                 modal.hide();
 
-                List<String> groups = new ArrayList<String>();
-                for (String group : result.keySet()) {
+                List<String> userGroups = new ArrayList<String>();
 
-                    if (group.equals(CoreConstants.GROUP_SUPPORT)) {
-                        groups.add(group);
-
-                    } else {
-                        if (result.get(group) == CoreConstants.GROUP_ROLE.Admin) {
-                            groups.add(group + " (" + CoreConstants.GROUP_ROLE.Admin.name() + ")");
-
-                        } else {
-                            groups.add(group + " (" + CoreConstants.GROUP_ROLE.User.name() + ")");
-                        }
+                for (Group group : result.keySet()) {
+                    if (result.get(group) != CoreConstants.GROUP_ROLE.None) {
+                        userGroups.add(
+                                group.getName().equals(CoreConstants.GROUP_SUPPORT)
+                                ? group.getName()
+                                : group.getName() + " (" + result.get(group).name() + ")");
                     }
                 }
-                groupsPickList.setValues(groups.toArray(new String[]{}));
+                groupsPickList.setValues(userGroups.toArray(new String[]{}));
+                saveButton.setDisabled(false);
             }
         };
         modal.show("Loading user's groups...", true);
@@ -256,6 +230,7 @@ public class EditUserStackSection extends SectionStackSection {
             @Override
             public void onSuccess(Void result) {
                 modal.hide();
+                saveButton.setDisabled(true);
                 nameLabel.setContents("");
                 emailLabel.setContents("");
                 levelPickList.setValues(new String[]{});
@@ -278,7 +253,7 @@ public class EditUserStackSection extends SectionStackSection {
         levelPickList.setValueMap(UserLevel.toStringArray());
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+        final AsyncCallback<List<Group>> callback = new AsyncCallback<List<Group>>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -286,15 +261,15 @@ public class EditUserStackSection extends SectionStackSection {
             }
 
             @Override
-            public void onSuccess(List<String> result) {
+            public void onSuccess(List<Group> result) {
 
                 List<String> dataList = new ArrayList<String>();
-                for (String g : result) {
-                    if (g.equals(CoreConstants.GROUP_SUPPORT)) {
-                        dataList.add(g);
+                for (Group g : result) {
+                    if (g.getName().equals(CoreConstants.GROUP_SUPPORT)) {
+                        dataList.add(g.getName());
                     } else {
-                        dataList.add(g + " (" + CoreConstants.GROUP_ROLE.Admin.name() + ")");
-                        dataList.add(g + " (" + CoreConstants.GROUP_ROLE.User.name() + ")");
+                        dataList.add(g.getName() + " (" + CoreConstants.GROUP_ROLE.Admin.name() + ")");
+                        dataList.add(g.getName() + " (" + CoreConstants.GROUP_ROLE.User.name() + ")");
                     }
                 }
                 groupsPickList.setValueMap(dataList.toArray(new String[]{}));

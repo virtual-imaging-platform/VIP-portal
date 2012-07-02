@@ -32,48 +32,40 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.system.application;
+package fr.insalyon.creatis.vip.core.client.bean;
 
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.toolbar.ToolStrip;
-import com.smartgwt.client.widgets.toolbar.ToolStripButton;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  *
  * @author Rafael Silva
  */
-public class ManageApplicationsToolStrip extends ToolStrip {
+public class Group implements IsSerializable {
 
-    public ManageApplicationsToolStrip() {
-        
-        this.setWidth100();
+    private String name;
+    private boolean publicGroup;
 
-        ToolStripButton addButton = new ToolStripButton("Add Application");
-        addButton.setIcon(CoreConstants.ICON_ADD);
-        addButton.addClickHandler(new ClickHandler() {
+    public Group() {
+    }
 
-            public void onClick(ClickEvent event) {
-                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
-                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                appsTab.setApplication(null, null, null);
-            }
-        });
-        this.addButton(addButton);
+    public Group(String name, boolean publicGroup) {
+        this.name = name;
+        this.publicGroup = publicGroup;
+    }
 
-        ToolStripButton refreshButton = new ToolStripButton("Refresh");
-        refreshButton.setIcon(CoreConstants.ICON_REFRESH);
-        refreshButton.addClickHandler(new ClickHandler() {
+    public String getName() {
+        return name;
+    }
 
-            public void onClick(ClickEvent event) {
-                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
-                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                appsTab.loadApplications();
-            }
-        });
-        this.addButton(refreshButton);
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean isPublicGroup() {
+        return publicGroup;
+    }
+
+    public void setPublicGroup(boolean publicGroup) {
+        this.publicGroup = publicGroup;
     }
 }

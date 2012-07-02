@@ -32,47 +32,39 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.system.group;
+package fr.insalyon.creatis.vip.application.server.dao;
 
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.toolbar.ToolStrip;
-import com.smartgwt.client.widgets.toolbar.ToolStripButton;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
+import fr.insalyon.creatis.vip.application.client.bean.Job;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author Rafael Silva
  */
-public class ManageGroupsToolStrip extends ToolStrip {
+public interface SimulationDAO {
+   
+    public Map<String, Integer> getStatusMap() throws DAOException;
 
-    public ManageGroupsToolStrip() {
-        
-        this.setWidth100();
+    public List<Job> getJobs() throws DAOException;
 
-        ToolStripButton addButton = new ToolStripButton("Add Group");
-        addButton.setIcon(CoreConstants.ICON_ADD);
-        addButton.addClickHandler(new ClickHandler() {
+    public List<String> getExecutionPerNumberOfJobs(int binSize) throws DAOException;
 
-            public void onClick(ClickEvent event) {
-                ManageGroupsTab groupTab = (ManageGroupsTab) Layout.getInstance().
-                        getTab(CoreConstants.TAB_MANAGE_GROUPS);
-                groupTab.setGroup(null);
-            }
-        });
-        this.addButton(addButton);
+    public List<String> getDownloadPerNumberOfJobs(int binSize) throws DAOException;
 
-        ToolStripButton refreshButton = new ToolStripButton("Refresh");
-        refreshButton.setIcon(CoreConstants.ICON_REFRESH);
-        refreshButton.addClickHandler(new ClickHandler() {
+    public List<String> getUploadPerNumberOfJobs(int binSize) throws DAOException;
 
-            public void onClick(ClickEvent event) {
-                ManageGroupsTab usersTab = (ManageGroupsTab) Layout.getInstance().
-                        getTab(CoreConstants.TAB_MANAGE_GROUPS);
-                usersTab.loadGroups();
-            }
-        });
-        this.addButton(refreshButton);
-    }
+    public List<String> getJobsPerTime() throws DAOException;
+
+    public List<String> getCkptsPerJob() throws DAOException;
+
+    public void sendSignal(String jobID, JobStatus status) throws DAOException;
+
+    public List<String> getSiteHistogram() throws DAOException;
+
+    public int[] getNumberOfActiveTasks() throws DAOException;
+    
+    public Map<String, Integer> getNodeCountriesMap() throws DAOException;
 }

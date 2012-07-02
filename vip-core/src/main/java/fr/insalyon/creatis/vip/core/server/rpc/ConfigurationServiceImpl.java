@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.core.server.rpc;
 
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -43,9 +44,7 @@ import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.h2.PlatformConnection;
-import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
@@ -70,14 +69,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @return
      * @throws CoreException
      */
+    @Override
     public User configure(String email, String session) throws CoreException {
 
         try {
             logger.info("Initializing VIP configuration.");
-            PlatformConnection.getInstance().setConnection(
-                    (Connection) getServletContext().getAttribute("connection"));
-            PlatformConnection.getInstance().createTables();
-
             configurationBusiness.configure();
             logger.info("VIP successfully configured.");
 
@@ -92,8 +88,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             }
             return null;
 
-        } catch (DAOException ex) {
-            throw new CoreException(ex);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -106,6 +100,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @param accountType User's account type
      * @throws CoreException
      */
+    @Override
     public void signup(User user, String comments, String accountType) throws CoreException {
 
         try {
@@ -234,15 +229,16 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     /**
      *
-     * @param groupName
+     * @param group
      * @throws CoreException
      */
-    public void addGroup(String groupName) throws CoreException {
+    @Override
+    public void addGroup(Group group) throws CoreException {
 
         try {
             authenticateSystemAdministrator(logger);
-            trace(logger, "Adding group '" + groupName + "'.");
-            configurationBusiness.addGroup(groupName);
+            trace(logger, "Adding group '" + group + "'.");
+            configurationBusiness.addGroup(group);
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
@@ -251,15 +247,16 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     /**
      *
-     * @param oldName
-     * @param newName
+     * @param name
+     * @param group
      * @throws CoreException
      */
-    public void updateGroup(String oldName, String newName) throws CoreException {
+    @Override
+    public void updateGroup(String name, Group group) throws CoreException {
         try {
             authenticateSystemAdministrator(logger);
-            trace(logger, "Updating group '" + oldName + "' to '" + newName + "'.");
-            configurationBusiness.updateGroup(oldName, newName);
+            trace(logger, "Updating group '" + name + "' to '" + group.getName() + "'.");
+            configurationBusiness.updateGroup(name, group);
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
@@ -271,6 +268,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @param groupName
      * @throws CoreException
      */
+    @Override
     public void removeGroup(String groupName) throws CoreException {
         try {
             authenticateSystemAdministrator(logger);
@@ -286,7 +284,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      *
      * @return @throws CoreException
      */
-    public List<String> getGroups() throws CoreException {
+    @Override
+    public List<Group> getGroups() throws CoreException {
 
         try {
             authenticateSystemAdministrator(logger);
@@ -342,7 +341,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @return
      * @throws CoreException
      */
-    public Map<String, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws CoreException {
+    @Override
+    public Map<Group, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws CoreException {
 
         try {
             if (email != null) {
@@ -359,18 +359,23 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     /**
      *
-     * @return 
-     * @throws CoreException
+     * @return @throws CoreException
      */
     @Override
     public List<String> getUserGroups() throws CoreException {
 
         try {
+            List<String> list = new ArrayList<String>();
             if (getSessionUser().isSystemAdministrator()) {
-                return configurationBusiness.getGroups();
+                for (Group group : configurationBusiness.getGroups()) {
+                    list.add(group.getName());
+                }
             } else {
-                return configurationBusiness.getUserGroupsName(getSessionUserGroups());
+                for (Group group : getSessionUserGroups().keySet()) {
+                    list.add(group.getName());
+                }
             }
+            return list;
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
@@ -386,7 +391,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @throws CoreException
      */
     @Override
-    public void updateUser(String email, UserLevel level, CountryCode countryCode, 
+    public void updateUser(String email, UserLevel level, CountryCode countryCode,
             Map<String, CoreConstants.GROUP_ROLE> groups) throws CoreException {
 
         try {
@@ -478,7 +483,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      */
     private User setUserSession(User user) throws BusinessException {
 
-        Map<String, GROUP_ROLE> groups = configurationBusiness.getUserGroups(user.getEmail());
+        Map<Group, GROUP_ROLE> groups = configurationBusiness.getUserGroups(user.getEmail());
         user.setGroups(groups);
 
         getSession().setAttribute(CoreConstants.SESSION_USER, user);
@@ -509,6 +514,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @param groupName
      * @throws CoreException
      */
+    @Override
     public void addUserToGroup(String groupName) throws CoreException {
 
         try {
@@ -543,24 +549,29 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @param groupName
      * @throws CoreException
      */
+    @Override
     public void removeUserFromGroup(String email, String groupName) throws CoreException {
 
         try {
-            authenticateSystemAdministrator(logger);
-            trace(logger, "Removing '" + email + "' from group '" + groupName + "'.");
-            configurationBusiness.removeUserFromGroup(email, groupName);
-
+            if (email != null) {
+                authenticateSystemAdministrator(logger);
+                trace(logger, "Removing '" + email + "' from '" + groupName + "' group.");
+                configurationBusiness.removeUserFromGroup(email, groupName);
+            } else {
+                trace(logger, "Removing user from '" + groupName + "' group.");
+                configurationBusiness.removeUserFromGroup(getSessionUser().getEmail(), groupName);
+            }
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
     }
 
     /**
-     * 
+     *
      * @param email
      * @param code
      * @param password
-     * @throws CoreException 
+     * @throws CoreException
      */
     @Override
     public void resetPassword(String email, String code, String password) throws CoreException {
@@ -568,7 +579,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             logger.info("(" + email + ") Reseting password.");
             configurationBusiness.resetPassword(email, code, password);
-            
+
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }

@@ -156,7 +156,7 @@ public class ProxyClient {
         logger.info("Adding VOMS Extension to server proxy.");
         // Voms Extension
         Server serverConf = Server.getInstance();
-        long hours = Long.parseLong(serverConf.getMyProxyLifeTime()) / 24;
+        long hours = Long.parseLong(serverConf.getMyProxyLifeTime()) / 3600;
         String command = "voms-proxy-init --voms biomed"
                 + " -cert " + serverConf.getServerProxy()
                 + " -key " + serverConf.getServerProxy()

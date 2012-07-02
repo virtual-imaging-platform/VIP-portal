@@ -34,54 +34,38 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.system.application;
 
-import com.smartgwt.client.types.VisibilityMode;
-import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.layout.SectionStack;
-import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.layout.HLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
 
 /**
  *
  * @author Rafael Silva
  */
-public class ManageApplicationsTab extends Tab {
+public class ManageApplicationsTab extends AbstractManageTab {
 
-    private ToolStrip toolStrip;
-    private ApplicationsStackSection appsStackSection;
-    private EditApplicationStackSection editStackSection;
+    private ApplicationsLayout appsLayout;
+    private EditApplicationLayout editLayout;
 
     public ManageApplicationsTab() {
 
-        this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_APPLICATION) + " " + ApplicationConstants.APP_APPLICATION);
-        this.setID(ApplicationConstants.TAB_MANAGE_APPLICATION);
-        this.setCanClose(true);
-
-        VLayout vLayout = new VLayout();
-
-        toolStrip = new ManageApplicationsToolStrip();
-        vLayout.addMember(toolStrip);
-
-        SectionStack sectionStack = new SectionStack();
-        sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
-        sectionStack.setAnimateSections(true);
-        sectionStack.setCanResizeSections(true);
-
-        appsStackSection = new ApplicationsStackSection();
-        editStackSection = new EditApplicationStackSection();
-
-        sectionStack.setSections(appsStackSection, editStackSection);
-        vLayout.addMember(sectionStack);
-
-        this.setPane(vLayout);
+        super(ApplicationConstants.ICON_APPLICATION, ApplicationConstants.APP_APPLICATION, ApplicationConstants.TAB_MANAGE_APPLICATION);
+        
+        appsLayout = new ApplicationsLayout();
+        editLayout = new EditApplicationLayout();
+        
+        HLayout hLayout = new HLayout(5);
+        hLayout.addMember(appsLayout);
+        hLayout.addMember(editLayout);
+        
+        vLayout.addMember(hLayout);
     }
     
     public void loadApplications() {
-        appsStackSection.loadData();
+        appsLayout.loadData();
     }
 
     public void setApplication(String name, String lfn, String classes) {
-        editStackSection.setApplication(name, lfn, classes);
+        editLayout.setApplication(name, lfn, classes);
     }
 }

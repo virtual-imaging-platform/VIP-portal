@@ -42,8 +42,10 @@ import java.util.Date;
  */
 public class CoreConstants {
 
-    public static final String VERSION = "v0.7.8";
+    public static final String VERSION = "v0.8";
     // Configuration Labels
+    public static final String LAB_DB_HOST = "database.server.host";
+    public static final String LAB_DB_PORT = "database.server.port";
     public static final String LAB_ADMIN_FIRST_NAME = "admin.first.name";
     public static final String LAB_ADMIN_LAST_NAME = "admin.last.name";
     public static final String LAB_ADMIN_EMAIL = "admin.email";
@@ -66,6 +68,9 @@ public class CoreConstants {
     public static final String LAB_DATA_PATH = "datamanager.path";
     public static final String LAB_DATA_LFC_HOST = "datamanager.lfc.host";
     public static final String LAB_DATA_LFC_PORT = "datamanager.lfc.port";
+    public static final String LAB_MOTEUR_HOST = "moteur.host";
+    public static final String LAB_TRUSTSTORE_FILE = "truststore.file";
+    public static final String LAB_TRUSTSTORE_PASS = "truststore.password";
     // Tabs
     public static final String TAB_ACCOUNT = "account-tab";
     public static final String TAB_ACTIVATION = "activation-tab";
@@ -93,6 +98,7 @@ public class CoreConstants {
     public static final String ICON_HOME = IMG_FOLDER + "icon-home.png";
     public static final String ICON_INFORMATION = IMG_FOLDER + "icon-information.png";
     public static final String ICON_LOADING = IMG_FOLDER + "icon-loading.gif";
+    public static final String ICON_LOCK = IMG_FOLDER + "icon-lock.png";
     public static final String ICON_PASSWORD = IMG_FOLDER + "icon-password.png";
     public static final String ICON_PERSONAL = IMG_FOLDER + "icon-personal.png";
     public static final String ICON_PICKER_QUESTION = IMG_FOLDER + "icon-picker-question.png";
@@ -132,6 +138,6 @@ public class CoreConstants {
 
     public static enum GROUP_ROLE {
 
-        Admin, User
+        Admin, User, None
     };
 }

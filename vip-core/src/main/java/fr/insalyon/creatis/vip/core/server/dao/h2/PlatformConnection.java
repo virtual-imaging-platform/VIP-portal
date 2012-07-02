@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.core.server.dao.h2;
 
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
@@ -42,6 +43,7 @@ import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
@@ -55,11 +57,13 @@ import org.apache.log4j.Logger;
 public class PlatformConnection {
 
     private final static Logger logger = Logger.getLogger(PlatformConnection.class);
+    private final String DRIVER = "org.h2.Driver";
     private static PlatformConnection instance;
     private boolean firstExecution;
     private Connection connection;
 
     public synchronized static PlatformConnection getInstance() throws DAOException {
+
         if (instance == null) {
             instance = new PlatformConnection();
         }
@@ -67,10 +71,38 @@ public class PlatformConnection {
     }
 
     private PlatformConnection() throws DAOException {
+
         firstExecution = true;
+        connect();
+        createTables();
     }
 
-    public void createTables() {
+    private void connect() {
+
+        String DBURL = "jdbc:h2:tcp://"
+                + Server.getInstance().getDatabaseServerHost() + ":"
+                + Server.getInstance().getDatabaseServerPort() + "/"
+                + Server.getInstance().getConfigurationFolder() + "/db/vip.db";
+
+        try {
+            Class.forName(DRIVER);
+            connection = DriverManager.getConnection(DBURL + ";create=true");
+            connection.setAutoCommit(true);
+
+        } catch (SQLException ex) {
+            try {
+                connection = DriverManager.getConnection(DBURL);
+                connection.setAutoCommit(true);
+
+            } catch (SQLException ex1) {
+                logger.error(ex1);
+            }
+        } catch (ClassNotFoundException ex) {
+            logger.error(ex);
+        }
+    }
+
+    private void createTables() {
 
         if (firstExecution) {
             logger.info("Configuring VIP database.");
@@ -86,6 +118,7 @@ public class PlatformConnection {
                     + "confirmed BOOLEAN, "
                     + "folder VARCHAR(100), "
                     + "session VARCHAR(255), "
+                    + "registration TIMESTAMP, "
                     + "last_login TIMESTAMP, "
                     + "level VARCHAR(50), "
                     + "country_code VARCHAR(2), "
@@ -104,7 +137,7 @@ public class PlatformConnection {
                             server.getAdminPassword(),
                             server.getAdminPhone(), true,
                             UUID.randomUUID().toString(), folder, "",
-                            new Date(), UserLevel.Administrator,
+                            new Date(), new Date(), UserLevel.Administrator,
                             CountryCode.fr));
 
                 } catch (DAOException ex) {
@@ -114,11 +147,12 @@ public class PlatformConnection {
 
             if (createTable("VIPGroups",
                     "groupname VARCHAR(50), "
+                    + "public BOOLEAN, "
                     + "PRIMARY KEY(groupname)")) {
 
                 try {
                     CoreDAOFactory.getDAOFactory().getGroupDAO().add(
-                            CoreConstants.GROUP_SUPPORT);
+                            new Group(CoreConstants.GROUP_SUPPORT, false));
                 } catch (DAOException ex) {
                     logger.error(ex);
                 }
@@ -207,10 +241,6 @@ public class PlatformConnection {
 
     public Connection getConnection() {
         return connection;
-    }
-
-    public void setConnection(Connection connection) {
-        this.connection = connection;
     }
 
     /**

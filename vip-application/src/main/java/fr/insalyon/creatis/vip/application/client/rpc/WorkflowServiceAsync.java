@@ -92,8 +92,6 @@ public interface WorkflowServiceAsync {
 
     public void deleteLogData(String path, AsyncCallback<Void> asyncCallback);
 
-    public void closeConnection(String workflowID, AsyncCallback<Void> asyncCallback);
-
     public void getWorkflowsInputByUserAndAppName(String user, String appName, AsyncCallback<List<SimulationInput>> asyncCallback);
 
     public void getFileURL(String baseDir, String fileName, AsyncCallback<String> asyncCallback);

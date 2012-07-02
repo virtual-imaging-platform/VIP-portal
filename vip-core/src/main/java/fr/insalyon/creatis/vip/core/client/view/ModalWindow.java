@@ -159,6 +159,7 @@ public class ModalWindow {
         if (showEndTime - showStartedTime < delay) {
             new Timer() {
 
+                @Override
                 public void run() {
                     _hide();
                 }
@@ -177,6 +178,7 @@ public class ModalWindow {
             canvas.addChild(parent);
             canvas.addResizedHandler(new ResizedHandler() {
 
+                @Override
                 public void onResized(ResizedEvent event) {
                     parent.setWidth(canvas.getWidth());
                     parent.setHeight(canvas.getHeight());
@@ -203,6 +205,7 @@ public class ModalWindow {
         // we need a handler to ensure we always cover the entire canvas
         parent.addDrawHandler(new DrawHandler() {
 
+            @Override
             public void onDraw(DrawEvent event) {
                 parent.setWidth(canvas.getVisibleWidth());
                 parent.setHeight(canvas.getVisibleHeight());
@@ -239,6 +242,7 @@ public class ModalWindow {
         label.setShadowOffset(10);
         label.addDrawHandler(new DrawHandler() {
 
+            @Override
             public void onDraw(DrawEvent event) {
                 int visibleWidth = label.getVisibleWidth();
                 label.setWidth(visibleWidth);

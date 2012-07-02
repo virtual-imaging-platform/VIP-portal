@@ -50,9 +50,9 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
@@ -195,18 +195,20 @@ public class EditClassStackSection extends SectionStackSection {
     private void loadData() {
         
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+        final AsyncCallback<List<Group>> callback = new AsyncCallback<List<Group>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to get list of groups:<br />" + caught.getMessage());
             }
 
-            public void onSuccess(List<String> result) {
+            @Override
+            public void onSuccess(List<Group> result) {
                 modal.hide();
                 List<String> dataList = new ArrayList<String>();
-                for (String g : result) {
-                        dataList.add(g);
+                for (Group group : result) {
+                        dataList.add(group.getName());
                 }
                 groupsPickList.setValueMap(dataList.toArray(new String[]{}));
             }

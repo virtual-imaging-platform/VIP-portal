@@ -102,8 +102,6 @@ public interface WorkflowService extends RemoteService {
 
     public Simulation getSimulation(String simulationID) throws ApplicationException;
 
-    public void closeConnection(String workflowID);
-
     public String getFile(String baseDir, String fileName);
 
     public String getFileURL(String baseDir, String fileName);

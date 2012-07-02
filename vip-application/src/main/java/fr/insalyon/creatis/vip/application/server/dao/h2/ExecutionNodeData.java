@@ -32,14 +32,11 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.server.dao.derby;
+package fr.insalyon.creatis.vip.application.server.dao.h2;
 
 import fr.insalyon.creatis.vip.application.client.bean.Node;
-import fr.insalyon.creatis.vip.application.server.dao.NodeDAO;
-import fr.insalyon.creatis.vip.application.server.dao.derby.connection.JobsConnection;
-import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.application.server.dao.ExecutionNodeDAO;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -49,45 +46,50 @@ import org.apache.log4j.Logger;
  *
  * @author Rafael Silva
  */
-public class NodeData implements NodeDAO {
+public class ExecutionNodeData extends AbstractJobData implements ExecutionNodeDAO {
 
-    private static Logger logger = Logger.getLogger(NodeData.class);
-    private Connection connection;
+    private static Logger logger = Logger.getLogger(ExecutionNodeData.class);
 
-    public NodeData(String workflowID) throws DAOException {
-        connection = JobsConnection.getInstance().connect(
-                Server.getInstance().getWorkflowsPath() + "/" + workflowID + "/jobs.db");
+    public ExecutionNodeData(String dbPath) throws DAOException {
+
+        super(dbPath);
     }
 
     /**
-     * 
+     *
      * @param siteID
      * @param nodeName
      * @return
-     * @throws DAOException 
+     * @throws DAOException
      */
+    @Override
     public Node getNode(String siteID, String nodeName) throws DAOException {
-        
+
         try {
-            PreparedStatement stat = connection.prepareStatement("SELECT "
+            PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "site, node_name, ncpus, cpu_model_name, cpu_mhz, "
                     + "cpu_cache_size, cpu_bogomips, mem_total "
-                    + "FROM nodes WHERE site = ? "
-                    + "AND node_name = ?");
-            stat.setString(1, siteID);
-            stat.setString(2, nodeName);
+                    + "FROM nodes WHERE site = ? AND node_name = ?");
+            ps.setString(1, siteID);
+            ps.setString(2, nodeName);
 
-            ResultSet rs = stat.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             rs.next();
-            return new Node(rs.getString("site"), rs.getString("node_name"),
+
+            Node node = new Node(rs.getString("site"), rs.getString("node_name"),
                     rs.getInt("ncpus"), rs.getString("cpu_model_name"),
                     rs.getDouble("cpu_mhz"), rs.getInt("cpu_cache_size"),
                     rs.getDouble("cpu_bogomips"), rs.getInt("mem_total"));
 
+            ps.close();
+            return node;
+
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
+        } finally {
+            close(logger);
         }
     }
 }

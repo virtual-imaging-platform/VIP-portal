@@ -60,22 +60,28 @@ public class ClassData implements ClassDAO {
         connection = PlatformConnection.getInstance().getConnection();
     }
 
+    /**
+     * 
+     * @param appClass
+     * @throws DAOException 
+     */
     @Override
-    public void add(AppClass c) throws DAOException {
+    public void add(AppClass appClass) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement(
                     "INSERT INTO VIPClasses(name) "
                     + "VALUES (?)");
 
-            ps.setString(1, c.getName());
+            ps.setString(1, appClass.getName());
             ps.execute();
+            ps.close();
 
-            addGroupsToClass(c.getName(), c.getGroups());
+            addGroupsToClass(appClass.getName(), appClass.getGroups());
 
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Unique index or primary key violation")) {
-                throw new DAOException("A class named \"" + c.getName() + "\" already exists.");
+                throw new DAOException("A class named \"" + appClass.getName() + "\" already exists.");
             } else {
                 logger.error(ex);
                 throw new DAOException(ex);
@@ -83,12 +89,17 @@ public class ClassData implements ClassDAO {
         }
     }
 
+    /**
+     * 
+     * @param appClass
+     * @throws DAOException 
+     */
     @Override
-    public void update(AppClass c) throws DAOException {
+    public void update(AppClass appClass) throws DAOException {
 
         try {
-            removeGroupsFromClass(c.getName());
-            addGroupsToClass(c.getName(), c.getGroups());
+            removeGroupsFromClass(appClass.getName());
+            addGroupsToClass(appClass.getName(), appClass.getGroups());
 
         } catch (DAOException ex) {
             logger.error(ex);
@@ -96,15 +107,21 @@ public class ClassData implements ClassDAO {
         }
     }
 
+    /**
+     * 
+     * @param className
+     * @throws DAOException 
+     */
     @Override
     public void remove(String className) throws DAOException {
 
         try {
-            PreparedStatement stat = connection.prepareStatement("DELETE "
+            PreparedStatement ps = connection.prepareStatement("DELETE "
                     + "FROM VIPClasses WHERE name=?");
 
-            stat.setString(1, className);
-            stat.execute();
+            ps.setString(1, className);
+            ps.execute();
+            ps.close();
 
         } catch (SQLException ex) {
             logger.error(ex);
@@ -112,29 +129,37 @@ public class ClassData implements ClassDAO {
         }
     }
 
+    /**
+     * 
+     * @return
+     * @throws DAOException 
+     */
     @Override
     public List<AppClass> getClasses() throws DAOException {
 
         try {
-            PreparedStatement stat = connection.prepareStatement(
+            PreparedStatement ps = connection.prepareStatement(
                     "SELECT name FROM VIPClasses  ORDER BY name");
 
-            ResultSet rs = stat.executeQuery();
+            ResultSet rs = ps.executeQuery();
             List<AppClass> classes = new ArrayList<AppClass>();
             
             while (rs.next()) {
                 List<String> groups = new ArrayList<String>();
-                PreparedStatement s = connection.prepareStatement(
+                PreparedStatement ps2 = connection.prepareStatement(
                         "SELECT groupname FROM VIPGroupsClasses "
                         + "WHERE classname=? ORDER BY groupname");
-                s.setString(1, rs.getString("name"));
-                ResultSet r = s.executeQuery();
+                ps2.setString(1, rs.getString("name"));
+                ResultSet r = ps2.executeQuery();
 
                 while (r.next()) {
                     groups.add(r.getString("groupname"));
                 }
                 classes.add(new AppClass(rs.getString("name"), groups));
+                ps2.close();
             }
+            
+            ps.close();
             return classes;
 
         } catch (SQLException ex) {
@@ -143,25 +168,34 @@ public class ClassData implements ClassDAO {
         }
     }
 
+    /**
+     * 
+     * @param className
+     * @return
+     * @throws DAOException 
+     */
     @Override
     public AppClass getClass(String className) throws DAOException {
 
         try {
             List<String> groups = new ArrayList<String>();
 
-            PreparedStatement stat = connection.prepareStatement("SELECT "
+            PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "groupname "
                     + "FROM VIPGroupsClasses "
                     + "WHERE classname=?");
 
-            stat.setString(1, className);
-            ResultSet rs = stat.executeQuery();
+            ps.setString(1, className);
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 groups.add(rs.getString("groupname"));
             }
 
-            return new AppClass(className, groups);
+            AppClass appClass = new AppClass(className, groups);
+            
+            ps.close();
+            return appClass;
 
         } catch (SQLException ex) {
             logger.error(ex);
@@ -169,6 +203,13 @@ public class ClassData implements ClassDAO {
         }
     }
 
+    /**
+     * 
+     * @param email
+     * @param validAdmin
+     * @return
+     * @throws DAOException 
+     */
     @Override
     public List<AppClass> getUserClasses(String email, boolean validAdmin) throws DAOException {
 
@@ -189,18 +230,20 @@ public class ClassData implements ClassDAO {
 
             while (rs.next()) {
                 List<String> groups = new ArrayList<String>();
-                PreparedStatement s = connection.prepareStatement(
+                PreparedStatement ps2 = connection.prepareStatement(
                         "SELECT groupname FROM VIPGroupsClasses "
                         + "WHERE classname=? ORDER BY groupname");
-                s.setString(1, rs.getString("classname"));
-                ResultSet r = s.executeQuery();
+                ps2.setString(1, rs.getString("classname"));
+                ResultSet r = ps2.executeQuery();
 
                 while (r.next()) {
                     groups.add(r.getString("groupname"));
                 }
                 classes.add(new AppClass(rs.getString("classname"), groups));
+                ps2.close();
             }
 
+            ps.close();
             return classes;
 
         } catch (SQLException ex) {
@@ -208,6 +251,12 @@ public class ClassData implements ClassDAO {
         }
     }
 
+    /**
+     * 
+     * @param className
+     * @param groups
+     * @throws DAOException 
+     */
     private void addGroupsToClass(String className, List<String> groups) throws DAOException {
 
         for (String groupName : groups) {
@@ -219,6 +268,7 @@ public class ClassData implements ClassDAO {
                 ps.setString(1, className);
                 ps.setString(2, groupName);
                 ps.execute();
+                ps.close();
 
             } catch (SQLException ex) {
                 if (ex.getMessage().contains("Unique index or primary key violation")) {
@@ -232,6 +282,11 @@ public class ClassData implements ClassDAO {
         }
     }
 
+    /**
+     * 
+     * @param className
+     * @throws DAOException 
+     */
     private void removeGroupsFromClass(String className) throws DAOException {
 
         try {
@@ -240,6 +295,7 @@ public class ClassData implements ClassDAO {
 
             ps.setString(1, className);
             ps.execute();
+            ps.close();
 
         } catch (SQLException ex) {
             logger.error(ex);

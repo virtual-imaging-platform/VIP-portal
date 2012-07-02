@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.core.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
@@ -62,19 +63,19 @@ public interface ConfigurationServiceAsync {
     
     public void sendResetCode(String email, AsyncCallback<Void> asyncCallback);
 
-    public void addGroup(String groupName, AsyncCallback<Void> asyncCallback);
+    public void addGroup(Group group, AsyncCallback<Void> asyncCallback);
 
     public void removeGroup(String groupName, AsyncCallback<Void> asyncCallback);
 
-    public void getGroups(AsyncCallback<List<String>> asyncCallback);
+    public void getGroups(AsyncCallback<List<Group>> asyncCallback);
 
-    public void updateGroup(String oldName, String newName, AsyncCallback<Void> asyncCallback);
+    public void updateGroup(String name, Group group, AsyncCallback<Void> asyncCallback);
 
     public void removeUser(String email, AsyncCallback<User> asyncCallback);
     
     public void removeUser(AsyncCallback<User> asyncCallback);
 
-    public void getUserGroups(String email, AsyncCallback<Map<String, CoreConstants.GROUP_ROLE>> asyncCallback);
+    public void getUserGroups(String email, AsyncCallback<Map<Group, CoreConstants.GROUP_ROLE>> asyncCallback);
     
     public void getUserGroups(AsyncCallback<List<String>> asyncCallback);
 

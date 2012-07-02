@@ -55,6 +55,9 @@ public class Server {
     // Portal
     private String configurationFolder;
     private String serverProxy;
+    // Database
+    private String databaseServerHost;
+    private int databaseServerPort;
     // Admin
     private String adminFirstName;
     private String adminLastName;
@@ -82,15 +85,15 @@ public class Server {
     private String dataManagerPath;
     private String dataManagerLFCHost;
     private int dataManagerLFCPort;
+    // Moteur
+    private String moteurServer;
+    private String truststoreFile;
+    private String truststorePass;
     // Workflows
     private String workflowsPath = "/var/www/html/workflows";
     private String workflowsDB = "/var/www/workflows.db";
     private String workflowsHost = "localhost";
     private int workflowsPort = 1527;
-    // Moteur
-    private String moteurServer = "https://localhost:443/cgi-bin/moteurServer/moteur_server";
-    private String truststoreFile = "/usr/local/apache-tomcat-6.0.29/conf/truststore.jks";
-    private String truststorePass = "";
     // Apache
     private String apacheHost = "localhost";
     private int apacheSSLPort = 80;
@@ -116,6 +119,9 @@ public class Server {
             // Configuration File
             String confFilePath = configurationFolder + CONF_FILE;
             PropertiesConfiguration config = new PropertiesConfiguration(confFilePath);
+
+            databaseServerHost = config.getString(CoreConstants.LAB_DB_HOST, "localhost");
+            databaseServerPort = config.getInt(CoreConstants.LAB_DB_PORT, 9092);
 
             adminFirstName = config.getString(CoreConstants.LAB_ADMIN_FIRST_NAME, "Administrator");
             adminLastName = config.getString(CoreConstants.LAB_ADMIN_LAST_NAME, "");
@@ -144,9 +150,9 @@ public class Server {
             dataManagerLFCHost = config.getString(CoreConstants.LAB_DATA_LFC_HOST, "lfc-biomed.in2p3.fr");
             dataManagerLFCPort = config.getInt(CoreConstants.LAB_DATA_LFC_PORT, 5010);
 
-            moteurServer = config.getString("moteur.host", moteurServer);
-            truststoreFile = config.getString("truststore.file", truststoreFile);
-            truststorePass = config.getString("truststore.password", truststorePass);
+            moteurServer = config.getString(CoreConstants.LAB_MOTEUR_HOST, "https://localhost:443/cgi-bin/moteurServer/moteur_server");
+            truststoreFile = config.getString(CoreConstants.LAB_TRUSTSTORE_FILE, "/usr/local/apache-tomcat-6.0.29/conf/truststore.jks");
+            truststorePass = config.getString(CoreConstants.LAB_TRUSTSTORE_PASS, "");
 
             workflowsPath = config.getString("workflows.directory", workflowsPath);
             workflowsDB = config.getString("workflows.db.name", workflowsDB);
@@ -161,6 +167,8 @@ public class Server {
             provenanceDBURL = config.getString("provenance.db.url", provenanceDBURL);
 
 
+            config.setProperty(CoreConstants.LAB_DB_HOST, databaseServerHost);
+            config.setProperty(CoreConstants.LAB_DB_PORT, databaseServerPort);
             config.setProperty(CoreConstants.LAB_ADMIN_FIRST_NAME, adminFirstName);
             config.setProperty(CoreConstants.LAB_ADMIN_LAST_NAME, adminLastName);
             config.setProperty(CoreConstants.LAB_ADMIN_EMAIL, adminEmail);
@@ -183,9 +191,9 @@ public class Server {
             config.setProperty(CoreConstants.LAB_DATA_PATH, dataManagerPath);
             config.setProperty(CoreConstants.LAB_DATA_LFC_HOST, dataManagerLFCHost);
             config.setProperty(CoreConstants.LAB_DATA_LFC_PORT, dataManagerLFCPort);
-            config.setProperty("moteur.host", moteurServer);
-            config.setProperty("truststore.file", truststoreFile);
-            config.setProperty("truststore.password", truststorePass);
+            config.setProperty(CoreConstants.LAB_MOTEUR_HOST, moteurServer);
+            config.setProperty(CoreConstants.LAB_TRUSTSTORE_FILE, truststoreFile);
+            config.setProperty(CoreConstants.LAB_TRUSTSTORE_PASS, truststorePass);
             config.setProperty("workflows.directory", workflowsPath);
             config.setProperty("workflows.db.name", workflowsDB);
             config.setProperty("workflows.db.host", workflowsHost);
@@ -209,6 +217,14 @@ public class Server {
             file.mkdirs();
         }
         return path;
+    }
+
+    public String getDatabaseServerHost() {
+        return databaseServerHost;
+    }
+
+    public int getDatabaseServerPort() {
+        return databaseServerPort;
     }
 
     public String getConfigurationFolder() {

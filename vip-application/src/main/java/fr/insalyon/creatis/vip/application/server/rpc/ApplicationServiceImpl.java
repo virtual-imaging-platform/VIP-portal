@@ -297,8 +297,9 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             status.setRunningWorkflows(runningSimulations.size());
             
             JobBusiness jobBusiness = new JobBusiness();
-            status.setRunningTasks(jobBusiness.getNumberOfTasks(runningSimulations, JobStatus.RUNNING));
-            status.setWaitingTasks(jobBusiness.getNumberOfTasks(runningSimulations, JobStatus.QUEUED));
+            int[] tasks = jobBusiness.getNumberOfActiveTasks(runningSimulations);
+            status.setRunningTasks(tasks[0]);
+            status.setWaitingTasks(tasks[1]);
 
             return status;
             

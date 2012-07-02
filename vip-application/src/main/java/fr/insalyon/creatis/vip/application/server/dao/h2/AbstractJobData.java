@@ -32,39 +32,52 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.system.user;
+package fr.insalyon.creatis.vip.application.server.dao.h2;
 
-import com.smartgwt.client.widgets.grid.ListGridRecord;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import java.util.Date;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author Rafael Silva
  */
-public class UserRecord extends ListGridRecord {
+public abstract class AbstractJobData {
 
-    public UserRecord() {
+    private final String DRIVER = "org.h2.Driver";
+    private final String DBURL = "jdbc:h2:tcp://"
+            + Server.getInstance().getWorkflowsHost() + ":"
+            //            + Server.getInstance().getWorkflowsPort() + "/"
+            + "9092/"
+            + Server.getInstance().getWorkflowsPath() + "/";
+    protected Connection connection;
+
+    public AbstractJobData(String dbPath) throws DAOException {
+
+        try {
+            Class.forName(DRIVER);
+            connection = DriverManager.getConnection(DBURL + dbPath + "/db/jobs", "gasw", "gasw");
+            connection.setAutoCommit(true);
+
+        } catch (ClassNotFoundException ex) {
+            throw new DAOException(ex);
+        } catch (SQLException ex) {
+            throw new DAOException(ex);
+        }
     }
 
-    public UserRecord(User user) {
+    /**
+     * Closes database connection.
+     */
+    protected void close(Logger logger) {
 
-        setAttribute("username", user.getFirstName() + " " + user.getLastName().toUpperCase());
-        setAttribute("email", user.getEmail());
-        setAttribute("institution", user.getInstitution());
-        setAttribute("phone", user.getPhone());
-        setAttribute("confirmed", user.isConfirmed());
-        setAttribute("folder", user.getFolder());
-        setAttribute("registration", user.getRegistration());
-        setAttribute("lastLogin", user.getLastLogin());
-        setAttribute("level", user.getLevel().name());
-        setAttribute("countryCode", user.getCountryCode().name());
-        setAttribute("countryCodeIcon", "core/flags/" + user.getCountryCode().name());
-        setAttribute("countryName", user.getCountryCode().getCountryName());
-    }
-    
-    public Date getDate() {
-        
-        return getAttributeAsDate("lastLogin");
+        try {
+            connection.close();
+        } catch (SQLException ex) {
+            logger.error(ex);
+        }
     }
 }

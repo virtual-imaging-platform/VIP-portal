@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server;
 
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
@@ -74,14 +75,14 @@ public class DataManagerUtil {
                 "/grid/biomed");
 
         try {
-            for (String groupName : CoreDAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
-                String folderName = groupName.replaceAll(" ", "_");
+            for (Group group : CoreDAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
+                String folderName = group.getName().replaceAll(" ", "_");
 
-                baseDir = parsePath(baseDir, groupName + DataManagerConstants.GROUP_APPEND,
+                baseDir = parsePath(baseDir, group.getName() + DataManagerConstants.GROUP_APPEND,
                         Server.getInstance().getDataManagerGroupsHome()
                         + "/" + folderName);
 
-                baseDir = parsePath(baseDir, groupName,
+                baseDir = parsePath(baseDir, group.getName(),
                         Server.getInstance().getDataManagerGroupsHome()
                         + "/" + folderName);
             }
@@ -143,11 +144,11 @@ public class DataManagerUtil {
         }
 
         try {
-            for (String groupName : CoreDAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
+            for (Group group : CoreDAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
                 baseDir = baseDir.replace(
                         Server.getInstance().getDataManagerGroupsHome()
-                        + "/" + groupName.replaceAll(" ", "_"),
-                        DataManagerConstants.ROOT + "/" + groupName
+                        + "/" + group.getName().replaceAll(" ", "_"),
+                        DataManagerConstants.ROOT + "/" + group.getName()
                         + DataManagerConstants.GROUP_APPEND);
             }
         } catch (DAOException ex) {

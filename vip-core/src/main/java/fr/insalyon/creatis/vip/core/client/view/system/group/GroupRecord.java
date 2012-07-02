@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.core.client.view.system.group;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 
 /**
  *
@@ -45,7 +46,9 @@ public class GroupRecord extends ListGridRecord {
     public GroupRecord() {
     }
 
-    public GroupRecord(String name) {
-        setAttribute("name", name);
+    public GroupRecord(Group group) {
+        
+        setAttribute("name", group.getName());
+        setAttribute("isPublic", group.isPublicGroup());
     }
 }

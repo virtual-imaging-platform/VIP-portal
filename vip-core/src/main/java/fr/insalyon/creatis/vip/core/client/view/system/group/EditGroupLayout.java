@@ -35,7 +35,6 @@
 package fr.insalyon.creatis.vip.core.client.view.system.group;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
@@ -43,22 +42,23 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
-import com.smartgwt.client.widgets.layout.SectionStackSection;
-import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.system.user.UserRecord;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,56 +66,46 @@ import java.util.List;
  *
  * @author Rafael Silva
  */
-public class EditGroupStackSection extends SectionStackSection {
+public class EditGroupLayout extends AbstractFormLayout {
 
-    private VLayout vLayout;
-    private ModalWindow modal;
     private String oldName = null;
     private boolean newGroup = true;
-    private DynamicForm form;
     private TextItem nameItem;
+    private CheckboxItem isPublicField;
     private IButton removeButton;
     private ListGrid grid;
     private ModalWindow gridModal;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
 
-    public EditGroupStackSection() {
+    public EditGroupLayout() {
 
-        this.setTitle("Add Group");
-        this.setCanCollapse(true);
-        this.setExpanded(true);
-        this.setResizeable(true);
+        super(380, 450);
+        addTitle("Add/Edit Group", CoreConstants.ICON_GROUP);
 
-        vLayout = new VLayout(15);
-        vLayout.setHeight100();
-        vLayout.setOverflow(Overflow.AUTO);
-        vLayout.setMargin(5);
-
-        configureButtonsLayout();
-        configureForm();
-        configureUsers();
-
-        this.addItem(vLayout);
-
-        modal = new ModalWindow(vLayout);
+        configure();
+        loadUsers();
     }
 
-    private void configureButtonsLayout() {
+    private void configure() {
 
-        HLayout buttonsLayout = new HLayout(10);
+        nameItem = FieldUtil.getTextItem(350, null);
+
+        isPublicField = new CheckboxItem();
+        isPublicField.setTitle("Public");
+        isPublicField.setWidth(350);
 
         IButton saveButton = new IButton("Save", new ClickHandler() {
 
             @Override
             public void onClick(ClickEvent event) {
-                if (form.validate()) {
-                    save(nameItem.getValueAsString().trim());
+                if (nameItem.validate()) {
+                    save(nameItem.getValueAsString().trim(), 
+                            isPublicField.getValueAsBoolean());
                 }
             }
         });
         saveButton.setIcon(CoreConstants.ICON_SAVE);
-        buttonsLayout.addMember(saveButton);
 
         removeButton = new IButton("Remove", new ClickHandler() {
 
@@ -126,23 +116,6 @@ public class EditGroupStackSection extends SectionStackSection {
         });
         removeButton.setIcon(CoreConstants.ICON_DELETE);
         removeButton.setDisabled(true);
-        buttonsLayout.addMember(removeButton);
-
-        vLayout.addMember(buttonsLayout);
-    }
-
-    private void configureForm() {
-
-        form = new DynamicForm();
-        form.setWidth(500);
-
-        nameItem = FieldUtil.getTextItem(350, true, "Name", null);
-
-        form.setFields(nameItem);
-        vLayout.addMember(form);
-    }
-
-    private void configureUsers() {
 
         grid = new ListGrid() {
 
@@ -180,7 +153,7 @@ public class EditGroupStackSection extends SectionStackSection {
                 return rollOverCanvas;
             }
         };
-        grid.setWidth(500);
+        grid.setWidth(350);
         grid.setHeight100();
         grid.setShowRollOverCanvas(true);
         grid.setShowAllRecords(false);
@@ -195,9 +168,13 @@ public class EditGroupStackSection extends SectionStackSection {
         grid.setSortField("username");
         grid.setSortDirection(SortDirection.ASCENDING);
 
-        vLayout.addMember(grid);
-
         gridModal = new ModalWindow(grid);
+
+        addField("Name", nameItem);
+        this.addMember(FieldUtil.getForm(isPublicField));
+        this.addMember(WidgetUtil.getLabel("<b>Users</b>", 15));
+        this.addMember(grid);
+        addButtons(saveButton, removeButton);
     }
 
     /**
@@ -205,37 +182,37 @@ public class EditGroupStackSection extends SectionStackSection {
      *
      * @param name Group name
      */
-    public void setGroup(String name) {
+    public void setGroup(String name, boolean isPublic) {
 
         if (name != null) {
-            this.setTitle("Editing Group: " + name);
             this.oldName = name;
             this.nameItem.setValue(name);
+            this.isPublicField.setValue(isPublic);
             this.newGroup = false;
             this.removeButton.setDisabled(false);
             loadUsers();
 
         } else {
-            this.setTitle("Add Group");
             this.oldName = null;
             this.nameItem.setValue("");
+            this.isPublicField.setValue(true);
             this.newGroup = true;
             this.removeButton.setDisabled(true);
             this.grid.setData(new ListGridRecord[]{});
         }
     }
 
-    private void save(String name) {
+    private void save(String name, boolean isPublic) {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
 
         if (newGroup) {
             modal.show("Adding " + name + "...", true);
-            service.addGroup(name, getCallback("add"));
+            service.addGroup(new Group(name, isPublic), getCallback("add"));
 
         } else {
             modal.show("Updating " + name + "...", true);
-            service.updateGroup(oldName, name, getCallback("update"));
+            service.updateGroup(oldName, new Group(name, isPublic), getCallback("update"));
         }
     }
 
@@ -245,7 +222,7 @@ public class EditGroupStackSection extends SectionStackSection {
             SC.warn("You can not remove the " + name + " group.");
             return;
         }
-        SC.ask("Do you really want to remove the group \"" + name + "\"?", new BooleanCallback() {
+        SC.ask("Do you really want to remove \"" + name + "\" group?", new BooleanCallback() {
 
             @Override
             public void execute(Boolean value) {
@@ -271,7 +248,7 @@ public class EditGroupStackSection extends SectionStackSection {
             @Override
             public void onSuccess(Void result) {
                 modal.hide();
-                setGroup(null);
+                setGroup(null, false);
                 ((ManageGroupsTab) Layout.getInstance().getTab(
                         CoreConstants.TAB_MANAGE_GROUPS)).loadGroups();
             }
@@ -300,7 +277,7 @@ public class EditGroupStackSection extends SectionStackSection {
                 grid.setData(dataList.toArray(new UserRecord[]{}));
             }
         };
-        gridModal.show("Loading users of group \"" + oldName + "\"...", true);
+        gridModal.show("Loading users from \"" + oldName + "\" group...", true);
         service.getUsersFromGroup(oldName, callback);
     }
 

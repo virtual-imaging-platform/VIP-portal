@@ -35,18 +35,16 @@
 package fr.insalyon.creatis.vip.core.client.view.user.account;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.SortDirection;
+import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.grid.ListGrid;
-import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
-import java.util.ArrayList;
-import java.util.List;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.Map;
 
 /**
@@ -55,41 +53,29 @@ import java.util.Map;
  */
 public class GroupLayout extends AbstractFormLayout {
 
-    private ListGrid grid;
+    private VLayout vLayout;
 
     public GroupLayout() {
 
-        super(350, 150);
+        super(350, 430);
         addTitle("Groups", CoreConstants.ICON_GROUP);
 
-        configureGrid();
+        vLayout = new VLayout(5);
+        vLayout.setWidth100();
+        vLayout.setHeight100();
+        vLayout.setOverflow(Overflow.AUTO);
+        this.addMember(vLayout);
+
+        this.addMember(WidgetUtil.getLabel("<font color=\"#666666\"><b>Note</b>: "
+                + "modifications will only take effect once reconnected.</font>", 30));
+
         loadData();
-    }
-
-    private void configureGrid() {
-
-        grid = new ListGrid();
-        grid.setWidth100();
-        grid.setHeight100();
-        grid.setShowAllRecords(false);
-        grid.setShowEmptyMessage(true);
-        grid.setEmptyMessage("<br>No data available.");
-
-        ListGridField nameField = new ListGridField("groupName", "Group");
-        ListGridField roleField = new ListGridField("role", "Role");
-
-        grid.setFields(nameField, roleField);
-        grid.setSortField("groupName");
-        grid.setSortDirection(SortDirection.ASCENDING);
-
-        modal = new ModalWindow(grid);
-        this.addMember(grid);
     }
 
     private void loadData() {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<Map<String, GROUP_ROLE>> callback = new AsyncCallback<Map<String, GROUP_ROLE>>() {
+        final AsyncCallback<Map<Group, GROUP_ROLE>> callback = new AsyncCallback<Map<Group, GROUP_ROLE>>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -98,17 +84,14 @@ public class GroupLayout extends AbstractFormLayout {
             }
 
             @Override
-            public void onSuccess(Map<String, GROUP_ROLE> result) {
-                List<GroupRecord> groups = new ArrayList<GroupRecord>();
+            public void onSuccess(Map<Group, GROUP_ROLE> result) {
 
-                for (String groupName : result.keySet()) {
-                    groups.add(new GroupRecord(groupName, result.get(groupName)));
+                for (Group group : result.keySet()) {
+                    vLayout.addMember(new GroupBoxLayout(group.getName(),
+                            group.isPublicGroup(), result.get(group)));
                 }
-                grid.setData(groups.toArray(new GroupRecord[]{}));
-                modal.hide();
             }
         };
-        modal.show("Loading groups...", true);
         service.getUserGroups(null, callback);
     }
 }

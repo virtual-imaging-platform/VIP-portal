@@ -36,25 +36,21 @@ package fr.insalyon.creatis.vip.application.client.view.system.application;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.MultipleAppearance;
-import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.layout.SectionStackSection;
-import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
-import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -63,34 +59,21 @@ import java.util.List;
  *
  * @author Rafael Silva
  */
-public class EditApplicationStackSection extends SectionStackSection {
+public class EditApplicationLayout extends AbstractFormLayout {
 
-    private ModalWindow modal;
-    private VLayout editAppLayout;
     private boolean newApplication = true;
     private TextItem nameField;
     private TextItem lfnField;
     private SelectItem classesPickList;
+    private IButton removeButton;
 
-    public EditApplicationStackSection() {
+    public EditApplicationLayout() {
 
-        this.setTitle("Add Application");
-        this.setCanCollapse(true);
-        this.setExpanded(true);
-        this.setResizeable(true);
-
-        VLayout vLayout = new VLayout(15);
-        vLayout.setHeight100();
-        vLayout.setOverflow(Overflow.AUTO);
-        vLayout.setMargin(5);
+        super(480, 200);
+        addTitle("Add/Edit Application", ApplicationConstants.ICON_APPLICATION);
 
         configure();
-
-        vLayout.addMember(editAppLayout);
-        modal = new ModalWindow(editAppLayout);
-
-        this.addItem(vLayout);
-        loadData();
+        loadClasses();
     }
 
     private void configure() {
@@ -105,7 +88,7 @@ public class EditApplicationStackSection extends SectionStackSection {
         classesPickList.setWidth(450);
 
         IButton saveButton = new IButton("Save");
-        saveButton.setWidth(70);
+        saveButton.setIcon(CoreConstants.ICON_SAVE);
         saveButton.addClickHandler(new ClickHandler() {
 
             @Override
@@ -121,17 +104,20 @@ public class EditApplicationStackSection extends SectionStackSection {
             }
         });
 
-        editAppLayout = WidgetUtil.getVIPLayout(480, 180);
+        removeButton = new IButton("Remove", new ClickHandler() {
+
+            @Override
+            public void onClick(ClickEvent event) {
+                remove(nameField.getValueAsString().trim());
+            }
+        });
+        removeButton.setIcon(CoreConstants.ICON_DELETE);
+        removeButton.setDisabled(true);
+
         addField("Name", nameField);
         addField("LFN", lfnField);
         addField("Classes", classesPickList);
-        editAppLayout.addMember(saveButton);
-    }
-
-    private void addField(String title, FormItem item) {
-
-        editAppLayout.addMember(WidgetUtil.getLabel("<b>" + title + "</b>", 15));
-        editAppLayout.addMember(FieldUtil.getForm(item));
+        addButtons(saveButton, removeButton);
     }
 
     /**
@@ -144,20 +130,20 @@ public class EditApplicationStackSection extends SectionStackSection {
     public void setApplication(String name, String lfn, String classes) {
 
         if (name != null) {
-            this.setTitle("Editing Application: " + name);
             this.nameField.setValue(name);
             this.nameField.setDisabled(true);
             this.lfnField.setValue(lfn);
             this.classesPickList.setValues(classes.split(", "));
             this.newApplication = false;
+            this.removeButton.setDisabled(false);
 
         } else {
-            this.setTitle("Add Application");
             this.nameField.setValue("");
             this.nameField.setDisabled(false);
             this.lfnField.setValue("");
             this.classesPickList.setValues(new String[]{});
             this.newApplication = true;
+            this.removeButton.setDisabled(true);
         }
     }
 
@@ -212,7 +198,7 @@ public class EditApplicationStackSection extends SectionStackSection {
     /**
      * Loads classes list
      */
-    private void loadData() {
+    private void loadClasses() {
 
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<List<AppClass>> callback = new AsyncCallback<List<AppClass>>() {
@@ -235,5 +221,34 @@ public class EditApplicationStackSection extends SectionStackSection {
         };
         modal.show("Loading classes...", true);
         service.getClasses(callback);
+    }
+
+    /**
+     * Removes an application.
+     *
+     * @param name Application name
+     */
+    private void remove(String name) {
+
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Unable to remove application:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                modal.hide();
+                SC.say("The application was successfully removed!");
+                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
+                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
+                appsTab.loadApplications();
+            }
+        };
+        modal.show("Removing application '" + name + "'...", true);
+        service.remove(name, callback);
     }
 }

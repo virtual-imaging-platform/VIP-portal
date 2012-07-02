@@ -66,6 +66,7 @@ public class ApplicationData implements ApplicationDAO {
      * @param application
      * @throws DAOException 
      */
+    @Override
     public void add(Application application) throws DAOException {
 
         try {
@@ -80,6 +81,7 @@ public class ApplicationData implements ApplicationDAO {
             for (String className : application.getApplicationClasses()) {
                 addClassToApplication(application.getName(), className);
             }
+            ps.close();
 
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Unique index or primary key violation")) {
@@ -97,17 +99,19 @@ public class ApplicationData implements ApplicationDAO {
      * @param application
      * @throws DAOException 
      */
+    @Override
     public void update(Application application) throws DAOException {
 
         try {
-            PreparedStatement stat = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
                     + "VIPApplications "
                     + "SET lfn=? "
                     + "WHERE name=?");
 
-            stat.setString(1, application.getLfn());
-            stat.setString(2, application.getName());
-            stat.executeUpdate();
+            ps.setString(1, application.getLfn());
+            ps.setString(2, application.getName());
+            ps.executeUpdate();
+            ps.close();
 
             removeAllClassesFromApplication(application.getName());
             for (String className : application.getApplicationClasses()) {
@@ -125,14 +129,16 @@ public class ApplicationData implements ApplicationDAO {
      * @param name
      * @throws DAOException 
      */
+    @Override
     public void remove(String name) throws DAOException {
 
         try {
-            PreparedStatement stat = connection.prepareStatement("DELETE "
+            PreparedStatement ps = connection.prepareStatement("DELETE "
                     + "FROM VIPApplications WHERE name=?");
 
-            stat.setString(1, name);
-            stat.execute();
+            ps.setString(1, name);
+            ps.execute();
+            ps.close();
 
         } catch (SQLException ex) {
             logger.error(ex);
@@ -146,6 +152,7 @@ public class ApplicationData implements ApplicationDAO {
      * @param name
      * @throws DAOException 
      */
+    @Override
     public void remove(String email, String name) throws DAOException {
 
         try {
@@ -157,6 +164,7 @@ public class ApplicationData implements ApplicationDAO {
                 ps.setString(1, c.getName());
                 ps.setString(2, name);
                 ps.execute();
+                ps.close();
             }
 
         } catch (SQLException ex) {
@@ -170,14 +178,14 @@ public class ApplicationData implements ApplicationDAO {
      * @return
      * @throws DAOException 
      */
+    @Override
     public List<Application> getApplications() throws DAOException {
 
         try {
-            PreparedStatement stat = null;
-            stat = connection.prepareStatement("SELECT name, lfn FROM "
+            PreparedStatement ps = connection.prepareStatement("SELECT name, lfn FROM "
                     + "VIPApplications ORDER BY name");
 
-            ResultSet rs = stat.executeQuery();
+            ResultSet rs = ps.executeQuery();
             List<Application> applications = new ArrayList<Application>();
 
             while (rs.next()) {
@@ -198,6 +206,7 @@ public class ApplicationData implements ApplicationDAO {
                 applications.add(new Application(name,
                         rs.getString("lfn"), classes));
             }
+            ps.close();
             return applications;
 
         } catch (SQLException ex) {
@@ -212,6 +221,7 @@ public class ApplicationData implements ApplicationDAO {
      * @return
      * @throws DAOException 
      */
+    @Override
     public List<Application> getApplications(String className) throws DAOException {
 
         try {
@@ -229,6 +239,7 @@ public class ApplicationData implements ApplicationDAO {
                 applications.add(new Application(
                         rs.getString("name"), rs.getString("lfn")));
             }
+            ps.close();
             return applications;
             
         } catch (SQLException ex) {
@@ -243,6 +254,7 @@ public class ApplicationData implements ApplicationDAO {
      * @return
      * @throws DAOException 
      */
+    @Override
     public List<Application> getApplications(List<String> classes) throws DAOException {
 
         try {
@@ -255,18 +267,18 @@ public class ApplicationData implements ApplicationDAO {
                     if (sb.length() > 0) {
                         sb.append(" OR ");
                     }
-                    sb.append("appc.class = '" + c + "'");
+                    sb.append("appc.class = '").append(c).append("'");
                 }
 
                 String clause = sb.length() > 0 ? " AND (" + sb.toString() + ")" : "";
 
-                PreparedStatement stat = connection.prepareStatement("SELECT DISTINCT "
+                PreparedStatement ps = connection.prepareStatement("SELECT DISTINCT "
                         + "name, lfn FROM "
                         + "VIPApplications app, VIPApplicationClasses appc "
                         + "WHERE app.name = appc.application " + clause + " "
                         + "ORDER BY name");
 
-                ResultSet rs = stat.executeQuery();
+                ResultSet rs = ps.executeQuery();
 
                 while (rs.next()) {
                     String name = rs.getString("name");
@@ -285,6 +297,7 @@ public class ApplicationData implements ApplicationDAO {
                     applications.add(new Application(name,
                             rs.getString("lfn"), appClasses));
                 }
+                ps.close();
             }
             return applications;
 
@@ -300,33 +313,37 @@ public class ApplicationData implements ApplicationDAO {
      * @return
      * @throws DAOException 
      */
+    @Override
     public Application getApplication(String applicationName) throws DAOException {
 
         try {
-            PreparedStatement stat = connection.prepareStatement("SELECT "
+            PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "class "
                     + "FROM VIPApplicationClasses "
                     + "WHERE application=?");
 
-            stat.setString(1, applicationName);
-            ResultSet rs = stat.executeQuery();
+            ps.setString(1, applicationName);
+            ResultSet rs = ps.executeQuery();
             List<String> classes = new ArrayList<String>();
 
             while (rs.next()) {
                 classes.add(rs.getString("class"));
             }
 
-            stat = connection.prepareStatement("SELECT "
+            ps = connection.prepareStatement("SELECT "
                     + "name, lfn "
                     + "FROM VIPApplications "
                     + "WHERE name=?");
 
-            stat.setString(1, applicationName);
-            rs = stat.executeQuery();
+            ps.setString(1, applicationName);
+            rs = ps.executeQuery();
             rs.next();
-
-            return new Application(rs.getString("name"),
+            
+            Application application = new Application(rs.getString("name"),
                     rs.getString("lfn"), classes);
+
+            ps.close();
+            return application;
 
         } catch (SQLException ex) {
             logger.error(ex);
@@ -339,25 +356,28 @@ public class ApplicationData implements ApplicationDAO {
      * @param applicationClass
      * @return 
      */
+    @Override
     public List<String> getApplicationsName(String applicationClass) {
         try {
 
             List<String> applications = new ArrayList<String>();
-            PreparedStatement stat = null;
+            PreparedStatement ps = null;
             if (applicationClass == null) {
-                stat = connection.prepareStatement("SELECT name, lfn FROM "
+                ps = connection.prepareStatement("SELECT name, lfn FROM "
                         + "WorkflowDescriptor ORDER BY name");
             } else {
-                stat = connection.prepareStatement("SELECT name, lfn FROM "
+                ps = connection.prepareStatement("SELECT name, lfn FROM "
                         + "WorkflowDescriptor wd, WorkflowClasses wc "
                         + "WHERE (wc.workflow=wd.name AND class=?)");
-                stat.setString(1, applicationClass);
+                ps.setString(1, applicationClass);
             }
 
-            ResultSet rs = stat.executeQuery();
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 applications.add(rs.getString("name"));
             }
+            
+            ps.close();
             return applications;
 
         } catch (SQLException ex) {
@@ -383,6 +403,7 @@ public class ApplicationData implements ApplicationDAO {
             ps.setString(1, applicationName);
             ps.setString(2, className);
             ps.execute();
+            ps.close();
 
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Unique index or primary key violation")) {
@@ -408,6 +429,7 @@ public class ApplicationData implements ApplicationDAO {
 
             ps.setString(1, workflowName);
             ps.execute();
+            ps.close();
 
         } catch (SQLException ex) {
             logger.error(ex);

@@ -35,6 +35,7 @@
 
 package fr.insalyon.creatis.vip.core.server.dao;
 
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import java.util.List;
 
 /**
@@ -43,11 +44,11 @@ import java.util.List;
  */
 public interface GroupDAO {
 
-    public void add(String groupName) throws DAOException;
+    public void add(Group group) throws DAOException;
 
     public void remove(String groupName) throws DAOException;
 
-    public void update(String oldName, String newName) throws DAOException;
+    public void update(String name, Group group) throws DAOException;
 
-    public List<String> getGroups() throws DAOException;
+    public List<Group> getGroups() throws DAOException;
 }

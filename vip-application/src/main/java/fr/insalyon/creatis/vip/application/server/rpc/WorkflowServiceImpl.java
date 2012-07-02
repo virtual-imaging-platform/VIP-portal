@@ -41,7 +41,7 @@ import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.InputBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
-import fr.insalyon.creatis.vip.application.server.dao.derby.connection.JobsConnection;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -96,7 +96,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
     /**
      * Launches a simulation.
-     * 
+     *
      * @param parametersMap Simulation parameters map
      * @param applicationName Application name
      * @param simulationName Simulation name
@@ -109,8 +109,13 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         try {
             trace(logger, "Launching simulation '" + simulationName + "' (" + applicationName + ").");
             User user = getSessionUser();
-            String workflowID = workflowBusiness.launch(user,
-                    new ArrayList<String>(getSessionUserGroups().keySet()),
+
+            List<String> groups = new ArrayList<String>();
+            for (Group group : getSessionUserGroups().keySet()) {
+                groups.add(group.getName());
+            }
+
+            String workflowID = workflowBusiness.launch(user, groups,
                     parametersMap, applicationName, simulationName);
 
             trace(logger, "Simulation '" + simulationName + "' launched with ID '" + workflowID + "'.");
@@ -434,20 +439,20 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             throw new ApplicationException(ex);
         }
     }
-    
+
     /**
-     * 
+     *
      * @param simulationID
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     @Override
     public Map<String, String> relaunchSimulation(String simulationID) throws ApplicationException {
-        
+
         try {
             trace(logger, "Relaunching simulation '" + simulationID + "'.");
             return workflowBusiness.relaunch(simulationID, getSessionUser().getFolder());
-            
+
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
         } catch (BusinessException ex) {
@@ -585,13 +590,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             return ApplicationDAOFactory.getDAOFactory().getApplicationInputDAO().getWorkflowInputByUserAndAppName(user, appName);
         } catch (DAOException ex) {
             return null;
-        }
-    }
-
-    public void closeConnection(String workflowID) {
-        try {
-            JobsConnection.getInstance().close(Server.getInstance().getWorkflowsPath() + "/" + workflowID + "/jobs.db");
-        } catch (DAOException ex) {
         }
     }
 
