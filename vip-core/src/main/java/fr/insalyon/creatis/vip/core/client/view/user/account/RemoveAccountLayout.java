@@ -119,7 +119,7 @@ public class RemoveAccountLayout extends AbstractFormLayout {
                             SC.say("Your account was successfully deleted.");
                         }
                     };
-                    service.removeUser(callback);
+                    service.removeUser(null, callback);
                     modal.show("Removing account...", true);
                 }
             }

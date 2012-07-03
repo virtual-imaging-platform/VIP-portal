@@ -91,8 +91,6 @@ public interface ConfigurationService extends RemoteService {
 
     public User removeUser(String email) throws CoreException;
     
-    public User removeUser() throws CoreException;
-
     public Map<Group, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws CoreException;
     
     public List<String> getUserGroups() throws CoreException;

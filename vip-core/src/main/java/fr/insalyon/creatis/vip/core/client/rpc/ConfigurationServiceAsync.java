@@ -73,8 +73,6 @@ public interface ConfigurationServiceAsync {
 
     public void removeUser(String email, AsyncCallback<User> asyncCallback);
     
-    public void removeUser(AsyncCallback<User> asyncCallback);
-
     public void getUserGroups(String email, AsyncCallback<Map<Group, CoreConstants.GROUP_ROLE>> asyncCallback);
     
     public void getUserGroups(AsyncCallback<List<String>> asyncCallback);

@@ -119,6 +119,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @throws CoreException
      * @return
      */
+    @Override
     public User signin(String email, String password) throws CoreException {
 
         try {
@@ -139,6 +140,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      *
      * @throws CoreException
      */
+    @Override
     public void signout() throws CoreException {
 
         try {
@@ -302,29 +304,14 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @return
      * @throws CoreException
      */
+    @Override
     public User removeUser(String email) throws CoreException {
 
         try {
-            authenticateSystemAdministrator(logger);
-            trace(logger, "Removing user '" + email + "'.");
-            User user = configurationBusiness.getUser(email);
-            configurationBusiness.removeUser(email, false);
-
-            return user;
-
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        }
-    }
-
-    /**
-     *
-     * @return @throws CoreException
-     */
-    public User removeUser() throws CoreException {
-
-        try {
-            User user = getSessionUser();
+            User user = email != null ? configurationBusiness.getUser(email) : getSessionUser();
+            if (email != null) {
+                authenticateSystemAdministrator(logger);
+            }
             trace(logger, "Removing user '" + user.getEmail() + "'.");
             configurationBusiness.removeUser(user.getEmail(), true);
 
@@ -342,7 +329,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @throws CoreException
      */
     @Override
-    public Map<Group, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws CoreException {
+    public Map<Group, GROUP_ROLE> getUserGroups(String email) throws CoreException {
 
         try {
             if (email != null) {
@@ -371,8 +358,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                     list.add(group.getName());
                 }
             } else {
-                for (Group group : getSessionUserGroups().keySet()) {
-                    list.add(group.getName());
+                Map<Group, GROUP_ROLE> groups = getSessionUserGroups();
+                for (Group group : groups.keySet()) {
+                    if (groups.get(group) != GROUP_ROLE.None) {
+                        list.add(group.getName());
+                    }
                 }
             }
             return list;
@@ -392,7 +382,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      */
     @Override
     public void updateUser(String email, UserLevel level, CountryCode countryCode,
-            Map<String, CoreConstants.GROUP_ROLE> groups) throws CoreException {
+            Map<String, GROUP_ROLE> groups) throws CoreException {
 
         try {
             authenticateSystemAdministrator(logger);
