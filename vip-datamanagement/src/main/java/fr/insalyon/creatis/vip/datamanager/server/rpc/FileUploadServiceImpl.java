@@ -116,6 +116,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                                     user.getEmail());
 
                         } else {
+                            operationID = fileName;
                             logger.info("(" + user.getEmail() + ") Uploaded '" + uploadedFile.getAbsolutePath() + "'.");
                         }
                     } catch (Exception ex) {
