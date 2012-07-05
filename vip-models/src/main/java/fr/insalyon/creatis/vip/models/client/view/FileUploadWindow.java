@@ -56,8 +56,8 @@ public class FileUploadWindow extends Window {
     private DynamicForm form;
     private UploadItem fileItem;
 
-    public FileUploadWindow(String baseDir) {
-        
+    public FileUploadWindow(String baseDir, String target) {
+
         this.setTitle("Upload file to: " + baseDir);
         this.setWidth(380);
         this.setHeight(110);
@@ -80,6 +80,9 @@ public class FileUploadWindow extends Window {
         HiddenItem pathItem = new HiddenItem("path");
         pathItem.setValue(baseDir);
 
+        HiddenItem targetItem = new HiddenItem("target");
+        targetItem.setValue(target);
+
         ButtonItem uploadButton = new ButtonItem("Upload");
         uploadButton.addClickHandler(new ClickHandler() {
 
@@ -98,7 +101,7 @@ public class FileUploadWindow extends Window {
                 //ModelImportTab.getInstance().addFile(fileItem.getValueAsString());
             }
         });
-        form.setItems(fileItem, pathItem, uploadButton);
+        form.setItems(fileItem, pathItem, targetItem, uploadButton);
 
         this.addItem(form);
     }

@@ -40,15 +40,21 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.TransferImgButton;
+import com.smartgwt.client.widgets.events.*;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tree.TreeNode;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.HStack;
+import com.smartgwt.client.widgets.layout.VStack;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import com.smartgwt.client.widgets.tree.events.FolderDropEvent;
+
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
@@ -60,10 +66,12 @@ import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 import fr.insalyon.creatis.vip.models.client.ModelConstants;
+import fr.insalyon.creatis.vip.models.client.view.FileTree.FileTreeNode;
 
 import java.util.Date;
 import java.util.List;
 
+//import com.allen_sauer.gwt.dnd.client.*;
 /**
  *
  * @author Tristan Glatard
@@ -79,8 +87,10 @@ class ModelImportTab extends Tab {
     private Label label;
     private SimulationObjectModel simulationObjectModel = null;
     private ModelDisplay modelDisplay;
+    private FileTree fileTree = null;
+    //private PickupDragController dragController;
+    private HStack grids = null;
 
-    
     public ModelImportTab() {
 
         this.setTitle("Import model");
@@ -89,12 +99,33 @@ class ModelImportTab extends Tab {
         initComplete(this);
 
         hl = new HLayout();
-        
+
         vl = new VLayout();
         files = new VLayout();
         modal = new ModalWindow(hl);
         label = new Label();
 
+        ToolStrip ts = new ToolStrip();
+        ts.setWidth100();
+
+        // ToolStripButton addButton = new ToolStripButton("Add file");
+        addFileButton addButton = new addFileButton("Add file");
+        addButton.setIcon(CoreConstants.ICON_ADD);
+        addButton.setTooltip("It adds a File to complete the current model");
+        addButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+
+                new FileUploadWindow("local", "addFileComplete").show();
+
+            }
+        });
+
+        ts.addButton(addButton);
+        vl.addMember(ts);
+
+        VLayout ml = new VLayout();
+        ml.setAlign(Alignment.CENTER);
 
         NamedFrame frame = new NamedFrame("uploadTarget");
         frame.setVisible(false);
@@ -108,27 +139,60 @@ class ModelImportTab extends Tab {
         label.setWrap(false);
         label.setShowEdges(false);
         label.setContents("");
-        
-          
+
+
         vl.addMember(files);
         vl.addMember(label);
 
+        VStack moveControls = new VStack(10);
+        moveControls.setWidth(32);
+        moveControls.setHeight(74);
+        moveControls.setLayoutAlign(Alignment.CENTER);
+
+        TransferImgButton rightArrow = new TransferImgButton(TransferImgButton.RIGHT, new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+
+                FolderDropEvent event3 = new FolderDropEvent(fileTree.getSelectedRecord().getJsObj());
+                SC.say(event.toString());
+                modelDisplay.getModelTree().fireEvent(event3);
+            }
+        });
+
+        rightArrow.setTooltip("drop file to IAMF model");
+
+        moveControls.addMember(rightArrow);
+
         hl.addMember(vl);
+        ml.addMember(moveControls);
+        hl.addMember(ml);
+
+
         this.setPane(hl);
 
-        new FileUploadWindow("local").show();
+        new FileUploadWindow("local", "uploadComplete").show();
+
     }
 
     public void uploadComplete(String fileName) {
-          setZipFile(fileName);
-          modelDisplay.enableCommit();
+        setZipFile(fileName);
+        modelDisplay.enableCommit();
     }
 
     private native void initComplete(ModelImportTab upload) /*-{
+    
     $wnd.uploadComplete = function (fileName) {
     upload.@fr.insalyon.creatis.vip.models.client.view.ModelImportTab::uploadComplete(Ljava/lang/String;)(fileName);
     };
+    $wnd.addFileComplete = function (fileName) {
+    upload.@fr.insalyon.creatis.vip.models.client.view.ModelImportTab::addFileComplete(Ljava/lang/String;)(fileName);
+     };
     }-*/;
+
+
+    public void addFileComplete(String fileName) {
+        fileTree.addData(fileTree.createNode("none", fileName));
+    }
 
     private void setZipFile(final String zipName) {
         zipFile = zipName;
@@ -158,42 +222,111 @@ class ModelImportTab extends Tab {
     public void displayFiles(String zipName, List<String> result) {
 
         // window.addItem(fileTreeGrid);
-        FileTree fileTree = new FileTree(zipFile, result);
+        fileTree = new FileTree(zipFile, result);
+
+
+
+        fileTree.addDragStartHandler(new DragStartHandler() {
+
+            @Override
+            public void onDragStart(DragStartEvent event) {
+                FileTreeNode node = (FileTreeNode) fileTree.getRecord(fileTree.getEventRow());
+                modelDisplay.getModelTree().setObjName(node.getAttribute("filename"));
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+
+
         files.addMember(fileTree);
         final String rdf = fileTree.getRdfFile();
-        if(rdf != null) {
+        if (rdf != null) {
             label.setContents("(Initialized annotations from file: " + rdf.substring(rdf.lastIndexOf('/') + 1) + ")");
-        
-        //building object model
-        modal.show("Building simulation object model.",true);
-         ModelServiceAsync ms = ModelService.Util.getInstance();
-         AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
-                
+
+            //building object model
+            modal.show("Building simulation object model.", true);
+            ModelServiceAsync ms = ModelService.Util.getInstance();
+            AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
+
+                public void onFailure(Throwable caught) {
+                    modal.hide();
+                    SC.warn("Couldn't build a simulation object model from file " + rdf.substring(rdf.lastIndexOf('/') + 1) + ". You will have to annotate the model yourself.");
+                    // Create an empty model
+                    setEmptyModel();
+                }
+
+                public void onSuccess(SimulationObjectModel result) {
+                    setSimulationObjectModel(result);
+                    fileTree.setModelDisplay(modelDisplay);
+                }
+            };
+            ms.rebuildObjectModelFromAnnotationFile(rdf, callback);
+
+        } else {
+            SC.say("Couldn't find any annotation file in this archive. You will have to annotate the model yourself.");
+            setEmptyModel();
+        }
+
+    }
+
+    public void setSimulationObjectModel(SimulationObjectModel result) {
+
+        modelDisplay = new ModelDisplay(result, true);
+        modelDisplay.setZipFile(zipFile);
+        modelDisplay.enableCommit();
+        //    modelCreate = new ModelCreateTab(result);
+        hl.addMember(modelDisplay);
+
+    }
+
+    public void setEmptyModel() {
+
+        ModelServiceAsync ms = ModelService.Util.getInstance();
+        AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
+
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Couldn't build a simulation object model from file "+rdf.substring(rdf.lastIndexOf('/') + 1)+". You will have to annotate the model yourself.");
+                SC.warn("Cant create an empty model. Please contact administrator");
             }
 
             public void onSuccess(SimulationObjectModel result) {
-                modal.hide();
-                setSimulationObjectModel(result);
-                
+                setCreateObjectModel(result);
             }
-
-                
         };
-        ms.rebuildObjectModelFromAnnotationFile(rdf, callback);
-        }else{
-        SC.say("Couldn't find any annotation file in this archive. You will have to annotate the model yourself.");
-        }
-        
+        ms.createEmptyModel(callback);
     }
-    public void setSimulationObjectModel(SimulationObjectModel result) {
-        modelDisplay = new ModelDisplay(result);
-        modelDisplay.setZipFile(zipFile);
-        modelDisplay.enableCommit();
+
+    public void setCreateObjectModel(SimulationObjectModel result) {
+        modelDisplay = new ModelDisplay(result, false);
         hl.addMember(modelDisplay);
     }
-  
-   
+
+    public class addFileButton extends ToolStripButton {
+
+        private ModelImportTab tab = null;
+
+        public addFileButton(String name) {
+            this.setTitle(name);
+            this.setIcon(CoreConstants.ICON_ADD);
+            this.setTooltip("It adds a file to complete the current model");
+            this.addClickHandler(new ClickHandler() {
+
+                public void onClick(ClickEvent event) {
+                    // addFile((addFileButton)event.getSource());
+                }
+            });
+        }
+
+        public void setTab(ModelImportTab modeltab) {
+            tab = modeltab;
+        }
+    }
 }

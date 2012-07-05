@@ -35,11 +35,13 @@
 package fr.insalyon.creatis.vip.models.client.rpc;
 
 import com.google.gwt.core.client.GWT;
+
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
 import fr.insalyon.creatis.vip.models.client.view.ModelException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -65,6 +67,8 @@ public interface ModelService extends RemoteService {
 
     public SimulationObjectModel createModel(String modelName) throws ModelException;
 
+    public SimulationObjectModel createEmptyModel() throws ModelException;
+
     public List<SimulationObjectModelLight> listAllModels() throws ModelException;
 
     public SimulationObjectModel getADAM() throws ModelException;
@@ -82,6 +86,24 @@ public interface ModelService extends RemoteService {
     public List<SimulationObjectModelLight> searchModels(String query, String[] types, String[] time) throws ModelException;
 
     public void deleteModel(String uri) throws ModelException;
-    
-     public String getStorageURL(String uri) throws ModelException;
+
+    public String getStorageURL(String uri) throws ModelException;
+
+    public SimulationObjectModel addTimePoint(SimulationObjectModel som, Date d) throws ModelException;
+
+    public SimulationObjectModel addInstant(SimulationObjectModel som, int timepoint) throws ModelException;
+
+    public List<String[]> searchWithScope(String query, boolean[] scope) throws ModelException;
+
+    public SimulationObjectModel addObject(SimulationObjectModel model, String ontoName, String objName, int tp, int ins, int type, int label) throws ModelException;
+
+    public SimulationObjectModel removeTimePoint(SimulationObjectModel model, int tp) throws ModelException;
+
+    public SimulationObjectModel removeInstant(SimulationObjectModel model, int tp, int ins) throws ModelException;
+
+    public SimulationObjectModel removeObjectLayer(SimulationObjectModel model, int tp, int ins, String layer) throws ModelException;
+
+    public SimulationObjectModel removeObject(SimulationObjectModel model, int tp, int ins, String layer, String name) throws ModelException;
+
+    public void recordAddeddFiles(String zipName, List<String> addFiles, SimulationObjectModel model);
 }

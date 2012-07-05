@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.models.client.rpc;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -49,6 +50,8 @@ public interface ModelServiceAsync {
 
     public void createModel(String modelName, AsyncCallback<SimulationObjectModel> asyncCallback);
 
+    public void createEmptyModel(AsyncCallback<SimulationObjectModel> asyncCallback);
+    
     public void listAllModels(AsyncCallback<List<SimulationObjectModelLight>> asyncCallback);
 
     public void getADAM(AsyncCallback<SimulationObjectModel> asyncCallback);
@@ -68,4 +71,22 @@ public interface ModelServiceAsync {
     public void deleteModel(String uri, AsyncCallback<Void> asyncCallback);
     
      public void getStorageURL(String uri, AsyncCallback<String> asyncCallback);
+     
+     public void addTimePoint(SimulationObjectModel som, Date d, AsyncCallback<SimulationObjectModel> asyncCallback);
+     
+     public void addInstant(SimulationObjectModel som, int timepoint, AsyncCallback<SimulationObjectModel> asyncCallback);
+     
+     public void searchWithScope(String query, boolean[] scope, AsyncCallback<List<String[]>> asyncCallback);
+     
+      public void addObject(SimulationObjectModel model, String ontoName, String objName, int tp, int ins, int type, int label, AsyncCallback<SimulationObjectModel> asyncCallback);
+      
+      public void removeTimePoint(SimulationObjectModel model, int tp, AsyncCallback<SimulationObjectModel> asyncCallback);
+      
+      public void removeInstant(SimulationObjectModel model, int tp, int ins,AsyncCallback<SimulationObjectModel> asyncCallback);
+      
+      public void removeObjectLayer(SimulationObjectModel model, int tp, int ins, String layer,AsyncCallback<SimulationObjectModel> asyncCallback);
+      
+      public void removeObject(SimulationObjectModel model, int tp, int ins, String layer, String name,AsyncCallback<SimulationObjectModel> asyncCallback);
+      
+      public void recordAddeddFiles(String zipName, List<String> addFiles ,SimulationObjectModel model, AsyncCallback<Void> asyncCallback);
 }

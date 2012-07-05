@@ -42,6 +42,8 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.models.client.view.ModelException;
 import fr.insalyon.creatis.vip.models.server.business.ModelBusiness;
+import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import org.apache.log4j.Logger;
@@ -115,7 +117,6 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         return modelBusiness.setStorageUrl(som, url);
     }
 
-  
     public void deleteAllModelsInTheTripleStore() throws ModelException {
 
         try {
@@ -127,7 +128,7 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
     }
 
-    public List<SimulationObjectModelLight> searchModels(String query, 
+    public List<SimulationObjectModelLight> searchModels(String query,
             String[] types, String[] time) throws ModelException {
 
         try {
@@ -139,27 +140,123 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
     }
 
     public String getStorageURL(String uri) throws ModelException {
-        try{
+        try {
             try {
                 trace(logger, "Removing object model: " + uri);
             } catch (CoreException ex) {
                 java.util.logging.Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
-        return modelBusiness.getStorageURL(uri);
-        }catch (BusinessException ex){
+            return modelBusiness.getStorageURL(uri);
+        } catch (BusinessException ex) {
             throw new ModelException(ex);
         }
     }
-    
+
     public void deleteModel(String uri) throws ModelException {
-        try{
+        try {
             try {
                 trace(logger, "Removing object model: " + uri);
             } catch (CoreException ex) {
                 java.util.logging.Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
-        modelBusiness.deleteModel(uri);
-        }catch (BusinessException ex){
+            modelBusiness.deleteModel(uri);
+        } catch (BusinessException ex) {
+            throw new ModelException(ex);
+        }
+    }
+
+    public SimulationObjectModel createEmptyModel() throws ModelException {
+        try {
+            trace(logger, "Creating an empty model ");
+            return modelBusiness.createModel("Empty_Model");
+
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        }
+    }
+
+    public SimulationObjectModel addTimePoint(SimulationObjectModel som, Date d) throws ModelException {
+        try {
+            trace(logger, "Add a TimePoint");
+            return modelBusiness.addTimePoint(som, d);
+
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        }
+    }
+
+    public SimulationObjectModel addInstant(SimulationObjectModel som, int tp) throws ModelException {
+        try {
+            trace(logger, "Add an Instant");
+            return modelBusiness.addInstant(som, tp);
+
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        }
+    }
+
+    public List<String[]> searchWithScope(String query, boolean[] scope) throws ModelException {
+        try {
+            trace(logger, "search through ontology");
+            return modelBusiness.searchWithScope(query, scope);
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        }
+    }
+
+    public SimulationObjectModel addObject(SimulationObjectModel model, String ontoName, String objName, int tp, int ins, int type, int label) throws ModelException {
+        try {
+            trace(logger, "search through ontology");
+            return modelBusiness.addObject(model, ontoName, objName, tp, ins, type, label);
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        }
+    }
+
+    public SimulationObjectModel removeTimePoint(SimulationObjectModel model, int tp) throws ModelException {
+
+        try {
+            trace(logger, "remove timepoint");
+            return modelBusiness.removeTimePoint(model, tp);
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        }
+    }
+
+    public SimulationObjectModel removeInstant(SimulationObjectModel model, int tp, int ins) throws ModelException {
+
+        try {
+            trace(logger, "remove instant: " + ins);
+            return modelBusiness.removeInstant(model, tp, ins);
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        }
+    }
+
+    public void recordAddeddFiles(String zipName, List<String> addfiles, SimulationObjectModel model) {
+        try {
+            modelBusiness.recordAddeddFiles(zipName, addfiles, model);
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    public SimulationObjectModel removeObjectLayer(SimulationObjectModel model, int tp, int ins, String layer) throws ModelException {
+        try {
+            trace(logger, "remove object layer: " + layer);
+            return modelBusiness.removeLayer(model, tp, ins, layer);
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        }
+
+    }
+
+    public SimulationObjectModel removeObject(SimulationObjectModel model, int tp, int ins, String layer, String name) throws ModelException {
+        try {
+            trace(logger, "remove object: " + name);
+            return modelBusiness.removeObject(model, tp, ins, layer, name);
+        } catch (CoreException ex) {
             throw new ModelException(ex);
         }
     }
