@@ -147,42 +147,12 @@ public class ModelDisplay extends VLayout {
     }
 
     private void addTimePoint(Date d) {
-
-        AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
-
-            public void onFailure(Throwable caught) {
-                SC.warn("Cant add a timepoint");
-            }
-
-            public void onSuccess(SimulationObjectModel result) {
-                model = result;
-                modelTreeGrid.addTimePoint(new Date(System.currentTimeMillis()), 0);
-                modelTreeGrid.refreshFields();
-                modelTreeGrid.refreshModel(model);
-                bmodif = true;
-            }
-        };
-        ms.addTimePoint(model, d, callback);
+           modelTreeGrid.addTimePoint(new Date(System.currentTimeMillis()), 0);
     }
 
     private void addInstant() {
-        if (modelTreeGrid.getTimePoint() >= 0) {
-            AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
-
-                public void onFailure(Throwable caught) {
-                    SC.warn("Cant add an instant");
-                }
-
-                public void onSuccess(SimulationObjectModel result) {
-                    model = result;
-                    modelTreeGrid.addInstant();
-                    modelTreeGrid.refreshFields();
-                    modelTreeGrid.refreshModel(model);
-                    bmodif = true;
-                }
-            };
-            ms.addInstant(model, modelTreeGrid.getTimePoint(), callback);
-        }
+        modelTreeGrid.addInstant();
+       bmodif = true;
     }
     // still needed????
 

@@ -154,7 +154,7 @@ class ModelImportTab extends Tab {
             public void onClick(ClickEvent event) {
 
                 FolderDropEvent event3 = new FolderDropEvent(fileTree.getSelectedRecord().getJsObj());
-                SC.say(event.toString());
+                SC.say(event3.toString());
                 modelDisplay.getModelTree().fireEvent(event3);
             }
         });

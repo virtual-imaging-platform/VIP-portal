@@ -78,6 +78,12 @@ public interface ModelServiceAsync {
      
      public void addInstant(SimulationObjectModel som, int timepoint, AsyncCallback<SimulationObjectModel> asyncCallback);
      
+     public void setInstantDuration(SimulationObjectModel objectModel, int tp, int ins, String duration, AsyncCallback<SimulationObjectModel> asyncCallback);
+     
+     public void duplicateTimePoint(SimulationObjectModel objectModel, int tp, AsyncCallback<SimulationObjectModel> asyncCallback);
+     
+     public void duplicateInstant(SimulationObjectModel objectModel, int tp, int ins,  AsyncCallback<SimulationObjectModel> asyncCallback);
+     
      public void searchWithScope(String query, boolean[] scope, AsyncCallback<List<String[]>> asyncCallback);
      
      public void addObject(SimulationObjectModel model, String ontoName, String objName, int tp, int ins, int type, int label, AsyncCallback<SimulationObjectModel> asyncCallback);

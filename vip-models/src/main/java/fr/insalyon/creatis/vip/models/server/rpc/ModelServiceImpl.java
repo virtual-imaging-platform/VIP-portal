@@ -196,6 +196,37 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
     }
 
+    public SimulationObjectModel setInstantDuration(SimulationObjectModel objectModel, int tp, int ins, String duration)throws ModelException {
+        try {
+            trace(logger, "set Instant Duration");
+            return modelBusiness.setInstantDuration(objectModel, tp, ins, duration);
+
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        }
+    }
+    public SimulationObjectModel duplicateTimePoint(SimulationObjectModel objectModel, int tp)throws ModelException
+    {
+        try {
+            trace(logger, "duplicate timepoint ");
+            return modelBusiness.duplicateTimePoint(objectModel, tp);
+
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        } 
+    }
+        
+    public SimulationObjectModel duplicateInstant(SimulationObjectModel objectModel, int tp, int ins) throws ModelException
+    {
+        try {
+            trace(logger, "duplicate Instant ");
+            return modelBusiness.duplicateInstant(objectModel, tp, ins);
+
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        } 
+    }
+    
     public List<String[]> searchWithScope(String query, boolean[] scope) throws ModelException {
         try {
             trace(logger, "search through ontology");

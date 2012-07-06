@@ -94,6 +94,12 @@ public interface ModelService extends RemoteService {
 
     public SimulationObjectModel addInstant(SimulationObjectModel som, int timepoint) throws ModelException;
 
+    public SimulationObjectModel setInstantDuration(SimulationObjectModel objectModel, int tp, int ins, String duration)throws ModelException;
+    
+    public SimulationObjectModel duplicateTimePoint(SimulationObjectModel objectModel, int tp) throws ModelException;
+    
+    public SimulationObjectModel duplicateInstant(SimulationObjectModel objectModel, int tp, int ins) throws ModelException;
+    
     public List<String[]> searchWithScope(String query, boolean[] scope) throws ModelException;
 
     public SimulationObjectModel addObject(SimulationObjectModel model, String ontoName, String objName, int tp, int ins, int type, int label) throws ModelException;

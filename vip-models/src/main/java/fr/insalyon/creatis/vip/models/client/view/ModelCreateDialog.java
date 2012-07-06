@@ -329,8 +329,11 @@ public class ModelCreateDialog extends Window {
             public void onClick(
                     com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
                 if (type == 0 || type == 1) {
+                    int label = 1;
+                    if (type ==1) 
+                        label = Integer.parseInt(valueLabel.getValueAsString());
                     tree.addObjectItem(tp, ins, type, filename, selectRecord.getAttribute("name"),
-                            selectRecord.getAttribute("type"), Integer.parseInt(valueLabel.getValueAsString()));
+                            selectRecord.getAttribute("type"), label);
                 } else if (type == 2 || type == 3) {
                     tree.addPhysicalItem(tp, ins, type, filename, getLayerforLUT(), physicalCombo.getValueAsString());
                 }

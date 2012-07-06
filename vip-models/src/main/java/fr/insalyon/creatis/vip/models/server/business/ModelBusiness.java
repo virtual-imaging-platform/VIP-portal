@@ -440,7 +440,46 @@ public class ModelBusiness {
         System.out.println("instant added");
         return som;
     }
-
+    
+     public SimulationObjectModel duplicateTimePoint(SimulationObjectModel objectModel, int tp)
+    {
+        ArrayList<Timepoint> tps = objectModel.getTimepoints();
+        Timepoint copy = new Timepoint();
+        timepointCopy(tps.get(tp),copy);
+        tps.add(tp+1, copy);
+        objectModel.setTimepoints(tps);
+        System.out.println("timepoint copied");
+        return objectModel;
+    }
+    
+     private void timepointCopy(Timepoint src, Timepoint dest)
+     {
+         
+     }
+    
+      public SimulationObjectModel setInstantDuration(SimulationObjectModel objectModel, int tp, int ins, String duration) {
+        ArrayList<Instant> in = objectModel.getTimepoint(tp).getInstants();
+        in.get(ins).setDuration(duration);
+        objectModel.getTimepoint(tp).setInstants(in);
+        System.out.println("duration changed :" + duration);
+        return objectModel;
+    }
+    
+    public SimulationObjectModel duplicateInstant(SimulationObjectModel objectModel, int tp, int ins)
+    {
+        ArrayList<Instant> in = objectModel.getTimepoint(tp).getInstants();
+        Instant copy = new Instant();
+        instantCopy(in.get(ins),copy);
+        in.add(ins+1, copy);
+        objectModel.getTimepoint(tp).setInstants(in);
+        System.out.println("instant copied");
+        return objectModel;
+    }
+     private void instantCopy(Instant src, Instant dest)
+     {
+         
+     }
+      
     public List<String[]> searchWithScope(String query, boolean[] scope) {
         List<String[]> action = new ArrayList<String[]>();
 

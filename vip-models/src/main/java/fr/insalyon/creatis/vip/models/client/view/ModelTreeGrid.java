@@ -354,19 +354,64 @@ public class ModelTreeGrid extends TreeGrid {
     }
 
     public void addTimePoint(Date d, int id) {
+        ModelServiceAsync ms = ModelService.Util.getInstance();
+         AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
-        ModelTreeNode timepoint = new ModelTreeNode("" + (2 + id + 1), "Timepoint (" + d + ")", true, ntp++, null);
-        timepoint.setIcon(ModelConstants.APP_IMG_TIMEPOINT);
-        modelTree.add(timepoint, modelTree.getRoot());
-        //this.addData(timepoint);
+            public void onFailure(Throwable caught) {
+                SC.warn("Cant add a timepoint");
+            }
+
+            public void onSuccess(SimulationObjectModel result) {
+                model = result;
+                ModelTreeNode timepoint = new ModelTreeNode("", "Timepoint (" + new Date(System.currentTimeMillis()) + ")", true, ntp++, null);
+                timepoint.setIcon(ModelConstants.APP_IMG_TIMEPOINT);
+                modelTree.add(timepoint, modelTree.getRoot());
+               
+            }
+        };
+        ms.addTimePoint(model, d, callback);
+         
     }
 
+    public void duplicateTimePoint()
+    {
+         ModelServiceAsync ms = ModelService.Util.getInstance();
+         AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
+
+            public void onFailure(Throwable caught) {
+                SC.warn("Cant add a timepoint");
+            }
+
+            public void onSuccess(SimulationObjectModel result) {
+                model = result;
+                ModelTreeNode copy = new ModelTreeNode("", "Timepoint (" + new Date(System.currentTimeMillis()) + ")", true, ntp++, null);
+                copy.setIcon(ModelConstants.APP_IMG_TIMEPOINT);
+                modelTree.add(copy, modelTree.getRoot(), tpSelected);
+               
+            }
+        };
+        ms.duplicateTimePoint(model, tpSelected, callback);
+    }
+    
     public void addInstant() {
-        ModelTreeNode node = findNode(tpSelected);
-        int size = modelTree.getFolders(node).length;
-        ModelTreeNode instant = new ModelTreeNode("", "Instant (1000 )", true, size, null);
-        instant.setIcon(ModelConstants.APP_IMG_INSTANT);
-        modelTree.add(instant, node);
+            ModelServiceAsync ms = ModelService.Util.getInstance();
+            AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
+
+                public void onFailure(Throwable caught) {
+                    SC.warn("Cant add an instant");
+                }
+
+                public void onSuccess(SimulationObjectModel result) {
+                    model = result;
+                    ModelTreeNode node = findNode(tpSelected);
+                    int size = modelTree.getFolders(node).length;
+                    ModelTreeNode instant = new ModelTreeNode("", "Instant (1000 )", true, size, null);
+                    instant.setIcon(ModelConstants.APP_IMG_INSTANT);
+                    modelTree.add(instant, node);
+                }
+            };
+            ms.addInstant(model, tpSelected, callback);
+    
     }
 
     public ModelTreeNode findNode(int... index) {
@@ -904,7 +949,9 @@ public class ModelTreeGrid extends TreeGrid {
         
     }
 
-    public class ModelTreeNode extends TreeNode {
+    
+    
+     public class ModelTreeNode extends TreeNode {
 
         public ModelTreeNode(String entityId, String entityName, boolean display, int number) {
             this(entityId, entityName, display, number, new ModelTreeNode[]{});
@@ -930,15 +977,45 @@ public class ModelTreeGrid extends TreeGrid {
         private MenuItem layerItem = null;
         private MenuItem durationItem = null;
         private MenuItem physicalItem = null;
-
+        private MenuItem duplicateInsItem = null;
+        private MenuItem duplicateTpItem = null;
+        
         public ModelMenu() {
+           
             instantItem = new MenuItem();
             instantItem.setTitle("add Instant");
             instantItem.setIcon(ModelConstants.APP_IMG_OK);
-
+            instantItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
+                public void onClick(MenuItemClickEvent event)
+                {
+                    addInstant();
+                }
+             });
+            
+            duplicateTpItem = new MenuItem();
+            duplicateTpItem.setTitle("duplicate timepoint");
+            duplicateTpItem.setIcon(ModelConstants.APP_IMG_OK);
+            duplicateTpItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
+                public void onClick(MenuItemClickEvent event)
+                {
+                    //duplicateTimePoint();
+                }
+             });
+            
+            duplicateInsItem = new MenuItem();
+            duplicateInsItem.setTitle("duplicate instant");
+            duplicateInsItem.setIcon(ModelConstants.APP_IMG_OK);
+            duplicateInsItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
+                public void onClick(MenuItemClickEvent event)
+                {
+                    //duplicateInstant();
+                }
+             });
+            
             layerItem = new MenuItem();
             layerItem.setTitle("add layer");
             layerItem.setIcon(ModelConstants.APP_IMG_OK);
+
 
             durationItem = new MenuItem();
             durationItem.setTitle("modify instant duration ");
@@ -977,7 +1054,8 @@ public class ModelTreeGrid extends TreeGrid {
             this.removeItem(objectsItem);
             this.removeItem(objectItem);
             this.removeItem(physicalItem);
-
+            this.removeItem(duplicateInsItem);
+            this.removeItem(duplicateTpItem);
 //            removeItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
 //                public void onClick(MenuItemClickEvent event)
 //                {
@@ -986,9 +1064,9 @@ public class ModelTreeGrid extends TreeGrid {
 //                }
 //            });
             if (node.getAttribute(model.getModelName()).contains("Timepoint")) {
-                this.setItems(instantItem, removeItem);
+                this.setItems(duplicateTpItem, instantItem, removeItem);
             } else if (node.getAttribute(model.getModelName()).contains("Instant")) {
-                this.setItems(layerItem, durationItem, removeItem);
+                this.setItems(duplicateInsItem,layerItem, durationItem, removeItem);
             } else if (node.getAttribute(model.getModelName()).contains("Objects")) {
                 this.setItems(objectItem, removeItem);
             } else if (layerTypeMap.keySet().contains(node.getAttribute(model.getModelName()))) {
