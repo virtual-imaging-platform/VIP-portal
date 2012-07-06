@@ -113,9 +113,12 @@ public class ModelCreateDialog extends Window {
         LUTCheck.enable();
         LUTCheck.setTitle("LUT");
 
+        LinkedHashMap<String, String> lutMap = new LinkedHashMap<String, String>();
+        for(String lut : tree.getLutMap())
+            lutMap.put(lut, lut);
         physicalCombo = new ComboBoxItem();
         physicalCombo.setTitle("physical parameters:");
-        //physicalCombo
+        physicalCombo.setValueMap(lutMap);
         physicalCombo.disable();
 
         valueLabel = new TextItem();
@@ -138,27 +141,31 @@ public class ModelCreateDialog extends Window {
 
             public void onChanged(ChangedEvent event) {
                 if ((String) event.getValue() == "voxel") {
-                    valueLabel.setTitle("Label: ");
+                    
                     valueLabel.setCanEdit(true);
                     searchText.setCanEdit(true);
+                    physicalCombo.disable();
                     type = 1;
                 } else if ((String) event.getValue() == "mesh") {
                     type = 0;
-                    valueLabel.setTitle("Label: ");
+                    
                     valueLabel.setCanEdit(false);
                     searchText.setCanEdit(true);
+                    physicalCombo.disable();
                 } else if ((String) event.getValue() == "LUT") {
                     type = 2;
-                    valueLabel.setTitle("Type: ");
-                    valueLabel.setCanEdit(true);
+                    
+                    valueLabel.setCanEdit(false);
                     searchText.setValue("");
                     searchText.setCanEdit(false);
+                    physicalCombo.enable();
                 } else    if ((String) event.getValue() == "Map") {
                     type = 3;
-                    valueLabel.setTitle("Type: ");
-                    valueLabel.setCanEdit(true);
+                    
+                    valueLabel.setCanEdit(false);
                     searchText.setValue("");
                     searchText.setCanEdit(false);
+                    physicalCombo.enable();
                 }
             }
         });
@@ -325,7 +332,7 @@ public class ModelCreateDialog extends Window {
                     tree.addObjectItem(tp, ins, type, filename, selectRecord.getAttribute("name"),
                             selectRecord.getAttribute("type"), Integer.parseInt(valueLabel.getValueAsString()));
                 } else if (type == 2 || type == 3) {
-                    tree.addPhysicalItem(tp, ins, type, filename, getLayerforLUT(), valueLabel.getValueAsString());
+                    tree.addPhysicalItem(tp, ins, type, filename, getLayerforLUT(), physicalCombo.getValueAsString());
                 }
                 hide();
                 refresh();
@@ -353,13 +360,16 @@ public class ModelCreateDialog extends Window {
             // case mhd
             case 0:
                 typeRadio.setDefaultValue("mesh");
+                physicalCombo.disable();
                 break;
             // case vtk
             case 1:
                 typeRadio.setDefaultValue("voxel");
+                physicalCombo.disable();
                 break;
             case 2:
                 typeRadio.setDefaultValue("LUT");
+                physicalCombo.enable();
                 break;
         }
     }

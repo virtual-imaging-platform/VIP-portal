@@ -65,8 +65,10 @@ import fr.insalyon.creatis.vip.models.client.ModelConstants;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 import fr.insalyon.creatis.vip.models.client.view.FileTree.FileTreeNode;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -764,6 +766,14 @@ public class ModelTreeGrid extends TreeGrid {
     public SimulationObjectModel.ObjectType getTypeFromMap(String type)
     {
         return layerTypeMap.get(type);
+    }
+    
+    public ArrayList<String> getLutMap()
+    {
+        ArrayList<String> luts = new ArrayList<String>();
+       for (Entry<String,PhysicalParameterType> entry : lutTypeMap.entrySet())
+           luts.add(entry.getValue().toString());
+       return luts;
     }
     
     public void addPhysicalItem(int tp, int ins, int type, String name, String objLayer, String label) {
