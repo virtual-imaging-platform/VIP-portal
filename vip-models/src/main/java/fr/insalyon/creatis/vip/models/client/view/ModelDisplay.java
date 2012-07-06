@@ -214,7 +214,7 @@ public class ModelDisplay extends VLayout {
 
     private void updateTreeModel() {
         this.removeMember(modelTreeGrid);
-        modelTreeGrid = new ModelTreeGrid(model);
+        modelTreeGrid = new ModelTreeGrid(model, true);
         addMember(modelTreeGrid);
         modelTreeGrid.refreshFields();
     }
@@ -236,14 +236,16 @@ public class ModelDisplay extends VLayout {
 //            this.removeMember(modelTreeGrid);
 //        }
 
-        modelTreeGrid = new ModelTreeGrid(model);
+        modelTreeGrid = new ModelTreeGrid(model, true);
         addMember(modelTreeGrid);
         modelTreeGrid.setParentElement(this);
 
     }
 
     public void createTreeGrid() {
-        modelTreeGrid = new ModelTreeGrid(model);
+        modelTreeGrid = new ModelTreeGrid(model, false);
+            addMember(modelTreeGrid);
+            modelTreeGrid.setParentElement(this);
         addTimePoint(new Date(System.currentTimeMillis()));
         addInstant();
         modelTreeGrid.refreshFields();

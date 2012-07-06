@@ -127,7 +127,7 @@ public class ModelCreateDialog extends Window {
         typeMap.put("mesh", "mesh");
         typeMap.put("voxel", "voxel");
         typeMap.put("LUT", "LUT");
-
+        typeMap.put("Map", "Map");
 
         typeRadio = new RadioGroupItem();
         typeRadio.setDefaultValue("exampleStyleOnline");
@@ -138,16 +138,27 @@ public class ModelCreateDialog extends Window {
 
             public void onChanged(ChangedEvent event) {
                 if ((String) event.getValue() == "voxel") {
+                    valueLabel.setTitle("Label: ");
                     valueLabel.setCanEdit(true);
+                    searchText.setCanEdit(true);
                     type = 1;
                 } else if ((String) event.getValue() == "mesh") {
                     type = 0;
+                    valueLabel.setTitle("Label: ");
                     valueLabel.setCanEdit(false);
+                    searchText.setCanEdit(true);
                 } else if ((String) event.getValue() == "LUT") {
                     type = 2;
-                    valueLabel.setCanEdit(false);
-                } else {
-                    // nothing
+                    valueLabel.setTitle("Type: ");
+                    valueLabel.setCanEdit(true);
+                    searchText.setValue("");
+                    searchText.setCanEdit(false);
+                } else    if ((String) event.getValue() == "Map") {
+                    type = 3;
+                    valueLabel.setTitle("Type: ");
+                    valueLabel.setCanEdit(true);
+                    searchText.setValue("");
+                    searchText.setCanEdit(false);
                 }
             }
         });
@@ -314,7 +325,7 @@ public class ModelCreateDialog extends Window {
                     tree.addObjectItem(tp, ins, type, filename, selectRecord.getAttribute("name"),
                             selectRecord.getAttribute("type"), Integer.parseInt(valueLabel.getValueAsString()));
                 } else if (type == 2 || type == 3) {
-                    tree.addPhysicalItem(tp, ins, type, filename, selectRecord.getAttribute("type"), valueLabel.getValueAsString());
+                    tree.addPhysicalItem(tp, ins, type, filename, getLayerforLUT(), valueLabel.getValueAsString());
                 }
                 hide();
                 refresh();
@@ -342,7 +353,6 @@ public class ModelCreateDialog extends Window {
             // case mhd
             case 0:
                 typeRadio.setDefaultValue("mesh");
-
                 break;
             // case vtk
             case 1:
@@ -368,6 +378,27 @@ public class ModelCreateDialog extends Window {
     public void setTimePoint(int tp) {
     }
 
+    public String getLayerforLUT()
+    {
+        String title = "";
+        if(anaCheck.getValueAsBoolean()==true)
+            title = anaCheck.getTitle();
+        else if(pathoCheck.getValueAsBoolean()==true)
+             title = pathoCheck.getTitle();
+        else if(geoCheck.getValueAsBoolean()==true)
+             title = geoCheck.getTitle();
+        else if(forCheck.getValueAsBoolean()==true)
+             title = forCheck.getTitle();
+        else if(exCheck.getValueAsBoolean()==true)
+             title = exCheck.getTitle();
+        if(title.isEmpty())
+            return "";
+        else
+            return tree.getTypeFromMap(title).toString();
+    }
+    
+    
+    
     public String getLayer() {
         return selectRecord.getAttribute("type");
     }

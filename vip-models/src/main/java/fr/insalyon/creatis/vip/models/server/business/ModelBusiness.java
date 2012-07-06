@@ -37,18 +37,9 @@ package fr.insalyon.creatis.vip.models.server.business;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectModelFactory;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectModelQueryer;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectSearcher;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Instant;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectLayer;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectLayerPart;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectMatch;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Timepoint;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectLayer;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.*;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectLayer.Resolution;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectLayerPart;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectLayerPart.Format;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelUtil;
 
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
@@ -473,30 +464,64 @@ public class ModelBusiness {
     }
 
     public SimulationObjectModel addObject(SimulationObjectModel model, String ontoName, String objName, int tp, int ins, int type, int label) {
+        System.out.println("object to add");
         ArrayList<String> objects = new ArrayList<String>();
         if (type == 0)//mesh type
         {
-            objects.add(ontoName);
+            System.out.println("mesh");
+            System.out.println("ontologie" + ontoName + "object : " + objName);
+            objects.add(objName);
             addObjectNoResolutionHandling(model, tp, ins, ontoName, objects, label, Format.mesh, -1);
         } else if (type == 1) {
+            System.out.println("voxel" + objName);
             if (objName.contains(".raw")) {
-                objects.add(objName.substring(0, objects.lastIndexOf(".raw")) + ".mhd");
+                objects.add(objName.substring(0, objName.lastIndexOf(".raw")) + ".mhd");
                 objects.add(objName);
             } else if (objName.contains(".zraw")) {
-                objects.add(objName.substring(0, objects.lastIndexOf(".zraw")) + ".mhd");
+                objects.add(objName.substring(0, objName.lastIndexOf(".zraw")) + ".mhd");
                 objects.add(objName);
             } else if (objName.contains(".mhd")) {
                 objects.add(objName);
-                objects.add(objName.substring(0, objects.lastIndexOf(".mhd")) + ".zraw");
+                objects.add(objName.substring(0, objName.lastIndexOf(".mhd")) + ".zraw");
 
             } else {
+                System.out.println("euh");
             }
+            System.out.println("ontologie" + ontoName + "object : " + objects);
             addObjectNoResolutionHandling(model, tp, ins, ontoName, objects, label, Format.voxel, -1);
         } else {
         }
         return model;
     }
 
+    public SimulationObjectModel addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type)
+    {   
+        ArrayList<ObjectLayer> aLayers = model.getInstant(tp, ins).getObjectLayers();
+        int index = -1;
+        for(ObjectLayer lay : aLayers)
+        {
+            index++;
+            if (lay.getType() == layer)
+            {
+                break;
+            }
+        }
+        ArrayList<String> objects = new ArrayList<String>();
+        objects.add(name);
+        if(type == 2)
+        {
+            addPhysicalParametersLUT(model, pptype,objects,-1, model.getInstant(tp,ins).getObjectLayers(index), tp, ins);
+        }
+        else if (type ==3)
+        {
+            addPhysicalParametersLayer(model, pptype, objects, -1, model.getInstant(tp, ins).getObjectLayers(index), tp, ins);
+        }
+        else
+        {
+            //nothing
+        }
+        return model;
+    }
     private static void addObjectNoResolutionHandling(SimulationObjectModel objectModel, int timePointIndex, int instantIndex, String objectName, ArrayList<String> fileName, int objectLabel, ObjectLayerPart.Format fileFormat, int objectPriority) {
 
         // found during fuzzy search (type field of SimulationObjectMatching
@@ -615,4 +640,34 @@ public class ModelBusiness {
         System.out.println("object removed");
         return objectModel;
     }
+    public static void addPhysicalParametersLayer(SimulationObjectModel objectModel, PhysicalParametersLayer.PhysicalParameterType physicalParametersType, ArrayList<String> fileName, double b0, ObjectLayer objectLayer, int timePointIndex, int instantIndex) {
+		
+		// list the object layers of the current instant
+		// ask to the user if we add the physical layer to an object layer or the instant (i.e. the model)
+		
+		// call the servlet to create the physical parameters layer
+		// parameters : physical paramter type, filename
+		PhysicalParametersLayer physicalParametersLayer = SimulationObjectModelFactory.createPhysicalParametersLayer(physicalParametersType, fileName, b0);
+		
+		// if the user want to add it to the instant (not linked to an object layer)
+		// in this example 0,0
+		if(objectLayer == null) {
+			SimulationObjectModelFactory.addPhysicalParametersLayerToInstant(physicalParametersLayer, objectModel.getInstant(timePointIndex, instantIndex));
+			objectModel.getInstant(timePointIndex, instantIndex).addPhysicalParametersLayer(physicalParametersLayer);
+		}
+		else {
+			// or to an object layer
+			// in this example the first layer of instant 0,0 (linked to an object layer)
+			SimulationObjectModelFactory.addPhysicalParametersLayerToObjectLayer(physicalParametersLayer, objectLayer);
+			objectLayer.addPhysicalParametersLayer(physicalParametersLayer);
+			//objectModel.getInstant(timePointIndex, instantIndex).getObjectLayers(0).addPhysicalParametersLayer(physicalParametersLayer);
+		}
+	}
+	
+	
+	public static void addPhysicalParametersLUT(SimulationObjectModel objectModel, PhysicalParametersLayer.PhysicalParameterType physicalParametersType, ArrayList<String> fileName, double b0, ObjectLayer objectLayer, int timePointIndex, int instantIndex) {
+		PhysicalParameter physicalParameter = SimulationObjectModelFactory.createPhysicalParameter(physicalParametersType, fileName, b0);
+		objectLayer.addPhysicalParameters(physicalParameter);
+		SimulationObjectModelFactory.addPhysicalParametersToObjectLayer(objectLayer, physicalParameter);
+	}
 }

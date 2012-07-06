@@ -73,7 +73,7 @@ class FileTree extends TreeGrid {
 //      {
 //           // index = event.getFolder().getName();
 //            //  logger.log(Level.SEVERE, event.getFolder().getName() +" aa ");
-//             SC.say("click3");
+
 //      }
 //    });
         addNodeClickHandler(new NodeClickHandler() {
@@ -108,7 +108,7 @@ class FileTree extends TreeGrid {
         addLeafContextClickHandler(new LeafContextClickHandler() {
 
             public void onLeafContextClick(LeafContextClickEvent event) {
-                SC.say("context click");
+               
             }
         });
     }

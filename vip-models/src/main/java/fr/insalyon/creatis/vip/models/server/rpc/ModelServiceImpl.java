@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.models.server.rpc;
 
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.PhysicalParametersLayer;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
@@ -206,13 +207,21 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
 
     public SimulationObjectModel addObject(SimulationObjectModel model, String ontoName, String objName, int tp, int ins, int type, int label) throws ModelException {
         try {
-            trace(logger, "search through ontology");
+            trace(logger, "add Object");
             return modelBusiness.addObject(model, ontoName, objName, tp, ins, type, label);
         } catch (CoreException ex) {
             throw new ModelException(ex);
         }
     }
-
+    
+     public SimulationObjectModel addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type) throws ModelException {
+           try {
+            trace(logger, "add LUT");
+            return modelBusiness.addLUT(model, layer,name, tp, ins, pptype, type);
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        }
+     }
     public SimulationObjectModel removeTimePoint(SimulationObjectModel model, int tp) throws ModelException {
 
         try {

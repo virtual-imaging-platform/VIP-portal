@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.models.client.view;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.TreeModelType;
@@ -93,10 +94,11 @@ public class ModelTreeGrid extends TreeGrid {
     private String objName = "";
     private String objLayer = "";
     private HashMap<String, SimulationObjectModel.ObjectType> layerTypeMap = new HashMap<String, SimulationObjectModel.ObjectType>();
+    private HashMap<String, PhysicalParameterType> lutTypeMap = new HashMap<String, PhysicalParameterType>();
     private ModelMenu mymenu = null;
     private ModelCreateDialog dg = null;
 
-    public ModelTreeGrid(final SimulationObjectModel model) {
+    public ModelTreeGrid(final SimulationObjectModel model, boolean bFull) {
         super();
 
         layerTypeMap.put("Anatomy", SimulationObjectModel.ObjectType.anatomical);
@@ -105,6 +107,15 @@ public class ModelTreeGrid extends TreeGrid {
         layerTypeMap.put("Pathology", SimulationObjectModel.ObjectType.pathological);
         layerTypeMap.put("Geometry", SimulationObjectModel.ObjectType.geometrical);
 
+        lutTypeMap.put("T1", PhysicalParameterType.T1);
+        lutTypeMap.put("T2", PhysicalParameterType.T2);
+        lutTypeMap.put("T2s", PhysicalParameterType.T2s);
+        lutTypeMap.put("chemicalBlend", PhysicalParameterType.chemicalBlend);
+        lutTypeMap.put("protonDensity", PhysicalParameterType.protonDensity);
+        lutTypeMap.put("radioactiviy", PhysicalParameterType.radioactiviy);
+        lutTypeMap.put("scatterers", PhysicalParameterType.scatterers);
+        lutTypeMap.put("susceptibility", PhysicalParameterType.susceptibility);
+        
         this.model = model;
         //init the tree grid
         logger = Logger.getLogger("ModelTree");
@@ -137,12 +148,13 @@ public class ModelTreeGrid extends TreeGrid {
         });
 
 
-        if (model != null) {
+        if (bFull) {
             logger.log(Level.SEVERE, "model tree set fields");
             setFields(tfg);
-            loadEmpty();
+           // loadEmpty();
             load(model);
         } else {
+            logger.log(Level.SEVERE, "load an empty model");
             loadEmpty();
         }
 
@@ -212,6 +224,7 @@ public class ModelTreeGrid extends TreeGrid {
         this.addNodeContextClickHandler(new NodeContextClickHandler() {
 
             public void onNodeContextClick(NodeContextClickEvent event) {
+                mnode = (ModelTreeNode) event.getNode();
                 ((ModelMenu) nodeMenu).setNode((ModelTreeNode) event.getNode());
             }
         });
@@ -320,7 +333,9 @@ public class ModelTreeGrid extends TreeGrid {
 
     private void loadEmpty() {
 
-        TreeNode root = new ModelTreeNode("1", "Root", true, 1, null);
+       ModelTreeNode timepoints = new ModelTreeNode("", "Timepoint (" +")", true, 0 - 1, null);
+            timepoints.setIcon(ModelConstants.APP_IMG_TIMEPOINT);
+        TreeNode root = new ModelTreeNode("1", "Root", true, 1, timepoints);
         modelTree = new Tree();
         modelTree.setModelType(TreeModelType.CHILDREN);
         modelTree.setNameProperty("Debug");
@@ -707,7 +722,7 @@ public class ModelTreeGrid extends TreeGrid {
                 } else if (name.contains(".zraw")) {
                     description += name.substring(0, name.indexOf(".zraw")) + ".mhd, " + name + ")";
                 } else {
-                    description += name + ", " + name.substring(0, name.indexOf(".mhd")) + ".zraw " + ")";
+                    description += name + ", " + name.substring(0, name.indexOf(".mhd")) + ".zraw" + ")";
                 }
             } else {
                 description += format + ": " + name + ")";
@@ -726,6 +741,7 @@ public class ModelTreeGrid extends TreeGrid {
                 } else {
                     // create the Layer
                     LayerNode = new ModelTreeNode("", layer, false, 1, objectLayerPartsNode);
+                    LayerNode.setIcon(getIconObject(layerTypeMap.get(layer)));
                     modelTree.add(LayerNode, insnode);
                 }
             }
@@ -738,13 +754,18 @@ public class ModelTreeGrid extends TreeGrid {
             }
 
             public void onSuccess(SimulationObjectModel result) {
+                SC.say("object added to model");
                 model = result;
             }
         };
 
         ms.addObject(model, OntoName, name, tp, ins, type, lab, callback);
     }
-
+    public SimulationObjectModel.ObjectType getTypeFromMap(String type)
+    {
+        return layerTypeMap.get(type);
+    }
+    
     public void addPhysicalItem(int tp, int ins, int type, String name, String objLayer, String label) {
         int nbChild = 0;
         logger.log(Level.SEVERE, "tp :" + String.valueOf(tp) + "ins : " + String.valueOf(ins) + "type : " + String.valueOf(type)
@@ -855,6 +876,22 @@ public class ModelTreeGrid extends TreeGrid {
                 }
             }
         }
+        
+        ModelServiceAsync ms = ModelService.Util.getInstance();
+        final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
+
+            public void onFailure(Throwable caught) {
+                SC.say("Cannot added LUT to model");
+            }
+
+            public void onSuccess(SimulationObjectModel result) {
+                SC.say("LUT added to model");
+                model = result;
+            }
+        };
+
+        ms.addLUT(model, layerTypeMap.get(layer), name, tpSelected, insSelected,lutTypeMap.get(label) ,  type, callback);
+        
     }
 
     public class ModelTreeNode extends TreeNode {
@@ -912,6 +949,12 @@ public class ModelTreeGrid extends TreeGrid {
             removeItem = new MenuItem();
             removeItem.setTitle("remove");
             removeItem.setIcon(ModelConstants.APP_IMG_KO);
+            removeItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
+                public void onClick(MenuItemClickEvent event)
+                {
+                    removeNode();
+                }
+            });
 
             this.setItems(instantItem, removeItem);
         }
@@ -925,6 +968,13 @@ public class ModelTreeGrid extends TreeGrid {
             this.removeItem(objectItem);
             this.removeItem(physicalItem);
 
+//            removeItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
+//                public void onClick(MenuItemClickEvent event)
+//                {
+//                    logger.log(Level.SEVERE, "ca va couper");
+//                    removeNode();
+//                }
+//            });
             if (node.getAttribute(model.getModelName()).contains("Timepoint")) {
                 this.setItems(instantItem, removeItem);
             } else if (node.getAttribute(model.getModelName()).contains("Instant")) {
@@ -947,7 +997,7 @@ public class ModelTreeGrid extends TreeGrid {
             mgrid = grid;
         }
 
-        public void removeNode() {
+        public void removeNode2() {
             ModelServiceAsync ms = ModelService.Util.getInstance();
 
             String name = mnode.getAttribute(model.getModelName());

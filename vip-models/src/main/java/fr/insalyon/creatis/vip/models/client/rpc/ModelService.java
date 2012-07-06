@@ -38,6 +38,7 @@ import com.google.gwt.core.client.GWT;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.PhysicalParametersLayer;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
 import fr.insalyon.creatis.vip.models.client.view.ModelException;
@@ -97,6 +98,8 @@ public interface ModelService extends RemoteService {
 
     public SimulationObjectModel addObject(SimulationObjectModel model, String ontoName, String objName, int tp, int ins, int type, int label) throws ModelException;
 
+    public SimulationObjectModel addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type) throws ModelException;
+    
     public SimulationObjectModel removeTimePoint(SimulationObjectModel model, int tp) throws ModelException;
 
     public SimulationObjectModel removeInstant(SimulationObjectModel model, int tp, int ins) throws ModelException;

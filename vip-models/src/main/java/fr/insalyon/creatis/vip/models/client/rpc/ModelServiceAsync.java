@@ -35,8 +35,10 @@
 package fr.insalyon.creatis.vip.models.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.PhysicalParametersLayer;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
+import fr.insalyon.creatis.vip.models.client.view.ModelException;
 import java.util.Date;
 import java.util.List;
 
@@ -78,7 +80,9 @@ public interface ModelServiceAsync {
      
      public void searchWithScope(String query, boolean[] scope, AsyncCallback<List<String[]>> asyncCallback);
      
-      public void addObject(SimulationObjectModel model, String ontoName, String objName, int tp, int ins, int type, int label, AsyncCallback<SimulationObjectModel> asyncCallback);
+     public void addObject(SimulationObjectModel model, String ontoName, String objName, int tp, int ins, int type, int label, AsyncCallback<SimulationObjectModel> asyncCallback);
+   
+     public void addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type, AsyncCallback<SimulationObjectModel> asyncCallback);
       
       public void removeTimePoint(SimulationObjectModel model, int tp, AsyncCallback<SimulationObjectModel> asyncCallback);
       
