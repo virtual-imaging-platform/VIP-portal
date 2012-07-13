@@ -127,6 +127,11 @@ public class LocationLayout extends AbstractFormLayout {
                     i++;
                 }
                 
+                if (i == 0) {
+                    dataTable.setValue(0, 0, "France");
+                    dataTable.setValue(0, 0, 0);
+                }
+                
                 GeoMap geoMap = new GeoMap(dataTable, options);
 
                 chartLayout.removeMember(innerChartLayout);
