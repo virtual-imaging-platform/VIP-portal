@@ -42,7 +42,7 @@ import java.util.Date;
  */
 public class CoreConstants {
 
-    public static final String VERSION = "v0.8";
+    public static final String VERSION = "v0.8.1";
     // Configuration Labels
     public static final String LAB_DB_HOST = "database.server.host";
     public static final String LAB_DB_PORT = "database.server.port";
@@ -71,6 +71,10 @@ public class CoreConstants {
     public static final String LAB_MOTEUR_HOST = "moteur.host";
     public static final String LAB_TRUSTSTORE_FILE = "truststore.file";
     public static final String LAB_TRUSTSTORE_PASS = "truststore.password";
+    public static final String LAB_WORKFLOWS_DB_HOST = "workflows.db.host";
+    public static final String LAB_WORKFLOWS_DB_NAME = "workflows.db.name";
+    public static final String LAB_WORKFLOWS_DB_PORT = "workflows.db.port";
+    public static final String LAB_WORKFLOWS_FOLDER = "workflows.directory";
     // Tabs
     public static final String TAB_ACCOUNT = "account-tab";
     public static final String TAB_ACTIVATION = "activation-tab";

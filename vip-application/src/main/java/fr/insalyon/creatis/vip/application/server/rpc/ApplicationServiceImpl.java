@@ -146,6 +146,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
+    @Override
     public List<Application> getApplications(String className) throws ApplicationException {
 
         try {
@@ -225,14 +226,12 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
+    @Override
     public List<AppClass> getClasses() throws ApplicationException {
 
         try {
             if (isSystemAdministrator()) {
                 return classBusiness.getClasses();
-
-            } else if (isGroupAdministrator()) {
-                return classBusiness.getUserClasses(getSessionUser().getEmail(), true);
             }
             return classBusiness.getUserClasses(getSessionUser().getEmail(), false);
 

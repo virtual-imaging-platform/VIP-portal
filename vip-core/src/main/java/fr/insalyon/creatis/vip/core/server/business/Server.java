@@ -90,10 +90,10 @@ public class Server {
     private String truststoreFile;
     private String truststorePass;
     // Workflows
-    private String workflowsPath = "/var/www/html/workflows";
-    private String workflowsDB = "/var/www/workflows.db";
-    private String workflowsHost = "localhost";
-    private int workflowsPort = 1527;
+    private String workflowsPath;
+    private String workflowsDB;
+    private String workflowsHost;
+    private int workflowsPort;
     // Apache
     private String apacheHost = "localhost";
     private int apacheSSLPort = 80;
@@ -154,10 +154,10 @@ public class Server {
             truststoreFile = config.getString(CoreConstants.LAB_TRUSTSTORE_FILE, "/usr/local/apache-tomcat-6.0.29/conf/truststore.jks");
             truststorePass = config.getString(CoreConstants.LAB_TRUSTSTORE_PASS, "");
 
-            workflowsPath = config.getString("workflows.directory", workflowsPath);
-            workflowsDB = config.getString("workflows.db.name", workflowsDB);
-            workflowsHost = config.getString("workflows.db.host", workflowsHost);
-            workflowsPort = config.getInt("workflows.db.port", workflowsPort);
+            workflowsPath = config.getString(CoreConstants.LAB_WORKFLOWS_FOLDER, "/var/www/html/workflows");
+            workflowsDB = config.getString(CoreConstants.LAB_WORKFLOWS_DB_NAME, "/var/www/workflows.db");
+            workflowsHost = config.getString(CoreConstants.LAB_WORKFLOWS_DB_HOST, "localhost");
+            workflowsPort = config.getInt(CoreConstants.LAB_WORKFLOWS_DB_PORT, 1527);
 
             apacheHost = config.getString("apache.host", apacheHost);
             apacheSSLPort = config.getInt("apache.ssl.port", apacheSSLPort);
@@ -194,10 +194,10 @@ public class Server {
             config.setProperty(CoreConstants.LAB_MOTEUR_HOST, moteurServer);
             config.setProperty(CoreConstants.LAB_TRUSTSTORE_FILE, truststoreFile);
             config.setProperty(CoreConstants.LAB_TRUSTSTORE_PASS, truststorePass);
-            config.setProperty("workflows.directory", workflowsPath);
-            config.setProperty("workflows.db.name", workflowsDB);
-            config.setProperty("workflows.db.host", workflowsHost);
-            config.setProperty("workflows.db.port", workflowsPort);
+            config.setProperty(CoreConstants.LAB_WORKFLOWS_FOLDER, workflowsPath);
+            config.setProperty(CoreConstants.LAB_WORKFLOWS_DB_NAME, workflowsDB);
+            config.setProperty(CoreConstants.LAB_WORKFLOWS_DB_HOST, workflowsHost);
+            config.setProperty(CoreConstants.LAB_WORKFLOWS_DB_PORT, workflowsPort);
             config.setProperty("apache.host", apacheHost);
             config.setProperty("apache.ssl.port", apacheSSLPort);
             config.setProperty("provenance.db.user", provenanceDBUser);

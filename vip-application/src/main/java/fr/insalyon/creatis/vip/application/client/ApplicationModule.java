@@ -83,10 +83,12 @@ public class ApplicationModule extends Module {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<List<AppClass>> callback = new AsyncCallback<List<AppClass>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 SC.say("Unable to load classes:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<AppClass> result) {
 
                 for (AppClass appClass : result) {
@@ -102,6 +104,7 @@ public class ApplicationModule extends Module {
         // Simulation close tab
         CenterTabSet.getInstance().addCloseClickHandler(new CloseClickHandler() {
 
+            @Override
             public void onCloseClick(TabCloseClickEvent event) {
                 Tab tab = event.getTab();
                 try {
@@ -140,11 +143,13 @@ public class ApplicationModule extends Module {
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 SC.say("Unable to add user to group '" + groupName
                         + "':<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
             }
         };
@@ -157,10 +162,12 @@ public class ApplicationModule extends Module {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 SC.say("Unable to signout:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
             }
         };
@@ -173,10 +180,12 @@ public class ApplicationModule extends Module {
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 SC.say("Unable to anonymize user data:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
             }
         };
@@ -190,10 +199,12 @@ public class ApplicationModule extends Module {
             WorkflowServiceAsync service = WorkflowService.Util.getInstance();
             final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+                @Override
                 public void onFailure(Throwable caught) {
                     SC.say("Unable to anonymize user data:<br />" + caught.getMessage());
                 }
 
+                @Override
                 public void onSuccess(Void result) {
                 }
             };

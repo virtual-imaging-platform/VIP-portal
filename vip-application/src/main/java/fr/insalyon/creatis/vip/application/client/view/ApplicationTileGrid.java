@@ -66,7 +66,6 @@ public class ApplicationTileGrid extends ApplicationsTileGrid {
         
         if (applicationNames.contains(applicationName)) {
             Layout.getInstance().addTab(new LaunchTab(applicationName));
-            return;
         }
     }
 
@@ -75,10 +74,12 @@ public class ApplicationTileGrid extends ApplicationsTileGrid {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 SC.say("Unable to load applications:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<Application> result) {
 
                 for (Application app : result) {
