@@ -50,7 +50,7 @@ public interface ModelServiceAsync {
 
     public void getFiles(String modelZipFile, AsyncCallback<List<String>> asyncCallback);
 
-    public void createModel(String modelName, AsyncCallback<SimulationObjectModel> asyncCallback);
+    public void createModel(String modelName, String user, AsyncCallback<SimulationObjectModel> asyncCallback);
 
     public void createEmptyModel(AsyncCallback<SimulationObjectModel> asyncCallback);
     

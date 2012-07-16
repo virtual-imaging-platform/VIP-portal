@@ -235,18 +235,7 @@ class ModelImportTab extends Tab {
             }
         });
 
-
-
-
-
-
-
-
-
-
-
-
-        files.addMember(fileTree);
+       files.addMember(fileTree);
         final String rdf = fileTree.getRdfFile();
         if (rdf != null) {
             label.setContents("(Initialized annotations from file: " + rdf.substring(rdf.lastIndexOf('/') + 1) + ")");
@@ -301,11 +290,11 @@ class ModelImportTab extends Tab {
                 setCreateObjectModel(result);
             }
         };
-        ms.createEmptyModel(callback);
+        ms.createModel("EmptyModel","cervenansky",callback);
     }
 
     public void setCreateObjectModel(SimulationObjectModel result) {
-        modelDisplay = new ModelDisplay(result, false);
+        modelDisplay = new ModelDisplay(result, true);
         hl.addMember(modelDisplay);
     }
 

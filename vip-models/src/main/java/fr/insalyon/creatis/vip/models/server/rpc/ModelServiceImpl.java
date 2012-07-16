@@ -73,11 +73,11 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
     }
 
-    public SimulationObjectModel createModel(String modelName) throws ModelException {
+    public SimulationObjectModel createModel(String modelName, String user) throws ModelException {
 
         try {
             trace(logger, "Creating model: " + modelName);
-            return modelBusiness.createModel(modelName);
+            return modelBusiness.createModel(modelName, user);
 
         } catch (CoreException ex) {
             throw new ModelException(ex);
@@ -169,7 +169,7 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
     public SimulationObjectModel createEmptyModel() throws ModelException {
         try {
             trace(logger, "Creating an empty model ");
-            return modelBusiness.createModel("Empty_Model");
+            return modelBusiness.createModel("Empty_Model","");
 
         } catch (CoreException ex) {
             throw new ModelException(ex);

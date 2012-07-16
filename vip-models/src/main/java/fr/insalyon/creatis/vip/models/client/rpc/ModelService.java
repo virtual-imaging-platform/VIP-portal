@@ -66,7 +66,7 @@ public interface ModelService extends RemoteService {
 
     public List<String> getFiles(String modelZipFile) throws ModelException;
 
-    public SimulationObjectModel createModel(String modelName) throws ModelException;
+    public SimulationObjectModel createModel(String modelName, String user) throws ModelException;
 
     public SimulationObjectModel createEmptyModel() throws ModelException;
 

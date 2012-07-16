@@ -211,8 +211,27 @@ public class ModelBusiness {
         copyFile(rootDirectory + "zip//" + zipName, rootDirectory + zipName);
     }
 
-    public SimulationObjectModel createModel(String modelName) {
-        return SimulationObjectModelFactory.createModel(modelName);
+    public SimulationObjectModel createModel(String modelName, String user) {
+
+        SimulationObjectModel model = SimulationObjectModelFactory.createModel(modelName);
+        String storageURL = "";
+        model.setStorageURL(storageURL);
+        SimulationObjectModelFactory.setStorageURL(model, storageURL);
+
+
+        model.setModelOwner(user);
+        SimulationObjectModelFactory.setModelOwner(model, user);
+
+        String description = "Empty model";
+        model.setModelDescription(description);
+        SimulationObjectModelFactory.setModelDescription(model, description);
+
+        Date now = new Date();
+        model.setLastModificationDate(now);
+        SimulationObjectModelFactory.setLastModificationDate(model, now);
+        addTimePoint(model,now);
+        //addInstant(model,0);
+        return model;
     }
 
     public SimulationObjectModel.ObjectType getObjectType(String objectName) {
@@ -440,46 +459,54 @@ public class ModelBusiness {
         System.out.println("instant added");
         return som;
     }
-    
-     public SimulationObjectModel duplicateTimePoint(SimulationObjectModel objectModel, int tp)
-    {
+
+    public SimulationObjectModel duplicateTimePoint(SimulationObjectModel objectModel, int tp) {
         ArrayList<Timepoint> tps = objectModel.getTimepoints();
         Timepoint copy = new Timepoint();
-        timepointCopy(tps.get(tp),copy);
-        tps.add(tp+1, copy);
+        timepointCopy(tps.get(tp), copy);
+        tps.add(tp + 1, copy);
         objectModel.setTimepoints(tps);
         System.out.println("timepoint copied");
         return objectModel;
     }
-    
-     private void timepointCopy(Timepoint src, Timepoint dest)
-     {
-         
-     }
-    
-      public SimulationObjectModel setInstantDuration(SimulationObjectModel objectModel, int tp, int ins, String duration) {
+
+    private void timepointCopy(Timepoint src, Timepoint dest) {
+        ArrayList<Instant> inss = src.getInstants();
+        for (Instant ins : inss) {
+            ArrayList<ObjectLayer> objs = ins.getObjectLayers();
+            for (ObjectLayer obj : objs) {
+                ArrayList<ObjectLayerPart> parts = obj.getLayerParts();
+
+                for (ObjectLayerPart part : parts) {
+                    //    ObjectLayerPart
+                }
+            }
+
+            //  ArrayList<PhysicalParameters>
+        }
+    }
+
+    public SimulationObjectModel setInstantDuration(SimulationObjectModel objectModel, int tp, int ins, String duration) {
         ArrayList<Instant> in = objectModel.getTimepoint(tp).getInstants();
         in.get(ins).setDuration(duration);
         objectModel.getTimepoint(tp).setInstants(in);
         System.out.println("duration changed :" + duration);
         return objectModel;
     }
-    
-    public SimulationObjectModel duplicateInstant(SimulationObjectModel objectModel, int tp, int ins)
-    {
+
+    public SimulationObjectModel duplicateInstant(SimulationObjectModel objectModel, int tp, int ins) {
         ArrayList<Instant> in = objectModel.getTimepoint(tp).getInstants();
         Instant copy = new Instant();
-        instantCopy(in.get(ins),copy);
-        in.add(ins+1, copy);
+        instantCopy(in.get(ins), copy);
+        in.add(ins + 1, copy);
         objectModel.getTimepoint(tp).setInstants(in);
         System.out.println("instant copied");
         return objectModel;
     }
-     private void instantCopy(Instant src, Instant dest)
-     {
-         
-     }
-      
+
+    private void instantCopy(Instant src, Instant dest) {
+    }
+
     public List<String[]> searchWithScope(String query, boolean[] scope) {
         List<String[]> action = new ArrayList<String[]>();
 
@@ -533,34 +560,27 @@ public class ModelBusiness {
         return model;
     }
 
-    public SimulationObjectModel addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type)
-    {   
+    public SimulationObjectModel addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type) {
         ArrayList<ObjectLayer> aLayers = model.getInstant(tp, ins).getObjectLayers();
         int index = -1;
-        for(ObjectLayer lay : aLayers)
-        {
+        for (ObjectLayer lay : aLayers) {
             index++;
-            if (lay.getType() == layer)
-            {
+            if (lay.getType() == layer) {
                 break;
             }
         }
         ArrayList<String> objects = new ArrayList<String>();
         objects.add(name);
-        if(type == 2)
-        {
-            addPhysicalParametersLUT(model, pptype,objects,-1, model.getInstant(tp,ins).getObjectLayers(index), tp, ins);
-        }
-        else if (type ==3)
-        {
+        if (type == 2) {
+            addPhysicalParametersLUT(model, pptype, objects, -1, model.getInstant(tp, ins).getObjectLayers(index), tp, ins);
+        } else if (type == 3) {
             addPhysicalParametersLayer(model, pptype, objects, -1, model.getInstant(tp, ins).getObjectLayers(index), tp, ins);
-        }
-        else
-        {
+        } else {
             //nothing
         }
         return model;
     }
+
     private static void addObjectNoResolutionHandling(SimulationObjectModel objectModel, int timePointIndex, int instantIndex, String objectName, ArrayList<String> fileName, int objectLabel, ObjectLayerPart.Format fileFormat, int objectPriority) {
 
         // found during fuzzy search (type field of SimulationObjectMatching
@@ -602,6 +622,13 @@ public class ModelBusiness {
         objectModel.getInstant(timePointIndex, instantIndex).addObjectLayer(objectLayer);
     }
 
+    /**
+     * Remove a timepoint
+     *
+     * @param objectModel model to modify
+     * @param tp timepoint to remove
+     * @return the updated model
+     */
     public SimulationObjectModel removeTimePoint(SimulationObjectModel objectModel, int tp) {
         System.out.println("timepoint to remove" + tp);
         ArrayList<Timepoint> timep = objectModel.getTimepoints();
@@ -613,6 +640,14 @@ public class ModelBusiness {
         return objectModel;
     }
 
+    /**
+     * Remove an instant from a specific timepoint
+     *
+     * @param objectModel model to modify
+     * @param tp timepoint selected
+     * @param ins instant to remove
+     * @return the updated model
+     */
     public SimulationObjectModel removeInstant(SimulationObjectModel objectModel, int tp, int ins) {
         ArrayList<Instant> in = objectModel.getTimepoint(tp).getInstants();
         SimulationObjectModelFactory.removeInstant(in.get(ins));
@@ -622,6 +657,15 @@ public class ModelBusiness {
         return objectModel;
     }
 
+    /**
+     * Remove an layer from a specific instant
+     *
+     * @param objectModel model to modify
+     * @param tp timepoint selected
+     * @param ins instant selected
+     * @param layer layer to remove
+     * @return the updated model
+     */
     public SimulationObjectModel removeLayer(SimulationObjectModel objectModel, int tp, int ins, String layer) {
 
         layer = layer.replace(" ", "_");
@@ -644,6 +688,16 @@ public class ModelBusiness {
         return objectModel;
     }
 
+    /**
+     * Remove an object from a specific layer
+     *
+     * @param objectModel model to modify
+     * @param tp timepoint selected
+     * @param ins instant selected
+     * @param layer layer selected
+     * @param name object name to remove
+     * @return the updated model
+     */
     public SimulationObjectModel removeObject(SimulationObjectModel objectModel, int tp, int ins, String layer, String name) {
         ArrayList<ObjectLayer> layers = objectModel.getTimepoint(tp).getInstant(ins).getObjectLayers();
         ObjectLayer ind = new ObjectLayer();
@@ -679,34 +733,33 @@ public class ModelBusiness {
         System.out.println("object removed");
         return objectModel;
     }
+
     public static void addPhysicalParametersLayer(SimulationObjectModel objectModel, PhysicalParametersLayer.PhysicalParameterType physicalParametersType, ArrayList<String> fileName, double b0, ObjectLayer objectLayer, int timePointIndex, int instantIndex) {
-		
-		// list the object layers of the current instant
-		// ask to the user if we add the physical layer to an object layer or the instant (i.e. the model)
-		
-		// call the servlet to create the physical parameters layer
-		// parameters : physical paramter type, filename
-		PhysicalParametersLayer physicalParametersLayer = SimulationObjectModelFactory.createPhysicalParametersLayer(physicalParametersType, fileName, b0);
-		
-		// if the user want to add it to the instant (not linked to an object layer)
-		// in this example 0,0
-		if(objectLayer == null) {
-			SimulationObjectModelFactory.addPhysicalParametersLayerToInstant(physicalParametersLayer, objectModel.getInstant(timePointIndex, instantIndex));
-			objectModel.getInstant(timePointIndex, instantIndex).addPhysicalParametersLayer(physicalParametersLayer);
-		}
-		else {
-			// or to an object layer
-			// in this example the first layer of instant 0,0 (linked to an object layer)
-			SimulationObjectModelFactory.addPhysicalParametersLayerToObjectLayer(physicalParametersLayer, objectLayer);
-			objectLayer.addPhysicalParametersLayer(physicalParametersLayer);
-			//objectModel.getInstant(timePointIndex, instantIndex).getObjectLayers(0).addPhysicalParametersLayer(physicalParametersLayer);
-		}
-	}
-	
-	
-	public static void addPhysicalParametersLUT(SimulationObjectModel objectModel, PhysicalParametersLayer.PhysicalParameterType physicalParametersType, ArrayList<String> fileName, double b0, ObjectLayer objectLayer, int timePointIndex, int instantIndex) {
-		PhysicalParameter physicalParameter = SimulationObjectModelFactory.createPhysicalParameter(physicalParametersType, fileName, b0);
-		objectLayer.addPhysicalParameters(physicalParameter);
-		SimulationObjectModelFactory.addPhysicalParametersToObjectLayer(objectLayer, physicalParameter);
-	}
+
+        // list the object layers of the current instant
+        // ask to the user if we add the physical layer to an object layer or the instant (i.e. the model)
+
+        // call the servlet to create the physical parameters layer
+        // parameters : physical paramter type, filename
+        PhysicalParametersLayer physicalParametersLayer = SimulationObjectModelFactory.createPhysicalParametersLayer(physicalParametersType, fileName, b0);
+
+        // if the user want to add it to the instant (not linked to an object layer)
+        // in this example 0,0
+        if (objectLayer == null) {
+            SimulationObjectModelFactory.addPhysicalParametersLayerToInstant(physicalParametersLayer, objectModel.getInstant(timePointIndex, instantIndex));
+            objectModel.getInstant(timePointIndex, instantIndex).addPhysicalParametersLayer(physicalParametersLayer);
+        } else {
+            // or to an object layer
+            // in this example the first layer of instant 0,0 (linked to an object layer)
+            SimulationObjectModelFactory.addPhysicalParametersLayerToObjectLayer(physicalParametersLayer, objectLayer);
+            objectLayer.addPhysicalParametersLayer(physicalParametersLayer);
+            //objectModel.getInstant(timePointIndex, instantIndex).getObjectLayers(0).addPhysicalParametersLayer(physicalParametersLayer);
+        }
+    }
+
+    public static void addPhysicalParametersLUT(SimulationObjectModel objectModel, PhysicalParametersLayer.PhysicalParameterType physicalParametersType, ArrayList<String> fileName, double b0, ObjectLayer objectLayer, int timePointIndex, int instantIndex) {
+        PhysicalParameter physicalParameter = SimulationObjectModelFactory.createPhysicalParameter(physicalParametersType, fileName, b0);
+        objectLayer.addPhysicalParameters(physicalParameter);
+        SimulationObjectModelFactory.addPhysicalParametersToObjectLayer(objectLayer, physicalParameter);
+    }
 }

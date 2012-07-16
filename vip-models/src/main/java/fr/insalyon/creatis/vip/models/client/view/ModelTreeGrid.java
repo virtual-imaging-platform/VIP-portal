@@ -157,6 +157,7 @@ public class ModelTreeGrid extends TreeGrid {
             load(model);
         } else {
             logger.log(Level.SEVERE, "load an empty model");
+            setFields(tfg);
             loadEmpty();
         }
 
@@ -335,7 +336,10 @@ public class ModelTreeGrid extends TreeGrid {
 
     private void loadEmpty() {
 
-       ModelTreeNode timepoints = new ModelTreeNode("", "Timepoint (" +")", true, 0 - 1, null);
+
+        ModelTreeNode instants = new ModelTreeNode("", "Instant 0", true, 0 , null);
+            instants.setIcon(ModelConstants.APP_IMG_INSTANT);
+       ModelTreeNode timepoints = new ModelTreeNode("", "Timepoint ()", true,1, instants);
             timepoints.setIcon(ModelConstants.APP_IMG_TIMEPOINT);
         TreeNode root = new ModelTreeNode("1", "Root", true, 1, timepoints);
         modelTree = new Tree();
