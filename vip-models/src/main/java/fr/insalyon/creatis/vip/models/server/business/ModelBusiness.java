@@ -457,9 +457,25 @@ public class ModelBusiness {
         System.out.println("instant created");
         som.getTimepoint(tp).addInstant(in);
         System.out.println("instant added");
+        
         return som;
     }
 
+    public SimulationObjectModel renameTimepoint(SimulationObjectModel model, int tp, Date starting){
+        System.out.println("starting changed");
+        ArrayList<Timepoint> tps = model.getTimepoints();
+        tps.get(tp).setStartingDate(starting);
+        model.setTimepoints(tps);
+        return model;
+    }
+    
+    public SimulationObjectModel renameInstant(SimulationObjectModel model, int tp, int ins, String duration){
+        System.out.println("duration changed");
+        ArrayList<Instant> in = model.getTimepoint(tp).getInstants();
+        in.get(ins).setDuration(duration);
+        model.getTimepoint(tp).setInstants(in);
+        return model;
+    }
     public SimulationObjectModel duplicateTimePoint(SimulationObjectModel objectModel, int tp) {
         ArrayList<Timepoint> tps = objectModel.getTimepoints();
         Timepoint copy = new Timepoint();

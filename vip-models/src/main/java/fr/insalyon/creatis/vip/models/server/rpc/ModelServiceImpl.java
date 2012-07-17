@@ -300,4 +300,23 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
             throw new ModelException(ex);
         }
     }
+    
+     public SimulationObjectModel renameTimepoint(SimulationObjectModel model, int tp, Date starting)throws ModelException {
+               try {
+            trace(logger, "rename timepoint: " + tp);
+            return modelBusiness.renameTimepoint(model, tp, starting);
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        }
+     }
+      
+      public SimulationObjectModel renameInstant(SimulationObjectModel model, int tp, int ins, String duration)throws ModelException {
+                try {
+            trace(logger, "rename instant: " + ins);
+            return modelBusiness.renameInstant(model, tp, ins, duration);
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        }
+
+    }
 }

@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.models.client.rpc;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
@@ -115,4 +116,9 @@ public interface ModelService extends RemoteService {
     public SimulationObjectModel removeObject(SimulationObjectModel model, int tp, int ins, String layer, String name) throws ModelException;
 
     public void recordAddeddFiles(String zipName, List<String> addFiles, SimulationObjectModel model);
+    
+    public SimulationObjectModel renameTimepoint(SimulationObjectModel model, int tp, Date starting) throws ModelException;
+    
+    public SimulationObjectModel renameInstant(SimulationObjectModel model, int tp, int ins, String duration)throws ModelException;
+
 }

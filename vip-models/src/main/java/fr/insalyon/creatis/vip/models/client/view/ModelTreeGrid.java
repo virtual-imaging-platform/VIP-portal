@@ -61,6 +61,7 @@ import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Physica
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.PhysicalParametersLayer.PhysicalParameterType;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Timepoint;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.models.client.ModelConstants;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
@@ -338,6 +339,7 @@ public class ModelTreeGrid extends TreeGrid {
 
 
         ModelTreeNode instants = new ModelTreeNode("", "Instant 0", true, 0 , null);
+        
             instants.setIcon(ModelConstants.APP_IMG_INSTANT);
        ModelTreeNode timepoints = new ModelTreeNode("", "Timepoint ()", true,1, instants);
             timepoints.setIcon(ModelConstants.APP_IMG_TIMEPOINT);
@@ -349,7 +351,7 @@ public class ModelTreeGrid extends TreeGrid {
         modelTree.setChildrenProperty("Children");
         modelTree.setOpenProperty("isOpen");
         modelTree.setRoot(root);
-
+        
         setData(modelTree);
     }
 
@@ -952,6 +954,35 @@ public class ModelTreeGrid extends TreeGrid {
         ms.addLUT(model, layerTypeMap.get(layer), name, tpSelected, insSelected,lutTypeMap.get(label) ,  type, callback);
         
     }
+    
+    public SimulationObjectModel getModel()
+    {
+        return model;
+    }
+    
+    public void rename(String name, SimulationObjectModel result)
+    {
+        model = result;
+        //mnode.setTitle(name);
+        mnode.setAttribute(model.getModelName(), name);
+        this.markForRedraw();
+    }
+    
+    public void renameTimepoint()
+    {
+         RenameTimepointWindow win = new RenameTimepointWindow(ModelTreeGrid.this,
+                Integer.parseInt(mnode.getAttribute("number")), mnode.getAttribute(model.getModelName()));
+        win.show();
+    }
+    
+    public void renameInstant()
+    {
+
+        RenameInstantWindow win = new RenameInstantWindow(ModelTreeGrid.this, Integer.parseInt(modelTree.getParent(mnode).getAttribute("number")),
+                Integer.parseInt(mnode.getAttribute("number")), mnode.getAttribute(model.getModelName()));
+        win.show();
+
+    }
 
     
     
@@ -979,13 +1010,14 @@ public class ModelTreeGrid extends TreeGrid {
         private MenuItem objectsItem = null;
         private MenuItem instantItem = null;
         private MenuItem layerItem = null;
-        private MenuItem durationItem = null;
+        private MenuItem durationIItem = null;
+        private MenuItem durationTItem = null;
         private MenuItem physicalItem = null;
         private MenuItem duplicateInsItem = null;
         private MenuItem duplicateTpItem = null;
         
         public ModelMenu() {
-           
+
             instantItem = new MenuItem();
             instantItem.setTitle("add Instant");
             instantItem.setIcon(ModelConstants.APP_IMG_OK);
@@ -1021,10 +1053,27 @@ public class ModelTreeGrid extends TreeGrid {
             layerItem.setIcon(ModelConstants.APP_IMG_OK);
 
 
-            durationItem = new MenuItem();
-            durationItem.setTitle("modify instant duration ");
-            durationItem.setIcon(ModelConstants.APP_IMG_OK);
-
+            durationTItem = new MenuItem();
+            durationTItem.setTitle("modify timepoint starting");
+            durationTItem.setIcon(CoreConstants.ICON_EDIT);
+            durationTItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
+            public void onClick(MenuItemClickEvent event)
+                {
+                    renameTimepoint();
+                }
+             });
+            
+            
+            durationIItem = new MenuItem();
+            durationIItem.setTitle("modify instant duration ");
+            durationIItem.setIcon(CoreConstants.ICON_EDIT);
+            durationIItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
+            public void onClick(MenuItemClickEvent event)
+                {
+                    renameInstant();
+                    }
+             });
+            
             physicalItem = new MenuItem();
             physicalItem.setTitle("add physical parameters ");
             physicalItem.setIcon(ModelConstants.APP_IMG_OK);
@@ -1051,26 +1100,21 @@ public class ModelTreeGrid extends TreeGrid {
         }
 
         public void setNode(ModelTreeNode node) {
-            logger.log(Level.SEVERE, "Attribute " + node.getAttribute(model.getModelName()).toString());
+
             this.removeItem(instantItem);
             this.removeItem(removeItem);
-            this.removeItem(durationItem);
+            this.removeItem(durationIItem);
             this.removeItem(objectsItem);
             this.removeItem(objectItem);
             this.removeItem(physicalItem);
             this.removeItem(duplicateInsItem);
             this.removeItem(duplicateTpItem);
-//            removeItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
-//                public void onClick(MenuItemClickEvent event)
-//                {
-//                    logger.log(Level.SEVERE, "ca va couper");
-//                    removeNode();
-//                }
-//            });
+            this.removeItem(durationTItem);
+
             if (node.getAttribute(model.getModelName()).contains("Timepoint")) {
-                this.setItems(duplicateTpItem, instantItem, removeItem);
+                this.setItems(duplicateTpItem, instantItem,durationTItem, removeItem);
             } else if (node.getAttribute(model.getModelName()).contains("Instant")) {
-                this.setItems(duplicateInsItem,layerItem, durationItem, removeItem);
+                this.setItems(duplicateInsItem,layerItem, durationIItem, removeItem);
             } else if (node.getAttribute(model.getModelName()).contains("Objects")) {
                 this.setItems(objectItem, removeItem);
             } else if (layerTypeMap.keySet().contains(node.getAttribute(model.getModelName()))) {

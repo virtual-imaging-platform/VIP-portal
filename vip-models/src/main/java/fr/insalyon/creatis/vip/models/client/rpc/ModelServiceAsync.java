@@ -99,4 +99,8 @@ public interface ModelServiceAsync {
       public void removeObject(SimulationObjectModel model, int tp, int ins, String layer, String name,AsyncCallback<SimulationObjectModel> asyncCallback);
       
       public void recordAddeddFiles(String zipName, List<String> addFiles ,SimulationObjectModel model, AsyncCallback<Void> asyncCallback);
+      
+      public void renameTimepoint(SimulationObjectModel model, int tp, Date start, AsyncCallback<SimulationObjectModel> asyncCallback);
+      
+      public void renameInstant(SimulationObjectModel model, int tp, int ins, String duration,  AsyncCallback<SimulationObjectModel> asyncCallback);
 }
