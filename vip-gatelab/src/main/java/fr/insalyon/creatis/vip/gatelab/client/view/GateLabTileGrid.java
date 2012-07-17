@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -49,7 +49,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class GateLabTileGrid extends ApplicationsTileGrid {
 
@@ -57,7 +57,7 @@ public class GateLabTileGrid extends ApplicationsTileGrid {
 
     public GateLabTileGrid() {
 
-        super(GateLabConstants.ACCOUNT_GATELAB);
+        super(GateLabConstants.GROUP_GATELAB);
         applicationNames = new ArrayList<String>();
         loadApplications();
     }

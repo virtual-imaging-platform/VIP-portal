@@ -32,38 +32,32 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.gatelab.client;
+package fr.insalyon.creatis.vip.core.client.view.system.account;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationModule;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.Module;
-import fr.insalyon.creatis.vip.gatelab.client.view.GateLabTileGrid;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
+import fr.insalyon.creatis.vip.core.client.bean.Account;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import java.util.List;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class GateLabModule extends Module {
+public class AccountRecord extends ListGridRecord {
 
-    public GateLabModule() {
+    private List<Group> groups;
 
-        ApplicationModule.reservedClasses.add(GateLabConstants.GATELAB_CLASS);
+    public AccountRecord() {
     }
 
-    @Override
-    public void load() {
+    public AccountRecord(Account account) {
 
-        if (CoreModule.user.isSystemAdministrator()
-                || CoreModule.user.hasGroupAccess(GateLabConstants.GROUP_GATELAB)) {
-            CoreModule.addApplicationsTileGrid(new GateLabTileGrid());
-        }
+        setAttribute("name", account.getName());
+        this.groups = account.getGroups();
     }
 
-    @Override
-    public void postLoading() {
-    }
+    public List<Group> getGroups() {
 
-    @Override
-    public void terminate() {
+        return groups;
     }
 }

@@ -32,38 +32,52 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.gatelab.client;
+package fr.insalyon.creatis.vip.core.client.view.system.account;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationModule;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.Module;
-import fr.insalyon.creatis.vip.gatelab.client.view.GateLabTileGrid;
+import com.smartgwt.client.widgets.layout.HLayout;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
+import java.util.List;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class GateLabModule extends Module {
+public class ManageAccountsTab extends AbstractManageTab {
 
-    public GateLabModule() {
+    private AccountsLayout accountsLayout;
+    private EditAccountLayout editLayout;
 
-        ApplicationModule.reservedClasses.add(GateLabConstants.GATELAB_CLASS);
+    public ManageAccountsTab() {
+
+        super(CoreConstants.ICON_ACCOUNT, CoreConstants.APP_ACCOUNT_MANAGER, CoreConstants.TAB_MANAGE_ACCOUNTS);
+       
+        accountsLayout = new AccountsLayout();
+        editLayout = new EditAccountLayout();
+        
+        HLayout hLayout = new HLayout(5);
+        hLayout.addMember(accountsLayout);
+        hLayout.addMember(editLayout);
+        
+        vLayout.addMember(hLayout);
     }
 
-    @Override
-    public void load() {
-
-        if (CoreModule.user.isSystemAdministrator()
-                || CoreModule.user.hasGroupAccess(GateLabConstants.GROUP_GATELAB)) {
-            CoreModule.addApplicationsTileGrid(new GateLabTileGrid());
-        }
+    /**
+     * 
+     */
+    public void loadAccounts() {
+        
+        accountsLayout.loadData();
     }
 
-    @Override
-    public void postLoading() {
-    }
+    /**
+     * 
+     * @param name
+     * @param groups 
+     */
+    public void setAccount(String name, List<Group> groups) {
 
-    @Override
-    public void terminate() {
+        editLayout.setAccount(name, groups);
     }
 }

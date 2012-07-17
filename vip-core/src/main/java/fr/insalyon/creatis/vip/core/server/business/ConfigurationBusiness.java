@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -38,6 +38,7 @@ import fr.insalyon.creatis.devtools.MD5;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
+import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -52,13 +53,12 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.text.Normalizer;
 import java.util.*;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ConfigurationBusiness {
 
@@ -151,6 +151,11 @@ public class ConfigurationBusiness {
             user.setLevel(UserLevel.Beginner);
 
             CoreDAOFactory.getDAOFactory().getUserDAO().add(user);
+
+            // Adding user to groups
+            for (Group group : CoreDAOFactory.getDAOFactory().getAccountDAO().getGroups(accountType)) {
+                CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().add(user.getEmail(), group.getName(), GROUP_ROLE.User);
+            }
 
             String emailContent = "<html>"
                     + "<head></head>"
@@ -842,5 +847,63 @@ public class ConfigurationBusiness {
             emails.add(admin.getEmail());
         }
         return emails.toArray(new String[]{});
+    }
+
+    /**
+     *
+     * @return @throws BusinessException
+     */
+    public List<Account> getAccounts() throws BusinessException {
+
+        try {
+            return CoreDAOFactory.getDAOFactory().getAccountDAO().getList();
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param name
+     * @param groups
+     * @throws BusinessException
+     */
+    public void addAccount(String name, List<String> groups) throws BusinessException {
+
+        try {
+            CoreDAOFactory.getDAOFactory().getAccountDAO().add(name, groups);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param oldName
+     * @param newName
+     * @param groups
+     * @throws BusinessException
+     */
+    public void updateAccount(String oldName, String newName, List<String> groups) throws BusinessException {
+
+        try {
+            CoreDAOFactory.getDAOFactory().getAccountDAO().update(oldName, newName, groups);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param name
+     * @throws BusinessException
+     */
+    public void removeAccount(String name) throws BusinessException {
+
+        try {
+            CoreDAOFactory.getDAOFactory().getAccountDAO().remove(name);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
     }
 }

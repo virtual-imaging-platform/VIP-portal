@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.core.client.rpc;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -48,7 +49,7 @@ import java.util.Map;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public interface ConfigurationService extends RemoteService {
 
@@ -114,4 +115,13 @@ public interface ConfigurationService extends RemoteService {
     public void removeUserFromGroup(String email, String groupName) throws CoreException;
     
     public void resetPassword(String email, String code, String password) throws CoreException;
+    
+    // Accounts
+    public List<Account> getAccounts() throws CoreException;
+    
+    public void addAccount(String name, List<String> groups) throws CoreException;
+    
+    public void updateAccount(String oldName, String newName, List<String> groups) throws CoreException;
+    
+    public void removeAccount(String name) throws CoreException;
 }

@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -35,13 +35,12 @@
 package fr.insalyon.creatis.vip.core.client;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class Modules {
 
@@ -83,25 +82,7 @@ public class Modules {
             module.terminate();
         }
     }
-    
-    public void initializeAccountTypes() {
-        
-        CoreModule.accountTypes = new ArrayList<String>();
-        
-        for (Module module : modules) {
-            CoreModule.accountTypes.addAll(module.getAccountTypes());
-        }
-    }
-    
-    public void parseAccountType(String accountType) {
-        
-        for (Module module : modules) {
-            if (module.parseAccountType(accountType)) {
-                return;
-            }
-        }
-    }
-    
+            
     public void userRemoved(User user) {
         
         for (Module module : modules) {

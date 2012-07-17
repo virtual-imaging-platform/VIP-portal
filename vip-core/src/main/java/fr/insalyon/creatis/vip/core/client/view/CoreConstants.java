@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -38,7 +38,7 @@ import java.util.Date;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class CoreConstants {
 
@@ -84,6 +84,7 @@ public class CoreConstants {
     public static final String TAB_SIGNIN = "signin-tab";
     public static final String TAB_SIGNUP = "signup-tab";
     public static final String TAB_SYSTEM = "system-tab";
+    public static final String TAB_MANAGE_ACCOUNTS = "manage-accounts-tab";
     public static final String TAB_MANAGE_GROUPS = "manage-groups-tab";
     public static final String TAB_MANAGE_TIPS = "manage-tips-tab";
     public static final String TAB_MANAGE_USERS = "manage-users-tab";
@@ -121,11 +122,13 @@ public class CoreConstants {
     public static final String FOLDER_FLAGS = IMG_FOLDER + "flags/";
     // Application Names
     public static final String APP_ACCOUNT = "My Account";
+    public static final String APP_ACCOUNT_MANAGER = "Accounts Type";
     public static final String APP_GROUP = "Groups";
     public static final String APP_TIP = "Tips";
     public static final String APP_USER = "Users";
     // Application Images
     public static final String APP_IMG_ACCOUNT = IMG_FOLDER + "app-account.png";
+    public static final String APP_IMG_ACCOUNT_MANAGER = IMG_FOLDER + "system/app-account.png";
     public static final String APP_IMG_GROUP = IMG_FOLDER + "system/app-group.png";
     public static final String APP_IMG_TIP = IMG_FOLDER + "system/app-tip.png";
     public static final String APP_IMG_USER = IMG_FOLDER + "system/app-user.png";

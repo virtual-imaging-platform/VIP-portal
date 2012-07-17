@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -45,8 +45,8 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.*;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Modules;
+import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
@@ -57,10 +57,11 @@ import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.ValidatorUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class SignUpTab extends Tab {
 
@@ -75,7 +76,7 @@ public class SignUpTab extends Tab {
     private SelectItem countryField;
     private PasswordItem passwordField;
     private PasswordItem confirmPasswordField;
-    private RadioGroupItem accountRadioGroupItem;
+    private SelectItem accountTypeField;
     private TextAreaItem commentsItem;
     private CheckboxItem acceptField;
     private IButton signupButton;
@@ -99,6 +100,8 @@ public class SignUpTab extends Tab {
         vLayout.addMember(signupLayout);
 
         this.setPane(vLayout);
+        
+        loadAccountTypes();
     }
 
     private void configureSignupLayout() {
@@ -115,24 +118,21 @@ public class SignUpTab extends Tab {
 
         institutionField = FieldUtil.getTextItem(300, false, "", null);
         phoneField = FieldUtil.getTextItem(150, false, "", "[0-9\\(\\)\\-+. ]");
-        
+
         countryField = new SelectItem();
         countryField.setShowTitle(false);
         countryField.setValueMap(CountryCode.getCountriesMap());
         countryField.setValueIcons(CountryCode.getCodesMap());
-        countryField.setImageURLPrefix(CoreConstants.FOLDER_FLAGS);  
+        countryField.setImageURLPrefix(CoreConstants.FOLDER_FLAGS);
         countryField.setImageURLSuffix(".png");
         countryField.setRequired(true);
 
         passwordField = FieldUtil.getPasswordItem(150, 32);
         confirmPasswordField = FieldUtil.getPasswordItem(150, 32);
 
-        accountRadioGroupItem = new RadioGroupItem();
-        accountRadioGroupItem.setShowTitle(false);
-        accountRadioGroupItem.setVertical(false);
-        accountRadioGroupItem.setValueMap(CoreModule.accountTypes.toArray(new String[]{}));
-        accountRadioGroupItem.setRequired(true);
-        accountRadioGroupItem.setWidth(300);
+        accountTypeField = new SelectItem();
+        accountTypeField.setShowTitle(false);
+        accountTypeField.setRequired(true);
 
         commentsItem = new TextAreaItem("comment", "");
         commentsItem.setHeight(80);
@@ -155,7 +155,7 @@ public class SignUpTab extends Tab {
                         & institutionField.validate() & phoneField.validate()
                         & countryField.validate()
                         & passwordField.validate() & confirmPasswordField.validate()
-                        & accountRadioGroupItem.validate() & acceptField.validate()
+                        & accountTypeField.validate() & acceptField.validate()
                         & acceptField.getValueAsBoolean()) {
 
                     if (!emailField.getValueAsString().equals(confirmEmailField.getValueAsString())) {
@@ -199,7 +199,7 @@ public class SignUpTab extends Tab {
                     };
                     modal.show("Signing up...", true);
                     service.signup(user, commentsItem.getValueAsString(),
-                            accountRadioGroupItem.getValueAsString(), callback);
+                            accountTypeField.getValueAsString(), callback);
                 }
             }
         });
@@ -214,12 +214,12 @@ public class SignUpTab extends Tab {
         WidgetUtil.addFieldToVIPLayout(signupLayout, "Country", countryField);
         WidgetUtil.addFieldToVIPLayout(signupLayout, "Password", passwordField);
         WidgetUtil.addFieldToVIPLayout(signupLayout, "Re-enter Password", confirmPasswordField);
-        WidgetUtil.addFieldToVIPLayout(signupLayout, "Account Type", accountRadioGroupItem);
+        WidgetUtil.addFieldToVIPLayout(signupLayout, "Account Type", accountTypeField);
         WidgetUtil.addFieldToVIPLayout(signupLayout, "Comments", commentsItem);
         signupLayout.addMember(FieldUtil.getForm(acceptField));
         signupLayout.addMember(signupButton);
     }
-    
+
     private void signin() {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
@@ -238,7 +238,6 @@ public class SignUpTab extends Tab {
             @Override
             public void onSuccess(User result) {
                 modal.hide();
-                Modules.getInstance().parseAccountType(accountRadioGroupItem.getValueAsString());
                 Layout.getInstance().removeTab(CoreConstants.TAB_SIGNIN);
                 Layout.getInstance().removeTab(CoreConstants.TAB_SIGNUP);
 
@@ -255,5 +254,28 @@ public class SignUpTab extends Tab {
         modal.show("Signing in...", true);
         service.signin(emailField.getValueAsString().trim(),
                 passwordField.getValueAsString(), callback);
+    }
+
+    private void loadAccountTypes() {
+
+        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+        final AsyncCallback<List<Account>> callback = new AsyncCallback<List<Account>>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                SC.warn("Unable to load account types:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(List<Account> result) {
+                
+                String[] values = new String[result.size()];
+                for (int i = 0; i < result.size(); i++) {
+                    values[i] = result.get(i).getName();
+                }
+                accountTypeField.setValueMap(values);
+            }
+        };
+        service.getAccounts(callback);
     }
 }

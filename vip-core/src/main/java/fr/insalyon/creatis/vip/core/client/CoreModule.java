@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -53,7 +53,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class CoreModule extends Module {
 
@@ -101,12 +101,6 @@ public class CoreModule extends Module {
 
         MainToolStrip.getInstance().addFill();
         MainToolStrip.getInstance().addMember(helpButton);
-    }
-
-    @Override
-    public boolean parseAccountType(String accountType) {
-
-        return false;
     }
 
     @Override

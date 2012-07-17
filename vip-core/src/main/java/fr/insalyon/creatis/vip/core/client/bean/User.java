@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -43,7 +43,7 @@ import java.util.Map;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class User implements IsSerializable {
 
@@ -200,7 +200,7 @@ public class User implements IsSerializable {
     public boolean hasGroupAccess(String groupName) {
 
         for (Group group : groups.keySet()) {
-            if (group.getName().equals(groupName)) {
+            if (group.getName().equals(groupName) && groups.get(group) != GROUP_ROLE.None) {
                 return true;
             }
         }

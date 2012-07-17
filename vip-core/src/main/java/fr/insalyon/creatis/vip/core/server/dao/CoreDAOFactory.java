@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -36,7 +36,7 @@ package fr.insalyon.creatis.vip.core.server.dao;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public abstract class CoreDAOFactory {
 
@@ -58,4 +58,6 @@ public abstract class CoreDAOFactory {
     public abstract GroupDAO getGroupDAO() throws DAOException;
     
     public abstract UsersGroupsDAO getUsersGroupsDAO() throws DAOException;
+    
+    public abstract AccountDAO getAccountDAO() throws DAOException;
 }

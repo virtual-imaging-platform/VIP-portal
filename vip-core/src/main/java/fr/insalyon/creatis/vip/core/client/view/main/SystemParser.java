@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -38,12 +38,13 @@ import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.system.account.ManageAccountsTab;
 import fr.insalyon.creatis.vip.core.client.view.system.group.ManageGroupsTab;
 import fr.insalyon.creatis.vip.core.client.view.system.user.ManageUsersTab;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class SystemParser extends ApplicationParser {
 
@@ -53,6 +54,7 @@ public class SystemParser extends ApplicationParser {
         if (CoreModule.user.isSystemAdministrator()) {
             addApplication(CoreConstants.APP_USER, CoreConstants.APP_IMG_USER);
             addApplication(CoreConstants.APP_GROUP, CoreConstants.APP_IMG_GROUP);
+            addApplication(CoreConstants.APP_ACCOUNT_MANAGER, CoreConstants.APP_IMG_ACCOUNT_MANAGER);
         }
     }
 
@@ -65,6 +67,10 @@ public class SystemParser extends ApplicationParser {
 
         } else if (applicationName.equals(CoreConstants.APP_GROUP)) {
             Layout.getInstance().addTab(new ManageGroupsTab());
+            return true;
+        
+        } else if (applicationName.equals(CoreConstants.APP_ACCOUNT_MANAGER)) {
+            Layout.getInstance().addTab(new ManageAccountsTab());
             return true;
         }
         return false;

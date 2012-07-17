@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.core.server.rpc;
 
+import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
@@ -51,7 +52,7 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet implements ConfigurationService {
 
@@ -569,6 +570,67 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             logger.info("(" + email + ") Reseting password.");
             configurationBusiness.resetPassword(email, code, password);
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    /**
+     *
+     * @return List of accounts
+     * @throws CoreException
+     */
+    @Override
+    public List<Account> getAccounts() throws CoreException {
+
+        try {
+            return configurationBusiness.getAccounts();
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param name
+     * @throws CoreException
+     */
+    @Override
+    public void removeAccount(String name) throws CoreException {
+
+        try {
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Removing account type '" + name + "'.");
+            configurationBusiness.removeAccount(name);
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    @Override
+    public void addAccount(String name, List<String> groups) throws CoreException {
+
+        try {
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Adding account type '" + name + "'.");
+            configurationBusiness.addAccount(name, groups);
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    @Override
+    public void updateAccount(String oldName, String newName, List<String> groups)
+            throws CoreException {
+
+        try {
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Updating account type from '" + oldName + "' to '" + newName + "'.");
+            configurationBusiness.updateAccount(oldName, newName, groups);
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);

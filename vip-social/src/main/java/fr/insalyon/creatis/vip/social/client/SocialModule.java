@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -52,7 +52,7 @@ import fr.insalyon.creatis.vip.social.client.view.SocialTab;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class SocialModule extends Module {
 
@@ -82,16 +82,11 @@ public class SocialModule extends Module {
                 verifyMessages();
             }
         };
-        timer.scheduleRepeating(3 * 60000);
+        timer.scheduleRepeating(5 * 60000);
     }
 
     @Override
     public void postLoading() {
-    }
-
-    @Override
-    public boolean parseAccountType(String accountType) {
-        return false;
     }
 
     @Override

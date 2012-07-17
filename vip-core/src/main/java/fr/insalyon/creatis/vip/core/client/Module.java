@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -35,34 +35,18 @@
 package fr.insalyon.creatis.vip.core.client;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public abstract class Module {
-
-    private List<String> accountTypes = new ArrayList<String>();
 
     public abstract void load();
 
     public abstract void postLoading();
 
     public abstract void terminate();
-
-    public abstract boolean parseAccountType(String accountType);
-
-    protected void addAccountType(String accountType) {
-
-        accountTypes.add(accountType);
-    }
-
-    public List<String> getAccountTypes() {
-
-        return accountTypes;
-    }
 
     /**
      * This method is invoked when a user is removed from the platform. Its 

@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -52,15 +52,13 @@ import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulation
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Module;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
-import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.layout.CenterTabSet;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ApplicationModule extends Module {
 
@@ -69,8 +67,6 @@ public class ApplicationModule extends Module {
     public ApplicationModule() {
 
         reservedClasses = new ArrayList<String>();
-        addAccountType(ApplicationConstants.ACCOUNT_VIP);
-        addAccountType(ApplicationConstants.ACCOUNT_NEUROIMAGING);
     }
 
     @Override
@@ -118,42 +114,6 @@ public class ApplicationModule extends Module {
 
     @Override
     public void postLoading() {
-    }
-
-    @Override
-    public boolean parseAccountType(String accountType) {
-
-        if (accountType.equals(ApplicationConstants.ACCOUNT_VIP)) {
-            addUserToGroup(ApplicationConstants.GROUP_VIP);
-            return true;
-        } else if (accountType.equals(ApplicationConstants.ACCOUNT_NEUROIMAGING)) {
-            addUserToGroup(ApplicationConstants.GROUP_NEUROIMAGING);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * 
-     * @param groupName 
-     */
-    private void addUserToGroup(final String groupName) {
-
-        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-                SC.say("Unable to add user to group '" + groupName
-                        + "':<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(Void result) {
-            }
-        };
-        service.addUserToGroup(groupName, callback);
     }
 
     @Override

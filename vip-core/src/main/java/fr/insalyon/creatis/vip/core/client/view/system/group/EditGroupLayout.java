@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -64,7 +64,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class EditGroupLayout extends AbstractFormLayout {
 
@@ -100,7 +100,7 @@ public class EditGroupLayout extends AbstractFormLayout {
             @Override
             public void onClick(ClickEvent event) {
                 if (nameItem.validate()) {
-                    save(nameItem.getValueAsString().trim(), 
+                    save(nameItem.getValueAsString().trim(),
                             isPublicField.getValueAsBoolean());
                 }
             }
@@ -111,7 +111,9 @@ public class EditGroupLayout extends AbstractFormLayout {
 
             @Override
             public void onClick(ClickEvent event) {
-                remove(nameItem.getValueAsString().trim());
+                if (nameItem.validate()) {
+                    remove(nameItem.getValueAsString().trim());
+                }
             }
         });
         removeButton.setIcon(CoreConstants.ICON_DELETE);

@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -40,7 +40,7 @@ import fr.insalyon.creatis.vip.docs.client.view.DocsParser;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class DocsModule extends Module {
 
@@ -52,11 +52,6 @@ public class DocsModule extends Module {
 
     @Override
     public void postLoading() {
-    }
-
-    @Override
-    public boolean parseAccountType(String accountType) {
-        return false;
     }
 
     @Override

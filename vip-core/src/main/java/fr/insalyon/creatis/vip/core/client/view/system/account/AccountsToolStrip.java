@@ -32,38 +32,49 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.gatelab.client;
+package fr.insalyon.creatis.vip.core.client.view.system.account;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationModule;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.Module;
-import fr.insalyon.creatis.vip.gatelab.client.view.GateLabTileGrid;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class GateLabModule extends Module {
+public class AccountsToolStrip extends ToolStrip {
 
-    public GateLabModule() {
+    public AccountsToolStrip() {
 
-        ApplicationModule.reservedClasses.add(GateLabConstants.GATELAB_CLASS);
-    }
+        this.setWidth100();
 
-    @Override
-    public void load() {
+        ToolStripButton addButton = new ToolStripButton("Add Account Type");
+        addButton.setIcon(CoreConstants.ICON_ADD);
+        addButton.addClickHandler(new ClickHandler() {
 
-        if (CoreModule.user.isSystemAdministrator()
-                || CoreModule.user.hasGroupAccess(GateLabConstants.GROUP_GATELAB)) {
-            CoreModule.addApplicationsTileGrid(new GateLabTileGrid());
-        }
-    }
+            @Override
+            public void onClick(ClickEvent event) {
+                ManageAccountsTab tab = (ManageAccountsTab) Layout.getInstance().
+                        getTab(CoreConstants.TAB_MANAGE_ACCOUNTS);
+                tab.setAccount(null, null);
+            }
+        });
+        this.addButton(addButton);
 
-    @Override
-    public void postLoading() {
-    }
+        ToolStripButton refreshButton = new ToolStripButton("Refresh");
+        refreshButton.setIcon(CoreConstants.ICON_REFRESH);
+        refreshButton.addClickHandler(new ClickHandler() {
 
-    @Override
-    public void terminate() {
+            @Override
+            public void onClick(ClickEvent event) {
+                ManageAccountsTab tab = (ManageAccountsTab) Layout.getInstance().
+                        getTab(CoreConstants.TAB_MANAGE_ACCOUNTS);
+                tab.loadAccounts();
+            }
+        });
+        this.addButton(refreshButton);
     }
 }

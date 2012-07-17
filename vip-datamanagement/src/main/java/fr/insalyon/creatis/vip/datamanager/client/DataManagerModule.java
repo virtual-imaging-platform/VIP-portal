@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -45,7 +45,7 @@ import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class DataManagerModule extends Module {
 
@@ -66,11 +66,6 @@ public class DataManagerModule extends Module {
         Layout.getInstance().removeMainSection(DataManagerConstants.SECTION_FILE_TRANSFER);
         BrowserLayout.terminate();
         OperationLayout.terminate();
-    }
-
-    @Override
-    public boolean parseAccountType(String accountType) {
-        return false;
     }
 
     @Override

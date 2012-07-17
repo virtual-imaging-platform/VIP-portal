@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.core.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -45,7 +46,7 @@ import java.util.Map;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public interface ConfigurationServiceAsync {
 
@@ -98,4 +99,13 @@ public interface ConfigurationServiceAsync {
     public void removeUserFromGroup(String email, String groupName, AsyncCallback<Void> asyncCallback);
     
     public void resetPassword(String email, String code, String password, AsyncCallback<Void> asyncCallback);
+    
+    // Accounts
+    public void getAccounts(AsyncCallback<List<Account>> asyncCallback);
+    
+    public void addAccount(String name, List<String> groups, AsyncCallback<Void> asyncCallback);
+    
+    public void updateAccount(String oldName, String newName, List<String> groups, AsyncCallback<Void> asyncCallback);
+    
+    public void removeAccount(String name, AsyncCallback<Void> asyncCallback);
 }

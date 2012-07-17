@@ -158,7 +158,7 @@ public class PlatformConnection {
                 }
             }
 
-            if (createTable("VIPUsersGroups",
+            createTable("VIPUsersGroups",
                     "email VARCHAR(255), "
                     + "groupname VARCHAR(100), "
                     + "role VARCHAR(30), "
@@ -166,8 +166,20 @@ public class PlatformConnection {
                     + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
                     + "ON DELETE CASCADE ON UPDATE RESTRICT, "
                     + "FOREIGN KEY (groupname) REFERENCES VIPGroups(groupname) "
-                    + "ON DELETE CASCADE ON UPDATE RESTRICT")) {
-            }
+                    + "ON DELETE CASCADE ON UPDATE RESTRICT");
+            
+            createTable("VIPAccounts", 
+                    "name VARCHAR(255), "
+                    + "PRIMARY KEY (name)");
+            
+            createTable("VIPAccountsGroups", 
+                    "name VARCHAR(255), "
+                    + "groupname VARCHAR(255), "
+                    + "PRIMARY KEY (name, groupname), "
+                    + "FOREIGN KEY (name) REFERENCES VIPAccounts(name) "
+                    + "ON DELETE CASCADE ON UPDATE RESTRICT, "
+                    + "FOREIGN KEY (groupname) REFERENCES VIPGroups(groupname) "
+                    + "ON DELETE CASCADE ON UPDATE RESTRICT");
 
             firstExecution = false;
         }

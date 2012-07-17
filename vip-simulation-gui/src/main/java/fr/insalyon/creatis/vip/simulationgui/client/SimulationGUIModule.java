@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -44,7 +44,7 @@ import fr.insalyon.creatis.vip.simulationgui.client.view.SimulationGUIParser;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class SimulationGUIModule extends Module {
 
@@ -56,10 +56,12 @@ public class SimulationGUIModule extends Module {
         VTKControllerAsync service = VTKController.Util.getInstance();
         AsyncCallback<Void> asyncCallback = new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 SC.say("Unable to configure Simulation GUI:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
             }
         };
@@ -68,11 +70,6 @@ public class SimulationGUIModule extends Module {
 
     @Override
     public void postLoading() {
-    }
-
-    @Override
-    public boolean parseAccountType(String accountType) {
-        return false;
     }
 
     @Override

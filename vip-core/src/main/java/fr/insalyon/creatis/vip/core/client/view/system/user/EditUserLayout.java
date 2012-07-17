@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -61,7 +61,7 @@ import java.util.Map;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class EditUserLayout extends AbstractFormLayout {
 
@@ -115,10 +115,7 @@ public class EditUserLayout extends AbstractFormLayout {
         confirmedField.setDisabled(true);
         confirmedField.setWidth(350);
 
-        saveButton = new IButton("Save");
-        saveButton.setWidth(70);
-        saveButton.setDisabled(true);
-        saveButton.addClickHandler(new ClickHandler() {
+        saveButton = new IButton("Save", new ClickHandler() {
 
             @Override
             public void onClick(ClickEvent event) {
@@ -150,6 +147,8 @@ public class EditUserLayout extends AbstractFormLayout {
                 }
             }
         });
+        saveButton.setIcon(CoreConstants.ICON_SAVE);
+        saveButton.setDisabled(true);
 
         this.addMember(nameLabel);
         this.addMember(emailLabel);

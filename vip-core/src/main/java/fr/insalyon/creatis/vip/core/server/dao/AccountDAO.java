@@ -32,38 +32,26 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.gatelab.client;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationModule;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.Module;
-import fr.insalyon.creatis.vip.gatelab.client.view.GateLabTileGrid;
+package fr.insalyon.creatis.vip.core.server.dao;
+
+import fr.insalyon.creatis.vip.core.client.bean.Account;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import java.util.List;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class GateLabModule extends Module {
+public interface AccountDAO {
 
-    public GateLabModule() {
+    public void add(String name, List<String> groups) throws DAOException;
+    
+    public void update(String oldName, String newName, List<String> groups) throws DAOException;
+    
+    public void remove(String nName) throws DAOException;
 
-        ApplicationModule.reservedClasses.add(GateLabConstants.GATELAB_CLASS);
-    }
-
-    @Override
-    public void load() {
-
-        if (CoreModule.user.isSystemAdministrator()
-                || CoreModule.user.hasGroupAccess(GateLabConstants.GROUP_GATELAB)) {
-            CoreModule.addApplicationsTileGrid(new GateLabTileGrid());
-        }
-    }
-
-    @Override
-    public void postLoading() {
-    }
-
-    @Override
-    public void terminate() {
-    }
+    public List<Account> getList() throws DAOException;
+    
+    public List<Group> getGroups(String accountName) throws DAOException;
 }

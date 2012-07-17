@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -34,13 +34,14 @@
  */
 package fr.insalyon.creatis.vip.core.server.dao;
 
+import fr.insalyon.creatis.vip.core.server.dao.h2.AccountData;
 import fr.insalyon.creatis.vip.core.server.dao.h2.GroupData;
 import fr.insalyon.creatis.vip.core.server.dao.h2.UserData;
 import fr.insalyon.creatis.vip.core.server.dao.h2.UsersGroupsData;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class H2DAOFactory extends CoreDAOFactory {
 
@@ -70,5 +71,10 @@ public class H2DAOFactory extends CoreDAOFactory {
     @Override
     public UsersGroupsDAO getUsersGroupsDAO() throws DAOException {
         return new UsersGroupsData();
+    }
+
+    @Override
+    public AccountDAO getAccountDAO() throws DAOException {
+        return new AccountData();
     }
 }

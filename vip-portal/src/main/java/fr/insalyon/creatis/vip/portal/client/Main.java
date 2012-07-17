@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -55,7 +55,7 @@ import fr.insalyon.creatis.vip.social.client.SocialModule;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class Main implements EntryPoint {
 
@@ -73,7 +73,6 @@ public class Main implements EntryPoint {
         modulesInit.add(new SimulationGUIModule());
         modulesInit.add(new ApplicationModule());
         modulesInit.add(new GateLabModule());
-        modulesInit.initializeAccountTypes();
         // End-Modules
 
         // Cookies
