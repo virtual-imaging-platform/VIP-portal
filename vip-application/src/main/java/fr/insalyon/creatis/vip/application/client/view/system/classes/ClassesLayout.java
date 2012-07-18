@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -50,7 +50,6 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
-import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
@@ -64,36 +63,32 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
-public class ClassesStackSection extends SectionStackSection {
+public class ClassesLayout extends VLayout {
 
     private ModalWindow modal;
     private ListGrid grid;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
 
-    public ClassesStackSection() {
+    public ClassesLayout() {
 
-        this.setTitle("Classes");
-        this.setCanCollapse(true);
-        this.setExpanded(true);
-        this.setResizeable(true);
+        this.setWidth100();
+        this.setHeight100();
+        this.setOverflow(Overflow.AUTO);
 
         configureGrid();
         modal = new ModalWindow(grid);
 
-        VLayout vLayout = new VLayout();
-        vLayout.setMaxHeight(400);
-        vLayout.setHeight100();
-        vLayout.setOverflow(Overflow.AUTO);
-        vLayout.addMember(grid);
+        this.addMember(new ClassesToolStrip());
+        this.addMember(grid);
 
-        this.addItem(vLayout);
         loadData();
     }
 
     private void configureGrid() {
+
         grid = new ListGrid() {
 
             @Override
@@ -109,6 +104,7 @@ public class ClassesStackSection extends SectionStackSection {
                     ImgButton loadImg = getImgButton(CoreConstants.ICON_EDIT, "Edit");
                     loadImg.addClickHandler(new ClickHandler() {
 
+                        @Override
                         public void onClick(ClickEvent event) {
                             edit(rollOverRecord.getAttribute("name"),
                                     rollOverRecord.getAttribute("groups"));
@@ -117,13 +113,15 @@ public class ClassesStackSection extends SectionStackSection {
                     ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
                     deleteImg.addClickHandler(new ClickHandler() {
 
+                        @Override
                         public void onClick(ClickEvent event) {
                             final String name = rollOverRecord.getAttribute("name");
-                            SC.confirm("Do you really want to remove the user \""
-                                    + name + "\"?", new BooleanCallback() {
+                            SC.ask("Do you really want to remove the class '"
+                                    + name + "'?", new BooleanCallback() {
 
+                                @Override
                                 public void execute(Boolean value) {
-                                    if (value != null && value) {
+                                    if (value) {
                                         remove(name);
                                     }
                                 }
@@ -155,15 +153,14 @@ public class ClassesStackSection extends SectionStackSection {
         grid.setShowEmptyMessage(true);
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
-
-        ListGridField nameField = new ListGridField("name", "Class Name");
-        ListGridField groupsField = new ListGridField("groups", "Groups");
-
-        grid.setFields(nameField, groupsField);
+        grid.setFields(
+                new ListGridField("name", "Class Name"),
+                new ListGridField("groups", "Groups"));
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 
+            @Override
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 edit(event.getRecord().getAttribute("name"),
                         event.getRecord().getAttribute("groups"));
@@ -175,11 +172,13 @@ public class ClassesStackSection extends SectionStackSection {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<List<AppClass>> callback = new AsyncCallback<List<AppClass>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to get list of classes:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<AppClass> result) {
                 List<ClassRecord> dataList = new ArrayList<ClassRecord>();
 
@@ -206,11 +205,13 @@ public class ClassesStackSection extends SectionStackSection {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to remove class:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
                 modal.hide();
                 SC.say("The class was successfully removed!");

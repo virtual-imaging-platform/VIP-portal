@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -34,54 +34,38 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.system.classes;
 
-import com.smartgwt.client.types.VisibilityMode;
-import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.layout.SectionStack;
-import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.layout.HLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
-public class ManageClassesTab extends Tab {
+public class ManageClassesTab extends AbstractManageTab {
 
-    private ToolStrip toolStrip;
-    private ClassesStackSection classesStackSection;
-    private EditClassStackSection editStackSection;
+    private ClassesLayout classesLayout;
+    private EditClassLayout editLayout;
 
     public ManageClassesTab() {
 
-        this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_CLASSES) + " " + ApplicationConstants.APP_CLASSES);
-        this.setID(ApplicationConstants.TAB_MANAGE_CLASSES);
-        this.setCanClose(true);
-
-        VLayout vLayout = new VLayout();
-
-        toolStrip = new ManageClassesToolStrip();
-        vLayout.addMember(toolStrip);
-
-        SectionStack sectionStack = new SectionStack();
-        sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
-        sectionStack.setAnimateSections(true);
-        sectionStack.setCanResizeSections(true);
-
-        classesStackSection = new ClassesStackSection();
-        editStackSection = new EditClassStackSection();
-
-        sectionStack.setSections(classesStackSection, editStackSection);
-        vLayout.addMember(sectionStack);
-
-        this.setPane(vLayout);
+        super(ApplicationConstants.ICON_CLASSES, ApplicationConstants.APP_CLASSES, ApplicationConstants.TAB_MANAGE_CLASSES);
+        
+        classesLayout = new ClassesLayout();
+        editLayout = new EditClassLayout();
+        
+        HLayout hLayout = new HLayout(5);
+        hLayout.addMember(classesLayout);
+        hLayout.addMember(editLayout);
+        
+        vLayout.addMember(hLayout);
     }
 
     public void loadClasses() {
-        classesStackSection.loadData();
+        classesLayout.loadData();
     }
 
     public void setClass(String name, String groups) {
-        editStackSection.setClass(name, groups);
+        editLayout.setClass(name, groups);
     }
 }

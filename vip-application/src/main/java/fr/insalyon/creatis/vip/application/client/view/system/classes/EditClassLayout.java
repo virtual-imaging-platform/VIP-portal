@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -36,16 +36,13 @@ package fr.insalyon.creatis.vip.application.client.view.system.classes;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.MultipleAppearance;
-import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.ButtonItem;
+import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
-import com.smartgwt.client.widgets.layout.SectionStackSection;
-import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
@@ -53,7 +50,8 @@ import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import java.util.ArrayList;
@@ -62,138 +60,143 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
-public class EditClassStackSection extends SectionStackSection {
+public class EditClassLayout extends AbstractFormLayout {
 
-    private ModalWindow modal;
     private boolean newClass = true;
-    private DynamicForm form;
-    private TextItem nameItem;
+    private TextItem nameField;
     private SelectItem groupsPickList;
+    private IButton removeButton;
 
-    public EditClassStackSection() {
+    public EditClassLayout() {
 
-        this.setTitle("Add Class");
-        this.setCanCollapse(true);
-        this.setExpanded(true);
-        this.setResizeable(true);
+        super(380, 200);
+        addTitle("Add/Edit Class", ApplicationConstants.ICON_CLASSES);
 
-        configureForm();
-
-        VLayout vLayout = new VLayout(15);
-        vLayout.setHeight100();
-        vLayout.setOverflow(Overflow.AUTO);
-        vLayout.setMargin(5);
-        vLayout.addMember(form);
-
-        modal = new ModalWindow(vLayout);
-
-        this.addItem(vLayout);
+        configure();
         loadData();
     }
 
-    private void configureForm() {
-        form = new DynamicForm();
-        form.setWidth(500);
+    private void configure() {
 
-        nameItem = FieldUtil.getTextItem(350, true, "Class Name", null);
+        nameField = FieldUtil.getTextItem(350, null);
 
         groupsPickList = new SelectItem();
-        groupsPickList.setTitle("Groups");
+        groupsPickList.setShowTitle(false);
         groupsPickList.setMultiple(true);
         groupsPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
         groupsPickList.setWidth(350);
 
-        ButtonItem saveItem = new ButtonItem("Save");
-        saveItem.setWidth(50);
-        saveItem.addClickHandler(new ClickHandler() {
+        IButton saveButton = new IButton("Save");
+        saveButton.setIcon(CoreConstants.ICON_SAVE);
+        saveButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
-                if (form.validate()) {
-                    List<String> values = new ArrayList<String>();
-                    values.addAll(Arrays.asList(groupsPickList.getValues()));
-
-                    save(new AppClass(nameItem.getValueAsString().trim(),
-                            values));
+                if (nameField.validate()) {
+                    save(new AppClass(nameField.getValueAsString().trim(),
+                            Arrays.asList(groupsPickList.getValues())));
                 }
             }
         });
 
-        form.setFields(nameItem, groupsPickList, saveItem);
+        removeButton = new IButton("Remove", new ClickHandler() {
+
+            @Override
+            public void onClick(ClickEvent event) {
+                SC.ask("Do you really want to remove this class?", new BooleanCallback() {
+
+                    @Override
+                    public void execute(Boolean value) {
+                        if (value) {
+                            remove(nameField.getValueAsString().trim());
+                        }
+                    }
+                });
+            }
+        });
+        removeButton.setIcon(CoreConstants.ICON_DELETE);
+        removeButton.setDisabled(true);
+
+        addField("Name", nameField);
+        addField("Groups", groupsPickList);
+        addButtons(saveButton, removeButton);
     }
 
     /**
      * Sets a class to edit or creates a blank form.
-     * 
+     *
      * @param name Class name
      * @param groups Class groups
      */
     public void setClass(String name, String groups) {
+
         if (name != null) {
-            this.setTitle("Editing Class: " + name);
-            this.nameItem.setValue(name);
-            this.nameItem.setDisabled(true);
+            this.nameField.setValue(name);
+            this.nameField.setDisabled(true);
             this.groupsPickList.setValues(groups.split(", "));
             this.newClass = false;
+            this.removeButton.setDisabled(false);
+
         } else {
-            this.setTitle("Add Class");
-            this.nameItem.setValue("");
-            this.nameItem.setDisabled(false);
+            this.nameField.setValue("");
+            this.nameField.setDisabled(false);
             this.groupsPickList.setValues(new String[]{});
             this.newClass = true;
+            this.removeButton.setDisabled(true);
         }
     }
 
+    /**
+     *
+     * @param appClass
+     */
     private void save(AppClass appClass) {
 
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
 
         if (newClass) {
-            final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-                public void onFailure(Throwable caught) {
-                    modal.hide();
-                    SC.warn("Unable to add class:<br />" + caught.getMessage());
-                }
-
-                public void onSuccess(Void result) {
-                    modal.hide();
-                    ManageClassesTab classTab = (ManageClassesTab) Layout.getInstance().
-                            getTab(ApplicationConstants.TAB_MANAGE_CLASSES);
-                    classTab.loadClasses();
-                    setClass(null, null);
-                }
-            };
             modal.show("Adding class '" + appClass.getName() + "'...", true);
-            service.addClass(appClass, callback);
+            service.addClass(appClass, getCallback("add"));
 
         } else {
-            final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-                public void onFailure(Throwable caught) {
-                    modal.hide();
-                    SC.warn("Unable to update class:<br />" + caught.getMessage());
-                }
-
-                public void onSuccess(Void result) {
-                    modal.hide();
-                    ManageClassesTab classTab = (ManageClassesTab) Layout.getInstance().
-                            getTab(ApplicationConstants.TAB_MANAGE_CLASSES);
-                    classTab.loadClasses();
-                    setClass(null, null);
-                }
-            };
             modal.show("Updating class '" + appClass.getName() + "'...", true);
-            service.updateClass(appClass, callback);
+            service.updateClass(appClass, getCallback("update"));
         }
+    }
+
+    /**
+     *
+     * @param text
+     * @return
+     */
+    private AsyncCallback<Void> getCallback(final String text) {
+
+        return new AsyncCallback<Void>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Unable to " + text + " class:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                modal.hide();
+                setClass(null, null);
+                ManageClassesTab tab = (ManageClassesTab) Layout.getInstance().
+                        getTab(ApplicationConstants.TAB_MANAGE_CLASSES);
+                tab.loadClasses();
+            }
+        };
     }
 
     /**
      * Loads groups list
      */
     private void loadData() {
-        
+
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<List<Group>> callback = new AsyncCallback<List<Group>>() {
 
@@ -208,12 +211,41 @@ public class EditClassStackSection extends SectionStackSection {
                 modal.hide();
                 List<String> dataList = new ArrayList<String>();
                 for (Group group : result) {
-                        dataList.add(group.getName());
+                    dataList.add(group.getName());
                 }
                 groupsPickList.setValueMap(dataList.toArray(new String[]{}));
             }
         };
         modal.show("Loading groups...", true);
         service.getGroups(callback);
+    }
+
+    /**
+     * Removes a class.
+     *
+     * @param name Class name
+     */
+    private void remove(String name) {
+
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Unable to remove class:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                modal.hide();
+                SC.say("The class was successfully removed!");
+                ManageClassesTab tab = (ManageClassesTab) Layout.getInstance().
+                        getTab(ApplicationConstants.TAB_MANAGE_CLASSES);
+                tab.loadClasses();
+            }
+        };
+        modal.show("Removing class '" + name + "'...", true);
+        service.removeClass(name, callback);
     }
 }

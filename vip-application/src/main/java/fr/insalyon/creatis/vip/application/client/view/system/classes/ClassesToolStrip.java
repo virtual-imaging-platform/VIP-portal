@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -44,34 +44,34 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
-public class ManageClassesToolStrip extends ToolStrip {
+public class ClassesToolStrip extends ToolStrip {
 
-    public ManageClassesToolStrip() {
+    public ClassesToolStrip() {
 
         this.setWidth100();
 
-        ToolStripButton addButton = new ToolStripButton("Add Class");
-        addButton.setIcon(CoreConstants.ICON_ADD);
+        ToolStripButton addButton = new ToolStripButton("Add Class", CoreConstants.ICON_ADD);
         addButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
-                ManageClassesTab classTab = (ManageClassesTab) Layout.getInstance().
+                ManageClassesTab tab = (ManageClassesTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_CLASSES);
-                classTab.setClass(null, null);
+                tab.setClass(null, null);
             }
         });
         this.addButton(addButton);
 
-        ToolStripButton refreshButton = new ToolStripButton("Refresh");
-        refreshButton.setIcon(CoreConstants.ICON_REFRESH);
+        ToolStripButton refreshButton = new ToolStripButton("Refresh", CoreConstants.ICON_REFRESH);
         refreshButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
-                ManageClassesTab classTab = (ManageClassesTab) Layout.getInstance().
+                ManageClassesTab tab = (ManageClassesTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_CLASSES);
-                classTab.loadClasses();
+                tab.loadClasses();
             }
         });
         this.addButton(refreshButton);

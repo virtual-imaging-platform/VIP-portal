@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -63,7 +63,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ApplicationsLayout extends VLayout {
 
@@ -117,12 +117,12 @@ public class ApplicationsLayout extends VLayout {
                         @Override
                         public void onClick(ClickEvent event) {
                             final String name = rollOverRecord.getAttribute("name");
-                            SC.confirm("Do you really want to remove the application \""
+                            SC.ask("Do you really want to remove the application \""
                                     + name + "\"?", new BooleanCallback() {
 
                                 @Override
                                 public void execute(Boolean value) {
-                                    if (value != null && value) {
+                                    if (value) {
                                         remove(name);
                                     }
                                 }

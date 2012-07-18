@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.application.client.view.system.application;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.MultipleAppearance;
+import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -57,7 +58,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class EditApplicationLayout extends AbstractFormLayout {
 
@@ -108,7 +109,15 @@ public class EditApplicationLayout extends AbstractFormLayout {
 
             @Override
             public void onClick(ClickEvent event) {
-                remove(nameField.getValueAsString().trim());
+                SC.ask("Do you really want to remove this application?", new BooleanCallback() {
+
+                    @Override
+                    public void execute(Boolean value) {
+                        if (value) {
+                            remove(nameField.getValueAsString().trim());
+                        }
+                    }
+                });
             }
         });
         removeButton.setIcon(CoreConstants.ICON_DELETE);
@@ -147,52 +156,48 @@ public class EditApplicationLayout extends AbstractFormLayout {
         }
     }
 
+    /**
+     * 
+     * @param app 
+     */
     private void save(Application app) {
 
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
 
         if (newApplication) {
-            final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                    modal.hide();
-                    SC.warn("Unable to add application:<br />" + caught.getMessage());
-                }
-
-                @Override
-                public void onSuccess(Void result) {
-                    modal.hide();
-                    ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
-                            getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                    appsTab.loadApplications();
-                    setApplication(null, null, null);
-                }
-            };
             modal.show("Adding application '" + app.getName() + "'...", true);
-            service.add(app, callback);
+            service.add(app, getCallback("add"));
 
         } else {
-            final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                    modal.hide();
-                    SC.warn("Unable to update application:<br />" + caught.getMessage());
-                }
-
-                @Override
-                public void onSuccess(Void result) {
-                    modal.hide();
-                    ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
-                            getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                    appsTab.loadApplications();
-                    setApplication(null, null, null);
-                }
-            };
             modal.show("Updating application '" + app.getName() + "'...", true);
-            service.update(app, callback);
+            service.update(app, getCallback("update"));
         }
+    }
+
+    /**
+     * 
+     * @param text
+     * @return 
+     */
+    private AsyncCallback<Void> getCallback(final String text) {
+
+        return new AsyncCallback<Void>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Unable to " + text + " application:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                modal.hide();
+                setApplication(null, null, null);
+                ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().
+                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
+                tab.loadApplications();
+            }
+        };
     }
 
     /**
