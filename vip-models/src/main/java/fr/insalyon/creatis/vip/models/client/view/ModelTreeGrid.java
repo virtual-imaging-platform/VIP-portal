@@ -379,26 +379,7 @@ public class ModelTreeGrid extends TreeGrid {
          
     }
 
-    public void duplicateTimePoint()
-    {
-         ModelServiceAsync ms = ModelService.Util.getInstance();
-         AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
-
-            public void onFailure(Throwable caught) {
-                SC.warn("Cant add a timepoint");
-            }
-
-            public void onSuccess(SimulationObjectModel result) {
-                model = result;
-                ModelTreeNode copy = new ModelTreeNode("", "Timepoint (" + new Date(System.currentTimeMillis()) + ")", true, ntp++, null);
-                copy.setIcon(ModelConstants.APP_IMG_TIMEPOINT);
-                modelTree.add(copy, modelTree.getRoot(), tpSelected);
-               
-            }
-        };
-        ms.duplicateTimePoint(model, tpSelected, callback);
-    }
-    
+     
     public void addInstant() {
             ModelServiceAsync ms = ModelService.Util.getInstance();
             AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
@@ -968,6 +949,49 @@ public class ModelTreeGrid extends TreeGrid {
         this.markForRedraw();
     }
     
+    public void duplicateInstant()
+    {
+        ModelServiceAsync ms = ModelService.Util.getInstance();
+        final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
+
+            public void onFailure(Throwable caught) {
+                SC.say("Cannot duplicate Instant");
+            }
+
+            public void onSuccess(SimulationObjectModel result) {
+                SC.say("Instant duplicated");
+                model = result;
+                modelTree.add(new ModelTreeNode(mnode), modelTree.getParent(mnode));
+            }
+        };
+
+        ms.duplicateInstant(model, Integer.parseInt(modelTree.getParent(mnode).getAttribute("number")), Integer.parseInt(mnode.getAttribute("number")), callback);
+       this.markForRedraw();
+    }
+    
+    
+    public void duplicateTimepoint()
+    {
+        ModelServiceAsync ms = ModelService.Util.getInstance();
+        final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
+
+            public void onFailure(Throwable caught) {
+                SC.say("Cannot duplicate Timepoint");
+            }
+
+            public void onSuccess(SimulationObjectModel result) {
+                SC.say("Timepoint duplicated");
+                model = result;
+                ModelTreeNode node =  new ModelTreeNode(mnode);
+                
+                modelTree.add(node, modelTree.getParent(mnode));
+            }
+        };
+
+        ms.duplicateTimePoint(model, Integer.parseInt(mnode.getAttribute("number")), callback);
+       this.markForRedraw();
+    }
+    
     public void renameTimepoint()
     {
          RenameTimepointWindow win = new RenameTimepointWindow(ModelTreeGrid.this,
@@ -991,6 +1015,27 @@ public class ModelTreeGrid extends TreeGrid {
         public ModelTreeNode(String entityId, String entityName, boolean display, int number) {
             this(entityId, entityName, display, number, new ModelTreeNode[]{});
         }
+        
+        public ModelTreeNode(ModelTreeNode src)
+        {
+            setAttribute(model.getModelName(), src.getAttribute(model.getModelName()));
+            setAttribute("EntityId", src.getAttribute("entityId"));
+
+            if(modelTree.hasChildren(src))
+            {
+                TreeNode[] srChildren = modelTree.getChildren(src);
+                TreeNode[] children = new TreeNode[srChildren.length];
+                int index = 0;
+                for(TreeNode node : srChildren)
+                    children[index++] = (new ModelTreeNode((ModelTreeNode)node));
+                setAttribute("Children", children);
+            }
+            setAttribute("isOpen", false);
+            setAttribute("number", String.valueOf(modelTree.getChildren(src).length+1));
+            this.setIcon(src.getIcon());
+            this.setTitle(src.getTitle());
+
+        }
 
         public ModelTreeNode(String entityId, String entityName, boolean display, int number, ModelTreeNode... children) {
             setAttribute(model.getModelName(), entityName);
@@ -999,6 +1044,8 @@ public class ModelTreeGrid extends TreeGrid {
             setAttribute("isOpen", display);
             setAttribute("number", String.valueOf(number));
         }
+        
+
     }
 
     public class ModelMenu extends Menu {
@@ -1034,7 +1081,7 @@ public class ModelTreeGrid extends TreeGrid {
             duplicateTpItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
                 public void onClick(MenuItemClickEvent event)
                 {
-                    //duplicateTimePoint();
+                    duplicateTimepoint();
                 }
              });
             
@@ -1044,7 +1091,7 @@ public class ModelTreeGrid extends TreeGrid {
             duplicateInsItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
                 public void onClick(MenuItemClickEvent event)
                 {
-                    //duplicateInstant();
+                    duplicateInstant();
                 }
              });
             

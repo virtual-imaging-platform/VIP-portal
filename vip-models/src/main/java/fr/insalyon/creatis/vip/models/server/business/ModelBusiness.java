@@ -487,19 +487,22 @@ public class ModelBusiness {
     }
 
     private void timepointCopy(Timepoint src, Timepoint dest) {
-        ArrayList<Instant> inss = src.getInstants();
-        for (Instant ins : inss) {
-            ArrayList<ObjectLayer> objs = ins.getObjectLayers();
-            for (ObjectLayer obj : objs) {
-                ArrayList<ObjectLayerPart> parts = obj.getLayerParts();
-
-                for (ObjectLayerPart part : parts) {
-                    //    ObjectLayerPart
-                }
-            }
-
-            //  ArrayList<PhysicalParameters>
-        }
+        dest.setInstants(src.getInstants());
+        dest.setStartingDate(src.getStartingDate());
+        
+//        ArrayList<Instant> inss = src.getInstants();
+//        for (Instant ins : inss) {
+//            ArrayList<ObjectLayer> objs = ins.getObjectLayers();
+//            for (ObjectLayer obj : objs) {
+//                ArrayList<ObjectLayerPart> parts = obj.getLayerParts();
+//
+//                for (ObjectLayerPart part : parts) {
+//                    //    ObjectLayerPart
+//                }
+//            }
+//
+//            //  ArrayList<PhysicalParameters>
+//        }
     }
 
     public SimulationObjectModel setInstantDuration(SimulationObjectModel objectModel, int tp, int ins, String duration) {
@@ -521,6 +524,22 @@ public class ModelBusiness {
     }
 
     private void instantCopy(Instant src, Instant dest) {
+        dest.setObjectLayers(src.getObjectLayers());
+        dest.setPhysicalParametersLayers(src.getPhysicalParametersLayers());
+//          ArrayList<ObjectLayer> objs = src.getObjectLayers();
+//            for (ObjectLayer obj : objs) {
+//                obj.
+//                ArrayList<ObjectLayerPart> parts = obj.getLayerParts();
+//
+//                for (ObjectLayerPart part : parts) {
+//                    //    ObjectLayerPart
+//                }
+//            }
+//           ArrayList<PhysicalParametersLayer> phys = src.getPhysicalParametersLayers();
+//            for (PhysicalParametersLayer phy : phys) {
+//                
+//            }
+           dest.setDuration(src.getDuration());
     }
 
     public List<String[]> searchWithScope(String query, boolean[] scope) {
