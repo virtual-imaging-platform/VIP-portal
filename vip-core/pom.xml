@@ -69,7 +69,7 @@
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>grida-client</artifactId>
-            <version>1.2.2</version>
+            <version>1.3</version>
         </dependency>
 
         <dependency>

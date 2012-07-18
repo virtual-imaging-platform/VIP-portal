@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -50,7 +50,7 @@ import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ManageOperationsContextMenu extends Menu {
 
@@ -60,30 +60,34 @@ public class ManageOperationsContextMenu extends Menu {
         this.setShadowDepth(10);
         this.setWidth(90);
 
-        MenuItem clearItem = new MenuItem("Clear Operation");
+        MenuItem clearItem = new MenuItem("Remove Operation");
         clearItem.setIcon(CoreConstants.ICON_CLEAR);
         clearItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
-                SC.confirm("Do you want to clear this operation?", new BooleanCallback() {
+                SC.confirm("Do you want to remove this operation?", new BooleanCallback() {
 
+                    @Override
                     public void execute(Boolean value) {
                         if (value != null && value) {
                             DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+                                @Override
                                 public void onFailure(Throwable caught) {
                                     modal.hide();
-                                    SC.warn("Error executing clear operations: " + caught.getMessage());
+                                    SC.warn("Unable to remove operation:<br />" + caught.getMessage());
                                 }
 
+                                @Override
                                 public void onSuccess(Void result) {
                                     modal.hide();
                                     ManageOperationsTab tab = (ManageOperationsTab) Layout.getInstance().getTab(DataManagerConstants.TAB_MANAGE_OPERATIONS);
                                     tab.loadData();
                                 }
                             };
-                            modal.show("Clearing operation...", true);
+                            modal.show("Removing operation...", true);
                             service.removeOperationById(operation.getId(), callback);
                         }
                     }

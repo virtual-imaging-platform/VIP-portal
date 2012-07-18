@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -39,7 +39,7 @@ import java.util.Date;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class PoolOperation implements IsSerializable {
 
@@ -108,6 +108,10 @@ public class PoolOperation implements IsSerializable {
 
     public Status getStatus() {
         return status;
+    }
+    
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public Type getType() {

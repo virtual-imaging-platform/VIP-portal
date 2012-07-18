@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -58,7 +58,7 @@ import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class OperationBoxLayout extends HLayout {
 
@@ -227,19 +227,17 @@ public class OperationBoxLayout extends HLayout {
 
         actionLayout.removeMembers(actionLayout.getMembers());
 
-        if (operation.getStatus() != Status.Running) {
-            Img removeImg = new Img(DataManagerConstants.OP_ICON_CLEAR, 16, 16);
-            removeImg.setCursor(Cursor.HAND);
-            removeImg.setPrompt("Remove");
-            removeImg.addClickHandler(new ClickHandler() {
+        Img removeImg = new Img(DataManagerConstants.OP_ICON_CLEAR, 16, 16);
+        removeImg.setCursor(Cursor.HAND);
+        removeImg.setPrompt("Remove");
+        removeImg.addClickHandler(new ClickHandler() {
 
-                @Override
-                public void onClick(ClickEvent event) {
-                    remove();
-                }
-            });
-            actionLayout.addMember(removeImg);
-        }
+            @Override
+            public void onClick(ClickEvent event) {
+                remove();
+            }
+        });
+        actionLayout.addMember(removeImg);
 
         if (operation.getType() == Type.Download && operation.getStatus() == Status.Done) {
             Img downloadImg = new Img(DataManagerConstants.OP_ICON_DOWNLOAD, 16, 16);
@@ -265,7 +263,14 @@ public class OperationBoxLayout extends HLayout {
 
             @Override
             public void onFailure(Throwable caught) {
-                SC.warn("Unable to update operation data:<br />" + caught.getMessage());
+                if (caught.getMessage().contains("No data is available")) {
+                    timer.cancel();
+                    operation.setStatus(Status.Failed);
+                    configureMainLayout();
+                    configureActionLayout();
+                } else {
+                    SC.warn("Unable to update operation data:<br />" + caught.getMessage());
+                }
             }
 
             @Override
@@ -304,7 +309,12 @@ public class OperationBoxLayout extends HLayout {
 
                         @Override
                         public void onFailure(Throwable caught) {
-                            SC.warn("Unable to remove operation:<br />" + caught.getMessage());
+                            if (caught.getMessage().contains("No data is available")) {
+                                timer.cancel();
+                                destroy();
+                            } else {
+                                SC.warn("Unable to remove operation:<br />" + caught.getMessage());
+                            }
                         }
 
                         @Override

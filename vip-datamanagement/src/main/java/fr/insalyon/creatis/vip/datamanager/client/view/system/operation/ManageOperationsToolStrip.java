@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -53,7 +53,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ManageOperationsToolStrip extends ToolStrip {
 
@@ -65,48 +65,49 @@ public class ManageOperationsToolStrip extends ToolStrip {
         refreshButton.setIcon(CoreConstants.ICON_REFRESH);
         refreshButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
-                ManageOperationsTab tab = (ManageOperationsTab) Layout.getInstance()
-                        .getTab(DataManagerConstants.TAB_MANAGE_OPERATIONS);
+                ManageOperationsTab tab = (ManageOperationsTab) Layout.getInstance().getTab(DataManagerConstants.TAB_MANAGE_OPERATIONS);
                 tab.loadData();
             }
         });
         this.addButton(refreshButton);
 
-        ToolStripButton clearSelectedOperations = new ToolStripButton("Clear Selected Operations");
+        ToolStripButton clearSelectedOperations = new ToolStripButton("Remove Selected Operations");
         clearSelectedOperations.setIcon(CoreConstants.ICON_CLEAR);
         clearSelectedOperations.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
-                SC.confirm("Do you really want to clear all selected operations?", new BooleanCallback() {
+                SC.confirm("Do you really want to remove all selected operations?", new BooleanCallback() {
 
+                    @Override
                     public void execute(Boolean value) {
                         if (value != null && value) {
-                            final ManageOperationsTab tab = (ManageOperationsTab) Layout.getInstance()
-                                    .getTab(DataManagerConstants.TAB_MANAGE_OPERATIONS);
+                            final ManageOperationsTab tab = (ManageOperationsTab) Layout.getInstance().getTab(DataManagerConstants.TAB_MANAGE_OPERATIONS);
                             List<String> ids = new ArrayList<String>();
-                            
+
                             for (ListGridRecord record : tab.getGridSelection()) {
                                 OperationRecord op = (OperationRecord) record;
-                                if (!op.getStatus().equals("Running")) {
-                                    ids.add(op.getId());
-                                }
+                                ids.add(op.getId());
                             }
-                            
+
                             DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
+                                @Override
                                 public void onFailure(Throwable caught) {
                                     modal.hide();
-                                    SC.warn("Unable to clear operations:<br />" + caught.getMessage());
+                                    SC.warn("Unable to remove operations:<br />" + caught.getMessage());
                                 }
 
+                                @Override
                                 public void onSuccess(Void result) {
                                     modal.hide();
                                     tab.loadData();
                                 }
                             };
-                            modal.show("Clearing operations...", true);
+                            modal.show("Removing operations...", true);
                             service.removeOperations(ids, callback);
                         }
                     }
