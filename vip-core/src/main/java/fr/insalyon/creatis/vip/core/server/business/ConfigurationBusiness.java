@@ -534,8 +534,9 @@ public class ConfigurationBusiness {
         try {
             GRIDAClient client = CoreUtil.getGRIDAClient();
             if (!name.equals(group.getName())) {
-                client.rename(Server.getInstance().getDataManagerGroupsHome()
-                        + "/" + name.replaceAll(" ", "_"), group.getName().replaceAll(" ", "_"));
+                client.rename(
+                        Server.getInstance().getDataManagerGroupsHome() + "/" + name.replaceAll(" ", "_"),
+                        Server.getInstance().getDataManagerGroupsHome() + "/" + group.getName().replaceAll(" ", "_"));
             }
 
             CoreDAOFactory.getDAOFactory().getGroupDAO().update(name, group);

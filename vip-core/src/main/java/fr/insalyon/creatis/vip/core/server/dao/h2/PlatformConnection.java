@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -52,7 +52,7 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class PlatformConnection {
 
@@ -164,9 +164,9 @@ public class PlatformConnection {
                     + "role VARCHAR(30), "
                     + "PRIMARY KEY (email, groupname), "
                     + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
-                    + "ON DELETE CASCADE ON UPDATE RESTRICT, "
+                    + "ON DELETE CASCADE ON UPDATE CASCADE, "
                     + "FOREIGN KEY (groupname) REFERENCES VIPGroups(groupname) "
-                    + "ON DELETE CASCADE ON UPDATE RESTRICT");
+                    + "ON DELETE CASCADE ON UPDATE CASCADE");
             
             createTable("VIPAccounts", 
                     "name VARCHAR(255), "
@@ -177,9 +177,9 @@ public class PlatformConnection {
                     + "groupname VARCHAR(255), "
                     + "PRIMARY KEY (name, groupname), "
                     + "FOREIGN KEY (name) REFERENCES VIPAccounts(name) "
-                    + "ON DELETE CASCADE ON UPDATE RESTRICT, "
+                    + "ON DELETE CASCADE ON UPDATE CASCADE, "
                     + "FOREIGN KEY (groupname) REFERENCES VIPGroups(groupname) "
-                    + "ON DELETE CASCADE ON UPDATE RESTRICT");
+                    + "ON DELETE CASCADE ON UPDATE CASCADE");
 
             firstExecution = false;
         }
