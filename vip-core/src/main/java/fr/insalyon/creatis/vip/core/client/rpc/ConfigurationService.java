@@ -67,10 +67,12 @@ public interface ConfigurationService extends RemoteService {
     }
 
     public User configure(String email, String session) throws CoreException;
-
+    
     public void signup(User user, String comments, String accountType) throws CoreException;
 
     public User signin(String email, String password) throws CoreException;
+    
+    public User signin(String ticket) throws CoreException;
 
     public void signout() throws CoreException;
 
@@ -124,4 +126,6 @@ public interface ConfigurationService extends RemoteService {
     public void updateAccount(String oldName, String newName, List<String> groups) throws CoreException;
     
     public void removeAccount(String name) throws CoreException;
+    
+    public String getCASLoginPageUrl() throws CoreException;
 }

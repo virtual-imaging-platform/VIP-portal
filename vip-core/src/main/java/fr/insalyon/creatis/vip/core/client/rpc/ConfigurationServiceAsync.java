@@ -51,10 +51,12 @@ import java.util.Map;
 public interface ConfigurationServiceAsync {
 
     public void configure(String email, String session, AsyncCallback<User> asyncCallback);
-
+    
     public void signup(User user, String comments, String accountType, AsyncCallback<Void> asyncCallback);
 
     public void signin(String email, String password, AsyncCallback<User> asyncCallback);
+    
+    public void signin(String ticket, AsyncCallback<User> asyncCallback);
 
     public void signout(AsyncCallback<Void> asyncCallback);
 
@@ -108,4 +110,6 @@ public interface ConfigurationServiceAsync {
     public void updateAccount(String oldName, String newName, List<String> groups, AsyncCallback<Void> asyncCallback);
     
     public void removeAccount(String name, AsyncCallback<Void> asyncCallback);
+    
+    public void getCASLoginPageUrl(AsyncCallback<String> asyncCallback);
 }

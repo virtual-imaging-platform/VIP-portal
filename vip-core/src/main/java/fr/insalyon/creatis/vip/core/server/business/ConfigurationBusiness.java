@@ -53,8 +53,19 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.text.Normalizer;
 import java.util.*;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+
+import edu.yale.its.tp.cas.client.ServiceTicketValidator;
+import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
+import fr.insalyon.creatis.vip.core.server.dao.UsersGroupsDAO;
+import java.net.URL;
+import javax.servlet.http.HttpServletRequest;
+import org.jasig.cas.client.authentication.AttributePrincipal;
+import org.jasig.cas.client.validation.Assertion;
+import org.jasig.cas.client.validation.Saml11TicketValidator;
+import org.jasig.cas.client.validation.TicketValidationException;
 
 /**
  *
@@ -126,15 +137,7 @@ public class ConfigurationBusiness {
         }
     }
 
-    /**
-     *
-     * @param user
-     * @param comments
-     * @param accountType
-     * @throws BusinessException
-     */
-    public void signup(User user, String comments, String accountType) throws BusinessException {
-
+    public void signup(User user, String comments, String accountType, boolean auto) throws BusinessException {
         try {
             user.setCode(UUID.randomUUID().toString());
             user.setPassword(MD5.get(user.getPassword()));
@@ -157,45 +160,71 @@ public class ConfigurationBusiness {
                 CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().add(user.getEmail(), group.getName(), GROUP_ROLE.User);
             }
 
-            String emailContent = "<html>"
-                    + "<head></head>"
-                    + "<body>"
-                    + "<p>Dear " + user.getFirstName() + " " + user.getLastName() + ",</p>"
-                    + "<p>We have successfully received your membership registration "
-                    + "and your personal profile has been created.</p>"
-                    + "<p>Please confirm your registration using the following activation "
-                    + "code on your first login:</p>"
-                    + "<p><b>" + user.getCode() + "</b></p>"
-                    + "<p>Best Regards,</p>"
-                    + "<p>VIP Team</p>"
-                    + "</body>"
-                    + "</html>";
+            if (!auto) {
+                String emailContent = "<html>"
+                        + "<head></head>"
+                        + "<body>"
+                        + "<p>Dear " + user.getFirstName() + " " + user.getLastName() + ",</p>"
+                        + "<p>We have successfully received your membership registration "
+                        + "and your personal profile has been created.</p>"
+                        + "<p>Please confirm your registration using the following activation "
+                        + "code on your first login:</p>"
+                        + "<p><b>" + user.getCode() + "</b></p>"
+                        + "<p>Best Regards,</p>"
+                        + "<p>VIP Team</p>"
+                        + "</body>"
+                        + "</html>";
 
-            logger.info("Sending confirmation email to '" + user.getEmail() + "'.");
-            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
-                    "VIP account details", emailContent, new String[]{user.getEmail()});
+                logger.info("Sending confirmation email to '" + user.getEmail() + "'.");
+                CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
+                        "VIP account details", emailContent, new String[]{user.getEmail()});
 
-            String adminsEmailContents = "<html>"
-                    + "<head></head>"
-                    + "<body>"
-                    + "<p>Dear Administrators,</p>"
-                    + "<p>A new user requested an account:</p>"
-                    + "<p><b>First Name:</b> " + user.getFirstName() + "</p>"
-                    + "<p><b>Last Name:</b> " + user.getLastName() + "</p>"
-                    + "<p><b>Email:</b> " + user.getEmail() + "</p>"
-                    + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
-                    + "<p><b>Phone:</b> " + user.getPhone() + "</p>"
-                    + "<p><b>Country:</b> " + user.getCountryCode().getCountryName() + "</p>"
-                    + "<p><b>Account Type:</b> " + accountType + "</p>"
-                    + "<p><b>Comments:</b><br />" + comments + "</p>"
-                    + "<p>&nbsp;</p>"
-                    + "<p>Best Regards,</p>"
-                    + "<p>VIP Team</p>"
-                    + "</body>"
-                    + "</html>";
+                String adminsEmailContents = "<html>"
+                        + "<head></head>"
+                        + "<body>"
+                        + "<p>Dear Administrators,</p>"
+                        + "<p>A new user requested an account:</p>"
+                        + "<p><b>First Name:</b> " + user.getFirstName() + "</p>"
+                        + "<p><b>Last Name:</b> " + user.getLastName() + "</p>"
+                        + "<p><b>Email:</b> " + user.getEmail() + "</p>"
+                        + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
+                        + "<p><b>Phone:</b> " + user.getPhone() + "</p>"
+                        + "<p><b>Country:</b> " + user.getCountryCode().getCountryName() + "</p>"
+                        + "<p><b>Account Type:</b> " + accountType + "</p>"
+                        + "<p><b>Comments:</b><br />" + comments + "</p>"
+                        + "<p>&nbsp;</p>"
+                        + "<p>Best Regards,</p>"
+                        + "<p>VIP Team</p>"
+                        + "</body>"
+                        + "</html>";
 
-            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
-                    "[VIP Admin] Account Requested", adminsEmailContents, getAdministratorsEmails());
+                CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
+                        "[VIP Admin] Account Requested", adminsEmailContents, getAdministratorsEmails());
+            } else {
+          
+                String adminsEmailContents = "<html>"
+                        + "<head></head>"
+                        + "<body>"
+                        + "<p>Dear Administrators,</p>"
+                        + "<p>The following account was automatically created for a CAS user:</p>"
+                        + "<p><b>First Name:</b> " + user.getFirstName() + "</p>"
+                        + "<p><b>Last Name:</b> " + user.getLastName() + "</p>"
+                        + "<p><b>Email:</b> " + user.getEmail() + "</p>"
+                        + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
+                        + "<p><b>Phone:</b> " + user.getPhone() + "</p>"
+                        + "<p><b>Country:</b> " + user.getCountryCode().getCountryName() + "</p>"
+                        + "<p><b>Account Type:</b> " + accountType + "</p>"
+                        + "<p><b>Comments:</b><br />" + comments + "</p>"
+                        + "<p>&nbsp;</p>"
+                        + "<p>Best Regards,</p>"
+                        + "<p>VIP Team</p>"
+                        + "</body>"
+                        + "</html>";
+
+                CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
+                        "[VIP Admin] Automatic Account Creation", adminsEmailContents, getAdministratorsEmails());
+            }
+
 
         } catch (GRIDAClientException ex) {
             logger.error(ex);
@@ -213,6 +242,18 @@ public class ConfigurationBusiness {
 
     /**
      *
+     * @param user
+     * @param comments
+     * @param accountType
+     * @throws BusinessException
+     */
+    public void signup(User user, String comments, String accountType) throws BusinessException {
+        signup(user, comments, accountType, false);
+
+    }
+
+    /**
+     *
      * @param email
      * @param password
      * @return
@@ -226,10 +267,7 @@ public class ConfigurationBusiness {
 
             if (userDAO.authenticate(email, password)) {
 
-                String session = UUID.randomUUID().toString();
-                userDAO.updateSession(email, session);
-
-                return userDAO.getUser(email);
+                return getUserWithSession(email);
 
             } else {
                 logger.error("Authentication failed to '" + email + "' (email or password incorrect).");
@@ -244,6 +282,93 @@ public class ConfigurationBusiness {
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
+    }
+
+    /**
+     *
+     * @param ticket
+     * @param password
+     * @return
+     * @throws BusinessException
+     */
+    public User signin(String ticket, URL serviceURL) throws BusinessException {
+
+        //validate ticket
+        User user = getCASUser(ticket, serviceURL);
+
+        if (user != null) {
+
+            UserDAO userDAO;
+            try {
+                userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
+            } catch (DAOException ex) {
+                throw new BusinessException(ex);
+            }
+            try {
+                user = userDAO.getUser(user.getEmail());
+            } catch (DAOException ex) {
+                try {
+                    signup(user, "Automatically generated from CAS login", Server.getInstance().getCasAccountType(),true);
+                    this.activateUser(user.getEmail());
+                    user = userDAO.getUser(user.getEmail());
+                    
+                } catch (DAOException ex1) {
+                    throw new BusinessException(ex1);
+                }
+            }
+            try {
+                return getUserWithSession(user.getEmail());
+            } catch (DAOException e) {
+                throw new BusinessException(e);
+            }
+
+        } else {
+            logger.error("Authentication failed to CAS ticket '" + ticket + "' (invalid ticket, cannot get user email or cannot contact server).");
+            throw new BusinessException("Authentication failed (invalid CAS ticket, cannot get user email or cannot contact server).");
+        }
+
+    }
+
+    private User getCASUser(String ticket, URL serviceURL) {
+        //  String userId = null;
+        if (ticket != null) {
+
+            Saml11TicketValidator sv = new Saml11TicketValidator(Server.getInstance().getCasURL());
+
+            Assertion a;
+            try {
+                a = sv.validate(ticket, serviceURL.toString());
+            } catch (TicketValidationException ex) {
+                return null;
+            }
+            String email = (a.getPrincipal().getAttributes().get("USER_EMAIL_ADDRESS")).toString();
+            String[] n = (a.getPrincipal().getAttributes().get("USER_FULL_NAME")).toString().split(" ");
+            String first = "";
+            String last = "";
+            if (n.length >= 2) {
+                first = n[0];
+                for (int i = 1; i < n.length; i++) {
+                    if (i > 1) {
+                        last += " ";
+                    }
+                    last += n[i];
+                }
+            } else {
+                last = n[0];
+            }
+
+            User u = new User(
+                    first.trim(),
+                    last.trim(),
+                    email.trim(),
+                    "Unknown",
+                    UUID.randomUUID().toString(),
+                    "0000",
+                    CountryCode.aq);
+
+            return u;
+        }
+        return null;
     }
 
     /**
@@ -906,5 +1031,18 @@ public class ConfigurationBusiness {
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
+    }
+
+    private User getUserWithSession(String email) throws DAOException {
+        UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
+
+        String session = UUID.randomUUID().toString();
+        userDAO.updateSession(email, session);
+
+        return userDAO.getUser(email);
+    }
+
+    public String getLoginUrlCas(URL serviceURL) {
+        return Server.getInstance().getCasURL() + "/login?service=" + serviceURL;
     }
 }

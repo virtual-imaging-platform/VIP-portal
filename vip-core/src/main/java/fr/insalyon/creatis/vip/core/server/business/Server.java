@@ -102,6 +102,10 @@ public class Server {
     private String provenanceDBPass = "";
     private String provenanceDBURL = "jdbc:mysql://localhost:3306/SDB2";
 
+    //cas
+    private String casURL = "https://ng-cas.maatg.fr/pandora-gateway-sl-cas";
+    private String casAccountType = "Neuroimaging";
+    
     public static Server getInstance() {
         if (instance == null) {
             instance = new Server();
@@ -166,7 +170,9 @@ public class Server {
             provenanceDBPass = config.getString("provenance.db.pass", provenanceDBPass);
             provenanceDBURL = config.getString("provenance.db.url", provenanceDBURL);
 
-
+            casURL = config.getString("cas.url",casURL);
+            casAccountType = config.getString("cas.accounttype",casAccountType);
+          
             config.setProperty(CoreConstants.LAB_DB_HOST, databaseServerHost);
             config.setProperty(CoreConstants.LAB_DB_PORT, databaseServerPort);
             config.setProperty(CoreConstants.LAB_ADMIN_FIRST_NAME, adminFirstName);
@@ -204,6 +210,9 @@ public class Server {
             config.setProperty("provenance.db.pass", provenanceDBPass);
             config.setProperty("provenance.db.url", provenanceDBURL);
 
+            config.setProperty("cas.url", casURL);
+            config.setProperty("cas.accounttype", casAccountType);
+            
             config.save();
 
         } catch (ConfigurationException ex) {
@@ -370,4 +379,14 @@ public class Server {
     public String getAdminPhone() {
         return adminPhone;
     }
+
+    public String getCasURL() {
+        return casURL;
+    }
+
+    public String getCasAccountType() {
+        return casAccountType;
+    }
+    
+    
 }
