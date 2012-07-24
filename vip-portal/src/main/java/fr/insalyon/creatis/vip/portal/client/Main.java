@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.portal.client;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Cookies;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.application.client.ApplicationModule;
@@ -49,8 +50,8 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
 import fr.insalyon.creatis.vip.docs.client.DocsModule;
 import fr.insalyon.creatis.vip.gatelab.client.GateLabModule;
-import fr.insalyon.creatis.vip.models.client.ModelModule;
-import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIModule;
+//import fr.insalyon.creatis.vip.models.client.ModelModule;
+//import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIModule;
 import fr.insalyon.creatis.vip.social.client.SocialModule;
 
 /**
@@ -62,23 +63,52 @@ public class Main implements EntryPoint {
     public void onModuleLoad() {
 
         Layout.getInstance().getModal().show("Loading VIP " + CoreConstants.VERSION, true);
-        
         // Modules
         Modules modulesInit = Modules.getInstance();
         modulesInit.add(new CoreModule());
         modulesInit.add(new SocialModule());
         modulesInit.add(new DocsModule());
         modulesInit.add(new DataManagerModule());
-        modulesInit.add(new ModelModule());
-        modulesInit.add(new SimulationGUIModule());
+//        modulesInit.add(new ModelModule());
+//        modulesInit.add(new SimulationGUIModule());
         modulesInit.add(new ApplicationModule());
         modulesInit.add(new GateLabModule());
         // End-Modules
 
+
+        final String ticket = Window.Location.getParameter("ticket");
+        String login = Window.Location.getParameter("login");
+        if (ticket == null && (login == null || !login.equals("CASN4U"))) {
+            //regular VIP authentication
+            configureVIP();
+        } else {
+           configureN4U(ticket);
+        }
+    }
+
+    //redirect to N4U CAS authentication
+    public void displayLoginView() {
+        ConfigurationService.Util.getInstance().getCASLoginPageUrl(new AsyncCallback<String>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                Window.alert(caught.toString());
+            }
+
+            @Override
+            public void onSuccess(String url) {
+                // redirect to login page
+                Window.Location.replace(url);
+            }
+        });
+    }
+
+    private void configureVIP() {
+
         // Cookies
         String email = null;
         String session = null;
-        
+
         if (Cookies.getCookieNames().contains(CoreConstants.COOKIES_USER)) {
             email = Cookies.getCookie(CoreConstants.COOKIES_USER);
             session = Cookies.getCookie(CoreConstants.COOKIES_SESSION);
@@ -100,5 +130,43 @@ public class Main implements EntryPoint {
             }
         };
         service.configure(email, session, callback);
+    }
+
+    private void configureN4U(String ticket) {
+         //N4U authentication
+            if (ticket == null) {
+                //if the user has no ticket, get one
+                displayLoginView();
+            } else {
+                //sign in with N4U ticket
+                ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+
+                final AsyncCallback<User> callback = new AsyncCallback<User>() {
+
+                    public void onFailure(Throwable caught) {
+                        Layout.getInstance().getModal().hide();
+                        if (caught.getMessage().contains("Authentication failed")) {
+                             displayLoginView();
+                        } else {
+                            configureVIP();
+                        }
+                    }
+
+                    public void onSuccess(User result) {
+                        Layout.getInstance().getModal().hide();
+
+                        Cookies.setCookie(CoreConstants.COOKIES_USER,
+                                result.getEmail(), CoreConstants.COOKIES_EXPIRATION_DATE,
+                                null, "/", false);
+                        Cookies.setCookie(CoreConstants.COOKIES_SESSION,
+                                result.getSession(), CoreConstants.COOKIES_EXPIRATION_DATE,
+                                null, "/", false);
+
+                        Layout.getInstance().authenticate(result);
+                    }
+                };
+                Layout.getInstance().getModal().show("Signing in with CAS...", true);
+                service.signin(ticket, callback);
+            }
     }
 }
