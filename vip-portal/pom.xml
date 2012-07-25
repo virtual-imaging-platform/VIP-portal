@@ -88,54 +88,19 @@
             <artifactId>vip-models</artifactId>
             <version>${vip.models.version}</version>
         </dependency>
-        
+
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-social</artifactId>
+            <version>${vip.social.version}</version>
+        </dependency>
+
       <!--dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-physical-properties</artifactId>
             <version>0.1</version>
         </dependency-->
         <!-- END VIP MODULES -->
-        
-       <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-social</artifactId>
-            <version>${vip.social.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.6</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.opensaml</groupId>
-            <artifactId>opensaml1</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>xml-security</groupId>
-            <artifactId>xmlsec</artifactId>
-            <version>1.0.5D2</version>
-        </dependency>
-        <dependency>
-            <groupId>ant</groupId>
-            <artifactId>ant-apache-log4j</artifactId>
-            <version>1.6.2</version>
-        </dependency>
-      <dependency>
-    <groupId>org.jasig.cas.client</groupId>
-    <artifactId>cas-client-core</artifactId>
-    <version>3.2.1</version>
-</dependency>
-        <dependency>
-        <groupId>xalan</groupId>
-        <artifactId>xalan</artifactId>
-        <version>2.3.1</version>
-      </dependency>
     </dependencies>
     
     <build>
