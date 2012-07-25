@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -38,7 +38,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class JobRecord extends ListGridRecord {
 
@@ -137,6 +137,9 @@ public class JobRecord extends ListGridRecord {
                     break;
                 case 5:
                     setAttribute("minorStatus", "Uploading Results");
+                    break;
+                case 6:
+                    setAttribute("minorStatus", "Finishing");
                     break;
                 default:
                     setAttribute("minorStatus", "");

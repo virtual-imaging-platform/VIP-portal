@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -34,7 +34,6 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao.h2;
 
-import fr.insalyon.creatis.gasw.bean.JobMinorStatus;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationDAO;
@@ -51,7 +50,7 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class SimulationData extends AbstractJobData implements SimulationDAO {
 
@@ -392,6 +391,8 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
             return 4;
         } else if (minorStatus.equals("Outputs")) {
             return 5;
+        } else if (minorStatus.equals("Finished")) {
+            return 6;
         }
         return -1;
     }

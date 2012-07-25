@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -36,7 +36,7 @@ package fr.insalyon.creatis.vip.application.client;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ApplicationConstants {
 
@@ -95,7 +95,7 @@ public class ApplicationConstants {
 
         SUCCESSFULLY_SUBMITTED, QUEUED, RUNNING, COMPLETED,
         CANCELLED, CANCELLED_REPLICA, ERROR, STALLED,
-        REPLICATE, KILL, RESCHEDULE
+        REPLICATE, KILL, KILL_REPLICA, RESCHEDULE
     };
 
     public static enum SimulationStatus {

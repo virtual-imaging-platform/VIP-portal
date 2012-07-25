@@ -11,7 +11,7 @@
         <vip.core.version>0.8.2</vip.core.version>
         <vip.portal.version>0.8.2</vip.portal.version>
         <vip.docs.version>0.8.1</vip.docs.version>
-        <vip.application.version>0.8.1</vip.application.version>
+        <vip.application.version>0.8.2</vip.application.version>
         <vip.datamanager.version>0.8.1</vip.datamanager.version>
         <vip.datamanager-applet.version>0.3.1</vip.datamanager-applet.version>
         <vip.gatelab.version>0.5.9</vip.gatelab.version>
