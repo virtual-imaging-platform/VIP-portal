@@ -50,13 +50,12 @@ import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.text.Normalizer;
 import java.util.*;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
-import java.net.URL;
 import org.jasig.cas.client.validation.Assertion;
 import org.jasig.cas.client.validation.Saml11TicketValidator;
 import org.jasig.cas.client.validation.TicketValidationException;
@@ -195,7 +194,7 @@ public class ConfigurationBusiness {
                 CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
                         "[VIP Admin] Account Requested", adminsEmailContents, getAdministratorsEmails());
             } else {
-          
+
                 String adminsEmailContents = "<html>"
                         + "<head></head>"
                         + "<body>"
@@ -302,10 +301,10 @@ public class ConfigurationBusiness {
                 user = userDAO.getUser(user.getEmail());
             } catch (DAOException ex) {
                 try {
-                    signup(user, "Automatically generated from CAS login", Server.getInstance().getCasAccountType(),true);
+                    signup(user, "Automatically generated from CAS login", Server.getInstance().getCasAccountType(), true);
                     this.activateUser(user.getEmail());
                     user = userDAO.getUser(user.getEmail());
-                    
+
                 } catch (DAOException ex1) {
                     throw new BusinessException(ex1);
                 }

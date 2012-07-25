@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -42,7 +42,7 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class Server {
 
@@ -101,11 +101,10 @@ public class Server {
     private String provenanceDBUser = "vip";
     private String provenanceDBPass = "";
     private String provenanceDBURL = "jdbc:mysql://localhost:3306/SDB2";
-
     //cas
-    private String casURL = "https://ng-cas.maatg.fr/pandora-gateway-sl-cas";
-    private String casAccountType = "Neuroimaging";
-    
+    private String casURL;
+    private String casAccountType;
+
     public static Server getInstance() {
         if (instance == null) {
             instance = new Server();
@@ -170,9 +169,9 @@ public class Server {
             provenanceDBPass = config.getString("provenance.db.pass", provenanceDBPass);
             provenanceDBURL = config.getString("provenance.db.url", provenanceDBURL);
 
-            casURL = config.getString("cas.url",casURL);
-            casAccountType = config.getString("cas.accounttype",casAccountType);
-          
+            casURL = config.getString(CoreConstants.LAB_CAS_URL, "https://ng-cas.maatg.fr/pandora-gateway-sl-cas");
+            casAccountType = config.getString(CoreConstants.LAB_CAS_ACCOUNT_TYPE, "Neuroimaging");
+
             config.setProperty(CoreConstants.LAB_DB_HOST, databaseServerHost);
             config.setProperty(CoreConstants.LAB_DB_PORT, databaseServerPort);
             config.setProperty(CoreConstants.LAB_ADMIN_FIRST_NAME, adminFirstName);
@@ -209,10 +208,9 @@ public class Server {
             config.setProperty("provenance.db.user", provenanceDBUser);
             config.setProperty("provenance.db.pass", provenanceDBPass);
             config.setProperty("provenance.db.url", provenanceDBURL);
+            config.setProperty(CoreConstants.LAB_CAS_URL, casURL);
+            config.setProperty(CoreConstants.LAB_CAS_ACCOUNT_TYPE, casAccountType);
 
-            config.setProperty("cas.url", casURL);
-            config.setProperty("cas.accounttype", casAccountType);
-            
             config.save();
 
         } catch (ConfigurationException ex) {
@@ -387,6 +385,4 @@ public class Server {
     public String getCasAccountType() {
         return casAccountType;
     }
-    
-    
 }

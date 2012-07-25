@@ -48,7 +48,6 @@ import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -90,15 +89,14 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 trace(logger, "Connected.");
 
                 return user;
-            } 
+            }
             return null;
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
     }
-    
-     
+
     /**
      *
      * @param user User bean object
@@ -141,8 +139,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             throw new CoreException(ex);
         }
     }
-    
-     /**
+
+    /**
      *
      * @param ticket
      * @throws CoreException
@@ -153,9 +151,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
         try {
             logger.info("Authenticating CAS ticket '" + ticket + "'.");
-           
-            
-            User user = configurationBusiness.signin(ticket,getBaseURL());
+            User user = configurationBusiness.signin(ticket, getBaseURL());
             user = setUserSession(user);
             configurationBusiness.updateUserLastLogin(user.getEmail());
             trace(logger, "Connected.");
@@ -164,12 +160,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
-        }
-        catch(MalformedURLException e){
+        } catch (MalformedURLException e) {
             throw new CoreException(e);
         }
     }
-
 
     /**
      *
@@ -671,30 +665,36 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         }
     }
 
+    /**
+     *
+     * @return @throws CoreException
+     */
     @Override
-    public String getCASLoginPageUrl() throws CoreException{
-        URL url = null;
-        try{
-            url = getBaseURL();
-        }catch(MalformedURLException e){
+    public String getCASLoginPageUrl() throws CoreException {
+
+        try {
+            return configurationBusiness.getLoginUrlCas(getBaseURL());
+
+        } catch (MalformedURLException e) {
             throw new CoreException(e);
         }
-         return configurationBusiness.getLoginUrlCas(url);
     }
 
+    /**
+     *
+     * @return @throws MalformedURLException
+     */
     private URL getBaseURL() throws MalformedURLException {
-        URL url = null;
+
         HttpServletRequest request = this.getThreadLocalRequest();
-        if ((request.getServerPort() == 80)
-                || (request.getServerPort() == 443)) {
-            url = new URL(request.getScheme() + "://"
-                    + request.getServerName()
-                    + request.getContextPath());
-        } else {
-            url = new URL(request.getScheme() + "://"
-                    + request.getServerName() + ":" + request.getServerPort()
-                    + request.getContextPath());
-        }
-        return url;
+        return (request.getServerPort() == 80)
+                || (request.getServerPort() == 443)
+                ? new URL(request.getScheme() + "://"
+                + request.getServerName()
+                + request.getContextPath())
+                : new URL(request.getScheme() + "://"
+                + request.getServerName() + ":"
+                + request.getServerPort()
+                + request.getContextPath());
     }
 }
