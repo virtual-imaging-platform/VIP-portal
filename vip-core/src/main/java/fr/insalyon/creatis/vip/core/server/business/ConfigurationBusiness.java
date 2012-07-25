@@ -349,7 +349,19 @@ public class ConfigurationBusiness {
             } else {
                 last = n[0];
             }
-
+            
+            CountryCode cc = CountryCode.aq;
+            
+            String country ="";
+            
+            try{
+             country = email.substring(email.lastIndexOf('.')+1);
+            }catch(NullPointerException e){}
+            
+            if(CountryCode.valueOf(country) != null)
+                cc = CountryCode.valueOf(country);
+                
+            
             User u = new User(
                     first.trim(),
                     last.trim(),
@@ -357,7 +369,7 @@ public class ConfigurationBusiness {
                     "Unknown",
                     UUID.randomUUID().toString(),
                     "0000",
-                    CountryCode.aq);
+                    cc);
 
             return u;
         }
