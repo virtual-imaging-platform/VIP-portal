@@ -123,22 +123,11 @@
             <version>1.0.5D2</version>
         </dependency>
         <dependency>
-            <groupId>ant</groupId>
-            <artifactId>ant-apache-log4j</artifactId>
-            <version>1.6.2</version>
-        </dependency>
-        <dependency>
             <groupId>org.jasig.cas.client</groupId>
             <artifactId>cas-client-core</artifactId>
             <version>3.2.1</version>
         </dependency>
-        <dependency>
-            <groupId>cas</groupId>
-            <artifactId>casclient</artifactId>
-            <version>2.1.1</version>
-            <type>jar</type>
-        </dependency>
-    </dependencies>
+     </dependencies>
     <build>
         <plugins>
             <plugin>

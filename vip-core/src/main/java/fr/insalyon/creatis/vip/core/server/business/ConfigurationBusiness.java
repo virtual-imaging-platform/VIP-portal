@@ -53,16 +53,10 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.text.Normalizer;
 import java.util.*;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import edu.yale.its.tp.cas.client.ServiceTicketValidator;
-import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
-import fr.insalyon.creatis.vip.core.server.dao.UsersGroupsDAO;
 import java.net.URL;
-import javax.servlet.http.HttpServletRequest;
-import org.jasig.cas.client.authentication.AttributePrincipal;
 import org.jasig.cas.client.validation.Assertion;
 import org.jasig.cas.client.validation.Saml11TicketValidator;
 import org.jasig.cas.client.validation.TicketValidationException;
