@@ -147,6 +147,7 @@ public class ModelDisplay extends VLayout {
     }
 
     private void addTimePoint(Date d) {
+         bmodif = true;
            modelTreeGrid.addTimePoint(new Date(System.currentTimeMillis()), 0);
     }
 
@@ -187,6 +188,7 @@ public class ModelDisplay extends VLayout {
         modelTreeGrid = new ModelTreeGrid(model, true);
         addMember(modelTreeGrid);
         modelTreeGrid.refreshFields();
+        //modelTreeGrid.setToolStrip(toolStrip);
     }
 
     public ModelTreeGrid getModelTree() {
@@ -209,7 +211,7 @@ public class ModelDisplay extends VLayout {
         modelTreeGrid = new ModelTreeGrid(model, true);
         addMember(modelTreeGrid);
         modelTreeGrid.setParentElement(this);
-
+        //modelTreeGrid.setToolStrip(toolStrip);
     }
 
     public void createTreeGrid() {
@@ -220,6 +222,7 @@ public class ModelDisplay extends VLayout {
         addInstant();
         modelTreeGrid.refreshFields();
         modelTreeGrid.refreshModel(model);
+        //modelTreeGrid.setToolStrip(toolStrip);
         bmodif = true;
 
     }
@@ -244,7 +247,21 @@ public class ModelDisplay extends VLayout {
                 if (bmodif) {
                     addDatatoZip();
                 }
-                modal.show("Uploading " + zipFile, true);
+                else
+                {
+                    setStorage();
+                }
+            }
+        });
+        upload.setTooltip("Commit model to the repository");
+        toolStrip.addButton(upload);
+
+    }
+
+    
+    private void setStorage()
+    {
+        modal.show("Uploading " + zipFile, true);
                 final String lfn = uploadModel(zipFile);
 
                 modal.show("Committing annotations to the Triple Store", true);
@@ -260,15 +277,15 @@ public class ModelDisplay extends VLayout {
                     public void onSuccess(SimulationObjectModel result) {
                         final String uri = result.getURI();
                         ModelServiceAsync mms = ModelService.Util.getInstance();
-                        AsyncCallback<Void> callback1 = new AsyncCallback<Void>() {
-
-                            public void onFailure(Throwable caught) {
-                                modal.hide();
-                                SC.warn("Cannot commit model to the Triple Store");
-                            }
-
-                            @Override
-                            public void onSuccess(Void result) {
+//                        AsyncCallback<Void> callback1 = new AsyncCallback<Void>() {
+//
+//                            public void onFailure(Throwable caught) {
+//                                modal.hide();
+//                                SC.warn("Cannot commit model to the Triple Store");
+//                            }
+//
+//                            @Override
+//                            public void onSuccess(Void result) {
                                 modal.hide();
                                 SC.say("Model successfully comitted to the Triple Store (" + uri + ")");
                                 ModelListTab modelsTab = (ModelListTab) Layout.getInstance().getTab("model-browse-tab");
@@ -276,30 +293,30 @@ public class ModelDisplay extends VLayout {
                                     modelsTab.loadModels();
                                 }
                             }
-                        };
-                        mms.completeModel(result, callback1);
-                    }
+//                        };
+//                        mms.completeModel(result, callback1);
+                        //}
                 };
                 ssu.setStorageUrl(model, lfn, cbssu);
             }
-        });
-        upload.setTooltip("Commit model to the repository");
-        toolStrip.addButton(upload);
-
-    }
-
+    
+    
+    
     private void addDatatoZip() {
         //uploading zip file
-        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+        AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
             public void onFailure(Throwable caught) {
                 SC.warn("Cannot added files to  zip");
             }
 
-            public void onSuccess(Void result) {
+            public void onSuccess(SimulationObjectModel result) {
+                model = result;
+                SC.warn(zipFile);
+                setStorage();
             }
         };
-        ms.recordAddeddFiles(zipFile, addFiles, model, callback);
+        ms.recordAddedFiles(zipFile, addFiles, model, callback);
     }
 
     private void enableDownload() {
@@ -307,11 +324,15 @@ public class ModelDisplay extends VLayout {
         download.setIcon(DataManagerConstants.ICON_DOWNLOAD);
         download.setTooltip("Download model files");
         toolStrip.addButton(download);
+        
         download.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                String lfn = model.getStorageURL();
-                downloadModel(lfn);
+                if(download.getIcon() == ModelConstants.APP_IMG_OK)
+                {
+                    String lfn = model.getStorageURL();
+                    downloadModel(lfn);
+                }
             }
         });
     }
@@ -356,6 +377,7 @@ public class ModelDisplay extends VLayout {
 
     public void checkModel(final SimulationObjectModel model) {
         final String lfn = model.getStorageURL();
+        //modal.show(lfn, true);
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
 
         AsyncCallback<Boolean> callback = new AsyncCallback<Boolean>() {
