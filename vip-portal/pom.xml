@@ -71,7 +71,7 @@
             <version>${vip.gatelab-applet.version}</version>
         </dependency>
 
-<!--        <dependency>
+        <!--        <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-provenance</artifactId>
             <version>${vip.provenance.version}</version>
@@ -95,12 +95,19 @@
             <version>${vip.social.version}</version>
         </dependency>
 
-      <!--dependency>
+        <!--dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-physical-properties</artifactId>
             <version>0.1</version>
         </dependency-->
         <!-- END VIP MODULES -->
+        
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+
     </dependencies>
     
     <build>

@@ -665,36 +665,62 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         }
     }
 
-    /**
-     *
-     * @return @throws CoreException
-     */
+//    /**
+//     *
+//     * @return @throws CoreException
+//     */
+//    @Override
+//    public String getCASLoginPageUrl() throws CoreException {
+//
+//        try {
+//            return configurationBusiness.getLoginUrlCas(getBaseURL());
+//
+//        } catch (MalformedURLException e) {
+//            throw new CoreException(e);
+//        }
+//    }
+//
+//    /**
+//     *
+//     * @return @throws MalformedURLException
+//     */
+//    private URL getBaseURL() throws MalformedURLException {
+//
+//        HttpServletRequest request = this.getThreadLocalRequest();
+//        return (request.getServerPort() == 80)
+//                || (request.getServerPort() == 443)
+//                ? new URL(request.getScheme() + "://"
+//                + request.getServerName()
+//                + request.getContextPath())
+//                : new URL(request.getScheme() + "://"
+//                + request.getServerName() + ":"
+//                + request.getServerPort()
+//                + request.getContextPath());
+//    }
     @Override
     public String getCASLoginPageUrl() throws CoreException {
-
+        URL url = null;
         try {
-            return configurationBusiness.getLoginUrlCas(getBaseURL());
-
+            url = getBaseURL();
         } catch (MalformedURLException e) {
             throw new CoreException(e);
         }
+        return configurationBusiness.getLoginUrlCas(url);
     }
 
-    /**
-     *
-     * @return @throws MalformedURLException
-     */
     private URL getBaseURL() throws MalformedURLException {
-
+        URL url = null;
         HttpServletRequest request = this.getThreadLocalRequest();
-        return (request.getServerPort() == 80)
-                || (request.getServerPort() == 443)
-                ? new URL(request.getScheme() + "://"
-                + request.getServerName()
-                + request.getContextPath())
-                : new URL(request.getScheme() + "://"
-                + request.getServerName() + ":"
-                + request.getServerPort()
-                + request.getContextPath());
+        if ((request.getServerPort() == 80)
+                || (request.getServerPort() == 443)) {
+            url = new URL(request.getScheme() + "://"
+                    + request.getServerName()
+                    + request.getContextPath());
+        } else {
+            url = new URL(request.getScheme() + "://"
+                    + request.getServerName() + ":" + request.getServerPort()
+                    + request.getContextPath());
+        }
+        return url;
     }
 }
