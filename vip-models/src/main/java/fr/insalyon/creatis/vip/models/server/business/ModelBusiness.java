@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.models.server.business;
 
+import com.hp.hpl.jena.rdf.model.RDFWriter;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectModelFactory;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectModelQueryer;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectSearcher;
@@ -104,9 +105,10 @@ public class ModelBusiness {
                     while ((n = zipinputstream.read(buf, 0, 1024)) > -1) {
                         fileoutputstream.write(buf, 0, n);
                     }
-
+                    
                     fileoutputstream.close();
                     zipinputstream.closeEntry();
+                    //checkRDFEncoding(rootDirectory + entryName);
                 }
                 files.add(rootDirectory + entryName);
                 zipentry = zipinputstream.getNextEntry();
@@ -120,12 +122,22 @@ public class ModelBusiness {
         }
     }
 
+    private void checkRDFEncoding(String file) throws FileNotFoundException
+    {
+        File f1 = new File(file);
+InputStream ips=new FileInputStream(file); 
+			InputStreamReader ipsr=new InputStreamReader(ips);
+			BufferedReader br=new BufferedReader(ipsr);
+                        
+//	ligne=br.readLine();
+        
+    }
     private void copyFile(String srFile, String dtFile) throws FileNotFoundException, IOException {
 
         File f1 = new File(srFile);
         File f2 = new File(dtFile);
         InputStream in = new FileInputStream(f1);
-
+       
         OutputStream out = new FileOutputStream(f2);
 
         byte[] buf = new byte[1024];
@@ -138,7 +150,7 @@ public class ModelBusiness {
         System.out.println("File copied.");
     }
 
-    public void recordAddeddFiles(String zipName, List<String> addfiles, SimulationObjectModel model) throws IOException {
+    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles, SimulationObjectModel model) throws IOException {
         List<File> files = new ArrayList<File>();
         String rootDirectory = Server.getInstance().getDataManagerPath() + "/uploads/";
         File zipFile = new File(rootDirectory + zipName);
@@ -173,16 +185,20 @@ public class ModelBusiness {
             zin.closeEntry();
 
             files.add(new File(zipdir + "/" + name));
-            System.out.println("filex present :" + rootDirectory + name);
+            System.out.println("files present :" + rootDirectory + name);
             entry = zin.getNextEntry();
         }
         // Close the streams        
         zin.close();
+        System.out.println("time to add"); 
         //copy additional file
-        for (String file : addfiles) {
-            copyFile(rootDirectory + file, zipdir + file);
-            files.add(new File(zipdir + file));
-            System.out.println("filex added :" + zipdir + file);
+        if (addfiles.size() >0)
+        {
+            for (String file : addfiles) {
+                copyFile(rootDirectory + file, zipdir + file);
+                files.add(new File(zipdir + file));
+                System.out.println("filex added :" + zipdir + file);
+            }
         }
         //copy rdf.
         SimulationObjectModelFactory.inferModelSemanticAxes(model);
@@ -190,6 +206,9 @@ public class ModelBusiness {
         SimulationObjectModelFactory.dumpInFile(zipdir + modelname);
         SimulationObjectModelFactory.completeModel(model);
 
+        
+
+        
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(rootDirectory + "zip//" + zipName));
         // Compress the files
         for (File i : files) {
@@ -209,6 +228,7 @@ public class ModelBusiness {
         // Complete the ZIP file
         out.close();
         copyFile(rootDirectory + "zip//" + zipName, rootDirectory + zipName);
+        return model;
     }
 
     public SimulationObjectModel createModel(String modelName, String user) {
@@ -279,6 +299,8 @@ public class ModelBusiness {
     }
 
     public SimulationObjectModel setStorageUrl(SimulationObjectModel som, String url) {
+        System.out.println("url" +url);
+          System.out.println("URI "+som.getURI());
         SimulationObjectModelFactory.setStorageURL(som, url);
         return som;
     }

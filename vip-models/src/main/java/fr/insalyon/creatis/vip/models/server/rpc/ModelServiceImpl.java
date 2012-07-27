@@ -273,13 +273,18 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
     }
 
-    public void recordAddeddFiles(String zipName, List<String> addfiles, SimulationObjectModel model) {
-        try {
-            modelBusiness.recordAddeddFiles(zipName, addfiles, model);
-        } catch (IOException ex) {
+    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles, SimulationObjectModel model) throws ModelException {
+      
+            try {
+                trace(logger, "add files to zip");
+                return modelBusiness.recordAddedFiles(zipName, addfiles, model);
+            } catch (CoreException ex) {
+                 throw new ModelException(ex);
+            }
+           catch (IOException ex) {
             java.util.logging.Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+             throw new ModelException(ex);
         }
-
     }
 
     public SimulationObjectModel removeObjectLayer(SimulationObjectModel model, int tp, int ins, String layer) throws ModelException {

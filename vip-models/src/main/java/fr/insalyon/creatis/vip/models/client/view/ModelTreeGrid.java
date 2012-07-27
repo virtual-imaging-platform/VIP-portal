@@ -52,6 +52,8 @@ import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+//import com.smartgwt.client.widgets.toolbar.ToolStrip;
+//import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import com.smartgwt.client.widgets.tree.events.*;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Instant;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectLayer;
@@ -100,7 +102,8 @@ public class ModelTreeGrid extends TreeGrid {
     private HashMap<String, PhysicalParameterType> lutTypeMap = new HashMap<String, PhysicalParameterType>();
     private ModelMenu mymenu = null;
     private ModelCreateDialog dg = null;
-
+   // private ToolStrip displayToolStrip = null;
+    
     public ModelTreeGrid(final SimulationObjectModel model, boolean bFull) {
         super();
 
@@ -137,7 +140,13 @@ public class ModelTreeGrid extends TreeGrid {
         setDragDataAction(DragDataAction.COPY);
 
         TreeGridField tfg = new TreeGridField(model.getModelName());
-
+        MenuItem modelNameItem = new MenuItem();
+        modelNameItem.setTitle("Change model name ");
+        modelNameItem.setIcon(CoreConstants.ICON_EDIT);
+        Menu tfgMenu = new Menu();
+        tfgMenu.setItemChecked(modelNameItem);
+        //tfg.setContextMenu(tfgMenu);
+        
         tfg.setCellFormatter(new CellFormatter() {
 
             public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
@@ -214,11 +223,8 @@ public class ModelTreeGrid extends TreeGrid {
 
             @Override
             public void onFolderDrop(FolderDropEvent event) {
-                //   logger.log(Level.SEVERE, "linktext" +event.getNodes()[0].getAttribute("FileName"));
-                //  objType = typeDropped(event.getNodes()[0].getAttribute("FileName"));
                 dg.addInfo(typeDropped(event.getNodes()[0].getAttribute("FileName")), tpSelected, insSelected, event.getNodes()[0].getAttribute("FileName"));
                 dg.show();
-                //  addItem(0,0,0,event.getNodes()[0].getAttribute("FileName"),"Brain","Anatomy",20);//dg.getLayer(),dg.getLabel());
                 event.cancel();
 
             }
@@ -232,18 +238,7 @@ public class ModelTreeGrid extends TreeGrid {
                 ((ModelMenu) nodeMenu).setNode((ModelTreeNode) event.getNode());
             }
         });
-
-
-        this.setContextMenu(nodeMenu);
-
-//         
-//         this.addSelectionHandler(new SelectionHandler<TreeItem>() {
-//  @Override
-//  public void onSelection(SelectionEvent event) {
-//    TreeItem item = event.getSelectedItem();
-//    // expand the selected item
-//  }
-//});
+       this.setContextMenu(nodeMenu);
 
     }
 
@@ -259,6 +254,11 @@ public class ModelTreeGrid extends TreeGrid {
         objOnto = name;
     }
 
+//    public void setToolStrip(ToolStrip ts)
+//    {
+//        displayToolStrip = ts;
+//    }
+    
     public void removeNode() {
         ModelServiceAsync ms = ModelService.Util.getInstance();
 
@@ -799,6 +799,17 @@ public class ModelTreeGrid extends TreeGrid {
     {
         return layerTypeMap.get(type);
     }
+     public String getLayerFromMap(String type)
+     {
+        String layer = "";
+        for (String key : layerTypeMap.keySet()) {
+            if (layerTypeMap.get(key).toString() == type) {
+                layer = key;
+                break;
+            }
+        }
+        return layer;
+     }
     
     public ArrayList<String> getLutMap()
     {
@@ -827,13 +838,7 @@ public class ModelTreeGrid extends TreeGrid {
         boolean bObjectExist = false;
         boolean bphysicalLutExist = false;
 
-        String layer = "";
-        for (String key : layerTypeMap.keySet()) {
-            if (layerTypeMap.get(key).toString() == objLayer) {
-                layer = key;
-                break;
-            }
-        }
+        String layer = getLayerFromMap(objLayer);
 
         logger.log(Level.SEVERE, "layer :" + layer);
         String layerPartName = "Physical parameters";
@@ -966,6 +971,7 @@ public class ModelTreeGrid extends TreeGrid {
         };
 
         ms.duplicateInstant(model, Integer.parseInt(modelTree.getParent(mnode).getAttribute("number")), Integer.parseInt(mnode.getAttribute("number")), callback);
+        checkModality();
        this.markForRedraw();
     }
     
@@ -1008,8 +1014,51 @@ public class ModelTreeGrid extends TreeGrid {
 
     }
 
+    private void checkModality()
+    {
+  //      ((ToolStripButton)displayToolStrip.getMember("MRI")).setIcon(ModelConstants.APP_IMG_OK);
+    }
     
     
+    
+    public ArrayList<String> getObjectsLabel(int tp, int ins, String layerType)
+    {
+        ArrayList<String> results = new ArrayList<String>();
+        ArrayList<ObjectLayer> ols = model.getTimepoint(tp).getInstant(ins).getObjectLayers();
+  
+        for( ObjectLayer ol : ols)
+        {
+            for (ObjectLayerPart olp : ol.getLayerParts())
+            {
+//               logger.log(Level.SEVERE, "label label:"+ getLayerFromMap(layerType));
+//                logger.log(Level.SEVERE, "label label2:" + olp.getType().toString());
+                if (olp.getType().toString() == layerType)
+                {
+                    logger.log(Level.SEVERE, "label label3: " + String.valueOf(olp.getLabel()));
+                    results.add(String.valueOf(olp.getLabel()));
+                    
+                }
+                    
+            }
+        }
+        return results;
+    }
+     
+    public ArrayList<String> getObjectsEntity(int tp, int ins, String layerType)
+    {
+         ArrayList<String> results = new ArrayList<String>();
+             ArrayList<ObjectLayer> ols = model.getTimepoint(tp).getInstant(ins).getObjectLayers();
+        for( ObjectLayer ol : ols)
+        {
+            for (ObjectLayerPart olp : ol.getLayerParts())
+            {
+                if (olp.getType().equals(layerType))
+                    results.add(olp.getReferredObject().getObjectName());
+            }
+        }
+        return results;
+    }
+     
      public class ModelTreeNode extends TreeNode {
 
         public ModelTreeNode(String entityId, String entityName, boolean display, int number) {
@@ -1066,8 +1115,9 @@ public class ModelTreeGrid extends TreeGrid {
         public ModelMenu() {
 
             instantItem = new MenuItem();
-            instantItem.setTitle("add Instant");
-            instantItem.setIcon(ModelConstants.APP_IMG_OK);
+            instantItem.setTitle("Add Instant");
+
+            instantItem.setIcon(CoreConstants.ICON_ADD);
             instantItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
                 public void onClick(MenuItemClickEvent event)
                 {
@@ -1076,8 +1126,8 @@ public class ModelTreeGrid extends TreeGrid {
              });
             
             duplicateTpItem = new MenuItem();
-            duplicateTpItem.setTitle("duplicate timepoint");
-            duplicateTpItem.setIcon(ModelConstants.APP_IMG_OK);
+            duplicateTpItem.setTitle("Duplicate timepoint");
+            duplicateTpItem.setIcon(CoreConstants.ICON_ADD);
             duplicateTpItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
                 public void onClick(MenuItemClickEvent event)
                 {
@@ -1086,7 +1136,7 @@ public class ModelTreeGrid extends TreeGrid {
              });
             
             duplicateInsItem = new MenuItem();
-            duplicateInsItem.setTitle("duplicate instant");
+            duplicateInsItem.setTitle("Duplicate instant");
             duplicateInsItem.setIcon(ModelConstants.APP_IMG_OK);
             duplicateInsItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
                 public void onClick(MenuItemClickEvent event)
@@ -1096,12 +1146,12 @@ public class ModelTreeGrid extends TreeGrid {
              });
             
             layerItem = new MenuItem();
-            layerItem.setTitle("add layer");
+            layerItem.setTitle("Add layer");
             layerItem.setIcon(ModelConstants.APP_IMG_OK);
 
 
             durationTItem = new MenuItem();
-            durationTItem.setTitle("modify timepoint starting");
+            durationTItem.setTitle("Modify timepoint starting");
             durationTItem.setIcon(CoreConstants.ICON_EDIT);
             durationTItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
             public void onClick(MenuItemClickEvent event)
@@ -1112,7 +1162,7 @@ public class ModelTreeGrid extends TreeGrid {
             
             
             durationIItem = new MenuItem();
-            durationIItem.setTitle("modify instant duration ");
+            durationIItem.setTitle("Modify instant duration ");
             durationIItem.setIcon(CoreConstants.ICON_EDIT);
             durationIItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
             public void onClick(MenuItemClickEvent event)
@@ -1122,19 +1172,19 @@ public class ModelTreeGrid extends TreeGrid {
              });
             
             physicalItem = new MenuItem();
-            physicalItem.setTitle("add physical parameters ");
+            physicalItem.setTitle("Add physical parameters ");
             physicalItem.setIcon(ModelConstants.APP_IMG_OK);
 
             objectsItem = new MenuItem();
-            objectsItem.setTitle("add objects layer part");
+            objectsItem.setTitle("Add objects layer part");
             objectsItem.setIcon(ModelConstants.APP_IMG_OK);
 
             objectItem = new MenuItem();
-            objectItem.setTitle("add object");
+            objectItem.setTitle("Add object");
             objectItem.setIcon(ModelConstants.APP_IMG_OK);
 
             removeItem = new MenuItem();
-            removeItem.setTitle("remove");
+            removeItem.setTitle("Remove");
             removeItem.setIcon(ModelConstants.APP_IMG_KO);
             removeItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
                 public void onClick(MenuItemClickEvent event)
