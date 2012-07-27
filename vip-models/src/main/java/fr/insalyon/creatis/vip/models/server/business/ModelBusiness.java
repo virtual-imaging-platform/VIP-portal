@@ -205,8 +205,9 @@ InputStream ips=new FileInputStream(file);
         System.out.println(zipdir + modelname);
         SimulationObjectModelFactory.dumpInFile(zipdir + modelname);
         SimulationObjectModelFactory.completeModel(model);
-
-        
+        SimulationObjectModelFactory.inferModelSemanticAxes(model);
+         System.out.println("URI: "+model.getURI());        
+         System.out.println( "URl : " +model.getStorageURL()); 
 
         
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(rootDirectory + "zip//" + zipName));
@@ -300,7 +301,7 @@ InputStream ips=new FileInputStream(file);
 
     public SimulationObjectModel setStorageUrl(SimulationObjectModel som, String url) {
         System.out.println("url" +url);
-          System.out.println("URI "+som.getURI());
+        System.out.println("URI "+som.getURI());
         SimulationObjectModelFactory.setStorageURL(som, url);
         return som;
     }
@@ -798,7 +799,7 @@ InputStream ips=new FileInputStream(file);
 
         // call the servlet to create the physical parameters layer
         // parameters : physical paramter type, filename
-        PhysicalParametersLayer physicalParametersLayer = SimulationObjectModelFactory.createPhysicalParametersLayer(physicalParametersType, fileName, b0);
+        PhysicalParametersLayer physicalParametersLayer = SimulationObjectModelFactory.createPhysicalParametersLayer(physicalParametersType, fileName, b0,"","");
 
         // if the user want to add it to the instant (not linked to an object layer)
         // in this example 0,0

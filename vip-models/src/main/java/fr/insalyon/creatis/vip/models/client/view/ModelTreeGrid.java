@@ -116,10 +116,11 @@ public class ModelTreeGrid extends TreeGrid {
         lutTypeMap.put("T1", PhysicalParameterType.T1);
         lutTypeMap.put("T2", PhysicalParameterType.T2);
         lutTypeMap.put("T2s", PhysicalParameterType.T2s);
-        lutTypeMap.put("chemicalBlend", PhysicalParameterType.chemicalBlend);
+        lutTypeMap.put("chemicalComposition", PhysicalParameterType.chemicalComposition);
+        lutTypeMap.put("concentration", PhysicalParameterType.concentration);
         lutTypeMap.put("protonDensity", PhysicalParameterType.protonDensity);
-        lutTypeMap.put("radioactiviy", PhysicalParameterType.radioactiviy);
-        lutTypeMap.put("scatterers", PhysicalParameterType.scatterers);
+        lutTypeMap.put("radioactivity", PhysicalParameterType.radioactivity);
+        lutTypeMap.put("echogenicity", PhysicalParameterType.echogenicity);
         lutTypeMap.put("susceptibility", PhysicalParameterType.susceptibility);
         
         this.model = model;
@@ -450,16 +451,19 @@ public class ModelTreeGrid extends TreeGrid {
                     if (pl.getType() == PhysicalParameterType.T1 || pl.getType() == PhysicalParameterType.T2 || pl.getType() == PhysicalParameterType.T2s || pl.getType() == PhysicalParameterType.protonDensity || pl.getType() == PhysicalParameterType.susceptibility) {
                         icon = ModelConstants.APP_IMG_MAGNETIC;
                     }
-                    if (pl.getType() == PhysicalParameterType.chemicalBlend) {
+                    if (pl.getType() == PhysicalParameterType.chemicalComposition) {
                         icon = ModelConstants.APP_IMG_CHEMICAL;
                     }
-                    if (pl.getType() == PhysicalParameterType.radioactiviy) {
+                     if (pl.getType() == PhysicalParameterType.concentration) {
+                        icon = ModelConstants.APP_IMG_CHEMICAL;
+                    }
+                    if (pl.getType() == PhysicalParameterType.radioactivity) {
                         icon = ModelConstants.APP_IMG_RADIO;
                     }
-                    if (pl.getType() == PhysicalParameterType.scatterers) {
+                    if (pl.getType() == PhysicalParameterType.echogenicity) {
                         icon = ModelConstants.APP_IMG_ECHO;
                     }
-
+                    
                     physicalLayers[nopl++] = new ModelTreeNode("" + (2 + id++), pl.toString(), false, nopl);
                     physicalLayers[nopl - 1].setIcon(icon);
                 }
@@ -484,14 +488,17 @@ public class ModelTreeGrid extends TreeGrid {
                         if (pp.getType() == PhysicalParameterType.T1 || pp.getType() == PhysicalParameterType.T2 || pp.getType() == PhysicalParameterType.T2s || pp.getType() == PhysicalParameterType.protonDensity || pp.getType() == PhysicalParameterType.susceptibility) {
                             icon = ModelConstants.APP_IMG_MAGNETIC;
                         }
-                        if (pp.getType() == PhysicalParameterType.chemicalBlend) {
+                        if (pp.getType() == PhysicalParameterType.chemicalComposition) {
                             icon = ModelConstants.APP_IMG_CHEMICAL;
                         }
-                        if (pp.getType() == PhysicalParameterType.radioactiviy) {
+                        if (pp.getType() == PhysicalParameterType.radioactivity) {
                             icon = ModelConstants.APP_IMG_RADIO;
                         }
-                        if (pp.getType() == PhysicalParameterType.scatterers) {
+                        if (pp.getType() == PhysicalParameterType.echogenicity) {
                             icon = ModelConstants.APP_IMG_ECHO;
+                        }
+                        if (pp.getType() == PhysicalParameterType.concentration) {
+                            icon = ModelConstants.APP_IMG_CHEMICAL;
                         }
                         objectLayerPhysParamsLUT[olppl++] = new ModelTreeNode("" + (2 + id++), description, false, olppl);
                         objectLayerPhysParamsLUT[olppl - 1].setIcon(icon);
@@ -627,12 +634,14 @@ public class ModelTreeGrid extends TreeGrid {
                 || type == PhysicalParameterType.T2s || type == PhysicalParameterType.protonDensity
                 || type == PhysicalParameterType.susceptibility) {
             return ModelConstants.APP_IMG_MAGNETIC;
-        } else if (type == PhysicalParameterType.chemicalBlend) {
+        } else if (type == PhysicalParameterType.chemicalComposition) {
             return ModelConstants.APP_IMG_CHEMICAL;
-        } else if (type == PhysicalParameterType.radioactiviy) {
+        } else if (type == PhysicalParameterType.radioactivity) {
             return ModelConstants.APP_IMG_RADIO;
-        } else if (type == PhysicalParameterType.scatterers) {
+        } else if (type == PhysicalParameterType.echogenicity) {
             return ModelConstants.APP_IMG_ECHO;
+        } else if (type == PhysicalParameterType.concentration) {
+            return ModelConstants.APP_IMG_CHEMICAL;
         } else {
             return "";
         }
