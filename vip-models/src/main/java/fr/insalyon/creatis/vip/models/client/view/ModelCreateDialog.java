@@ -37,6 +37,7 @@ import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.fields.*;
 import com.smartgwt.client.widgets.form.validator.CustomValidator;
+import com.smartgwt.client.widgets.form.validator.IsIntegerValidator;
 import com.smartgwt.client.widgets.form.validator.IntegerRangeValidator;
 import com.smartgwt.client.widgets.form.validator.DoesntContainValidator;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -191,7 +192,12 @@ public class ModelCreateDialog extends Window {
                 
                 boolean badd = false;
                 if (type == 0) {
-                    label = 1;
+                     String slabel = rd.getAttributeAsString("priority");
+                     label = 1;
+                     if(!slabel.isEmpty())
+                         label = Integer.parseInt(slabel);
+                     if(label> 4)
+                         label = 4;
                 } else {
 
                     String slabel = rd.getAttributeAsString("label");
@@ -314,6 +320,17 @@ public class ModelCreateDialog extends Window {
         {
             resultTG.setSelectionType(SelectionStyle.SINGLE);
             resultTG.setFields(fieldname, fieldtype, fieldscore);
+            IsIntegerValidator iiv = new IsIntegerValidator();
+            IntegerRangeValidator integerRangeValidator = new IntegerRangeValidator();  
+            integerRangeValidator.setMin(1);
+            integerRangeValidator.setMax(4);
+            TreeGridField priorityField = new TreeGridField("priority");
+            priorityField.setCanSort(false);
+            priorityField.setCanEdit(true);
+            priorityField.setBaseStyle("myHighGridCell");
+            priorityField.setValidators(iiv,integerRangeValidator);
+            resultTG.setSelectionType(SelectionStyle.SINGLE);
+            resultTG.setFields(fieldname, fieldtype, fieldscore,priorityField);
         } else //voxel
         {
             IntegerRangeValidator integerRangeValidator = new IntegerRangeValidator();  
