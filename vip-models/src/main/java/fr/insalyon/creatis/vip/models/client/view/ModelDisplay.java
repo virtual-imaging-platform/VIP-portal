@@ -95,6 +95,7 @@ public class ModelDisplay extends VLayout {
 
     public void setZipFile(String z) {
         zipFile = z;
+        modelTreeGrid.setZipFile(z);
     }
 
     private void init(boolean bfull) {
@@ -186,6 +187,7 @@ public class ModelDisplay extends VLayout {
     private void updateTreeModel() {
         this.removeMember(modelTreeGrid);
         modelTreeGrid = new ModelTreeGrid(model, true);
+       // modelTreeGrid.setZipFile(zipFile);
         addMember(modelTreeGrid);
         modelTreeGrid.refreshFields();
         //modelTreeGrid.setToolStrip(toolStrip);
@@ -209,6 +211,7 @@ public class ModelDisplay extends VLayout {
 //        }
 
         modelTreeGrid = new ModelTreeGrid(model, true);
+       // modelTreeGrid.setZipFile(zipFile);
         addMember(modelTreeGrid);
         modelTreeGrid.setParentElement(this);
         //modelTreeGrid.setToolStrip(toolStrip);
@@ -216,6 +219,7 @@ public class ModelDisplay extends VLayout {
 
     public void createTreeGrid() {
         modelTreeGrid = new ModelTreeGrid(model, false);
+       // modelTreeGrid.setZipFile(zipFile);
             addMember(modelTreeGrid);
             modelTreeGrid.setParentElement(this);
         addTimePoint(new Date(System.currentTimeMillis()));

@@ -86,7 +86,7 @@ public interface ModelServiceAsync {
      
      public void searchWithScope(String query, boolean[] scope, AsyncCallback<List<String[]>> asyncCallback);
      
-     public void addObject(SimulationObjectModel model, String ontoName, String objName, int tp, int ins, int type, int label, AsyncCallback<SimulationObjectModel> asyncCallback);
+     public void addObject(SimulationObjectModel model, String ontoName, List<String> objName, int tp, int ins, int type, int label, AsyncCallback<SimulationObjectModel> asyncCallback);
    
      public void addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type, AsyncCallback<SimulationObjectModel> asyncCallback);
       
@@ -103,4 +103,6 @@ public interface ModelServiceAsync {
       public void renameTimepoint(SimulationObjectModel model, int tp, Date start, AsyncCallback<SimulationObjectModel> asyncCallback);
       
       public void renameInstant(SimulationObjectModel model, int tp, int ins, String duration,  AsyncCallback<SimulationObjectModel> asyncCallback);
+      
+      public void extractRaw(String name, String zipname, AsyncCallback< String > asyncCallback);
 }

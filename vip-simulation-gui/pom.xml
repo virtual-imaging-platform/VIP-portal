@@ -37,7 +37,7 @@
             <version>${vip.datamanager.version}</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-models</artifactId>
@@ -63,7 +63,11 @@
             <artifactId>gwtgl-source</artifactId>
             <version>0.3</version>
         </dependency>
-
+<!--        <dependency>
+            <groupId>fr.cnrs.i3s</groupId>
+            <artifactId>NeuSemStore-simulation-objects</artifactId>
+            <version>0.1.4-SNAPSHOT</version>
+        </dependency>-->
     </dependencies>
     
     <build>

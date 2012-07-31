@@ -34,6 +34,8 @@
  */
 package fr.insalyon.creatis.vip.models.server.rpc;
 
+import fr.insalyon.creatis.vip.core.client.bean.User;
+
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.PhysicalParametersLayer;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
@@ -43,7 +45,9 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.models.client.view.ModelException;
 import fr.insalyon.creatis.vip.models.server.business.ModelBusiness;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -77,7 +81,7 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
 
         try {
             trace(logger, "Creating model: " + modelName);
-            return modelBusiness.createModel(modelName, user);
+            return modelBusiness.createModel(modelName, getSessionUser().getLastName());
 
         } catch (CoreException ex) {
             throw new ModelException(ex);
@@ -169,7 +173,7 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
     public SimulationObjectModel createEmptyModel() throws ModelException {
         try {
             trace(logger, "Creating an empty model ");
-            return modelBusiness.createModel("Empty_Model","");
+            return modelBusiness.createModel("Empty_Model",getSessionUser().getLastName());
 
         } catch (CoreException ex) {
             throw new ModelException(ex);
@@ -236,7 +240,7 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
     }
 
-    public SimulationObjectModel addObject(SimulationObjectModel model, String ontoName, String objName, int tp, int ins, int type, int label) throws ModelException {
+    public SimulationObjectModel addObject(SimulationObjectModel model, String ontoName, List<String> objName, int tp, int ins, int type, int label) throws ModelException {
         try {
             trace(logger, "add Object");
             return modelBusiness.addObject(model, ontoName, objName, tp, ins, type, label);
@@ -277,7 +281,8 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
       
             try {
                 trace(logger, "add files to zip");
-                return modelBusiness.recordAddedFiles(zipName, addfiles, model);
+                return modelBusiness.recordAddedFiles(zipName, addfiles, model,
+                        getSessionUser().getLastName());
             } catch (CoreException ex) {
                  throw new ModelException(ex);
             }
@@ -322,6 +327,10 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         } catch (CoreException ex) {
             throw new ModelException(ex);
         }
-
     }
+     
+     public String extractRaw(String name, String zipname)
+     {
+         return modelBusiness.extractRaw(name, zipname);
+     }
 }

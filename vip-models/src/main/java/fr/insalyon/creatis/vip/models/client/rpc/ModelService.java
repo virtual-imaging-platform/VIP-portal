@@ -103,7 +103,7 @@ public interface ModelService extends RemoteService {
     
     public List<String[]> searchWithScope(String query, boolean[] scope) throws ModelException;
 
-    public SimulationObjectModel addObject(SimulationObjectModel model, String ontoName, String objName, int tp, int ins, int type, int label) throws ModelException;
+    public SimulationObjectModel addObject(SimulationObjectModel model, String ontoName, List<String> objName, int tp, int ins, int type, int label) throws ModelException;
 
     public SimulationObjectModel addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type) throws ModelException;
     
@@ -120,5 +120,7 @@ public interface ModelService extends RemoteService {
     public SimulationObjectModel renameTimepoint(SimulationObjectModel model, int tp, Date starting) throws ModelException;
     
     public SimulationObjectModel renameInstant(SimulationObjectModel model, int tp, int ins, String duration)throws ModelException;
+    
+    public String extractRaw(String name, String zipname);
 
 }

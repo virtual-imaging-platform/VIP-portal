@@ -42,6 +42,18 @@ import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.*;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectLayer.Resolution;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectLayerPart.Format;
 
+
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
+
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+
+
+
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.server.rpc.DataManagerServiceImpl;
@@ -86,31 +98,35 @@ public class ModelBusiness {
             byte[] buf = new byte[1024];
 
             while (zipentry != null) {
-                //for each entry to be extracted
-                String entryName = zipentry.getName();
-                if (entryName.endsWith(".rdf")) { //extract only the annotations.
-                    FileOutputStream fileoutputstream;
-                    File newFile = new File(entryName);
-                    String directory = newFile.getParent();
 
-                    if (directory == null) {
-                        if (newFile.isDirectory()) {
-                            break;
+                if(!zipentry.isDirectory())
+                {
+                    //for each entry to be extracted
+                    String entryName = zipentry.getName();
+                    if (entryName.endsWith(".rdf")) { //extract only the annotations.
+                        FileOutputStream fileoutputstream;
+                        File newFile = new File(entryName);
+                        String directory = newFile.getParent();
+
+                        if (directory == null) {
+                            if (newFile.isDirectory()) {
+                                break;
+                            }
                         }
-                    }
-                    int n;
-                    fileoutputstream = new FileOutputStream(
-                            rootDirectory + entryName);
+                        int n;
+                        fileoutputstream = new FileOutputStream(
+                                rootDirectory + entryName);
+                                System.out.println("rdf file : " + entryName);
+                        while ((n = zipinputstream.read(buf, 0, 1024)) > -1) {
+                            fileoutputstream.write(buf, 0, n);
+                        }
 
-                    while ((n = zipinputstream.read(buf, 0, 1024)) > -1) {
-                        fileoutputstream.write(buf, 0, n);
+                        fileoutputstream.close();
+                        zipinputstream.closeEntry();
+                        //checkRDFEncoding(rootDirectory + entryName);
                     }
-                    
-                    fileoutputstream.close();
-                    zipinputstream.closeEntry();
-                    //checkRDFEncoding(rootDirectory + entryName);
+                    files.add(rootDirectory + entryName);
                 }
-                files.add(rootDirectory + entryName);
                 zipentry = zipinputstream.getNextEntry();
             }
             zipinputstream.close();
@@ -150,7 +166,7 @@ InputStream ips=new FileInputStream(file);
         System.out.println("File copied.");
     }
 
-    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles, SimulationObjectModel model) throws IOException {
+    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles, SimulationObjectModel model, String user) throws IOException {
         List<File> files = new ArrayList<File>();
         String rootDirectory = Server.getInstance().getDataManagerPath() + "/uploads/";
         File zipFile = new File(rootDirectory + zipName);
@@ -201,13 +217,16 @@ InputStream ips=new FileInputStream(file);
             }
         }
         //copy rdf.
-        SimulationObjectModelFactory.inferModelSemanticAxes(model);
-        System.out.println(zipdir + modelname);
+        // Create a new model
+        SimulationObjectModel nwmodel = SimulationObjectModelFactory.createModel(model.getModelName());
+        nwmodel.setModelOwner(user);
+        nwmodel.setModelDescription(model.getModelName());
+        SimulationObjectModelFactory.inferModelSemanticAxes(nwmodel);
         SimulationObjectModelFactory.dumpInFile(zipdir + modelname);
-        SimulationObjectModelFactory.completeModel(model);
-        SimulationObjectModelFactory.inferModelSemanticAxes(model);
+        SimulationObjectModelFactory.completeModel(nwmodel);
+     //   SimulationObjectModelFactory.inferModelSemanticAxes(model);
          System.out.println("URI: "+model.getURI());        
-         System.out.println( "URl : " +model.getStorageURL()); 
+         System.out.println( "URL : " +model.getStorageURL()); 
 
         
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(rootDirectory + "zip//" + zipName));
@@ -239,7 +258,7 @@ InputStream ips=new FileInputStream(file);
         model.setStorageURL(storageURL);
         SimulationObjectModelFactory.setStorageURL(model, storageURL);
 
-
+        System.out.println("model owner :" + user);
         model.setModelOwner(user);
         SimulationObjectModelFactory.setModelOwner(model, user);
 
@@ -547,28 +566,83 @@ InputStream ips=new FileInputStream(file);
     }
 
     private void instantCopy(Instant src, Instant dest) {
-        dest.setObjectLayers(src.getObjectLayers());
-        dest.setPhysicalParametersLayers(src.getPhysicalParametersLayers());
-//          ArrayList<ObjectLayer> objs = src.getObjectLayers();
-//            for (ObjectLayer obj : objs) {
-//                obj.
-//                ArrayList<ObjectLayerPart> parts = obj.getLayerParts();
-//
-//                for (ObjectLayerPart part : parts) {
-//                    //    ObjectLayerPart
-//                }
-//            }
-//           ArrayList<PhysicalParametersLayer> phys = src.getPhysicalParametersLayers();
-//            for (PhysicalParametersLayer phy : phys) {
-//                
-//            }
-           dest.setDuration(src.getDuration());
+        
+        for (ObjectLayer obj : src.getObjectLayers()) {
+                ObjectLayer objdest = new ObjectLayer();
+                objectLayerCopy(obj,objdest);
+                dest.addObjectLayer(objdest);
+            }
+          
+         for (PhysicalParametersLayer ppl : src.getPhysicalParametersLayers())
+         {
+             PhysicalParametersLayer ppldest = new PhysicalParametersLayer();
+             PhysicalParametersLayerCopy(ppl, ppldest);
+             dest.addPhysicalParametersLayer(ppl);
+         }
+         dest.setDuration(src.getDuration());
     }
-
+    
+    private void objectLayerCopy(ObjectLayer src, ObjectLayer dest) {
+  
+        for (ObjectLayerPart vx : src.getLayerParts(Format.voxel))
+        {
+            ObjectLayerPart vxdest = new ObjectLayerPart();
+            objectLayerPartCopy(vx,vxdest);
+            vxdest.setLabel(vx.getLabel());
+            vxdest.setParent(dest);
+            dest.addObjectLayerPart(vxdest);
+        }
+        
+        for (ObjectLayerPart ms : src.getLayerParts(Format.mesh))
+        {
+            ObjectLayerPart msdest = new ObjectLayerPart();
+            objectLayerPartCopy(ms,msdest);
+            msdest.setParent(dest);
+            msdest.setPriority(ms.getPriority());
+            dest.addObjectLayerPart(msdest);
+        }
+        
+        for (PhysicalParameter pp : src.getPhysicalParameters())
+        {
+            PhysicalParameter ppdest = new PhysicalParameter();
+            PhysicalParameterCopy(pp,ppdest);
+            dest.addPhysicalParameters(ppdest);
+        }
+        for (PhysicalParametersLayer ppl: src.getPhysicalParametersLayers() )
+        {
+           PhysicalParametersLayer ppldest = new PhysicalParametersLayer();
+           PhysicalParametersLayerCopy(ppl, ppldest);
+           dest.addPhysicalParametersLayer(ppldest);
+        }
+    }
+    
+    private void objectLayerPartCopy(ObjectLayerPart src, ObjectLayerPart dest)
+    {
+        dest.setFileNames(src.getFileNames());
+        dest.setFormat(src.getFormat());
+        dest.setReferredObject(src.getReferredObject());
+        dest.setType(src.getType());
+   }
+    
+    
+   private void PhysicalParametersLayerCopy(PhysicalParametersLayer src, PhysicalParametersLayer dest)
+   {
+       dest.setFileName(src.getFileName());
+       dest.setB0(src.getB0());
+       dest.setType(src.getType());
+       //dest.setURI(src.setURI());
+   }
+   private void PhysicalParameterCopy(PhysicalParameter src, PhysicalParameter dest)
+   {
+       dest.setB0(src.getB0());
+       dest.setFileNames(src.getFileNames());
+       dest.setType(src.getType());
+       //dest.setURI(dest.getURI());
+    }
+    
+    
     public List<String[]> searchWithScope(String query, boolean[] scope) {
         List<String[]> action = new ArrayList<String[]>();
-
-
 
         //  String[][] resultats = new String[]();
         int i = 0;
@@ -587,30 +661,18 @@ InputStream ips=new FileInputStream(file);
         return action;
     }
 
-    public SimulationObjectModel addObject(SimulationObjectModel model, String ontoName, String objName, int tp, int ins, int type, int label) {
+    public SimulationObjectModel addObject(SimulationObjectModel model, String ontoName, List<String> objName, int tp, int ins, int type, int label) {
         System.out.println("object to add");
-        ArrayList<String> objects = new ArrayList<String>();
+        ArrayList<String> objects = new ArrayList<String>(objName);
+
         if (type == 0)//mesh type
         {
+          
             System.out.println("mesh");
-            System.out.println("ontologie" + ontoName + "object : " + objName);
-            objects.add(objName);
+            System.out.println("ontologie" + ontoName + "object : " + objName.get(0));
             addObjectNoResolutionHandling(model, tp, ins, ontoName, objects, label, Format.mesh, -1);
         } else if (type == 1) {
-            System.out.println("voxel" + objName);
-            if (objName.contains(".raw")) {
-                objects.add(objName.substring(0, objName.lastIndexOf(".raw")) + ".mhd");
-                objects.add(objName);
-            } else if (objName.contains(".zraw")) {
-                objects.add(objName.substring(0, objName.lastIndexOf(".zraw")) + ".mhd");
-                objects.add(objName);
-            } else if (objName.contains(".mhd")) {
-                objects.add(objName);
-                objects.add(objName.substring(0, objName.lastIndexOf(".mhd")) + ".zraw");
-
-            } else {
-                System.out.println("euh");
-            }
+            
             System.out.println("ontologie" + ontoName + "object : " + objects);
             addObjectNoResolutionHandling(model, tp, ins, ontoName, objects, label, Format.voxel, -1);
         } else {
@@ -799,7 +861,7 @@ InputStream ips=new FileInputStream(file);
 
         // call the servlet to create the physical parameters layer
         // parameters : physical paramter type, filename
-        PhysicalParametersLayer physicalParametersLayer = SimulationObjectModelFactory.createPhysicalParametersLayer(physicalParametersType, fileName, b0,"","");
+        PhysicalParametersLayer physicalParametersLayer = SimulationObjectModelFactory.createPhysicalParametersLayer(physicalParametersType, fileName, b0);
 
         // if the user want to add it to the instant (not linked to an object layer)
         // in this example 0,0
@@ -819,5 +881,101 @@ InputStream ips=new FileInputStream(file);
         PhysicalParameter physicalParameter = SimulationObjectModelFactory.createPhysicalParameter(physicalParametersType, fileName, b0);
         objectLayer.addPhysicalParameters(physicalParameter);
         SimulationObjectModelFactory.addPhysicalParametersToObjectLayer(objectLayer, physicalParameter);
+    }
+    
+    public String extractRaw(String name, String zipname) 
+    {
+        String rootDirectory = Server.getInstance().getDataManagerPath() + "/uploads/";
+        File dir = new File(rootDirectory);
+        boolean bfound = false;
+                            System.out.println("zip :" + zipname);
+                                                System.out.println("name"+ name);
+        String raw = "";
+        for(String fi : dir.list())
+        {
+            if (fi.equals(name))
+            {
+                bfound = true;
+                break;
+            }
+                
+        }
+        if(bfound)
+            raw = extractRawfromFile(rootDirectory+name);
+        else
+            raw = extractRawfromZipFile(name,rootDirectory+zipname);
+        return raw;
+    }
+    
+    public String extractRawfromFile(String name) 
+    {
+        String result = "";
+        FileInputStream fstream = null;
+        try {
+            
+            fstream = new FileInputStream(name);
+            BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+            String line="";
+            while ((line = br.readLine()) != null)   {
+                if (line.contains("ElementDataFile"))
+                {
+                    result = line.substring(line.indexOf("=")).replace("=","").replace(" ","");
+                    break;
+                }
+          } 
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(ModelBusiness.class.getName()).log(Level.SEVERE, null, ex);
+        }  finally {
+            try {
+                fstream.close();
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(ModelBusiness.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return result;
+    }
+    
+     public String extractRawfromZipFile(String name, String zipname) 
+    {
+        ZipInputStream zipinputstream = null;
+        String result = "";
+                    System.out.println(zipname);
+        try {
+
+            zipinputstream = new ZipInputStream(new FileInputStream(zipname));
+            ZipEntry zipentry = zipinputstream.getNextEntry();
+            ArrayList<String> files = new ArrayList<String>();
+            byte[] buf = new byte[1024];
+            while (zipentry != null) {
+                    //for each entry to be extracted
+                    String entryName = zipentry.getName();
+                    if (entryName.equals(name)) { //extract only the annotations.
+                        FileOutputStream fileoutputstream;
+                        fileoutputstream = new FileOutputStream(
+                                zipname+"_temp");
+                        int n = 0;
+                        while ((n = zipinputstream.read(buf, 0, 1024)) > -1) {
+                            fileoutputstream.write(buf, 0, n);
+                        }
+                        fileoutputstream.close();
+                        result = extractRawfromFile(zipname+"_temp") ;
+                        System.out.println("result : "+result);
+                        zipinputstream.closeEntry();
+                        File f = new File(zipname+"_temp");
+                        f.delete();
+                        break;
+                    }
+                    zipentry = zipinputstream.getNextEntry();
+                }
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(ModelBusiness.class.getName()).log(Level.SEVERE, null, ex);
+        }  finally {
+            try {
+                zipinputstream.close();
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(ModelBusiness.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+       return result;
     }
 }

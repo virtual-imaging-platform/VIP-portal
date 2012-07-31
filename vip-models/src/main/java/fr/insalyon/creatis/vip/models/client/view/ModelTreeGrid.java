@@ -71,6 +71,7 @@ import fr.insalyon.creatis.vip.models.client.view.FileTree.FileTreeNode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -102,8 +103,10 @@ public class ModelTreeGrid extends TreeGrid {
     private HashMap<String, PhysicalParameterType> lutTypeMap = new HashMap<String, PhysicalParameterType>();
     private ModelMenu mymenu = null;
     private ModelCreateDialog dg = null;
-   // private ToolStrip displayToolStrip = null;
-    
+    private String zipfile = "";
+    // private ToolStrip displayToolStrip = null;
+    private String associatedraw = "";
+
     public ModelTreeGrid(final SimulationObjectModel model, boolean bFull) {
         super();
 
@@ -116,13 +119,12 @@ public class ModelTreeGrid extends TreeGrid {
         lutTypeMap.put("T1", PhysicalParameterType.T1);
         lutTypeMap.put("T2", PhysicalParameterType.T2);
         lutTypeMap.put("T2s", PhysicalParameterType.T2s);
-        lutTypeMap.put("chemicalComposition", PhysicalParameterType.chemicalComposition);
-        lutTypeMap.put("concentration", PhysicalParameterType.concentration);
+        lutTypeMap.put("chemicalComposition", PhysicalParameterType.chemicalBlend);
         lutTypeMap.put("protonDensity", PhysicalParameterType.protonDensity);
-        lutTypeMap.put("radioactivity", PhysicalParameterType.radioactivity);
-        lutTypeMap.put("echogenicity", PhysicalParameterType.echogenicity);
+        lutTypeMap.put("radioactivity", PhysicalParameterType.radioactiviy);
+        lutTypeMap.put("echogenicity", PhysicalParameterType.scatterers);
         lutTypeMap.put("susceptibility", PhysicalParameterType.susceptibility);
-        
+
         this.model = model;
         //init the tree grid
         logger = Logger.getLogger("ModelTree");
@@ -147,7 +149,7 @@ public class ModelTreeGrid extends TreeGrid {
         Menu tfgMenu = new Menu();
         tfgMenu.setItemChecked(modelNameItem);
         //tfg.setContextMenu(tfgMenu);
-        
+
         tfg.setCellFormatter(new CellFormatter() {
 
             public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
@@ -164,7 +166,7 @@ public class ModelTreeGrid extends TreeGrid {
         if (bFull) {
             logger.log(Level.SEVERE, "model tree set fields");
             setFields(tfg);
-           // loadEmpty();
+            // loadEmpty();
             load(model);
         } else {
             logger.log(Level.SEVERE, "load an empty model");
@@ -224,7 +226,26 @@ public class ModelTreeGrid extends TreeGrid {
 
             @Override
             public void onFolderDrop(FolderDropEvent event) {
-                dg.addInfo(typeDropped(event.getNodes()[0].getAttribute("FileName")), tpSelected, insSelected, event.getNodes()[0].getAttribute("FileName"));
+                String dropname = event.getNodes()[0].getAttribute("FileName");
+                if(dropname.endsWith(".mhd"))
+                {
+                    ModelServiceAsync ms = ModelService.Util.getInstance();
+                    final AsyncCallback<String> callback = new AsyncCallback<String>() {
+
+                    public void onFailure(Throwable caught) {
+                        SC.say("The raw file associated with this mhd file is not available.");
+                    }
+
+                    public void onSuccess(String result) {
+                       associatedraw = result;
+                        
+                    }
+                };
+                ms.extractRaw(dropname, zipfile, callback);
+                }
+                else
+                {}
+                dg.addInfo(typeDropped(dropname), tpSelected, insSelected, event.getNodes()[0].getAttribute("FileName"));
                 dg.show();
                 event.cancel();
 
@@ -239,7 +260,7 @@ public class ModelTreeGrid extends TreeGrid {
                 ((ModelMenu) nodeMenu).setNode((ModelTreeNode) event.getNode());
             }
         });
-       this.setContextMenu(nodeMenu);
+        this.setContextMenu(nodeMenu);
 
     }
 
@@ -255,11 +276,15 @@ public class ModelTreeGrid extends TreeGrid {
         objOnto = name;
     }
 
+    public void setZipFile(String z)
+    {
+        zipfile = z;
+        logger.log(Level.SEVERE,"zipfile :" + zipfile);
+    }
 //    public void setToolStrip(ToolStrip ts)
 //    {
 //        displayToolStrip = ts;
 //    }
-    
     public void removeNode() {
         ModelServiceAsync ms = ModelService.Util.getInstance();
 
@@ -339,11 +364,11 @@ public class ModelTreeGrid extends TreeGrid {
     private void loadEmpty() {
 
 
-        ModelTreeNode instants = new ModelTreeNode("", "Instant 0", true, 0 , null);
-        
-            instants.setIcon(ModelConstants.APP_IMG_INSTANT);
-       ModelTreeNode timepoints = new ModelTreeNode("", "Timepoint ()", true,1, instants);
-            timepoints.setIcon(ModelConstants.APP_IMG_TIMEPOINT);
+        ModelTreeNode instants = new ModelTreeNode("", "Instant 0", true, 0, null);
+
+        instants.setIcon(ModelConstants.APP_IMG_INSTANT);
+        ModelTreeNode timepoints = new ModelTreeNode("", "Timepoint ()", true, 1, instants);
+        timepoints.setIcon(ModelConstants.APP_IMG_TIMEPOINT);
         TreeNode root = new ModelTreeNode("1", "Root", true, 1, timepoints);
         modelTree = new Tree();
         modelTree.setModelType(TreeModelType.CHILDREN);
@@ -352,7 +377,7 @@ public class ModelTreeGrid extends TreeGrid {
         modelTree.setChildrenProperty("Children");
         modelTree.setOpenProperty("isOpen");
         modelTree.setRoot(root);
-        
+
         setData(modelTree);
     }
 
@@ -362,7 +387,7 @@ public class ModelTreeGrid extends TreeGrid {
 
     public void addTimePoint(Date d, int id) {
         ModelServiceAsync ms = ModelService.Util.getInstance();
-         AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
+        AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
             public void onFailure(Throwable caught) {
                 SC.warn("Cant add a timepoint");
@@ -373,33 +398,32 @@ public class ModelTreeGrid extends TreeGrid {
                 ModelTreeNode timepoint = new ModelTreeNode("", "Timepoint (" + new Date(System.currentTimeMillis()) + ")", true, ntp++, null);
                 timepoint.setIcon(ModelConstants.APP_IMG_TIMEPOINT);
                 modelTree.add(timepoint, modelTree.getRoot());
-               
+
             }
         };
         ms.addTimePoint(model, d, callback);
-         
+
     }
 
-     
     public void addInstant() {
-            ModelServiceAsync ms = ModelService.Util.getInstance();
-            AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
+        ModelServiceAsync ms = ModelService.Util.getInstance();
+        AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
-                public void onFailure(Throwable caught) {
-                    SC.warn("Cant add an instant");
-                }
+            public void onFailure(Throwable caught) {
+                SC.warn("Cant add an instant");
+            }
 
-                public void onSuccess(SimulationObjectModel result) {
-                    model = result;
-                    ModelTreeNode node = findNode(tpSelected);
-                    int size = modelTree.getFolders(node).length;
-                    ModelTreeNode instant = new ModelTreeNode("", "Instant (1000 )", true, size, null);
-                    instant.setIcon(ModelConstants.APP_IMG_INSTANT);
-                    modelTree.add(instant, node);
-                }
-            };
-            ms.addInstant(model, tpSelected, callback);
-    
+            public void onSuccess(SimulationObjectModel result) {
+                model = result;
+                ModelTreeNode node = findNode(tpSelected);
+                int size = modelTree.getFolders(node).length;
+                ModelTreeNode instant = new ModelTreeNode("", "Instant (1000 )", true, size, null);
+                instant.setIcon(ModelConstants.APP_IMG_INSTANT);
+                modelTree.add(instant, node);
+            }
+        };
+        ms.addInstant(model, tpSelected, callback);
+
     }
 
     public ModelTreeNode findNode(int... index) {
@@ -451,19 +475,16 @@ public class ModelTreeGrid extends TreeGrid {
                     if (pl.getType() == PhysicalParameterType.T1 || pl.getType() == PhysicalParameterType.T2 || pl.getType() == PhysicalParameterType.T2s || pl.getType() == PhysicalParameterType.protonDensity || pl.getType() == PhysicalParameterType.susceptibility) {
                         icon = ModelConstants.APP_IMG_MAGNETIC;
                     }
-                    if (pl.getType() == PhysicalParameterType.chemicalComposition) {
+                    if (pl.getType() == PhysicalParameterType.chemicalBlend) {
                         icon = ModelConstants.APP_IMG_CHEMICAL;
                     }
-                     if (pl.getType() == PhysicalParameterType.concentration) {
-                        icon = ModelConstants.APP_IMG_CHEMICAL;
-                    }
-                    if (pl.getType() == PhysicalParameterType.radioactivity) {
+                    if (pl.getType() == PhysicalParameterType.radioactiviy) {
                         icon = ModelConstants.APP_IMG_RADIO;
                     }
-                    if (pl.getType() == PhysicalParameterType.echogenicity) {
+                    if (pl.getType() == PhysicalParameterType.scatterers) {
                         icon = ModelConstants.APP_IMG_ECHO;
                     }
-                    
+
                     physicalLayers[nopl++] = new ModelTreeNode("" + (2 + id++), pl.toString(), false, nopl);
                     physicalLayers[nopl - 1].setIcon(icon);
                 }
@@ -488,18 +509,16 @@ public class ModelTreeGrid extends TreeGrid {
                         if (pp.getType() == PhysicalParameterType.T1 || pp.getType() == PhysicalParameterType.T2 || pp.getType() == PhysicalParameterType.T2s || pp.getType() == PhysicalParameterType.protonDensity || pp.getType() == PhysicalParameterType.susceptibility) {
                             icon = ModelConstants.APP_IMG_MAGNETIC;
                         }
-                        if (pp.getType() == PhysicalParameterType.chemicalComposition) {
+                        if (pp.getType() == PhysicalParameterType.chemicalBlend) {
                             icon = ModelConstants.APP_IMG_CHEMICAL;
                         }
-                        if (pp.getType() == PhysicalParameterType.radioactivity) {
+                        if (pp.getType() == PhysicalParameterType.radioactiviy) {
                             icon = ModelConstants.APP_IMG_RADIO;
                         }
-                        if (pp.getType() == PhysicalParameterType.echogenicity) {
+                        if (pp.getType() == PhysicalParameterType.scatterers) {
                             icon = ModelConstants.APP_IMG_ECHO;
                         }
-                        if (pp.getType() == PhysicalParameterType.concentration) {
-                            icon = ModelConstants.APP_IMG_CHEMICAL;
-                        }
+
                         objectLayerPhysParamsLUT[olppl++] = new ModelTreeNode("" + (2 + id++), description, false, olppl);
                         objectLayerPhysParamsLUT[olppl - 1].setIcon(icon);
                     }
@@ -634,14 +653,12 @@ public class ModelTreeGrid extends TreeGrid {
                 || type == PhysicalParameterType.T2s || type == PhysicalParameterType.protonDensity
                 || type == PhysicalParameterType.susceptibility) {
             return ModelConstants.APP_IMG_MAGNETIC;
-        } else if (type == PhysicalParameterType.chemicalComposition) {
+        } else if (type == PhysicalParameterType.chemicalBlend) {
             return ModelConstants.APP_IMG_CHEMICAL;
-        } else if (type == PhysicalParameterType.radioactivity) {
+        } else if (type == PhysicalParameterType.radioactiviy) {
             return ModelConstants.APP_IMG_RADIO;
-        } else if (type == PhysicalParameterType.echogenicity) {
+        } else if (type == PhysicalParameterType.scatterers) {
             return ModelConstants.APP_IMG_ECHO;
-        } else if (type == PhysicalParameterType.concentration) {
-            return ModelConstants.APP_IMG_CHEMICAL;
         } else {
             return "";
         }
@@ -765,7 +782,7 @@ public class ModelTreeGrid extends TreeGrid {
                 } else if (name.contains(".zraw")) {
                     description += name.substring(0, name.indexOf(".zraw")) + ".mhd, " + name + ")";
                 } else {
-                    description += name + ", " + name.substring(0, name.indexOf(".mhd")) + ".zraw" + ")";
+                    description += name + ", " + associatedraw + ")";
                 }
             } else {
                 description += format + ": " + name + ")";
@@ -789,6 +806,30 @@ public class ModelTreeGrid extends TreeGrid {
                 }
             }
         }
+        ArrayList<String> objNames = new ArrayList<String>();
+
+        if (type == 0)
+        {
+            objNames.add(name);
+        }
+        else
+        {
+            if (name.contains(".raw")) {
+                    objNames.add(name.substring(0, name.lastIndexOf(".raw")) + ".mhd");
+                    objNames.add(name);
+                } else if (name.contains(".zraw")) {
+                    objNames.add(name.substring(0, name.lastIndexOf(".zraw")) + ".mhd");
+                    objNames.add(name);
+                } else if (name.contains(".mhd")) {
+                    objNames.add(name);
+                    objNames.add(associatedraw);
+            }
+                else {}
+        }
+        
+
+
+
         ModelServiceAsync ms = ModelService.Util.getInstance();
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
@@ -802,14 +843,14 @@ public class ModelTreeGrid extends TreeGrid {
             }
         };
 
-        ms.addObject(model, OntoName, name, tp, ins, type, lab, callback);
+        ms.addObject(model, OntoName, objNames, tp, ins, type, lab, callback);
     }
-    public SimulationObjectModel.ObjectType getTypeFromMap(String type)
-    {
+
+    public SimulationObjectModel.ObjectType getTypeFromMap(String type) {
         return layerTypeMap.get(type);
     }
-     public String getLayerFromMap(String type)
-     {
+
+    public String getLayerFromMap(String type) {
         String layer = "";
         for (String key : layerTypeMap.keySet()) {
             if (layerTypeMap.get(key).toString() == type) {
@@ -818,16 +859,16 @@ public class ModelTreeGrid extends TreeGrid {
             }
         }
         return layer;
-     }
-    
-    public ArrayList<String> getLutMap()
-    {
-        ArrayList<String> luts = new ArrayList<String>();
-       for (Entry<String,PhysicalParameterType> entry : lutTypeMap.entrySet())
-           luts.add(entry.getValue().toString());
-       return luts;
     }
-    
+
+    public ArrayList<String> getLutMap() {
+        ArrayList<String> luts = new ArrayList<String>();
+        for (Entry<String, PhysicalParameterType> entry : lutTypeMap.entrySet()) {
+            luts.add(entry.getValue().toString());
+        }
+        return luts;
+    }
+
     public void addPhysicalItem(int tp, int ins, int type, String name, String objLayer, String label) {
         int nbChild = 0;
         logger.log(Level.SEVERE, "tp :" + String.valueOf(tp) + "ins : " + String.valueOf(ins) + "type : " + String.valueOf(type)
@@ -932,7 +973,7 @@ public class ModelTreeGrid extends TreeGrid {
                 }
             }
         }
-        
+
         ModelServiceAsync ms = ModelService.Util.getInstance();
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
@@ -946,25 +987,22 @@ public class ModelTreeGrid extends TreeGrid {
             }
         };
 
-        ms.addLUT(model, layerTypeMap.get(layer), name, tpSelected, insSelected,lutTypeMap.get(label) ,  type, callback);
-        
+        ms.addLUT(model, layerTypeMap.get(layer), name, tpSelected, insSelected, lutTypeMap.get(label), type, callback);
+
     }
-    
-    public SimulationObjectModel getModel()
-    {
+
+    public SimulationObjectModel getModel() {
         return model;
     }
-    
-    public void rename(String name, SimulationObjectModel result)
-    {
+
+    public void rename(String name, SimulationObjectModel result) {
         model = result;
         //mnode.setTitle(name);
         mnode.setAttribute(model.getModelName(), name);
         this.markForRedraw();
     }
-    
-    public void duplicateInstant()
-    {
+
+    public void duplicateInstant() {
         ModelServiceAsync ms = ModelService.Util.getInstance();
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
@@ -981,12 +1019,10 @@ public class ModelTreeGrid extends TreeGrid {
 
         ms.duplicateInstant(model, Integer.parseInt(modelTree.getParent(mnode).getAttribute("number")), Integer.parseInt(mnode.getAttribute("number")), callback);
         checkModality();
-       this.markForRedraw();
+        this.markForRedraw();
     }
-    
-    
-    public void duplicateTimepoint()
-    {
+
+    public void duplicateTimepoint() {
         ModelServiceAsync ms = ModelService.Util.getInstance();
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
@@ -997,25 +1033,23 @@ public class ModelTreeGrid extends TreeGrid {
             public void onSuccess(SimulationObjectModel result) {
                 SC.say("Timepoint duplicated");
                 model = result;
-                ModelTreeNode node =  new ModelTreeNode(mnode);
-                
+                ModelTreeNode node = new ModelTreeNode(mnode);
+
                 modelTree.add(node, modelTree.getParent(mnode));
             }
         };
 
         ms.duplicateTimePoint(model, Integer.parseInt(mnode.getAttribute("number")), callback);
-       this.markForRedraw();
+        this.markForRedraw();
     }
-    
-    public void renameTimepoint()
-    {
-         RenameTimepointWindow win = new RenameTimepointWindow(ModelTreeGrid.this,
+
+    public void renameTimepoint() {
+        RenameTimepointWindow win = new RenameTimepointWindow(ModelTreeGrid.this,
                 Integer.parseInt(mnode.getAttribute("number")), mnode.getAttribute(model.getModelName()));
         win.show();
     }
-    
-    public void renameInstant()
-    {
+
+    public void renameInstant() {
 
         RenameInstantWindow win = new RenameInstantWindow(ModelTreeGrid.this, Integer.parseInt(modelTree.getParent(mnode).getAttribute("number")),
                 Integer.parseInt(mnode.getAttribute("number")), mnode.getAttribute(model.getModelName()));
@@ -1023,73 +1057,63 @@ public class ModelTreeGrid extends TreeGrid {
 
     }
 
-    private void checkModality()
-    {
-  //      ((ToolStripButton)displayToolStrip.getMember("MRI")).setIcon(ModelConstants.APP_IMG_OK);
+    private void checkModality() {
+        //      ((ToolStripButton)displayToolStrip.getMember("MRI")).setIcon(ModelConstants.APP_IMG_OK);
     }
-    
-    
-    
-    public ArrayList<String> getObjectsLabel(int tp, int ins, String layerType)
-    {
+
+    public ArrayList<String> getObjectsLabel(int tp, int ins, String layerType) {
         ArrayList<String> results = new ArrayList<String>();
         ArrayList<ObjectLayer> ols = model.getTimepoint(tp).getInstant(ins).getObjectLayers();
-  
-        for( ObjectLayer ol : ols)
-        {
-            for (ObjectLayerPart olp : ol.getLayerParts())
-            {
+
+        for (ObjectLayer ol : ols) {
+            for (ObjectLayerPart olp : ol.getLayerParts()) {
 //               logger.log(Level.SEVERE, "label label:"+ getLayerFromMap(layerType));
 //                logger.log(Level.SEVERE, "label label2:" + olp.getType().toString());
-                if (olp.getType().toString() == layerType)
-                {
+                if (olp.getType().toString() == layerType) {
                     logger.log(Level.SEVERE, "label label3: " + String.valueOf(olp.getLabel()));
                     results.add(String.valueOf(olp.getLabel()));
-                    
+
                 }
-                    
+
             }
         }
         return results;
     }
-     
-    public ArrayList<String> getObjectsEntity(int tp, int ins, String layerType)
-    {
-         ArrayList<String> results = new ArrayList<String>();
-             ArrayList<ObjectLayer> ols = model.getTimepoint(tp).getInstant(ins).getObjectLayers();
-        for( ObjectLayer ol : ols)
-        {
-            for (ObjectLayerPart olp : ol.getLayerParts())
-            {
-                if (olp.getType().equals(layerType))
+
+    public ArrayList<String> getObjectsEntity(int tp, int ins, String layerType) {
+        ArrayList<String> results = new ArrayList<String>();
+        ArrayList<ObjectLayer> ols = model.getTimepoint(tp).getInstant(ins).getObjectLayers();
+        for (ObjectLayer ol : ols) {
+            for (ObjectLayerPart olp : ol.getLayerParts()) {
+                if (olp.getType().equals(layerType)) {
                     results.add(olp.getReferredObject().getObjectName());
+                }
             }
         }
         return results;
     }
-     
-     public class ModelTreeNode extends TreeNode {
+
+    public class ModelTreeNode extends TreeNode {
 
         public ModelTreeNode(String entityId, String entityName, boolean display, int number) {
             this(entityId, entityName, display, number, new ModelTreeNode[]{});
         }
-        
-        public ModelTreeNode(ModelTreeNode src)
-        {
+
+        public ModelTreeNode(ModelTreeNode src) {
             setAttribute(model.getModelName(), src.getAttribute(model.getModelName()));
             setAttribute("EntityId", src.getAttribute("entityId"));
 
-            if(modelTree.hasChildren(src))
-            {
+            if (modelTree.hasChildren(src)) {
                 TreeNode[] srChildren = modelTree.getChildren(src);
                 TreeNode[] children = new TreeNode[srChildren.length];
                 int index = 0;
-                for(TreeNode node : srChildren)
-                    children[index++] = (new ModelTreeNode((ModelTreeNode)node));
+                for (TreeNode node : srChildren) {
+                    children[index++] = (new ModelTreeNode((ModelTreeNode) node));
+                }
                 setAttribute("Children", children);
             }
             setAttribute("isOpen", false);
-            setAttribute("number", String.valueOf(modelTree.getChildren(src).length+1));
+            setAttribute("number", String.valueOf(modelTree.getChildren(src).length + 1));
             this.setIcon(src.getIcon());
             this.setTitle(src.getTitle());
 
@@ -1102,8 +1126,6 @@ public class ModelTreeGrid extends TreeGrid {
             setAttribute("isOpen", display);
             setAttribute("number", String.valueOf(number));
         }
-        
-
     }
 
     public class ModelMenu extends Menu {
@@ -1120,40 +1142,40 @@ public class ModelTreeGrid extends TreeGrid {
         private MenuItem physicalItem = null;
         private MenuItem duplicateInsItem = null;
         private MenuItem duplicateTpItem = null;
-        
+
         public ModelMenu() {
 
             instantItem = new MenuItem();
             instantItem.setTitle("Add Instant");
 
             instantItem.setIcon(CoreConstants.ICON_ADD);
-            instantItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
-                public void onClick(MenuItemClickEvent event)
-                {
+            instantItem.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+
+                public void onClick(MenuItemClickEvent event) {
                     addInstant();
                 }
-             });
-            
+            });
+
             duplicateTpItem = new MenuItem();
             duplicateTpItem.setTitle("Duplicate timepoint");
             duplicateTpItem.setIcon(CoreConstants.ICON_ADD);
-            duplicateTpItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
-                public void onClick(MenuItemClickEvent event)
-                {
+            duplicateTpItem.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+
+                public void onClick(MenuItemClickEvent event) {
                     duplicateTimepoint();
                 }
-             });
-            
+            });
+
             duplicateInsItem = new MenuItem();
             duplicateInsItem.setTitle("Duplicate instant");
             duplicateInsItem.setIcon(ModelConstants.APP_IMG_OK);
-            duplicateInsItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
-                public void onClick(MenuItemClickEvent event)
-                {
+            duplicateInsItem.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+
+                public void onClick(MenuItemClickEvent event) {
                     duplicateInstant();
                 }
-             });
-            
+            });
+
             layerItem = new MenuItem();
             layerItem.setTitle("Add layer");
             layerItem.setIcon(ModelConstants.APP_IMG_OK);
@@ -1162,24 +1184,24 @@ public class ModelTreeGrid extends TreeGrid {
             durationTItem = new MenuItem();
             durationTItem.setTitle("Modify timepoint starting");
             durationTItem.setIcon(CoreConstants.ICON_EDIT);
-            durationTItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
-            public void onClick(MenuItemClickEvent event)
-                {
+            durationTItem.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+
+                public void onClick(MenuItemClickEvent event) {
                     renameTimepoint();
                 }
-             });
-            
-            
+            });
+
+
             durationIItem = new MenuItem();
             durationIItem.setTitle("Modify instant duration ");
             durationIItem.setIcon(CoreConstants.ICON_EDIT);
-            durationIItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
-            public void onClick(MenuItemClickEvent event)
-                {
+            durationIItem.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+
+                public void onClick(MenuItemClickEvent event) {
                     renameInstant();
-                    }
-             });
-            
+                }
+            });
+
             physicalItem = new MenuItem();
             physicalItem.setTitle("Add physical parameters ");
             physicalItem.setIcon(ModelConstants.APP_IMG_OK);
@@ -1195,9 +1217,9 @@ public class ModelTreeGrid extends TreeGrid {
             removeItem = new MenuItem();
             removeItem.setTitle("Remove");
             removeItem.setIcon(ModelConstants.APP_IMG_KO);
-            removeItem.addClickHandler( new com.smartgwt.client.widgets.menu.events.ClickHandler(){
-                public void onClick(MenuItemClickEvent event)
-                {
+            removeItem.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+
+                public void onClick(MenuItemClickEvent event) {
                     removeNode();
                 }
             });
@@ -1218,9 +1240,9 @@ public class ModelTreeGrid extends TreeGrid {
             this.removeItem(durationTItem);
 
             if (node.getAttribute(model.getModelName()).contains("Timepoint")) {
-                this.setItems(duplicateTpItem, instantItem,durationTItem, removeItem);
+                this.setItems(duplicateTpItem, instantItem, durationTItem, removeItem);
             } else if (node.getAttribute(model.getModelName()).contains("Instant")) {
-                this.setItems(duplicateInsItem,layerItem, durationIItem, removeItem);
+                this.setItems(duplicateInsItem, layerItem, durationIItem, removeItem);
             } else if (node.getAttribute(model.getModelName()).contains("Objects")) {
                 this.setItems(objectItem, removeItem);
             } else if (layerTypeMap.keySet().contains(node.getAttribute(model.getModelName()))) {
