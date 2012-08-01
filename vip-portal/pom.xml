@@ -77,7 +77,7 @@
             <version>${vip.provenance.version}</version>
         </dependency>-->
                 
-<!--        <dependency>
+        <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-simulation-gui</artifactId>
             <version>${vip.simulation-gui.version}</version>
@@ -87,7 +87,7 @@
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-models</artifactId>
             <version>${vip.models.version}</version>
-        </dependency>-->
+        </dependency>
 
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
