@@ -4,7 +4,7 @@
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>0.8.2</version>
+        <version>0.8.3</version>
         <relativePath>..</relativePath>
     </parent>
     <groupId>fr.insalyon.creatis</groupId>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
-            <version>1.4.4</version>
+            <version>1.4.5</version>
         </dependency>
         
         <dependency>
@@ -131,6 +131,13 @@
             <artifactId>cas-client-core</artifactId>
             <version>3.2.1</version>
         </dependency>
+        
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        
     </dependencies>
     <build>
         <plugins>

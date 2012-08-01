@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -52,7 +52,7 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class CoreUtil {
 
@@ -91,7 +91,7 @@ public class CoreUtil {
                 for (int i = 0; i < recipients.length; i++) {
                     addressTo[i] = new InternetAddress(recipients[i]);
                 }
-                mimeMessage.setRecipients(Message.RecipientType.TO, addressTo);
+                mimeMessage.setRecipients(Message.RecipientType.BCC, addressTo);
 
                 transport.sendMessage(mimeMessage, addressTo);
                 transport.close();
