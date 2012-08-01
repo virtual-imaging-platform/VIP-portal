@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -52,7 +52,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class MessageBusiness {
 
@@ -93,13 +93,13 @@ public class MessageBusiness {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
-     * 
+     *
      * @param groupName
      * @param startDate
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public List<GroupMessage> getGroupMessages(String groupName, Date startDate)
             throws BusinessException {
@@ -159,7 +159,7 @@ public class MessageBusiness {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
      *
      * @param id
@@ -201,24 +201,24 @@ public class MessageBusiness {
 
             for (String recipient : recipients) {
                 messageDAO.associateMessageToUser(recipient, messageId);
-
-                String emailContent = "<html>"
-                        + "<head></head>"
-                        + "<body>"
-                        + "<p>Hello,</p>"
-                        + "<p><b>" + user.getFullName() + "</b> sent you a message on VIP:</p>"
-                        + "<p style=\"background-color: #F2F2F2\"><br />"
-                        + "<b>Subject:</b> " + subject + "<br />"
-                        + "<em>" + message + "</em><br /></p>"
-                        + "<p>Best Regards,</p>"
-                        + "<p>VIP Team</p>"
-                        + "</body>"
-                        + "</html>";
-
-                CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
-                        "VIP Message: " + subject + " (" + user.getFullName() + ")", emailContent,
-                        new String[]{recipient});
             }
+
+            String emailContent = "<html>"
+                    + "<head></head>"
+                    + "<body>"
+                    + "<p>Hello,</p>"
+                    + "<p><b>" + user.getFullName() + "</b> sent you a message on VIP:</p>"
+                    + "<p style=\"background-color: #F2F2F2\"><br />"
+                    + "<b>Subject:</b> " + subject + "<br />"
+                    + "<em>" + message + "</em><br /></p>"
+                    + "<p>Best Regards,</p>"
+                    + "<p>VIP Team</p>"
+                    + "</body>"
+                    + "</html>";
+
+            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
+                    "VIP Message: " + subject + " (" + user.getFullName() + ")",
+                    emailContent, recipients);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -239,7 +239,7 @@ public class MessageBusiness {
         try {
             GroupMessageDAO groupMessageDAO = SocialDAOFactory.getDAOFactory().getGroupMessageDAO();
             groupMessageDAO.add(user.getEmail(), groupName, subject, message);
-            
+
             String emailContent = "<html>"
                     + "<head></head>"
                     + "<body>"
@@ -254,13 +254,16 @@ public class MessageBusiness {
                     + "</body>"
                     + "</html>";
 
+            List<String> recipients = new ArrayList<String>();
             for (User u : users) {
                 if (!u.getEmail().equals(user.getEmail())) {
-                    CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
-                            "VIP Message: " + subject + " (" + groupName + ")",
-                            emailContent, new String[]{u.getEmail()});
+                    recipients.add(u.getEmail());
                 }
             }
+            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
+                    "VIP Message: " + subject + " (" + groupName + ")",
+                    emailContent, recipients.toArray(new String[]{}));
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
