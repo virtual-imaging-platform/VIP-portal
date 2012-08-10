@@ -56,6 +56,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -111,7 +112,7 @@ public class ModelListTab extends Tab {
         addButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                Layout.getInstance().addTab(new ModelImportTab());
+                Layout.getInstance().addTab(new ModelImportTab(true, "Import model",""));
             }
         });
         toolStrip.addButton(addButton);
@@ -119,6 +120,8 @@ public class ModelListTab extends Tab {
         ToolStripButton deleteButton = new ToolStripButton();
         deleteButton.setIcon(CoreConstants.ICON_CLEAR);
         deleteButton.setTitle("Delete all");
+        if (!CoreModule.user.isGroupAdmin())
+            deleteButton.disable();
         deleteButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
@@ -209,8 +212,9 @@ public class ModelListTab extends Tab {
         ListGridField longitudinalField = new ListGridField("longitudinal", "Longitudinal");
         ListGridField movementField = new ListGridField("movement", "Movement");
         ListGridField URIField = new ListGridField("uri", "URI");
+        ListGridField ownerField = new ListGridField("owner", "Owner");
         
-        grid.setFields(modelNameField, typeField, longitudinalField, movementField, URIField);
+        grid.setFields(modelNameField, typeField, longitudinalField, movementField, URIField, ownerField);
 
         rowContextClickHandler = grid.addRowContextClickHandler(new RowContextClickHandler() {
 
@@ -218,7 +222,12 @@ public class ModelListTab extends Tab {
                 event.cancel();
                 String modelURI = event.getRecord().getAttribute("uri");
                 String title = event.getRecord().getAttribute("name");
-                new ModelContextMenu(modal, modelURI, title).showContextMenu();
+                String owner =  event.getRecord().getAttribute("owner");
+
+                boolean bdelete = false;
+                if (owner.equals( CoreModule.user.getLastName()))
+                        bdelete = true;
+                new ModelContextMenu(modal, modelURI, title, bdelete).showContextMenu();
             }
             
         });
@@ -286,7 +295,8 @@ public class ModelListTab extends Tab {
                 init = true;
                 type += "external agent";
             }
-            dataList.add(new SimulationObjectModelLightRecord(s.getModelName(), type, "" + s.isLongitudinal(), "" + s.isMoving(), s.getURI()));
+            dataList.add(new SimulationObjectModelLightRecord(s.getModelName(), 
+                    type, "" + s.isLongitudinal(), "" + s.isMoving(), s.getURI(),s.getOwner()));
         }
         grid.setData(dataList.toArray(new SimulationObjectModelLightRecord[]{}));
     }

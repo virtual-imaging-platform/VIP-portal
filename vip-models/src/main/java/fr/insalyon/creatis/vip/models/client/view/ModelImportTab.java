@@ -86,14 +86,15 @@ class ModelImportTab extends Tab {
     private String zipFile;
     private Label label;
     private SimulationObjectModel simulationObjectModel = null;
-    private ModelDisplay modelDisplay;
+    private ModelDisplay modelDisplay = null;
     private FileTree fileTree = null;
     //private PickupDragController dragController;
     private HStack grids = null;
 
-    public ModelImportTab() {
+    public ModelImportTab(boolean bTS, String nameTab, String modelURI) {
 
-        this.setTitle("Import model");
+
+        this.setTitle(nameTab);
         //this.setID();
         this.setCanClose(true);
         initComplete(this);
@@ -190,8 +191,9 @@ class ModelImportTab extends Tab {
     }-*/;
 
 
-    public void addFileComplete(String fileName) {
-        fileTree.addData(fileTree.createNode("none", fileName));
+    public void addFileComplete(String filename) {
+        modelDisplay.addFile(filename);
+        fileTree.addData(fileTree.createNode("none", filename));
     }
 
     private void setZipFile(final String zipName) {
@@ -309,7 +311,7 @@ class ModelImportTab extends Tab {
             this.addClickHandler(new ClickHandler() {
 
                 public void onClick(ClickEvent event) {
-                    // addFile((addFileButton)event.getSource());
+         
                 }
             });
         }

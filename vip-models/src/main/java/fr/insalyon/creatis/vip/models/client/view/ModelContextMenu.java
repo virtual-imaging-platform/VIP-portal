@@ -29,7 +29,7 @@ class ModelContextMenu extends Menu {
     private String modelURI;
     private String modelName;
 
-    public ModelContextMenu(ModalWindow modal, String uri,  String title) {
+    public ModelContextMenu(ModalWindow modal, String uri,  String title, boolean bdelete) {
         this.modal = modal;
         this.modelURI = uri;
         this.modelName = title;
@@ -64,7 +64,24 @@ class ModelContextMenu extends Menu {
                 Layout.getInstance().addTab(new ModelDisplayTab(modelURI,modelName));
             }
         });
-        this.setItems(viewItem, deleteItem);
+        
+        MenuItem modifyItem = new MenuItem("Modify model");
+        modifyItem.setIcon(ApplicationConstants.ICON_SIMULATION_VIEW);
+        modifyItem.setEnabled(false);
+        modifyItem.addClickHandler(new ClickHandler() {
+
+            public void onClick(MenuItemClickEvent event) {
+                     Layout.getInstance().addTab(new ModelImportTab(false, modelName, modelURI));
+            }
+        });
+        
+              
+        
+        
+        if(bdelete)
+            this.setItems(viewItem, modifyItem,deleteItem);
+        else
+            this.setItems(viewItem,modifyItem);
     }
 
     private void deleteModel() {

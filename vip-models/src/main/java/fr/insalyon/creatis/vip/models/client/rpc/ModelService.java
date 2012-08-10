@@ -115,12 +115,22 @@ public interface ModelService extends RemoteService {
 
     public SimulationObjectModel removeObject(SimulationObjectModel model, int tp, int ins, String layer, String name) throws ModelException;
 
-    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addFiles, SimulationObjectModel model) throws ModelException;
+    public SimulationObjectModel removePhysical(SimulationObjectModel objectModel, int tp, int ins, String layer, PhysicalParametersLayer.PhysicalParameterType type) throws ModelException;
+    
+    public SimulationObjectModel removeObjects(SimulationObjectModel model, int tp, int ins, String layer) throws ModelException;
+    
+    public SimulationObjectModel removePhysicals(SimulationObjectModel model, int tp, int ins, String layer) throws ModelException;
+    
+    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addFiles, SimulationObjectModel model, String lfn) throws ModelException;
     
     public SimulationObjectModel renameTimepoint(SimulationObjectModel model, int tp, Date starting) throws ModelException;
     
     public SimulationObjectModel renameInstant(SimulationObjectModel model, int tp, int ins, String duration)throws ModelException;
     
     public String extractRaw(String name, String zipname);
+    
+    public SimulationObjectModel setDescription(SimulationObjectModel model, String description)throws ModelException;
+    
+    public SimulationObjectModel addMap(SimulationObjectModel model, List<String> filenames, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0)throws ModelException;
 
 }

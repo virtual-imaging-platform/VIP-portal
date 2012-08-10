@@ -96,13 +96,23 @@ public interface ModelServiceAsync {
       
       public void removeObjectLayer(SimulationObjectModel model, int tp, int ins, String layer,AsyncCallback<SimulationObjectModel> asyncCallback);
       
-      public void removeObject(SimulationObjectModel model, int tp, int ins, String layer, String name,AsyncCallback<SimulationObjectModel> asyncCallback);
+      public void removeObjects(SimulationObjectModel model, int tp, int ins, String layer, AsyncCallback<SimulationObjectModel> asyncCallback);
       
-      public void recordAddedFiles(String zipName, List<String> addFiles ,SimulationObjectModel model, AsyncCallback<SimulationObjectModel> asyncCallback);
+      public void removePhysical(SimulationObjectModel objectModel, int tp, int ins, String layer, PhysicalParametersLayer.PhysicalParameterType type, AsyncCallback<SimulationObjectModel> asyncCallback);
+      
+      public void removePhysicals(SimulationObjectModel model, int tp, int ins, String layer, AsyncCallback<SimulationObjectModel> asyncCallback);
+      
+       public void removeObject(SimulationObjectModel model, int tp, int ins, String layer, String name,AsyncCallback<SimulationObjectModel> asyncCallback);
+      
+      public void recordAddedFiles(String zipName, List<String> addFiles ,SimulationObjectModel model, String lfn, AsyncCallback<SimulationObjectModel> asyncCallback);
       
       public void renameTimepoint(SimulationObjectModel model, int tp, Date start, AsyncCallback<SimulationObjectModel> asyncCallback);
       
       public void renameInstant(SimulationObjectModel model, int tp, int ins, String duration,  AsyncCallback<SimulationObjectModel> asyncCallback);
       
       public void extractRaw(String name, String zipname, AsyncCallback< String > asyncCallback);
+      
+      public void setDescription(SimulationObjectModel model,  String description,  AsyncCallback<SimulationObjectModel> asyncCallback);
+      
+      public void addMap(SimulationObjectModel model, List<String> filenames, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0,  AsyncCallback<SimulationObjectModel> asyncCallback);
 }

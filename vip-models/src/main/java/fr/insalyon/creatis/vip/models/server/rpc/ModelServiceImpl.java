@@ -277,11 +277,11 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
     }
 
-    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles, SimulationObjectModel model) throws ModelException {
+    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles, SimulationObjectModel model, String lfn) throws ModelException {
       
             try {
                 trace(logger, "add files to zip");
-                return modelBusiness.recordAddedFiles(zipName, addfiles, model,
+                return modelBusiness.recordAddedFiles(zipName, addfiles, model,lfn,
                         getSessionUser().getLastName());
             } catch (CoreException ex) {
                  throw new ModelException(ex);
@@ -311,6 +311,35 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
     }
     
+         public SimulationObjectModel removePhysical(SimulationObjectModel objectModel, int tp, int ins, String layer, PhysicalParametersLayer.PhysicalParameterType type) throws ModelException
+    {
+                try {
+            trace(logger, "remove physical paramters " + type.toString());
+            return modelBusiness.removePhysical(objectModel, tp, ins, layer, type);
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        }
+    }
+    
+    public SimulationObjectModel removeObjects(SimulationObjectModel model, int tp, int ins, String layer) throws ModelException
+    {
+                try {
+            trace(logger, "remove objects from " + layer);
+            return modelBusiness.removeObjects(model, tp, ins, layer);
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        }
+    }
+    
+    public SimulationObjectModel removePhysicals(SimulationObjectModel model, int tp, int ins, String layer) throws ModelException
+    {
+                try {
+            trace(logger, "remove all physical paramters from " + layer);
+            return modelBusiness.removePhysicals(model, tp, ins, layer);
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        }
+    }
      public SimulationObjectModel renameTimepoint(SimulationObjectModel model, int tp, Date starting)throws ModelException {
                try {
             trace(logger, "rename timepoint: " + tp);
@@ -333,4 +362,25 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
      {
          return modelBusiness.extractRaw(name, zipname);
      }
+     
+     public SimulationObjectModel setDescription(SimulationObjectModel model, String description )throws ModelException
+     {
+          try {
+            trace(logger, "set description " + description);
+            return modelBusiness.setDescription(model, description);
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        }
+     }
+     
+      public SimulationObjectModel addMap(SimulationObjectModel model, List<String> filenames, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0)throws ModelException
+      {
+           try {
+            trace(logger, "add map of type " + pptype.toString());
+            return modelBusiness.addMap(model, filenames, tp, ins, pptype, b0);
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        }
+          
+      }
 }

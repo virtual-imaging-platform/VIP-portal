@@ -70,16 +70,20 @@ public class ModelDisplay extends VLayout {
     protected SimulationObjectModel model = null;
     protected ToolStrip toolStrip;
     private ToolStripButton download, upload;
+    private ToolStripButton addTimepoint, addInstant;
     private ModelTreeGrid modelTreeGrid;
     private ModelServiceAsync ms = null;
     private String zipFile;
     private int selectTP = -1;
     private boolean bmodif = false;
     private ArrayList<String> addFiles = new ArrayList<String>();
+    private String timeStamp = "";
 
     ModelDisplay(String uri) {
         super();
         buildModel(uri);
+        enableAdd();
+        disableAdd();
     }
 
     ModelDisplay(SimulationObjectModel result, boolean bfull) {
@@ -114,71 +118,47 @@ public class ModelDisplay extends VLayout {
 
         if (model != null) {
             enableDownload();
+            enableAdd();
             checkModel(model);
         }
         toolStrip.addSeparator();
-        ToolStripButton addTimepoint = new ToolStripButton("Add timepoint");
-        addTimepoint.setIcon(ModelConstants.APP_IMG_TIMEPOINT);
-        addTimepoint.setTooltip("It adds a TimePoint to current model");
-
-
-        addTimepoint.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-                addTimePoint(new Date(System.currentTimeMillis()));
-
-            }
-        });
-
-        toolStrip.addButton(addTimepoint);
-
-
-        ToolStripButton addInstant = new ToolStripButton("Add instant");
-        addInstant.setIcon(ModelConstants.APP_IMG_INSTANT);
-        addInstant.setTooltip("It adds a Instant to current model");
-        addInstant.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-                addInstant();
-            }
-        });
-        toolStrip.addButton(addInstant);
+        
         addMember(toolStrip);
 
     }
 
+    private void enableAdd()
+    {
+        addTimepoint = new ToolStripButton("Add timepoint");
+        addTimepoint.setIcon(ModelConstants.APP_IMG_TIMEPOINT);
+        addTimepoint.setTooltip("It adds a TimePoint to current model");
+        addTimepoint.addClickHandler(new ClickHandler() {
+            public void onClick(ClickEvent event) {
+                addTimePoint(new Date(System.currentTimeMillis()));
+            }
+        });
+        toolStrip.addButton(addTimepoint);
+
+        addInstant = new ToolStripButton("Add instant");
+        addInstant.setIcon(ModelConstants.APP_IMG_INSTANT);
+        addInstant.setTooltip("It adds a Instant to current model");
+        addInstant.addClickHandler(new ClickHandler() {
+         public void onClick(ClickEvent event) {
+                addInstant();
+            }
+        });
+        toolStrip.addButton(addInstant);
+    }
     private void addTimePoint(Date d) {
-         bmodif = true;
-           modelTreeGrid.addTimePoint(new Date(System.currentTimeMillis()), 0);
+        bmodif = true;
+        modelTreeGrid.addTimePoint(new Date(System.currentTimeMillis()), 0);
     }
 
     private void addInstant() {
         modelTreeGrid.addInstant();
-       bmodif = true;
+        bmodif = true;
     }
     // still needed????
-
-    public void addObject(String ontoName, List<String> ontoObj, int type) {
-//         ModelServiceAsync ms = ModelService.Util.getInstance();
-//          final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
-//
-//            public void onFailure(Throwable caught) {
-//                modal.hide();
-//                SC.warn("problem to add file");
-//            }
-//
-//            public void onSuccess(SimulationObjectModel result) {
-//             
-//                updateTreeGrid();
-//                 modelTreeGrid.refreshFields();
-//                 modelTreeGrid.refreshModel(model);
-//                  bmodif = true;
-//            }
-//        };
-// 
-//        ms.addObject(model, ontoName, ontoObj, modelTreeGrid.getTimePoint(),
-//                modelTreeGrid.getInstant(), type, selectTP, callback);
-    }
 
     public void setModif(boolean value) {
         bmodif = value;
@@ -187,7 +167,7 @@ public class ModelDisplay extends VLayout {
     private void updateTreeModel() {
         this.removeMember(modelTreeGrid);
         modelTreeGrid = new ModelTreeGrid(model, true);
-       // modelTreeGrid.setZipFile(zipFile);
+        // modelTreeGrid.setZipFile(zipFile);
         addMember(modelTreeGrid);
         modelTreeGrid.refreshFields();
         //modelTreeGrid.setToolStrip(toolStrip);
@@ -203,6 +183,10 @@ public class ModelDisplay extends VLayout {
         }
     }
 
+    public void addFile(String filename) {
+        addFiles.add(filename);
+    }
+
     private void updateTreeGrid() {
 //        if(model != null && this.contains(modelTreeGrid).booleanValue())
 //        {   modal.hide();
@@ -211,7 +195,7 @@ public class ModelDisplay extends VLayout {
 //        }
 
         modelTreeGrid = new ModelTreeGrid(model, true);
-       // modelTreeGrid.setZipFile(zipFile);
+        // modelTreeGrid.setZipFile(zipFile);
         addMember(modelTreeGrid);
         modelTreeGrid.setParentElement(this);
         //modelTreeGrid.setToolStrip(toolStrip);
@@ -219,9 +203,9 @@ public class ModelDisplay extends VLayout {
 
     public void createTreeGrid() {
         modelTreeGrid = new ModelTreeGrid(model, false);
-       // modelTreeGrid.setZipFile(zipFile);
-            addMember(modelTreeGrid);
-            modelTreeGrid.setParentElement(this);
+        // modelTreeGrid.setZipFile(zipFile);
+        addMember(modelTreeGrid);
+        modelTreeGrid.setParentElement(this);
         addTimePoint(new Date(System.currentTimeMillis()));
         addInstant();
         modelTreeGrid.refreshFields();
@@ -238,6 +222,7 @@ public class ModelDisplay extends VLayout {
 
             public void onClick(ClickEvent event) {
 
+                model = modelTreeGrid.getModel();
                 if (zipFile == null) {
                     SC.warn("No zip file");//TODO: build it
                     return;
@@ -248,11 +233,10 @@ public class ModelDisplay extends VLayout {
                     return;
                 }
                 ////TODO put annotations in ZIP file in case they were modifited
-                if (bmodif) {
+                if (bmodif || modelTreeGrid.isModif()) {
                     addDatatoZip();
-                }
-                else
-                {
+                } else {
+                    timeStamp = getTimeStampMilli()  + "-" ;
                     setStorage();
                 }
             }
@@ -262,25 +246,33 @@ public class ModelDisplay extends VLayout {
 
     }
 
-    
-    private void setStorage()
-    {
+    private void setStorage() {
         modal.show("Uploading " + zipFile, true);
-                final String lfn = uploadModel(zipFile);
+        modal.show("Committing annotations to the Triple Store", true);
+        //commit rdf annotations
 
-                modal.show("Committing annotations to the Triple Store", true);
-                //commit rdf annotations
+        ModelServiceAsync ssu = ModelService.Util.getInstance();
+        AsyncCallback<SimulationObjectModel> cbssu = new AsyncCallback<SimulationObjectModel>() {
 
-                ModelServiceAsync ssu = ModelService.Util.getInstance();
-                AsyncCallback<SimulationObjectModel> cbssu = new AsyncCallback<SimulationObjectModel>() {
+            public void onFailure(Throwable caught) {
+                SC.warn("Cannot set the model storage URL");
+            }
 
-                    public void onFailure(Throwable caught) {
-                        SC.warn("Cannot set the model storage URL");
-                    }
+            public void onSuccess(SimulationObjectModel result) {
+                model = result;
+                uploadModelTTS();
+            }
+        };
 
-                    public void onSuccess(SimulationObjectModel result) {
-                        final String uri = result.getURI();
-                        ModelServiceAsync mms = ModelService.Util.getInstance();
+        String lfn = ModelConstants.MODEL_HOME +"/" + timeStamp +  zipFile;
+        ssu.setStorageUrl(model, lfn, cbssu);
+    }
+
+    
+    private void uploadModelTTS(){
+                uploadModel(zipFile);
+                final String uri = model.getURI();
+                ModelServiceAsync mms = ModelService.Util.getInstance();
 //                        AsyncCallback<Void> callback1 = new AsyncCallback<Void>() {
 //
 //                            public void onFailure(Throwable caught) {
@@ -290,24 +282,21 @@ public class ModelDisplay extends VLayout {
 //
 //                            @Override
 //                            public void onSuccess(Void result) {
-                                modal.hide();
-                                SC.say("Model successfully comitted to the Triple Store (" + uri + ")");
-                                ModelListTab modelsTab = (ModelListTab) Layout.getInstance().getTab("model-browse-tab");
-                                if (modelsTab != null) {
-                                    modelsTab.loadModels();
-                                }
-                            }
+                modal.hide();
+                SC.say("Model successfully comitted to the Triple Store (" + uri + ")");
+                ModelListTab modelsTab = (ModelListTab) Layout.getInstance().getTab("model-browse-tab");
+                if (modelsTab != null) {
+                    modelsTab.loadModels();
+                }
+            //}
 //                        };
 //                        mms.completeModel(result, callback1);
-                        //}
-                };
-                ssu.setStorageUrl(model, lfn, cbssu);
-            }
-    
-    
+            //}
+    }
     
     private void addDatatoZip() {
         //uploading zip file
+      
         AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
             public void onFailure(Throwable caught) {
@@ -316,11 +305,12 @@ public class ModelDisplay extends VLayout {
 
             public void onSuccess(SimulationObjectModel result) {
                 model = result;
-                SC.warn(zipFile);
-                setStorage();
+               uploadModelTTS();
             }
         };
-        ms.recordAddedFiles(zipFile, addFiles, model, callback);
+        timeStamp = getTimeStampMilli()  + "-" ;
+        String lfn = ModelConstants.MODEL_HOME +"/" + timeStamp  + zipFile;
+        ms.recordAddedFiles(zipFile, addFiles, model, lfn, callback);
     }
 
     private void enableDownload() {
@@ -328,18 +318,18 @@ public class ModelDisplay extends VLayout {
         download.setIcon(DataManagerConstants.ICON_DOWNLOAD);
         download.setTooltip("Download model files");
         toolStrip.addButton(download);
-        
+
         download.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                if(download.getIcon() == ModelConstants.APP_IMG_OK)
-                {
+                if (download.getIcon() == ModelConstants.APP_IMG_OK) {
                     String lfn = model.getStorageURL();
                     downloadModel(lfn);
                 }
             }
         });
     }
+
 
     private String uploadModel(String file) {
 
@@ -359,7 +349,7 @@ public class ModelDisplay extends VLayout {
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         String remoteDir = ModelConstants.MODEL_HOME;
         //TODO: check if this exists
-        String remoteName = getTimeStampMilli() + "-" + file;
+        String remoteName = timeStamp + file;
         String localName = file;
         service.uploadFile(localName, remoteName, remoteDir, callback);
         upload.disable();
@@ -371,6 +361,12 @@ public class ModelDisplay extends VLayout {
         return date.getTime();
     }
 
+    private void disableAdd()
+    {
+        addTimepoint.hide();
+        addInstant.hide();
+    }
+    
     private void disableDownload(String lfn, boolean hide) {
         if (hide) {
             download.hide();

@@ -4,11 +4,9 @@
  */
 package fr.insalyon.creatis.vip.models.client.view;
 
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.data.fields.DataSourceTextField;
+
 import com.smartgwt.client.types.*;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -16,7 +14,7 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
-import com.smartgwt.client.widgets.form.fields.RichTextItem;
+
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
@@ -33,21 +31,18 @@ import com.smartgwt.client.widgets.tree.TreeNode;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 import java.util.List;
-import com.smartgwt.client.util.BooleanCallback;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.fields.*;
 import com.smartgwt.client.widgets.form.validator.CustomValidator;
 import com.smartgwt.client.widgets.form.validator.IsIntegerValidator;
 import com.smartgwt.client.widgets.form.validator.IntegerRangeValidator;
-import com.smartgwt.client.widgets.form.validator.DoesntContainValidator;
+
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.layout.VLayout;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-import java.util.logging.Handler;
+
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 /**
@@ -75,7 +70,7 @@ public class ModelCreateDialog extends Window {
     private ModelTreeGrid tree = null;
     private int tp = -1;
     private int ins = -1;
-    private int type = -1;
+    private int type = 1;
     private String filename = "";
     private DynamicForm layerForm = null;
     private DynamicForm searchForm = null;
@@ -86,19 +81,20 @@ public class ModelCreateDialog extends Window {
     public ModelCreateDialog(ModelTreeGrid treegrid) {
         ms = ModelService.Util.getInstance();
         tree = treegrid;
-        type = 1;
         logger = Logger.getLogger("ModelCreateDialog");
         logger.log(Level.SEVERE, "init");
         init();
     }
 
     public void addInfo(int extension, int timepoint, int instant, String name) {
+        removeForms();
         manageExt(extension);
         type = extension;
         tp = timepoint;
         ins = instant;
         filename = name;
         this.setTitle("add Object at timepoint: " + timepoint + " instant: " + instant);
+       initForms();
     }
 
     public void updateTree(ModelTreeGrid treegrid)
@@ -133,15 +129,8 @@ public class ModelCreateDialog extends Window {
                 changeType((String) event.getValue());
             }
         });
-
-        if (type == 0 || type == 1) {
-            initObjectForms();
-        } else if (type == 2 || type == 3) {
-            initPhysicalForms();
-        } else {
-            //nothing
-        }
-        createOKBt();
+        initForms();
+        
     }
 //   @Override 
 //   public HandlerRegistration addCloseClickHandler(CloseClickHandler handler) { 
@@ -153,6 +142,14 @@ public class ModelCreateDialog extends Window {
 //       }); //what should it return? 
 //       return super.addCloseClickHandler(handler); }
 
+   private void initForms(){
+        if (type == 0 || type == 1) {
+            initObjectForms();
+        } else {
+            initPhysicalForms();
+        }
+        createOKBt();
+   }
     private void createOKBt() {
         ButtonItem submitButton = new ButtonItem("OK");
         submitButton.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
@@ -283,7 +280,13 @@ public class ModelCreateDialog extends Window {
         String title = layerRadio.getValueAsString();
         if (title.isEmpty()) {
             return "";
-        } else {
+        } else if (title.equals("All"))
+        {
+            return "All";
+        }
+        else {
+            
+        
             return tree.getTypeFromMap(title).toString();
         }
     }
@@ -312,6 +315,7 @@ public class ModelCreateDialog extends Window {
         TreeGridField fieldscore = new TreeGridField("score");
         fieldscore.setCanSort(false);
         fieldname.setCanEdit(false);
+        
         resultTG = new TreeGrid();
         resultTG.setAlign(Alignment.CENTER);
         resultTG.deselectAllRecords();
@@ -399,6 +403,10 @@ public class ModelCreateDialog extends Window {
         layerMap.put("Geometrical", "Geometrical");
         layerMap.put("Foreign-body", "Foreign-body");
         layerMap.put("External-agent", "External-agent");
+        if(type == 3)
+        {
+            layerMap.put("All", "All");
+        }
 
         layerRadio = new RadioGroupItem();
         layerRadio.setDefaultValue("exampleStyleOnline");
@@ -430,41 +438,34 @@ public class ModelCreateDialog extends Window {
         this.removeItem(validateForm);
     }
 
-    public void changeType(String typeName) {
-        if (typeName.equals("voxel")) {
-            if (type == 2 || type == 3) {
-                removePhysicalForms();
+    
+    private void removeForms()
+    {
+        if (type == 2 || type == 3) {
+               removePhysicalForms();
             } else {
                 removeObjectForms();
             }
+    }
+    public void changeType(String typeName) {
+        if (typeName.equals("voxel")) {
+            removeForms();
             type = 1;
             initObjectForms();
 
         } else if (typeName.equals("mesh")) {
 
-            if (type == 2 || type == 3) {
-                removePhysicalForms();
-            } else {
-                removeObjectForms();
-            }
-            type = 0;
-            initObjectForms();
+          removeForms();
+          type = 0;
+          initObjectForms();
 
         } else if (typeName.equals("LUT")) {
-            if (type == 0 || type == 1) {
-                removeObjectForms();
-            } else {
-                removePhysicalForms();
-            }
+            removeForms();
             type = 2;
             initPhysicalForms();
 
         } else if (typeName.equals("Map")) {
-            if (type == 0 || type == 1) {
-                removeObjectForms();
-            } else {
-                removePhysicalForms();
-            }
+            removeForms();
             type = 3;
             initPhysicalForms();
 
@@ -569,12 +570,6 @@ public class ModelCreateDialog extends Window {
 
         hLayout.addMember(resultTreeGrid);
         this.addItem(hLayout);
-
-//        SearchLayout.addMember(searchForm);
-//        SearchLayout.addMember(layerForm);
-//        SearchLayout.addMember(resultTreeGrid);
-//        SearchLayout.addMember(layerForm);
-//        this.addItem(SearchLayout);
     }
 
     public static class SearchTreeNode extends TreeNode {
