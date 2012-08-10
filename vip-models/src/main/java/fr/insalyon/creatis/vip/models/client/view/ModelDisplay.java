@@ -82,8 +82,8 @@ public class ModelDisplay extends VLayout {
     ModelDisplay(String uri) {
         super();
         buildModel(uri);
-        enableAdd();
-        disableAdd();
+      //  enableAdd();
+        //disableAdd();
     }
 
     ModelDisplay(SimulationObjectModel result, boolean bfull) {
