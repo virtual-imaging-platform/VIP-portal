@@ -611,27 +611,27 @@ public class ModelBusiness {
     private void timepointDeepCopy(Timepoint src, Timepoint dest, SimulationObjectModel model, int indtp) {
         int index = 0; 
         for (Instant ins : src.getInstants()) {
-          //  instantCopy(ins, dest.getInstant(index), model, indtp, index);
+            instantCopy(ins, dest.getInstant(index), model, indtp, index);
             index++;
         }
     }
     
-//    private void instantCopy(Instant src, Instant dest, SimulationObjectModel model, int indtp, int indins) {
-//
-//        for (ObjectLayer obj : src.getObjectLayers()) {
-//            ObjectLayer objdest = SimulationObjectModelFactory.createObjectLayer(model,
-//                    indtp, indins, obj.getType(), Resolution.none);
-//            objectLayerCopy(obj, objdest);
-//            dest.addObjectLayer(objdest);
-//        }
-//
-//        for (PhysicalParametersLayer ppl : src.getPhysicalParametersLayers()) {
-//            PhysicalParametersLayer ppldest = new PhysicalParametersLayer();
-//            PhysicalParametersLayerCopy(ppl, ppldest);
-//            dest.addPhysicalParametersLayer(ppl);
-//        }
-//        dest.setDuration(src.getDuration());
-//    }
+    private void instantCopy(Instant src, Instant dest, SimulationObjectModel model, int indtp, int indins) {
+
+        for (ObjectLayer obj : src.getObjectLayers()) {
+            ObjectLayer objdest = SimulationObjectModelFactory.createObjectLayer(model,
+                    indtp, indins, obj.getType(), Resolution.none);
+            objectLayerCopy(obj, objdest);
+            dest.addObjectLayer(objdest);
+        }
+
+        for (PhysicalParametersLayer ppl : src.getPhysicalParametersLayers()) {
+            PhysicalParametersLayer ppldest = new PhysicalParametersLayer();
+            PhysicalParametersLayerCopy(ppl, ppldest);
+            dest.addPhysicalParametersLayer(ppl);
+        }
+        dest.setDuration(src.getDuration());
+    }
 
     private void objectLayerCopy(ObjectLayer src, ObjectLayer dest) {
 
