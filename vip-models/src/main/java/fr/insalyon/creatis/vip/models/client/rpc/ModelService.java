@@ -131,6 +131,6 @@ public interface ModelService extends RemoteService {
     
     public SimulationObjectModel setDescription(SimulationObjectModel model, String description)throws ModelException;
     
-    public SimulationObjectModel addMap(SimulationObjectModel model, List<String> filenames, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0)throws ModelException;
+    public SimulationObjectModel addMap(SimulationObjectModel model, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0, String externalAgent, String unitOfMeasure)throws ModelException;
 
 }

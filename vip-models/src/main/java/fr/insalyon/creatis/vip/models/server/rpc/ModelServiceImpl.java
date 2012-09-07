@@ -373,11 +373,12 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
      }
      
-      public SimulationObjectModel addMap(SimulationObjectModel model, List<String> filenames, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0)throws ModelException
+      public SimulationObjectModel addMap(SimulationObjectModel model, String name,
+              int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0,  String externalAgent, String unitOfMeasure)throws ModelException
       {
            try {
             trace(logger, "add map of type " + pptype.toString());
-            return modelBusiness.addMap(model, filenames, tp, ins, pptype, b0);
+            return modelBusiness.addMap(model, name, tp, ins, pptype, b0, externalAgent, unitOfMeasure);
         } catch (CoreException ex) {
             throw new ModelException(ex);
         }

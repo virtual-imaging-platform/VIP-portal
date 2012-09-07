@@ -167,6 +167,7 @@ public class ModelCreateDialog extends Window {
                    else{}
                        
                 } else if (type == 2 || type == 3) {
+                    
                     tree.addPhysicalItem(tp, ins, type, filename, getLayerforLUT(), physicalCombo.getValueAsString());
                     hide();
                     refresh();

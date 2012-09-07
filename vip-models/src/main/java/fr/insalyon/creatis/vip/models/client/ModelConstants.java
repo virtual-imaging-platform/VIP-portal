@@ -62,7 +62,7 @@ public class ModelConstants {
     public static final String APP_IMG_ECHO = IMG_FOLDER + "icon-echo.png";
     public static final String APP_IMG_MAGNETIC = IMG_FOLDER + "icon-magnetic.png";
     public static final String APP_IMG_CHEMICAL = IMG_FOLDER + "icon-chemical.png";
-    public static final String APP_IMG_CONCENTRATION = IMG_FOLDER + "icon-concentration.png";
+    public static final String APP_IMG_CONCENTRATION = IMG_FOLDER + "icon-chemical.png";
     public static final String APP_IMG_PATHOLOGY = IMG_FOLDER + "icon-pathology.png";
     public static final String APP_IMG_LUT = IMG_FOLDER + "icon-physical-lut.png";
     public static final String APP_IMG_MAP = IMG_FOLDER + "icon-physical-map.png";

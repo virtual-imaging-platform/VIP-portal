@@ -729,11 +729,17 @@ public class ModelBusiness {
         return model;
     }
     
-    public SimulationObjectModel addMap(SimulationObjectModel model, List<String> names, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0) {
-                ArrayList<String> filenames = new ArrayList<String>(names);    
-        model.getInstant(tp, ins).addPhysicalParametersLayer(
-                    SimulationObjectModelFactory.createPhysicalParametersLayer(pptype, filenames, b0,"",""));
-            return model;
+    public SimulationObjectModel addMap(SimulationObjectModel model, String name,
+            int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0, String externalAgent, String unitOfMeasure) {
+        
+        ArrayList<String> filenames = new ArrayList<String>();
+        filenames.add(name);
+
+        PhysicalParametersLayer ppl = SimulationObjectModelFactory.createPhysicalParametersLayer(pptype, filenames, b0, externalAgent, unitOfMeasure);
+        SimulationObjectModelFactory.addPhysicalParametersLayerToInstant(ppl, model.getInstant(tp, ins));
+        model.getInstant(tp, ins).addPhysicalParametersLayer(ppl);
+         
+        return model;
     }
 
     public SimulationObjectModel addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type) {

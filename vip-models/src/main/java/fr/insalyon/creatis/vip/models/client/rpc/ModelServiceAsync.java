@@ -114,5 +114,5 @@ public interface ModelServiceAsync {
       
       public void setDescription(SimulationObjectModel model,  String description,  AsyncCallback<SimulationObjectModel> asyncCallback);
       
-      public void addMap(SimulationObjectModel model, List<String> filenames, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0,  AsyncCallback<SimulationObjectModel> asyncCallback);
+      public void addMap(SimulationObjectModel model, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0, String externalAgent, String unitOfMeasure, AsyncCallback<SimulationObjectModel> asyncCallback);
 }

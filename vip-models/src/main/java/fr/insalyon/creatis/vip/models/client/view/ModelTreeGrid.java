@@ -1039,6 +1039,7 @@ public class ModelTreeGrid extends TreeGrid {
         ModelTreeNode insnode = findNode(tp, ins);
         // pour objet on doit regarder un niveau en dessous
         //Check if the object layer exists for this instant
+        logger.log(Level.SEVERE, "layer :" + objLayer);
         TreeNode[] nodes = modelTree.getFolders(insnode);
         ModelTreeNode objectLayerPartsNode = null;
         ModelTreeNode LayerNode = null;
@@ -1160,8 +1161,71 @@ public class ModelTreeGrid extends TreeGrid {
         }
         else
         {
-            // Need to add All
+           
+
+            logger.log(Level.SEVERE, "layer :" + objLayer);
+            String layerPartName = "Physical parameters";
+     
+            for (TreeNode nd : nodes) {
+                logger.log(Level.SEVERE, "nom des couches :" + nd.getAttribute(model.getModelName()));
+                // Find if the wanted layer exists
+                if (nd.getAttribute(model.getModelName()).contains(layerPartName)) {
+                    TreeNode[] physicalnodes = modelTree.getFolders(nd);
+                    bLayerExist = true;
+                    LayerNode = (ModelTreeNode) nd;
+                    for (TreeNode physical : physicalnodes) {
+
+                        if (physical.getAttribute(model.getModelName()).contains("Maps")) {
+                            bphysicalLutExist = true;
+                            nbChild = modelTree.getDescendantLeaves(physical).length;
+                            logger.log(Level.SEVERE, "LUT trouvé: " + String.valueOf(nbChild));
+                            physicalLutNode = (ModelTreeNode) physical;
+                            break;
+                        }
+
+                    }
+                }
+                if (bLayerExist) {
+                        break;
+                    }
+
+            }
+        
+        
+        String format = name;
+        String description = format + ": " + name + ")";
+        
+        ModelTreeNode objectNode = new ModelTreeNode("", description, false, 1, null);
+        objectNode.setIcon(getPhysicalIcon(lutTypeMap.get(label)));
+        if (bphysicalLutExist) {
+            modelTree.add(objectNode, physicalLutNode);
+        } else {
+            // map
+                physicalLutNode = new ModelTreeNode("", "Maps", false, 1, objectNode);
+                physicalLutNode.setIcon(ModelConstants.APP_IMG_MAP);
+                objectLayerPartsNode = new ModelTreeNode("", layerPartName, false, 1, physicalLutNode);
+                objectLayerPartsNode.setIcon(ModelConstants.APP_IMG_OBJECT);
+                modelTree.add(objectLayerPartsNode, insnode);
+               
+            }
+        
+        ModelServiceAsync ms = ModelService.Util.getInstance();
+        final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
+
+            public void onFailure(Throwable caught) {
+                SC.say("Cannot added MAP to model");
+            }
+
+            public void onSuccess(SimulationObjectModel result) {
+                SC.say("MAP added to model");
+                model = result;
+            }
+        };
+
+            ms.addMap(model, name, tp, ins, PhysicalParameterType.T1, 0,"","", callback);
         }
+                    
+         
     }
 
     public SimulationObjectModel getModel() {
