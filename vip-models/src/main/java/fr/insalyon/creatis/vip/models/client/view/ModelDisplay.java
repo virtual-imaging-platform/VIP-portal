@@ -90,7 +90,7 @@ public class ModelDisplay extends VLayout {
         super();
         this.model = result;
         ms = ModelService.Util.getInstance();
-        init(bfull);
+        init(bfull, false);
     }
 
     public ModelServiceAsync getService() {
@@ -102,29 +102,31 @@ public class ModelDisplay extends VLayout {
         modelTreeGrid.setZipFile(z);
     }
 
-    private void init(boolean bfull) {
-
-        toolStrip = new ToolStrip();
-        toolStrip.setWidth100();
+    private void init(boolean bfull, boolean bmodif) {
 
 
-
-        addMember(toolStrip);
+      
         if (bfull) {
             updateTreeGrid();
         } else {
             createTreeGrid();
         }
 
-        if (model != null) {
-            enableDownload();
-            enableAdd();
-            checkModel(model);
+        if(bmodif)
+        {
+           enableDownload();
         }
-        toolStrip.addSeparator();
-        
-        addMember(toolStrip);
+         
+        else
+        {
+                      enableAdd();  
+        }
 
+        
+        if (model != null) {
+           ((ModelToolStrip)toolStrip).initCheck();
+        }
+        
     }
 
     private void enableAdd()
@@ -167,10 +169,11 @@ public class ModelDisplay extends VLayout {
     private void updateTreeModel() {
         this.removeMember(modelTreeGrid);
         modelTreeGrid = new ModelTreeGrid(model, true);
-        // modelTreeGrid.setZipFile(zipFile);
+        toolStrip = (ToolStrip) modelTreeGrid.getToolStrip();
+        addMember(toolStrip);
         addMember(modelTreeGrid);
         modelTreeGrid.refreshFields();
-        //modelTreeGrid.setToolStrip(toolStrip);
+        
     }
 
     public ModelTreeGrid getModelTree() {
@@ -188,13 +191,10 @@ public class ModelDisplay extends VLayout {
     }
 
     private void updateTreeGrid() {
-//        if(model != null && this.contains(modelTreeGrid).booleanValue())
-//        {   modal.hide();
-//            SC.warn("nothing to do here");
-//            this.removeMember(modelTreeGrid);
-//        }
-
+        
         modelTreeGrid = new ModelTreeGrid(model, true);
+        toolStrip = (ToolStrip) modelTreeGrid.getToolStrip();
+        addMember(toolStrip);
         // modelTreeGrid.setZipFile(zipFile);
         addMember(modelTreeGrid);
         modelTreeGrid.setParentElement(this);
@@ -232,7 +232,7 @@ public class ModelDisplay extends VLayout {
                     SC.warn("No simulation object model to commit.");
                     return;
                 }
-                ////TODO put annotations in ZIP file in case they were modifited
+
                 if (bmodif || modelTreeGrid.isModif()) {
                     addDatatoZip();
                 } else {
@@ -322,10 +322,10 @@ public class ModelDisplay extends VLayout {
         download.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                if (download.getIcon() == ModelConstants.APP_IMG_OK) {
+               // if (download.getIcon() == ModelConstants.APP_IMG_OK) {
                     String lfn = model.getStorageURL();
                     downloadModel(lfn);
-                }
+               // }
             }
         });
     }
@@ -352,7 +352,7 @@ public class ModelDisplay extends VLayout {
         String remoteName = timeStamp + file;
         String localName = file;
         service.uploadFile(localName, remoteName, remoteDir, callback);
-        upload.disable();
+        //upload.disable();
         return remoteDir + "/" + remoteName;
     }
 
@@ -399,28 +399,33 @@ public class ModelDisplay extends VLayout {
             disableDownload("No storage URL", true);
         }
 
-        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.IRM)) {
-            toolStrip.addMember(modalityButton("MRI", true));
-        } else {
-            toolStrip.addMember(modalityButton("MRI", false));
-        }
-        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.CT)) {
-            toolStrip.addMember(modalityButton("CT", true));
-        } else {
-            toolStrip.addMember(modalityButton("CT", false));
-        }
-        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.PET)) {
-            toolStrip.addMember(modalityButton("PET", true));
-        } else {
-            toolStrip.addMember(modalityButton("PET", false));
-        }
-        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.US)) {
-            toolStrip.addMember(modalityButton("Ultrasound", true));
-        } else {
-            toolStrip.addMember(modalityButton("Ultrasound", false));
-        }
+        
+//        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.IRM)) {
+//            toolStrip.addMember(modalityButton("MRI", true));
+//        } else {
+//            toolStrip.addMember(modalityButton("MRI", false));
+//        }
+//        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.CT)) {
+//            toolStrip.addMember(modalityButton("CT", true));
+//        } else {
+//            toolStrip.addMember(modalityButton("CT", false));
+//        }
+//        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.PET)) {
+//            toolStrip.addMember(modalityButton("PET", true));
+//        } else {
+//            toolStrip.addMember(modalityButton("PET", false));
+//        }
+//        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.US)) {
+//            toolStrip.addMember(modalityButton("Ultrasound", true));
+//        } else {
+//            toolStrip.addMember(modalityButton("Ultrasound", false));
+//        }
     }
-
+    public ToolStrip getToolStrip()
+    {
+        return toolStrip;
+    }
+    
     private void downloadModel(final String lfnModel) {
 
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
@@ -456,7 +461,7 @@ public class ModelDisplay extends VLayout {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
-                init(false);
+                init(false,true);
                 SC.say("Cannot load model (" + uri + ")");
             }
 
@@ -465,7 +470,7 @@ public class ModelDisplay extends VLayout {
                 if (result != null) {
                     model = result;
                     //SC.say("Model loaded.");
-                    init(true);
+                    init(true,true);
                 } else {
                     SC.say("Cannot load model");
                 }

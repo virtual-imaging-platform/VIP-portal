@@ -189,9 +189,9 @@ public class ModelCreateDialog extends Window {
                 
                 boolean badd = false;
                 if (type == 0) {
-                     String slabel = rd.getAttributeAsString("priority");
+                    String slabel = rd.getAttribute("priority");
                      label = 1;
-                     if(!slabel.isEmpty())
+                     if(slabel != null)
                          label = Integer.parseInt(slabel);
                      if(label> 4)
                          label = 4;
@@ -332,7 +332,7 @@ public class ModelCreateDialog extends Window {
             priorityField.setCanSort(false);
             priorityField.setCanEdit(true);
             priorityField.setBaseStyle("myHighGridCell");
-            priorityField.setValidators(iiv,integerRangeValidator);
+            //priorityField.setValidators(iiv,integerRangeValidator);
             resultTG.setSelectionType(SelectionStyle.SINGLE);
             resultTG.setFields(fieldname, fieldtype, fieldscore,priorityField);
         } else //voxel
@@ -400,9 +400,9 @@ public class ModelCreateDialog extends Window {
         LinkedHashMap<String, String> layerMap = new LinkedHashMap<String, String>();
         layerMap.put("Anatomy", "Anatomy");
         layerMap.put("Pathology", "Pathology");
-        layerMap.put("Geometrical", "Geometrical");
-        layerMap.put("Foreign-body", "Foreign-body");
-        layerMap.put("External-agent", "External-agent");
+        layerMap.put("Geometry", "Geometry");
+        layerMap.put("Foreign body", "Foreign body");
+        layerMap.put("External agent", "External agent");
         if(type == 3)
         {
             layerMap.put("All", "All");

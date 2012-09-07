@@ -177,7 +177,7 @@ class ModelImportTab extends Tab {
 
     public void uploadComplete(String fileName) {
         setZipFile(fileName);
-        modelDisplay.enableCommit();
+        //modelDisplay.enableCommit();
     }
 
     private native void initComplete(ModelImportTab upload) /*-{
@@ -264,6 +264,7 @@ class ModelImportTab extends Tab {
         } else {
             SC.say("Couldn't find any annotation file in this archive. You will have to annotate the model yourself.");
             setEmptyModel();
+             
         }
 
     }
@@ -298,6 +299,7 @@ class ModelImportTab extends Tab {
     public void setCreateObjectModel(SimulationObjectModel result) {
         modelDisplay = new ModelDisplay(result, true);
         hl.addMember(modelDisplay);
+        modelDisplay.enableCommit();
     }
 
     public class addFileButton extends ToolStripButton {

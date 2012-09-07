@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.models.client.view;
 
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.TreeModelType;
@@ -42,6 +43,7 @@ import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeGridField;
 import com.smartgwt.client.widgets.tree.TreeNode;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.DropEvent;
 import com.smartgwt.client.widgets.events.DropHandler;
 import com.smartgwt.client.widgets.grid.CellFormatter;
@@ -52,17 +54,13 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 //import com.smartgwt.client.widgets.toolbar.ToolStrip;
 //import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import com.smartgwt.client.widgets.tree.events.*;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Instant;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectLayer;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectLayerPart;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.PhysicalParameter;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.PhysicalParametersLayer;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.*;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.PhysicalParametersLayer.PhysicalParameterType;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Timepoint;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.models.client.ModelConstants;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
@@ -102,8 +100,9 @@ public class ModelTreeGrid extends TreeGrid {
     private ModelMenu mymenu = null;
     private ModelCreateDialog dg = null;
     private String zipfile = "";
-    // private ToolStrip displayToolStrip = null;
+    private ToolStrip displayToolStrip = null;
     private String associatedraw = "";
+    private ModelToolStrip mts = null;
 
     public ModelTreeGrid(final SimulationObjectModel model, boolean bFull) {
         super();
@@ -126,6 +125,8 @@ public class ModelTreeGrid extends TreeGrid {
         lutTypeMap.put("susceptibility", PhysicalParameterType.susceptibility);
 
         this.model = model;
+        
+        mts = new ModelToolStrip();
         //init the tree grid
         logger = Logger.getLogger("ModelTree");
         logger.log(Level.SEVERE, "model tree creation");
@@ -331,6 +332,7 @@ public class ModelTreeGrid extends TreeGrid {
                 public void onSuccess(SimulationObjectModel result) {
                     model = result;
                    bmodif = true;
+                   checkModality();
 
                 }
             };
@@ -349,6 +351,7 @@ public class ModelTreeGrid extends TreeGrid {
                 public void onSuccess(SimulationObjectModel result) {
                     model = result;
                     bmodif = true;
+                    checkModality();
                 }
             };
             ms.removeInstant(model, Integer.parseInt(modelTree.getParent(mnode).getAttribute("number")),
@@ -367,6 +370,7 @@ public class ModelTreeGrid extends TreeGrid {
                 public void onSuccess(SimulationObjectModel result) {
                     model = result;
                          bmodif = true;
+                         checkModality();
                 }
             };
             int ins = Integer.parseInt(modelTree.getParent(mnode).getAttribute("number"));
@@ -386,6 +390,7 @@ public class ModelTreeGrid extends TreeGrid {
                 public void onSuccess(SimulationObjectModel result) {
                     model = result;
                     bmodif = true;
+                    checkModality();
                 }
             };
             int ins = Integer.parseInt(modelTree.getParent(modelTree.getParent(mnode)).getAttribute("number"));
@@ -408,6 +413,7 @@ public class ModelTreeGrid extends TreeGrid {
                 public void onSuccess(SimulationObjectModel result) {
                     model = result;
                     bmodif = true;
+                    checkModality();
                 }
             };
             int ins = Integer.parseInt(modelTree.getParent(modelTree.getParent(mnode)).getAttribute("number"));
@@ -430,6 +436,7 @@ public class ModelTreeGrid extends TreeGrid {
                 public void onSuccess(SimulationObjectModel result) {
                     model = result;
                     bmodif = true;
+                    checkModality();
                 }
             };
             ModelTreeNode objects = (ModelTreeNode)modelTree.getParent(mnode);
@@ -453,6 +460,7 @@ public class ModelTreeGrid extends TreeGrid {
                 public void onSuccess(SimulationObjectModel result) {
                     model = result;
                     bmodif = true;
+                    checkModality();
                 }
             };
             ModelTreeNode objects = (ModelTreeNode)modelTree.getParent(mnode);
@@ -519,6 +527,7 @@ public class ModelTreeGrid extends TreeGrid {
     public void refreshModel(SimulationObjectModel result) {
         bmodif = true;
         model = result;
+        checkModality();
     }
 
     public void addTimePoint(Date d, int id) {
@@ -532,6 +541,7 @@ public class ModelTreeGrid extends TreeGrid {
             public void onSuccess(SimulationObjectModel result) {
                 bmodif = true;
                 model = result;
+                checkModality();
                 ModelTreeNode timepoint = new ModelTreeNode("", "Timepoint (" + new Date(System.currentTimeMillis()) + ")", true, ntp++, null);
                 timepoint.setIcon(ModelConstants.APP_IMG_TIMEPOINT);
                 modelTree.add(timepoint, modelTree.getRoot());
@@ -553,6 +563,7 @@ public class ModelTreeGrid extends TreeGrid {
             public void onSuccess(SimulationObjectModel result) {
                 model = result;
                 bmodif = true;
+                checkModality();
                 ModelTreeNode node = findNode(tpSelected);
                 int size = modelTree.getFolders(node).length;
                 ModelTreeNode instant = new ModelTreeNode("", "Instant (1000 )", true, size, null);
@@ -823,6 +834,7 @@ public class ModelTreeGrid extends TreeGrid {
     public void addObjectItem(int tp, int ins, int type, String name, String OntoName, String objLayer, int lab) {
         int nbChild = 0;
         bmodif = true;
+        checkModality();
         logger.log(Level.SEVERE, "tp :" + String.valueOf(tp) + "ins : " + String.valueOf(ins) + "type : " + String.valueOf(type)
                 + "name : " + name + "OntoName : " + OntoName + "lab :" + String.valueOf(lab));
         ModelTreeNode insnode = findNode(tp, ins);
@@ -1021,6 +1033,7 @@ public class ModelTreeGrid extends TreeGrid {
     public void addPhysicalItem(int tp, int ins, int type, String name, String objLayer, String label) {
         int nbChild = 0;
         bmodif = true;
+        checkModality();
         logger.log(Level.SEVERE, "tp :" + String.valueOf(tp) + "ins : " + String.valueOf(ins) + "type : " + String.valueOf(type)
                 + "name : " + name + "lab :" + label);
         ModelTreeNode insnode = findNode(tp, ins);
@@ -1047,12 +1060,15 @@ public class ModelTreeGrid extends TreeGrid {
             String layerPartName = "Physical parameters";
      
             for (TreeNode nd : nodes) {
+                logger.log(Level.SEVERE, "nom des couches :" + nd.getAttribute(model.getModelName()));
                 // Find if the wanted layer exists
                 if (nd.getAttribute(model.getModelName()).contains(layer)) {
                     TreeNode[] objects = modelTree.getFolders(nd);
                     bLayerExist = true;
                     LayerNode = (ModelTreeNode) nd;
                     for (TreeNode obj : objects) {
+                        logger.log(Level.SEVERE, "nom des couches objects :" + obj.getAttribute(model.getModelName()));
+                        logger.log(Level.SEVERE, "layerpartName :" + layerPartName);
                         // Find if the Object Layer exist
                         if (obj.getAttribute(model.getModelName()).contains(layerPartName)) {
                             bObjectLayerExist = true;
@@ -1077,7 +1093,7 @@ public class ModelTreeGrid extends TreeGrid {
 
                             }
                         }
-                        break;
+                        
                     }
                     if (bObjectLayerExist) {
                         break;
@@ -1099,7 +1115,7 @@ public class ModelTreeGrid extends TreeGrid {
         }
 
         ModelTreeNode objectNode = new ModelTreeNode("", description, false, 1, null);
-        objectNode.setIcon(getPhysicalIcon(PhysicalParameterType.T1));
+        objectNode.setIcon(getPhysicalIcon(lutTypeMap.get(label)));
         if (bphysicalLutExist) {
             modelTree.add(objectNode, physicalLutNode);
         } else {
@@ -1155,6 +1171,7 @@ public class ModelTreeGrid extends TreeGrid {
     public void rename(String name, SimulationObjectModel result) {
         model = result;
         bmodif = true;
+        checkModality();
         mnode.setAttribute(model.getModelName(), name);
         this.markForRedraw();
     }
@@ -1171,6 +1188,7 @@ public class ModelTreeGrid extends TreeGrid {
                 SC.say("Instant duplicated");
                 model = result;
                 bmodif = true;
+                checkModality();
                 modelTree.add(new ModelTreeNode(mnode), modelTree.getParent(mnode));
             }
         };
@@ -1192,6 +1210,7 @@ public class ModelTreeGrid extends TreeGrid {
                 SC.say("Timepoint duplicated");
                 model = result;
                 bmodif = true;
+                checkModality();
                 ModelTreeNode node = new ModelTreeNode(mnode);
 
                 modelTree.add(node, modelTree.getParent(mnode));
@@ -1204,6 +1223,7 @@ public class ModelTreeGrid extends TreeGrid {
 
     public void renameTimepoint() {
               bmodif = true;
+              checkModality();
         RenameTimepointWindow win = new RenameTimepointWindow(ModelTreeGrid.this,
                 Integer.parseInt(mnode.getAttribute("number")), mnode.getAttribute(model.getModelName()));
         win.show();
@@ -1211,15 +1231,44 @@ public class ModelTreeGrid extends TreeGrid {
 
     public void renameInstant() {
       bmodif = true;
+      checkModality();
         RenameInstantWindow win = new RenameInstantWindow(ModelTreeGrid.this, Integer.parseInt(modelTree.getParent(mnode).getAttribute("number")),
                 Integer.parseInt(mnode.getAttribute("number")), mnode.getAttribute(model.getModelName()));
         win.show();
 
     }
-
-    private void checkModality() {
-        //      ((ToolStripButton)displayToolStrip.getMember("MRI")).setIcon(ModelConstants.APP_IMG_OK);
+    
+    public ModelToolStrip getToolStrip()
+    {
+        return mts;
     }
+    private void checkModality()
+    {
+  
+            if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.IRM)) {
+                mts.isOk("MRI");
+        } else {
+              mts.isKo("MRI");
+        }
+        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.CT)) {
+             mts.isOk("PET");
+        } else {
+              mts.isKo("PET");
+        }
+        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.PET)) {
+             mts.isOk("CT");
+        } else {
+             mts.isKo("CT");
+        }
+        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.US)) {
+             mts.isOk("UltraSound");
+        } else {
+              mts.isKo("UltraSound");
+        }
+           mts.redraw();
+    }
+
+
 
     public ArrayList<String> getObjectsLabel(int tp, int ins, String layerType) {
         ArrayList<String> results = new ArrayList<String>();

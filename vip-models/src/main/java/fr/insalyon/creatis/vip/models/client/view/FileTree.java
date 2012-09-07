@@ -66,24 +66,6 @@ class FileTree extends TreeGrid {
 
         fileTree.setData(fileData);
 
-
-
-//        addFolderClickHandler(new FolderClickHandler() {
-//      public void onFolderClick(FolderClickEvent event)
-//      {
-//           // index = event.getFolder().getName();
-//            //  logger.log(Level.SEVERE, event.getFolder().getName() +" aa ");
-
-//      }
-//    });
-        addNodeClickHandler(new NodeClickHandler() {
-
-            public void onNodeClick(NodeClickEvent event) {
-                logger.log(Level.SEVERE, event.getNode().getName());
-
-            }
-        });
-
         setWidth(500);
         setHeight(900);
         setNodeIcon("icon-file.png");
@@ -96,21 +78,6 @@ class FileTree extends TreeGrid {
         setClosedIconSuffix("");
         setDragDataAction(DragDataAction.COPY);
         setData(fileTree);
-
-        addLeafClickHandler(new LeafClickHandler() {
-
-            public void onLeafClick(LeafClickEvent event) {
-
-                SC.say("click" + event.getLeaf().getName());
-            }
-        });
-
-        addLeafContextClickHandler(new LeafContextClickHandler() {
-
-            public void onLeafContextClick(LeafContextClickEvent event) {
-               
-            }
-        });
     }
 
     public String getRdfFile() {
@@ -146,10 +113,6 @@ class FileTree extends TreeGrid {
             setAttribute("FileName", fileName);
             setAttribute("isOpen", true);
 
-
-            //    setAttribute("description", getFileDescription(zipFileName));
-
-            //extract file
         }
     }
 }

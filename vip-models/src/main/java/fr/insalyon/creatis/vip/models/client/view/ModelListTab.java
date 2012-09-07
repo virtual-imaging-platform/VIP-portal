@@ -42,8 +42,10 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.grid.HoverCustomizer;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.RowMouseDownEvent;
@@ -64,6 +66,7 @@ import fr.insalyon.creatis.vip.models.client.ModelConstants;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -77,6 +80,7 @@ public class ModelListTab extends Tab {
     private HandlerRegistration rowContextClickHandler;
     private HandlerRegistration rowMouseDownHandler;
     private SearchStackSection searchSection;
+
 
     public ModelListTab() {
 
@@ -97,6 +101,7 @@ public class ModelListTab extends Tab {
         ToolStripButton refreshButton = new ToolStripButton();
         refreshButton.setIcon(CoreConstants.ICON_REFRESH);
         refreshButton.setTitle("Refresh");
+        
         refreshButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
@@ -213,8 +218,22 @@ public class ModelListTab extends Tab {
         ListGridField movementField = new ListGridField("movement", "Movement");
         ListGridField URIField = new ListGridField("uri", "URI");
         ListGridField ownerField = new ListGridField("owner", "Owner");
+
+       // modelNameField.setPrompt(grid.getSelectedRecord().getAttribute("uri"));
+        modelNameField.setShowHover(true);
         
-        grid.setFields(modelNameField, typeField, longitudinalField, movementField, URIField, ownerField);
+        modelNameField.setHoverCustomizer(new HoverCustomizer() {  
+            public String hoverHTML(Object value, ListGridRecord record, int rowNum, int colNum) {  
+//                CountryRecord countryRecord = (CountryRecord) record;  
+//                int governmentDesc = countryRecord.getGovernmentDesc();  
+                return record.getAttribute("uri");  
+            }  
+        });  
+        
+        
+     
+        grid.setFields(modelNameField, ownerField,typeField, longitudinalField, movementField, URIField);
+        grid.hideField("uri");
 
         rowContextClickHandler = grid.addRowContextClickHandler(new RowContextClickHandler() {
 
@@ -259,7 +278,9 @@ public class ModelListTab extends Tab {
 
     public void setModelList(List<SimulationObjectModelLight> result) {
         List<SimulationObjectModelLightRecord> dataList = new ArrayList<SimulationObjectModelLightRecord>();
+
         for (SimulationObjectModelLight s : result) {
+          
             String type = "";
             boolean[] saxes = s.getSemanticAxes();
             boolean init = false;
