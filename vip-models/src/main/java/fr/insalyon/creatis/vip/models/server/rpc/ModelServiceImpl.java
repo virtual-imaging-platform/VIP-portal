@@ -114,8 +114,12 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         return modelBusiness.rebuildObjectModelFromTripleStore(uri);
     }
 
-    public SimulationObjectModel rebuildObjectModelFromAnnotationFile(String fileName) {
-        return modelBusiness.rebuildObjectModelFromAnnotationFile(fileName);
+    public SimulationObjectModel rebuildObjectModelFromAnnotationFile(String fileName) throws ModelException {
+        try {
+            return modelBusiness.rebuildObjectModelFromAnnotationFile(fileName,getSessionUser().getLastName());
+        } catch (CoreException ex) {
+             throw new ModelException(ex);
+        }
     }
 
     public SimulationObjectModel setStorageUrl(SimulationObjectModel som, String url) {
@@ -277,12 +281,12 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
     }
 
-    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles, SimulationObjectModel model, String lfn) throws ModelException {
+    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles, SimulationObjectModel model, String lfn, String nwName) throws ModelException {
       
             try {
                 trace(logger, "add files to zip");
                 return modelBusiness.recordAddedFiles(zipName, addfiles, model,lfn,
-                        getSessionUser().getLastName());
+                        getSessionUser().getLastName(), nwName);
             } catch (CoreException ex) {
                  throw new ModelException(ex);
             }
@@ -384,4 +388,17 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
           
       }
+      
+     public void checkRDFEncoding(String files) throws ModelException
+     {
+            try {
+                modelBusiness.checkRDF(files);
+            } catch (FileNotFoundException ex) {
+                java.util.logging.Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
+          
+        } 
+       
 }

@@ -121,7 +121,7 @@ public interface ModelService extends RemoteService {
     
     public SimulationObjectModel removePhysicals(SimulationObjectModel model, int tp, int ins, String layer) throws ModelException;
     
-    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addFiles, SimulationObjectModel model, String lfn) throws ModelException;
+    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addFiles, SimulationObjectModel model, String lfn, String nwName) throws ModelException;
     
     public SimulationObjectModel renameTimepoint(SimulationObjectModel model, int tp, Date starting) throws ModelException;
     
@@ -132,5 +132,7 @@ public interface ModelService extends RemoteService {
     public SimulationObjectModel setDescription(SimulationObjectModel model, String description)throws ModelException;
     
     public SimulationObjectModel addMap(SimulationObjectModel model, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0, String externalAgent, String unitOfMeasure)throws ModelException;
+    
+    public void checkRDFEncoding(String files)throws ModelException;
 
 }

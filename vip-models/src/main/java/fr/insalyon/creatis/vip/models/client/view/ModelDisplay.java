@@ -237,13 +237,30 @@ public class ModelDisplay extends VLayout {
                     addDatatoZip();
                 } else {
                     timeStamp = getTimeStampMilli()  + "-" ;
-                    setStorage();
+                    checkRDFEncoding();
                 }
             }
         });
         upload.setTooltip("Commit model to the repository");
         toolStrip.addButton(upload);
 
+    }
+    
+    private void  checkRDFEncoding()
+    {
+         AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
+         public void onFailure(Throwable caught) {
+                SC.warn("Cannot Modify the encoding of rdf file");
+            }
+
+            public void onSuccess(SimulationObjectModel result) {
+                model = result;
+                 uploadModelTTS();
+                //setStorage();
+            }
+        };
+        
+        ms.checkRDFEncoding(zipFile, callback);
     }
 
     private void setStorage() {
@@ -310,7 +327,7 @@ public class ModelDisplay extends VLayout {
         };
         timeStamp = getTimeStampMilli()  + "-" ;
         String lfn = ModelConstants.MODEL_HOME +"/" + timeStamp  + zipFile;
-        ms.recordAddedFiles(zipFile, addFiles, model, lfn, callback);
+        ms.recordAddedFiles(zipFile, addFiles, model, lfn,modelTreeGrid.getModelName(), callback);
     }
 
     private void enableDownload() {

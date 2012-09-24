@@ -104,7 +104,7 @@ public interface ModelServiceAsync {
       
        public void removeObject(SimulationObjectModel model, int tp, int ins, String layer, String name,AsyncCallback<SimulationObjectModel> asyncCallback);
       
-      public void recordAddedFiles(String zipName, List<String> addFiles ,SimulationObjectModel model, String lfn, AsyncCallback<SimulationObjectModel> asyncCallback);
+      public void recordAddedFiles(String zipName, List<String> addFiles ,SimulationObjectModel model, String lfn, String nwName, AsyncCallback<SimulationObjectModel> asyncCallback);
       
       public void renameTimepoint(SimulationObjectModel model, int tp, Date start, AsyncCallback<SimulationObjectModel> asyncCallback);
       
@@ -115,4 +115,7 @@ public interface ModelServiceAsync {
       public void setDescription(SimulationObjectModel model,  String description,  AsyncCallback<SimulationObjectModel> asyncCallback);
       
       public void addMap(SimulationObjectModel model, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0, String externalAgent, String unitOfMeasure, AsyncCallback<SimulationObjectModel> asyncCallback);
+      
+      public void checkRDFEncoding(String files, AsyncCallback<SimulationObjectModel> asyncCallback);
 }
+

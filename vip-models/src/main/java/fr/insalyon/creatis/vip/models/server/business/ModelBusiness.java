@@ -58,6 +58,7 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.server.rpc.DataManagerServiceImpl;
 import java.io.*;
+import java.io.BufferedWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -119,9 +120,9 @@ public class ModelBusiness {
                         while ((n = zipinputstream.read(buf, 0, 1024)) > -1) {
                             fileoutputstream.write(buf, 0, n);
                         }
-
                         fileoutputstream.close();
                         zipinputstream.closeEntry();
+                        //checkEmptyRDF(rootDirectory + entryName);
                         //checkRDFEncoding(rootDirectory + entryName);
                     }
                     files.add(rootDirectory + entryName);
@@ -136,18 +137,39 @@ public class ModelBusiness {
             throw new BusinessException(ex);
         }
     }
-
-    private void checkRDFEncoding(String file) throws FileNotFoundException {
-        File f1 = new File(file);
+   private boolean checkRDFEncoding(String file) throws FileNotFoundException, IOException {
+        File f = new File(file);
+        boolean btest = false;
         InputStream ips = new FileInputStream(file);
         InputStreamReader ipsr = new InputStreamReader(ips);
         BufferedReader br = new BufferedReader(ipsr);
-
-//	ligne=br.readLine();
-
+        String temp = br.readLine();
+        String tp = "";
+        if (temp.contains("windows"))
+        {
+            System.out.println("windows encoding");
+            temp = temp.replace("windows-1252", "UTF-8");
+            btest = true;
+            while ((tp  = br.readLine()) != null)
+            {
+                temp += tp;
+            }
+            br.close();
+            ips.close();
+            
+            OutputStream out = new FileOutputStream(f); 
+            out.write(temp.getBytes());
+            out.close();    
+        }
+        else
+        {
+             br.close();
+            ips.close();
+        }
+        return btest;
     }
 
-    private void copyFile(String srFile, String dtFile) throws FileNotFoundException, IOException {
+        private void copyFile(String srFile, String dtFile) throws FileNotFoundException, IOException {
 
         File f1 = new File(srFile);
         File f2 = new File(dtFile);
@@ -164,8 +186,97 @@ public class ModelBusiness {
         out.close();
         System.out.println("File copied.");
     }
+    
 
-    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles, SimulationObjectModel model, String lfn, String user) throws IOException {
+      private boolean checkEmptyRDF(String file) throws FileNotFoundException, IOException {
+        boolean bres = true;
+        System.out.println("Empty file : " + file);
+        File f1 = new File(file);
+        InputStream ips = new FileInputStream(file);
+        InputStreamReader ipsr = new InputStreamReader(ips);
+        BufferedReader br = new BufferedReader(ipsr);
+        if (br.read() == -1)
+        {
+            System.out.println("Empty file : " + file);
+            bres = false;
+        }
+        br.close();
+        return bres;
+    }
+    
+    public void checkRDF(String zipName) throws FileNotFoundException, IOException
+    {
+         System.out.println("check RDF  ");
+        List<File> files = new ArrayList<File>();
+        String rootDirectory = Server.getInstance().getDataManagerPath() + "/uploads/";
+        File zipFile = new File(rootDirectory + zipName);
+        File zipdir = new File(rootDirectory + "/zip/");
+        if (!zipdir.exists()) {
+            zipdir.mkdirs();
+        }
+        copyFile(rootDirectory + zipName, zipdir + zipName);
+
+        byte[] buf = new byte[1024];
+        String modelname = "";
+        ZipInputStream zin = new ZipInputStream(new FileInputStream(zipdir + zipName));
+
+        ZipEntry entry = zin.getNextEntry();
+        while (entry != null) {
+            String name = entry.getName();
+            if (name.contains(".rdf")) {
+                modelname = name;
+            }
+
+            FileOutputStream fileoutputstream;
+            int n;
+            fileoutputstream = new FileOutputStream(zipdir + "/" + name);
+            while ((n = zin.read(buf, 0, 1024)) > -1) {
+                fileoutputstream.write(buf, 0, n);
+            }
+            fileoutputstream.close();
+            zin.closeEntry();
+
+            files.add(new File(zipdir + "/" + name));
+            entry = zin.getNextEntry();
+        }
+        // Close the streams        
+        zin.close();
+       System.out.println("cyheck RDF 2");
+       if (checkRDFEncoding(zipdir + "/"+ modelname))
+       {
+           File fz = new File(rootDirectory + "zip//" + zipName);
+             if (fz.exists())
+            fz.delete();
+         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(rootDirectory + "zip//" + zipName));
+       
+        // Compress the files
+        for (File i : files) {
+            System.out.println("files zipped :" + i);
+            InputStream in = new FileInputStream(i);
+            // Add ZIP entry to output stream.
+            out.putNextEntry(new ZipEntry(i.getName()));
+            // Transfer bytes from the file to the ZIP file
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            // Complete the entry
+            out.closeEntry();
+            in.close();
+        }
+        // Complete the ZIP file
+        out.close();
+        copyFile(rootDirectory + "zip//" + zipName, rootDirectory + zipName);
+       }
+       else
+       {
+           //nothing           
+       }
+    
+    }
+    
+    
+    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles, SimulationObjectModel model, String lfn, String user, String nwName) throws IOException {
 
         List<File> files = new ArrayList<File>();
         String rootDirectory = Server.getInstance().getDataManagerPath() + "/uploads/";
@@ -221,6 +332,13 @@ public class ModelBusiness {
         //copy rdf.
         // Create a new model
        // SimulationObjectModel nwmodel = SimulationObjectModelFactory.createModel(model.getModelName());
+        if(!nwName.isEmpty())
+        {
+            //model.setModelName(nwName);
+            SimulationObjectModelFactory.setName(model, nwName);
+            
+            System.out.println("new name:" + nwName);
+        }
         model.setModelOwner(user);
         //model.setModelDescription(model.getModelName());
         //modelCopy(model, nwmodel);
@@ -282,7 +400,7 @@ public class ModelBusiness {
         Date now = new Date();
         model.setLastModificationDate(now);
         SimulationObjectModelFactory.setLastModificationDate(model, now);
-        addTimePoint(model, now);
+        //addTimePoint(model, now);
         //addInstant(model,0);
         return model;
     }
@@ -327,13 +445,20 @@ public class ModelBusiness {
         return SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri);
     }
 
-    public SimulationObjectModel rebuildObjectModelFromAnnotationFile(String fileName) {
+    public SimulationObjectModel rebuildObjectModelFromAnnotationFile(String fileName, String user) {
         try {
             System.out.println(fileName);
-            String nwname = fileName.substring(0,fileName.indexOf(".rdf"))+ "_copy.rdf";
-            SimulationObjectModelFactory.deepCopyModelFromAnnotationFile(fileName, nwname);
-            System.out.println(nwname);
-            return SimulationObjectModelFactory.rebuildObjectModelFromAnnotationFile(nwname, true);
+            if(checkEmptyRDF(fileName))
+            {
+                String nwname = fileName.substring(0,fileName.indexOf(".rdf"))+ "_copy.rdf";
+                SimulationObjectModelFactory.deepCopyModelFromAnnotationFile(fileName, nwname);
+                System.out.println(nwname);
+                return SimulationObjectModelFactory.rebuildObjectModelFromAnnotationFile(nwname, true);
+            }
+            else
+            {
+               return createModel("Empty", user);
+            }
         } catch (Exception ex) {
             java.util.logging.Logger.getLogger(ModelBusiness.class.getName()).log(Level.SEVERE, null, ex);
             return null;
@@ -342,7 +467,7 @@ public class ModelBusiness {
 
     public SimulationObjectModel setStorageUrl(SimulationObjectModel som, String url) {
         System.out.println("url" + url);
-        System.out.println("URI " + som.getURI());
+        //System.out.println("URI " + som.getURI());
         SimulationObjectModelFactory.setStorageURL(som, url);
         return som;
     }

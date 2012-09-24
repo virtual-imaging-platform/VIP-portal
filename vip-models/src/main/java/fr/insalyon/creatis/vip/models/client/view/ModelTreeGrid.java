@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.models.client.view;
 
 
+import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.TreeModelType;
@@ -44,10 +45,13 @@ import com.smartgwt.client.widgets.tree.TreeGridField;
 import com.smartgwt.client.widgets.tree.TreeNode;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.DropEvent;
 import com.smartgwt.client.widgets.events.DropHandler;
+import com.smartgwt.client.widgets.form.fields.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.widgets.grid.events.RecordClickEvent;
 import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -103,6 +107,10 @@ public class ModelTreeGrid extends TreeGrid {
     private ToolStrip displayToolStrip = null;
     private String associatedraw = "";
     private ModelToolStrip mts = null;
+    private String nwName = "";
+    private String oldName = "";
+    private  MenuItem modelNameItem = null;
+    private TreeGridField tfg = null;
 
     public ModelTreeGrid(final SimulationObjectModel model, boolean bFull) {
         super();
@@ -125,7 +133,7 @@ public class ModelTreeGrid extends TreeGrid {
         lutTypeMap.put("susceptibility", PhysicalParameterType.susceptibility);
 
         this.model = model;
-        
+        oldName = this.model.getModelName();
         mts = new ModelToolStrip();
         //init the tree grid
         logger = Logger.getLogger("ModelTree");
@@ -143,8 +151,8 @@ public class ModelTreeGrid extends TreeGrid {
         setCanDragRecordsOut(true);
         setDragDataAction(DragDataAction.COPY);
 
-        TreeGridField tfg = new TreeGridField(model.getModelName());
-
+        tfg = new TreeGridField(model.getModelName());
+         tfg.setCanEdit(true);
         MenuItem modelNameItem = new MenuItem();
         modelNameItem.setTitle("Change model name ");
         modelNameItem.setIcon(CoreConstants.ICON_EDIT);
@@ -265,6 +273,7 @@ public class ModelTreeGrid extends TreeGrid {
             }
         });
         this.setContextMenu(nodeMenu);
+  
 
     }
 
@@ -277,12 +286,12 @@ public class ModelTreeGrid extends TreeGrid {
               setDescription();          
            }
        });
-       MenuItem modelNameItem = new MenuItem("Change model name");
+       modelNameItem = new MenuItem("Change model name");
        modelNameItem.setIcon(CoreConstants.ICON_EDIT);
-       modelNameItem.setEnabled(false);
+       modelNameItem.setEnabled(true);
        modelNameItem.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
            public void onClick(MenuItemClickEvent event) {
-                  
+                  setName();
            }
        });
        MenuItem[] newItems = new MenuItem[items.length + 3];
@@ -302,6 +311,37 @@ public class ModelTreeGrid extends TreeGrid {
           dg.show();
     }
     
+        private void setName()
+    {
+          ModelNameWindow dg = new ModelNameWindow(ModelTreeGrid.this);
+          dg.show();
+    }
+    
+       public String getModelName()
+       {    
+           return nwName;
+       }
+       
+       public void setModelName(String name)
+       {    
+           nwName = name;
+           tfg.setPrompt("model name changed. You need to commit to record the modification.");
+            tfg.setTitle(nwName);
+            
+            tfg.fireEvent(new DoubleClickEvent(this.getJsObj()));
+            //tfg.fireEvent(new ItemClickEvent());
+            bmodif = true;
+           logger.log(Level.SEVERE,"NAME : " + nwName);
+//          //this.removeData(modelTree);
+//           modelTree.destroy();
+//          this.setAttribute(oldName, nwName, true);
+//          model.setModelName(nwName);
+//            logger.log(Level.SEVERE,"NAME : " + nwName);
+//          load(model);
+//           
+           redraw();
+         }
+
     public void setObjName(String name) {
         objName = name;
     }
@@ -333,6 +373,7 @@ public class ModelTreeGrid extends TreeGrid {
                     model = result;
                    bmodif = true;
                    checkModality();
+                   
 
                 }
             };
@@ -501,6 +542,7 @@ public class ModelTreeGrid extends TreeGrid {
             //nothing
         }
         modelTree.remove(mnode);
+        mnode = (ModelTreeNode)modelTree.getRoot();
        
     }
 
@@ -607,6 +649,7 @@ public class ModelTreeGrid extends TreeGrid {
         int nit = 0;
 
         ModelTreeNode[] timepoints = new ModelTreeNode[model.getTimepoints().size()];
+                logger.log(Level.SEVERE, "TIMEPOINTS size : " + timepoints.length);
         //  SC.say(String.valueOf(model.getTimepoints().size()));
         for (Timepoint tp : model.getTimepoints()) {
             ModelTreeNode[] instants = new ModelTreeNode[tp.getInstants().size()];
