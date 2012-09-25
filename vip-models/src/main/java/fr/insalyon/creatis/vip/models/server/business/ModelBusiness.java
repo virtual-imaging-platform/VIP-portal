@@ -206,7 +206,6 @@ public class ModelBusiness {
     
     public void checkRDF(String zipName) throws FileNotFoundException, IOException
     {
-         System.out.println("check RDF  ");
         List<File> files = new ArrayList<File>();
         String rootDirectory = Server.getInstance().getDataManagerPath() + "/uploads/";
         File zipFile = new File(rootDirectory + zipName);
@@ -241,7 +240,7 @@ public class ModelBusiness {
         }
         // Close the streams        
         zin.close();
-       System.out.println("cyheck RDF 2");
+
        if (checkRDFEncoding(zipdir + "/"+ modelname))
        {
            File fz = new File(rootDirectory + "zip//" + zipName);

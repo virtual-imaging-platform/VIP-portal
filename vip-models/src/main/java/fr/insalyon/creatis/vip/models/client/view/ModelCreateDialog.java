@@ -37,6 +37,7 @@ import com.smartgwt.client.widgets.form.validator.IsIntegerValidator;
 import com.smartgwt.client.widgets.form.validator.IntegerRangeValidator;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.widgets.grid.events.SelectionUpdatedHandler;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -325,6 +326,9 @@ public class ModelCreateDialog extends Window {
         {
             resultTG.setSelectionType(SelectionStyle.SINGLE);
             resultTG.setFields(fieldname, fieldtype, fieldscore);
+            
+            
+   
             IsIntegerValidator iiv = new IsIntegerValidator();
             IntegerRangeValidator integerRangeValidator = new IntegerRangeValidator();  
             integerRangeValidator.setMin(1);
@@ -332,6 +336,7 @@ public class ModelCreateDialog extends Window {
             TreeGridField priorityField = new TreeGridField("priority");
             priorityField.setCanSort(false);
             priorityField.setCanEdit(true);
+            priorityField.setPrompt("By default, the priority is set to 1. To change it, edit the value.");
             priorityField.setBaseStyle("myHighGridCell");
             //priorityField.setValidators(iiv,integerRangeValidator);
             resultTG.setSelectionType(SelectionStyle.SINGLE);
@@ -377,7 +382,19 @@ public class ModelCreateDialog extends Window {
 
             @Override
             public void onSelectionChanged(SelectionEvent event) {
+                if (type == 0 && selectRecord != null)
+                {
+                    selectRecord.setAttribute("priority", "");
+                }
                 selectRecord = event.getRecord();
+                if (type == 0) //mesh
+                {
+                    if(selectRecord.getAttribute("priority") == null || selectRecord.getAttribute("priority").isEmpty())
+                    {
+                         selectRecord.setAttribute("priority", 1);
+                         resultTG.redraw();
+                    }
+                 }
 
             }
         });
