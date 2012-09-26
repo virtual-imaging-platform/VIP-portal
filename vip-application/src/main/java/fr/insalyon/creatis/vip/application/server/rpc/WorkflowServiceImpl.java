@@ -134,7 +134,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @return
      * @throws ApplicationException
      */
-    @Override
     public SimulationInput getInputByNameUserApp(String name, String appName)
             throws ApplicationException {
 
@@ -154,7 +153,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param simulationInput
      * @throws ApplicationException
      */
-    @Override
     public void addSimulationInput(SimulationInput simulationInput)
             throws ApplicationException {
 
@@ -174,7 +172,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param simulationInput
      * @throws ApplicationException
      */
-    @Override
     public void updateSimulationInput(SimulationInput simulationInput)
             throws ApplicationException {
 
@@ -194,7 +191,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param fileName
      * @return
      */
-    @Override
     public String loadSimulationInput(String fileName) throws ApplicationException {
 
         try {
@@ -212,7 +208,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param applicationName
      * @throws ApplicationException
      */
-    @Override
     public void removeSimulationInput(String inputName, String applicationName)
             throws ApplicationException {
 
@@ -233,7 +228,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param applicationName
      * @throws ApplicationException
      */
-    @Override
     public void removeSimulationInputExample(String inputName, String applicationName)
             throws ApplicationException {
 
@@ -249,7 +243,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      *
      * @return @throws ApplicationException
      */
-    @Override
     public List<SimulationInput> getSimulationInputByUser() throws ApplicationException {
 
         try {
@@ -267,7 +260,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param simulationInput
      * @throws ApplicationException
      */
-    @Override
     public void saveInputsAsExamples(SimulationInput simulationInput) throws ApplicationException {
 
         try {
@@ -282,7 +274,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      *
      * @return @throws ApplicationException
      */
-    @Override
     public List<SimulationInput> getSimulationInputExamples() throws ApplicationException {
 
         try {
@@ -298,7 +289,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param simulationIDs
      * @throws ApplicationException
      */
-    @Override
     public void killSimulations(List<String> simulationIDs) throws ApplicationException {
 
         try {
@@ -368,7 +358,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param simulationIDs
      * @throws ApplicationException
      */
-    @Override
     public void purgeSimulations(List<String> simulationIDs) throws ApplicationException {
 
         try {
@@ -401,7 +390,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param simulationID
      * @throws ApplicationException
      */
-    @Override
     public void killWorkflow(String simulationID) throws ApplicationException {
 
         try {
@@ -420,7 +408,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param simulationID
      * @throws ApplicationException
      */
-    @Override
     public void cleanWorkflow(String simulationID) throws ApplicationException {
 
         try {
@@ -520,7 +507,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @return
      * @throws ApplicationException
      */
-    @Override
     public Simulation getSimulation(String simulationID) throws ApplicationException {
 
         try {
@@ -531,7 +517,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         }
     }
 
-    @Override
     public String getFile(String baseDir, String fileName) {
         try {
             FileReader fr = new FileReader(
@@ -558,7 +543,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         return null;
     }
 
-    @Override
     public String getFileURL(String baseDir, String fileName) {
         Server configuration = Server.getInstance();
         return "https://" + configuration.getApacheHost() + ":"
@@ -567,7 +551,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
                 + baseDir + "/" + fileName;
     }
 
-    @Override
     public List<String> getLogs(String baseDir) {
         List<String> list = new ArrayList<String>();
 
@@ -592,7 +575,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param path
      * @throws ApplicationException
      */
-    @Override
     public void deleteLogData(String path) throws ApplicationException {
 
         try {
@@ -603,7 +585,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         }
     }
 
-    @Override
     public List<SimulationInput> getWorkflowsInputByUserAndAppName(String user, String appName) {
         try {
             return ApplicationDAOFactory.getDAOFactory().getApplicationInputDAO().getWorkflowInputByUserAndAppName(user, appName);
@@ -619,7 +600,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @return
      * @throws ApplicationException
      */
-    @Override
     public String getPerformanceStats(List<Simulation> simulationList, int type) throws ApplicationException {
 
         try {
@@ -674,7 +654,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @return
      * @throws ApplicationException
      */
-    @Override
     public List<Processor> getProcessors(String simulationID) throws ApplicationException {
 
         try {
@@ -709,7 +688,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param newUser
      * @throws ApplicationException
      */
-    @Override
     public void updateUser(String currentUser, String newUser) throws ApplicationException {
 
         try {
