@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -34,29 +34,43 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.common;
 
-import fr.insalyon.creatis.vip.application.client.view.launch.DocumentationSection;
-import com.smartgwt.client.types.VisibilityMode;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.layout.SectionStack;
-import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
+import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
+import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
+import fr.insalyon.creatis.vip.application.client.view.launch.InputsLayout;
 import fr.insalyon.creatis.vip.application.client.view.launch.InputsStackSection;
+import fr.insalyon.creatis.vip.application.client.view.launch.LaunchFormLayout;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public abstract class AbstractLaunchTab extends Tab {
 
-    protected SectionStack sectionStack;
-    protected AbstractLaunchStackSection launchSection;
+    protected HLayout layout;
     protected InputsStackSection inputsSection;
-    protected DocumentationSection documentationSection;
     protected String applicationName;
-    
+    protected ModalWindow modal;
+    protected LaunchFormLayout launchFormLayout;
+    protected InputsLayout inputsLayout;
+
     public AbstractLaunchTab(String applicationName) {
+
         this.applicationName = applicationName;
         this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_APPLICATION) + " "
                 + applicationName);
@@ -64,37 +78,252 @@ public abstract class AbstractLaunchTab extends Tab {
         this.setAttribute("paneMargin", 0);
         this.setID(ApplicationConstants.getLaunchTabID(applicationName));
 
-        VLayout vLayout = new VLayout();
-        vLayout.setWidth100();
-        vLayout.setHeight100();
+        layout = new HLayout(10);
+        layout.setWidth100();
+        layout.setHeight100();
+        layout.setMargin(5);
 
-        sectionStack = new SectionStack();
-        sectionStack.setVisibilityMode(VisibilityMode.MULTIPLE);
-        sectionStack.setAnimateSections(true);
+        modal = new ModalWindow(layout);
 
-        vLayout.addMember(sectionStack);
-        this.setPane(vLayout);
-    }
-    
-    protected void addDocumentationSection(){
-        documentationSection = new DocumentationSection(applicationName);
-        sectionStack.addSection(documentationSection);
-    }
-    
-    protected void addInputsSection() {
-        inputsSection = new InputsStackSection(this.getID());
-        sectionStack.addSection(inputsSection);
+        this.setPane(layout);
     }
 
+    /**
+     * Launches a simulation.
+     */
+    protected abstract void launch();
+
+    /**
+     *
+     */
     public void loadInputsList() {
-        inputsSection.loadData();
+
+        inputsLayout.loadData();
     }
 
+    /**
+     * Loads input values from string.
+     *
+     * @param values Input values
+     */
     public void loadInput(String name, String values) {
-        launchSection.loadInput(name, values);
+
+        Map<String, String> valuesMap = new HashMap<String, String>();
+
+        for (String input : values.split("<br />")) {
+            String[] s = input.split(" = ");
+            valuesMap.put(s[0], s[1] != null ? s[1] : "");
+        }
+        launchFormLayout.loadInputs(name, valuesMap);
     }
 
-    public DocumentationSection getDescriptionSection() {
-        return documentationSection;
+    /**
+     * Sets a value to an input name. The value should be in the following
+     * forms:
+     *
+     * For single list field: a string For multiple list fields: strings
+     * separated by '; ' For ranges: an string like 'Start: 0 - Stop: 0 - Step:
+     * 0'
+     *
+     * @param inputName
+     * @param value
+     */
+    public void setInputValue(String inputName, String value) {
+
+        launchFormLayout.setInputValue(inputName, value);
+    }
+
+    /**
+     * 
+     */
+    protected void configureInputsLayout() {
+        
+        inputsLayout = new InputsLayout(getAttribute("ID"));
+        layout.addMember(inputsLayout);
+    }
+
+    /**
+     *
+     * @return
+     */
+    protected Map<String, String> getParametersMap() {
+
+        return launchFormLayout.getParametersMap();
+    }
+
+    protected IButton getLaunchButton() {
+
+        IButton launchButton = new IButton("Launch");
+        launchButton.setIcon(ApplicationConstants.ICON_LAUNCH);
+        launchButton.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                if (validate()) {
+                    launch();
+                } else {
+                    SC.warn("Cannot launch. Some inputs are not valid.");
+                }
+            }
+        });
+        return launchButton;
+    }
+
+    protected IButton getSaveInputsButton() {
+
+        IButton saveButton = new IButton("Save Inputs");
+        saveButton.setIcon(CoreConstants.ICON_SAVED);
+        saveButton.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                if (validate()) {
+                    verifySimulationName();
+                }
+            }
+        });
+        return saveButton;
+    }
+
+    protected IButton getSaveAsExampleButton() {
+
+        IButton saveButton = new IButton("Save as Example");
+        saveButton.setIcon(CoreConstants.ICON_EXAMPLE);
+        saveButton.setWidth(120);
+        saveButton.setPrompt("Save the inputs as a featured example that will "
+                + "be available for all users.");
+        saveButton.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                if (validate()) {
+                    saveInputsAsExample();
+                }
+            }
+        });
+        return saveButton;
+    }
+
+    /**
+     * Gets the name of the simulation.
+     * 
+     * @return 
+     */
+    protected String getSimulationName() {
+
+        return launchFormLayout.getSimulationName();
+    }
+
+    /**
+     * Validates the form before launch a simulation.
+     *
+     * @return Result of the validation
+     */
+    protected boolean validate() {
+
+        return launchFormLayout.validate();
+    }
+
+    /**
+     * Verifies if the simulation name already exists.
+     */
+    private void verifySimulationName() {
+
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<SimulationInput> callback = new AsyncCallback<SimulationInput>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                if (!caught.getMessage().contains("No data is available")) {
+                    SC.warn("Unable to verify simulation name:<br />" + caught.getMessage());
+                } else {
+                    saveInputs(false);
+                }
+            }
+
+            @Override
+            public void onSuccess(SimulationInput result) {
+                modal.hide();
+                SC.ask("A simulation entitled \"" + getSimulationName() + "\" "
+                        + "already exists. <br />Do you want to ovewrite the input data?", new BooleanCallback() {
+                    @Override
+                    public void execute(Boolean value) {
+                        if (value) {
+                            saveInputs(true);
+                        }
+                    }
+                });
+            }
+        };
+        modal.show("Verifying simulation name...", true);
+        service.getInputByNameUserApp(getSimulationName(), applicationName, callback);
+    }
+
+    private void saveInputs(boolean update) {
+
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Unable to save simulation inputs:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().
+                        getTab(ApplicationConstants.getLaunchTabID(applicationName));
+                launchTab.loadInputsList();
+                modal.hide();
+                SC.say("Input values were succesfully saved!");
+            }
+        };
+        modal.show("Saving inputs...", true);
+        if (update) {
+            service.updateSimulationInput(getSimulationInput(), callback);
+
+        } else {
+            service.addSimulationInput(getSimulationInput(), callback);
+        }
+    }
+
+    private void saveInputsAsExample() {
+
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Unable to save simulation inputs:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().
+                        getTab(ApplicationConstants.getLaunchTabID(applicationName));
+                launchTab.loadInputsList();
+                modal.hide();
+                SC.say("Input values were succesfully saved!");
+            }
+        };
+        modal.show("Saving example inputs...", true);
+        service.saveInputsAsExamples(getSimulationInput(), callback);
+    }
+
+    private SimulationInput getSimulationInput() {
+
+        StringBuilder sb = new StringBuilder();
+        for (String k : getParametersMap().keySet()) {
+            sb.append(k);
+            sb.append("=");
+            String value = getParametersMap().get(k);
+            if (value == null) {
+                value = "";
+            } else if (value.contains("null")) {
+                value = value.replaceAll("null", "");
+            }
+            sb.append(value);
+            sb.append("--");
+        }
+
+        return new SimulationInput(applicationName,
+                getSimulationName(), sb.toString());
     }
 }

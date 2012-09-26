@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -46,6 +46,7 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.application.client.view.common.AbstractSourceLayout;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
@@ -56,7 +57,7 @@ import java.util.Map;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class LaunchFormLayout extends AbstractFormLayout {
 
@@ -68,10 +69,10 @@ public class LaunchFormLayout extends AbstractFormLayout {
         super("600", "*");
         addTitle(title, icon);
 
-        Label docLabel = WidgetUtil.getLabel("Documentation and Terms of Use", 
+        Label docLabel = WidgetUtil.getLabel("Documentation and Terms of Use",
                 CoreConstants.ICON_INFORMATION, 30, Cursor.HAND);
         docLabel.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(ClickEvent event) {
                 new DocumentationLayout(event.getX(), event.getY(), description).show();
             }
@@ -90,29 +91,40 @@ public class LaunchFormLayout extends AbstractFormLayout {
 
     /**
      *
-     * @param inputHLayout
+     * @param sourceLayout
      */
-    public void addSource(InputHLayout inputHLayout) {
+    public void addSource(AbstractSourceLayout sourceLayout) {
 
-        Label sourceLabel = WidgetUtil.getLabel("<b>" + inputHLayout.getName() + "</b>", 15);
-        String comment = inputHLayout.getComment();
+        Label sourceLabel = WidgetUtil.getLabel("<b>" + sourceLayout.getName() + "</b>", 15);
+        String comment = sourceLayout.getComment();
         if (comment != null) {
             sourceLabel.setTooltip(comment);
             sourceLabel.setHoverWidth(500);
         }
         sourcesLayout.addMember(sourceLabel);
-        sourcesLayout.addMember(inputHLayout);
+        sourcesLayout.addMember(sourceLayout);
     }
 
     /**
      *
      * @param buttons
      */
+    @Override
     public void addButtons(IButton... buttons) {
+
+        addButtons(20, buttons);
+    }
+
+    /**
+     *
+     * @param margin
+     * @param buttons
+     */
+    public void addButtons(int margin, IButton... buttons) {
 
         HLayout buttonsLayout = new HLayout(5);
         buttonsLayout.setAlign(VerticalAlignment.CENTER);
-        buttonsLayout.setMargin(20);
+        buttonsLayout.setMargin(margin);
 
         for (IButton button : buttons) {
             buttonsLayout.addMember(button);
@@ -138,9 +150,9 @@ public class LaunchFormLayout extends AbstractFormLayout {
 
         boolean valid = simulationNameItem.validate();
         for (Canvas canvas : sourcesLayout.getMembers()) {
-            if (canvas instanceof InputHLayout) {
-                InputHLayout input = (InputHLayout) canvas;
-                if (!input.validate()) {
+            if (canvas instanceof AbstractSourceLayout) {
+                AbstractSourceLayout source = (AbstractSourceLayout) canvas;
+                if (!source.validate()) {
                     valid = false;
                 }
             }
@@ -161,20 +173,20 @@ public class LaunchFormLayout extends AbstractFormLayout {
         StringBuilder sb = new StringBuilder();
 
         for (Canvas canvas : sourcesLayout.getMembers()) {
-            if (canvas instanceof InputHLayout) {
-                final InputHLayout input = (InputHLayout) canvas;
-                final String inputValue = valuesMap.get(input.getName());
+            if (canvas instanceof AbstractSourceLayout) {
+                final AbstractSourceLayout source = (AbstractSourceLayout) canvas;
+                final String inputValue = valuesMap.get(source.getName());
 
                 if (inputValue != null) {
-                    if (input.getValue() == null || input.getValue().isEmpty()) {
-                        input.setValue(inputValue);
+                    if (source.getValue() == null || source.getValue().isEmpty()) {
+                        source.setValue(inputValue);
 
                     } else {
-                        conflictMap.put(input.getName(), inputValue);
+                        conflictMap.put(source.getName(), inputValue);
                     }
                 } else {
                     sb.append("Could not find value for parameter \"");
-                    sb.append(input.getName()).append("\".<br />");
+                    sb.append(source.getName()).append("\".<br />");
                 }
             }
         }
@@ -182,13 +194,13 @@ public class LaunchFormLayout extends AbstractFormLayout {
             SC.ask("The following fields already have a value.<br />"
                     + "Do you want to replace them?<br />"
                     + "Fields: " + conflictMap.keySet(), new BooleanCallback() {
-
+                @Override
                 public void execute(Boolean value) {
                     if (value) {
                         for (Canvas canvas : sourcesLayout.getMembers()) {
-                            if (canvas instanceof InputHLayout) {
-                                InputHLayout input = (InputHLayout) canvas;
-                                input.setValue(conflictMap.get(input.getName()));
+                            if (canvas instanceof AbstractSourceLayout) {
+                                AbstractSourceLayout source = (AbstractSourceLayout) canvas;
+                                source.setValue(conflictMap.get(source.getName()));
                             }
                         }
                     }
@@ -214,10 +226,10 @@ public class LaunchFormLayout extends AbstractFormLayout {
     public void setInputValue(String inputName, String value) {
 
         for (Canvas canvas : sourcesLayout.getMembers()) {
-            if (canvas instanceof InputHLayout) {
-                InputHLayout input = (InputHLayout) canvas;
-                if (input.getName().equals(inputName)) {
-                    input.setValue(value);
+            if (canvas instanceof AbstractSourceLayout) {
+                AbstractSourceLayout source = (AbstractSourceLayout) canvas;
+                if (source.getName().equals(inputName)) {
+                    source.setValue(value);
                 }
             }
         }
@@ -233,15 +245,29 @@ public class LaunchFormLayout extends AbstractFormLayout {
         Map<String, String> paramsMap = new HashMap<String, String>();
 
         for (Canvas canvas : sourcesLayout.getMembers()) {
-            if (canvas instanceof InputHLayout) {
-                InputHLayout input = (InputHLayout) canvas;
-                paramsMap.put(input.getName(), input.getValue());
+            if (canvas instanceof AbstractSourceLayout) {
+                AbstractSourceLayout source = (AbstractSourceLayout) canvas;
+                paramsMap.put(source.getName(), source.getValue());
             }
         }
         return paramsMap;
     }
 
+    /**
+     * 
+     * @return 
+     */
     public ModalWindow getModal() {
-        return modal;
+        
+        return modal = new ModalWindow(this);
+    }
+
+    /**
+     * 
+     * @param visible 
+     */
+    public void setSourcesLayoutVisibible(boolean visible) {
+
+        sourcesLayout.setVisible(visible);
     }
 }

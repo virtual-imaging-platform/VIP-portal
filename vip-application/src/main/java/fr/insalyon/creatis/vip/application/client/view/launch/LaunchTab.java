@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -34,12 +34,24 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.util.SC;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
+import fr.insalyon.creatis.vip.application.client.bean.Source;
+import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
+import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class LaunchTab extends AbstractLaunchTab {
 
@@ -47,49 +59,118 @@ public class LaunchTab extends AbstractLaunchTab {
 
         this(applicationName, null, null);
     }
-    
+
     public LaunchTab(String applicationName, String simulationName, Map<String, String> inputs) {
-        
+
         super(applicationName);
-        
-        sectionStack.clear();
-        
-        addLaunchSection(applicationName, simulationName, inputs);
+        layout.clear();
+
+        loadData(simulationName, inputs);
     }
 
     /**
-     * Sets a value to an input name. The value should be in the following
-     * forms:
-     *
-     * For single list field: a string For multiple list fields: strings
-     * separated by '; ' For ranges: an string like 'Start: 0 - Stop: 0 - Step:
-     * 0'
-     *
-     * @param inputName
-     * @param value
+     * Loads simulation sources list.
      */
-    public void setInputValue(String inputName, String value) {
+    private void loadData(final String simulationName, final Map<String, String> inputs) {
 
-        ((LaunchStackSection) launchSection).setInputValue(inputName, value);
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<Descriptor> callback = new AsyncCallback<Descriptor>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Unable to download application source file:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Descriptor descriptor) {
+
+                launchFormLayout = new LaunchFormLayout(applicationName, null, descriptor.getDescription());
+                layout.addMember(launchFormLayout);
+
+                for (Source source : descriptor.getSources()) {
+                    launchFormLayout.addSource(new InputHLayout(source.getName(), source.getDescription()));
+                }
+
+                if (CoreModule.user.isSystemAdministrator() || CoreModule.user.isGroupAdmin()) {
+                    launchFormLayout.addButtons(getLaunchButton(), getSaveInputsButton(),
+                            getSaveAsExampleButton());
+                } else {
+                    launchFormLayout.addButtons(getLaunchButton(), getSaveInputsButton());
+                }
+
+                modal.hide();
+                modal = launchFormLayout.getModal();
+
+                configureInputsLayout();
+
+                if (simulationName != null) {
+                    launchFormLayout.loadInputs(simulationName, inputs);
+                }
+            }
+        };
+        modal.show("Loading launch panel...", true);
+        service.getApplicationDescriptor(applicationName, callback);
     }
 
     /**
-     * 
-     * @param applicationName
-     * @param simulationName
-     * @param inputs 
+     * Launches a simulation.
      */
-    private void addLaunchSection(String applicationName, String simulationName, 
-            Map<String, String> inputs) {
-
-        launchSection = new LaunchStackSection(applicationName, this.getID(), 
-                simulationName, inputs);
-        sectionStack.addSection(launchSection);
-    }
-
     @Override
-    public void loadInputsList() {
-        
-        ((LaunchStackSection) launchSection).loadInputsList();
+    protected void launch() {
+
+        modal.show("Launching simulation '" + getSimulationName() + "'...", true);
+
+        // Input data verification
+        List<String> inputData = new ArrayList<String>();
+        for (String input : getParametersMap().values()) {
+            if (input.startsWith(DataManagerConstants.ROOT)) {
+                if (input.contains(ApplicationConstants.SEPARATOR_LIST)) {
+                    inputData.addAll(Arrays.asList(input.split(ApplicationConstants.SEPARATOR_LIST)));
+                } else {
+                    inputData.add(input);
+                }
+            }
+        }
+        if (!inputData.isEmpty()) {
+            WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+            final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                    modal.hide();
+                    SC.warn("Error on input data:<br />" + caught.getMessage());
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                    submit();
+                }
+            };
+            service.validateInputs(inputData, callback);
+        } else {
+            submit();
+        }
+    }
+
+    /**
+     * Submits a simulation to the workflow engine.
+     */
+    private void submit() {
+
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Unable to launch the simulation:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                modal.hide();
+                SC.say("Simulation '" + getSimulationName() + "' successfully launched.");
+            }
+        };
+        service.launchSimulation(getParametersMap(), applicationName,
+                getSimulationName(), callback);
     }
 }

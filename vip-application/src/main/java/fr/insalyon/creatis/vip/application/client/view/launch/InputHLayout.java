@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -40,18 +40,18 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.view.common.AbstractSourceLayout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
-public class InputHLayout extends VLayout {
+public class InputHLayout extends AbstractSourceLayout {
 
     private static enum InputType {
 
@@ -65,9 +65,6 @@ public class InputHLayout extends VLayout {
             return list.toArray(new String[]{});
         }
     };
-    private String name;
-    private String comment;
-    private HLayout hLayout;
     private SelectItem selectItem;
     // List items
     private VLayout listLayout;
@@ -81,19 +78,15 @@ public class InputHLayout extends VLayout {
 
     public InputHLayout(String name, String comment) {
 
-        this.name = name;
-        this.comment = comment;
-        this.setAutoWidth();
-
-        hLayout = new HLayout(3);
-
+        super(name, comment);
+        
         configureTypeSelectItem();
-        hLayout.addMember(FieldUtil.getForm(selectItem));
+        this.addMember(FieldUtil.getForm(selectItem));
 
         // List
         listLayout = new VLayout();
         listLayout.addMember(new ListHLayout(listLayout, true));
-        hLayout.addMember(listLayout);
+        this.addMember(listLayout);
 
         // Range
         startItem = FieldUtil.getTextItem(70, true, "Start", "[0-9.]");
@@ -102,8 +95,6 @@ public class InputHLayout extends VLayout {
         startItemForm = FieldUtil.getForm(startItem);
         stopItemForm = FieldUtil.getForm(stopItem);
         stepItemForm = FieldUtil.getForm(stepItem);
-
-        this.addMember(hLayout);
     }
 
     private void configureTypeSelectItem() {
@@ -114,6 +105,7 @@ public class InputHLayout extends VLayout {
         selectItem.setValue(InputType.List.name());
         selectItem.addChangedHandler(new ChangedHandler() {
 
+            @Override
             public void onChanged(ChangedEvent event) {
                 InputType type = InputType.valueOf((String) event.getValue());
                 if (type == InputType.List) {
@@ -127,28 +119,21 @@ public class InputHLayout extends VLayout {
 
     private void setList() {
 
-        hLayout.addMember(listLayout);
-        hLayout.removeMember(startItemForm);
-        hLayout.removeMember(stopItemForm);
-        hLayout.removeMember(stepItemForm);
+        this.addMember(listLayout);
+        this.removeMember(startItemForm);
+        this.removeMember(stopItemForm);
+        this.removeMember(stepItemForm);
     }
 
     private void setRange() {
 
-        hLayout.removeMember(listLayout);
-        hLayout.addMember(startItemForm);
-        hLayout.addMember(stopItemForm);
-        hLayout.addMember(stepItemForm);
+        this.removeMember(listLayout);
+        this.addMember(startItemForm);
+        this.addMember(stopItemForm);
+        this.addMember(stepItemForm);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
+    @Override
     public boolean validate() {
 
         InputType type = InputType.valueOf(selectItem.getValueAsString());
@@ -169,6 +154,7 @@ public class InputHLayout extends VLayout {
         }
     }
 
+    @Override
     public String getValue() {
 
         InputType type = InputType.valueOf(selectItem.getValueAsString());
@@ -194,6 +180,7 @@ public class InputHLayout extends VLayout {
         }
     }
 
+    @Override
     public void setValue(String value) {
 
         if (value.contains("Start: ")) { // Range
