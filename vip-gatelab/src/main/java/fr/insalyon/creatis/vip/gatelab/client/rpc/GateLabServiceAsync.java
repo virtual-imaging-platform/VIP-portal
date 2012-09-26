@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -41,7 +41,7 @@ import java.util.Map;
 
 /**
  *
- * @author Ibrahim Kallel, Rafael Silva
+ * @author Rafael Ferreira da Silva, Ibrahim Kallel
  */
 public interface GateLabServiceAsync {
 
@@ -52,4 +52,6 @@ public interface GateLabServiceAsync {
     public void getNumberParticles(String workflowID, AsyncCallback<java.lang.Long> asyncCallback);
 
     public void StopWorkflowSimulation(String workflowID, AsyncCallback<Void> asyncCallback);
+    
+    public void reportProblem(String message, AsyncCallback<Void> asyncCallback);
 }

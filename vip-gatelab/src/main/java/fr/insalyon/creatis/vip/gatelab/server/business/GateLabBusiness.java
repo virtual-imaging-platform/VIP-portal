@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -38,7 +38,12 @@ import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.gatelab.client.GateLabConstants;
 import fr.insalyon.creatis.vip.gatelab.server.dao.DAOFactory;
@@ -49,16 +54,15 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author Ibrahim Kallel, Rafael Silva
+ * @author Rafael Ferreira da Silva, Ibrahim Kallel
  */
 public class GateLabBusiness {
 
     private final static Logger logger = Logger.getLogger(GateLabBusiness.class);
 
     /**
-     * 
-     * @return
-     * @throws BusinessException 
+     *
+     * @return @throws BusinessException
      */
     public List<Application> getApplications() throws BusinessException {
 
@@ -72,7 +76,7 @@ public class GateLabBusiness {
                 throw new BusinessException(ex);
             }
         }
-        
+
         ApplicationBusiness applicationBusiness = new ApplicationBusiness();
         List<String> classes = new ArrayList<String>();
         classes.add(GateLabConstants.GATELAB_CLASS);
@@ -81,13 +85,13 @@ public class GateLabBusiness {
     }
 
     /**
-     * 
+     *
      * @param workflowID
      * @param currentUserFolder
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
-    public Map<String, String> getGatelabWorkflowInputs(String workflowID, 
+    public Map<String, String> getGatelabWorkflowInputs(String workflowID,
             String currentUserFolder) throws BusinessException {
 
         try {
@@ -106,10 +110,10 @@ public class GateLabBusiness {
     }
 
     /**
-     * 
+     *
      * @param workflowID
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public long getNumberParticles(String workflowID) throws BusinessException {
 
@@ -122,9 +126,9 @@ public class GateLabBusiness {
     }
 
     /**
-     * 
+     *
      * @param workflowID
-     * @throws GateLabException 
+     * @throws GateLabException
      */
     public void StopWorkflowSimulation(String workflowID) throws BusinessException {
 
@@ -133,6 +137,47 @@ public class GateLabBusiness {
 
         } catch (DAOException ex) {
             logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param email
+     * @param message
+     * @throws BusinessException
+     */
+    public void reportProblem(String email, String message) throws BusinessException {
+
+        try {
+            User user = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
+
+            List<String> emails = new ArrayList<String>();
+            for (User u : CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
+                emails.add(u.getEmail());
+            }
+
+            String adminsEmailContents = "<html>"
+                    + "<head></head>"
+                    + "<body>"
+                    + "<p>Dear Supporters,</p>"
+                    + "<p>The following user tried to submit a GATE-Lab simulation:</p>"
+                    + "<p><b>First Name:</b> " + user.getFirstName() + "</p>"
+                    + "<p><b>Last Name:</b> " + user.getLastName() + "</p>"
+                    + "<p><b>Email:</b> " + user.getEmail() + "</p>"
+                    + "<p>&nbsp;</p>"
+                    + "<p><b>Error Message:</b></p>"
+                    + "<p style=\"background-color: #F6F6F6\">" + message + "</p>"
+                    + "<p>&nbsp;</p>"
+                    + "<p>Best Regards,</p>"
+                    + "<p>VIP Team</p>"
+                    + "</body>"
+                    + "</html>";
+
+            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
+                    "[VIP Contact] GATE-Lab Error", adminsEmailContents, emails.toArray(new String[]{}));
+
+        } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }

@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -44,7 +44,7 @@ import java.util.Map;
 
 /**
  *
- * @author Ibrahim Kallel, Rafael Silva
+ * @author Rafael Ferreira da Silva, Ibrahim Kallel
  */
 public interface GateLabService extends RemoteService {
 
@@ -68,4 +68,6 @@ public interface GateLabService extends RemoteService {
     public long getNumberParticles(String workflowID) throws GateLabException;
 
     public void StopWorkflowSimulation(String workflowID) throws GateLabException;
+    
+    public void reportProblem(String message) throws GateLabException;
 }

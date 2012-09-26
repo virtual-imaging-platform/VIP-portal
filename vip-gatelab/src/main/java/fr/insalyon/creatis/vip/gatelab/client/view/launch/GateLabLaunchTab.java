@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -34,43 +34,181 @@
  */
 package fr.insalyon.creatis.vip.gatelab.client.view.launch;
 
-//import com.smartgwt.client.widgets.grid.events.RowMouseDownEvent;
-//import com.smartgwt.client.widgets.grid.events.RowMouseDownHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
+import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
+import fr.insalyon.creatis.vip.application.client.bean.Source;
+import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
+import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
-//import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.application.client.view.launch.LaunchFormLayout;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabService;
+import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabServiceAsync;
 
 /**
  *
- * @author camarasu
+ * @author Sorina Camarasu, Rafael Ferreira da Silva
  */
 public class GateLabLaunchTab extends AbstractLaunchTab {
 
-    //private GateLabLaunchStackSection launchSection;
+    private LoadMacWindow loadMacWindow;
+    private String baseDir;
+    private IButton loadMacButton;
+
     public GateLabLaunchTab(String applicationName) {
 
         super(applicationName);
-        
-        sectionStack.clear();
+        layout.clear();
+        initComplete(this);
 
-        addDocumentationSection();
-        
-        this.launchSection = new GateLabLaunchStackSection(applicationName, this.getID());
-        sectionStack.setSections(launchSection);
+        baseDir = DataManagerConstants.ROOT + "/Home/myGateSimus/inputs";
 
-        addInputsSection();
+        loadData();
     }
 
+    private void loadData() {
+
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<Descriptor> callback = new AsyncCallback<Descriptor>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Unable to download application source file:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Descriptor descriptor) {
+
+                launchFormLayout = new LaunchFormLayout(applicationName, null, descriptor.getDescription());
+                layout.addMember(launchFormLayout);
+
+                launchFormLayout.setSourcesLayoutVisibible(false);
+
+                for (Source source : descriptor.getSources()) {
+                    launchFormLayout.addSource(new GateLabSourceLayout(source.getName(), source.getDescription()));
+                }
+
+                loadMacButton = getLoadMacButton();
+                launchFormLayout.addButtons(5, loadMacButton);
+
+                modal.hide();
+                modal = launchFormLayout.getModal();
+
+                configureInputsLayout();
+            }
+        };
+        modal.show("Loading launch panel...", true);
+        service.getApplicationDescriptor(applicationName, callback);
+    }
+
+    private IButton getLoadMacButton() {
+
+        IButton launchButton = new IButton("Load Main MacFile");
+        launchButton.setWidth(150);
+        launchButton.setIcon(CoreConstants.ICON_SAVED);
+        launchButton.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                loadMacWindow = new LoadMacWindow(modal, baseDir);
+                loadMacWindow.show();
+            }
+        });
+        return launchButton;
+    }
+
+    public void uploadMacComplete(String inputTgz, String simuType, String nbPart) {
+
+        if (loadMacWindow != null) {
+            loadMacWindow.destroy();
+            loadMacWindow = null;
+
+            modal.hide();
+
+            String[] it = inputTgz.split(" = ");
+            setInputValue(it[0], baseDir.concat("/").concat(it[1]));
+            //We do not fill in the parallelization type automaticlaly for the moment
+            //String[] st = simuType.split(" = ");
+            //setInputValue(st[0], st[1]);
+            String[] np = nbPart.split(" = ");
+            setInputValue(np[0], np[1]);
+
+            String[] st = simuType.split(" = ");
+            setInputValue(st[0], st[1]);
+
+            loadMacButton.hide();
+            launchFormLayout.setSourcesLayoutVisibible(true);
+            launchFormLayout.addButtons(getLaunchButton(), getSaveInputsButton());
+        }
+    }
+
+    public void close() {
+
+        if (loadMacWindow != null) {
+            loadMacWindow.destroy();
+            loadMacWindow = null;
+
+            modal.hide();
+        }
+    }
+
+    public void report(String message) {
+
+        close();
+        GateLabServiceAsync service = GateLabService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Unable to download application source file:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                modal.hide();
+                SC.say("Problem successfully reported.");
+            }
+        };
+        modal.show("Reporting problem...", true);
+        service.reportProblem(message.replaceAll("\\n", "<br />"), callback);
+    }
+
+    private native void initComplete(GateLabLaunchTab uploadMac) /*-{
+     $wnd.uploadMacComplete = function (inputTgz,simuType,nbPart) {
+     uploadMac.@fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab::uploadMacComplete(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)(inputTgz,simuType,nbPart);
+     };
+     $wnd.close = function () {
+     uploadMac.@fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab::close()();
+     };
+     $wnd.report = function (message) {
+     uploadMac.@fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab::report(Ljava/lang/String;)(message);
+     };
+     }-*/;
+
     /**
-     * Sets a value to an input name. The value should be in the following forms:
-     *
-     * For single list field: a string
-     * For multiple list fields: strings separated by '; '
-     * For ranges: an string like 'Start: 0 - Stop: 0 - Step: 0'
-     *
-     * @param inputName
-     * @param value
+     * Launches a simulation.
      */
-    public void setInputValue(String inputName, String value) {
-        //launchSection.setInputValue(inputName, value);
+    @Override
+    protected void launch() {
+
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Error while launching simulation: " + caught.getMessage());
+            }
+
+            public void onSuccess(Void result) {
+                modal.hide();
+                SC.say("Simulation '" + getSimulationName() + "' successfully launched.");
+            }
+        };
+        modal.show("Launching simulation '" + getSimulationName() + "'...", true);
+        service.launchSimulation(getParametersMap(), applicationName,
+                getSimulationName(), callback);
     }
 }

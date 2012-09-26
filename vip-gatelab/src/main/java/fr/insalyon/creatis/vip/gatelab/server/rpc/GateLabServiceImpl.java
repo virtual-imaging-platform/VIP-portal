@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -51,7 +51,7 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author Ibrahim Kallel, Rafael Silva
+ * @author Rafael Ferreira da Silva, Ibrahim Kallel
  */
 public class GateLabServiceImpl extends AbstractRemoteServiceServlet implements GateLabService {
 
@@ -112,6 +112,20 @@ public class GateLabServiceImpl extends AbstractRemoteServiceServlet implements 
         try {
             trace(logger, "Stopping GateLab simulation: " + simulationID);
             gatelabBusiness.StopWorkflowSimulation(simulationID);
+
+        } catch (CoreException ex) {
+            throw new GateLabException(ex);
+        } catch (BusinessException ex) {
+            throw new GateLabException(ex);
+        }
+    }
+
+    @Override
+    public void reportProblem(String message) throws GateLabException {
+
+        try {
+            trace(logger, "Reporting simulation launch problem.");
+            gatelabBusiness.reportProblem(getSessionUser().getEmail(), message);
 
         } catch (CoreException ex) {
             throw new GateLabException(ex);

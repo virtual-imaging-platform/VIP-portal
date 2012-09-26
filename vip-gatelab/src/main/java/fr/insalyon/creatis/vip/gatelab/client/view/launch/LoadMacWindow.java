@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -40,15 +40,15 @@ import fr.insalyon.creatis.vip.datamanager.client.view.common.AppletHTMLPane;
 
 /**
  *
- * @author Sorina Camarasu
+ * @author Sorina Camarasu, Rafael Ferreira da Silva
  */
 public class LoadMacWindow extends Window {
 
     public LoadMacWindow(ModalWindow modal, String baseDir) {
 
         this.setTitle("Load Main Mac File");
-        this.setWidth(750);
-        this.setHeight(550);
+        this.setWidth(590);
+        this.setHeight(320);
         this.setShowMinimizeButton(false);
         this.setIsModal(true);
         this.setShowModalMask(true);
@@ -57,8 +57,8 @@ public class LoadMacWindow extends Window {
 
         this.addItem(new AppletHTMLPane(
                 "DataUpload",
-                "fr.insalyon.creatis.vip.gatelab.applet.loadmac.LoadMac",
-                "vip-gatelab-applet.jar", 710, 525,
+                "fr.insalyon.creatis.vip.gatelab.applet.loadmac.Main",
+                "vip-gatelab-applet.jar", 550, 280,
                 baseDir, false, false));
     }
 }
