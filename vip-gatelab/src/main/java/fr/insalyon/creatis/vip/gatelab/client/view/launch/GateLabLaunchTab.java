@@ -99,7 +99,7 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
                 modal.hide();
                 modal = launchFormLayout.getModal();
 
-                configureInputsLayout();
+                configureInputsLayout(false);
             }
         };
         modal.show("Loading launch panel...", true);
