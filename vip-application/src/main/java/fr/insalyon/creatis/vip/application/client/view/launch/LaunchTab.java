@@ -101,7 +101,7 @@ public class LaunchTab extends AbstractLaunchTab {
                 modal.hide();
                 modal = launchFormLayout.getModal();
 
-                configureInputsLayout();
+                configureInputsLayout(true);
 
                 if (simulationName != null) {
                     launchFormLayout.loadInputs(simulationName, inputs);

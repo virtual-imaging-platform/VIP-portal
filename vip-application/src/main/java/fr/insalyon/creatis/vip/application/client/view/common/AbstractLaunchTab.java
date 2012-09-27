@@ -48,7 +48,6 @@ import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.launch.InputsLayout;
-import fr.insalyon.creatis.vip.application.client.view.launch.InputsStackSection;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
@@ -63,7 +62,6 @@ import java.util.Map;
 public abstract class AbstractLaunchTab extends Tab {
 
     protected HLayout layout;
-    protected InputsStackSection inputsSection;
     protected String applicationName;
     protected ModalWindow modal;
     protected LaunchFormLayout launchFormLayout;
@@ -136,9 +134,9 @@ public abstract class AbstractLaunchTab extends Tab {
     /**
      * 
      */
-    protected void configureInputsLayout() {
+    protected void configureInputsLayout(boolean showExamples) {
         
-        inputsLayout = new InputsLayout(getAttribute("ID"));
+        inputsLayout = new InputsLayout(getAttribute("ID"), showExamples);
         layout.addMember(inputsLayout);
     }
 

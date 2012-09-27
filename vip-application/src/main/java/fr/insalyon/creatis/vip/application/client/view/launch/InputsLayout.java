@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -45,29 +45,31 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class InputsLayout extends VLayout {
 
     private AbstractInputsLayout mainLayout;
     private String tabID;
-            
-    public InputsLayout(String tabID) {
+
+    public InputsLayout(String tabID, boolean showExamples) {
 
         this.tabID = tabID;
-        
         this.setMembersMargin(10);
-        
-        configureButtons();
+
+        configureButtons(showExamples);
     }
 
-    private void configureButtons() {
+    private void configureButtons(boolean showExamples) {
+
+        HLayout buttonsLayout = new HLayout(5);
+        buttonsLayout.setWidth100();
 
         Label savedInputsLabel = WidgetUtil.getLabel("Saved Inputs", CoreConstants.ICON_SAVED, 15, Cursor.HAND);
         savedInputsLabel.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(ClickEvent event) {
-                
+
                 if (mainLayout != null) {
                     mainLayout.destroy();
                 }
@@ -75,30 +77,28 @@ public class InputsLayout extends VLayout {
                 addMember(mainLayout);
             }
         });
-
-        Label examplesLabel = WidgetUtil.getLabel("Examples", CoreConstants.ICON_EXAMPLE, 15, Cursor.HAND);
-        examplesLabel.addClickHandler(new ClickHandler() {
-
-            public void onClick(ClickEvent event) {
-                if (mainLayout != null) {
-                    mainLayout.destroy();
-                }
-                mainLayout = new ExampleInputsLayout(tabID);
-                addMember(mainLayout);
-            }
-        });
-        
-        HLayout buttonsLayout = new HLayout(5);
-        buttonsLayout.setWidth100();
-
         buttonsLayout.addMember(savedInputsLabel);
-        buttonsLayout.addMember(examplesLabel);
+
+        if (showExamples) {
+            Label examplesLabel = WidgetUtil.getLabel("Examples", CoreConstants.ICON_EXAMPLE, 15, Cursor.HAND);
+            examplesLabel.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    if (mainLayout != null) {
+                        mainLayout.destroy();
+                    }
+                    mainLayout = new ExampleInputsLayout(tabID);
+                    addMember(mainLayout);
+                }
+            });
+            buttonsLayout.addMember(examplesLabel);
+        }
 
         this.addMember(buttonsLayout);
     }
-    
+
     public void loadData() {
-        
+
         if (mainLayout != null) {
             mainLayout.loadData();
         }
