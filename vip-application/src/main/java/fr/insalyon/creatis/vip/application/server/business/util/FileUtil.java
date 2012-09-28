@@ -32,14 +32,11 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-
 package fr.insalyon.creatis.vip.application.server.business.util;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.File;
+import java.io.FileReader;
 import org.apache.log4j.Logger;
 
 /**
@@ -47,28 +44,26 @@ import org.apache.log4j.Logger;
  * @author Rafael Silva
  */
 public class FileUtil {
-    
+
     private static Logger logger = Logger.getLogger(FileUtil.class);
 
-    public static String read(String fileName) {
+    public static String read(File file) {
+
+        StringBuilder content = new StringBuilder();
         try {
-            FileInputStream fstream = new FileInputStream(fileName);
-            DataInputStream in = new DataInputStream(fstream);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
-            String strLine;
-            StringBuilder content = new StringBuilder();
-
-            while ((strLine = br.readLine()) != null)   {
-                content.append(strLine + "\n");
+            FileReader reader = new FileReader(file);
+            BufferedReader buffer = new BufferedReader(reader);
+            String line;
+            while ((line = buffer.readLine()) != null) {
+                content.append(line).append("\n");
             }
-            in.close();
 
-            return content.toString();
-
-        } catch (IOException ex) {
+            buffer.close();
+        } catch (java.io.IOException ex) {
             logger.error(ex);
         }
-        return null;
+
+        return (content.length() == 0) ? null : content.toString();
     }
 }

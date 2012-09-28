@@ -100,12 +100,7 @@ public class ApplicationConstants {
 
     public static enum SimulationStatus {
 
-        Running, Completed, Killed, Cleaned
-    };
-
-    public static enum MoteurStatus {
-
-        RUNNING, COMPLETE, TERMINATED, UNKNOWN
+        Running, Completed, Killed, Cleaned, Queued, Unknown
     };
 
     public static enum ProcessorStatus {
