@@ -77,6 +77,7 @@ public class CoreConstants {
     public static final String LAB_WORKFLOWS_DB_NAME = "workflows.db.name";
     public static final String LAB_WORKFLOWS_DB_PORT = "workflows.db.port";
     public static final String LAB_WORKFLOWS_FOLDER = "workflows.directory";
+    public static final String LAB_WORKFLOWS_EXEC_MODE = "workflows.exec.mode";
     // Tabs
     public static final String TAB_ACCOUNT = "account-tab";
     public static final String TAB_ACTIVATION = "activation-tab";

@@ -94,6 +94,7 @@ public class Server {
     private String workflowsDB;
     private String workflowsHost;
     private int workflowsPort;
+    private String workflowsExecuctionMode;
     // Apache
     private String apacheHost = "localhost";
     private int apacheSSLPort = 80;
@@ -161,6 +162,7 @@ public class Server {
             workflowsDB = config.getString(CoreConstants.LAB_WORKFLOWS_DB_NAME, "/var/www/workflows.db");
             workflowsHost = config.getString(CoreConstants.LAB_WORKFLOWS_DB_HOST, "localhost");
             workflowsPort = config.getInt(CoreConstants.LAB_WORKFLOWS_DB_PORT, 1527);
+            workflowsExecuctionMode = config.getString(CoreConstants.LAB_WORKFLOWS_EXEC_MODE, "ws");
 
             apacheHost = config.getString("apache.host", apacheHost);
             apacheSSLPort = config.getInt("apache.ssl.port", apacheSSLPort);
@@ -203,6 +205,7 @@ public class Server {
             config.setProperty(CoreConstants.LAB_WORKFLOWS_DB_NAME, workflowsDB);
             config.setProperty(CoreConstants.LAB_WORKFLOWS_DB_HOST, workflowsHost);
             config.setProperty(CoreConstants.LAB_WORKFLOWS_DB_PORT, workflowsPort);
+            config.setProperty(CoreConstants.LAB_WORKFLOWS_EXEC_MODE, workflowsExecuctionMode);
             config.setProperty("apache.host", apacheHost);
             config.setProperty("apache.ssl.port", apacheSSLPort);
             config.setProperty("provenance.db.user", provenanceDBUser);
@@ -292,6 +295,10 @@ public class Server {
 
     public String getWorkflowsPath() {
         return workflowsPath;
+    }
+
+    public String getWorflowsExecMode() {
+        return workflowsExecuctionMode;
     }
 
     public String getApacheHost() {
