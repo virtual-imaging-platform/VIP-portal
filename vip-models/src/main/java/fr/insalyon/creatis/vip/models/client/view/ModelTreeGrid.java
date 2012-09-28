@@ -212,27 +212,7 @@ public class ModelTreeGrid extends TreeGrid {
                 logger.log(Level.SEVERE, "tp : " + tpSelected + " ins : " + insSelected);
             }
         });
-//             this.addDropHandler(new DropHandler() {
-//
-//            @Override
-//            public void onDrop(DropEvent event) {
-//        //           logger.log(Level.SEVERE, "node to add " + objName);
-//                  //  objType = typeDropped(objName);
-//                    //   addItem(0,0,0,"test.mhd","Brain","anatomical",10);
-//            
-//               ModelCreateDialog dg = new ModelCreateDialog(objType, 0,0);
-//               dg.show();
-//               logger.log(Level.SEVERE, "label =  " + String.valueOf(dg.getLabel()));
-//                logger.log(Level.SEVERE, "layer =  " + dg.getLayer());
-//                             logger.log(Level.SEVERE, "ontologie =  " + String.valueOf(dg.getOntoName()));
-//             //  addItem(0,0,0,"test.mhd",dg.getOntoName(),dg.getLayer(),dg.getLabel());
-//               event.cancel();
-//           //   addItem(tpSelected,insSelected,objType,event.getSource().toString().getNodes()[0].getAttribute("FileName"), objOnto, Integer.parseInt(objLab));  
-//            }
-//             
-//             });
-//            
-//             
+            
         dg = new ModelCreateDialog(this);
         this.addFolderDropHandler(new FolderDropHandler() {
 
@@ -791,6 +771,7 @@ public class ModelTreeGrid extends TreeGrid {
         logger.log(Level.SEVERE, "root size : " + modelTree.getFolders(modelTree.getRoot()).length);
 
         setData(modelTree);
+        
     }
 
     public int getTimePoint() {
@@ -1349,28 +1330,36 @@ public class ModelTreeGrid extends TreeGrid {
     {
         return mts;
     }
-    private void checkModality()
+    public void checkModality()
     {
   
-            if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.IRM)) {
+        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.IRM)) {
                 mts.isOk("MRI");
+                  logger.log(Level.SEVERE, "MRI ok?");
         } else {
               mts.isKo("MRI");
+              logger.log(Level.SEVERE, "MRI ko!");
         }
         if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.CT)) {
              mts.isOk("PET");
+             logger.log(Level.SEVERE, "PET ok?");
         } else {
               mts.isKo("PET");
+              logger.log(Level.SEVERE, "PET ko?");
         }
         if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.PET)) {
              mts.isOk("CT");
+             logger.log(Level.SEVERE, "CT ok?");
         } else {
              mts.isKo("CT");
+             logger.log(Level.SEVERE, "CT ko?");
         }
         if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.US)) {
              mts.isOk("UltraSound");
+             logger.log(Level.SEVERE, "US ok?");
         } else {
               mts.isKo("UltraSound");
+              logger.log(Level.SEVERE, "US ko?");
         }
            mts.redraw();
     }

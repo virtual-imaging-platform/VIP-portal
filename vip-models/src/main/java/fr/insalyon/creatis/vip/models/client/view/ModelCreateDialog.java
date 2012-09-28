@@ -95,13 +95,13 @@ public class ModelCreateDialog extends Window {
         ins = instant;
         filename = name;
         this.setTitle("add Object at timepoint: " + timepoint + " instant: " + instant);
-       initForms();
+        initForms();
     }
 
-    public void updateTree(ModelTreeGrid treegrid)
-    {
+    public void updateTree(ModelTreeGrid treegrid) {
         tree = treegrid;
     }
+
     public void init() {
 
         this.setTitle("add Object");
@@ -131,7 +131,7 @@ public class ModelCreateDialog extends Window {
             }
         });
         initForms();
-        
+
     }
 //   @Override 
 //   public HandlerRegistration addCloseClickHandler(CloseClickHandler handler) { 
@@ -143,14 +143,15 @@ public class ModelCreateDialog extends Window {
 //       }); //what should it return? 
 //       return super.addCloseClickHandler(handler); }
 
-   private void initForms(){
+    private void initForms() {
         if (type == 0 || type == 1) {
             initObjectForms();
         } else {
             initPhysicalForms();
         }
         createOKBt();
-   }
+    }
+
     private void createOKBt() {
         ButtonItem submitButton = new ButtonItem("OK");
         submitButton.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
@@ -159,21 +160,21 @@ public class ModelCreateDialog extends Window {
                     com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
 
                 if (type == 0 || type == 1) {
-                   if (isObjectsValidated() == true){
+                    if (isObjectsValidated() == true) {
                         addObjectItem();
-                        hide() ;
+                        hide();
                         refresh();
-                        
-                   }
-                   else{}
-                       
+
+                    } else {
+                    }
+
                 } else if (type == 2 || type == 3) {
-                    
+
                     tree.addPhysicalItem(tp, ins, type, filename, getLayerforLUT(), physicalCombo.getValueAsString());
                     hide();
                     refresh();
                 }
-                
+
             }
         });
         validateForm = new DynamicForm();
@@ -183,59 +184,54 @@ public class ModelCreateDialog extends Window {
         validateForm.setFields(submitButton);
         this.addItem(validateForm);
     }
-     private void addObjectItem() {
-         
+
+    private void addObjectItem() {
+
         int label;
         ListGridRecord[] records = resultTG.getSelectedRecords();
         for (ListGridRecord rd : records) {
-                
-                boolean badd = false;
-                if (type == 0) {
-                    String slabel = rd.getAttribute("priority");
-                     label = 1;
-                     if(slabel != null)
-                         label = Integer.parseInt(slabel);
-                     if(label> 4)
-                         label = 4;
-                } else {
 
-                    String slabel = rd.getAttributeAsString("label");
-                     label = Integer.parseInt(slabel);
+            boolean badd = false;
+            if (type == 0) {
+                String slabel = rd.getAttribute("priority");
+                label = 1;
+                if (slabel != null) {
+                    label = Integer.parseInt(slabel);
                 }
-                tree.addObjectItem(tp, ins, type, filename, rd.getAttribute("name"),
-                        rd.getAttribute("type"), label);
-            }
-     }
+                if (label > 4) {
+                    label = 4;
+                }
+            } else {
 
-    private boolean isObjectsValidated(){
+                String slabel = rd.getAttributeAsString("label");
+                label = Integer.parseInt(slabel);
+            }
+            tree.addObjectItem(tp, ins, type, filename, rd.getAttribute("name"),
+                    rd.getAttribute("type"), label);
+        }
+    }
+
+    private boolean isObjectsValidated() {
         boolean bhide = true;
         ListGridRecord[] records = resultTG.getSelectedRecords();
-        if(records.length == 0)
-        {
+        if (records.length == 0) {
             SC.say("No entity selected.");
             bhide = false;
-        }
-        else
-        {
-            for (ListGridRecord rd : records) 
-            {
+        } else {
+            for (ListGridRecord rd : records) {
                 if (type == 1) {
                     String slabel = rd.getAttributeAsString("label");
                     if (slabel.isEmpty()) {
                         SC.say("labels missing for entities. Cannot add object.");
                         bhide = false;
                         break;
-                    }
-                    else
-                    {
-                        ArrayList<String> labels = tree.getObjectsLabel(tp, ins,rd.getAttribute("type"));
-                        for(String lb: labels)
-                        {
-                            if(lb.equals(slabel))
-                            {
-                                
+                    } else {
+                        ArrayList<String> labels = tree.getObjectsLabel(tp, ins, rd.getAttribute("type"));
+                        for (String lb : labels) {
+                            if (lb.equals(slabel)) {
+
                                 SC.say("Label already used for " + rd.getAttribute("name")
-                                        +". Please choose another value.");
+                                        + ". Please choose another value.");
                                 bhide = false;
                                 break;
                             }
@@ -243,7 +239,7 @@ public class ModelCreateDialog extends Window {
                     }
                 }
             }
-             
+
         }
         return bhide;
     }
@@ -282,13 +278,11 @@ public class ModelCreateDialog extends Window {
         String title = layerRadio.getValueAsString();
         if (title.isEmpty()) {
             return "";
-        } else if (title.equals("All"))
-        {
+        } else if (title.equals("All")) {
             return "All";
-        }
-        else {
-            
-        
+        } else {
+
+
             return tree.getTypeFromMap(title).toString();
         }
     }
@@ -301,13 +295,13 @@ public class ModelCreateDialog extends Window {
         for (Record rec : resultTreeGrid.getRecords()) {
             resultTreeGrid.removeData(rec);
         }
-      typeRadio.setValue("");
-      searchText.setValue("");
+        typeRadio.setValue("");
+        searchText.setValue("");
 
     }
 
     public TreeGrid createVoxelTreeGrid() {
-        resultTG = new TreeGrid();  
+        resultTG = new TreeGrid();
         TreeGridField fieldname = new TreeGridField("name");
         fieldname.setCanSort(false);
         fieldname.setCanEdit(false);
@@ -317,7 +311,7 @@ public class ModelCreateDialog extends Window {
         TreeGridField fieldscore = new TreeGridField("score");
         fieldscore.setCanSort(false);
         fieldname.setCanEdit(false);
-        
+
         resultTG = new TreeGrid();
         resultTG.setAlign(Alignment.CENTER);
         resultTG.deselectAllRecords();
@@ -326,11 +320,11 @@ public class ModelCreateDialog extends Window {
         {
             resultTG.setSelectionType(SelectionStyle.SINGLE);
             resultTG.setFields(fieldname, fieldtype, fieldscore);
-            
-            
-   
+
+
+
             IsIntegerValidator iiv = new IsIntegerValidator();
-            IntegerRangeValidator integerRangeValidator = new IntegerRangeValidator();  
+            IntegerRangeValidator integerRangeValidator = new IntegerRangeValidator();
             integerRangeValidator.setMin(1);
             integerRangeValidator.setMax(4);
             TreeGridField priorityField = new TreeGridField("priority");
@@ -340,10 +334,10 @@ public class ModelCreateDialog extends Window {
             priorityField.setBaseStyle("myHighGridCell");
             //priorityField.setValidators(iiv,integerRangeValidator);
             resultTG.setSelectionType(SelectionStyle.SINGLE);
-            resultTG.setFields(fieldname, fieldtype, fieldscore,priorityField);
+            resultTG.setFields(fieldname, fieldtype, fieldscore, priorityField);
         } else //voxel
         {
-            IntegerRangeValidator integerRangeValidator = new IntegerRangeValidator();  
+            IntegerRangeValidator integerRangeValidator = new IntegerRangeValidator();
             integerRangeValidator.setMin(0);
             //DoesntContainValidator val = new DoesntContainValidator();
             LabelValidator val = new LabelValidator();
@@ -352,29 +346,25 @@ public class ModelCreateDialog extends Window {
             labelField.setCanSort(false);
             labelField.setCanEdit(true);
 
-            labelField.setValidators(integerRangeValidator,val, vale);
+            labelField.setValidators(integerRangeValidator, val, vale);
             labelField.setBaseStyle("myHighGridCell");
-                     //   labelField.setRequired(true);
-            
-            labelField.addChangedHandler(new com.smartgwt.client.widgets.grid.events.ChangedHandler(){
-                public void  onChanged(com.smartgwt.client.widgets.grid.events.ChangedEvent event) {
-                                      
-                    ArrayList<String> labels = tree.getObjectsLabel(tp, ins,String.valueOf(resultTG.getRecord(event.getRowNum()).getAttribute("type")));
-                            //tree.getTypeFromMap(resultTG.getRecord(event.getRowNum()).getAttribute("type")));
+            //   labelField.setRequired(true);
 
-                    for(String label: labels)
-                    {
-                        if(label.equals(event.getValue().toString()))
-                        {
+            labelField.addChangedHandler(new com.smartgwt.client.widgets.grid.events.ChangedHandler() {
+
+                public void onChanged(com.smartgwt.client.widgets.grid.events.ChangedEvent event) {
+
+                    ArrayList<String> labels = tree.getObjectsLabel(tp, ins, String.valueOf(resultTG.getRecord(event.getRowNum()).getAttribute("type")));
+                    //tree.getTypeFromMap(resultTG.getRecord(event.getRowNum()).getAttribute("type")));
+
+                    for (String label : labels) {
+                        if (label.equals(event.getValue().toString())) {
                             SC.say("Label already used. Please choose another value.");
-                         }
+                        }
                     }
-                     
-                   }
-                
+
+                }
             });
-                
-             
             resultTG.setSelectionType(SelectionStyle.MULTIPLE);
             resultTG.setFields(fieldname, fieldtype, fieldscore, labelField);
         }
@@ -382,19 +372,17 @@ public class ModelCreateDialog extends Window {
 
             @Override
             public void onSelectionChanged(SelectionEvent event) {
-                if (type == 0 && selectRecord != null)
-                {
+                if (type == 0 && selectRecord != null) {
                     selectRecord.setAttribute("priority", "");
                 }
                 selectRecord = event.getRecord();
                 if (type == 0) //mesh
                 {
-                    if(selectRecord.getAttribute("priority") == null || selectRecord.getAttribute("priority").isEmpty())
-                    {
-                         selectRecord.setAttribute("priority", 1);
-                         resultTG.redraw();
+                    if (selectRecord.getAttribute("priority") == null || selectRecord.getAttribute("priority").isEmpty()) {
+                        selectRecord.setAttribute("priority", 1);
+                        resultTG.redraw();
                     }
-                 }
+                }
 
             }
         });
@@ -421,8 +409,7 @@ public class ModelCreateDialog extends Window {
         layerMap.put("Geometry", "Geometry");
         layerMap.put("Foreign body", "Foreign body");
         layerMap.put("External agent", "External agent");
-        if(type == 3)
-        {
+        if (type == 3) {
             layerMap.put("All", "All");
         }
 
@@ -456,15 +443,14 @@ public class ModelCreateDialog extends Window {
         this.removeItem(validateForm);
     }
 
-    
-    private void removeForms()
-    {
+    private void removeForms() {
         if (type == 2 || type == 3) {
-               removePhysicalForms();
-            } else {
-                removeObjectForms();
-            }
+            removePhysicalForms();
+        } else {
+            removeObjectForms();
+        }
     }
+
     public void changeType(String typeName) {
         if (typeName.equals("voxel")) {
             removeForms();
@@ -473,9 +459,9 @@ public class ModelCreateDialog extends Window {
 
         } else if (typeName.equals("mesh")) {
 
-          removeForms();
-          type = 0;
-          initObjectForms();
+            removeForms();
+            type = 0;
+            initObjectForms();
 
         } else if (typeName.equals("LUT")) {
             removeForms();
@@ -599,95 +585,74 @@ public class ModelCreateDialog extends Window {
 
         }
     }
-    
-    
-    
-    
-    
-     class LabelValidator extends CustomValidator  {
 
-         @Override
-         protected boolean condition(Object value) {
-             boolean bvalid = true;
-            ArrayList<String> labels = tree.getObjectsLabel(tp, ins,String.valueOf(resultTG.getSelectedRecord().getAttribute("type")));
-                    for(String label: labels)
-                    {
-                        if(label.equals(String.valueOf(value)) || String.valueOf(value).isEmpty())
-                        {
-                            bvalid = false;
-                         }
-                    }
-                    return bvalid;
-         }
-    }
-     
-     
-      class LabelEmptyValidator extends CustomValidator  {
+    class LabelValidator extends CustomValidator {
 
-         @Override
-         protected boolean condition(Object value) {
-             boolean bvalid = true;
-             value.toString().isEmpty();
-                   if(value.toString().isEmpty())
-                        {
-                            bvalid = false;
-                         }
-                    return bvalid;
-         }
+        @Override
+        protected boolean condition(Object value) {
+            boolean bvalid = true;
+            ArrayList<String> labels = tree.getObjectsLabel(tp, ins, String.valueOf(resultTG.getSelectedRecord().getAttribute("type")));
+            for (String label : labels) {
+                if (label.equals(String.valueOf(value)) || String.valueOf(value).isEmpty()) {
+                    bvalid = false;
+                }
+            }
+            return bvalid;
+        }
     }
-     
-     
-    
-    public class LabelRecord extends ListGridRecord {  
-  
+
+    class LabelEmptyValidator extends CustomValidator {
+
+        @Override
+        protected boolean condition(Object value) {
+            boolean bvalid = true;
+            value.toString().isEmpty();
+            if (value.toString().isEmpty()) {
+                bvalid = false;
+            }
+            return bvalid;
+        }
+    }
+
+    public class LabelRecord extends ListGridRecord {
+
         private ModelTreeGrid mtree = null;
-    public LabelRecord() {  
-    }  
-  
-    public LabelRecord(String name, String type, String score, String label, ModelTreeGrid tree) {  
-        setName(name);  
-        setType(type);  
-        setScore(score);  
-        setLabel(label);  
-        mtree = tree;
-    }  
-  
-  
-    public LabelRecord(String name, String type, String score, ModelTreeGrid tree) {  
-        setName(name);  
-        setType(type);  
-        setScore(score);  
+
+        public LabelRecord() {
+        }
+
+        public LabelRecord(String name, String type, String score, String label, ModelTreeGrid tree) {
+            setName(name);
+            setType(type);
+            setScore(score);
+            setLabel(label);
+            mtree = tree;
+        }
+
+        public LabelRecord(String name, String type, String score, ModelTreeGrid tree) {
+            setName(name);
+            setType(type);
+            setScore(score);
+        }
+
+        private void setName(String name) {
+            setAttribute("name", name);
+        }
+
+        private void setType(String type) {
+            setAttribute("type", type);
+        }
+
+        private void setScore(String score) {
+            setAttribute("score", score);
+        }
+
+        private void setLabel(String label) {
+            setAttribute("label", label);
+        }
+
+        private void getLabel(String label) {
+            setAttribute("label", label);
+        }
     }
-    
-    
-    
-    
-    private void setName(String name)
-    {
-        setAttribute("name",name);
-    }
-    private void setType(String type)
-    {
-        setAttribute("type",type);
-    }
-     private void setScore(String score)
-    {
-        setAttribute("score",score);
-    }
-     
-     private void setLabel(String label)
-    {
-        setAttribute("label",label);
-    }
-     
-     
-     private void getLabel(String label)
-    {
-        setAttribute("label",label);
-    }
-     
-     
-     
-    }
-    
 }

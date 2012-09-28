@@ -349,6 +349,7 @@ public class ModelBusiness {
         if (f.exists())
             f.delete();
         model.setStorageURL(lfn);
+        SimulationObjectModelFactory.setStorageURL(model, lfn);
         SimulationObjectModelFactory.inferModelSemanticAxes(model);
        
         SimulationObjectModelFactory.dumpInFileModel(model,zipdir + "//"+ modelname);
@@ -435,7 +436,7 @@ public class ModelBusiness {
         }
     }
 
-    public void completeModel(SimulationObjectModel som) {
+        public void completeModel(SimulationObjectModel som) {
         SimulationObjectModelFactory.inferModelSemanticAxes(som);
         SimulationObjectModelFactory.completeModel(som);
     }
@@ -466,7 +467,8 @@ public class ModelBusiness {
 
     public SimulationObjectModel setStorageUrl(SimulationObjectModel som, String url) {
         System.out.println("url" + url);
-        //System.out.println("URI " + som.getURI());
+     //   System.out.println("URI " + som.getURI());
+        som.setStorageURL(url);
         SimulationObjectModelFactory.setStorageURL(som, url);
         return som;
     }

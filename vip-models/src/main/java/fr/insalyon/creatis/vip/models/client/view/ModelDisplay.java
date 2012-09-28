@@ -78,9 +78,11 @@ public class ModelDisplay extends VLayout {
     private boolean bmodif = false;
     private ArrayList<String> addFiles = new ArrayList<String>();
     private String timeStamp = "";
+    private String muri = "";
 
     ModelDisplay(String uri) {
         super();
+        muri = uri;
         buildModel(uri);
       //  enableAdd();
         //disableAdd();
@@ -126,7 +128,7 @@ public class ModelDisplay extends VLayout {
         if (model != null) {
            ((ModelToolStrip)toolStrip).initCheck();
         }
-        
+         modelTreeGrid.checkModality();
     }
 
     private void enableAdd()
@@ -173,7 +175,7 @@ public class ModelDisplay extends VLayout {
         addMember(toolStrip);
         addMember(modelTreeGrid);
         modelTreeGrid.refreshFields();
-        
+       // modelTreeGrid.checkModality(); 
     }
 
     public ModelTreeGrid getModelTree() {
@@ -198,7 +200,7 @@ public class ModelDisplay extends VLayout {
         // modelTreeGrid.setZipFile(zipFile);
         addMember(modelTreeGrid);
         modelTreeGrid.setParentElement(this);
-        //modelTreeGrid.setToolStrip(toolStrip);
+       //modelTreeGrid.checkModality();
     }
 
     public void createTreeGrid() {
@@ -255,8 +257,8 @@ public class ModelDisplay extends VLayout {
 
             public void onSuccess(SimulationObjectModel result) {
                 model = result;
-                 uploadModelTTS();
-                //setStorage();
+                 //uploadModelTTS();
+                setStorage();
             }
         };
         
@@ -282,6 +284,7 @@ public class ModelDisplay extends VLayout {
         };
 
         String lfn = ModelConstants.MODEL_HOME +"/" + timeStamp +  zipFile;
+         model = modelTreeGrid.getModel();
         ssu.setStorageUrl(model, lfn, cbssu);
     }
 
@@ -334,12 +337,13 @@ public class ModelDisplay extends VLayout {
         download = new ToolStripButton("Download");
         download.setIcon(DataManagerConstants.ICON_DOWNLOAD);
         download.setTooltip("Download model files");
+        download.enable();
         toolStrip.addButton(download);
-
+        model = modelTreeGrid.getModel();
         download.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-               // if (download.getIcon() == ModelConstants.APP_IMG_OK) {
+              SC.say("Added zip file to the upload pool");
                     String lfn = model.getStorageURL();
                     downloadModel(lfn);
                // }
@@ -416,27 +420,7 @@ public class ModelDisplay extends VLayout {
             disableDownload("No storage URL", true);
         }
 
-        
-//        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.IRM)) {
-//            toolStrip.addMember(modalityButton("MRI", true));
-//        } else {
-//            toolStrip.addMember(modalityButton("MRI", false));
-//        }
-//        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.CT)) {
-//            toolStrip.addMember(modalityButton("CT", true));
-//        } else {
-//            toolStrip.addMember(modalityButton("CT", false));
-//        }
-//        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.PET)) {
-//            toolStrip.addMember(modalityButton("PET", true));
-//        } else {
-//            toolStrip.addMember(modalityButton("PET", false));
-//        }
-//        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.US)) {
-//            toolStrip.addMember(modalityButton("Ultrasound", true));
-//        } else {
-//            toolStrip.addMember(modalityButton("Ultrasound", false));
-//        }
+
     }
     public ToolStrip getToolStrip()
     {
@@ -449,11 +433,12 @@ public class ModelDisplay extends VLayout {
         AsyncCallback<String> callback = new AsyncCallback<String>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Cannot download model file.");
+                SC.warn("Cannot download model file. : " + lfnModel);
             }
 
             public void onSuccess(String result) {
                 SC.say("Model file download is in progress.");
+                 OperationLayout.getInstance().addOperation(result);
                 ((DataManagerSection) Layout.getInstance().getMainSection(DataManagerConstants.SECTION_FILE_TRANSFER)).expand();
             }
         };
@@ -486,7 +471,6 @@ public class ModelDisplay extends VLayout {
                 modal.hide();
                 if (result != null) {
                     model = result;
-                    //SC.say("Model loaded.");
                     init(true,true);
                 } else {
                     SC.say("Cannot load model");
