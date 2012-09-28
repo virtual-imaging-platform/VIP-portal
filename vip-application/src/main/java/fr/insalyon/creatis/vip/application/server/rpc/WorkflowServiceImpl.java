@@ -41,6 +41,7 @@ import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.InputBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
@@ -48,6 +49,8 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -57,6 +60,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
+import fr.cnrs.i3s.neusemstore.provenance.expsummaries.SorteoExperimentSummary;
 
 /**
  *
@@ -700,4 +704,49 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             throw new ApplicationException(ex);
         }
     }
-}
+
+    private String getJenaDirName(String baseDir) throws ApplicationException{
+        File dir = new File(baseDir);
+        
+        if(dir.isDirectory()){
+            for(String names : dir.list())
+                if(names.startsWith("JENA-TDB-dir"))
+                    return names;
+        }else
+            throw new ApplicationException(baseDir+"is not a directory");
+        return null;
+    }
+    
+    @Override
+    public List<ExpeSummaryTriple> getSemantics(String baseDir) throws ApplicationException {
+        List<ExpeSummaryTriple> triples = new ArrayList<ExpeSummaryTriple>();
+        
+        //check that there's a Jena dir and sem descriptor in this directory
+        String semDescriptors = Server.getInstance().getWorkflowsPath()
+                + "/"+baseDir+"/sem-descriptors";
+        String jenaDir=getJenaDirName(Server.getInstance().getWorkflowsPath()
+                + "/"+baseDir);
+        if(jenaDir == null)
+            throw new ApplicationException("Can't find any Jena dir in "+baseDir);
+        if(!(new File(semDescriptors)).isDirectory())
+            throw new ApplicationException("Can't find any sem-descriptors dir in "+baseDir);
+        
+        SorteoExperimentSummary expeSummary = new SorteoExperimentSummary();
+        List<fr.cnrs.i3s.neusemstore.provenance.expsummaries.dto.ExpeSummaryTriple> triples_neu = expeSummary.generateSummaryBeans(semDescriptors,Server.getInstance().getWorkflowsPath()
+                + "/"+baseDir+"/"+jenaDir);
+       
+        for (fr.cnrs.i3s.neusemstore.provenance.expsummaries.dto.ExpeSummaryTriple nt : triples_neu){
+           triples.add(new ExpeSummaryTriple(new ExpeSummaryEntity(nt.getSubject().getUri(),nt.getSubject().getLabel()), new ExpeSummaryEntity(nt.getPredicate().getUri(),nt.getPredicate().getLabel()),new ExpeSummaryEntity(nt.getObject().getUri(),nt.getObject().getLabel())));
+        }
+        return triples;
+
+    }
+    
+    private String cleanse(String s) throws DataManagerException{
+        if(s.startsWith("lfn://") || s.startsWith("/grid"))
+            return DataManagerUtil.parseBaseDir(CoreModule.user, s);
+        else
+            return s;
+    }
+
+   }

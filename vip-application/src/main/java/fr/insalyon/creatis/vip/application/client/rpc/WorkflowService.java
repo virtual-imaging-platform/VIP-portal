@@ -123,4 +123,6 @@ public interface WorkflowService extends RemoteService {
     public void validateInputs(List<String> inputs) throws ApplicationException;
 
     public void updateUser(String currentUser, String newUser) throws ApplicationException;
+    
+    public List<ExpeSummaryTriple>  getSemantics(String baseDir) throws ApplicationException ;
 }

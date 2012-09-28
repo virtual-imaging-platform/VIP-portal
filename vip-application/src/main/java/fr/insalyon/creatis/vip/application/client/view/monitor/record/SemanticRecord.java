@@ -2,7 +2,7 @@
  *
  * Rafael Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.rafaelsilva.com
+ * http://www.creatis.insa-lyon.fr/~silva
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -32,50 +32,24 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.monitor;
+package fr.insalyon.creatis.vip.application.client.view.monitor.record;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
-import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
  *
- * @author Rafael Silva
+ * @author Tristan Glatard
  */
-public class SimulationTab extends AbstractSimulationTab {
-
-    private GeneralTab generalTab;
-    private SummaryTab summaryTab;
-    private ChartsTab chartsTab;
-    private LogsTab logsTab;
-    private SemanticTab semanticTab;
-
-    public SimulationTab(String simulationID, String simulationName, SimulationStatus status) {
-        
-        super(simulationID, simulationName, status);
-
-        generalTab = new GeneralTab(simulationID, simulationName);
-        summaryTab = new SummaryTab(simulationID, completed);
-        chartsTab = new ChartsTab(simulationID);
-
-        tabSet.addTab(generalTab);
-        tabSet.addTab(summaryTab);
-        tabSet.addTab(chartsTab);
-        
-        if (CoreModule.user.isSystemAdministrator()) {
-            logsTab = new LogsTab(simulationID);
-            tabSet.addTab(logsTab);
-        }
-        if(CoreModule.user.hasGroupAccess("Semantics")){
-            semanticTab = new SemanticTab(simulationID);
-            tabSet.addTab(semanticTab);
-        }
+public class SemanticRecord extends ListGridRecord {
+    
+    public SemanticRecord() {
     }
-
-    @Override
-    protected void updateData() {
-
-        summaryTab.loadData();
-        generalTab.loadData();
+    
+    public SemanticRecord(String subject, String predicate, String object) {
+        setAttribute("icon", "icon-file");
+        setAttribute("subject", subject);
+        setAttribute("predicate", predicate);
+        setAttribute("object", object);
     }
+ 
 }
