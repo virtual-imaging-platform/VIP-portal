@@ -224,8 +224,6 @@ public class ModelListTab extends Tab {
         
         modelNameField.setHoverCustomizer(new HoverCustomizer() {  
             public String hoverHTML(Object value, ListGridRecord record, int rowNum, int colNum) {  
-//                CountryRecord countryRecord = (CountryRecord) record;  
-//                int governmentDesc = countryRecord.getGovernmentDesc();  
                 return record.getAttribute("uri");  
             }  
         });  

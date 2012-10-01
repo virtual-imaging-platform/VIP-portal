@@ -79,6 +79,8 @@ public class ModelDisplay extends VLayout {
     private ArrayList<String> addFiles = new ArrayList<String>();
     private String timeStamp = "";
     private String muri = "";
+    private String zipFullPath = "";
+    private boolean mbUpload = true;
 
     ModelDisplay(String uri) {
         super();
@@ -99,9 +101,11 @@ public class ModelDisplay extends VLayout {
         return ms;
     }
 
-    public void setZipFile(String z) {
+    public void setZipFile(String z, String path, boolean bUpload) {
         zipFile = z;
-        modelTreeGrid.setZipFile(z);
+        zipFullPath = path;
+        mbUpload = bUpload;
+        modelTreeGrid.setZipFile(z,zipFullPath, mbUpload);
     }
 
     private void init(boolean bfull, boolean bmodif) {
@@ -262,7 +266,7 @@ public class ModelDisplay extends VLayout {
             }
         };
         
-        ms.checkRDFEncoding(zipFile, callback);
+        ms.checkRDFEncoding(zipFile, zipFullPath, mbUpload, callback);
     }
 
     private void setStorage() {
@@ -330,7 +334,7 @@ public class ModelDisplay extends VLayout {
         };
         timeStamp = getTimeStampMilli()  + "-" ;
         String lfn = ModelConstants.MODEL_HOME +"/" + timeStamp  + zipFile;
-        ms.recordAddedFiles(zipFile, addFiles, model, lfn,modelTreeGrid.getModelName(), callback);
+        ms.recordAddedFiles(zipFile, addFiles, model, lfn,modelTreeGrid.getModelName(), zipFullPath, mbUpload, callback);
     }
 
     private void enableDownload() {

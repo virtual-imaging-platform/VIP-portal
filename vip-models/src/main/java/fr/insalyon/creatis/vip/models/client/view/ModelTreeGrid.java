@@ -104,11 +104,13 @@ public class ModelTreeGrid extends TreeGrid {
     private ModelMenu mymenu = null;
     private ModelCreateDialog dg = null;
     private String zipfile = "";
+    private String zipFullPath = "";
     private ToolStrip displayToolStrip = null;
     private String associatedraw = "";
     private ModelToolStrip mts = null;
     private String nwName = "";
-    private String oldName = "";
+    private boolean mbUpload = false;
+
     private  MenuItem modelNameItem = null;
     private TreeGridField tfg = null;
 
@@ -133,7 +135,7 @@ public class ModelTreeGrid extends TreeGrid {
         lutTypeMap.put("susceptibility", PhysicalParameterType.susceptibility);
 
         this.model = model;
-        oldName = this.model.getModelName();
+
         mts = new ModelToolStrip();
         //init the tree grid
         logger = Logger.getLogger("ModelTree");
@@ -233,7 +235,7 @@ public class ModelTreeGrid extends TreeGrid {
                         
                     }
                 };
-                ms.extractRaw(dropname, zipfile, callback);
+                ms.extractRaw(dropname, zipfile,zipFullPath, mbUpload, callback);
                 }
                 else
                 {}
@@ -312,13 +314,7 @@ public class ModelTreeGrid extends TreeGrid {
             //tfg.fireEvent(new ItemClickEvent());
             bmodif = true;
            logger.log(Level.SEVERE,"NAME : " + nwName);
-//          //this.removeData(modelTree);
-//           modelTree.destroy();
-//          this.setAttribute(oldName, nwName, true);
-//          model.setModelName(nwName);
-//            logger.log(Level.SEVERE,"NAME : " + nwName);
-//          load(model);
-//           
+         
            redraw();
          }
 
@@ -334,10 +330,11 @@ public class ModelTreeGrid extends TreeGrid {
         objOnto = name;
     }
 
-    public void setZipFile(String z)
+    public void setZipFile(String z, String path, boolean bUpload)
     {
         zipfile = z;
-        logger.log(Level.SEVERE,"zipfile :" + zipfile);
+        zipFullPath = path;
+        mbUpload = bUpload;
     }
 
     public void removeTimepoint()

@@ -90,6 +90,9 @@ class ModelImportTab extends Tab {
     private FileTree fileTree = null;
     //private PickupDragController dragController;
     private HStack grids = null;
+    private String dwnmodel;
+    private String zipFullPath = "";
+    private boolean mbUpload = true;
 
     public ModelImportTab(boolean bTS, String nameTab, String modelURI) {
 
@@ -108,6 +111,7 @@ class ModelImportTab extends Tab {
 
         ToolStrip ts = new ToolStrip();
         ts.setWidth100();
+
 
         // ToolStripButton addButton = new ToolStripButton("Add file");
         addFileButton addButton = new addFileButton("Add file");
@@ -171,13 +175,44 @@ class ModelImportTab extends Tab {
 
         this.setPane(hl);
 
-        new FileUploadWindow("local", "uploadComplete").show();
+        if (bTS) {
+            new FileUploadWindow("local", "uploadComplete").show();
+        } else {
+            ModelServiceAsync msa = ModelService.Util.getInstance();
+            AsyncCallback<String> mscallback = new AsyncCallback<String>() {
+
+                public void onFailure(Throwable caught) {
+                    SC.warn("Cannot identify model URL");
+                }
+
+                public void onSuccess(String result) {
+                    zipFullPath = result;
+                    mbUpload = false;
+                    dwnmodel = result.substring(result.lastIndexOf("/") + 1, result.length());
+                    DataManagerServiceAsync service = DataManagerService.Util.getInstance();
+                    AsyncCallback<String> callback = new AsyncCallback<String>() {
+
+                        public void onFailure(Throwable caught) {
+                            SC.warn("Cannot modify model file.");
+                        }
+
+                        public void onSuccess(String result2) {
+                            SC.warn(dwnmodel);
+                            setZipFile(dwnmodel, zipFullPath, false);
+                        }
+                    };
+                    service.downloadFile(result, callback);
+                }
+            };
+            msa.getURLFromURI(modelURI, mscallback);
+        }
+
 
     }
 
     public void uploadComplete(String fileName) {
-        setZipFile(fileName);
-        //modelDisplay.enableCommit();
+        setZipFile(fileName,"", true);
+    
     }
 
     private native void initComplete(ModelImportTab upload) /*-{
@@ -196,7 +231,7 @@ class ModelImportTab extends Tab {
         fileTree.addData(fileTree.createNode("none", filename));
     }
 
-    private void setZipFile(final String zipName) {
+    private void setZipFile(final String zipName, String modelFullName, boolean bUpload) {
         zipFile = zipName;
 
         ModelServiceAsync ms = ModelService.Util.getInstance();
@@ -218,7 +253,7 @@ class ModelImportTab extends Tab {
             }
         };
         modal.show("Processing zip file", true);
-        ms.getFiles(zipName, callback);
+        ms.getFiles(zipName,modelFullName, bUpload, callback);
     }
 
     public void displayFiles(String zipName, List<String> result) {
@@ -272,7 +307,7 @@ class ModelImportTab extends Tab {
     public void setSimulationObjectModel(SimulationObjectModel result) {
 
         modelDisplay = new ModelDisplay(result, true);
-        modelDisplay.setZipFile(zipFile);
+        modelDisplay.setZipFile(zipFile, zipFullPath, mbUpload);
         modelDisplay.enableCommit();
         //    modelCreate = new ModelCreateTab(result);
         hl.addMember(modelDisplay);

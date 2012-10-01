@@ -19,6 +19,8 @@ import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 
+//import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIConstants;
+//import fr.insalyon.creatis.vip.simulationgui.client.view.SimulationGUITab;
 /**
  *
  * @author glatard
@@ -67,7 +69,7 @@ class ModelContextMenu extends Menu {
         
         MenuItem modifyItem = new MenuItem("Modify model");
         modifyItem.setIcon(ApplicationConstants.ICON_SIMULATION_VIEW);
-        modifyItem.setEnabled(false);
+        modifyItem.setEnabled(true);
         modifyItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
@@ -75,8 +77,16 @@ class ModelContextMenu extends Menu {
             }
         });
         
-              
-        
+//        MenuItem SimulationItem = new MenuItem("Launch Simulation GUI");
+//        SimulationItem.setIcon(SimulationGUIConstants.APP_IMG_EDITOR);
+//        SimulationItem.setEnabled(true);
+//        SimulationItem.addClickHandler(new ClickHandler() {
+//
+//            public void onClick(MenuItemClickEvent event) {
+//                      Layout.getInstance().addTab(new SimulationGUITab());
+//            }
+//        });      
+//        
         
         if(bdelete)
             this.setItems(viewItem, modifyItem,deleteItem);

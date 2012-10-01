@@ -56,6 +56,8 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.rpc.DataManagerServiceImpl;
 import java.io.*;
 import java.io.BufferedWriter;
@@ -67,6 +69,7 @@ import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -83,15 +86,17 @@ public class ModelBusiness {
      * @return
      * @throws BusinessException
      */
-    public List<String> getFiles(String modelZipFile) throws BusinessException {
+    public List<String> getFiles(String modelZipFile, User user, String zipFullPath, boolean bUpload) throws BusinessException, DataManagerException {
 
-        logger.info("Calling getFiles " + modelZipFile);
+        System.out.println("Calling getFiles " + modelZipFile);
+        
         if (modelZipFile.lastIndexOf(".zip") == -1) {
             throw new BusinessException("This is not a zip file");
         }
 
         try {
-            String rootDirectory = Server.getInstance().getDataManagerPath() + "/uploads/";
+            String rootDirectory =  getZipPath(user, zipFullPath,bUpload);
+            System.out.println("Calling getFiles " + rootDirectory);
             ZipInputStream zipinputstream = new ZipInputStream(new FileInputStream(rootDirectory + modelZipFile));
             ZipEntry zipentry = zipinputstream.getNextEntry();
 
@@ -204,10 +209,10 @@ public class ModelBusiness {
         return bres;
     }
     
-    public void checkRDF(String zipName) throws FileNotFoundException, IOException
+    public void checkRDF(String zipName,User user, String zipFullPath, boolean bUpload) throws DataManagerException, FileNotFoundException, IOException
     {
         List<File> files = new ArrayList<File>();
-        String rootDirectory = Server.getInstance().getDataManagerPath() + "/uploads/";
+        String rootDirectory = getZipPath(user,zipFullPath, bUpload);
         File zipFile = new File(rootDirectory + zipName);
         File zipdir = new File(rootDirectory + "/zip/");
         if (!zipdir.exists()) {
@@ -275,10 +280,10 @@ public class ModelBusiness {
     }
     
     
-    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles, SimulationObjectModel model, String lfn, String user, String nwName) throws IOException {
+    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles, SimulationObjectModel model, String lfn, User user, String nwName,String zipFullPath, boolean bUpload) throws IOException, DataManagerException {
 
         List<File> files = new ArrayList<File>();
-        String rootDirectory = Server.getInstance().getDataManagerPath() + "/uploads/";
+        String rootDirectory = getZipPath(user, zipFullPath, bUpload);
         File zipFile = new File(rootDirectory + zipName);
         if (zipFile.exists())
                     System.out.println("zipname :" + zipFile);
@@ -338,7 +343,7 @@ public class ModelBusiness {
             
             System.out.println("new name:" + nwName);
         }
-        model.setModelOwner(user);
+        model.setModelOwner(user.getLastName());
         //model.setModelDescription(model.getModelName());
         //modelCopy(model, nwmodel);
         System.out.println("timepoint " + model.getTimepoints().size());
@@ -441,6 +446,11 @@ public class ModelBusiness {
         SimulationObjectModelFactory.completeModel(som);
     }
 
+     public String getURLFromURI(String uri)
+     {
+            return SimulationObjectModelFactory.getURLFromURI(uri);
+     }
+     
     public SimulationObjectModel rebuildObjectModelFromTripleStore(String uri) {
         return SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri);
     }
@@ -1180,8 +1190,28 @@ public class ModelBusiness {
         SimulationObjectModelFactory.addPhysicalParametersToObjectLayer(objectLayer, physicalParameter);
     }
 
-    public String extractRaw(String name, String zipname) {
-        String rootDirectory = Server.getInstance().getDataManagerPath() + "/uploads/";
+    private String getZipPath(User user,String zipFullPath, boolean bUpload) throws DataManagerException
+    {
+        String rootDirectory = "";
+            if(bUpload)
+            {
+                rootDirectory = Server.getInstance().getDataManagerPath() + "/uploads/";
+            }
+            else
+            {
+                String remotePath = DataManagerUtil.parseBaseDir(user, zipFullPath);
+                rootDirectory = Server.getInstance().getDataManagerPath()
+                    + "/downloads" + FilenameUtils.getFullPath(remotePath);
+                System.out.println("model path " + zipFullPath);
+                System.out.println("remote path " + remotePath);
+                System.out.println("full path " + rootDirectory);
+            }
+        return rootDirectory;
+    }
+    public String extractRaw(String name, String zipname, User user, String zipFullPath, boolean bUpload) throws DataManagerException {
+        
+        String rootDirectory = getZipPath(user, zipFullPath,bUpload);
+         
         File dir = new File(rootDirectory);
         boolean bfound = false;
         System.out.println("zip :" + zipname);

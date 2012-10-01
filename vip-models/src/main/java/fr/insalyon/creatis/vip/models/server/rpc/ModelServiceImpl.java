@@ -43,6 +43,7 @@ import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.models.client.view.ModelException;
 import fr.insalyon.creatis.vip.models.server.business.ModelBusiness;
 import java.io.FileNotFoundException;
@@ -67,10 +68,18 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         modelBusiness = new ModelBusiness();
     }
 
-    public List<String> getFiles(String modelZipFile) throws ModelException {
+    public List<String> getFiles(String modelZipFile, String modelFullPath, boolean bUpload) throws ModelException {
 
         try {
-            return modelBusiness.getFiles(modelZipFile);
+            try {
+                try {
+                    return modelBusiness.getFiles(modelZipFile, getSessionUser(),modelFullPath,bUpload);
+                } catch (CoreException ex) {
+                    throw new ModelException(ex);
+                }
+            } catch (DataManagerException ex) {
+                throw new ModelException(ex);
+            }
 
         } catch (BusinessException ex) {
             throw new ModelException(ex);
@@ -281,12 +290,17 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
     }
 
-    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles, SimulationObjectModel model, String lfn, String nwName) throws ModelException {
+    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles, 
+            SimulationObjectModel model, String lfn, String nwName, String zipFullPath, boolean bUpload) throws ModelException {
       
             try {
                 trace(logger, "add files to zip");
+            try {
                 return modelBusiness.recordAddedFiles(zipName, addfiles, model,lfn,
-                        getSessionUser().getLastName(), nwName);
+                        getSessionUser(), nwName, zipFullPath, bUpload);
+            } catch (DataManagerException ex) {
+                throw new ModelException(ex);
+            }
             } catch (CoreException ex) {
                  throw new ModelException(ex);
             }
@@ -362,9 +376,17 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
     }
      
-     public String extractRaw(String name, String zipname)
+     public String extractRaw(String name, String zipname,String modelFullPath, boolean bUpload) throws ModelException 
      {
-         return modelBusiness.extractRaw(name, zipname);
+        try {
+            try {
+                return modelBusiness.extractRaw(name, zipname, getSessionUser(), modelFullPath, bUpload);
+            } catch (DataManagerException ex) {
+                throw new ModelException(ex);
+            }
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        }
      }
      
      public SimulationObjectModel setDescription(SimulationObjectModel model, String description )throws ModelException
@@ -389,16 +411,28 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
           
       }
       
-     public void checkRDFEncoding(String files) throws ModelException
-     {
+    public void checkRDFEncoding(String files, String modelFullPath, boolean bUpload) throws ModelException {
+        try {
             try {
-                modelBusiness.checkRDF(files);
-            } catch (FileNotFoundException ex) {
-                java.util.logging.Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
+                try {
+                    modelBusiness.checkRDF(files, getSessionUser(), modelFullPath, bUpload);
+                } catch (CoreException ex) {
+                    java.util.logging.Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } catch (DataManagerException ex) {
                 java.util.logging.Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
-          
-        } 
+        } catch (FileNotFoundException ex) {
+            java.util.logging.Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+     
+      public String getURLFromURI(String uri) 
+      {
+            return modelBusiness.getURLFromURI(uri);
        
+        }
 }

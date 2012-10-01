@@ -48,7 +48,7 @@ import java.util.List;
  */
 public interface ModelServiceAsync {
 
-    public void getFiles(String modelZipFile, AsyncCallback<List<String>> asyncCallback);
+    public void getFiles(String modelZipFile, String modelFullPath, boolean bUpload, AsyncCallback<List<String>> asyncCallback);
 
     public void createModel(String modelName, String user, AsyncCallback<SimulationObjectModel> asyncCallback);
 
@@ -104,18 +104,20 @@ public interface ModelServiceAsync {
       
        public void removeObject(SimulationObjectModel model, int tp, int ins, String layer, String name,AsyncCallback<SimulationObjectModel> asyncCallback);
       
-      public void recordAddedFiles(String zipName, List<String> addFiles ,SimulationObjectModel model, String lfn, String nwName, AsyncCallback<SimulationObjectModel> asyncCallback);
+      public void recordAddedFiles(String zipName, List<String> addFiles ,SimulationObjectModel model, String lfn, String nwName,String zipFullPath, boolean bUpload, AsyncCallback<SimulationObjectModel> asyncCallback);
       
       public void renameTimepoint(SimulationObjectModel model, int tp, Date start, AsyncCallback<SimulationObjectModel> asyncCallback);
       
       public void renameInstant(SimulationObjectModel model, int tp, int ins, String duration,  AsyncCallback<SimulationObjectModel> asyncCallback);
       
-      public void extractRaw(String name, String zipname, AsyncCallback< String > asyncCallback);
+      public void extractRaw(String name, String zipname, String modelFullPath, boolean bUpload, AsyncCallback< String > asyncCallback);
       
       public void setDescription(SimulationObjectModel model,  String description,  AsyncCallback<SimulationObjectModel> asyncCallback);
       
       public void addMap(SimulationObjectModel model, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0, String externalAgent, String unitOfMeasure, AsyncCallback<SimulationObjectModel> asyncCallback);
       
-      public void checkRDFEncoding(String files, AsyncCallback<SimulationObjectModel> asyncCallback);
+      public void checkRDFEncoding(String files,String modelFullPath, boolean bUpload, AsyncCallback<SimulationObjectModel> asyncCallback);
+      
+      public void getURLFromURI(String files, AsyncCallback<String> asyncCallback);
 }
 
