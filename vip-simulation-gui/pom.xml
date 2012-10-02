@@ -40,13 +40,6 @@
 
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-models</artifactId>
-            <version>${vip.models.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-application</artifactId>
             <version>${vip.application.version}</version>
             <scope>provided</scope>
@@ -63,11 +56,12 @@
             <artifactId>gwtgl-source</artifactId>
             <version>0.3</version>
         </dependency>
-<!--        <dependency>
+ 
+        <dependency>
             <groupId>fr.cnrs.i3s</groupId>
             <artifactId>NeuSemStore-simulation-objects</artifactId>
             <version>0.1.4-SNAPSHOT</version>
-        </dependency>-->
+        </dependency>
     </dependencies>
     
     <build>

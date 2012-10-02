@@ -35,9 +35,11 @@
 package fr.insalyon.creatis.vip.simulationgui.server.business;
 
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectModelFactory;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectModelQueryer;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.*;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
@@ -47,6 +49,7 @@ import fr.insalyon.creatis.vip.simulationgui.client.view.SimulationGUIException;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.apache.log4j.Logger;
@@ -171,12 +174,31 @@ public class DownloadService {
     {
          return rebuildObject(finalPath, rdfPath);
     }
+    
+    
+    public static List<SimulationObjectModelLight> listAllModels() throws BusinessException {
+
+        try {
+            return SimulationObjectModelQueryer.getAllModels();
+
+        } catch (Exception ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
+     public static SimulationObjectModel rebuildObjectModelFromTripleStore(String uri) {
+        return SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri);
+    }
+    
     private Data3D[][] rebuildObject(String path, String rdfPath) throws SimulationGUIException, Exception {
-        
+        System.out.println(path);
+         System.out.println(rdfPath);
         SimulationObjectModel inModel = SimulationObjectModelFactory.rebuildObjectModelFromAnnotationFile(rdfPath, true);
         int index = 0;
 
         Timepoint tp = inModel.getTimepoints().get(0);
+        
         Instant it = tp.getInstants().get(0);
         String[][] entry = new String[it.getObjectLayers().size()][1];
         String[] type = new String[it.getObjectLayers().size()];
@@ -198,6 +220,8 @@ public class DownloadService {
 //       
 
         //ObjectFactoryOld objFact=ObjectFactoryOld.getInstance();
+        System.out.println("ok");
         return ObjectFactory.buildMulti(path, entry, type);
+
     }
 }

@@ -34,8 +34,11 @@
  */
 package fr.insalyon.creatis.vip.simulationgui.server.rpc;
 
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIConstants;
@@ -46,6 +49,7 @@ import fr.insalyon.creatis.vip.simulationgui.client.view.SimulationGUIException;
 import fr.insalyon.creatis.vip.simulationgui.server.business.DownloadService;
 import fr.insalyon.creatis.vip.simulationgui.server.business.ObjectFactory;
 import java.util.ArrayList;
+import java.util.List;
 import org.apache.log4j.Logger;
 
 /**
@@ -184,5 +188,13 @@ public class VTKControllerImpl extends AbstractRemoteServiceServlet implements V
                 throw new SimulationGUIException(ex);
             }
         }
+    }
+    
+     public List<SimulationObjectModelLight> listAllModels() throws Exception{
+             return DownloadService.listAllModels();
+    }
+     
+     public SimulationObjectModel rebuildObjectModelFromTripleStore(String uri) {
+        return DownloadService.rebuildObjectModelFromTripleStore(uri);
     }
 }

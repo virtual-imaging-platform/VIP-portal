@@ -55,8 +55,6 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
-import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
-import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIConstants;
 import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3D;
 import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3Dij;
@@ -64,6 +62,7 @@ import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.ObjectModel;
 import fr.insalyon.creatis.vip.simulationgui.client.rpc.VTKController;
 import fr.insalyon.creatis.vip.simulationgui.client.rpc.VTKControllerAsync;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,16 +72,15 @@ import java.util.Map;
  */
 public class SimulationGUITab extends Tab {
 
-    private final ToolStrip toolStrip;
-    private final DefineSceneSection defineSceneSection;
+    private ToolStrip toolStrip;
+    private DefineSceneSection defineSceneSection;
     // private final DefineParamsSection defineParamsSection;
     private VTKControllerAsync VTK = VTKController.Util.getInstance();
-    private ModelServiceAsync MAP = ModelService.Util.getInstance();
-    private ModalWindow modal;
+    private ModalWindow modal = null;
     private String dynaStringTab[];
     private SelectItem modelSelectItem = new SelectItem("model");
-    private Map<String, String> mapNameUri = new HashMap<String, String>();
-    private String uri;
+    private LinkedHashMap<String, String> mapNameUri = new LinkedHashMap<String, String>();
+    private String uri ="";
     private ToolStripButton exampleButton = new ToolStripButton("Load example");
     static private String modelStorageURL = "";
     //dans le constructeur, creer les 4 tabs. Les ajouter/enlever du Layout en fonction des cases cochees
@@ -92,7 +90,23 @@ public class SimulationGUITab extends Tab {
 
     public SimulationGUITab() {
 
-        this.setTitle(Canvas.imgHTML(SimulationGUIConstants.ICON_EDITOR) + " "
+        init();
+        
+    }
+    
+    public SimulationGUITab(String i_uri, List<String> modalities)
+    {
+        init();
+        SC.say(i_uri);
+        modelSelectItem.setValue(i_uri);
+//        for (String mod: modalities)
+//            defineSceneSection.enableBox(mod);
+    }
+
+    
+    private void init()
+    {
+          this.setTitle(Canvas.imgHTML(SimulationGUIConstants.ICON_EDITOR) + " "
                 + SimulationGUIConstants.APP_EDITOR);
         this.setID(SimulationGUIConstants.TAB_EDITOR);
         this.setCanClose(true);
@@ -123,8 +137,8 @@ public class SimulationGUITab extends Tab {
         this.setPane(vLayout);
         initControl();
         initRPC();
+        
     }
-
     private void initRPC() {
         
         modal.show("Loading list of model from grid", true);
@@ -154,7 +168,7 @@ public class SimulationGUITab extends Tab {
             }
         });
         
-        MAP.listAllModels(new AsyncCallback<List<SimulationObjectModelLight>>() {
+        VTK.listAllModels(new AsyncCallback<List<SimulationObjectModelLight>>() {
 
             public void onSuccess(List<SimulationObjectModelLight> result) {
                 modal.hide();
@@ -162,10 +176,11 @@ public class SimulationGUITab extends Tab {
                 int i = 0;
                 for (SimulationObjectModelLight s : result) {
                     dynaStringTab[i] = s.getModelName();
-                    mapNameUri.put(s.getModelName(), s.getURI());
+                    //mapNameUri.put(s.getModelName(), s.getURI());
+                    mapNameUri.put( s.getURI(), s.getModelName());
                     i++;
                 }
-                modelSelectItem.setValueMap(dynaStringTab);
+                modelSelectItem.setValueMap(mapNameUri);
                 toolStrip.setHeight(10);
             }
 
@@ -180,9 +195,10 @@ public class SimulationGUITab extends Tab {
 
             public void onChange(ChangeEvent event) {
                 String selectedItem = (String) event.getValue();
+                // To modify
                 uri = mapNameUri.get(selectedItem);
                 defineSceneSection.showModal("Object downloading");
-                MAP.rebuildObjectModelFromTripleStore(uri, new AsyncCallback<SimulationObjectModel>() {
+                VTK.rebuildObjectModelFromTripleStore(uri, new AsyncCallback<SimulationObjectModel>() {
 
                     public void onSuccess(final SimulationObjectModel result) {
                         modelStorageURL = result.getStorageURL();

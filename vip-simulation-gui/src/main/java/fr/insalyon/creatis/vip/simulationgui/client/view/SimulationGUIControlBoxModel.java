@@ -424,6 +424,7 @@ public class SimulationGUIControlBoxModel extends Portlet {
         elementTree.setParentIdField("ReportsTo");
         elementTree.setOpenProperty("isOpen");
         elementTree.setData(elementData);
+        
 
 
         elementTreeGrid = new TreeGrid();

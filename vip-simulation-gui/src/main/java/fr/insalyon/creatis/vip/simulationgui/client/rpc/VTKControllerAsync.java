@@ -35,8 +35,11 @@
 package fr.insalyon.creatis.vip.simulationgui.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
 import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3D;
 import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3Dij;
+import java.util.List;
 
 /**
  *
@@ -53,4 +56,8 @@ public interface VTKControllerAsync {
     public void UnzipModel(String url, AsyncCallback<int[][]> callback);
     
     public void downloadModel(int i, int j, AsyncCallback<Data3Dij> callback);
+    
+     public void listAllModels( AsyncCallback<List<SimulationObjectModelLight>> callback);
+     
+     public void rebuildObjectModelFromTripleStore(String uri, AsyncCallback<SimulationObjectModel> callback);
 }

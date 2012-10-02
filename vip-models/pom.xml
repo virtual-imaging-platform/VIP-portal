@@ -40,6 +40,14 @@
             <version>${vip.application.version}</version>
             <scope>provided</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-simulation-gui</artifactId>
+            <version>${vip.simulation-gui.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
         <dependency>
             <groupId>fr.cnrs.i3s</groupId>
             <artifactId>NeuSemStore-simulation-objects</artifactId>

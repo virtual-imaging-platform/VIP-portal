@@ -38,9 +38,12 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
 import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3D;
 import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3Dij;
 import fr.insalyon.creatis.vip.simulationgui.client.view.SimulationGUIException;
+import java.util.List;
 
 /**
  *
@@ -71,4 +74,8 @@ public interface VTKController extends RemoteService {
     public int[][] UnzipModel(String url) throws Exception;
     
     public Data3Dij downloadModel(int i, int j) throws Exception;
+    
+     public List<SimulationObjectModelLight> listAllModels() throws Exception;
+     
+     public SimulationObjectModel rebuildObjectModelFromTripleStore(String uri);
 }

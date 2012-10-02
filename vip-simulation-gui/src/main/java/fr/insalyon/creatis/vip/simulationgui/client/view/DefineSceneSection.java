@@ -427,6 +427,20 @@ public class DefineSceneSection extends SectionStackSection {
         
         modal.show(contents, true);
     }
+    
+    public void enableBox(String box) {
+        if (box == "MRI") {
+            checkBoxMri.disable();
+        } else if (box == "PET") {
+            checkBoxPet.disable();
+        } else if (box == "CT") {
+            checkBoxCt.disable();
+        } else if (box == "US") {
+            checkBoxUs.disable();
+        } else {
+        }
+
+    }
     /* 
     private BufferedImage canvasToImage(Canvas cnvs) {
     int w = cnvs.getWidth();

@@ -4,15 +4,13 @@
 
     <inherits name='fr.insalyon.creatis.vip.core.Core'/>
     <inherits name='fr.insalyon.creatis.vip.datamanager.DataManager'/>    
-    <inherits name='fr.insalyon.creatis.vip.models.Models'/>
     <inherits name='fr.insalyon.creatis.vip.application.Application'/>
-    
+    <inherits name="fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjects" />
     <inherits name='com.googlecode.gwtgl.binding'/>
     <inherits name="fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjects" />
    
     <!-- Servlets -->
     <servlet  class="fr.insalyon.creatis.vip.simulationgui.server.rpc.VTKControllerImpl" path="/vtkcontroller"/>
-    <servlet class="fr.insalyon.creatis.vip.models.server.rpc.ModelServiceImpl" path="/modelservice"/>
     <servlet class="fr.insalyon.creatis.vip.application.server.rpc.WorkflowServiceImpl" path="/workflowservice"/>
     <servlet class="fr.insalyon.creatis.vip.application.server.rpc.JobServiceImpl" path="/jobservice"/>
     

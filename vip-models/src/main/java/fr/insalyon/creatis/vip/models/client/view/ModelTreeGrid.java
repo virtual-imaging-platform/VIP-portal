@@ -51,17 +51,14 @@ import com.smartgwt.client.widgets.events.DropHandler;
 import com.smartgwt.client.widgets.form.fields.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.RecordClickEvent;
-import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
-import com.smartgwt.client.widgets.grid.events.SelectionEvent;
+import com.smartgwt.client.widgets.grid.events.*;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
-//import com.smartgwt.client.widgets.toolbar.ToolStrip;
-//import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+
 import com.smartgwt.client.widgets.tree.events.*;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.*;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.PhysicalParametersLayer.PhysicalParameterType;
@@ -113,6 +110,8 @@ public class ModelTreeGrid extends TreeGrid {
 
     private  MenuItem modelNameItem = null;
     private TreeGridField tfg = null;
+    private Menu tfgMenu = null;
+    private int iWidth = 100;
 
     public ModelTreeGrid(final SimulationObjectModel model, boolean bFull) {
         super();
@@ -160,10 +159,25 @@ public class ModelTreeGrid extends TreeGrid {
         modelNameItem.setIcon(CoreConstants.ICON_EDIT);
         tfg.setCanSort(false);
      
-        Menu tfgMenu = new Menu();
+        tfgMenu = new Menu();
         tfgMenu.setItemChecked(modelNameItem);
+        
         //tfg.setContextMenu(tfgMenu);
-
+   
+        tfgMenu.addHeaderClickHandler( new HeaderClickHandler () {
+         public void onHeaderClick(HeaderClickEvent event)
+            {
+                     logger.log(Level.SEVERE, "EVVVVENTTTT    " + event.toString());
+            }
+        });
+        
+       tfgMenu.addHeaderDoubleClickHandler(new HeaderDoubleClickHandler() {
+            public void onHeaderDoubleClick(HeaderDoubleClickEvent event)
+            {
+                    // logger.log(Level.SEVERE, "EVVVVENTTTT    " + event.toString());
+            }
+         });
+       
         tfg.setCellFormatter(new CellFormatter() {
 
             public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
@@ -304,19 +318,16 @@ public class ModelTreeGrid extends TreeGrid {
            return nwName;
        }
        
-       public void setModelName(String name)
-       {    
-           nwName = name;
-           tfg.setPrompt("model name changed. You need to commit to record the modification.");
-            tfg.setTitle(nwName);
-            
-            tfg.fireEvent(new DoubleClickEvent(this.getJsObj()));
-            //tfg.fireEvent(new ItemClickEvent());
-            bmodif = true;
-           logger.log(Level.SEVERE,"NAME : " + nwName);
-         
-           redraw();
-         }
+    public void setModelName(String name) {
+        nwName = name;
+        tfg.setPrompt("model name changed. You need to commit to record the modification.");
+        tfg.setTitle(nwName);
+        // tricks to display new name. Firevent seems not to work.
+        bmodif = true;
+        --iWidth;
+        this.setWidth(String.valueOf(iWidth) + "%");
+        redraw();
+    }
 
     public void setObjName(String name) {
         objName = name;
@@ -561,7 +572,9 @@ public class ModelTreeGrid extends TreeGrid {
                 bmodif = true;
                 model = result;
                 checkModality();
-                ModelTreeNode timepoint = new ModelTreeNode("", "Timepoint (" + new Date(System.currentTimeMillis()) + ")", true, ntp++, null);
+                ModelTreeNode instant = new ModelTreeNode("", "Instant (1000 )", true, 0, null);
+                 instant.setIcon(ModelConstants.APP_IMG_INSTANT);
+                ModelTreeNode timepoint = new ModelTreeNode("", "Timepoint (" + new Date(System.currentTimeMillis()) + ")", true, ntp++, instant);
                 timepoint.setIcon(ModelConstants.APP_IMG_TIMEPOINT);
                 modelTree.add(timepoint, modelTree.getRoot());
 
