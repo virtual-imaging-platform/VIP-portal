@@ -56,7 +56,6 @@
             <artifactId>gwtgl-source</artifactId>
             <version>0.3</version>
         </dependency>
- 
         <dependency>
             <groupId>fr.cnrs.i3s</groupId>
             <artifactId>NeuSemStore-simulation-objects</artifactId>

@@ -188,6 +188,7 @@ public class DownloadService {
     }
 
      public static SimulationObjectModel rebuildObjectModelFromTripleStore(String uri) {
+         System.out.println("rebuild from triplestore " + uri);
         return SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri);
     }
     

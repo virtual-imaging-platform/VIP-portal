@@ -82,14 +82,21 @@ public class ObjectFactory {
             i++;
         }
         i = 0;
+        System.out.println("got object List");
         for (String[] st : objectList) {
             ArrayList<Data3D> temp = new ArrayList<Data3D>();
             for (String st1d : st) {
-                String tmp = st1d.replace("[", "").replace("]", "");
-                if (tmp.endsWith(".zraw") || tmp.endsWith(".raw") || tmp.endsWith(".mhd")) {
-                    StringTokenizer st1dTokenize = new StringTokenizer(tmp);
-                    temp.add(addMHD(path, st1dTokenize.nextToken(","), type[i]));
-                    bbound[i] = true;
+                st1d = st1d.replace("[", "").replace("]", "");
+                String[] std = st1d.split("file://", -1);
+                if(std.length >2)
+                {
+                    String tmp = std[2].replace(",", "");
+                        System.out.println(tmp);
+                    if (tmp.endsWith(".zraw") || tmp.endsWith(".raw") || tmp.endsWith(".mhd")) {
+                        StringTokenizer st1dTokenize = new StringTokenizer(tmp);
+                        temp.add(addMHD(path, st1dTokenize.nextToken(","), type[i]));
+                        bbound[i] = true;
+                    }
                 }
             }
             
@@ -115,11 +122,12 @@ public class ObjectFactory {
             i++;
         }
         i = 0;
+        System.out.println("bounding box done");
         for (String[] st2 : objectList) {
             j = 1;
             
             for (String st2d : st2) {
-                String tmp = st2d.replace("[", "").replace("]", "");
+                String tmp = st2d.replace("[", "").replace("]", "").replace("file://","");
                 if (tmp.endsWith(".vtp") || tmp.endsWith(".vtk")) {
                     System.out.println("object" + i + " " + j + " created");
                     objectTab[i][j] = addVTP(path, tmp, type[i], objectTab[i][0].getBoundingBox(), bbound[i]);
@@ -211,12 +219,12 @@ public class ObjectFactory {
         float xgravit = 0;
         float ygravit = 0;
         float zgravit = 0;
-         
+
         Data3D object = new Data3D(name);
         object.setType(type);
 
         VTKEmulator DATA = new VTKEmulator(path + "/" + name);
-        
+        System.out.println(path + " " + name + " " +type + " ");
         if (!DATA.getThereIsAnError()) {
             // if a mhd image is associated, we take the corresponding bounds
             //System.out.println(i + " x:" + vertex[i]+" y:"+ vertex[i + 1]+ " z:"+vertex[i + 2]);

@@ -98,7 +98,10 @@ public class SimulationGUITab extends Tab {
     {
         init();
         SC.say(i_uri);
+
         modelSelectItem.setValue(i_uri);
+        loadModel(i_uri);
+
 //        for (String mod: modalities)
 //            defineSceneSection.enableBox(mod);
     }
@@ -195,9 +198,19 @@ public class SimulationGUITab extends Tab {
 
             public void onChange(ChangeEvent event) {
                 String selectedItem = (String) event.getValue();
-                // To modify
-                uri = mapNameUri.get(selectedItem);
-                defineSceneSection.showModal("Object downloading");
+                //uri = mapNameUri.get(selectedItem);
+                loadModel(selectedItem);
+            }
+        });
+    }
+
+    /**
+     * Hover
+     */
+    
+    private void loadModel(String uri)
+    {
+         defineSceneSection.showModal("Object downloading");
                 VTK.rebuildObjectModelFromTripleStore(uri, new AsyncCallback<SimulationObjectModel>() {
 
                     public void onSuccess(final SimulationObjectModel result) {
@@ -271,17 +284,11 @@ public class SimulationGUITab extends Tab {
 
                     public void onFailure(Throwable caught) {
                         defineSceneSection.hideModal();
-                        SC.say("url error");
+                       // SC.say("url error");
                         modelSelectItem.setValue("Grid error");
                     }
                 });
-            }
-        });
     }
-
-    /**
-     * Hover
-     */
     private void initControl() {
         
         exampleButton.setCanHover(Boolean.TRUE);
