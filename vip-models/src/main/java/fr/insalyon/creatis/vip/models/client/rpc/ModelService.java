@@ -137,5 +137,7 @@ public interface ModelService extends RemoteService {
     public void checkRDFEncoding(String files, String modelFullPath, boolean bUpload)throws ModelException;
     
     public String getURLFromURI(String uri);
+    
+    public String readLicense(String file) throws ModelException;
 
 }

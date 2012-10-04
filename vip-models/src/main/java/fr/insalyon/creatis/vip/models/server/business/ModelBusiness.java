@@ -282,11 +282,19 @@ public class ModelBusiness {
     
     public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles, SimulationObjectModel model, String lfn, User user, String nwName,String zipFullPath, boolean bUpload) throws IOException, DataManagerException {
 
+         String modelname = "";
+        if (zipName == null) // to avoid crash for archive without rdf file
+        {
+            zipName = model.getModelName() + ".rdf";
+            modelname = zipName;
+        }
         List<File> files = new ArrayList<File>();
         String rootDirectory = getZipPath(user, zipFullPath, bUpload);
         File zipFile = new File(rootDirectory + zipName);
         if (zipFile.exists())
                     System.out.println("zipname :" + zipFile);
+        else
+            zipFile.createNewFile();
         File zipdir = new File(rootDirectory + "/zip/");
         if (!zipdir.exists()) {
             zipdir.mkdirs();
@@ -296,7 +304,7 @@ public class ModelBusiness {
         copyFile(rootDirectory + zipName, zipdir + zipName);
 
         byte[] buf = new byte[1024];
-        String modelname = "";
+       
         ZipInputStream zin = new ZipInputStream(new FileInputStream(zipdir + zipName));
 
 
@@ -340,19 +348,24 @@ public class ModelBusiness {
         {
             //model.setModelName(nwName);
             SimulationObjectModelFactory.setName(model, nwName);
-            
             System.out.println("new name:" + nwName);
         }
         model.setModelOwner(user.getLastName());
         //model.setModelDescription(model.getModelName());
         //modelCopy(model, nwmodel);
         System.out.println("timepoint " + model.getTimepoints().size());
-//        System.out.println("nwtimepoint " + nwmodel.getTimepoints().size());
-//        System.out.println("tp 0 nwinstant " + nwmodel.getTimepoint(0).getInstants().size());
-//        System.out.println("to write in" + zipdir  + "/"+  modelname);
-        File f = new File(zipdir  + "/"+ modelname);
-        if (f.exists())
-            f.delete();
+
+        if(modelname.isEmpty())
+        {
+            modelname = model.getModelName() + ".rdf";
+            files.add(new File(zipdir  + "/"+ modelname ));
+        }
+        else
+        {
+            File f = new File(zipdir  + "/"+ modelname);
+            if (f.exists())
+                f.delete();
+        }
         model.setStorageURL(lfn);
         SimulationObjectModelFactory.setStorageURL(model, lfn);
         SimulationObjectModelFactory.inferModelSemanticAxes(model);
@@ -360,7 +373,7 @@ public class ModelBusiness {
         SimulationObjectModelFactory.dumpInFileModel(model,zipdir + "//"+ modelname);
         SimulationObjectModelFactory.completeModel(model);
         System.out.println("URI: " + model.getURI());
-        //System.out.println("URL : " + nwmodel.getURI());
+
         File fz = new File(rootDirectory + "zip//" + zipName);
         if (fz.exists())
             fz.delete();
@@ -1299,5 +1312,22 @@ public class ModelBusiness {
             }
         }
         return result;
+    }
+    
+    public String readLicense(String file) throws FileNotFoundException, IOException {
+        String license = "";
+
+        File f = new File(file);
+        InputStream ips = new FileInputStream(file);
+        InputStreamReader ipsr = new InputStreamReader(ips);
+        BufferedReader br = new BufferedReader(ipsr);
+        String tp;
+        while ((tp = br.readLine()) != null) {
+            license += tp;
+        }
+        br.close();
+        ips.close();
+
+        return license;
     }
 }

@@ -201,7 +201,7 @@ public class ModelDisplay extends VLayout {
         modelTreeGrid = new ModelTreeGrid(model, true);
         toolStrip = (ToolStrip) modelTreeGrid.getToolStrip();
         addMember(toolStrip);
-        // modelTreeGrid.setZipFile(zipFile);
+
         addMember(modelTreeGrid);
         modelTreeGrid.setParentElement(this);
        //modelTreeGrid.checkModality();
@@ -209,7 +209,7 @@ public class ModelDisplay extends VLayout {
 
     public void createTreeGrid() {
         modelTreeGrid = new ModelTreeGrid(model, false);
-        // modelTreeGrid.setZipFile(zipFile);
+
         addMember(modelTreeGrid);
         modelTreeGrid.setParentElement(this);
         addTimePoint(new Date(System.currentTimeMillis()));
@@ -222,6 +222,10 @@ public class ModelDisplay extends VLayout {
     }
 
     public void enableCommit() {
+//        ModelLicenseWindow mlw = new ModelLicenseWindow( "");
+//        mlw.show();
+//        mlw.getLicense();
+        
         upload = new ToolStripButton("Commit model");
         upload.setIcon(DataManagerConstants.ICON_UPLOAD);
         upload.addClickHandler(new ClickHandler() {
@@ -229,10 +233,10 @@ public class ModelDisplay extends VLayout {
             public void onClick(ClickEvent event) {
 
                 model = modelTreeGrid.getModel();
-                if (zipFile == null) {
-                    SC.warn("No zip file");//TODO: build it
-                    return;
-                }
+//                if (zipFile == null) {
+//                    SC.warn("No zip file");//TODO: build it
+//                    return;
+//                }
 
                 if (model == null) {
                     SC.warn("No simulation object model to commit.");

@@ -119,5 +119,7 @@ public interface ModelServiceAsync {
       public void checkRDFEncoding(String files,String modelFullPath, boolean bUpload, AsyncCallback<SimulationObjectModel> asyncCallback);
       
       public void getURLFromURI(String files, AsyncCallback<String> asyncCallback);
+      
+      public void readLicense(String file, AsyncCallback<String> asyncCallback);
 }
 

@@ -309,7 +309,6 @@ class ModelImportTab extends Tab {
         modelDisplay = new ModelDisplay(result, true);
         modelDisplay.setZipFile(zipFile, zipFullPath, mbUpload);
         modelDisplay.enableCommit();
-        //    modelCreate = new ModelCreateTab(result);
         hl.addMember(modelDisplay);
 
     }
@@ -333,6 +332,7 @@ class ModelImportTab extends Tab {
 
     public void setCreateObjectModel(SimulationObjectModel result) {
         modelDisplay = new ModelDisplay(result, true);
+         modelDisplay.setZipFile(zipFile, zipFullPath, mbUpload);
         hl.addMember(modelDisplay);
         modelDisplay.enableCommit();
     }

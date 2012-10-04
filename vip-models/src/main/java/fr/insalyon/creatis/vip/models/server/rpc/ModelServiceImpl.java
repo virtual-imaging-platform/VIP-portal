@@ -434,5 +434,19 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
       {
             return modelBusiness.getURLFromURI(uri);
        
-        }
+      }
+      
+      public String readLicense (String file) throws ModelException
+      {
+            try {
+                return modelBusiness.readLicense(file);
+            } catch (FileNotFoundException ex) {
+                throw new ModelException(ex);
+            } catch (IOException ex) {
+                throw new ModelException(ex);
+            }
+          
+          
+      }
+      
 }
