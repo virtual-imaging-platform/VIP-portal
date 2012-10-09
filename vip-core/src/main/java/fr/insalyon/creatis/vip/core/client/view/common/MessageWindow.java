@@ -56,13 +56,16 @@ public class MessageWindow {
 
     private HLayout panel;
     private Label messageLabel;
+    private Canvas canvas;
 
     public MessageWindow(final Canvas canvas) {
 
+        this.canvas = canvas;
+        
         panel = new HLayout();
         panel.hide();
 
-        panel.setOpacity(85);
+        panel.setOpacity(75);
         panel.setBackgroundColor("#FFFFFF");
         panel.setBorder("1px solid #CCCCCC");
         panel.setUseOpacityFilter(true);
@@ -94,31 +97,47 @@ public class MessageWindow {
         return (canvas.getVisibleWidth() / 2) - (panel.getWidth() / 2);
     }
     
+    /**
+     * Removes all components from the panel.
+     */
     private void clear() {
 
-        for (Canvas canvas : panel.getMembers()) {
-            panel.removeMember(canvas);
-            canvas.destroy();
+        for (Canvas c : panel.getMembers()) {
+            panel.removeMember(c);
+            c.destroy();
         }
     }
 
-    private void createLabel(String message) {
+    /**
+     * Creates a label and adds it to the message panel.
+     * 
+     * @param title Label title
+     * @param icon Label icon
+     */
+    private void createLabel(String title, String icon) {
 
         messageLabel = new Label();
         messageLabel.setWrap(false);
         messageLabel.setWidth(1);
         messageLabel.setHeight(1);
-        messageLabel.setContents(message);
+        messageLabel.setContents(title);
+        messageLabel.setIcon(icon);
         messageLabel.addDrawHandler(new DrawHandler() {
             @Override
             public void onDraw(DrawEvent event) {
                 messageLabel.setWidth(messageLabel.getVisibleWidth());
                 messageLabel.setMargin(5);
+                panel.setWidth(messageLabel.getWidth());
+                panel.setHeight(messageLabel.getHeight());
+                panel.moveTo(getPanelXPosition(canvas), 2);
             }
         });
         panel.addMember(messageLabel);
     }
 
+    /**
+     * Creates a close image button to close the panel.
+     */
     private void createCloseImg() {
 
         Img closeImg = new Img(CoreConstants.ICON_CLOSE, 16, 16);
@@ -129,7 +148,6 @@ public class MessageWindow {
             @Override
             public void onClick(ClickEvent event) {
                 panel.animateFade(0);
-//                panel.hide();
             }
         });
         panel.addMember(closeImg);
@@ -140,19 +158,19 @@ public class MessageWindow {
      * 
      * @param message Message to be displayed
      * @param bgColor Background color in hexadecimal
+     * @param icon Message icon
      * @param delay Time in seconds the panel will appear
      */
-    public void setMessage(String message, String bgColor, int delay) {
+    public void setMessage(String message, String bgColor, String icon, int delay) {
 
         clear();
-        createLabel(message);
+        createLabel(message, icon);
         createCloseImg();
         if (delay > 0) {
             new Timer() {
                 @Override
                 public void run() {
                     panel.animateFade(0);
-//                    panel.hide();
                 }
             }.schedule(delay * 1000);
         }

@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -37,7 +37,6 @@ package fr.insalyon.creatis.vip.core.client.view.auth;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -51,18 +50,16 @@ import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class RecoveryTab extends Tab {
 
-    private ModalWindow modal;
     private VLayout vLayout;
     private VLayout recoverLayout;
     private TextItem emailField;
@@ -86,8 +83,6 @@ public class RecoveryTab extends Tab {
         vLayout.setOverflow(Overflow.AUTO);
         vLayout.setDefaultLayoutAlign(Alignment.CENTER);
 
-        modal = new ModalWindow(vLayout);
-
         configureRecoveryLayout();
         configureNewForm();
         vLayout.addMember(recoverLayout);
@@ -100,7 +95,6 @@ public class RecoveryTab extends Tab {
 
         emailField = FieldUtil.getTextItem(300, false, "", "[a-zA-Z0-9_.\\-+@]");
         emailField.addKeyPressHandler(new KeyPressHandler() {
-
             @Override
             public void onKeyPress(KeyPressEvent event) {
                 if (event.getKeyName().equals("Enter")) {
@@ -111,7 +105,6 @@ public class RecoveryTab extends Tab {
 
         continueButton = new IButton("Continue");
         continueButton.addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 sendResetCode();
@@ -129,7 +122,6 @@ public class RecoveryTab extends Tab {
 
         newForm = FieldUtil.getForm(FieldUtil.getLinkItem("link_code", "Have a reset code already?",
                 new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-
                     @Override
                     public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
                         configureResetLayout(null);
@@ -145,22 +137,20 @@ public class RecoveryTab extends Tab {
 
             ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
             final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
                 @Override
                 public void onFailure(Throwable caught) {
-                    modal.hide();
-                    SC.warn("Unable to send reset code:<br />" + caught.getMessage());
+                    WidgetUtil.resetIButton(continueButton, "Continue", null);
+                    Layout.getInstance().setWarningMessage("Unable to send reset code:<br />" + caught.getMessage(), 10);
                 }
 
                 @Override
                 public void onSuccess(Void result) {
                     configureResetLayout(email);
-                    modal.hide();
-                    SC.say("A reset code was sent to '" + email + "'. "
-                            + "Please use this code to reset the password.");
+                    Layout.getInstance().setNoticeMessage("A reset code was sent to '" + email + "'.<br />"
+                            + "Please use this code to reset the password.", 15);
                 }
             };
-            modal.show("Sending code...", true);
+            WidgetUtil.setLoadingButton(continueButton, "Sending code...");
             service.sendResetCode(email, callback);
         }
     }
@@ -176,46 +166,39 @@ public class RecoveryTab extends Tab {
         }
 
         codeField = FieldUtil.getTextItem(300, false, "", "[a-zA-Z0-9\\-]");
+        codeField.addKeyPressHandler(new KeyPressHandler() {
+            @Override
+            public void onKeyPress(KeyPressEvent event) {
+                if (event.getKeyName().equals("Enter")) {
+                    resetPassword();
+                }
+            }
+        });
 
         passwordField = FieldUtil.getPasswordItem(150, 32);
+        passwordField.addKeyPressHandler(new KeyPressHandler() {
+            @Override
+            public void onKeyPress(KeyPressEvent event) {
+                if (event.getKeyName().equals("Enter")) {
+                    resetPassword();
+                }
+            }
+        });
         confirmPasswordField = FieldUtil.getPasswordItem(150, 32);
+        confirmPasswordField.addKeyPressHandler(new KeyPressHandler() {
+            @Override
+            public void onKeyPress(KeyPressEvent event) {
+                if (event.getKeyName().equals("Enter")) {
+                    resetPassword();
+                }
+            }
+        });
 
         resetButton = new IButton("Reset Password");
         resetButton.addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
-
-                if (emailField.validate() & codeField.validate()
-                        & passwordField.validate() & confirmPasswordField.validate()) {
-
-                    if (!passwordField.getValueAsString().equals(confirmPasswordField.getValueAsString())) {
-                        SC.warn("Passwords do not match. Please verify the entered password.");
-                        passwordField.focusInItem();
-                        return;
-                    }
-
-                    final String email = emailField.getValueAsString().trim();
-
-                    ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-                    final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-                        @Override
-                        public void onFailure(Throwable caught) {
-                            modal.hide();
-                            SC.warn("Unable to reset password:<br />" + caught.getMessage());
-                        }
-
-                        @Override
-                        public void onSuccess(Void result) {
-                            modal.hide();
-                            Layout.getInstance().removeTab(CoreConstants.TAB_RECOVERY);
-                            SC.say("Your password was successfully reseted.");
-                        }
-                    };
-                    service.resetPassword(email, codeField.getValueAsString().trim(),
-                            passwordField.getValueAsString(), callback);
-                }
+                resetPassword();
             }
         });
 
@@ -227,5 +210,41 @@ public class RecoveryTab extends Tab {
         recoverLayout.addMember(resetButton);
 
         vLayout.addMember(recoverLayout);
+    }
+
+    /**
+     * Resets user's password.
+     */
+    private void resetPassword() {
+
+        if (emailField.validate() & codeField.validate()
+                & passwordField.validate() & confirmPasswordField.validate()) {
+
+            if (!passwordField.getValueAsString().equals(confirmPasswordField.getValueAsString())) {
+                Layout.getInstance().setWarningMessage("<b>Passwords</b> do not match. Please verify the entered password.", 10);
+                passwordField.focusInItem();
+                return;
+            }
+
+            final String email = emailField.getValueAsString().trim();
+
+            ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+            final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                    WidgetUtil.resetIButton(resetButton, "Reset Password", null);
+                    Layout.getInstance().setWarningMessage("Unable to reset password:<br />" + caught.getMessage(), 10);
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                    Layout.getInstance().removeTab(CoreConstants.TAB_RECOVERY);
+                    Layout.getInstance().setNoticeMessage("Your password was successfully reseted.", 15);
+                }
+            };
+            WidgetUtil.setLoadingButton(resetButton, "Reseting password...");
+            service.resetPassword(email, codeField.getValueAsString().trim(),
+                    passwordField.getValueAsString(), callback);
+        }
     }
 }

@@ -215,7 +215,7 @@ public class Layout {
      * @param delay
      */
     public void setMessage(String message, int delay) {
-        messageWindow.setMessage(message, "#FFFFFF", delay);
+        messageWindow.setMessage(message, "#FFFFFF", null, delay);
     }
 
     /**
@@ -225,7 +225,7 @@ public class Layout {
      */
     public void setNoticeMessage(String message, int delay) {
 
-        messageWindow.setMessage(message, "#99CC99", delay);
+        messageWindow.setMessage(message, "#B3CC99", CoreConstants.ICON_SUCCESS, delay);
     }
 
     /**
@@ -235,6 +235,6 @@ public class Layout {
      */
     public void setWarningMessage(String message, int delay) {
 
-        messageWindow.setMessage(message, "#DD8888", delay);
+        messageWindow.setMessage(message, "#F79191", CoreConstants.ICON_WARNING, delay);
     }
 }

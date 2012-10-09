@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -46,7 +46,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class UserMenuButton extends ToolStripMenuButton {
 
@@ -65,6 +65,7 @@ public class UserMenuButton extends ToolStripMenuButton {
         upgradeItem.setIcon(CoreConstants.ICON_USER_INFO);
         upgradeItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 new UpgradeLevelLayout(200, 25).show();
             }
@@ -75,9 +76,9 @@ public class UserMenuButton extends ToolStripMenuButton {
         accountItem.setIcon(CoreConstants.ICON_ACCOUNT);
         accountItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
-//                Layout.getInstance().addTab(new AccountTab());
-                Layout.getInstance().setMessage("Account Settings Message", 5000);
+                Layout.getInstance().addTab(new AccountTab());
             }
         });
 
@@ -86,6 +87,7 @@ public class UserMenuButton extends ToolStripMenuButton {
         signoutItem.setIcon(CoreConstants.ICON_SIGNOUT);
         signoutItem.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 Layout.getInstance().signout();
             }

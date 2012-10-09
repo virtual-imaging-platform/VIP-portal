@@ -102,6 +102,7 @@ public class CoreConstants {
     public static final String ICON_DELETE = IMG_FOLDER + "icon-delete.png";
     public static final String ICON_EDIT = IMG_FOLDER + "icon-edit.png";
     public static final String ICON_EXAMPLE = IMG_FOLDER + "icon-example.png";
+    public static final String ICON_GROUP = IMG_FOLDER + "system/icon-group.png";
     public static final String ICON_HELP = IMG_FOLDER + "icon-help.png";
     public static final String ICON_HOME = IMG_FOLDER + "icon-home.png";
     public static final String ICON_INFORMATION = IMG_FOLDER + "icon-information.png";
@@ -114,11 +115,12 @@ public class CoreConstants {
     public static final String ICON_SAVE = IMG_FOLDER + "icon-save.png";
     public static final String ICON_SAVED = IMG_FOLDER + "icon-saved.png";
     public static final String ICON_SIGNOUT = IMG_FOLDER + "icon-signout.png";
+    public static final String ICON_SUCCESS = IMG_FOLDER + "icon-success.png";
     public static final String ICON_SYSTEM = IMG_FOLDER + "system/icon-system.png";
     public static final String ICON_TIP = IMG_FOLDER + "icon-tip.png";
     public static final String ICON_USER = IMG_FOLDER + "system/icon-user.png";
     public static final String ICON_USER_INFO = IMG_FOLDER + "system/icon-user-info.png";
-    public static final String ICON_GROUP = IMG_FOLDER + "system/icon-group.png";
+    public static final String ICON_WARNING = IMG_FOLDER + "icon-warning.png";
     public static final String ICON_WORLD = IMG_FOLDER + "flags/_world.png";
     // Folders
     public static final String FOLDER_TRASH = "Trash";

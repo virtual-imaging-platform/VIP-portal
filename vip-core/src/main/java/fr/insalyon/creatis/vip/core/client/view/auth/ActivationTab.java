@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -37,13 +37,14 @@ package fr.insalyon.creatis.vip.core.client.view.auth;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.LinkItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
+import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -57,7 +58,7 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ActivationTab extends Tab {
 
@@ -96,37 +97,20 @@ public class ActivationTab extends Tab {
         validateLayout = WidgetUtil.getVIPLayout(300, 120);
 
         codeField = FieldUtil.getTextItem(280, false, "", "[a-zA-Z0-9\\-]");
+        codeField.addKeyPressHandler(new KeyPressHandler() {
+            @Override
+            public void onKeyPress(KeyPressEvent event) {
+                if (event.getKeyName().equals("Enter")) {
+                    validateCode();
+                }
+            }
+        });
 
         validateButton = new IButton("Activate");
         validateButton.addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
-                if (codeField.validate()) {
-
-                    ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-                    final AsyncCallback<User> callback = new AsyncCallback<User>() {
-
-                        @Override
-                        public void onFailure(Throwable caught) {
-                            modal.hide();
-                            if (caught.getMessage().contains("Activation failed")) {
-                                SC.warn("Unable to activate account.<br />The code you entered is incorrect.");
-                            } else {
-                                SC.warn("Unable to activate account:<br />" + caught.getMessage());
-                            }
-                        }
-
-                        @Override
-                        public void onSuccess(User result) {
-                            modal.hide();
-                            Layout.getInstance().removeTab(CoreConstants.TAB_ACTIVATION);
-                            Layout.getInstance().authenticate(result);
-                        }
-                    };
-                    modal.show("Activating account...", true);
-                    service.activate(codeField.getValueAsString().trim(), callback);
-                }
+                validateCode();
             }
         });
 
@@ -134,27 +118,55 @@ public class ActivationTab extends Tab {
         validateLayout.addMember(validateButton);
     }
 
+    /**
+     * Validates the code and activates user account.
+     */
+    private void validateCode() {
+
+        if (codeField.validate()) {
+
+            ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+            final AsyncCallback<User> callback = new AsyncCallback<User>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                    WidgetUtil.resetIButton(validateButton, "Activate", null);
+                    if (caught.getMessage().contains("Activation failed")) {
+                        Layout.getInstance().setWarningMessage("Unable to activate account.<br />The code you entered is incorrect.", 10);
+                    } else {
+                        Layout.getInstance().setWarningMessage("Unable to activate account:<br />" + caught.getMessage(), 10);
+                    }
+                }
+
+                @Override
+                public void onSuccess(User result) {
+                    Layout.getInstance().removeTab(CoreConstants.TAB_ACTIVATION);
+                    Layout.getInstance().authenticate(result);
+                }
+            };
+            WidgetUtil.setLoadingButton(validateButton, "Activating...");
+            service.activate(codeField.getValueAsString().trim(), callback);
+        }
+    }
+
     private void configureResendForm() {
 
         LinkItem resendLink = FieldUtil.getLinkItem("link_resend",
                 "Lost your code? Click here and we will resend it to you.",
                 new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-
                     @Override
                     public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
                         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
                         final AsyncCallback<String> callback = new AsyncCallback<String>() {
-
                             @Override
                             public void onFailure(Throwable caught) {
                                 modal.hide();
-                                SC.warn("Unable to resend activation code:\n" + caught.getMessage());
+                                Layout.getInstance().setWarningMessage("Unable to resend activation code:<br />" + caught.getMessage(), 10);
                             }
 
                             @Override
                             public void onSuccess(String result) {
                                 modal.hide();
-                                SC.say("An activation code was sent to:\n" + result);
+                                Layout.getInstance().setNoticeMessage("An activation code was sent to:<br /><b>" + result + "</b>", 10);
                             }
                         };
                         modal.show("Resending activation code...", true);

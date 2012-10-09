@@ -38,20 +38,17 @@ import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.*;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import fr.insalyon.creatis.vip.core.client.Modules;
 import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
@@ -65,7 +62,6 @@ import java.util.List;
  */
 public class SignUpTab extends Tab {
 
-    private ModalWindow modal;
     private VLayout signupLayout;
     private TextItem firstNameField;
     private TextItem lastNameField;
@@ -93,8 +89,6 @@ public class SignUpTab extends Tab {
         vLayout.setMargin(5);
         vLayout.setOverflow(Overflow.AUTO);
         vLayout.setDefaultLayoutAlign(Alignment.CENTER);
-
-        modal = new ModalWindow(vLayout);
 
         configureSignupLayout();
         vLayout.addMember(signupLayout);
@@ -159,17 +153,19 @@ public class SignUpTab extends Tab {
                         & acceptField.getValueAsBoolean()) {
 
                     if (!emailField.getValueAsString().equals(confirmEmailField.getValueAsString())) {
-                        SC.warn("E-mails do not match. Please verify the entered e-mail.");
+                        Layout.getInstance().setWarningMessage("<b>E-mails</b> do not match. Please verify the entered e-mail.", 10);
                         emailField.focusInItem();
                         return;
                     }
 
                     if (!passwordField.getValueAsString().equals(confirmPasswordField.getValueAsString())) {
-                        SC.warn("Passwords do not match. Please verify the entered password.");
+                        Layout.getInstance().setWarningMessage("<b>Passwords</b> do not match. Please verify the entered password.", 10);
                         passwordField.focusInItem();
                         return;
                     }
 
+                    WidgetUtil.setLoadingButton(signupButton, "Signing up...");
+                    
                     User user = new User(
                             firstNameField.getValueAsString().trim(),
                             lastNameField.getValueAsString().trim(),
@@ -184,20 +180,19 @@ public class SignUpTab extends Tab {
 
                         @Override
                         public void onFailure(Throwable caught) {
-                            modal.hide();
-                            SC.warn("Unable to signing up:<br />" + caught.getMessage());
+                            WidgetUtil.resetIButton(signupButton, "Sign Up", null);
+                            Layout.getInstance().setWarningMessage("Unable to signing up:<br />" + caught.getMessage(), 10);
                         }
 
                         @Override
                         public void onSuccess(Void result) {
-                            modal.hide();
-                            SC.say("Your membership request was successfully processed.\n"
-                                    + "An activation code was sent to your email.\n"
-                                    + "This code will be requested on your first login.");
+                            WidgetUtil.resetIButton(signupButton, "Sign Up", null);
+                            Layout.getInstance().setNoticeMessage("Your membership request was successfully processed.<br />"
+                                    + "An activation code was sent to your email.<br />"
+                                    + "This code will be requested on your first login.", 15);
                             signin();
                         }
                     };
-                    modal.show("Signing up...", true);
                     service.signup(user, commentsItem.getValueAsString(),
                             accountTypeField.getValueAsString(), callback);
                 }
@@ -227,17 +222,15 @@ public class SignUpTab extends Tab {
 
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
                 if (caught.getMessage().contains("Authentication failed")) {
-                    SC.warn("The username or password you entered is incorrect.");
+                    Layout.getInstance().setWarningMessage("The username or password you entered is incorrect.", 10);
                 } else {
-                    SC.warn("Unable to signing in:\n" + caught.getMessage());
+                    Layout.getInstance().setWarningMessage("Unable to signing in:\n" + caught.getMessage(), 10);
                 }
             }
 
             @Override
             public void onSuccess(User result) {
-                modal.hide();
                 Layout.getInstance().removeTab(CoreConstants.TAB_SIGNIN);
                 Layout.getInstance().removeTab(CoreConstants.TAB_SIGNUP);
 
@@ -251,7 +244,6 @@ public class SignUpTab extends Tab {
                 Layout.getInstance().authenticate(result);
             }
         };
-        modal.show("Signing in...", true);
         service.signin(emailField.getValueAsString().trim(),
                 passwordField.getValueAsString(), callback);
     }
@@ -263,7 +255,7 @@ public class SignUpTab extends Tab {
 
             @Override
             public void onFailure(Throwable caught) {
-                SC.warn("Unable to load account types:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to load account types:<br />" + caught.getMessage(), 10);
             }
 
             @Override

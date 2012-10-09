@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -38,7 +38,6 @@ import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -55,18 +54,16 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class SignInTab extends Tab {
 
-    private ModalWindow modal;
     private VLayout signinLayout;
     private DynamicForm newForm;
     private TextItem emailField;
@@ -87,8 +84,6 @@ public class SignInTab extends Tab {
         vLayout.setAlign(Alignment.CENTER);
         vLayout.setDefaultLayoutAlign(Alignment.CENTER);
 
-        modal = new ModalWindow(vLayout);
-
         configureSigninLayout();
         configureNewForm();
 
@@ -102,7 +97,6 @@ public class SignInTab extends Tab {
 
         emailField = FieldUtil.getTextItem(230, false, "", "[a-zA-Z0-9_.\\-+@]");
         emailField.addKeyPressHandler(new KeyPressHandler() {
-
             @Override
             public void onKeyPress(KeyPressEvent event) {
                 if (event.getKeyName().equals("Enter")) {
@@ -117,7 +111,6 @@ public class SignInTab extends Tab {
         passwordField.setShowTitle(false);
         passwordField.setRequired(true);
         passwordField.addKeyPressHandler(new KeyPressHandler() {
-
             @Override
             public void onKeyPress(KeyPressEvent event) {
                 if (event.getKeyName().equals("Enter")) {
@@ -133,7 +126,6 @@ public class SignInTab extends Tab {
 
         signinButton = new IButton("Sign in");
         signinButton.addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 signin();
@@ -151,7 +143,6 @@ public class SignInTab extends Tab {
 
         LinkItem createAccount = FieldUtil.getLinkItem("link_create", "Create an account.",
                 new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-
                     @Override
                     public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
                         Layout.getInstance().addTab(new SignUpTab());
@@ -160,7 +151,6 @@ public class SignInTab extends Tab {
 
         LinkItem recoverAccount = FieldUtil.getLinkItem("link_reset", "Can't access your account?",
                 new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-
                     @Override
                     public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
                         Layout.getInstance().addTab(new RecoveryTab());
@@ -177,18 +167,19 @@ public class SignInTab extends Tab {
 
             ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
             final AsyncCallback<User> callback = new AsyncCallback<User>() {
-
+                @Override
                 public void onFailure(Throwable caught) {
-                    modal.hide();
+                    WidgetUtil.resetIButton(signinButton, "Sign in", null);
                     if (caught.getMessage().contains("Authentication failed")) {
-                        SC.warn("The username or password you entered is incorrect.");
+                        Layout.getInstance().setWarningMessage("The username or password you entered is incorrect.", 10);
                     } else {
-                        SC.warn("Unable to signing in:\n" + caught.getMessage());
+                        Layout.getInstance().setWarningMessage("Unable to signing in:\n" + caught.getMessage(), 10);
                     }
                 }
 
+                @Override
                 public void onSuccess(User result) {
-                    modal.hide();
+                    WidgetUtil.resetIButton(signinButton, "Sign in", null);
                     Layout.getInstance().removeTab(CoreConstants.TAB_SIGNIN);
                     Layout.getInstance().removeTab(CoreConstants.TAB_SIGNUP);
 
@@ -214,7 +205,7 @@ public class SignInTab extends Tab {
                     Layout.getInstance().authenticate(result);
                 }
             };
-            modal.show("Signing in...", true);
+            WidgetUtil.setLoadingButton(signinButton, "Signing in...");
             service.signin(emailField.getValueAsString().trim(),
                     passwordField.getValueAsString(), callback);
         }
