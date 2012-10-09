@@ -143,7 +143,7 @@ public class ActivationTab extends Tab {
                     Layout.getInstance().authenticate(result);
                 }
             };
-            WidgetUtil.setLoadingButton(validateButton, "Activating...");
+            WidgetUtil.setLoadingIButton(validateButton, "Activating...");
             service.activate(codeField.getValueAsString().trim(), callback);
         }
     }

@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -44,6 +44,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerContext;
@@ -59,7 +60,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class BrowserToolStrip extends BasicBrowserToolStrip {
 
@@ -73,7 +74,6 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         this.addSeparator();
         this.addButton(WidgetUtil.getToolStripButton(
                 DataManagerConstants.ICON_CUT, "Cut", new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 String path = pathItem.getValueAsString();
@@ -88,7 +88,6 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         // Paste Button
         pasteButton = WidgetUtil.getToolStripButton(
                 DataManagerConstants.ICON_PASTE, "Paste", new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 String path = pathItem.getValueAsString();
@@ -106,7 +105,6 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         this.addSeparator();
         this.addButton(WidgetUtil.getToolStripButton(
                 DataManagerConstants.ICON_UPLOAD, "Upload a File", new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 String path = pathItem.getValueAsString();
@@ -121,7 +119,6 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         // Upload Multiple Data Button
         this.addButton(WidgetUtil.getToolStripButton(
                 DataManagerConstants.ICON_UPLOAD_MULTIPLE, "Upload Multiple Data", new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 String path = pathItem.getValueAsString();
@@ -138,7 +135,6 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         // Download Button
         this.addButton(WidgetUtil.getToolStripButton(
                 DataManagerConstants.ICON_DOWNLOAD, "Download Selected Data", new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 download();
@@ -148,7 +144,6 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         // Delete Button
         this.addButton(WidgetUtil.getToolStripButton(
                 CoreConstants.ICON_DELETE, "Delete Selected Files/Folders", new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 String path = pathItem.getValueAsString();
@@ -164,7 +159,6 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         this.addSeparator();
         this.addButton(WidgetUtil.getToolStripButton(
                 DataManagerConstants.ICON_TRASH, "Trash", new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 BrowserLayout.getInstance().loadData(DataManagerConstants.ROOT
@@ -175,7 +169,6 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         // Empty Trash Button
         this.addButton(WidgetUtil.getToolStripButton(
                 DataManagerConstants.ICON_EMPTY_TRASH, "Empty Trash", new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 emptyTrash();
@@ -192,11 +185,10 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
             if (data.getType() == Data.Type.file) {
                 DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                 AsyncCallback<String> callback = new AsyncCallback<String>() {
-
                     @Override
                     public void onFailure(Throwable caught) {
                         modal.hide();
-                        SC.warn("Unable to download file:<br />" + caught.getMessage());
+                        Layout.getInstance().setWarningMessage("Unable to download file:<br />" + caught.getMessage());
                     }
 
                     @Override
@@ -213,11 +205,10 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
             } else {
                 DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                 AsyncCallback<String> callback = new AsyncCallback<String>() {
-
                     @Override
                     public void onFailure(Throwable caught) {
                         modal.hide();
-                        SC.warn("Unable to download folder: " + caught.getMessage());
+                        Layout.getInstance().setWarningMessage("Unable to download folder: " + caught.getMessage());
                     }
 
                     @Override
@@ -250,7 +241,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
             pasteButton.setDisabled(false);
 
         } else {
-            SC.warn("There are no data selected to cut.");
+            Layout.getInstance().setWarningMessage("There are no data selected to cut.");
         }
     }
 
@@ -258,11 +249,10 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to paste file/folder:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to paste file/folder:<br />" + caught.getMessage());
             }
 
             @Override
@@ -282,7 +272,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                     baseDir, false, callback);
 
         } else {
-            SC.warn("Unable to move data into the same folder.");
+            Layout.getInstance().setWarningMessage("Unable to move data into the same folder.");
         }
     }
 
@@ -294,7 +284,6 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
         if (baseDir.startsWith(DataManagerConstants.ROOT + "/" + DataManagerConstants.TRASH_HOME)) {
             SC.ask("Do you really want to permanently delete the selected files/folders?", new BooleanCallback() {
-
                 @Override
                 public void execute(Boolean value) {
                     if (value) {
@@ -305,17 +294,16 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                         }
 
                         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
                             @Override
                             public void onFailure(Throwable caught) {
                                 modal.hide();
-                                SC.warn("Unable to delete files/folders:<br />" + caught.getMessage());
+                                Layout.getInstance().setWarningMessage("Unable to delete files/folders:<br />" + caught.getMessage());
                             }
 
                             @Override
                             public void onSuccess(Void result) {
                                 modal.hide();
-                                SC.say("The selected files/folders were successfully scheduled to be permanentely deleted.");
+                                Layout.getInstance().setWarningMessage("The selected files/folders were successfully scheduled to be permanentely deleted.");
                                 BrowserLayout.getInstance().loadData(baseDir, true);
                             }
                         };
@@ -327,7 +315,6 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
         } else {
             SC.ask("Do you really want to delete the selected files/folders?", new BooleanCallback() {
-
                 @Override
                 public void execute(Boolean value) {
                     if (value) {
@@ -338,11 +325,10 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                         }
 
                         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
                             @Override
                             public void onFailure(Throwable caught) {
                                 modal.hide();
-                                SC.warn("Unable to delete files/folders:<br />" + caught.getMessage());
+                                Layout.getInstance().setWarningMessage("Unable to delete files/folders:<br />" + caught.getMessage());
                             }
 
                             @Override
@@ -363,18 +349,16 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
     private void emptyTrash() {
         SC.ask("Do you really want to remove the items in the trash permanently?", new BooleanCallback() {
-
             @Override
             public void execute(Boolean value) {
                 if (value) {
 
                     final DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                     AsyncCallback<List<Data>> callback = new AsyncCallback<List<Data>>() {
-
                         @Override
                         public void onFailure(Throwable caught) {
                             modal.hide();
-                            SC.warn("Unable to delete files/folders:<br />" + caught.getMessage());
+                            Layout.getInstance().setWarningMessage("Unable to delete files/folders:<br />" + caught.getMessage());
                         }
 
                         @Override
@@ -388,17 +372,16 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                             }
 
                             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
                                 @Override
                                 public void onFailure(Throwable caught) {
                                     modal.hide();
-                                    SC.warn("Error executing empty trash: " + caught.getMessage());
+                                    Layout.getInstance().setWarningMessage("Error executing empty trash: " + caught.getMessage());
                                 }
 
                                 @Override
                                 public void onSuccess(Void result) {
                                     modal.hide();
-                                    SC.say("Your Trash folder was successfully scheduled to be emptied.");
+                                    Layout.getInstance().setNoticeMessage("Your Trash folder was successfully scheduled to be emptied.");
                                     BrowserLayout.getInstance().loadData(
                                             DataManagerConstants.ROOT + "/"
                                             + DataManagerConstants.TRASH_HOME, true);

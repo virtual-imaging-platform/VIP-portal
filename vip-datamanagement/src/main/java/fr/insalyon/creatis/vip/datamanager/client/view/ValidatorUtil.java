@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -34,14 +34,14 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view;
 
-import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ValidatorUtil {
 
@@ -54,23 +54,24 @@ public class ValidatorUtil {
     public static boolean validateRootPath(String baseDir, String errorMessage) {
 
         if (baseDir.equals(DataManagerConstants.ROOT)) {
-            SC.warn("You cannot " + errorMessage + " the root folder.");
+            Layout.getInstance().setWarningMessage("You cannot " + errorMessage + " the root folder.");
             return false;
         }
         return true;
     }
 
     /**
-     * 
+     *
      * @param baseDir
      * @param errorMessage
-     * @return 
+     * @return
      */
     public static boolean validateUserLevel(String baseDir, String errorMessage) {
 
         if (baseDir.contains(DataManagerConstants.GROUP_APPEND)
                 && CoreModule.user.getLevel() == UserLevel.Beginner) {
-            SC.warn("You cannot " + errorMessage + " a group folder<br />"
+            Layout.getInstance().setWarningMessage("You cannot " + errorMessage
+                    + " a group folder<br />"
                     + "since you have 'Beginner' level.");
             return false;
         }

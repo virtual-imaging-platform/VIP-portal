@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -44,6 +44,7 @@ import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerContext;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
@@ -56,7 +57,7 @@ import java.util.Arrays;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class BrowserContextMenu extends Menu {
 
@@ -195,13 +196,13 @@ public class BrowserContextMenu extends Menu {
                             @Override
                             public void onFailure(Throwable caught) {
                                 modal.hide();
-                                SC.warn("Unable to delete file/folder:<br />" + caught.getMessage());
+                                Layout.getInstance().setWarningMessage("Unable to delete file/folder:<br />" + caught.getMessage());
                             }
 
                             @Override
                             public void onSuccess(Void result) {
                                 modal.hide();
-                                SC.say("The file/folder was successfully scheduled to be permanentely deleted.");
+                                Layout.getInstance().setNoticeMessage("The file/folder was successfully scheduled to be permanentely deleted.");
                                 BrowserLayout.getInstance().loadData(baseDir, true);
                             }
                         };
@@ -222,7 +223,7 @@ public class BrowserContextMenu extends Menu {
                             @Override
                             public void onFailure(Throwable caught) {
                                 modal.hide();
-                                SC.warn("Unable to delete file/folder:<br />" + caught.getMessage());
+                                Layout.getInstance().setWarningMessage("Unable to delete file/folder:<br />" + caught.getMessage());
                             }
 
                             @Override
@@ -260,10 +261,10 @@ public class BrowserContextMenu extends Menu {
                     modal.hide();
                     if (caught.getMessage().contains("No such file or directory")
                             || caught.getMessage().contains("Error while performing:LINKSTAT")) {
-                        SC.warn("The file " + baseDir + "/" + data.getName() + " is unavailable.");
+                        Layout.getInstance().setWarningMessage("The file " + baseDir + "/" + data.getName() + " is unavailable.");
                         BrowserLayout.getInstance().loadData(baseDir, true);
                     } else {
-                        SC.warn("Unable to download file:<br />" + caught.getMessage());
+                        Layout.getInstance().setWarningMessage("Unable to download file:<br />" + caught.getMessage());
                     }
                 }
 
@@ -285,10 +286,10 @@ public class BrowserContextMenu extends Menu {
                     modal.hide();
                     if (caught.getMessage().contains("No such file or directory")
                             || caught.getMessage().contains("Error while performing:LINKSTAT")) {
-                        SC.warn("The folder " + baseDir + "/" + data.getName() + " is unavailable.");
+                        Layout.getInstance().setWarningMessage("The folder " + baseDir + "/" + data.getName() + " is unavailable.");
                         BrowserLayout.getInstance().loadData(baseDir, true);
                     } else {
-                        SC.warn("Unable to download folder:<br />" + caught.getMessage());
+                        Layout.getInstance().setWarningMessage("Unable to download folder:<br />" + caught.getMessage());
                     }
                 }
 
@@ -316,7 +317,7 @@ public class BrowserContextMenu extends Menu {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to paste file/folder:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to paste file/folder:<br />" + caught.getMessage());
             }
 
             @Override
@@ -335,7 +336,7 @@ public class BrowserContextMenu extends Menu {
                     new ArrayList(Arrays.asList(DataManagerContext.getInstance().getCutName())),
                     baseDir, false, callback);
         } else {
-            SC.warn("Unable to move data into the same folder.");
+            Layout.getInstance().setWarningMessage("Unable to move data into the same folder.");
         }
     }
 }

@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -37,7 +37,6 @@ package fr.insalyon.creatis.vip.core.client.view.contact;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -52,18 +51,17 @@ import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.LinkedHashMap;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ContactTab extends Tab {
 
-    private ModalWindow modal;
     private VLayout contactLayout;
     private TextItem nameField;
     private TextItem emailField;
@@ -87,7 +85,6 @@ public class ContactTab extends Tab {
 
         configure();
         vLayout.addMember(contactLayout);
-        modal = new ModalWindow(contactLayout);
 
         this.setPane(vLayout);
     }
@@ -127,17 +124,15 @@ public class ContactTab extends Tab {
 
                         @Override
                         public void onFailure(Throwable caught) {
-                            modal.hide();
-                            SC.warn("Unable to send contact email:<br />" + caught.getMessage());
+                            Layout.getInstance().setWarningMessage("Unable to send contact email:<br />" + caught.getMessage());
                         }
 
                         @Override
                         public void onSuccess(Void result) {
-                            modal.hide();
-                            SC.say("Contact successfully sent.");
+                            Layout.getInstance().setNoticeMessage("Contact successfully sent.");
                         }
                     };
-                    modal.show("Sending contact messsage...", true);
+                    WidgetUtil.setLoadingIButton(submitButton, "Sending messsage...");
                     service.sendContactMail(
                             categoryItem.getValueAsString(),
                             subjectField.getValueAsString().trim(),

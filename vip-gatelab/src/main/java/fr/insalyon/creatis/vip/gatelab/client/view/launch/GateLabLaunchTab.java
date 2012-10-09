@@ -198,7 +198,7 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
     @Override
     protected void launch() {
 
-        WidgetUtil.setLoadingButton(launchButton, "Launching...");
+        WidgetUtil.setLoadingIButton(launchButton, "Launching...");
         
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {

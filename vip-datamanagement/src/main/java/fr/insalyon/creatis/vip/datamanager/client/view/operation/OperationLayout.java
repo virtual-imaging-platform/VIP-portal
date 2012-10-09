@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -37,11 +37,10 @@ package fr.insalyon.creatis.vip.datamanager.client.view.operation;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
@@ -51,12 +50,11 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class OperationLayout extends VLayout {
 
     private static OperationLayout instance;
-    private ModalWindow modal;
     private OperationToolStrip toolStrip;
     private VLayout operationsLayout;
     private Date lastDate;
@@ -89,8 +87,7 @@ public class OperationLayout extends VLayout {
         operationsLayout.setAlign(VerticalAlignment.TOP);
         operationsLayout.setBackgroundColor("#F2F2F2");
 
-        modal = new ModalWindow(operationsLayout);
-        toolStrip = new OperationToolStrip(modal);
+        toolStrip = new OperationToolStrip();
         this.addMember(toolStrip);
         this.addMember(operationsLayout);
 
@@ -113,7 +110,7 @@ public class OperationLayout extends VLayout {
 
             @Override
             public void onFailure(Throwable caught) {
-                SC.warn("Unable to get list of operations:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get list of operations:<br />" + caught.getMessage());
             }
 
             @Override
@@ -130,10 +127,8 @@ public class OperationLayout extends VLayout {
                         operationsLayout.addMember(loadMoreDataBoxLayout);
                     }
                 }
-                modal.hide();
             }
         };
-        modal.show("Loading operations...", true);
         service.getPoolOperationsByUser(callback);
     }
 
@@ -144,7 +139,7 @@ public class OperationLayout extends VLayout {
 
             @Override
             public void onFailure(Throwable caught) {
-                SC.warn("Unable to get list of operations:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get list of operations:<br />" + caught.getMessage());
             }
 
             @Override
@@ -179,7 +174,7 @@ public class OperationLayout extends VLayout {
 
             @Override
             public void onFailure(Throwable caught) {
-                SC.warn(operationID + "<br />Unable to get operation data:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage(operationID + "<br />Unable to get operation data:<br />" + caught.getMessage());
             }
 
             @Override

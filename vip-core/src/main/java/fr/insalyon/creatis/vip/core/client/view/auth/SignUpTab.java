@@ -164,7 +164,7 @@ public class SignUpTab extends Tab {
                         return;
                     }
 
-                    WidgetUtil.setLoadingButton(signupButton, "Signing up...");
+                    WidgetUtil.setLoadingIButton(signupButton, "Signing up...");
                     
                     User user = new User(
                             firstNameField.getValueAsString().trim(),

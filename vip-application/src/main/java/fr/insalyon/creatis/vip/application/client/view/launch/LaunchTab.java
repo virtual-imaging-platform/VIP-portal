@@ -123,7 +123,7 @@ public class LaunchTab extends AbstractLaunchTab {
     @Override
     protected void launch() {
 
-        WidgetUtil.setLoadingButton(launchButton, "Launching...");
+        WidgetUtil.setLoadingIButton(launchButton, "Launching...");
 
         // Input data verification
         List<String> inputData = new ArrayList<String>();

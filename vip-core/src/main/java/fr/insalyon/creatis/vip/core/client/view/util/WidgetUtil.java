@@ -122,28 +122,28 @@ public class WidgetUtil {
     }
 
     /**
-     * 
+     *
      * @param width
      * @param height
-     * @return 
+     * @return
      */
     public static VLayout getVIPLayout(int width, String height) {
-        
+
         return getVIPLayout(width, height, true);
     }
-    
+
     /**
-     * 
+     *
      * @param width
      * @param height
      * @param showTitle
-     * @return 
+     * @return
      */
     public static VLayout getVIPLayout(int width, int height, boolean showTitle) {
-        
+
         return getVIPLayout(width, Integer.toString(height), showTitle);
     }
-    
+
     /**
      *
      * @param width
@@ -216,47 +216,75 @@ public class WidgetUtil {
         button.addClickHandler(clickHandler);
         return button;
     }
-    
+
     /**
-     * Gets an IButton configured to display a title, an icon and perform an action.
-     * 
+     * Sets a toolstrip button to a loading state.
+     *
+     * @param button Button object
+     * @param title Button title
+     */
+    public static void setLoadingToolStripButton(ToolStripButton button, String title) {
+
+        button.setTitle(title);
+        button.setIcon(CoreConstants.ICON_LOADING);
+        button.setDisabled(true);
+    }
+
+    /**
+     * Resets a toolstrip button to its initial state.
+     *
+     * @param button Button object
+     * @param title Button title
+     * @param icon Button icon
+     */
+    public static void resetToolStripButton(ToolStripButton button, String title, String icon) {
+
+        button.setTitle(title);
+        button.setIcon(icon);
+        button.setDisabled(false);
+    }
+
+    /**
+     * Gets an IButton configured to display a title, an icon and perform an
+     * action.
+     *
      * @param title Button title
      * @param icon Button icon
      * @param clickHandler Action to be performed
-     * @return 
+     * @return
      */
-    public static IButton getIButton(String title, String icon, 
+    public static IButton getIButton(String title, String icon,
             ClickHandler clickHandler) {
-        
+
         IButton button = new IButton(title);
         button.setIcon(icon);
         button.setShowDisabledIcon(false);
         button.addClickHandler(clickHandler);
         return button;
     }
-    
+
     /**
      * Sets a button to a loading state.
-     * 
+     *
      * @param button Button object
      * @param title Button title
      */
-    public static void setLoadingButton(IButton button, String title) {
-        
+    public static void setLoadingIButton(IButton button, String title) {
+
         button.setTitle(title);
         button.setIcon(CoreConstants.ICON_LOADING);
         button.setDisabled(true);
     }
-    
+
     /**
      * Resets a button to its initial state.
-     * 
+     *
      * @param button Button object
      * @param title Button title
-     * @param icon  Button icon
+     * @param icon Button icon
      */
     public static void resetIButton(IButton button, String title, String icon) {
-        
+
         button.setTitle(title);
         button.setIcon(icon);
         button.setDisabled(false);

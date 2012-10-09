@@ -150,7 +150,7 @@ public class RecoveryTab extends Tab {
                             + "Please use this code to reset the password.", 15);
                 }
             };
-            WidgetUtil.setLoadingButton(continueButton, "Sending code...");
+            WidgetUtil.setLoadingIButton(continueButton, "Sending code...");
             service.sendResetCode(email, callback);
         }
     }
@@ -242,7 +242,7 @@ public class RecoveryTab extends Tab {
                     Layout.getInstance().setNoticeMessage("Your password was successfully reseted.", 15);
                 }
             };
-            WidgetUtil.setLoadingButton(resetButton, "Reseting password...");
+            WidgetUtil.setLoadingIButton(resetButton, "Reseting password...");
             service.resetPassword(email, codeField.getValueAsString().trim(),
                     passwordField.getValueAsString(), callback);
         }

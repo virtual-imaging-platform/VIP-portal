@@ -255,7 +255,7 @@ public abstract class AbstractLaunchTab extends Tab {
      */
     private void saveInputs() {
 
-        WidgetUtil.setLoadingButton(saveInputsButton, "Saving...");
+        WidgetUtil.setLoadingIButton(saveInputsButton, "Saving...");
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<SimulationInput> callback = new AsyncCallback<SimulationInput>() {
             @Override
@@ -314,7 +314,7 @@ public abstract class AbstractLaunchTab extends Tab {
 
     private void saveInputsAsExample() {
 
-        WidgetUtil.setLoadingButton(saveAsExampleButton, "Saving...");
+        WidgetUtil.setLoadingIButton(saveAsExampleButton, "Saving...");
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override

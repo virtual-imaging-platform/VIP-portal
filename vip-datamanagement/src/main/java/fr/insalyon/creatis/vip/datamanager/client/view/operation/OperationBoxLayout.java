@@ -49,6 +49,7 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Status;
@@ -98,7 +99,6 @@ public class OperationBoxLayout extends HLayout {
         configureActionLayout();
 
         timer = new Timer() {
-
             @Override
             public void run() {
                 loadData();
@@ -122,7 +122,6 @@ public class OperationBoxLayout extends HLayout {
             if (operation.getStatus() == Status.Done) {
                 icon.setCursor(Cursor.HAND);
                 icon.addClickHandler(new ClickHandler() {
-
                     @Override
                     public void onClick(ClickEvent event) {
                         download();
@@ -174,7 +173,6 @@ public class OperationBoxLayout extends HLayout {
                 downloadLabel.setWidth(55);
                 downloadLabel.setCursor(Cursor.HAND);
                 downloadLabel.addClickHandler(new ClickHandler() {
-
                     @Override
                     public void onClick(ClickEvent event) {
                         download();
@@ -231,7 +229,6 @@ public class OperationBoxLayout extends HLayout {
         removeImg.setCursor(Cursor.HAND);
         removeImg.setPrompt("Remove");
         removeImg.addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 remove();
@@ -244,7 +241,6 @@ public class OperationBoxLayout extends HLayout {
             downloadImg.setCursor(Cursor.HAND);
             downloadImg.setPrompt("Download");
             downloadImg.addClickHandler(new ClickHandler() {
-
                 @Override
                 public void onClick(ClickEvent event) {
                     download();
@@ -260,7 +256,6 @@ public class OperationBoxLayout extends HLayout {
 
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<PoolOperation> asyncCallback = new AsyncCallback<PoolOperation>() {
-
             @Override
             public void onFailure(Throwable caught) {
                 if (caught.getMessage().contains("No data is available")) {
@@ -269,7 +264,7 @@ public class OperationBoxLayout extends HLayout {
                     configureMainLayout();
                     configureActionLayout();
                 } else {
-                    SC.warn("Unable to update operation data:<br />" + caught.getMessage());
+                    Layout.getInstance().setWarningMessage("Unable to update operation data:<br />" + caught.getMessage());
                 }
             }
 
@@ -300,20 +295,18 @@ public class OperationBoxLayout extends HLayout {
     private void remove() {
 
         SC.confirm("Do you want to remove this operation?", new BooleanCallback() {
-
             @Override
             public void execute(Boolean value) {
                 if (value != null && value) {
                     DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                     AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
                         @Override
                         public void onFailure(Throwable caught) {
                             if (caught.getMessage().contains("No data is available")) {
                                 timer.cancel();
                                 destroy();
                             } else {
-                                SC.warn("Unable to remove operation:<br />" + caught.getMessage());
+                                Layout.getInstance().setWarningMessage("Unable to remove operation:<br />" + caught.getMessage());
                             }
                         }
 
