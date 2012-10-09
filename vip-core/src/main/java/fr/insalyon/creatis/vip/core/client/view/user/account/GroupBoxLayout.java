@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -47,11 +47,12 @@ import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class GroupBoxLayout extends HLayout {
 
@@ -143,7 +144,7 @@ public class GroupBoxLayout extends HLayout {
 
             @Override
             public void onFailure(Throwable caught) {
-                SC.warn("Unable to leave '" + name + "':<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to leave '" + name + "':<br />" + caught.getMessage());
             }
 
             @Override
@@ -164,7 +165,7 @@ public class GroupBoxLayout extends HLayout {
 
             @Override
             public void onFailure(Throwable caught) {
-                SC.warn("Unable to join '" + name + "':<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to join '" + name + "':<br />" + caught.getMessage());
             }
 
             @Override

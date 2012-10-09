@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -36,7 +36,6 @@ package fr.insalyon.creatis.vip.core.client.view.user.account;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -55,7 +54,7 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class RemoveAccountLayout extends AbstractFormLayout {
 
@@ -107,20 +106,19 @@ public class RemoveAccountLayout extends AbstractFormLayout {
 
                         @Override
                         public void onFailure(Throwable caught) {
-                            modal.hide();
-                            SC.say("Unable to delete account:<br />" + caught.getMessage());
+                            WidgetUtil.resetIButton(removeButton, "Delete VIP Account", null);
+                            Layout.getInstance().setWarningMessage("Unable to delete account:<br />" + caught.getMessage());
                         }
 
                         @Override
                         public void onSuccess(User result) {
                             Modules.getInstance().userRemoved(result);
-                            modal.hide();
                             Layout.getInstance().signout();
-                            SC.say("Your account was successfully deleted.");
+                            Layout.getInstance().setNoticeMessage("Your account was successfully deleted.");
                         }
                     };
                     service.removeUser(null, callback);
-                    modal.show("Removing account...", true);
+                    WidgetUtil.setLoadingIButton(removeButton, "Removing account...");
                 }
             }
         });

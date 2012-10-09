@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -35,7 +35,6 @@
 package fr.insalyon.creatis.vip.core.client.view.user.account;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -44,11 +43,13 @@ import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class PasswordLayout extends AbstractFormLayout {
 
@@ -71,42 +72,44 @@ public class PasswordLayout extends AbstractFormLayout {
         newPasswordField = FieldUtil.getPasswordItem(150, 32);
         confirmPasswordField = FieldUtil.getPasswordItem(150, 32);
 
-        saveButton = new IButton("Save Changes");
-        saveButton.addClickHandler(new ClickHandler() {
+        saveButton = WidgetUtil.getIButton("Save Changes", CoreConstants.ICON_SAVED,
+                new ClickHandler() {
+                    @Override
+                    public void onClick(ClickEvent event) {
 
-            public void onClick(ClickEvent event) {
+                        if (currentPasswordField.validate() & newPasswordField.validate()
+                                & confirmPasswordField.validate()) {
 
-                if (currentPasswordField.validate() & newPasswordField.validate()
-                        & confirmPasswordField.validate()) {
-                    
-                    if (!newPasswordField.getValueAsString().equals(confirmPasswordField.getValueAsString())) {
-                        SC.warn("Passwords do not match. Please verify the entered password.");
-                        newPasswordField.focusInItem();
-                        return;
+                            if (!newPasswordField.getValueAsString().equals(confirmPasswordField.getValueAsString())) {
+                                Layout.getInstance().setWarningMessage("Passwords do not match. Please verify the entered password.");
+                                newPasswordField.focusInItem();
+                                return;
+                            }
+
+                            ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+                            final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+                                @Override
+                                public void onFailure(Throwable caught) {
+                                    WidgetUtil.resetIButton(saveButton, "Save Changes", CoreConstants.ICON_SAVED);
+                                    Layout.getInstance().setWarningMessage("Unable to update password:<br />" + caught.getMessage());
+                                }
+
+                                @Override
+                                public void onSuccess(Void result) {
+                                    currentPasswordField.setValue("");
+                                    newPasswordField.setValue("");
+                                    confirmPasswordField.setValue("");
+                                    WidgetUtil.resetIButton(saveButton, "Save Changes", CoreConstants.ICON_SAVED);
+                                    Layout.getInstance().setNoticeMessage("Password successfully updated.");
+                                }
+                            };
+                            WidgetUtil.setLoadingIButton(saveButton, "Saving...");
+                            service.updateUserPassword(
+                                    currentPasswordField.getValueAsString(),
+                                    newPasswordField.getValueAsString(), callback);
+                        }
                     }
-
-                    ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-                    final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-                        public void onFailure(Throwable caught) {
-                            modal.hide();
-                            SC.warn("Unable to update password:<br />" + caught.getMessage());
-                        }
-
-                        public void onSuccess(Void result) {
-                            currentPasswordField.setValue("");
-                            newPasswordField.setValue("");
-                            confirmPasswordField.setValue("");
-                            modal.hide();
-                        }
-                    };
-                    modal.show("Saving changes...", true);
-                    service.updateUserPassword(
-                            currentPasswordField.getValueAsString(),
-                            newPasswordField.getValueAsString(), callback);
-                }
-            }
-        });
+                });
 
         addField("Current", currentPasswordField);
         addField("New", newPasswordField);

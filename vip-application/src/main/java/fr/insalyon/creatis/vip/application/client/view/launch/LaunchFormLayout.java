@@ -85,8 +85,6 @@ public class LaunchFormLayout extends AbstractFormLayout {
         sourcesLayout = new VLayout(5);
         sourcesLayout.setAutoHeight();
         this.addMember(sourcesLayout);
-
-        modal = new ModalWindow(this);
     }
 
     /**
@@ -251,15 +249,6 @@ public class LaunchFormLayout extends AbstractFormLayout {
             }
         }
         return paramsMap;
-    }
-
-    /**
-     * 
-     * @return 
-     */
-    public ModalWindow getModal() {
-        
-        return modal = new ModalWindow(this);
     }
 
     /**

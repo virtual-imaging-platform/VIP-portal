@@ -54,6 +54,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -67,6 +68,7 @@ public class EditClassLayout extends AbstractFormLayout {
     private boolean newClass = true;
     private TextItem nameField;
     private SelectItem groupsPickList;
+    private IButton saveButton;
     private IButton removeButton;
 
     public EditClassLayout() {
@@ -88,35 +90,31 @@ public class EditClassLayout extends AbstractFormLayout {
         groupsPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
         groupsPickList.setWidth(350);
 
-        IButton saveButton = new IButton("Save");
-        saveButton.setIcon(CoreConstants.ICON_SAVE);
-        saveButton.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(ClickEvent event) {
-                if (nameField.validate()) {
-                    save(new AppClass(nameField.getValueAsString().trim(),
-                            Arrays.asList(groupsPickList.getValues())));
-                }
-            }
-        });
-
-        removeButton = new IButton("Remove", new ClickHandler() {
-
-            @Override
-            public void onClick(ClickEvent event) {
-                SC.ask("Do you really want to remove this class?", new BooleanCallback() {
-
+        saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
+                new ClickHandler() {
                     @Override
-                    public void execute(Boolean value) {
-                        if (value) {
-                            remove(nameField.getValueAsString().trim());
+                    public void onClick(ClickEvent event) {
+                        if (nameField.validate()) {
+                            save(new AppClass(nameField.getValueAsString().trim(),
+                                    Arrays.asList(groupsPickList.getValues())));
                         }
                     }
                 });
-            }
-        });
-        removeButton.setIcon(CoreConstants.ICON_DELETE);
+
+        removeButton = WidgetUtil.getIButton("Remove", CoreConstants.ICON_DELETE,
+                new ClickHandler() {
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        SC.ask("Do you really want to remove this class?", new BooleanCallback() {
+                            @Override
+                            public void execute(Boolean value) {
+                                if (value) {
+                                    remove(nameField.getValueAsString().trim());
+                                }
+                            }
+                        });
+                    }
+                });
         removeButton.setDisabled(true);
 
         addField("Name", nameField);
@@ -155,69 +153,13 @@ public class EditClassLayout extends AbstractFormLayout {
     private void save(AppClass appClass) {
 
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        WidgetUtil.setLoadingIButton(saveButton, "Saving...");
 
         if (newClass) {
-            modal.show("Adding class '" + appClass.getName() + "'...", true);
             service.addClass(appClass, getCallback("add"));
-
         } else {
-            modal.show("Updating class '" + appClass.getName() + "'...", true);
             service.updateClass(appClass, getCallback("update"));
         }
-    }
-
-    /**
-     *
-     * @param text
-     * @return
-     */
-    private AsyncCallback<Void> getCallback(final String text) {
-
-        return new AsyncCallback<Void>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to " + text + " class:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(Void result) {
-                modal.hide();
-                setClass(null, null);
-                ManageClassesTab tab = (ManageClassesTab) Layout.getInstance().
-                        getTab(ApplicationConstants.TAB_MANAGE_CLASSES);
-                tab.loadClasses();
-            }
-        };
-    }
-
-    /**
-     * Loads groups list
-     */
-    private void loadData() {
-
-        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<List<Group>> callback = new AsyncCallback<List<Group>>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to get list of groups:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(List<Group> result) {
-                modal.hide();
-                List<String> dataList = new ArrayList<String>();
-                for (Group group : result) {
-                    dataList.add(group.getName());
-                }
-                groupsPickList.setValueMap(dataList.toArray(new String[]{}));
-            }
-        };
-        modal.show("Loading groups...", true);
-        service.getGroups(callback);
     }
 
     /**
@@ -228,24 +170,58 @@ public class EditClassLayout extends AbstractFormLayout {
     private void remove(String name) {
 
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
-        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+        WidgetUtil.setLoadingIButton(removeButton, "Removing...");
+        service.removeClass(name, getCallback("remove"));
+    }
 
+    /**
+     *
+     * @param text
+     * @return
+     */
+    private AsyncCallback<Void> getCallback(final String text) {
+
+        return new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to remove class:<br />" + caught.getMessage());
+                WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
+                WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
+                Layout.getInstance().setWarningMessage("Unable to " + text + " class:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(Void result) {
-                modal.hide();
-                SC.say("The class was successfully removed!");
+                WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
+                WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
+                setClass(null, null);
                 ManageClassesTab tab = (ManageClassesTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_CLASSES);
                 tab.loadClasses();
             }
         };
-        modal.show("Removing class '" + name + "'...", true);
-        service.removeClass(name, callback);
+    }
+
+    /**
+     * Loads groups list.
+     */
+    private void loadData() {
+
+        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+        final AsyncCallback<List<Group>> callback = new AsyncCallback<List<Group>>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to get list of groups:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(List<Group> result) {
+                List<String> dataList = new ArrayList<String>();
+                for (Group group : result) {
+                    dataList.add(group.getName());
+                }
+                groupsPickList.setValueMap(dataList.toArray(new String[]{}));
+            }
+        };
+        service.getGroups(callback);
     }
 }

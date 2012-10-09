@@ -36,7 +36,6 @@ package fr.insalyon.creatis.vip.core.client.view.system.user;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.MultipleAppearance;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -115,39 +114,38 @@ public class EditUserLayout extends AbstractFormLayout {
         confirmedField.setDisabled(true);
         confirmedField.setWidth(350);
 
-        saveButton = new IButton("Save", new ClickHandler() {
+        saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
+                new ClickHandler() {
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        if (levelPickList.validate() & countryPickList.validate()) {
 
-            @Override
-            public void onClick(ClickEvent event) {
-                if (levelPickList.validate() & countryPickList.validate()) {
+                            String[] values = groupsPickList.getValues();
+                            Map<String, CoreConstants.GROUP_ROLE> map = new HashMap<String, CoreConstants.GROUP_ROLE>();
 
-                    String[] values = groupsPickList.getValues();
-                    Map<String, CoreConstants.GROUP_ROLE> map = new HashMap<String, CoreConstants.GROUP_ROLE>();
+                            for (String v : values) {
+                                if (v.equals(CoreConstants.GROUP_SUPPORT)) {
+                                    map.put(v, CoreConstants.GROUP_ROLE.User);
 
-                    for (String v : values) {
-                        if (v.equals(CoreConstants.GROUP_SUPPORT)) {
-                            map.put(v, CoreConstants.GROUP_ROLE.User);
+                                } else {
+                                    String name = v.substring(0, v.indexOf(" ("));
+                                    CoreConstants.GROUP_ROLE role = v.contains("("
+                                            + CoreConstants.GROUP_ROLE.Admin.name() + ")")
+                                            ? CoreConstants.GROUP_ROLE.Admin
+                                            : CoreConstants.GROUP_ROLE.User;
 
-                        } else {
-                            String name = v.substring(0, v.indexOf(" ("));
-                            CoreConstants.GROUP_ROLE role = v.contains("("
-                                    + CoreConstants.GROUP_ROLE.Admin.name() + ")")
-                                    ? CoreConstants.GROUP_ROLE.Admin
-                                    : CoreConstants.GROUP_ROLE.User;
-
-                            if (map.get(name) == null || role == CoreConstants.GROUP_ROLE.Admin) {
-                                map.put(name, role);
+                                    if (map.get(name) == null || role == CoreConstants.GROUP_ROLE.Admin) {
+                                        map.put(name, role);
+                                    }
+                                }
                             }
+                            save(emailLabel.getContents(),
+                                    UserLevel.valueOf(levelPickList.getValueAsString()),
+                                    CountryCode.valueOf(countryPickList.getValueAsString()),
+                                    map);
                         }
                     }
-                    save(emailLabel.getContents(),
-                            UserLevel.valueOf(levelPickList.getValueAsString()),
-                            CountryCode.valueOf(countryPickList.getValueAsString()),
-                            map);
-                }
-            }
-        });
-        saveButton.setIcon(CoreConstants.ICON_SAVE);
+                });
         saveButton.setDisabled(true);
 
         this.addMember(nameLabel);
@@ -179,16 +177,13 @@ public class EditUserLayout extends AbstractFormLayout {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<Map<Group, GROUP_ROLE>> callback = new AsyncCallback<Map<Group, GROUP_ROLE>>() {
-
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to get list of groups:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get list of groups:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(Map<Group, GROUP_ROLE> result) {
-                modal.hide();
 
                 List<String> userGroups = new ArrayList<String>();
 
@@ -204,7 +199,6 @@ public class EditUserLayout extends AbstractFormLayout {
                 saveButton.setDisabled(false);
             }
         };
-        modal.show("Loading user's groups...", true);
         service.getUserGroups(email, callback);
     }
 
@@ -219,16 +213,15 @@ public class EditUserLayout extends AbstractFormLayout {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to update user:<br />" + caught.getMessage());
+                WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
+                Layout.getInstance().setWarningMessage("Unable to update user:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(Void result) {
-                modal.hide();
+                WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 saveButton.setDisabled(true);
                 nameLabel.setContents("");
                 emailLabel.setContents("");
@@ -237,10 +230,10 @@ public class EditUserLayout extends AbstractFormLayout {
                 countryPickList.setValues(new String[]{});
                 confirmedField.setValue(false);
                 ((ManageUsersTab) Layout.getInstance().getTab(CoreConstants.TAB_MANAGE_USERS)).loadUsers();
-                SC.say("User successfully updated.");
+                Layout.getInstance().setNoticeMessage("User successfully updated.");
             }
         };
-        modal.show("Updating user...", true);
+        WidgetUtil.setLoadingIButton(saveButton, "Updating user...");
         service.updateUser(email, level, countryCode, groups, callback);
     }
 
@@ -253,10 +246,9 @@ public class EditUserLayout extends AbstractFormLayout {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<List<Group>> callback = new AsyncCallback<List<Group>>() {
-
             @Override
             public void onFailure(Throwable caught) {
-                SC.warn("Unable to get groups list:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get groups list:<br />" + caught.getMessage());
             }
 
             @Override

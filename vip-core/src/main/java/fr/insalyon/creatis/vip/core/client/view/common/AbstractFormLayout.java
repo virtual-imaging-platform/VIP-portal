@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -40,17 +40,14 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public abstract class AbstractFormLayout extends VLayout {
-
-    protected ModalWindow modal;
 
     public AbstractFormLayout(int width, int height) {
 
@@ -70,8 +67,6 @@ public abstract class AbstractFormLayout extends VLayout {
         this.setBackgroundColor("#F5F5F5");
         this.setPadding(10);
         this.setMembersMargin(5);
-
-        modal = new ModalWindow(this);
     }
 
     /**

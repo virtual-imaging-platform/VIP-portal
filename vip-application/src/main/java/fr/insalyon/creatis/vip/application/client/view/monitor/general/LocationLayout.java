@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -39,19 +39,18 @@ import com.google.gwt.visualization.client.AbstractDataTable;
 import com.google.gwt.visualization.client.DataTable;
 import com.google.gwt.visualization.client.VisualizationUtils;
 import com.google.gwt.visualization.client.visualizations.GeoMap;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import java.util.Map;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class LocationLayout extends AbstractFormLayout {
 
@@ -66,7 +65,6 @@ public class LocationLayout extends AbstractFormLayout {
         this.simulationID = simulationID;
 
         configureChart();
-        modal = new ModalWindow(chartLayout);
     }
 
     private void configureChart() {
@@ -87,27 +85,22 @@ public class LocationLayout extends AbstractFormLayout {
 
         JobServiceAsync service = JobService.Util.getInstance();
         AsyncCallback<Map<String, Integer>> callback = new AsyncCallback<Map<String, Integer>>() {
-
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to load locations:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to load locations:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(Map<String, Integer> result) {
-                modal.hide();
                 VisualizationUtils.loadVisualizationApi(getGeoMapRunnable(result), GeoMap.PACKAGE);
             }
         };
-        modal.show("Loading locations...", true);
         service.getCountriesMap(simulationID, callback);
     }
 
     private Runnable getGeoMapRunnable(final Map<String, Integer> data) {
 
         return new Runnable() {
-
             @Override
             public void run() {
 
@@ -126,12 +119,12 @@ public class LocationLayout extends AbstractFormLayout {
                     dataTable.setValue(i, 1, data.get(country));
                     i++;
                 }
-                
+
                 if (i == 0) {
                     dataTable.setValue(0, 0, "France");
                     dataTable.setValue(0, 0, 0);
                 }
-                
+
                 GeoMap geoMap = new GeoMap(dataTable, options);
 
                 chartLayout.removeMember(innerChartLayout);

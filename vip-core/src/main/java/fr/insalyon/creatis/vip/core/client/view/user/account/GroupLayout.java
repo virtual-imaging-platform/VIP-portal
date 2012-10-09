@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -36,7 +36,6 @@ package fr.insalyon.creatis.vip.core.client.view.user.account;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
@@ -44,12 +43,13 @@ import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.Map;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class GroupLayout extends AbstractFormLayout {
 
@@ -79,8 +79,7 @@ public class GroupLayout extends AbstractFormLayout {
 
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.say("Unable to load groups:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to load groups:<br />" + caught.getMessage());
             }
 
             @Override

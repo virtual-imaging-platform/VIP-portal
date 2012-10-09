@@ -72,6 +72,7 @@ public class EditGroupLayout extends AbstractFormLayout {
     private boolean newGroup = true;
     private TextItem nameItem;
     private CheckboxItem isPublicField;
+    private IButton saveButton;
     private IButton removeButton;
     private ListGrid grid;
     private ModalWindow gridModal;
@@ -95,32 +96,29 @@ public class EditGroupLayout extends AbstractFormLayout {
         isPublicField.setTitle("Public");
         isPublicField.setWidth(350);
 
-        IButton saveButton = new IButton("Save", new ClickHandler() {
+        saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
+                new ClickHandler() {
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        if (nameItem.validate()) {
+                            save(nameItem.getValueAsString().trim(),
+                                    isPublicField.getValueAsBoolean());
+                        }
+                    }
+                });
 
-            @Override
-            public void onClick(ClickEvent event) {
-                if (nameItem.validate()) {
-                    save(nameItem.getValueAsString().trim(),
-                            isPublicField.getValueAsBoolean());
-                }
-            }
-        });
-        saveButton.setIcon(CoreConstants.ICON_SAVE);
-
-        removeButton = new IButton("Remove", new ClickHandler() {
-
-            @Override
-            public void onClick(ClickEvent event) {
-                if (nameItem.validate()) {
-                    remove(nameItem.getValueAsString().trim());
-                }
-            }
-        });
-        removeButton.setIcon(CoreConstants.ICON_DELETE);
+        removeButton = WidgetUtil.getIButton("Remove", CoreConstants.ICON_DELETE,
+                new ClickHandler() {
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        if (nameItem.validate()) {
+                            remove(nameItem.getValueAsString().trim());
+                        }
+                    }
+                });
         removeButton.setDisabled(true);
 
         grid = new ListGrid() {
-
             @Override
             protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
 
@@ -135,13 +133,11 @@ public class EditGroupLayout extends AbstractFormLayout {
                     rollOverCanvas.addMember(FieldUtil.getImgButton(
                             CoreConstants.ICON_DELETE, "Remove user from this group",
                             new ClickHandler() {
-
                                 @Override
                                 public void onClick(ClickEvent event) {
                                     final String email = rollOverRecord.getAttribute("email");
                                     SC.ask("Do you really want to remove the user \""
                                             + email + "\" from this group?", new BooleanCallback() {
-
                                         @Override
                                         public void execute(Boolean value) {
                                             if (value) {
@@ -207,13 +203,11 @@ public class EditGroupLayout extends AbstractFormLayout {
     private void save(String name, boolean isPublic) {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+        WidgetUtil.setLoadingIButton(saveButton, "Saving...");
 
         if (newGroup) {
-            modal.show("Adding " + name + "...", true);
             service.addGroup(new Group(name, isPublic), getCallback("add"));
-
         } else {
-            modal.show("Updating " + name + "...", true);
             service.updateGroup(oldName, new Group(name, isPublic), getCallback("update"));
         }
     }
@@ -221,16 +215,15 @@ public class EditGroupLayout extends AbstractFormLayout {
     private void remove(final String name) {
 
         if (name.equals(CoreConstants.GROUP_SUPPORT)) {
-            SC.warn("You can not remove the " + name + " group.");
+            Layout.getInstance().setWarningMessage("You can not remove the <b>" + name + "</b> group.");
             return;
         }
         SC.ask("Do you really want to remove \"" + name + "\" group?", new BooleanCallback() {
-
             @Override
             public void execute(Boolean value) {
                 if (value) {
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-                    modal.show("Removing " + name + "...", true);
+                    WidgetUtil.setLoadingIButton(removeButton, "Removing...");
                     service.removeGroup(name, getCallback("remove"));
                 }
             }
@@ -240,16 +233,17 @@ public class EditGroupLayout extends AbstractFormLayout {
     private AsyncCallback<Void> getCallback(final String text) {
 
         return new AsyncCallback<Void>() {
-
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to " + text + " group:<br />" + caught.getMessage());
+                WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
+                WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
+                Layout.getInstance().setWarningMessage("Unable to " + text + " group:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(Void result) {
-                modal.hide();
+                WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
+                WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
                 setGroup(null, false);
                 ((ManageGroupsTab) Layout.getInstance().getTab(
                         CoreConstants.TAB_MANAGE_GROUPS)).loadGroups();
@@ -261,11 +255,10 @@ public class EditGroupLayout extends AbstractFormLayout {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<List<User>> callback = new AsyncCallback<List<User>>() {
-
             @Override
             public void onFailure(Throwable caught) {
                 gridModal.hide();
-                SC.warn("Unable to load users:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to load users:<br />" + caught.getMessage());
             }
 
             @Override
@@ -287,11 +280,10 @@ public class EditGroupLayout extends AbstractFormLayout {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
             @Override
             public void onFailure(Throwable caught) {
                 gridModal.hide();
-                SC.warn("Unable to remove user:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to remove user:<br />" + caught.getMessage());
             }
 
             @Override

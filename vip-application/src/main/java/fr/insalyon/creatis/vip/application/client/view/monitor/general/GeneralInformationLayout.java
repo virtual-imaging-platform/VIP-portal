@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -35,7 +35,6 @@
 package fr.insalyon.creatis.vip.application.client.view.monitor.general;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -44,13 +43,13 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants.Simulatio
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class GeneralInformationLayout extends AbstractFormLayout {
 
@@ -61,17 +60,15 @@ public class GeneralInformationLayout extends AbstractFormLayout {
 
         super("100%", "200px");
         addTitle("General Information", ApplicationConstants.ICON_GENERAL);
-        
+
         this.simulationID = simulationID;
 
         configureGrid();
-        modal = new ModalWindow(grid);
     }
 
     private void configureGrid() {
 
         grid = new ListGrid() {
-
             @Override
             protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
 
@@ -102,7 +99,7 @@ public class GeneralInformationLayout extends AbstractFormLayout {
         ListGridField valueField = new ListGridField("value", "Value");
 
         grid.setFields(propertyField, valueField);
-        
+
         this.addMember(grid);
     }
 
@@ -110,16 +107,13 @@ public class GeneralInformationLayout extends AbstractFormLayout {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Simulation> callback = new AsyncCallback<Simulation>() {
-
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to load general information:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to load general information:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(Simulation result) {
-                modal.hide();
                 grid.setData(new PropertyRecord[]{
                             new PropertyRecord("Simulation Name", result.getSimulationName()),
                             new PropertyRecord("Simulation Identifier", result.getID()),
@@ -130,7 +124,6 @@ public class GeneralInformationLayout extends AbstractFormLayout {
                         });
             }
         };
-        modal.show("Loading data...", true);
         service.getSimulation(simulationID, callback);
     }
 }

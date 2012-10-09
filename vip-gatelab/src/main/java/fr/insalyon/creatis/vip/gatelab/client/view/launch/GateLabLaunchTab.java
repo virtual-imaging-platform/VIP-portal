@@ -98,7 +98,6 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
                 launchFormLayout.addButtons(5, loadMacButton);
 
                 modal.hide();
-                modal = launchFormLayout.getModal();
 
                 configureInputsLayout(false);
             }

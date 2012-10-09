@@ -104,7 +104,6 @@ public class LaunchTab extends AbstractLaunchTab {
                 }
 
                 modal.hide();
-                modal = launchFormLayout.getModal();
 
                 configureInputsLayout(true);
 

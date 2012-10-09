@@ -52,6 +52,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -66,6 +67,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
     private TextItem nameField;
     private TextItem lfnField;
     private SelectItem classesPickList;
+    private IButton saveButton;
     private IButton removeButton;
 
     public EditApplicationLayout() {
@@ -88,39 +90,35 @@ public class EditApplicationLayout extends AbstractFormLayout {
         classesPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
         classesPickList.setWidth(450);
 
-        IButton saveButton = new IButton("Save");
-        saveButton.setIcon(CoreConstants.ICON_SAVE);
-        saveButton.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(ClickEvent event) {
-                if (nameField.validate() & lfnField.validate() & classesPickList.validate()) {
-
-                    List<String> values = new ArrayList<String>();
-                    values.addAll(Arrays.asList(classesPickList.getValues()));
-
-                    save(new Application(nameField.getValueAsString().trim(),
-                            lfnField.getValueAsString().trim(), values));
-                }
-            }
-        });
-
-        removeButton = new IButton("Remove", new ClickHandler() {
-
-            @Override
-            public void onClick(ClickEvent event) {
-                SC.ask("Do you really want to remove this application?", new BooleanCallback() {
-
+        saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
+                new ClickHandler() {
                     @Override
-                    public void execute(Boolean value) {
-                        if (value) {
-                            remove(nameField.getValueAsString().trim());
+                    public void onClick(ClickEvent event) {
+                        if (nameField.validate() & lfnField.validate() & classesPickList.validate()) {
+
+                            List<String> values = new ArrayList<String>();
+                            values.addAll(Arrays.asList(classesPickList.getValues()));
+
+                            save(new Application(nameField.getValueAsString().trim(),
+                                    lfnField.getValueAsString().trim(), values));
                         }
                     }
                 });
-            }
-        });
-        removeButton.setIcon(CoreConstants.ICON_DELETE);
+
+        removeButton = WidgetUtil.getIButton("Remove", CoreConstants.ICON_DELETE,
+                new ClickHandler() {
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        SC.ask("Do you really want to remove this application?", new BooleanCallback() {
+                            @Override
+                            public void execute(Boolean value) {
+                                if (value) {
+                                    remove(nameField.getValueAsString().trim());
+                                }
+                            }
+                        });
+                    }
+                });
         removeButton.setDisabled(true);
 
         addField("Name", nameField);
@@ -157,41 +155,52 @@ public class EditApplicationLayout extends AbstractFormLayout {
     }
 
     /**
-     * 
-     * @param app 
+     *
+     * @param app
      */
     private void save(Application app) {
 
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        WidgetUtil.setLoadingIButton(saveButton, "Saving...");
 
         if (newApplication) {
-            modal.show("Adding application '" + app.getName() + "'...", true);
             service.add(app, getCallback("add"));
-
         } else {
-            modal.show("Updating application '" + app.getName() + "'...", true);
             service.update(app, getCallback("update"));
         }
     }
 
     /**
-     * 
+     * Removes an application.
+     *
+     * @param name Application name
+     */
+    private void remove(String name) {
+
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        WidgetUtil.setLoadingIButton(removeButton, "Removing...");
+        service.remove(name, getCallback("remove"));
+    }
+
+    /**
+     *
      * @param text
-     * @return 
+     * @return
      */
     private AsyncCallback<Void> getCallback(final String text) {
 
         return new AsyncCallback<Void>() {
-
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to " + text + " application:<br />" + caught.getMessage());
+                WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
+                WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
+                Layout.getInstance().setWarningMessage("Unable to " + text + " application:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(Void result) {
-                modal.hide();
+                WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
+                WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
                 setApplication(null, null, null);
                 ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
@@ -207,16 +216,13 @@ public class EditApplicationLayout extends AbstractFormLayout {
 
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<List<AppClass>> callback = new AsyncCallback<List<AppClass>>() {
-
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to get list of classes:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get list of classes:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(List<AppClass> result) {
-                modal.hide();
                 List<String> dataList = new ArrayList<String>();
                 for (AppClass c : result) {
                     dataList.add(c.getName());
@@ -224,36 +230,6 @@ public class EditApplicationLayout extends AbstractFormLayout {
                 classesPickList.setValueMap(dataList.toArray(new String[]{}));
             }
         };
-        modal.show("Loading classes...", true);
         service.getClasses(callback);
-    }
-
-    /**
-     * Removes an application.
-     *
-     * @param name Application name
-     */
-    private void remove(String name) {
-
-        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
-        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to remove application:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(Void result) {
-                modal.hide();
-                SC.say("The application was successfully removed!");
-                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
-                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                appsTab.loadApplications();
-            }
-        };
-        modal.show("Removing application '" + name + "'...", true);
-        service.remove(name, callback);
     }
 }
