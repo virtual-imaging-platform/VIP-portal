@@ -43,6 +43,8 @@ import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +56,7 @@ import java.util.Map;
  * @author Rafael Ferreira da Silva
  */
 public class LaunchTab extends AbstractLaunchTab {
-
+    
     public LaunchTab(String applicationName) {
 
         this(applicationName, null, null);
@@ -90,12 +92,15 @@ public class LaunchTab extends AbstractLaunchTab {
                 for (Source source : descriptor.getSources()) {
                     launchFormLayout.addSource(new InputHLayout(source.getName(), source.getDescription()));
                 }
+                
+                launchButton = getLaunchButton();
+                saveInputsButton = getSaveInputsButton();
 
                 if (CoreModule.user.isSystemAdministrator() || CoreModule.user.isGroupAdmin()) {
-                    launchFormLayout.addButtons(getLaunchButton(), getSaveInputsButton(),
+                    launchFormLayout.addButtons(launchButton, saveInputsButton,
                             getSaveAsExampleButton());
                 } else {
-                    launchFormLayout.addButtons(getLaunchButton(), getSaveInputsButton());
+                    launchFormLayout.addButtons(launchButton, saveInputsButton);
                 }
 
                 modal.hide();
@@ -118,7 +123,9 @@ public class LaunchTab extends AbstractLaunchTab {
     @Override
     protected void launch() {
 
-        modal.show("Launching simulation '" + getSimulationName() + "'...", true);
+        launchButton.setTitle("Launching...");
+        launchButton.setIcon(CoreConstants.ICON_LOADING);
+        launchButton.setDisabled(true);
 
         // Input data verification
         List<String> inputData = new ArrayList<String>();
@@ -136,8 +143,8 @@ public class LaunchTab extends AbstractLaunchTab {
             final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
                 @Override
                 public void onFailure(Throwable caught) {
-                    modal.hide();
-                    SC.warn("Error on input data:<br />" + caught.getMessage());
+                    resetLaunchButton();
+                    Layout.getInstance().setWarningMessage("Error on input data:<br />" + caught.getMessage(), 10);
                 }
 
                 @Override
@@ -160,14 +167,14 @@ public class LaunchTab extends AbstractLaunchTab {
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to launch the simulation:<br />" + caught.getMessage());
+                resetLaunchButton();
+                Layout.getInstance().setWarningMessage("Unable to launch the simulation:<br />" + caught.getMessage(), 10);
             }
 
             @Override
             public void onSuccess(Void result) {
-                modal.hide();
-                SC.say("Simulation '" + getSimulationName() + "' successfully launched.");
+                resetLaunchButton();
+                Layout.getInstance().setNoticeMessage("Simulation '<b>" + getSimulationName() + "</b>' successfully launched.", 10);
             }
         };
         service.launchSimulation(getParametersMap(), applicationName,

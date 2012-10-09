@@ -66,6 +66,8 @@ public abstract class AbstractLaunchTab extends Tab {
     protected ModalWindow modal;
     protected LaunchFormLayout launchFormLayout;
     protected InputsLayout inputsLayout;
+    protected IButton launchButton;
+    protected IButton saveInputsButton;
 
     public AbstractLaunchTab(String applicationName) {
 
@@ -132,10 +134,10 @@ public abstract class AbstractLaunchTab extends Tab {
     }
 
     /**
-     * 
+     *
      */
     protected void configureInputsLayout(boolean showExamples) {
-        
+
         inputsLayout = new InputsLayout(getAttribute("ID"), showExamples);
         layout.addMember(inputsLayout);
     }
@@ -151,8 +153,9 @@ public abstract class AbstractLaunchTab extends Tab {
 
     protected IButton getLaunchButton() {
 
-        IButton launchButton = new IButton("Launch");
+        launchButton = new IButton("Launch");
         launchButton.setIcon(ApplicationConstants.ICON_LAUNCH);
+        launchButton.setShowDisabledIcon(false);
         launchButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
@@ -164,6 +167,13 @@ public abstract class AbstractLaunchTab extends Tab {
             }
         });
         return launchButton;
+    }
+
+    protected void resetLaunchButton() {
+        
+        launchButton.setTitle("Launch");
+        launchButton.setIcon(ApplicationConstants.ICON_LAUNCH);
+        launchButton.setDisabled(false);
     }
 
     protected IButton getSaveInputsButton() {
@@ -201,8 +211,8 @@ public abstract class AbstractLaunchTab extends Tab {
 
     /**
      * Gets the name of the simulation.
-     * 
-     * @return 
+     *
+     * @return
      */
     protected String getSimulationName() {
 

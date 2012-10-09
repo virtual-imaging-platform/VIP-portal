@@ -76,7 +76,8 @@ public class UserMenuButton extends ToolStripMenuButton {
         accountItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new AccountTab());
+//                Layout.getInstance().addTab(new AccountTab());
+                Layout.getInstance().setMessage("Account Settings Message", 5000);
             }
         });
 

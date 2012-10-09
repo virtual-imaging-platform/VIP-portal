@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -35,7 +35,6 @@
 package fr.insalyon.creatis.vip.core.client.view.layout;
 
 import com.google.gwt.user.client.Cookies;
-import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.VisibilityMode;
 import com.smartgwt.client.util.SC;
@@ -51,11 +50,13 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.auth.ActivationTab;
 import fr.insalyon.creatis.vip.core.client.view.auth.SignInTab;
+import fr.insalyon.creatis.vip.core.client.view.common.MessageWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
 import java.util.Date;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class Layout {
 
@@ -64,6 +65,7 @@ public class Layout {
     private CenterTabSet centerTabSet;
     private SectionStack mainSectionStack;
     private ModalWindow modal;
+    private MessageWindow messageWindow;
 
     public static Layout getInstance() {
         if (instance == null) {
@@ -77,6 +79,8 @@ public class Layout {
         vLayout = new VLayout();
         vLayout.setWidth100();
         vLayout.setHeight100();
+
+        messageWindow = new MessageWindow(vLayout);
 
         vLayout.addMember(MainToolStrip.getInstance());
 
@@ -107,7 +111,7 @@ public class Layout {
 
     /**
      * Authenticates a user.
-     * 
+     *
      */
     public void authenticate(User user) {
 
@@ -131,17 +135,18 @@ public class Layout {
 
     /**
      * Signs out.
-     * 
+     *
      */
     public void signout() {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
+            @Override
             public void onFailure(Throwable caught) {
                 SC.warn("Error while signing out:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
 
                 Cookies.setCookie(CoreConstants.COOKIES_USER, null, new Date(0), null, "/", false);
@@ -202,5 +207,34 @@ public class Layout {
         if (centerTabSet.getTab(tab.getID()) != null) {
             centerTabSet.removeTab(tab);
         }
+    }
+
+    /**
+     *
+     * @param message
+     * @param delay
+     */
+    public void setMessage(String message, int delay) {
+        messageWindow.setMessage(message, "#FFFFFF", delay);
+    }
+
+    /**
+     *
+     * @param message
+     * @param delay
+     */
+    public void setNoticeMessage(String message, int delay) {
+
+        messageWindow.setMessage(message, "#99CC99", delay);
+    }
+
+    /**
+     *
+     * @param message
+     * @param delay
+     */
+    public void setWarningMessage(String message, int delay) {
+
+        messageWindow.setMessage(message, "#DD8888", delay);
     }
 }

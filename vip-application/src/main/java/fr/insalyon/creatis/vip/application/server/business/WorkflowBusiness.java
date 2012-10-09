@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -69,7 +69,7 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class WorkflowBusiness {
 
@@ -265,6 +265,7 @@ public class WorkflowBusiness {
             for (String output : outputs) {
                 client.delete(output, email);
             }
+            workflowDB.cleanWorkflow(simulationID);
 
         } catch (fr.insalyon.creatis.vip.core.server.dao.DAOException ex) {
             WorkflowBusiness.logAndThrow(ex);

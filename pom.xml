@@ -4,14 +4,14 @@
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip</artifactId>
     <packaging>pom</packaging>
-    <version>0.8.6</version>
+    <version>0.8.7</version>
     <name>VIP</name>
     
     <properties>
-        <vip.core.version>0.8.6</vip.core.version>
-        <vip.portal.version>0.8.6</vip.portal.version>
+        <vip.core.version>0.8.7</vip.core.version>
+        <vip.portal.version>0.8.7</vip.portal.version>
         <vip.docs.version>0.8.1</vip.docs.version>
-        <vip.application.version>0.8.6</vip.application.version>
+        <vip.application.version>0.8.7</vip.application.version>
         <vip.datamanager.version>0.8.1</vip.datamanager.version>
         <vip.datamanager-applet.version>0.3.1</vip.datamanager-applet.version>
         <vip.gatelab.version>0.5.10</vip.gatelab.version>

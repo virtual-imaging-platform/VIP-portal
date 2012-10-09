@@ -36,7 +36,6 @@ package fr.insalyon.creatis.vip.social.client;
 
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -101,7 +100,7 @@ public class SocialModule extends Module {
         AsyncCallback<Integer> callback = new AsyncCallback<Integer>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Unable to verify messages:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Connection lost with the server.", 20);
             }
 
             public void onSuccess(Integer result) {
