@@ -35,7 +35,6 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
@@ -43,8 +42,8 @@ import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,7 +79,7 @@ public class LaunchTab extends AbstractLaunchTab {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to download application source file:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to download application source file:<br />" + caught.getMessage(), 10);
             }
 
             @Override
@@ -93,12 +92,13 @@ public class LaunchTab extends AbstractLaunchTab {
                     launchFormLayout.addSource(new InputHLayout(source.getName(), source.getDescription()));
                 }
                 
-                launchButton = getLaunchButton();
-                saveInputsButton = getSaveInputsButton();
+                configureLaunchButton();
+                configureSaveInputsButton();
 
                 if (CoreModule.user.isSystemAdministrator() || CoreModule.user.isGroupAdmin()) {
+                    configureSaveAsExampleButton();
                     launchFormLayout.addButtons(launchButton, saveInputsButton,
-                            getSaveAsExampleButton());
+                            saveAsExampleButton);
                 } else {
                     launchFormLayout.addButtons(launchButton, saveInputsButton);
                 }
@@ -123,9 +123,7 @@ public class LaunchTab extends AbstractLaunchTab {
     @Override
     protected void launch() {
 
-        launchButton.setTitle("Launching...");
-        launchButton.setIcon(CoreConstants.ICON_LOADING);
-        launchButton.setDisabled(true);
+        WidgetUtil.setLoadingButton(launchButton, "Launching...");
 
         // Input data verification
         List<String> inputData = new ArrayList<String>();

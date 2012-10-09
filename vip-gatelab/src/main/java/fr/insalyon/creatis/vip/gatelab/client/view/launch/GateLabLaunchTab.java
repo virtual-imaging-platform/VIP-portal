@@ -35,7 +35,6 @@
 package fr.insalyon.creatis.vip.gatelab.client.view.launch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -46,6 +45,8 @@ import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabService;
 import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabServiceAsync;
@@ -78,7 +79,7 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to download application source file:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to download application source file:<br />" + caught.getMessage(), 10);
             }
 
             @Override
@@ -93,7 +94,7 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
                     launchFormLayout.addSource(new GateLabSourceLayout(source.getName(), source.getDescription()));
                 }
 
-                loadMacButton = getLoadMacButton();
+                configureLoadMacButton();
                 launchFormLayout.addButtons(5, loadMacButton);
 
                 modal.hide();
@@ -106,19 +107,17 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
         service.getApplicationDescriptor(applicationName, callback);
     }
 
-    private IButton getLoadMacButton() {
+    private void configureLoadMacButton() {
 
-        IButton launchButton = new IButton("Load Main MacFile");
-        launchButton.setWidth(150);
-        launchButton.setIcon(CoreConstants.ICON_SAVED);
-        launchButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                loadMacWindow = new LoadMacWindow(modal, baseDir);
-                loadMacWindow.show();
-            }
-        });
-        return launchButton;
+        loadMacButton = WidgetUtil.getIButton("Load Main MacFile", CoreConstants.ICON_SAVED,
+                new ClickHandler() {
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        loadMacWindow = new LoadMacWindow(modal, baseDir);
+                        loadMacWindow.show();
+                    }
+                });
+        loadMacButton.setWidth(150);
     }
 
     public void uploadMacComplete(String inputTgz, String simuType, String nbPart) {
@@ -142,7 +141,11 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
 
             loadMacButton.hide();
             launchFormLayout.setSourcesLayoutVisibible(true);
-            launchFormLayout.addButtons(getLaunchButton(), getSaveInputsButton());
+            
+            configureLaunchButton();
+            configureSaveInputsButton();
+            
+            launchFormLayout.addButtons(launchButton, saveInputsButton);
         }
     }
 
@@ -164,13 +167,13 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to download application source file:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to report problem:<br />" + caught.getMessage(), 10);
             }
 
             @Override
             public void onSuccess(Void result) {
                 modal.hide();
-                SC.say("Problem successfully reported.");
+                Layout.getInstance().setNoticeMessage("Problem successfully reported.", 10);
             }
         };
         modal.show("Reporting problem...", true);
@@ -195,19 +198,20 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
     @Override
     protected void launch() {
 
+        WidgetUtil.setLoadingButton(launchButton, "Launching...");
+        
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Error while launching simulation: " + caught.getMessage());
+                resetLaunchButton();
+                Layout.getInstance().setWarningMessage("Unable to launch the simulation:<br />" + caught.getMessage(), 10);
             }
 
             public void onSuccess(Void result) {
-                modal.hide();
-                SC.say("Simulation '" + getSimulationName() + "' successfully launched.");
+                resetLaunchButton();
+                Layout.getInstance().setNoticeMessage("Simulation '<b>" + getSimulationName() + "</b>' successfully launched.", 10);
             }
         };
-        modal.show("Launching simulation '" + getSimulationName() + "'...", true);
         service.launchSimulation(getParametersMap(), applicationName,
                 getSimulationName(), callback);
     }

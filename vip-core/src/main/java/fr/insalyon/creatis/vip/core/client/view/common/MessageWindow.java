@@ -65,23 +65,35 @@ public class MessageWindow {
         panel.setOpacity(85);
         panel.setBackgroundColor("#FFFFFF");
         panel.setBorder("1px solid #CCCCCC");
+        panel.setUseOpacityFilter(true);
+        panel.setAnimateTime(1200);
         panel.addDrawHandler(new DrawHandler() {
             @Override
             public void onDraw(DrawEvent event) {
                 panel.setWidth(messageLabel.getWidth());
                 panel.setHeight(messageLabel.getHeight());
-                panel.moveTo((canvas.getVisibleWidth() / 2) - (panel.getWidth() / 2), 2);
+                panel.moveTo(getPanelXPosition(canvas), 2);
             }
         });
 
         canvas.addResizedHandler(new ResizedHandler() {
             @Override
             public void onResized(ResizedEvent event) {
-                panel.moveTo((canvas.getVisibleWidth() / 2) - (panel.getWidth() / 2), 2);
+                panel.moveTo(getPanelXPosition(canvas), 2);
             }
         });
     }
 
+    /**
+     * Gets the X axis position for the panel.
+     * 
+     * @param canvas
+     * @return 
+     */
+    private int getPanelXPosition(Canvas canvas) {
+        return (canvas.getVisibleWidth() / 2) - (panel.getWidth() / 2);
+    }
+    
     private void clear() {
 
         for (Canvas canvas : panel.getMembers()) {
@@ -112,20 +124,23 @@ public class MessageWindow {
         Img closeImg = new Img(CoreConstants.ICON_CLOSE, 16, 16);
         closeImg.setCursor(Cursor.HAND);
         closeImg.setPrompt("Close");
+        closeImg.setMargin(2);
         closeImg.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                panel.hide();
+                panel.animateFade(0);
+//                panel.hide();
             }
         });
         panel.addMember(closeImg);
     }
 
     /**
+     * Displays a message in the panel.
      * 
-     * @param message
-     * @param bgColor
-     * @param delay 
+     * @param message Message to be displayed
+     * @param bgColor Background color in hexadecimal
+     * @param delay Time in seconds the panel will appear
      */
     public void setMessage(String message, String bgColor, int delay) {
 
@@ -136,11 +151,13 @@ public class MessageWindow {
             new Timer() {
                 @Override
                 public void run() {
-                    panel.hide();
+                    panel.animateFade(0);
+//                    panel.hide();
                 }
             }.schedule(delay * 1000);
         }
         panel.setBackgroundColor(bgColor);
         panel.show();
+        panel.animateFade(100);
     }
 }

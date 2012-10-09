@@ -36,12 +36,14 @@ package fr.insalyon.creatis.vip.core.client.view.util;
 
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Cursor;
+import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 
 /**
  *
@@ -213,5 +215,50 @@ public class WidgetUtil {
         button.setPrompt(prompt);
         button.addClickHandler(clickHandler);
         return button;
+    }
+    
+    /**
+     * Gets an IButton configured to display a title, an icon and perform an action.
+     * 
+     * @param title Button title
+     * @param icon Button icon
+     * @param clickHandler Action to be performed
+     * @return 
+     */
+    public static IButton getIButton(String title, String icon, 
+            ClickHandler clickHandler) {
+        
+        IButton button = new IButton(title);
+        button.setIcon(icon);
+        button.setShowDisabledIcon(false);
+        button.addClickHandler(clickHandler);
+        return button;
+    }
+    
+    /**
+     * Sets a button to a loading state.
+     * 
+     * @param button Button object
+     * @param title Button title
+     */
+    public static void setLoadingButton(IButton button, String title) {
+        
+        button.setTitle(title);
+        button.setIcon(CoreConstants.ICON_LOADING);
+        button.setDisabled(true);
+    }
+    
+    /**
+     * Resets a button to its initial state.
+     * 
+     * @param button Button object
+     * @param title Button title
+     * @param icon  Button icon
+     */
+    public static void resetIButton(IButton button, String title, String icon) {
+        
+        button.setTitle(title);
+        button.setIcon(icon);
+        button.setDisabled(false);
     }
 }

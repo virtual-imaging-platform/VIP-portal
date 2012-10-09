@@ -52,6 +52,7 @@ import fr.insalyon.creatis.vip.application.client.view.launch.LaunchFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,6 +69,7 @@ public abstract class AbstractLaunchTab extends Tab {
     protected InputsLayout inputsLayout;
     protected IButton launchButton;
     protected IButton saveInputsButton;
+    protected IButton saveAsExampleButton;
 
     public AbstractLaunchTab(String applicationName) {
 
@@ -151,62 +153,81 @@ public abstract class AbstractLaunchTab extends Tab {
         return launchFormLayout.getParametersMap();
     }
 
-    protected IButton getLaunchButton() {
+    /**
+     * Configures the launch button.
+     */
+    protected void configureLaunchButton() {
 
-        launchButton = new IButton("Launch");
-        launchButton.setIcon(ApplicationConstants.ICON_LAUNCH);
-        launchButton.setShowDisabledIcon(false);
-        launchButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                if (validate()) {
-                    launch();
-                } else {
-                    SC.warn("Cannot launch. Some inputs are not valid.");
-                }
-            }
-        });
-        return launchButton;
+        launchButton = WidgetUtil.getIButton("Launch", ApplicationConstants.ICON_LAUNCH,
+                new ClickHandler() {
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        if (validate()) {
+                            launch();
+                        } else {
+                            SC.warn("Cannot launch. Some inputs are not valid.");
+                        }
+                    }
+                });
     }
 
+    /**
+     * Resets the launch button to its initial state.
+     */
     protected void resetLaunchButton() {
-        
-        launchButton.setTitle("Launch");
-        launchButton.setIcon(ApplicationConstants.ICON_LAUNCH);
-        launchButton.setDisabled(false);
+
+        WidgetUtil.resetIButton(launchButton, "Launch", ApplicationConstants.ICON_LAUNCH);
     }
 
-    protected IButton getSaveInputsButton() {
+    /**
+     * Configures the save inputs button.
+     */
+    protected void configureSaveInputsButton() {
 
-        IButton saveButton = new IButton("Save Inputs");
-        saveButton.setIcon(CoreConstants.ICON_SAVED);
-        saveButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                if (validate()) {
-                    verifySimulationName();
-                }
-            }
-        });
-        return saveButton;
+        saveInputsButton = WidgetUtil.getIButton("Save Inputs", CoreConstants.ICON_SAVED,
+                new ClickHandler() {
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        if (validate()) {
+                            saveInputs();
+                        }
+                    }
+                });
     }
 
-    protected IButton getSaveAsExampleButton() {
+    /**
+     * Resets the save inputs button to its initial state.
+     */
+    protected void resetSaveInputsButton() {
 
-        IButton saveButton = new IButton("Save as Example");
-        saveButton.setIcon(CoreConstants.ICON_EXAMPLE);
-        saveButton.setWidth(120);
-        saveButton.setPrompt("Save the inputs as a featured example that will "
+        WidgetUtil.resetIButton(saveInputsButton, "Save Inputs", CoreConstants.ICON_SAVED);
+    }
+
+    /**
+     * Configures the save as example button.
+     */
+    protected void configureSaveAsExampleButton() {
+
+        saveAsExampleButton = WidgetUtil.getIButton("Save as Example", CoreConstants.ICON_EXAMPLE,
+                new ClickHandler() {
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        if (validate()) {
+                            saveInputsAsExample();
+                        }
+                    }
+                });
+        saveAsExampleButton.setPrompt("Save the inputs as a featured example that will "
                 + "be available for all users.");
-        saveButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                if (validate()) {
-                    saveInputsAsExample();
-                }
-            }
-        });
-        return saveButton;
+        saveAsExampleButton.setWidth(120);
+    }
+
+    /**
+     * Resets the save as example button to its initial state.
+     */
+    protected void resetSaveAsExampleButton() {
+
+        WidgetUtil.resetIButton(saveAsExampleButton, "Save as Example", CoreConstants.ICON_EXAMPLE);
     }
 
     /**
@@ -230,17 +251,18 @@ public abstract class AbstractLaunchTab extends Tab {
     }
 
     /**
-     * Verifies if the simulation name already exists.
+     * Verifies if the simulation name already exists and save the inputs.
      */
-    private void verifySimulationName() {
+    private void saveInputs() {
 
+        WidgetUtil.setLoadingButton(saveInputsButton, "Saving...");
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<SimulationInput> callback = new AsyncCallback<SimulationInput>() {
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
                 if (!caught.getMessage().contains("No data is available")) {
-                    SC.warn("Unable to verify simulation name:<br />" + caught.getMessage());
+                    resetSaveInputsButton();
+                    Layout.getInstance().setWarningMessage("Unable to verify simulation name:<br />" + caught.getMessage(), 10);
                 } else {
                     saveInputs(false);
                 }
@@ -248,19 +270,19 @@ public abstract class AbstractLaunchTab extends Tab {
 
             @Override
             public void onSuccess(SimulationInput result) {
-                modal.hide();
                 SC.ask("A simulation entitled \"" + getSimulationName() + "\" "
                         + "already exists. <br />Do you want to ovewrite the input data?", new BooleanCallback() {
                     @Override
                     public void execute(Boolean value) {
                         if (value) {
                             saveInputs(true);
+                        } else {
+                            resetSaveInputsButton();
                         }
                     }
                 });
             }
         };
-        modal.show("Verifying simulation name...", true);
         service.getInputByNameUserApp(getSimulationName(), applicationName, callback);
     }
 
@@ -270,8 +292,8 @@ public abstract class AbstractLaunchTab extends Tab {
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to save simulation inputs:<br />" + caught.getMessage());
+                resetSaveInputsButton();
+                Layout.getInstance().setWarningMessage("Unable to save simulation inputs:<br />" + caught.getMessage(), 10);
             }
 
             @Override
@@ -279,14 +301,12 @@ public abstract class AbstractLaunchTab extends Tab {
                 AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().
                         getTab(ApplicationConstants.getLaunchTabID(applicationName));
                 launchTab.loadInputsList();
-                modal.hide();
-                SC.say("Input values were succesfully saved!");
+                resetSaveInputsButton();
+                Layout.getInstance().setNoticeMessage("Input values were succesfully saved!", 10);
             }
         };
-        modal.show("Saving inputs...", true);
         if (update) {
             service.updateSimulationInput(getSimulationInput(), callback);
-
         } else {
             service.addSimulationInput(getSimulationInput(), callback);
         }
@@ -294,12 +314,13 @@ public abstract class AbstractLaunchTab extends Tab {
 
     private void saveInputsAsExample() {
 
+        WidgetUtil.setLoadingButton(saveAsExampleButton, "Saving...");
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to save simulation inputs:<br />" + caught.getMessage());
+                resetSaveAsExampleButton();
+                Layout.getInstance().setWarningMessage("Unable to save example inputs:<br />" + caught.getMessage(), 10);
             }
 
             @Override
@@ -307,11 +328,10 @@ public abstract class AbstractLaunchTab extends Tab {
                 AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().
                         getTab(ApplicationConstants.getLaunchTabID(applicationName));
                 launchTab.loadInputsList();
-                modal.hide();
-                SC.say("Input values were succesfully saved!");
+                resetSaveAsExampleButton();
+                Layout.getInstance().setNoticeMessage("Examples input values were succesfully saved!", 10);
             }
         };
-        modal.show("Saving example inputs...", true);
         service.saveInputsAsExamples(getSimulationInput(), callback);
     }
 
@@ -331,7 +351,6 @@ public abstract class AbstractLaunchTab extends Tab {
             sb.append("--");
         }
 
-        return new SimulationInput(applicationName,
-                getSimulationName(), sb.toString());
+        return new SimulationInput(applicationName, getSimulationName(), sb.toString());
     }
 }
