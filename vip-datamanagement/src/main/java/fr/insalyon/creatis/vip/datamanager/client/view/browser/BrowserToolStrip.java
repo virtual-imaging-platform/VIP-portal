@@ -303,7 +303,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                             @Override
                             public void onSuccess(Void result) {
                                 modal.hide();
-                                Layout.getInstance().setWarningMessage("The selected files/folders were successfully scheduled to be permanentely deleted.");
+                                Layout.getInstance().setNoticeMessage("The selected files/folders were successfully scheduled to be permanentely deleted.");
                                 BrowserLayout.getInstance().loadData(baseDir, true);
                             }
                         };
