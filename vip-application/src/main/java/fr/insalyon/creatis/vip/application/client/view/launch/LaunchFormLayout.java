@@ -48,8 +48,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSourceLayout;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.HashMap;
@@ -206,7 +206,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
             });
         }
         if (sb.length() > 0) {
-            SC.warn(sb.toString());
+            Layout.getInstance().setWarningMessage(sb.toString());
         }
     }
 

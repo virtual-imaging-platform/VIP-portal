@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -37,7 +37,6 @@ package fr.insalyon.creatis.vip.application.client.view.monitor;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SortDirection;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -60,13 +59,14 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.menu.LogsContextM
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.FileOrFolderRecord;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class LogsTab extends Tab {
 
@@ -120,6 +120,7 @@ public class LogsTab extends Tab {
 
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 
+            @Override
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 String type = event.getRecord().getAttributeAsString("icon");
                 if (type.contains("folder")) {
@@ -131,6 +132,7 @@ public class LogsTab extends Tab {
         });
         grid.addRowContextClickHandler(new RowContextClickHandler() {
 
+            @Override
             public void onRowContextClick(RowContextClickEvent event) {
                 event.cancel();
                 showContextMenu(event.getRecord());
@@ -154,6 +156,7 @@ public class LogsTab extends Tab {
         folderUpButton.setTooltip("Folder Up");
         folderUpButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 if (!pathItem.getValueAsString().equals("/" + simulationID)) {
                     String newPath = pathItem.getValueAsString();
@@ -168,6 +171,7 @@ public class LogsTab extends Tab {
         refreshButton.setTooltip("Refresh");
         refreshButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 loadData(pathItem.getValueAsString());
             }
@@ -179,6 +183,7 @@ public class LogsTab extends Tab {
         homeButton.setTooltip("Home");
         homeButton.addClickHandler(new ClickHandler() {
 
+            @Override
             public void onClick(ClickEvent event) {
                 loadData("/" + simulationID);
             }
@@ -191,11 +196,13 @@ public class LogsTab extends Tab {
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to get logs:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get logs:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<String> result) {
                 FileOrFolderRecord[] data = new FileOrFolderRecord[result.size()];
                 for (int i = 0; i < result.size(); i++) {

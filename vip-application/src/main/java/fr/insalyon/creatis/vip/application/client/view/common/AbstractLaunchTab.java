@@ -165,7 +165,7 @@ public abstract class AbstractLaunchTab extends Tab {
                         if (validate()) {
                             launch();
                         } else {
-                            SC.warn("Cannot launch. Some inputs are not valid.");
+                            Layout.getInstance().setWarningMessage("Cannot launch. Some inputs are not valid.");
                         }
                     }
                 });

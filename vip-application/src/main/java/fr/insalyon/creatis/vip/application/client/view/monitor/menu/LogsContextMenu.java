@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -47,14 +47,15 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
-import fr.insalyon.creatis.vip.application.client.view.monitor.ViewerWindow;
 import fr.insalyon.creatis.vip.application.client.view.monitor.LogsTab;
+import fr.insalyon.creatis.vip.application.client.view.monitor.ViewerWindow;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class LogsContextMenu extends Menu {
 
@@ -73,7 +74,7 @@ public class LogsContextMenu extends Menu {
         MenuItem viewItem = new MenuItem("View File");
         viewItem.setIcon(ApplicationConstants.ICON_PREVIEW);
         viewItem.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 new ViewerWindow("Viewing File: " + dataName,
                         simulationID, folder, dataName, "").show();
@@ -83,12 +84,12 @@ public class LogsContextMenu extends Menu {
         MenuItem downloadItem = new MenuItem("Download File");
         downloadItem.setIcon(DataManagerConstants.ICON_DOWNLOAD);
         downloadItem.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 Window.open(
                         GWT.getModuleBaseURL()
                         + "/getfileservice?filepath=" + baseDir
-                        + "/" + dataName + "&" + CoreConstants.COOKIES_SESSION 
+                        + "/" + dataName + "&" + CoreConstants.COOKIES_SESSION
                         + "=" + Cookies.getCookie(CoreConstants.COOKIES_SESSION), "", "");
             }
         });
@@ -96,10 +97,10 @@ public class LogsContextMenu extends Menu {
         MenuItem deleteItem = new MenuItem("Delete");
         deleteItem.setIcon(CoreConstants.ICON_DELETE);
         deleteItem.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 SC.confirm("Do you really want to delete '" + baseDir + "/" + dataName + "'?", new BooleanCallback() {
-
+                    @Override
                     public void execute(Boolean value) {
                         if (value != null && value) {
                             delete(baseDir + "/" + dataName);
@@ -111,22 +112,23 @@ public class LogsContextMenu extends Menu {
 
         if (isFile) {
             this.setItems(viewItem, downloadItem, deleteItem);
-            
+
         } else {
             this.setItems(deleteItem);
         }
     }
 
     private void delete(String path) {
-        
+
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
+            @Override
             public void onFailure(Throwable caught) {
                 section.getModal().hide();
-                SC.warn("Unable to delete:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to delete:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
                 section.getModal().hide();
                 section.loadData(baseDir);

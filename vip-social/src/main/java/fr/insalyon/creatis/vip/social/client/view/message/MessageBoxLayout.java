@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -45,6 +45,7 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
 import fr.insalyon.creatis.vip.social.client.bean.Message;
@@ -53,7 +54,7 @@ import fr.insalyon.creatis.vip.social.client.rpc.SocialServiceAsync;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class MessageBoxLayout extends HLayout {
 
@@ -110,7 +111,7 @@ public class MessageBoxLayout extends HLayout {
                 + message.getMessage().substring(0, 50) + "...</font>", 15, Cursor.HAND));
 
         mainLayout.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(ClickEvent event) {
                 setBackgroundColor("#FFFFFF");
                 new MessageViewerWindow(message).show();
@@ -130,7 +131,7 @@ public class MessageBoxLayout extends HLayout {
         dateLayout.setWidth(150);
         dateLayout.setAlign(VerticalAlignment.TOP);
 
-        dateLayout.addMember(WidgetUtil.getLabel("<font color=\"#666666\">" 
+        dateLayout.addMember(WidgetUtil.getLabel("<font color=\"#666666\">"
                 + message.getPosted() + "</font>", 15));
 
         this.addMember(dateLayout);
@@ -150,7 +151,7 @@ public class MessageBoxLayout extends HLayout {
         removeImg.setCursor(Cursor.HAND);
         removeImg.setPrompt("Remove");
         removeImg.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(ClickEvent event) {
                 remove();
             }
@@ -163,19 +164,20 @@ public class MessageBoxLayout extends HLayout {
     private void remove() {
 
         SC.confirm("Do you really want to remove this message?", new BooleanCallback() {
-
             public void execute(Boolean value) {
 
                 if (value != null && value) {
                     SocialServiceAsync service = SocialService.Util.getInstance();
                     AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
+                        @Override
                         public void onFailure(Throwable caught) {
-                            SC.warn("Unable to remove message:<br />" + caught.getMessage());
+                            Layout.getInstance().setWarningMessage("Unable to remove message:<br />" + caught.getMessage());
                         }
 
+                        @Override
                         public void onSuccess(Void result) {
                             destroy();
+                            Layout.getInstance().setNoticeMessage("Message successfully removed.");
                         }
                     };
                     service.removeMessageByReceiver(message.getId(), callback);

@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -38,7 +38,6 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -61,7 +60,7 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.chart.CheckpointC
 import fr.insalyon.creatis.vip.application.client.view.monitor.chart.GeneralBarChart;
 import fr.insalyon.creatis.vip.application.client.view.monitor.chart.JobFlowChart;
 import fr.insalyon.creatis.vip.application.client.view.monitor.chart.SitesBarChart;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.LinkedHashMap;
@@ -69,17 +68,17 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ChartsTab extends Tab {
 
     private String simulationID;
-    private ModalWindow modal;
     private VLayout leftVLayout;
     private VLayout rightVLayout;
     private SelectItem chartsItem;
     private TextItem binItem;
     private ListGrid grid;
+    private IButton generateButton;
 
     public ChartsTab(String simulationID) {
 
@@ -108,7 +107,6 @@ public class ChartsTab extends Tab {
         hLayout.addMember(leftVLayout);
         hLayout.addMember(rightVLayout);
 
-        modal = new ModalWindow(hLayout);
         this.setPane(hLayout);
     }
 
@@ -127,7 +125,6 @@ public class ChartsTab extends Tab {
         chartsItem.setValueMap(chartsMap);
         chartsItem.setEmptyDisplayValue("Select a chart...");
         chartsItem.addChangedHandler(new ChangedHandler() {
-
             @Override
             public void onChanged(ChangedEvent event) {
                 int value = new Integer(chartsItem.getValueAsString());
@@ -142,9 +139,7 @@ public class ChartsTab extends Tab {
         binItem = FieldUtil.getTextItem(50, false, "", "[0-9.]");
         binItem.setValue("100");
 
-        IButton generateButton = new IButton("Generate Chart");
-        generateButton.addClickHandler(new ClickHandler() {
-
+        generateButton = WidgetUtil.getIButton("Generate Chart", null, new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
                 generateChart();
@@ -173,7 +168,6 @@ public class ChartsTab extends Tab {
         ListGridField valueField = new ListGridField("value", "Value");
         valueField.setAlign(Alignment.RIGHT);
         valueField.setCellFormatter(new CellFormatter() {
-
             @Override
             public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
 
@@ -224,50 +218,48 @@ public class ChartsTab extends Tab {
     }
 
     /**
-     * 
+     *
      */
     private void plotJobsPerTime() {
 
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
-
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to get chart data:<br />" + caught.getMessage());
+                resetGenerateButton();
+                Layout.getInstance().setWarningMessage("Unable to get chart data:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(List<String> result) {
                 new JobFlowChart(result, rightVLayout, grid).build();
-                modal.hide();
+                resetGenerateButton();
             }
         };
-        modal.show("Building job flow chart...", true);
+        setLoadingGenerateButton();
         service.getJobFlow(simulationID, callback);
     }
 
     /**
-     * 
+     *
      */
     private void plotCkptsPerJob() {
 
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
-
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to get chart data:<br />" + caught.getMessage());
+                resetGenerateButton();
+                Layout.getInstance().setWarningMessage("Unable to get chart data:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(List<String> result) {
                 new CheckpointChart(result, rightVLayout, grid).build();
-                modal.hide();
+                resetGenerateButton();
             }
         };
-        modal.show("Building chart...", true);
+        setLoadingGenerateButton();
         service.getCkptsPerJob(simulationID, callback);
     }
 
@@ -279,20 +271,19 @@ public class ChartsTab extends Tab {
 
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
-
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to get chart data:<br />" + caught.getMessage());
+                resetGenerateButton();
+                Layout.getInstance().setWarningMessage("Unable to get chart data:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(List<String> result) {
                 new GeneralBarChart(result, rightVLayout, grid).build("Execution Time (sec)", "#00aa00", binSize);
-                modal.hide();
+                resetGenerateButton();
             }
         };
-        modal.show("Building chart...", true);
+        setLoadingGenerateButton();
         service.getExecutionPerNumberOfJobs(simulationID, binSize, callback);
     }
 
@@ -304,20 +295,19 @@ public class ChartsTab extends Tab {
 
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
-
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to get chart data:<br />" + caught.getMessage());
+                resetGenerateButton();
+                Layout.getInstance().setWarningMessage("Unable to get chart data:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(List<String> result) {
                 new GeneralBarChart(result, rightVLayout, grid).build("Download Time (sec)", "#6699CC", binSize);
-                modal.hide();
+                resetGenerateButton();
             }
         };
-        modal.show("Building chart...", true);
+        setLoadingGenerateButton();
         service.getDownloadPerNumberOfJobs(simulationID, binSize, callback);
     }
 
@@ -329,44 +319,56 @@ public class ChartsTab extends Tab {
 
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
-
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to get chart data:<br />" + caught.getMessage());
+                resetGenerateButton();
+                Layout.getInstance().setWarningMessage("Unable to get chart data:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(List<String> result) {
                 new GeneralBarChart(result, rightVLayout, grid).build("Upload Time (sec)", "#CC9966", binSize);
-                modal.hide();
+                resetGenerateButton();
             }
         };
-        modal.show("Building chart...", true);
+        setLoadingGenerateButton();
         service.getUploadPerNumberOfJobs(simulationID, binSize, callback);
     }
 
     /**
-     * 
+     *
      */
     private void plotSiteHistogram() {
 
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
-
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to get chart data:<br />" + caught.getMessage());
+                resetGenerateButton();
+                Layout.getInstance().setWarningMessage("Unable to get chart data:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(List<String> result) {
                 new SitesBarChart(result, rightVLayout, grid).build();
-                modal.hide();
+                resetGenerateButton();
             }
         };
-        modal.show("Building chart...", true);
+        setLoadingGenerateButton();
         service.getSiteHistogram(simulationID, callback);
+    }
+    
+    /**
+     * Sets the generate chart button to the loading state.
+     */
+    private void setLoadingGenerateButton() {
+        WidgetUtil.setLoadingIButton(generateButton, "Generating...");
+    }
+    
+    /**
+     * Resets the generate chart button to its initial state.
+     */
+    private void resetGenerateButton() {
+        WidgetUtil.resetIButton(generateButton, "Generate Chart", null);
     }
 }

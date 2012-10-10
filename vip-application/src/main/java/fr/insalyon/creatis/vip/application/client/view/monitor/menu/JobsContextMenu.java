@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -50,10 +50,11 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.NodeInfoWindow;
 import fr.insalyon.creatis.vip.application.client.view.monitor.ViewerWindow;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.JobRecord;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class JobsContextMenu extends Menu {
 
@@ -71,7 +72,7 @@ public class JobsContextMenu extends Menu {
         MenuItem appOutputItem = new MenuItem("View Application Output");
         appOutputItem.setIcon(ApplicationConstants.ICON_PREVIEW);
         appOutputItem.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 new ViewerWindow("Viewing Application Output for Job ID " + job.getID(),
                         simulationID, "out", job.getFileName(), ".sh.app.out").show();
@@ -81,7 +82,7 @@ public class JobsContextMenu extends Menu {
         MenuItem appErrorItem = new MenuItem("View Application Error");
         appErrorItem.setIcon(ApplicationConstants.ICON_PREVIEW);
         appErrorItem.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 new ViewerWindow("Viewing Application Error for Job ID " + job.getID(),
                         simulationID, "err", job.getFileName(), ".sh.app.err").show();
@@ -91,7 +92,7 @@ public class JobsContextMenu extends Menu {
         MenuItem outputItem = new MenuItem("View Output File");
         outputItem.setIcon(ApplicationConstants.ICON_PREVIEW);
         outputItem.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 new ViewerWindow("Viewing Output File for Job ID " + job.getID(),
                         simulationID, "out", job.getFileName(), ".sh.out").show();
@@ -101,7 +102,7 @@ public class JobsContextMenu extends Menu {
         MenuItem errorItem = new MenuItem("View Error File");
         errorItem.setIcon(ApplicationConstants.ICON_PREVIEW);
         errorItem.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 new ViewerWindow("Viewing Error File for Job ID " + job.getID(),
                         simulationID, "err", job.getFileName(), ".sh.err").show();
@@ -111,7 +112,7 @@ public class JobsContextMenu extends Menu {
         MenuItem scriptItem = new MenuItem("View Script File");
         scriptItem.setIcon(ApplicationConstants.ICON_PREVIEW);
         scriptItem.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 new ViewerWindow("Viewing Script File for Job ID " + job.getID(),
                         simulationID, "sh", job.getFileName(), ".sh").show();
@@ -120,7 +121,7 @@ public class JobsContextMenu extends Menu {
 
         MenuItem nodeItem = new MenuItem("Node Information");
         nodeItem.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 new NodeInfoWindow(simulationID, job.getID(),
                         job.getSiteName(), job.getNodeName()).show();
@@ -157,11 +158,11 @@ public class JobsContextMenu extends Menu {
 
         MenuItem menuItem = new MenuItem("Send " + title + " Signal", icon);
         menuItem.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 SC.ask("Do you really want to " + title.toLowerCase()
                         + " this task?", new BooleanCallback() {
-
+                            @Override
                     public void execute(Boolean value) {
                         if (value) {
                             sendSignal(jobID, status);
@@ -177,15 +178,16 @@ public class JobsContextMenu extends Menu {
 
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Error executing send signal: " + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to send signal:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
                 modal.hide();
-                SC.say("Signal Successfully sent.");
+                Layout.getInstance().setNoticeMessage("Signal Successfully sent.");
             }
         };
         modal.show("Sending signal to job...", true);

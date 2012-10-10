@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -38,7 +38,6 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Cursor;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -47,11 +46,12 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class SystemLoadLayout extends VLayout {
 
@@ -80,11 +80,11 @@ public class SystemLoadLayout extends VLayout {
         workflowsLabel = new Label("Loading Simulations...");
         workflowsLabel.setHeight(18);
         this.addMember(workflowsLabel);
-        
+
         runningTasksLabel = new Label("Loading Running Tasks...");
         runningTasksLabel.setHeight(18);
         this.addMember(runningTasksLabel);
-        
+
         waitingTasksLabel = new Label("Loading Waiting Tasks...");
         waitingTasksLabel.setHeight(18);
         this.addMember(waitingTasksLabel);
@@ -96,7 +96,6 @@ public class SystemLoadLayout extends VLayout {
         closeLabel.setAlign(Alignment.RIGHT);
         closeLabel.setCursor(Cursor.HAND);
         closeLabel.addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 timer.cancel();
@@ -107,7 +106,6 @@ public class SystemLoadLayout extends VLayout {
         this.addMember(closeLabel);
 
         timer = new Timer() {
-
             @Override
             public void run() {
                 loadData();
@@ -120,16 +118,15 @@ public class SystemLoadLayout extends VLayout {
 
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<ApplicationStatus> callback = new AsyncCallback<ApplicationStatus>() {
-
             @Override
             public void onFailure(Throwable caught) {
-                
-                SC.warn("Unable to update system load:<br />" + caught.getMessage());
+
+                Layout.getInstance().setWarningMessage("Unable to update system load:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(ApplicationStatus result) {
-                
+
                 workflowsLabel.setContents("Running Simulations: " + result.getRunningWorkflows());
                 runningTasksLabel.setContents("Running Tasks: " + result.getRunningTasks());
                 waitingTasksLabel.setContents("Waiting Tasks: " + result.getWaitingTasks());

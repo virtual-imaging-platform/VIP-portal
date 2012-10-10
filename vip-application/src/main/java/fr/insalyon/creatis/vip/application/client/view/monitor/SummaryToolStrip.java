@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -49,12 +49,13 @@ import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.JobRecord;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class SummaryToolStrip extends ToolStrip {
 
@@ -69,11 +70,11 @@ public class SummaryToolStrip extends ToolStrip {
         this.simulationID = simulationID;
         this.setWidth100();
 
-        this.addButton(getToolStripButton("Replicate", 
+        this.addButton(getToolStripButton("Replicate",
                 ApplicationConstants.ICON_TASK_REPLICATE, JobStatus.REPLICATE));
-        this.addButton(getToolStripButton("Reschedule", 
+        this.addButton(getToolStripButton("Reschedule",
                 ApplicationConstants.ICON_TASK_RESCHEDULE, JobStatus.RESCHEDULE));
-        this.addButton(getToolStripButton("Kill", 
+        this.addButton(getToolStripButton("Kill",
                 ApplicationConstants.ICON_TASK_KILL, JobStatus.KILL));
     }
 
@@ -83,11 +84,11 @@ public class SummaryToolStrip extends ToolStrip {
         ToolStripButton button = new ToolStripButton(title, icon);
         button.setPrompt(title + " all selected not completed tasks.");
         button.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(ClickEvent event) {
                 SC.ask("Do you really want to " + title.toLowerCase()
                         + " all selected not completed tasks?", new BooleanCallback() {
-
+                    @Override
                     public void execute(Boolean value) {
                         if (value) {
                             sendSignal(getSelectedActiveJobs(), status);
@@ -121,15 +122,16 @@ public class SummaryToolStrip extends ToolStrip {
 
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Error executing send signal: " + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to send signal:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void result) {
                 modal.hide();
-                SC.say(status.name() + " signal successfully sent to "
+                Layout.getInstance().setNoticeMessage(status.name() + " signal successfully sent to "
                         + jobIDs.size() + " jobs.");
             }
         };

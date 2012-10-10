@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -39,7 +39,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.VisibilityMode;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -69,7 +68,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class SimulationsTab extends Tab {
 
@@ -86,7 +85,7 @@ public class SimulationsTab extends Tab {
     private List<Simulation> simulationsList;
 
     public SimulationsTab() {
-        
+
         this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_MONITOR) + " Simulations");
         this.setID(ApplicationConstants.TAB_MONITOR);
         this.setCanClose(true);
@@ -118,7 +117,7 @@ public class SimulationsTab extends Tab {
     }
 
     private void configureGrid() {
-        
+
         grid = new ListGrid();
         grid.setWidth100();
         grid.setHeight100();
@@ -140,7 +139,6 @@ public class SimulationsTab extends Tab {
                 applicationField, userField, dateField);
 
         rowContextClickHandler = grid.addRowContextClickHandler(new RowContextClickHandler() {
-
             @Override
             public void onRowContextClick(RowContextClickEvent event) {
                 event.cancel();
@@ -149,21 +147,20 @@ public class SimulationsTab extends Tab {
                 String applicationName = event.getRecord().getAttribute("application");
                 SimulationStatus status = SimulationStatus.valueOf(
                         event.getRecord().getAttribute("status"));
-                
-                new SimulationsContextMenu(modal, simulationId, title, 
+
+                new SimulationsContextMenu(modal, simulationId, title,
                         status, applicationName).showContextMenu();
             }
         });
         rowMouseDownHandler = grid.addRowMouseDownHandler(new RowMouseDownHandler() {
-
             @Override
             public void onRowMouseDown(RowMouseDownEvent event) {
                 if (event.getColNum() != 1) {
                     String simulationID = event.getRecord().getAttribute("simulationId");
                     String title = event.getRecord().getAttribute("simulationName");
                     SimulationStatus status = SimulationStatus.valueOf(
-                        event.getRecord().getAttribute("status"));
-                    
+                            event.getRecord().getAttribute("status"));
+
                     Layout.getInstance().addTab(new SimulationTab(simulationID,
                             title, status));
                 }
@@ -175,10 +172,9 @@ public class SimulationsTab extends Tab {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<List<Simulation>> callback = new AsyncCallback<List<Simulation>>() {
-
             @Override
             public void onFailure(Throwable caught) {
-                SC.warn("Unable to get simulations list:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get simulations list:<br />" + caught.getMessage());
             }
 
             @Override

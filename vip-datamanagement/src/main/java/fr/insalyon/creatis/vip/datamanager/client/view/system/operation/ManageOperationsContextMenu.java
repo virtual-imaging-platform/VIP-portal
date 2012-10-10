@@ -63,21 +63,18 @@ public class ManageOperationsContextMenu extends Menu {
         MenuItem clearItem = new MenuItem("Remove Operation");
         clearItem.setIcon(CoreConstants.ICON_CLEAR);
         clearItem.addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(MenuItemClickEvent event) {
                 SC.confirm("Do you want to remove this operation?", new BooleanCallback() {
-
                     @Override
                     public void execute(Boolean value) {
                         if (value != null && value) {
                             DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
                                 @Override
                                 public void onFailure(Throwable caught) {
                                     modal.hide();
-                                    SC.warn("Unable to remove operation:<br />" + caught.getMessage());
+                                    Layout.getInstance().setWarningMessage("Unable to remove operation:<br />" + caught.getMessage());
                                 }
 
                                 @Override

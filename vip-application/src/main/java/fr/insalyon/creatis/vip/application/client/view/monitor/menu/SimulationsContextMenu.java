@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -56,7 +56,7 @@ import java.util.Map;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class SimulationsContextMenu extends Menu {
 
@@ -80,7 +80,6 @@ public class SimulationsContextMenu extends Menu {
         MenuItem viewItem = new MenuItem("View Simulation");
         viewItem.setIcon(ApplicationConstants.ICON_SIMULATION_VIEW);
         viewItem.addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(MenuItemClickEvent event) {
                 Layout.getInstance().addTab(new SimulationTab(simulationID,
@@ -91,12 +90,10 @@ public class SimulationsContextMenu extends Menu {
         MenuItem killItem = new MenuItem("Kill Simulation");
         killItem.setIcon(ApplicationConstants.ICON_KILL);
         killItem.addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(MenuItemClickEvent event) {
                 SC.ask("Do you really want to kill this simulation ("
                         + title + ")?", new BooleanCallback() {
-
                     @Override
                     public void execute(Boolean value) {
                         if (value) {
@@ -110,12 +107,10 @@ public class SimulationsContextMenu extends Menu {
         MenuItem cleanItem = new MenuItem("Clean Simulation");
         cleanItem.setIcon(ApplicationConstants.ICON_CLEAN);
         cleanItem.addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(MenuItemClickEvent event) {
                 SC.ask("Do you really want to clean this simulation ("
                         + title + ")?", new BooleanCallback() {
-
                     @Override
                     public void execute(Boolean value) {
                         if (value) {
@@ -129,12 +124,10 @@ public class SimulationsContextMenu extends Menu {
         MenuItem purgeItem = new MenuItem("Purge Simulation");
         purgeItem.setIcon(CoreConstants.ICON_CLEAR);
         purgeItem.addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(MenuItemClickEvent event) {
                 SC.ask("Do you really want to purge this simulation ("
                         + title + ")?", new BooleanCallback() {
-
                     @Override
                     public void execute(Boolean value) {
                         if (value) {
@@ -148,19 +141,9 @@ public class SimulationsContextMenu extends Menu {
         MenuItem relauchItem = new MenuItem("Relaunch Simulation");
         relauchItem.setIcon(ApplicationConstants.ICON_RELAUNCH);
         relauchItem.addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(MenuItemClickEvent event) {
-                SC.ask("Do you really want to relaunch this simulation ("
-                        + title + ")?", new BooleanCallback() {
-
-                    @Override
-                    public void execute(Boolean value) {
-                        if (value) {
-                            relaunchSimulation();
-                        }
-                    }
-                });
+                relaunchSimulation();
             }
         });
 
@@ -182,11 +165,10 @@ public class SimulationsContextMenu extends Menu {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to kill simulation:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to kill simulation:<br />" + caught.getMessage());
             }
 
             @Override
@@ -206,11 +188,10 @@ public class SimulationsContextMenu extends Menu {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to clean simulation:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to clean simulation:<br />" + caught.getMessage());
             }
 
             @Override
@@ -230,11 +211,10 @@ public class SimulationsContextMenu extends Menu {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to purge simulation:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to purge simulation:<br />" + caught.getMessage());
             }
 
             @Override
@@ -254,11 +234,10 @@ public class SimulationsContextMenu extends Menu {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Map<String, String>> callback = new AsyncCallback<Map<String, String>>() {
-
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to relauch simulation:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to relauch simulation:<br />" + caught.getMessage());
             }
 
             @Override

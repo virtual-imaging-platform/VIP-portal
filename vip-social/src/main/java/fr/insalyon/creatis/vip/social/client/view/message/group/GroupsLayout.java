@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -35,7 +35,6 @@
 package fr.insalyon.creatis.vip.social.client.view.message.group;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -44,13 +43,14 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
 import fr.insalyon.creatis.vip.social.client.view.common.AbstractMainLayout;
 import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class GroupsLayout extends AbstractMainLayout {
 
@@ -79,7 +79,7 @@ public class GroupsLayout extends AbstractMainLayout {
         AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Unable to get user's groups:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get user's groups:<br />" + caught.getMessage());
             }
 
             public void onSuccess(List<String> result) {

@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -38,13 +38,13 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
@@ -57,7 +57,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class GroupLayout extends VLayout {
 
@@ -93,7 +93,6 @@ public class GroupLayout extends VLayout {
 
         moreDataBoxLayout = new MoreDataBoxLayout("messages");
         moreDataBoxLayout.addClickHandler(new ClickHandler() {
-
             public void onClick(ClickEvent event) {
                 messagesLayout.removeMember(moreDataBoxLayout);
                 loadData(lastDate);
@@ -115,9 +114,8 @@ public class GroupLayout extends VLayout {
 
         SocialServiceAsync service = SocialService.Util.getInstance();
         AsyncCallback<List<GroupMessage>> callback = new AsyncCallback<List<GroupMessage>>() {
-
             public void onFailure(Throwable caught) {
-                SC.warn("Unable to get list of messages:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get list of messages:<br />" + caught.getMessage());
             }
 
             public void onSuccess(List<GroupMessage> result) {
@@ -146,7 +144,6 @@ public class GroupLayout extends VLayout {
 
             Label composeLabel = WidgetUtil.getLabel("New Message", SocialConstants.ICON_COMPOSE, 15, Cursor.HAND);
             composeLabel.addClickHandler(new ClickHandler() {
-
                 public void onClick(ClickEvent event) {
                     new GroupComposerWindow(groupName).show();
                 }
@@ -156,7 +153,6 @@ public class GroupLayout extends VLayout {
 
         Label refreshLabel = WidgetUtil.getLabel("Refresh", SocialConstants.ICON_REFRESH, 15, Cursor.HAND);
         refreshLabel.addClickHandler(new ClickHandler() {
-
             public void onClick(ClickEvent event) {
                 loadData();
             }

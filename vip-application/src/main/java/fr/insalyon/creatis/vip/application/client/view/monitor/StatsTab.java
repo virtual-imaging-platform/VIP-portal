@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -41,7 +41,6 @@ import com.google.gwt.visualization.client.VisualizationUtils;
 import com.google.gwt.visualization.client.visualizations.corechart.PieChart;
 import com.google.gwt.visualization.client.visualizations.corechart.PieChart.PieOptions;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -55,12 +54,13 @@ import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class StatsTab extends Tab {
 
@@ -86,7 +86,7 @@ public class StatsTab extends Tab {
         vLayout.setHeight100();
         vLayout.setOverflow(Overflow.AUTO);
         vLayout.setPadding(5);
-        
+
         configureForm();
         configureChart();
 
@@ -114,7 +114,7 @@ public class StatsTab extends Tab {
 
         ButtonItem generateButtonItem = new ButtonItem("generateChart", " Generate Chart ");
         generateButtonItem.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(ClickEvent event) {
                 generateChart();
             }
@@ -154,12 +154,13 @@ public class StatsTab extends Tab {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<String> callback = new AsyncCallback<String>() {
-
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to load chart data:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to load chart data:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(String result) {
 
                 String[] res = result.split("##");
@@ -181,12 +182,13 @@ public class StatsTab extends Tab {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<String> callback = new AsyncCallback<String>() {
-
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to load chart data:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to load chart data:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(String result) {
 
                 String[] res = result.split("##");
@@ -207,7 +209,7 @@ public class StatsTab extends Tab {
     private Runnable getPieChartRunnable(final Object[][] data) {
 
         return new Runnable() {
-
+            @Override
             public void run() {
 
                 PieOptions options = PieOptions.create();

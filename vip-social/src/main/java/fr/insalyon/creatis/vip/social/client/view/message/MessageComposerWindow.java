@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -38,7 +38,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.RichTextEditor;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -47,6 +46,7 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
@@ -58,7 +58,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class MessageComposerWindow extends AbstractComposeWindow {
 
@@ -68,7 +68,7 @@ public class MessageComposerWindow extends AbstractComposeWindow {
     public MessageComposerWindow() {
 
         super("Compose New Message");
-        
+
         configureForm();
         loadUsers();
     }
@@ -78,7 +78,6 @@ public class MessageComposerWindow extends AbstractComposeWindow {
         HLayout buttonsLayout = new HLayout(5);
         Label sendLabel = WidgetUtil.getLabel("Send Message", SocialConstants.ICON_SEND, 15, Cursor.HAND);
         sendLabel.addClickHandler(new ClickHandler() {
-
             public void onClick(ClickEvent event) {
                 if (form.validate()) {
                     sendMessage(usersPickList.getValues(),
@@ -117,10 +116,9 @@ public class MessageComposerWindow extends AbstractComposeWindow {
 
         SocialServiceAsync service = SocialService.Util.getInstance();
         AsyncCallback<List<User>> callback = new AsyncCallback<List<User>>() {
-
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to get users list:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get users list:<br />" + caught.getMessage());
             }
 
             public void onSuccess(List<User> result) {
@@ -142,15 +140,14 @@ public class MessageComposerWindow extends AbstractComposeWindow {
 
         SocialServiceAsync service = SocialService.Util.getInstance();
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to send message:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to send message:<br />" + caught.getMessage());
             }
 
             public void onSuccess(Void result) {
                 destroy();
-                SC.say("Message successfully sent.");
+                Layout.getInstance().setNoticeMessage("Message successfully sent.");
             }
         };
         service.sendMessage(recipients, subject, message, callback);

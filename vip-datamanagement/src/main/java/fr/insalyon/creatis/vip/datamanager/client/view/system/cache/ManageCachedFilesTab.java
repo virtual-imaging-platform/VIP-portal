@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -38,7 +38,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -46,6 +45,7 @@ import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
@@ -56,7 +56,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ManageCachedFilesTab extends AbstractManageTab {
 
@@ -118,7 +118,7 @@ public class ManageCachedFilesTab extends AbstractManageTab {
 
             @Override
             public void onFailure(Throwable caught) {
-                SC.warn("Unable to get operations list:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get operations list:<br />" + caught.getMessage());
             }
 
             @Override

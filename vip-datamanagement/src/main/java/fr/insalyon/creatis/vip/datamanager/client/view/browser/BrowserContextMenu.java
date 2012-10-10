@@ -157,7 +157,7 @@ public class BrowserContextMenu extends Menu {
             @Override
             public void onClick(MenuItemClickEvent event) {
                 if (baseDir.equals(DataManagerConstants.ROOT)) {
-                    SC.warn("There are no properties for root folders.");
+                    Layout.getInstance().setWarningMessage("There are no properties for root folders.");
                 } else {
                     new DataPropertiesWindow(baseDir, data).show();
                 }

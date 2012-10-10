@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -52,7 +52,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ManageCachedFilesContextMenu extends Menu {
 
@@ -65,20 +65,21 @@ public class ManageCachedFilesContextMenu extends Menu {
         MenuItem deleteItem = new MenuItem("Delete File");
         deleteItem.setIcon(CoreConstants.ICON_DELETE);
         deleteItem.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(MenuItemClickEvent event) {
                 SC.confirm("Do you want to delete this file?", new BooleanCallback() {
-
+                    @Override
                     public void execute(Boolean value) {
                         if (value != null && value) {
                             DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
+                                @Override
                                 public void onFailure(Throwable caught) {
                                     modal.hide();
-                                    SC.warn("Error executing delete file:<br />" + caught.getMessage());
+                                    Layout.getInstance().setWarningMessage("Unable to delete file:<br />" + caught.getMessage());
                                 }
 
+                                @Override
                                 public void onSuccess(Void result) {
                                     modal.hide();
                                     ManageCachedFilesTab tab = (ManageCachedFilesTab) Layout.getInstance()

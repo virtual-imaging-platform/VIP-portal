@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -48,7 +48,6 @@ import com.smartgwt.client.types.GroupStartOpen;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -69,13 +68,14 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.menu.JobsContextM
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.JobRecord;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.SummaryRecord;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class SummaryTab extends Tab {
 
@@ -118,7 +118,7 @@ public class SummaryTab extends Tab {
         vLayout.addMember(summaryLayout);
 
         detailModal = new ModalWindow(detailGrid);
-        
+
         vLayout.addMember(new SummaryToolStrip(detailModal, detailGrid, simulationID));
         vLayout.addMember(detailGrid);
 
@@ -157,7 +157,6 @@ public class SummaryTab extends Tab {
     private void configureDetailGrid() {
 
         detailGrid = new ListGrid() {
-
             @Override
             protected Canvas getCellHoverComponent(Record record, Integer rowNum, Integer colNum) {
 
@@ -167,7 +166,7 @@ public class SummaryTab extends Tab {
                 DetailViewerField idField = new DetailViewerField("jobID", "Job ID");
                 DetailViewerField statusField = new DetailViewerField("status", "Status");
                 DetailViewerField parametersField = new DetailViewerField("parameters", "Parameters");
-                
+
                 detailViewer.setFields(idField, statusField, parametersField);
                 detailViewer.setData(new Record[]{record});
 
@@ -198,7 +197,7 @@ public class SummaryTab extends Tab {
         detailGrid.setGroupByField("command");
 
         detailGrid.addRowContextClickHandler(new RowContextClickHandler() {
-
+            @Override
             public void onRowContextClick(RowContextClickEvent event) {
                 event.cancel();
                 JobRecord job = (JobRecord) event.getRecord();
@@ -206,7 +205,7 @@ public class SummaryTab extends Tab {
             }
         });
         detailGrid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
-
+            @Override
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 detailGrid.expandRecord(event.getRecord());
             }
@@ -223,12 +222,13 @@ public class SummaryTab extends Tab {
 
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<Map<String, Integer>> callback = new AsyncCallback<Map<String, Integer>>() {
-
+            @Override
             public void onFailure(Throwable caught) {
                 summaryModal.hide();
-                SC.warn("Unable to get summary data:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get summary data:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Map<String, Integer> result) {
                 SummaryRecord[] data = new SummaryRecord[states.length];
                 int maxValue = 0;
@@ -258,7 +258,7 @@ public class SummaryTab extends Tab {
             private Runnable getPieChartRunnable(final SummaryRecord[] data) {
 
                 return new Runnable() {
-
+                    @Override
                     public void run() {
 
                         PieOptions options = PieOptions.create();
@@ -296,7 +296,7 @@ public class SummaryTab extends Tab {
             private Runnable getBarChartRunnable(final SummaryRecord[] data) {
 
                 return new Runnable() {
-
+                    @Override
                     public void run() {
 
                         Options options = Options.create();
@@ -342,12 +342,13 @@ public class SummaryTab extends Tab {
 
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<List<Job>> callback = new AsyncCallback<List<Job>>() {
-
+            @Override
             public void onFailure(Throwable caught) {
                 detailModal.hide();
-                SC.warn("Unable to get list of jobs:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get list of jobs:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<Job> result) {
                 List<JobRecord> dataList = new ArrayList<JobRecord>();
                 for (Job j : result) {

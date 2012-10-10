@@ -179,7 +179,7 @@ public class ApplicationsLayout extends VLayout {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to get list of applications:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get list of applications:<br />" + caught.getMessage());
             }
 
             @Override
@@ -212,13 +212,13 @@ public class ApplicationsLayout extends VLayout {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to remove application:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to remove application:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(Void result) {
                 modal.hide();
-                SC.say("The application was successfully removed!");
+                Layout.getInstance().setNoticeMessage("The application was successfully removed!");
                 loadData();
             }
         };

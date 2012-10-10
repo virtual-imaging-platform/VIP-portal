@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -35,7 +35,6 @@
 package fr.insalyon.creatis.vip.application.client.view.monitor.menu;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
@@ -44,6 +43,7 @@ import com.smartgwt.client.widgets.tree.Tree;
 import com.smartgwt.client.widgets.tree.TreeNode;
 import fr.insalyon.creatis.vip.application.client.view.monitor.general.InOutTreeNode;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
@@ -55,7 +55,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class InOutContextMenu extends Menu {
 
@@ -124,7 +124,7 @@ public class InOutContextMenu extends Menu {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to download file: " + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to download file:<br />" + caught.getMessage());
             }
 
             @Override
@@ -149,7 +149,7 @@ public class InOutContextMenu extends Menu {
         }
 
         if (paths.isEmpty()) {
-            SC.say("There are no data stored on the grid.");
+            Layout.getInstance().setWarningMessage("There are no data stored on the grid.");
         } else {
             downloadFiles(paths, simulationID + "-" + node.getName());
         }
@@ -163,7 +163,7 @@ public class InOutContextMenu extends Menu {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to download files: " + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to download files:<br />" + caught.getMessage());
             }
 
             @Override

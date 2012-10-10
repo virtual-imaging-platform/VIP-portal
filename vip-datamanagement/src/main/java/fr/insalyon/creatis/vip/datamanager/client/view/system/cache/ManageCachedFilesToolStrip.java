@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -53,7 +53,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ManageCachedFilesToolStrip extends ToolStrip {
 
@@ -64,7 +64,7 @@ public class ManageCachedFilesToolStrip extends ToolStrip {
         ToolStripButton refreshButton = new ToolStripButton("Refresh");
         refreshButton.setIcon(CoreConstants.ICON_REFRESH);
         refreshButton.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(ClickEvent event) {
                 ManageCachedFilesTab tab = (ManageCachedFilesTab) Layout.getInstance().getTab(DataManagerConstants.TAB_MANAGE_CACHED_FILES);
                 tab.loadData();
@@ -75,10 +75,10 @@ public class ManageCachedFilesToolStrip extends ToolStrip {
         ToolStripButton deleteSelectedFiles = new ToolStripButton("Delete Selected Files");
         deleteSelectedFiles.setIcon(CoreConstants.ICON_DELETE);
         deleteSelectedFiles.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(ClickEvent event) {
                 SC.ask("Do you really want to delete all selected files?", new BooleanCallback() {
-
+                    @Override
                     public void execute(Boolean value) {
 
                         if (value) {
@@ -92,12 +92,13 @@ public class ManageCachedFilesToolStrip extends ToolStrip {
 
                             DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
+                                @Override
                                 public void onFailure(Throwable caught) {
                                     modal.hide();
-                                    SC.warn("Unable to delete cached files:<br />" + caught.getMessage());
+                                    Layout.getInstance().setWarningMessage("Unable to delete cached files:<br />" + caught.getMessage());
                                 }
 
+                                @Override
                                 public void onSuccess(Void result) {
                                     modal.hide();
                                     tab.loadData();

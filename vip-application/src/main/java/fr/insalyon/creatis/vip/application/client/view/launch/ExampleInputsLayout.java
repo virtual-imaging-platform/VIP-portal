@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -64,7 +64,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ExampleInputsLayout extends AbstractInputsLayout {
 
@@ -79,14 +79,13 @@ public class ExampleInputsLayout extends AbstractInputsLayout {
         configureGrid();
         modal = new ModalWindow(grid);
         this.addMember(grid);
-        
+
         loadData();
     }
 
     private void configureGrid() {
 
         grid = new ListGrid() {
-
             @Override
             protected Canvas getExpansionComponent(ListGridRecord record) {
                 Canvas canvas = super.getExpansionComponent(record);
@@ -106,7 +105,7 @@ public class ExampleInputsLayout extends AbstractInputsLayout {
 
                     ImgButton loadImg = getImgButton("icon-load.png", "Load Input");
                     loadImg.addClickHandler(new ClickHandler() {
-
+                        @Override
                         public void onClick(ClickEvent event) {
                             String values = rollOverRecord.getAttribute("values");
                             AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().getTab(tabID);
@@ -116,12 +115,12 @@ public class ExampleInputsLayout extends AbstractInputsLayout {
 
                     ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
                     deleteImg.addClickHandler(new ClickHandler() {
-
+                        @Override
                         public void onClick(ClickEvent event) {
                             final String name = rollOverRecord.getAttribute("name");
                             final String applicationName = rollOverRecord.getAttribute("application");
                             SC.confirm("Do you really want to remove the entry \"" + name + "\"?", new BooleanCallback() {
-
+                                @Override
                                 public void execute(Boolean value) {
                                     if (value != null && value) {
                                         remove(name, applicationName);
@@ -169,7 +168,7 @@ public class ExampleInputsLayout extends AbstractInputsLayout {
         grid.setSortField("application");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
-
+            @Override
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 grid.expandRecord(event.getRecord());
             }
@@ -181,12 +180,13 @@ public class ExampleInputsLayout extends AbstractInputsLayout {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         AsyncCallback<List<SimulationInput>> callback = new AsyncCallback<List<SimulationInput>>() {
-
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to get simulations inputs:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get simulations inputs:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<SimulationInput> result) {
 
                 List<InputRecord> dataList = new ArrayList<InputRecord>();
@@ -218,12 +218,13 @@ public class ExampleInputsLayout extends AbstractInputsLayout {
         modal.show("Loading inputs...", true);
         service.getSimulationInputExamples(callback);
     }
-    
+
     private void remove(String name, String applicationName) {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
+        AsyncCallback<Void> callback;
+        callback = new AsyncCallback<Void>() {
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to remove simulation input:<br />" + caught.getMessage());

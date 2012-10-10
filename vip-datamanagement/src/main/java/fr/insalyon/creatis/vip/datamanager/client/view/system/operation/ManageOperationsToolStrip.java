@@ -64,7 +64,6 @@ public class ManageOperationsToolStrip extends ToolStrip {
         ToolStripButton refreshButton = new ToolStripButton("Refresh");
         refreshButton.setIcon(CoreConstants.ICON_REFRESH);
         refreshButton.addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 ManageOperationsTab tab = (ManageOperationsTab) Layout.getInstance().getTab(DataManagerConstants.TAB_MANAGE_OPERATIONS);
@@ -76,11 +75,9 @@ public class ManageOperationsToolStrip extends ToolStrip {
         ToolStripButton clearSelectedOperations = new ToolStripButton("Remove Selected Operations");
         clearSelectedOperations.setIcon(CoreConstants.ICON_CLEAR);
         clearSelectedOperations.addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 SC.confirm("Do you really want to remove all selected operations?", new BooleanCallback() {
-
                     @Override
                     public void execute(Boolean value) {
                         if (value != null && value) {
@@ -94,11 +91,10 @@ public class ManageOperationsToolStrip extends ToolStrip {
 
                             DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
                                 @Override
                                 public void onFailure(Throwable caught) {
                                     modal.hide();
-                                    SC.warn("Unable to remove operations:<br />" + caught.getMessage());
+                                    Layout.getInstance().setWarningMessage("Unable to remove operations:<br />" + caught.getMessage());
                                 }
 
                                 @Override

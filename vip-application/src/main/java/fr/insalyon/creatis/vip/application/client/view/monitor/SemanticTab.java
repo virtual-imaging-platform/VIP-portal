@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -37,7 +37,6 @@ package fr.insalyon.creatis.vip.application.client.view.monitor;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SortDirection;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -48,7 +47,6 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
-
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.ExpeSummaryTriple;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
@@ -56,6 +54,7 @@ import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.SemanticRecord;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import java.util.List;
 
@@ -74,7 +73,7 @@ public class SemanticTab extends Tab {
     public SemanticTab(String simulationID) {
 
         this.simulationID = simulationID;
-        
+
         this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_SEMANTICS));
         this.setPrompt("Semantics");
 
@@ -132,7 +131,7 @@ public class SemanticTab extends Tab {
     }
 
     private void configureToolStrip() {
-        
+
         toolStrip = new ToolStrip();
         toolStrip.setWidth100();
 
@@ -146,41 +145,41 @@ public class SemanticTab extends Tab {
         refreshButton.setIcon(CoreConstants.ICON_REFRESH);
         refreshButton.setTooltip("Refresh");
         refreshButton.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(ClickEvent event) {
                 loadData(pathItem.getValueAsString());
             }
         });
         toolStrip.addButton(refreshButton);
-        
+
     }
 
     public void loadData(final String baseDir) {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         AsyncCallback<List<ExpeSummaryTriple>> callback = new AsyncCallback<List<ExpeSummaryTriple>>() {
-
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to get semantic info:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get semantic info:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<ExpeSummaryTriple> result) {
                 SemanticRecord[] data = new SemanticRecord[result.size()];
                 for (int i = 0; i < result.size(); i++) {
-                    
-                    data[i] = new SemanticRecord(result.get(i).getSubject().getLabel(),result.get(i).getPredicate().getLabel(),result.get(i).getObject().getLabel());
+
+                    data[i] = new SemanticRecord(result.get(i).getSubject().getLabel(), result.get(i).getPredicate().getLabel(), result.get(i).getObject().getLabel());
                     grid.setData(data);
                 }
                 pathItem.setValue(baseDir);
                 modal.hide();
-               
+
             }
         };
         modal.show("Loading Semantic Data...", true);
         service.getSemantics(baseDir, callback);
     }
-
 //    private void showContextMenu(ListGridRecord record) {
 //
 //        String type = record.getAttributeAsString("icon");
@@ -195,8 +194,4 @@ public class SemanticTab extends Tab {
 //        new LogsContextMenu(this, simulationID, dataName,
 //                folder, type.contains("file")).showContextMenu();
 //    }
-
-    public ModalWindow getModal() {
-        return modal;
-    }
 }

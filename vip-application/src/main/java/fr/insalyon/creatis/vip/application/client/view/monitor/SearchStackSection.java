@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -35,7 +35,6 @@
 package fr.insalyon.creatis.vip.application.client.view.monitor;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -52,26 +51,25 @@ import fr.insalyon.creatis.vip.application.client.ApplicationModule;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class SearchStackSection extends SectionStackSection {
 
-    private ModalWindow modal;
     private DynamicForm form;
     private SelectItem userItem;
     private SelectItem simulationItem;
     private SelectItem statusItem;
     private DateItem startDateItem;
     private DateItem endDateItem;
-    private IButton submitButton;
+    private IButton searchButton;
     private IButton resetButton;
 
     public SearchStackSection() {
@@ -83,14 +81,12 @@ public class SearchStackSection extends SectionStackSection {
 
         HLayout hLayout = new HLayout(5);
         hLayout.setMargin(5);
-        hLayout.addMember(submitButton);
+        hLayout.addMember(searchButton);
         hLayout.addMember(resetButton);
 
         VLayout vLayout = new VLayout(5);
         vLayout.addMember(form);
         vLayout.addMember(hLayout);
-
-        modal = new ModalWindow(vLayout);
         this.addItem(vLayout);
 
         loadData();
@@ -113,9 +109,8 @@ public class SearchStackSection extends SectionStackSection {
         endDateItem = new DateItem("endDateFilter", "End Date");
         endDateItem.setUseTextField(true);
 
-        submitButton = new IButton("Search");
-        submitButton.addClickHandler(new ClickHandler() {
-
+        searchButton = WidgetUtil.getIButton("Search", null, new ClickHandler() {
+            @Override
             public void onClick(ClickEvent event) {
 
                 SimulationsTab simulationsTab = (SimulationsTab) Layout.getInstance().getTab(ApplicationConstants.TAB_MONITOR);
@@ -139,9 +134,8 @@ public class SearchStackSection extends SectionStackSection {
             }
         });
 
-        resetButton = new IButton("Reset");
-        resetButton.addClickHandler(new ClickHandler() {
-
+        resetButton = WidgetUtil.getIButton("Reset", null, new ClickHandler() {
+            @Override
             public void onClick(ClickEvent event) {
                 userItem.setValue("All");
                 simulationItem.setValue("All");
@@ -159,14 +153,15 @@ public class SearchStackSection extends SectionStackSection {
 
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<List<String>[]> callback = new AsyncCallback<List<String>[]>() {
-
+            @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to get users and applications lists:<br />" + caught.getMessage());
+                WidgetUtil.resetIButton(searchButton, "Search", null);
+                Layout.getInstance().setWarningMessage("Unable to get users and applications lists:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<String>[] result) {
-                modal.hide();
+                WidgetUtil.resetIButton(searchButton, "Search", null);
                 LinkedHashMap<String, String> usersMap = new LinkedHashMap<String, String>();
                 usersMap.put("All", "All");
                 for (String s : result[0]) {
@@ -195,7 +190,7 @@ public class SearchStackSection extends SectionStackSection {
                 statusItem.setValue("All");
             }
         };
-        modal.show("Loading search form data...", true);
+        WidgetUtil.setLoadingIButton(searchButton, "Searching...");
         service.getApplicationsAndUsers(ApplicationModule.reservedClasses, callback);
     }
 }

@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -37,12 +37,12 @@ package fr.insalyon.creatis.vip.datamanager.client.view.system.zombie;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
@@ -53,7 +53,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ManageZombieFilesTab extends AbstractManageTab {
 
@@ -100,7 +100,7 @@ public class ManageZombieFilesTab extends AbstractManageTab {
 
             @Override
             public void onFailure(Throwable caught) {
-                SC.warn("Unable to get files list:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get files list:<br />" + caught.getMessage());
             }
 
             @Override

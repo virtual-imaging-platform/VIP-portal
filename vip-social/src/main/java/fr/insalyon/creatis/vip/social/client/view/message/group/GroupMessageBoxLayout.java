@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -46,6 +46,7 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
 import fr.insalyon.creatis.vip.social.client.bean.GroupMessage;
@@ -54,7 +55,7 @@ import fr.insalyon.creatis.vip.social.client.rpc.SocialServiceAsync;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class GroupMessageBoxLayout extends HLayout {
 
@@ -171,7 +172,7 @@ public class GroupMessageBoxLayout extends HLayout {
                     AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                         public void onFailure(Throwable caught) {
-                            SC.warn("Unable to remove message:<br />" + caught.getMessage());
+                            Layout.getInstance().setWarningMessage("Unable to remove message:<br />" + caught.getMessage());
                         }
 
                         public void onSuccess(Void result) {

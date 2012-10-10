@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -36,12 +36,12 @@ package fr.insalyon.creatis.vip.social.client.view.message.group;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Cursor;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
@@ -51,7 +51,7 @@ import fr.insalyon.creatis.vip.social.client.view.common.AbstractComposeWindow;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class GroupComposerWindow extends AbstractComposeWindow {
 
@@ -104,12 +104,12 @@ public class GroupComposerWindow extends AbstractComposeWindow {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to send message:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to send message:<br />" + caught.getMessage());
             }
 
             public void onSuccess(Void result) {
                 destroy();
-                SC.say("Message successfully sent.");
+                Layout.getInstance().setNoticeMessage("Message successfully sent.");
             }
         };
         service.sendGroupMessage(groupName, subject, message, callback);

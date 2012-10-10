@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -35,9 +35,9 @@
 package fr.insalyon.creatis.vip.application.client.view.monitor.chart;
 
 import ca.nanometrics.gflot.client.*;
+import ca.nanometrics.gflot.client.options.*;
 import ca.nanometrics.gflot.client.options.LegendOptions.LabelFormatter;
 import ca.nanometrics.gflot.client.options.LegendOptions.LegendPosition;
-import ca.nanometrics.gflot.client.options.*;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
@@ -46,7 +46,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class CheckpointChart extends AbstractChart {
 

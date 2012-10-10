@@ -74,18 +74,17 @@ public class SavedInputsLayout extends AbstractInputsLayout {
     public SavedInputsLayout(String tabID) {
 
         super(tabID, "Saved Inputs", CoreConstants.ICON_SAVED);
-        
+
         configureGrid();
         modal = new ModalWindow(grid);
         this.addMember(grid);
-        
+
         loadData();
     }
 
     private void configureGrid() {
 
         grid = new ListGrid() {
-
             @Override
             protected Canvas getExpansionComponent(ListGridRecord record) {
                 Canvas canvas = super.getExpansionComponent(record);
@@ -105,7 +104,7 @@ public class SavedInputsLayout extends AbstractInputsLayout {
 
                     ImgButton loadImg = getImgButton("icon-load.png", "Load Input");
                     loadImg.addClickHandler(new ClickHandler() {
-
+                        @Override
                         public void onClick(ClickEvent event) {
                             String values = rollOverRecord.getAttribute("values");
                             AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().getTab(tabID);
@@ -115,12 +114,12 @@ public class SavedInputsLayout extends AbstractInputsLayout {
 
                     ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
                     deleteImg.addClickHandler(new ClickHandler() {
-
+                        @Override
                         public void onClick(ClickEvent event) {
                             final String name = rollOverRecord.getAttribute("name");
                             final String applicationName = rollOverRecord.getAttribute("application");
                             SC.confirm("Do you really want to remove the entry \"" + name + "\"?", new BooleanCallback() {
-
+                                @Override
                                 public void execute(Boolean value) {
                                     if (value != null && value) {
                                         remove(name, applicationName);
@@ -166,7 +165,7 @@ public class SavedInputsLayout extends AbstractInputsLayout {
         grid.setSortField("application");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
-
+            @Override
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 grid.expandRecord(event.getRecord());
             }
@@ -178,14 +177,15 @@ public class SavedInputsLayout extends AbstractInputsLayout {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         AsyncCallback<List<SimulationInput>> callback = new AsyncCallback<List<SimulationInput>>() {
-
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to get simulations inputs:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get simulations inputs:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<SimulationInput> result) {
-                
+
                 List<InputRecord> dataList = new ArrayList<InputRecord>();
 
                 for (SimulationInput wi : result) {
@@ -220,12 +220,13 @@ public class SavedInputsLayout extends AbstractInputsLayout {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
+            @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to remove simulation input:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to remove simulation input:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void v) {
                 modal.hide();
                 loadData();

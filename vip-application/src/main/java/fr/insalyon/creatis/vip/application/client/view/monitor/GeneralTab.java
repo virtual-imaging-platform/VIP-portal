@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -37,7 +37,6 @@ package fr.insalyon.creatis.vip.application.client.view.monitor;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.TreeModelType;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -59,11 +58,12 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.general.LogsLayou
 import fr.insalyon.creatis.vip.application.client.view.monitor.menu.InOutContextMenu;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class GeneralTab extends Tab {
 
@@ -182,7 +182,7 @@ public class GeneralTab extends Tab {
             @Override
             public void onFailure(Throwable caught) {
                 inOutTreeModal.hide();
-                SC.warn("Unable to load data:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to load data:<br />" + caught.getMessage());
             }
 
             @Override

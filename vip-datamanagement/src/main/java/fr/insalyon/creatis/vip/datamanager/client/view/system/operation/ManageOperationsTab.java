@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -37,7 +37,6 @@ package fr.insalyon.creatis.vip.datamanager.client.view.system.operation;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.grid.HoverCustomizer;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -46,6 +45,7 @@ import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
@@ -56,7 +56,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ManageOperationsTab extends AbstractManageTab {
 
@@ -65,7 +65,7 @@ public class ManageOperationsTab extends AbstractManageTab {
 
     public ManageOperationsTab() {
 
-        super(DataManagerConstants.ICON_OPERATION, DataManagerConstants.APP_OPERATIONS, 
+        super(DataManagerConstants.ICON_OPERATION, DataManagerConstants.APP_OPERATIONS,
                 DataManagerConstants.TAB_MANAGE_OPERATIONS);
 
         configureGrid();
@@ -92,7 +92,6 @@ public class ManageOperationsTab extends AbstractManageTab {
         ListGridField iconField = FieldUtil.getIconGridField("typeIcon");
         iconField.setShowHover(true);
         iconField.setHoverCustomizer(new HoverCustomizer() {
-
             @Override
             public String hoverHTML(Object value, ListGridRecord record, int rowNum, int colNum) {
                 OperationRecord operationRecord = (OperationRecord) record;
@@ -102,7 +101,6 @@ public class ManageOperationsTab extends AbstractManageTab {
         ListGridField statusField = FieldUtil.getIconGridField("statusIcon");
         statusField.setShowHover(true);
         statusField.setHoverCustomizer(new HoverCustomizer() {
-
             @Override
             public String hoverHTML(Object value, ListGridRecord record, int rowNum, int colNum) {
                 OperationRecord operationRecord = (OperationRecord) record;
@@ -117,7 +115,6 @@ public class ManageOperationsTab extends AbstractManageTab {
         grid.setFields(iconField, statusField, sourceField, destField, userField, dateField);
 
         grid.addCellContextClickHandler(new CellContextClickHandler() {
-
             @Override
             public void onCellContextClick(CellContextClickEvent event) {
                 event.cancel();
@@ -133,11 +130,10 @@ public class ManageOperationsTab extends AbstractManageTab {
 
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<List<PoolOperation>> callback = new AsyncCallback<List<PoolOperation>>() {
-
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to get list of operations:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get list of operations:<br />" + caught.getMessage());
             }
 
             @Override

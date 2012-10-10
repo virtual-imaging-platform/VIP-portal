@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -36,7 +36,6 @@ package fr.insalyon.creatis.vip.datamanager.client.view.browser;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -48,13 +47,14 @@ import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class RenameWindow extends Window {
 
@@ -87,7 +87,7 @@ public class RenameWindow extends Window {
         nameItem = FieldUtil.getTextItem(200, true, "Name", "[0-9A-Za-z-_.]");
         nameItem.setValue(name);
         nameItem.addKeyPressHandler(new KeyPressHandler() {
-
+            @Override
             public void onKeyPress(KeyPressEvent event) {
                 if (event.getKeyName().equals("Enter")) {
                     rename();
@@ -98,7 +98,7 @@ public class RenameWindow extends Window {
         ButtonItem renameButton = new ButtonItem("renameButton", "Rename");
         renameButton.setWidth(60);
         renameButton.addClickHandler(new ClickHandler() {
-
+            @Override
             public void onClick(ClickEvent event) {
                 rename();
             }
@@ -113,12 +113,13 @@ public class RenameWindow extends Window {
             if (!name.equals(nameItem.getValueAsString().trim())) {
                 DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                 AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
+                    @Override
                     public void onFailure(Throwable caught) {
                         modal.hide();
-                        SC.warn("Unable to rename:<br />" + caught.getMessage());
+                        Layout.getInstance().setWarningMessage("Unable to rename:<br />" + caught.getMessage());
                     }
 
+                    @Override
                     public void onSuccess(Void result) {
                         modal.hide();
                         BrowserLayout.getInstance().loadData(baseDir, true);
@@ -131,7 +132,7 @@ public class RenameWindow extends Window {
                 destroy();
 
             } else {
-                SC.warn("The specified name is the same as the original one.");
+                Layout.getInstance().setWarningMessage("The specified name is the same as the original one.");
             }
         }
     }

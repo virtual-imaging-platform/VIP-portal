@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -38,13 +38,13 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
 import fr.insalyon.creatis.vip.social.client.bean.Message;
@@ -57,7 +57,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class SentMessageLayout extends AbstractMainLayout {
 
@@ -105,7 +105,7 @@ public class SentMessageLayout extends AbstractMainLayout {
         AsyncCallback<List<Message>> callback = new AsyncCallback<List<Message>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Unable to get list of messages:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get list of messages:<br />" + caught.getMessage());
             }
 
             public void onSuccess(List<Message> result) {

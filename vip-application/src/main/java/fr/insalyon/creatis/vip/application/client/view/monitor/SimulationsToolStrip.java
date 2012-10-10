@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -56,7 +56,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class SimulationsToolStrip extends ToolStrip {
 
@@ -193,7 +193,7 @@ public class SimulationsToolStrip extends ToolStrip {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to kill simulations:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to kill simulations:<br />" + caught.getMessage());
             }
 
             @Override
@@ -232,7 +232,7 @@ public class SimulationsToolStrip extends ToolStrip {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to clean simulations:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to clean simulations:<br />" + caught.getMessage());
             }
 
             @Override
@@ -269,7 +269,7 @@ public class SimulationsToolStrip extends ToolStrip {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to purge simulations:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to purge simulations:<br />" + caught.getMessage());
             }
 
             @Override

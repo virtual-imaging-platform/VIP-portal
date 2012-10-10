@@ -1,8 +1,8 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
- * http://www.creatis.insa-lyon.fr/~silva
+ * http://www.rafaelsilva.com
  *
  * This software is a grid-enabled data-driven workflow manager and editor.
  *
@@ -35,16 +35,16 @@
 package fr.insalyon.creatis.vip.application.client.view.monitor;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.application.client.bean.Node;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.property.AbstractPropertyWindow;
 import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class NodeInfoWindow extends AbstractPropertyWindow {
 
@@ -53,7 +53,7 @@ public class NodeInfoWindow extends AbstractPropertyWindow {
     private String nodeName;
 
     public NodeInfoWindow(String simulationID, String jobID, String siteName, String nodeName) {
-        
+
         super("Node Information for Job ID " + jobID, 550, 240);
         this.simulationID = simulationID;
         this.siteName = siteName;
@@ -64,11 +64,12 @@ public class NodeInfoWindow extends AbstractPropertyWindow {
     private void loadData() {
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<Node> callback = new AsyncCallback<Node>() {
-
+            @Override
             public void onFailure(Throwable caught) {
-                SC.warn("Error executing get node: " + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get node information:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Node result) {
                 PropertyRecord[] data;
                 if (result != null) {
