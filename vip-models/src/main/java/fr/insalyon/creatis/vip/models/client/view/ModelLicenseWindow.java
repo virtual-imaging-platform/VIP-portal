@@ -66,7 +66,7 @@ public class ModelLicenseWindow  extends Window {
         });
 
         cboxItem = new CheckboxItem();
-        cboxItem.setTitle("I agree with the terms of license.");;
+        cboxItem.setTitle("I accept the terms in the license agreement.");;
         
         ButtonItem downItem = new ButtonItem("Download own License", "License");
         downItem.setWidth(60);

@@ -282,23 +282,27 @@ public class ModelBusiness {
     
     public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles, SimulationObjectModel model, String lfn, User user, String nwName,String zipFullPath, boolean bUpload) throws IOException, DataManagerException {
 
+        List<File> files = new ArrayList<File>();
          String modelname = "";
+         String rootDirectory = getZipPath(user, zipFullPath, bUpload);
+         File zipdir = new File(rootDirectory + "/zip/");
+         if (!zipdir.exists()) {
+            zipdir.mkdirs();
+          }
         if (zipName == null) // to avoid crash for archive without rdf file
         {
-            zipName = model.getModelName() + ".rdf";
-            modelname = zipName;
+            zipName = model.getModelName() + ".zip";
+            modelname = model.getModelName() + ".rdf";
+            files.add(new File(zipdir  + "//"+ modelname ));
         }
-        List<File> files = new ArrayList<File>();
-        String rootDirectory = getZipPath(user, zipFullPath, bUpload);
+        
+
         File zipFile = new File(rootDirectory + zipName);
         if (zipFile.exists())
                     System.out.println("zipname :" + zipFile);
         else
             zipFile.createNewFile();
-        File zipdir = new File(rootDirectory + "/zip/");
-        if (!zipdir.exists()) {
-            zipdir.mkdirs();
-        }
+       
         System.out.println("zipname :" + zipFile);
         System.out.println("zipdir :" + zipdir);
         copyFile(rootDirectory + zipName, zipdir + zipName);
@@ -358,7 +362,7 @@ public class ModelBusiness {
         if(modelname.isEmpty())
         {
             modelname = model.getModelName() + ".rdf";
-            files.add(new File(zipdir  + "/"+ modelname ));
+            files.add(new File(zipdir  + "//"+ modelname ));
         }
         else
         {
@@ -373,7 +377,7 @@ public class ModelBusiness {
         SimulationObjectModelFactory.dumpInFileModel(model,zipdir + "//"+ modelname);
         SimulationObjectModelFactory.completeModel(model);
         System.out.println("URI: " + model.getURI());
-
+        System.out.println("URI: " + model.getStorageURL());
         File fz = new File(rootDirectory + "zip//" + zipName);
         if (fz.exists())
             fz.delete();

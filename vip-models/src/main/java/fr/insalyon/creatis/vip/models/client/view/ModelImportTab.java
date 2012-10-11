@@ -67,6 +67,7 @@ import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 import fr.insalyon.creatis.vip.models.client.ModelConstants;
 import fr.insalyon.creatis.vip.models.client.view.FileTree.FileTreeNode;
+import java.util.ArrayList;
 
 import java.util.Date;
 import java.util.List;
@@ -176,7 +177,16 @@ class ModelImportTab extends Tab {
         this.setPane(hl);
 
         if (bTS) {
-            new FileUploadWindow("local", "uploadComplete").show();
+            if(!nameTab.isEmpty() || !modelURI.isEmpty())
+            {
+                new FileUploadWindow("local", "uploadComplete").show();
+            }
+            else
+            {
+                ArrayList<String> empty = new ArrayList<String>();
+                displayFiles(null, empty );
+            }
+                
         } else {
             ModelServiceAsync msa = ModelService.Util.getInstance();
             AsyncCallback<String> mscallback = new AsyncCallback<String>() {
@@ -327,7 +337,7 @@ class ModelImportTab extends Tab {
                 setCreateObjectModel(result);
             }
         };
-        ms.createModel("EmptyModel","cervenansky",callback);
+        ms.createModel("EmptyModel"+ String.valueOf((new Date()).getTime()),"cervenansky",callback);
     }
 
     public void setCreateObjectModel(SimulationObjectModel result) {

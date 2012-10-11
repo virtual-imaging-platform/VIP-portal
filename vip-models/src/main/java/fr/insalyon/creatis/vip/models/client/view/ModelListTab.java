@@ -111,6 +111,18 @@ public class ModelListTab extends Tab {
         });
         toolStrip.addButton(refreshButton);
 
+        
+        ToolStripButton createButton = new ToolStripButton();
+        createButton.setIcon(CoreConstants.ICON_ADD);
+        createButton.setTitle("Create");
+        createButton.addClickHandler(new ClickHandler() {
+
+            public void onClick(ClickEvent event) {
+                Layout.getInstance().addTab(new ModelImportTab(true, "",""));
+            }
+        });
+          toolStrip.addButton(createButton);
+        
         ToolStripButton addButton = new ToolStripButton();
         addButton.setIcon(CoreConstants.ICON_ADD);
         addButton.setTitle("Upload");

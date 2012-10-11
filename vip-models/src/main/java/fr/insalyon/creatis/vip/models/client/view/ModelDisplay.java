@@ -86,7 +86,7 @@ public class ModelDisplay extends VLayout {
         super();
         muri = uri;
         buildModel(uri);
-      //  enableAdd();
+       //  enableAdd();
         //disableAdd();
     }
 
@@ -291,7 +291,9 @@ public class ModelDisplay extends VLayout {
             }
         };
 
+       
         String lfn = ModelConstants.MODEL_HOME +"/" + timeStamp +  zipFile;
+        
          model = modelTreeGrid.getModel();
         ssu.setStorageUrl(model, lfn, cbssu);
     }
@@ -333,11 +335,20 @@ public class ModelDisplay extends VLayout {
 
             public void onSuccess(SimulationObjectModel result) {
                 model = result;
+                zipFile = modelTreeGrid.getModel().getModelName() + ".zip";
                uploadModelTTS();
             }
         };
         timeStamp = getTimeStampMilli()  + "-" ;
-        String lfn = ModelConstants.MODEL_HOME +"/" + timeStamp  + zipFile;
+        String lfn = ModelConstants.MODEL_HOME +"/" + timeStamp;
+         if(zipFile == null)
+        {
+          lfn +=  modelTreeGrid.getModel().getModelName() + ".zip";
+        }
+         else
+         {
+            lfn +=  zipFile;
+         }
         ms.recordAddedFiles(zipFile, addFiles, model, lfn,modelTreeGrid.getModelName(), zipFullPath, mbUpload, callback);
     }
 
@@ -378,6 +389,7 @@ public class ModelDisplay extends VLayout {
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         String remoteDir = ModelConstants.MODEL_HOME;
         //TODO: check if this exists
+        SC.say("localName : " + file );
         String remoteName = timeStamp + file;
         String localName = file;
         service.uploadFile(localName, remoteName, remoteDir, callback);

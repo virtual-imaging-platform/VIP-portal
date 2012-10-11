@@ -971,16 +971,16 @@ public class ModelTreeGrid extends TreeGrid {
             String description = OntoName;
             if (type == 1) { //voxel
                 format = " (voxel";
-                description += format + ": label " + String.valueOf(lab) + " in ";
+                description += format + ": label " + String.valueOf(lab) + " in file ://";
                 if (name.contains(".raw")) {
-                    description += name.substring(0, name.indexOf(".raw")) + ".mhd, " + name + ")";
+                    description += name.substring(0, name.indexOf(".raw")) + ".mhd, file ://" + name + ")";
                 } else if (name.contains(".zraw")) {
-                    description += name.substring(0, name.indexOf(".zraw")) + ".mhd, " + name + ")";
+                    description += name.substring(0, name.indexOf(".zraw")) + ".mhd, file ://" + name + ")";
                 } else {
                     description += name + ", " + associatedraw + ")";
                 }
             } else {
-                description += format + ": " + name + ")";
+                description += format + ": file://" + name + ")";
             }
 
             ModelTreeNode objectNode = new ModelTreeNode("", description, false, nbChild, null);
@@ -1063,6 +1063,12 @@ public class ModelTreeGrid extends TreeGrid {
         }
         return luts;
     }
+    
+    public void addPhysicalItem(int tp, int ins, int type, String name, String objLayer, String[] labels)
+    {
+        for(String lb : labels)
+            addPhysicalItem(tp,ins,type,name, objLayer, lb);
+    }
 
     public void addPhysicalItem(int tp, int ins, int type, String name, String objLayer, String label) {
         int nbChild = 0;
@@ -1143,10 +1149,10 @@ public class ModelTreeGrid extends TreeGrid {
         String format = name;
         String description = "";
         if (type == 2) { //LUT
-            description = label + "[" + name + "]";
+            description = label + "[file ://" + name + "]";
 
         } else {
-            description += format + ": " + name + ")";
+            description += format + ": file ://" + name + ")";
         }
 
         ModelTreeNode objectNode = new ModelTreeNode("", description, false, 1, null);

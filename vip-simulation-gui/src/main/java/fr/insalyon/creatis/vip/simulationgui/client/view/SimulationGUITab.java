@@ -54,6 +54,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelUtil;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIConstants;
 import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3D;
@@ -87,6 +88,7 @@ public class SimulationGUITab extends Tab {
     Data3D[][] res_mod;
     int mod_const = 0;
     int mod_lenght = 0;
+    private boolean bReady = false;
 
     public SimulationGUITab() {
 
@@ -98,7 +100,7 @@ public class SimulationGUITab extends Tab {
     {
         init();
         SC.say(i_uri);
-
+        bReady = true;
         modelSelectItem.setValue(i_uri);
         loadModel(i_uri);
 
@@ -207,13 +209,21 @@ public class SimulationGUITab extends Tab {
     /**
      * Hover
      */
-    
+  
     private void loadModel(String uri)
     {
          defineSceneSection.showModal("Object downloading");
                 VTK.rebuildObjectModelFromTripleStore(uri, new AsyncCallback<SimulationObjectModel>() {
 
                     public void onSuccess(final SimulationObjectModel result) {
+                        if (bReady)
+                        {
+                            allowModalitySim(result);
+                        SimulationObjectModelUtil.isReadyForSimulation(result, SimulationObjectModelUtil.Modality.IRM);
+                        SimulationObjectModelUtil.isReadyForSimulation(result, SimulationObjectModelUtil.Modality.PET);
+                        SimulationObjectModelUtil.isReadyForSimulation(result, SimulationObjectModelUtil.Modality.CT);
+                        SimulationObjectModelUtil.isReadyForSimulation(result, SimulationObjectModelUtil.Modality.US);
+                        }
                         modelStorageURL = result.getStorageURL();
                         defineSceneSection.showModal("Object making");
                         /*VTK.UnzipModel(modelStorageURL, new AsyncCallback<int[][]>() {
@@ -320,4 +330,25 @@ public class SimulationGUITab extends Tab {
         SimulationGUIControlBox.getInstance(SimulationGUIConstants.CLASS_CT).refreshLaunchTabValue();
         SimulationGUIControlBox.getInstance(SimulationGUIConstants.CLASS_PET).refreshLaunchTabValue();
     }
+      private void allowModalitySim(SimulationObjectModel model)
+    {
+        if(!SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.IRM))
+        {
+            defineSceneSection.enableBox("MRI");
+        }
+            
+        if(!SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.PET))
+        {
+            defineSceneSection.enableBox("PET");
+        }
+        if(!SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.CT))
+        {
+            defineSceneSection.enableBox("CT");
+        }
+        if(!SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.US))
+        {
+            defineSceneSection.enableBox("US");
+        }
+    }
+    
 }

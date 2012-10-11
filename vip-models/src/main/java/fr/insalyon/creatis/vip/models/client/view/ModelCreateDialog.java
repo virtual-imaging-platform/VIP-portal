@@ -17,7 +17,7 @@ import com.smartgwt.client.widgets.form.fields.ButtonItem;
 
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
-import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
+
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
@@ -32,12 +32,16 @@ import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 import java.util.List;
 import com.smartgwt.client.widgets.form.fields.*;
+import com.smartgwt.client.widgets.form.fields.events.IconClickEvent;
+import com.smartgwt.client.widgets.form.fields.events.IconClickHandler;
 import com.smartgwt.client.widgets.form.validator.CustomValidator;
 import com.smartgwt.client.widgets.form.validator.IsIntegerValidator;
 import com.smartgwt.client.widgets.form.validator.IntegerRangeValidator;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.SelectionUpdatedHandler;
+
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -54,7 +58,7 @@ public class ModelCreateDialog extends Window {
 
     private TextItem searchText = null;
     private ModelServiceAsync ms = null;
-    private ComboBoxItem physicalCombo = null;
+    private SelectItem physicalCombo = null;
     private CheckboxItem anaCheck = null;
     private CheckboxItem pathoCheck = null;
     private CheckboxItem geoCheck = null;
@@ -78,6 +82,13 @@ public class ModelCreateDialog extends Window {
     private TreeGrid resultTG = null;
     private Logger logger = null;
     DynamicForm validateForm = null;
+    private static final String HELPTEXT = "<br><b>Term : </b> Clicking the button search, allow to search the specified term"
+            + " and after to select the wanted value in grid results."
+            + "<br><br><b>Ontology : </b> the search will be performed through the Ontology"
+            + " OntoVip 0.4 . User can specify the kind of layer to explore: Anatomy, Pathology, ..."
+            + "<br><br><b>Search : </b>For meshes object, a new search will remove the previous search."
+            + "For voxels object, the previous search  is not removed by the fact user can select different terms"
+            + " represented by one organ. But only one type of layer is allowed by object.";
 
     public ModelCreateDialog(ModelTreeGrid treegrid) {
         ms = ModelService.Util.getInstance();
@@ -161,16 +172,20 @@ public class ModelCreateDialog extends Window {
 
                 if (type == 0 || type == 1) {
                     if (isObjectsValidated() == true) {
-                        addObjectItem();
-                        hide();
-                        refresh();
+                       
+                              if (addObjectItem())
+                              {
+                                    hide();
+                                    refresh();
+                              }
+
 
                     } else {
                     }
 
                 } else if (type == 2 || type == 3) {
 
-                    tree.addPhysicalItem(tp, ins, type, filename, getLayerforLUT(), physicalCombo.getValueAsString());
+                    tree.addPhysicalItem(tp, ins, type, filename, getLayerforLUT(), physicalCombo.getValues());
                     hide();
                     refresh();
                 }
@@ -185,26 +200,49 @@ public class ModelCreateDialog extends Window {
         this.addItem(validateForm);
     }
 
-    private void addObjectItem() {
+    private boolean addObjectItem() {
+        if (type == 0) {
+            addMeshesItem();
+            return true;
+        } else {
+            return addVoxelsItem();
+        }
+    }
+
+    private boolean addVoxelsItem() {
+
+  
+        boolean bmix = true;
+        for (ListGridRecord rd : resultTG.getSelectedRecords()) {
+            if (rd.getAttributeAsString("type") != resultTG.getSelectedRecords()[0].getAttributeAsString("type")) {
+                bmix = false;
+                break;
+            }
+        }
+        if (!bmix) {
+            SC.warn("we can't mix different types of layer for one object.");
+        } else {
+            for (ListGridRecord rd : resultTG.getSelectedRecords()) {
+                int label = rd.getAttributeAsInt("label");
+                tree.addObjectItem(tp, ins, type, filename, rd.getAttribute("name"),
+                        rd.getAttribute("type"), label);
+            }
+        }
+        return bmix;
+    }
+
+    private void addMeshesItem() {
 
         int label;
         ListGridRecord[] records = resultTG.getSelectedRecords();
         for (ListGridRecord rd : records) {
-
-            boolean badd = false;
-            if (type == 0) {
-                String slabel = rd.getAttribute("priority");
-                label = 1;
-                if (slabel != null) {
-                    label = Integer.parseInt(slabel);
-                }
-                if (label > 4) {
-                    label = 4;
-                }
-            } else {
-
-                String slabel = rd.getAttributeAsString("label");
+        String slabel = rd.getAttribute("priority");
+            label = 1;
+            if (slabel != null) {
                 label = Integer.parseInt(slabel);
+            }
+            if (label > 4) {
+                label = 4;
             }
             tree.addObjectItem(tp, ins, type, filename, rd.getAttribute("name"),
                     rd.getAttribute("type"), label);
@@ -365,7 +403,7 @@ public class ModelCreateDialog extends Window {
 
                 }
             });
-            resultTG.setSelectionType(SelectionStyle.MULTIPLE);
+            resultTG.setSelectionType(SelectionStyle.SIMPLE);
             resultTG.setFields(fieldname, fieldtype, fieldscore, labelField);
         }
         resultTG.addSelectionChangedHandler(new SelectionChangedHandler() {
@@ -394,9 +432,12 @@ public class ModelCreateDialog extends Window {
         for (String lut : tree.getLutMap()) {
             lutMap.put(lut, lut);
         }
-        physicalCombo = new ComboBoxItem();
-        physicalCombo.setTitle("physical parameters:");
+        physicalCombo = new SelectItem();
+        physicalCombo.setTitle("PHYSICAL PARAMATERS:");
+        physicalCombo.setMultiple(true);
+        physicalCombo.setMultipleAppearance(MultipleAppearance.PICKLIST);
         physicalCombo.setValueMap(lutMap);
+        physicalCombo.setPrompt("select the paramater(s) represented by the file.");
         physicalCombo.enable();
 
         extensionForm = new DynamicForm();
@@ -505,27 +546,41 @@ public class ModelCreateDialog extends Window {
                     geoCheck.getValueAsBoolean(), forCheck.getValueAsBoolean(), exCheck.getValueAsBoolean()};
                 String toSearch = searchText.getValueAsString();
 
-                AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
+                if (toSearch == null || toSearch.isEmpty()) {
+                    SC.warn("can't search in the ontology.Please add a term.");
+                } else {
+                    AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
 
-                    public void onFailure(Throwable caught) {
-                        SC.warn("Cant search through the ontology");
-                    }
+                        public void onFailure(Throwable caught) {
+                            SC.warn("Cant search through the ontology");
+                        }
 
-                    public void onSuccess(List<String[]> result) {
-                        int i = 0;
-                        if (type == 0) {
-                            for (Record rec : resultTreeGrid.getRecords()) {
-                                resultTreeGrid.removeData(rec);
+                        public void onSuccess(List<String[]> result) {
+                            int i = 0;
+                            if (type == 0) {
+                                for (Record rec : resultTreeGrid.getRecords()) {
+                                    resultTreeGrid.removeData(rec);
+                                }
+                            }
+                            resultData = new SearchTreeNode[result.size()];
+
+                            for (String[] ii : result) {
+                                resultTreeGrid.addData(new SearchTreeNode(ii[0], ii[1], ii[2]));
                             }
                         }
-                        resultData = new SearchTreeNode[result.size()];
+                    };
+                    ms.searchWithScope(toSearch, scope, callback);
+                }
+            }
+        });
 
-                        for (String[] ii : result) {
-                            resultTreeGrid.addData(new SearchTreeNode(ii[0], ii[1], ii[2]));
-                        }
-                    }
-                };
-                ms.searchWithScope(toSearch, scope, callback);
+        FormItemIcon icon = new FormItemIcon();
+        icon.setSrc(CoreConstants.ICON_HELP);
+        searchText.setIcons(icon);
+        searchText.addIconClickHandler(new IconClickHandler() {
+
+            public void onIconClick(IconClickEvent event) {
+                SC.say(HELPTEXT);
             }
         });
 
