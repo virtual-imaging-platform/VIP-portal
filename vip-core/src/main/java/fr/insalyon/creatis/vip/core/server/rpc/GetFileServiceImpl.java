@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.core.server.rpc;
 
+import fr.insalyon.creatis.devtools.zip.FolderZipper;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.Server;
@@ -49,11 +50,12 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class GetFileServiceImpl extends HttpServlet {
 
@@ -72,6 +74,16 @@ public class GetFileServiceImpl extends HttpServlet {
                 File file = new File(
                         Server.getInstance().getWorkflowsPath()
                         + filepath);
+
+                boolean isDir = false;
+                if (file.isDirectory()) {
+                    String zipName = file.getAbsolutePath() + ".zip";
+                    FolderZipper.zipFolder(file.getAbsolutePath(), zipName);
+                    filepath = zipName;
+                    file = new File(zipName);
+                    isDir = true;
+                }
+
                 logger.info("(" + user.getEmail() + ") Downloading file '" + filepath + "'.");
                 int length = 0;
                 ServletOutputStream op = resp.getOutputStream();
@@ -93,8 +105,12 @@ public class GetFileServiceImpl extends HttpServlet {
                 in.close();
                 op.flush();
                 op.close();
+
+                if (isDir) {
+                    FileUtils.deleteQuietly(file);
+                }
             }
-            
+
         } catch (DAOException ex) {
             throw new ServletException(ex);
         }

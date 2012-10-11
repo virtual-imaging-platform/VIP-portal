@@ -81,7 +81,7 @@ public class LogsContextMenu extends Menu {
             }
         });
 
-        MenuItem downloadItem = new MenuItem("Download File");
+        MenuItem downloadItem = new MenuItem("Download");
         downloadItem.setIcon(DataManagerConstants.ICON_DOWNLOAD);
         downloadItem.addClickHandler(new ClickHandler() {
             @Override
@@ -114,7 +114,7 @@ public class LogsContextMenu extends Menu {
             this.setItems(viewItem, downloadItem, deleteItem);
 
         } else {
-            this.setItems(deleteItem);
+            this.setItems(downloadItem, deleteItem);
         }
     }
 
