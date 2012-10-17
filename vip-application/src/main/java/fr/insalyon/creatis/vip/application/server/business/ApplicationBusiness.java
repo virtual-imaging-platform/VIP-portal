@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -43,7 +43,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ApplicationBusiness {
 
@@ -195,6 +195,21 @@ public class ApplicationBusiness {
 
         try {
             ApplicationDAOFactory.getDAOFactory().getApplicationDAO().remove(email, name);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
+    /**
+     * 
+     * @param name
+     * @return
+     * @throws BusinessException 
+     */
+    public String getCitation(String name) throws BusinessException {
+        
+        try {
+            return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getCitation(name);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

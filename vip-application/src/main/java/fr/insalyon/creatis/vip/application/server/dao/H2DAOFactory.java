@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -41,7 +41,7 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class H2DAOFactory extends ApplicationDAOFactory {
 
@@ -77,6 +77,7 @@ public class H2DAOFactory extends ApplicationDAOFactory {
             PlatformConnection.getInstance().createTable("VIPApplications",
                     "name VARCHAR(255), "
                     + "lfn VARCHAR(255), "
+                    + "citation CLOB, "
                     + "PRIMARY KEY (name)");
 
             PlatformConnection.getInstance().createTable("VIPApplicationClasses",

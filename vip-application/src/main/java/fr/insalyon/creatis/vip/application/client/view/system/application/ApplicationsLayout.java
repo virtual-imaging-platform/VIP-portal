@@ -90,7 +90,6 @@ public class ApplicationsLayout extends VLayout {
     private void configureGrid() {
 
         grid = new ListGrid() {
-
             @Override
             protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
                 rollOverRecord = this.getRecord(rowNum);
@@ -103,23 +102,21 @@ public class ApplicationsLayout extends VLayout {
 
                     ImgButton loadImg = getImgButton(CoreConstants.ICON_EDIT, "Edit");
                     loadImg.addClickHandler(new ClickHandler() {
-
                         @Override
                         public void onClick(ClickEvent event) {
                             edit(rollOverRecord.getAttribute("name"),
                                     rollOverRecord.getAttribute("lfn"),
-                                    rollOverRecord.getAttribute("classes"));
+                                    rollOverRecord.getAttribute("classes"),
+                                    rollOverRecord.getAttribute("citation"));
                         }
                     });
                     ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
                     deleteImg.addClickHandler(new ClickHandler() {
-
                         @Override
                         public void onClick(ClickEvent event) {
                             final String name = rollOverRecord.getAttribute("name");
                             SC.ask("Do you really want to remove the application \""
                                     + name + "\"?", new BooleanCallback() {
-
                                 @Override
                                 public void execute(Boolean value) {
                                     if (value) {
@@ -162,12 +159,12 @@ public class ApplicationsLayout extends VLayout {
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
-
             @Override
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 edit(event.getRecord().getAttribute("name"),
                         event.getRecord().getAttribute("lfn"),
-                        event.getRecord().getAttribute("classes"));
+                        event.getRecord().getAttribute("classes"),
+                        event.getRecord().getAttribute("citation"));
             }
         });
     }
@@ -175,7 +172,6 @@ public class ApplicationsLayout extends VLayout {
     public void loadData() {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
-
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
@@ -187,15 +183,16 @@ public class ApplicationsLayout extends VLayout {
                 modal.hide();
                 List<ApplicationRecord> dataList = new ArrayList<ApplicationRecord>();
 
-                for (Application a : result) {
+                for (Application app : result) {
                     StringBuilder sb = new StringBuilder();
-                    for (String className : a.getApplicationClasses()) {
+                    for (String className : app.getApplicationClasses()) {
                         if (sb.length() > 0) {
                             sb.append(", ");
                         }
                         sb.append(className);
                     }
-                    dataList.add(new ApplicationRecord(a.getName(), a.getLfn(), sb.toString()));
+                    dataList.add(new ApplicationRecord(app.getName(), app.getLfn(),
+                            sb.toString(), app.getCitation()));
                 }
                 grid.setData(dataList.toArray(new ApplicationRecord[]{}));
             }
@@ -208,7 +205,6 @@ public class ApplicationsLayout extends VLayout {
 
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
@@ -226,9 +222,9 @@ public class ApplicationsLayout extends VLayout {
         service.remove(name, callback);
     }
 
-    private void edit(String name, String lfn, String classes) {
+    private void edit(String name, String lfn, String classes, String citation) {
         ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                 getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-        appsTab.setApplication(name, lfn, classes);
+        appsTab.setApplication(name, lfn, classes, citation);
     }
 }

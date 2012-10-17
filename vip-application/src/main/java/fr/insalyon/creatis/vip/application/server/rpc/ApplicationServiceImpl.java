@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -35,7 +35,6 @@
 package fr.insalyon.creatis.vip.application.server.rpc;
 
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
@@ -58,7 +57,7 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ApplicationServiceImpl extends AbstractRemoteServiceServlet implements ApplicationService {
 
@@ -301,6 +300,23 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             status.setWaitingTasks(tasks[1]);
 
             return status;
+            
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param applicationName
+     * @return
+     * @throws ApplicationException 
+     */
+    @Override
+    public String getCitation(String applicationName) throws ApplicationException {
+        
+        try {
+            return applicationBusiness.getCitation(applicationName);
             
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);

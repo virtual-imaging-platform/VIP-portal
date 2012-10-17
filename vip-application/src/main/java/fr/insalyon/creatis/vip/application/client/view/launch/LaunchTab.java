@@ -103,6 +103,8 @@ public class LaunchTab extends AbstractLaunchTab {
                     launchFormLayout.addButtons(launchButton, saveInputsButton);
                 }
 
+                launchFormLayout.configureCitation(applicationName);
+                
                 modal.hide();
 
                 configureInputsLayout(true);

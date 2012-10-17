@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -40,7 +40,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public interface ApplicationDAO {
 
@@ -61,4 +61,6 @@ public interface ApplicationDAO {
     public List<String> getApplicationsName(String applicationClass) throws DAOException;
 
     public Application getApplication(String name) throws DAOException;
+    
+    public String getCitation(String name) throws DAOException;
 }

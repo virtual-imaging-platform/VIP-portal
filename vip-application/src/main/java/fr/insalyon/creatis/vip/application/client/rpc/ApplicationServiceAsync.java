@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -42,7 +42,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public interface ApplicationServiceAsync {
 
@@ -75,4 +75,6 @@ public interface ApplicationServiceAsync {
     public void getApplicationsAndUsers(List<String> reservedClasses, AsyncCallback<List<String>[]> asyncCallback);
     
     public void getApplicationStatus(AsyncCallback<ApplicationStatus> asyncCallback);
+    
+    public void getCitation(String applicationName, AsyncCallback<String> asyncCallback);
 }

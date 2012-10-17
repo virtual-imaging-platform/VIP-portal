@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -40,7 +40,7 @@ import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ManageApplicationsTab extends AbstractManageTab {
 
@@ -65,7 +65,7 @@ public class ManageApplicationsTab extends AbstractManageTab {
         appsLayout.loadData();
     }
 
-    public void setApplication(String name, String lfn, String classes) {
-        editLayout.setApplication(name, lfn, classes);
+    public void setApplication(String name, String lfn, String classes, String citation) {
+        editLayout.setApplication(name, lfn, classes, citation);
     }
 }

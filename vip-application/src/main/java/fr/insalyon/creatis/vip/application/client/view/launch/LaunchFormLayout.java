@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.BooleanCallback;
@@ -46,6 +47,7 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSourceLayout;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
@@ -258,5 +260,41 @@ public class LaunchFormLayout extends AbstractFormLayout {
     public void setSourcesLayoutVisibible(boolean visible) {
 
         sourcesLayout.setVisible(visible);
+    }
+    
+    /**
+     * 
+     * @param applicationName 
+     */
+    public void configureCitation(String applicationName) {
+        
+        AsyncCallback<String> callback = new AsyncCallback<String>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to load citation:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(String result) {
+                if (result != null && !result.isEmpty()) {
+                    
+                    VLayout citationLayout = new VLayout(5);
+                    citationLayout.addMember(WidgetUtil.getLabel("<b>Please refer to the following publication:</b>", 20));
+                    
+                    Label citation = new Label(result);
+                    citation.setWidth100();
+                    citation.setAutoHeight();
+                    citation.setCanSelectText(true);
+                    citation.setPadding(5);
+                    citation.setBackgroundColor("#FFFFFF");
+                    citation.setBorder("1px solid #CCCCCC");
+                    citationLayout.addMember(citation);
+                    
+                    addMember(citationLayout);
+                }
+            }
+        };
+        ApplicationService.Util.getInstance().getCitation(applicationName, callback);
     }
 }

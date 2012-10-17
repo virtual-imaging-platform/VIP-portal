@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -44,7 +44,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ApplicationsToolStrip extends ToolStrip {
 
@@ -60,7 +60,7 @@ public class ApplicationsToolStrip extends ToolStrip {
             public void onClick(ClickEvent event) {
                 ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                appsTab.setApplication(null, null, null);
+                appsTab.setApplication(null, null, null, null);
             }
         });
         this.addButton(addButton);

@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -38,14 +38,16 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ApplicationRecord extends ListGridRecord {
 
-    public ApplicationRecord(String name, String lfn, String classes) {
+    public ApplicationRecord(String name, String lfn, String classes, 
+            String citation) {
         
         setAttribute("name", name);
         setAttribute("lfn", lfn);
         setAttribute("classes", classes);
+        setAttribute("citation", citation);
     }
 }

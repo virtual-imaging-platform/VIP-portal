@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -39,27 +39,29 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class Application implements IsSerializable {
 
     private String name;
     private String lfn;
     private List<String> applicationClasses;
+    private String citation;
 
     public Application() {
     }
 
-    public Application(String name, String lfn) {
-        
-        this(name, lfn, null);
+    public Application(String name, String lfn, String citation) {
+
+        this(name, lfn, null, citation);
     }
-    
-    public Application(String name, String lfn, List<String> applicationClasses) {
-        
+
+    public Application(String name, String lfn, List<String> applicationClasses, String citation) {
+
         this.name = name;
         this.lfn = lfn;
         this.applicationClasses = applicationClasses;
+        this.citation = citation;
     }
 
     public String getLfn() {
@@ -72,5 +74,9 @@ public class Application implements IsSerializable {
 
     public List<String> getApplicationClasses() {
         return applicationClasses;
+    }
+
+    public String getCitation() {
+        return citation;
     }
 }

@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -45,7 +45,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public interface ApplicationService extends RemoteService {
 
@@ -91,4 +91,6 @@ public interface ApplicationService extends RemoteService {
     public List<String>[] getApplicationsAndUsers(List<String> reservedClasses) throws ApplicationException;
     
     public ApplicationStatus getApplicationStatus() throws ApplicationException;
+    
+    public String getCitation(String applicationName) throws ApplicationException;
 }

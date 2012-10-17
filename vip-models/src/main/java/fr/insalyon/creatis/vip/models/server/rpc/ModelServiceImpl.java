@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -34,21 +34,18 @@
  */
 package fr.insalyon.creatis.vip.models.server.rpc;
 
-import fr.insalyon.creatis.vip.core.client.bean.User;
-
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.PhysicalParametersLayer;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
-import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.view.ModelException;
 import fr.insalyon.creatis.vip.models.server.business.ModelBusiness;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -56,7 +53,7 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author Tristan Glatard, Rafael Silva
+ * @author Tristan Glatard, Rafael Ferreira da Silva
  */
 public class ModelServiceImpl extends AbstractRemoteServiceServlet implements ModelService {
 
@@ -73,7 +70,7 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         try {
             try {
                 try {
-                    return modelBusiness.getFiles(modelZipFile, getSessionUser(),modelFullPath,bUpload);
+                    return modelBusiness.getFiles(modelZipFile, getSessionUser(), modelFullPath, bUpload);
                 } catch (CoreException ex) {
                     throw new ModelException(ex);
                 }
@@ -125,9 +122,9 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
 
     public SimulationObjectModel rebuildObjectModelFromAnnotationFile(String fileName) throws ModelException {
         try {
-            return modelBusiness.rebuildObjectModelFromAnnotationFile(fileName,getSessionUser().getLastName());
+            return modelBusiness.rebuildObjectModelFromAnnotationFile(fileName, getSessionUser().getLastName());
         } catch (CoreException ex) {
-             throw new ModelException(ex);
+            throw new ModelException(ex);
         }
     }
 
@@ -186,7 +183,7 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
     public SimulationObjectModel createEmptyModel() throws ModelException {
         try {
             trace(logger, "Creating an empty model ");
-            return modelBusiness.createModel("Empty_Model",getSessionUser().getLastName());
+            return modelBusiness.createModel("Empty_Model", getSessionUser().getLastName());
 
         } catch (CoreException ex) {
             throw new ModelException(ex);
@@ -213,7 +210,7 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
     }
 
-    public SimulationObjectModel setInstantDuration(SimulationObjectModel objectModel, int tp, int ins, String duration)throws ModelException {
+    public SimulationObjectModel setInstantDuration(SimulationObjectModel objectModel, int tp, int ins, String duration) throws ModelException {
         try {
             trace(logger, "set Instant Duration");
             return modelBusiness.setInstantDuration(objectModel, tp, ins, duration);
@@ -222,28 +219,27 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
             throw new ModelException(ex);
         }
     }
-    public SimulationObjectModel duplicateTimePoint(SimulationObjectModel objectModel, int tp)throws ModelException
-    {
+
+    public SimulationObjectModel duplicateTimePoint(SimulationObjectModel objectModel, int tp) throws ModelException {
         try {
             trace(logger, "duplicate timepoint ");
             return modelBusiness.duplicateTimePoint(objectModel, tp);
 
         } catch (CoreException ex) {
             throw new ModelException(ex);
-        } 
+        }
     }
-        
-    public SimulationObjectModel duplicateInstant(SimulationObjectModel objectModel, int tp, int ins) throws ModelException
-    {
+
+    public SimulationObjectModel duplicateInstant(SimulationObjectModel objectModel, int tp, int ins) throws ModelException {
         try {
             trace(logger, "duplicate Instant ");
             return modelBusiness.duplicateInstant(objectModel, tp, ins);
 
         } catch (CoreException ex) {
             throw new ModelException(ex);
-        } 
+        }
     }
-    
+
     public List<String[]> searchWithScope(String query, boolean[] scope) throws ModelException {
         try {
             trace(logger, "search through ontology");
@@ -261,15 +257,16 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
             throw new ModelException(ex);
         }
     }
-    
-     public SimulationObjectModel addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type) throws ModelException {
-           try {
+
+    public SimulationObjectModel addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type) throws ModelException {
+        try {
             trace(logger, "add LUT");
-            return modelBusiness.addLUT(model, layer,name, tp, ins, pptype, type);
+            return modelBusiness.addLUT(model, layer, name, tp, ins, pptype, type);
         } catch (CoreException ex) {
             throw new ModelException(ex);
         }
-     }
+    }
+
     public SimulationObjectModel removeTimePoint(SimulationObjectModel model, int tp) throws ModelException {
 
         try {
@@ -290,23 +287,22 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
     }
 
-    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles, 
+    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles,
             SimulationObjectModel model, String lfn, String nwName, String zipFullPath, boolean bUpload) throws ModelException {
-      
+
+        try {
+            trace(logger, "add files to zip");
             try {
-                trace(logger, "add files to zip");
-            try {
-                return modelBusiness.recordAddedFiles(zipName, addfiles, model,lfn,
+                return modelBusiness.recordAddedFiles(zipName, addfiles, model, lfn,
                         getSessionUser(), nwName, zipFullPath, bUpload);
             } catch (DataManagerException ex) {
                 throw new ModelException(ex);
             }
-            } catch (CoreException ex) {
-                 throw new ModelException(ex);
-            }
-           catch (IOException ex) {
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        } catch (IOException ex) {
             java.util.logging.Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-             throw new ModelException(ex);
+            throw new ModelException(ex);
         }
     }
 
@@ -328,56 +324,53 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
             throw new ModelException(ex);
         }
     }
-    
-         public SimulationObjectModel removePhysical(SimulationObjectModel objectModel, int tp, int ins, String layer, PhysicalParametersLayer.PhysicalParameterType type) throws ModelException
-    {
-                try {
+
+    public SimulationObjectModel removePhysical(SimulationObjectModel objectModel, int tp, int ins, String layer, PhysicalParametersLayer.PhysicalParameterType type) throws ModelException {
+        try {
             trace(logger, "remove physical paramters " + type.toString());
             return modelBusiness.removePhysical(objectModel, tp, ins, layer, type);
         } catch (CoreException ex) {
             throw new ModelException(ex);
         }
     }
-    
-    public SimulationObjectModel removeObjects(SimulationObjectModel model, int tp, int ins, String layer) throws ModelException
-    {
-                try {
+
+    public SimulationObjectModel removeObjects(SimulationObjectModel model, int tp, int ins, String layer) throws ModelException {
+        try {
             trace(logger, "remove objects from " + layer);
             return modelBusiness.removeObjects(model, tp, ins, layer);
         } catch (CoreException ex) {
             throw new ModelException(ex);
         }
     }
-    
-    public SimulationObjectModel removePhysicals(SimulationObjectModel model, int tp, int ins, String layer) throws ModelException
-    {
-                try {
+
+    public SimulationObjectModel removePhysicals(SimulationObjectModel model, int tp, int ins, String layer) throws ModelException {
+        try {
             trace(logger, "remove all physical paramters from " + layer);
             return modelBusiness.removePhysicals(model, tp, ins, layer);
         } catch (CoreException ex) {
             throw new ModelException(ex);
         }
     }
-     public SimulationObjectModel renameTimepoint(SimulationObjectModel model, int tp, Date starting)throws ModelException {
-               try {
+
+    public SimulationObjectModel renameTimepoint(SimulationObjectModel model, int tp, Date starting) throws ModelException {
+        try {
             trace(logger, "rename timepoint: " + tp);
             return modelBusiness.renameTimepoint(model, tp, starting);
         } catch (CoreException ex) {
             throw new ModelException(ex);
         }
-     }
-      
-      public SimulationObjectModel renameInstant(SimulationObjectModel model, int tp, int ins, String duration)throws ModelException {
-                try {
+    }
+
+    public SimulationObjectModel renameInstant(SimulationObjectModel model, int tp, int ins, String duration) throws ModelException {
+        try {
             trace(logger, "rename instant: " + ins);
             return modelBusiness.renameInstant(model, tp, ins, duration);
         } catch (CoreException ex) {
             throw new ModelException(ex);
         }
     }
-     
-     public String extractRaw(String name, String zipname,String modelFullPath, boolean bUpload) throws ModelException 
-     {
+
+    public String extractRaw(String name, String zipname, String modelFullPath, boolean bUpload) throws ModelException {
         try {
             try {
                 return modelBusiness.extractRaw(name, zipname, getSessionUser(), modelFullPath, bUpload);
@@ -387,30 +380,28 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         } catch (CoreException ex) {
             throw new ModelException(ex);
         }
-     }
-     
-     public SimulationObjectModel setDescription(SimulationObjectModel model, String description )throws ModelException
-     {
-          try {
+    }
+
+    public SimulationObjectModel setDescription(SimulationObjectModel model, String description) throws ModelException {
+        try {
             trace(logger, "set description " + description);
             return modelBusiness.setDescription(model, description);
         } catch (CoreException ex) {
             throw new ModelException(ex);
         }
-     }
-     
-      public SimulationObjectModel addMap(SimulationObjectModel model, String name,
-              int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0,  String externalAgent, String unitOfMeasure)throws ModelException
-      {
-           try {
+    }
+
+    public SimulationObjectModel addMap(SimulationObjectModel model, String name,
+            int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0, String externalAgent, String unitOfMeasure) throws ModelException {
+        try {
             trace(logger, "add map of type " + pptype.toString());
             return modelBusiness.addMap(model, name, tp, ins, pptype, b0, externalAgent, unitOfMeasure);
         } catch (CoreException ex) {
             throw new ModelException(ex);
         }
-          
-      }
-      
+
+    }
+
     public void checkRDFEncoding(String files, String modelFullPath, boolean bUpload) throws ModelException {
         try {
             try {
@@ -429,24 +420,21 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
 
     }
-     
-      public String getURLFromURI(String uri) 
-      {
-            return modelBusiness.getURLFromURI(uri);
-       
-      }
-      
-      public String readLicense (String file) throws ModelException
-      {
-            try {
-                return modelBusiness.readLicense(file);
-            } catch (FileNotFoundException ex) {
-                throw new ModelException(ex);
-            } catch (IOException ex) {
-                throw new ModelException(ex);
-            }
-          
-          
-      }
-      
+
+    public String getURLFromURI(String uri) {
+        return modelBusiness.getURLFromURI(uri);
+
+    }
+
+    public String readLicense(String file) throws ModelException {
+        try {
+            return modelBusiness.readLicense(file);
+        } catch (FileNotFoundException ex) {
+            throw new ModelException(ex);
+        } catch (IOException ex) {
+            throw new ModelException(ex);
+        }
+
+
+    }
 }
