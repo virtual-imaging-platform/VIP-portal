@@ -91,9 +91,9 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
                 launchFormLayout.setSourcesLayoutVisibible(false);
 
                 for (Source source : descriptor.getSources()) {
-                    launchFormLayout.addSource(new GateLabSourceLayout(source.getName(), source.getDescription()));
+                    launchFormLayout.addSource(new GateLabSourceLayout(source.getName(), source.getDescription(),modal));
                 }
-
+                modal.show("Configuring mac button ", true);
                 configureLoadMacButton();
                 launchFormLayout.addButtons(5, loadMacButton);
                 launchFormLayout.configureCitation(applicationName);

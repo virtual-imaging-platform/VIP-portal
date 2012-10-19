@@ -34,15 +34,24 @@
  */
 package fr.insalyon.creatis.vip.gatelab.client.view.launch;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSourceLayout;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.selection.PathSelectionWindow;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  *
@@ -53,10 +62,13 @@ public class GateLabSourceLayout extends AbstractSourceLayout {
     private boolean isSelectItem;
     private SelectItem selectItem;
     private TextItem textItem;
+    private String releaseDir = "/vip/GateLab (group)/releases/";
 
-    public GateLabSourceLayout(String name, String comment) {
+    public GateLabSourceLayout(String name, String comment, final ModalWindow modal) {
 
         super(name, comment);
+
+
 
         if (name.equalsIgnoreCase("CPUestimation")) {
 
@@ -78,16 +90,43 @@ public class GateLabSourceLayout extends AbstractSourceLayout {
 
         } else if (name.equalsIgnoreCase("GateRelease")) {
 
-            configureTextItem();
-            textItem.setValue("/vip/GateLab (group)/releases/current_gate_release.tgz");
+            //get list of available releases
+            DataManagerServiceAsync service = DataManagerService.Util.getInstance();
+            AsyncCallback<List<Data>> callback = new AsyncCallback<List<Data>>() {
 
-            PickerIcon browsePicker = new PickerIcon(PickerIcon.SEARCH, new FormItemClickHandler() {
-                public void onFormItemClick(FormItemIconClickEvent event) {
-                    new PathSelectionWindow(textItem).show();
+                public void onFailure(Throwable caught) {
+                    modal.hide();
+                    Layout.getInstance().setWarningMessage("Unable to list release folder:<br />" + caught.getMessage());
                 }
-            });
-            browsePicker.setPrompt("Browse on the Grid");
-            textItem.setIcons(browsePicker);
+
+                public void onSuccess(List<Data> result) {
+                    modal.hide();
+                    List<Release> releases = new ArrayList<Release>();
+                    for (Data d : result) {
+                        releases.add(new Release(d.getName()));
+                    }
+                    Collections.sort(releases);
+
+                    LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+                    String value = releases.get(0).getReleaseName();
+                    for (Release r : releases) {
+                        map.put(releaseDir + "/" + r.getReleaseName(), r.getReleaseName());
+                    }
+                    configureSelectItem(map);
+                    setValue(value);
+                }
+            };
+            modal.show("Listing releases ", true);
+            service.listDir(releaseDir, true, callback);
+            // textItem.setValue("/vip/GateLab (group)/releases/current_gate_release.tgz");
+
+//            PickerIcon browsePicker = new PickerIcon(PickerIcon.SEARCH, new FormItemClickHandler() {
+//                public void onFormItemClick(FormItemIconClickEvent event) {
+//                    new PathSelectionWindow(textItem).show();
+//                }
+//            });
+//            browsePicker.setPrompt("Browse on the Grid");
+//            textItem.setIcons(browsePicker);
 
         } else if (name.equalsIgnoreCase("GateInput") || name.equalsIgnoreCase("NumberOfParticles")) {
 
