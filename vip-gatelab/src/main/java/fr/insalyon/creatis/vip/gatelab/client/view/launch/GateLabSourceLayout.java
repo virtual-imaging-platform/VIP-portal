@@ -108,11 +108,12 @@ public class GateLabSourceLayout extends AbstractSourceLayout {
                     Collections.sort(releases);
 
                     LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-                    String value = releases.get(0).getReleaseName();
+                    String value = releaseDir + "/" +releases.get(0).getReleaseName();
                     for (Release r : releases) {
                         map.put(releaseDir + "/" + r.getReleaseName(), r.getReleaseName());
                     }
                     configureSelectItem(map);
+                    
                     setValue(value);
                 }
             };
