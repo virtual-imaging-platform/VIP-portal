@@ -14,7 +14,7 @@
         <vip.application.version>0.8.8</vip.application.version>
         <vip.datamanager.version>0.8.7</vip.datamanager.version>
         <vip.datamanager-applet.version>0.3.1</vip.datamanager-applet.version>
-        <vip.gatelab.version>0.5.12</vip.gatelab.version>
+        <vip.gatelab.version>0.5.13</vip.gatelab.version>
         <vip.gatelab-applet.version>0.3.1</vip.gatelab-applet.version>
         <vip.simulation-gui.version>0.2.11</vip.simulation-gui.version>
         <vip.models.version>0.8.7</vip.models.version>
