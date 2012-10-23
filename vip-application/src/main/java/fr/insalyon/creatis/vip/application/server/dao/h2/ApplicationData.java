@@ -72,7 +72,7 @@ public class ApplicationData implements ApplicationDAO {
         try {
             PreparedStatement ps = connection.prepareStatement(
                     "INSERT INTO VIPApplications(name, lfn, citation) "
-                    + "VALUES (?, ?)");
+                    + "VALUES (?, ?, ?)");
 
             ps.setString(1, application.getName());
             ps.setString(2, application.getLfn());
