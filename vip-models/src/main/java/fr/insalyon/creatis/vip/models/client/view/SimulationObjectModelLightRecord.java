@@ -45,14 +45,15 @@ public class SimulationObjectModelLightRecord extends ListGridRecord {
     public SimulationObjectModelLightRecord() {
     }
 
-    public SimulationObjectModelLightRecord(String name, String types, String longitudinal,
-            String movement, String URI, String owner) {
+    public SimulationObjectModelLightRecord(String name, String owner, String description, String types, String longitudinal,
+            String movement, String URI) {
         setName(name);
         setTypes(types);
         setLongitudinal(longitudinal);
         setMovement(movement);
         setURI(URI);
         setOwner(owner);
+        setDescription(description);
     }
 
     private void setName(String name) {
@@ -77,5 +78,9 @@ public class SimulationObjectModelLightRecord extends ListGridRecord {
     
     private void setOwner(String owner) {
         setAttribute("owner", owner);
+    }
+    
+    private void setDescription(String description) {
+        setAttribute("description", description);
     }
 }

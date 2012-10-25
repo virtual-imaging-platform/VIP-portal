@@ -307,7 +307,6 @@ class ModelImportTab extends Tab {
             ms.rebuildObjectModelFromAnnotationFile(rdf, callback);
 
         } else {
-            SC.say("Couldn't find any annotation file in this archive. You will have to annotate the model yourself.");
             setEmptyModel();
              
         }

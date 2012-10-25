@@ -178,6 +178,8 @@ public class ModelBusiness {
 
         File f1 = new File(srFile);
         File f2 = new File(dtFile);
+        System.out.println(srFile);
+       System.out.println(dtFile); 
         InputStream in = new FileInputStream(f1);
 
         OutputStream out = new FileOutputStream(f2);
@@ -248,7 +250,7 @@ public class ModelBusiness {
 
        if (checkRDFEncoding(zipdir + "/"+ modelname))
        {
-           File fz = new File(rootDirectory + "zip//" + zipName);
+           File fz = new File(rootDirectory + "zip/" + zipName);
              if (fz.exists())
             fz.delete();
          ZipOutputStream out = new ZipOutputStream(new FileOutputStream(rootDirectory + "zip//" + zipName));
@@ -270,7 +272,7 @@ public class ModelBusiness {
         }
         // Complete the ZIP file
         out.close();
-        copyFile(rootDirectory + "zip//" + zipName, rootDirectory + zipName);
+        copyFile(rootDirectory + "zip/" + zipName, rootDirectory + zipName);
        }
        else
        {
@@ -285,7 +287,7 @@ public class ModelBusiness {
         List<File> files = new ArrayList<File>();
          String modelname = "";
          String rootDirectory = getZipPath(user, zipFullPath, bUpload);
-         File zipdir = new File(rootDirectory + "/zip/");
+         File zipdir = new File(rootDirectory + "/zip");
          if (!zipdir.exists()) {
             zipdir.mkdirs();
           }
@@ -293,7 +295,7 @@ public class ModelBusiness {
         {
             zipName = model.getModelName() + ".zip";
             modelname = model.getModelName() + ".rdf";
-            files.add(new File(zipdir  + "//"+ modelname ));
+            files.add(new File(zipdir  + "/"+ modelname ));
         }
         
 
@@ -305,10 +307,12 @@ public class ModelBusiness {
        
         System.out.println("zipname :" + zipFile);
         System.out.println("zipdir :" + zipdir);
-        copyFile(rootDirectory + zipName, zipdir + zipName);
+        copyFile(rootDirectory + zipName, zipdir + "/"+ zipName);
 
         byte[] buf = new byte[1024];
        
+        if(zipFile.length() != 0)
+        {
         ZipInputStream zin = new ZipInputStream(new FileInputStream(zipdir + zipName));
 
 
@@ -336,6 +340,7 @@ public class ModelBusiness {
         }
         // Close the streams        
         zin.close();
+        }
         System.out.println("time to add " + addfiles.size());
         //copy additional file
         if (addfiles.size() > 0) {
@@ -362,7 +367,7 @@ public class ModelBusiness {
         if(modelname.isEmpty())
         {
             modelname = model.getModelName() + ".rdf";
-            files.add(new File(zipdir  + "//"+ modelname ));
+            files.add(new File(zipdir  + "/"+ modelname ));
         }
         else
         {
@@ -374,14 +379,14 @@ public class ModelBusiness {
         SimulationObjectModelFactory.setStorageURL(model, lfn);
         SimulationObjectModelFactory.inferModelSemanticAxes(model);
        
-        SimulationObjectModelFactory.dumpInFileModel(model,zipdir + "//"+ modelname);
+        SimulationObjectModelFactory.dumpInFileModel(model,zipdir + "/"+ modelname);
         SimulationObjectModelFactory.completeModel(model);
         System.out.println("URI: " + model.getURI());
         System.out.println("URI: " + model.getStorageURL());
-        File fz = new File(rootDirectory + "zip//" + zipName);
+        File fz = new File(rootDirectory + "zip" +"/" + zipName);
         if (fz.exists())
             fz.delete();
-         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(rootDirectory + "zip//" + zipName));
+         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(rootDirectory + "zip/" + zipName));
        
         // Compress the files
         for (File i : files) {
@@ -400,7 +405,7 @@ public class ModelBusiness {
         }
         // Complete the ZIP file
         out.close();
-        copyFile(rootDirectory + "zip//" + zipName, rootDirectory + zipName);
+        copyFile(rootDirectory + "zip/" + zipName, rootDirectory + zipName);
         return model;
     }
 

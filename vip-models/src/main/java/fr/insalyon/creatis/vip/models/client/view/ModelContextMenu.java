@@ -58,7 +58,7 @@ class ModelContextMenu extends Menu {
         });
         
         
-        MenuItem viewItem = new MenuItem("View model");
+        MenuItem viewItem = new MenuItem("View model annotations");
         viewItem.setIcon(ApplicationConstants.ICON_SIMULATION_VIEW);
         viewItem.addClickHandler(new ClickHandler() {
 

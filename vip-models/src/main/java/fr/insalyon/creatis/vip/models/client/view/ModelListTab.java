@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.models.client.view;
 
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.VisibilityMode;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
@@ -56,6 +57,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import com.smartgwt.client.widgets.viewer.DetailViewer;
+import com.smartgwt.client.widgets.viewer.DetailViewerField;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
@@ -213,7 +216,24 @@ public class ModelListTab extends Tab {
 
     private void configureGrid() {
 
-        grid = new ListGrid();
+        grid = new ListGrid(){
+              @Override
+            protected Canvas getCellHoverComponent(Record record, Integer rowNum, Integer colNum) {
+
+                DetailViewer detailViewer = new DetailViewer();
+                detailViewer.setWidth(400);
+
+                DetailViewerField typeField = new DetailViewerField("types", "Type(s)");
+                DetailViewerField longsField = new DetailViewerField("longitudinal", "Longitudinal");
+                DetailViewerField moveField = new DetailViewerField("movement", "Movement");
+                DetailViewerField uriField = new DetailViewerField("uri", "URI");
+                detailViewer.setFields(typeField, longsField,moveField, uriField);
+                
+                detailViewer.setData(new Record[]{record});
+
+                return detailViewer;
+            }};
+        
         grid.setWidth100();
         grid.setHeight100();
         grid.setShowAllRecords(false);
@@ -223,13 +243,18 @@ public class ModelListTab extends Tab {
         //  grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
         grid.setEmptyMessage("<br>No result.");
 
+        
+        
+        
         //    ListGridField statusIcoField = FieldUtil.getIconGridField("statusIco");
         ListGridField modelNameField = new ListGridField("name", "Name");
+        ListGridField ownerField = new ListGridField("owner", "Owner");
+        ListGridField descriptionField = new ListGridField("description", "Description");  
         ListGridField typeField = new ListGridField("types", "Type(s)");
         ListGridField longitudinalField = new ListGridField("longitudinal", "Longitudinal");
         ListGridField movementField = new ListGridField("movement", "Movement");
         ListGridField URIField = new ListGridField("uri", "URI");
-        ListGridField ownerField = new ListGridField("owner", "Owner");
+
 
        // modelNameField.setPrompt(grid.getSelectedRecord().getAttribute("uri"));
         modelNameField.setShowHover(true);
@@ -242,7 +267,10 @@ public class ModelListTab extends Tab {
         
         
      
-        grid.setFields(modelNameField, ownerField,typeField, longitudinalField, movementField, URIField);
+        grid.setFields(modelNameField, ownerField,descriptionField,typeField, longitudinalField, movementField, URIField);
+        grid.hideField("types");
+        grid.hideField("longitudinal");
+        grid.hideField("movement");
         grid.hideField("uri");
 
         rowContextClickHandler = grid.addRowContextClickHandler(new RowContextClickHandler() {
@@ -327,7 +355,7 @@ public class ModelListTab extends Tab {
                 type += "external agent";
             }
             dataList.add(new SimulationObjectModelLightRecord(s.getModelName(), 
-                    type, "" + s.isLongitudinal(), "" + s.isMoving(), s.getURI(),s.getOwner()));
+                    s.getOwner(),s.getDescription(),type, "" + s.isLongitudinal(), "" + s.isMoving(), s.getURI()));
         }
         grid.setData(dataList.toArray(new SimulationObjectModelLightRecord[]{}));
     }

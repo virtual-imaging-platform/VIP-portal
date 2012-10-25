@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>VIP Documentation - Tutorial ESMP 2012</title>
+        <link rel="StyleSheet" href="../css/doc_main.css" type="text/css" />
+    </head>
+    <body>
+
+        <h2>Account creation and login</h2>
+        
+        <p><ul><li>Make sure that you are registered as a tutorial user. Your home page should look like this: <img alt="login-page" src="./tutorial/login.png"/>
+            </li></ul>      
+        
+        <h2>Browse Model repository</h2>
+        
+        <p>You can browse models through a repository.
+            <ul>
+            <li>To access to the repository; click on Models icon:
+            <img alt="home_models" src="tutorial2012/home.png"/></li>
+            <li>You will see three models:
+                <ol><li>Adam</li>
+                <li>Extended Adam</li>
+                <li>Zubal</li></ol>
+            </li>
+            <li>These models are referenced models for simulation. </li>
+            <li>To view and explore a model, right click on the first and select "View model annotations".
+                <img alt="view_models" src="tutorial2012/view_extended_adam.png"/></li>
+            <li>You can explore through the different layers (timepoint, instant, Object Layer) to look at the different objects composing a model.
+                Each object is labelised by a semantic term. The first model Adam only contains voxels and meshes objects.
+                If you come back to the model repository and select to view the second (Extended Adam), you will see the Physical parameters layers used for the simulations.</li>
+             <li>Now, download a model by clicking the download button.<img alt="download_models" src="tutorial2012/download_models.png"/>.
+             Inspect the downloaded archive to control that voxel and meshes files are present. Note the presence of rdf file containing all the semantic aspect of models.</li>
+        
+        <li>You can display a model by a right-click on laucnh simulation GUI.</li>
+        </ul> 
+         <h3>Create-Annotate YOUR own model</h3>
+         <p>
+        <li>First, download one of meshes object from the <a href="http://vip.creatis.insa-lyon.fr/tutorialEMSP2012/">website
+            </a>.
+        </li>
+        After, in the models repository tab, click on Create button:<img alt="create_button_models" src="tutorial2012/create.png"/>.
+ An empty model is automatically created with one timepoint and one instant by default.<img alt="create_model" src="tutorial2012/create_model.png"/>.
+The page is divised in two sections: the left frame will contain the files you will add to your model. 
+The right model will contain your on-going model.</li>
+        <ul>
+            <li>Now, you will add the previous meshes object <img alt="add_file" src="tutorial2012/add_file.png"/>.
+            The selected file will be displayed in the left file<img alt="file_added" src="tutorial2012/file_added.png"/>.
+            You can add several files in the same way.
+            To add an object to model, you have to drag and drop the file on the right frame.
+            A dialog box will appear. That box allows to associate semantic terms to your objects.
+            In our example, search the appropriate semantic term in text field:<img alt="add_file" src="tutorial2012/add_file.png"/>.
+            The results will be displayed in the spreadsheet below. You can try several terms.
+            At the end, you have to select the right term by clicking it and validate it with OK button.</li>
+            <li>You have to rename your model by a right click on the right bar <img alt="rename_file" src="tutorial2012/rename.png"/> and select "Change model name".</li>
+            <li>Now, you can commit your model with the commit button <img alt="rename_file" src="tutorial2012/rename.png"/>.</li>
+            <li>Your model is now displayed in the model repository.</li>
+            
+        </ul>        
+        </p>
+         </body>
+</html>
+

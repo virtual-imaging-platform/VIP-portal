@@ -313,7 +313,7 @@ public class ModelDisplay extends VLayout {
 //                            @Override
 //                            public void onSuccess(Void result) {
                 modal.hide();
-                SC.say("Model successfully comitted to the Triple Store (" + uri + ")");
+               // SC.say("Model successfully comitted to the Triple Store (" + uri + ")");
                 ModelListTab modelsTab = (ModelListTab) Layout.getInstance().getTab("model-browse-tab");
                 if (modelsTab != null) {
                     modelsTab.loadModels();
@@ -335,7 +335,10 @@ public class ModelDisplay extends VLayout {
 
             public void onSuccess(SimulationObjectModel result) {
                 model = result;
-                zipFile = modelTreeGrid.getModel().getModelName() + ".zip";
+                if(zipFile == null)
+                {
+                    zipFile = modelTreeGrid.getModel().getModelName() + ".zip";
+                }
                uploadModelTTS();
             }
         };
@@ -381,7 +384,7 @@ public class ModelDisplay extends VLayout {
             }
 
             public void onSuccess(Void result) {
-                SC.say("Added zip file to the upload pool");
+               // SC.say("Added zip file to the upload pool");
                 ((DataManagerSection) Layout.getInstance().getMainSection(DataManagerConstants.SECTION_FILE_TRANSFER)).expand();
                 BrowserLayout.getInstance().loadData(ModelConstants.MODEL_HOME, true);
             }
@@ -389,7 +392,7 @@ public class ModelDisplay extends VLayout {
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         String remoteDir = ModelConstants.MODEL_HOME;
         //TODO: check if this exists
-        SC.say("localName : " + file );
+//        SC.say("localName : " + file );
         String remoteName = timeStamp + file;
         String localName = file;
         service.uploadFile(localName, remoteName, remoteDir, callback);

@@ -82,13 +82,25 @@ public class ModelCreateDialog extends Window {
     private TreeGrid resultTG = null;
     private Logger logger = null;
     DynamicForm validateForm = null;
-    private static final String HELPTEXT = "<br><b>Term : </b> Clicking the button search, allow to search the specified term"
+    private static final String HELPTEXT = "<br><b>Term : </b> Clicking the button search," 
+            + "it allows to search the specified term"
             + " and after to select the wanted value in grid results."
             + "<br><br><b>Ontology : </b> the search will be performed through the Ontology"
             + " OntoVip 0.4 . User can specify the kind of layer to explore: Anatomy, Pathology, ..."
             + "<br><br><b>Search : </b>For meshes object, a new search will remove the previous search."
             + "For voxels object, the previous search  is not removed by the fact user can select different terms"
             + " represented by one organ. But only one type of layer is allowed by object.";
+    
+    
+    
+    private static final String PRIORITYTEXT = "<br><b>Priority : </b>"
+            + " the priority value is for the flattening. This ordering"
+            +"is based on a rough layer priority guess assuming that geometry"
+            +"and anatomy are always superseded by pathology that"
+            +"is in turn overlaid by external bodies and foreign agents."
+            +" The values are between 1 and 4. 1 is the default value and"
+            + " 4 the high value."
+            +" <br>By default, the priority is set to 1. To change it, edit the value.";
 
     public ModelCreateDialog(ModelTreeGrid treegrid) {
         ms = ModelService.Util.getInstance();
@@ -368,7 +380,7 @@ public class ModelCreateDialog extends Window {
             TreeGridField priorityField = new TreeGridField("priority");
             priorityField.setCanSort(false);
             priorityField.setCanEdit(true);
-            priorityField.setPrompt("By default, the priority is set to 1. To change it, edit the value.");
+            priorityField.setPrompt(PRIORITYTEXT);
             priorityField.setBaseStyle("myHighGridCell");
             //priorityField.setValidators(iiv,integerRangeValidator);
             resultTG.setSelectionType(SelectionStyle.SINGLE);
