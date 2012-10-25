@@ -91,7 +91,7 @@ class ModelContextMenu extends Menu {
         if(bdelete)
             this.setItems(viewItem, modifyItem,deleteItem, SimulationItem);
         else
-            this.setItems(viewItem,modifyItem);
+            this.setItems(viewItem,modifyItem,SimulationItem);
     }
 
     private void deleteModel() {

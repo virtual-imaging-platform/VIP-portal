@@ -917,7 +917,7 @@ public class ModelTreeGrid extends TreeGrid {
                         if (type == 0 || type == 1) {
                             bObjectLayerExist = true;
                             nbChild = modelTree.getDescendantLeaves(obj).length;
-                            logger.log(Level.SEVERE, "couche object trouvé: " + String.valueOf(nbChild));
+                            logger.log(Level.SEVERE, "Found object layer: " + String.valueOf(nbChild));
                             objectLayerPartsNode = (ModelTreeNode) obj;
                             TreeNode[] leaves = modelTree.getLeaves(objectLayerPartsNode);
                             for (TreeNode leave : leaves) {
@@ -937,14 +937,14 @@ public class ModelTreeGrid extends TreeGrid {
                                 if (physical.getAttribute(model.getModelName()).contains("Look-up tables") && type == 2) {
                                     bphysicalLutExist = true;
                                     nbChild = modelTree.getDescendantLeaves(physical).length;
-                                    logger.log(Level.SEVERE, "couche object trouvé: " + String.valueOf(nbChild));
+                                    logger.log(Level.SEVERE, "Found object layer: " + String.valueOf(nbChild));
                                     physicalLutNode = (ModelTreeNode) physical;
                                     break;
 
                                 } else if (physical.getAttribute(model.getModelName()).contains("Maps") && type == 3) {
                                     bphysicalLutExist = true;
                                     nbChild = modelTree.getDescendantLeaves(physical).length;
-                                    logger.log(Level.SEVERE, "LUT trouvé: " + String.valueOf(nbChild));
+                                    logger.log(Level.SEVERE, "LUT found: " + String.valueOf(nbChild));
                                     physicalLutNode = (ModelTreeNode) physical;
                                     break;
                                 }
@@ -1120,14 +1120,14 @@ public class ModelTreeGrid extends TreeGrid {
                                 if (physical.getAttribute(model.getModelName()).contains("Look-up tables") && type == 2) {
                                     bphysicalLutExist = true;
                                     nbChild = modelTree.getDescendantLeaves(physical).length;
-                                    logger.log(Level.SEVERE, "couche object trouvé: " + String.valueOf(nbChild));
+                                    logger.log(Level.SEVERE, "couche object trouvï¿½: " + String.valueOf(nbChild));
                                     physicalLutNode = (ModelTreeNode) physical;
                                     break;
 
                                 } else if (physical.getAttribute(model.getModelName()).contains("Maps") && type == 3) {
                                     bphysicalLutExist = true;
                                     nbChild = modelTree.getDescendantLeaves(physical).length;
-                                    logger.log(Level.SEVERE, "LUT trouvé: " + String.valueOf(nbChild));
+                                    logger.log(Level.SEVERE, "LUT trouvï¿½: " + String.valueOf(nbChild));
                                     physicalLutNode = (ModelTreeNode) physical;
                                     break;
                                 }
@@ -1218,7 +1218,7 @@ public class ModelTreeGrid extends TreeGrid {
                         if (physical.getAttribute(model.getModelName()).contains("Maps")) {
                             bphysicalLutExist = true;
                             nbChild = modelTree.getDescendantLeaves(physical).length;
-                            logger.log(Level.SEVERE, "LUT trouvé: " + String.valueOf(nbChild));
+                            logger.log(Level.SEVERE, "LUT trouvï¿½: " + String.valueOf(nbChild));
                             physicalLutNode = (ModelTreeNode) physical;
                             break;
                         }
