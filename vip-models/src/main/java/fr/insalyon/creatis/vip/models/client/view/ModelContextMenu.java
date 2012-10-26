@@ -101,9 +101,9 @@ class ModelContextMenu extends Menu {
         });
         
         if(bdelete)
-            this.setItems(viewItem, modifyItem,deleteItem, SimulationItem,downloadItem);
+            this.setItems(viewItem, deleteItem, SimulationItem,downloadItem);
         else
-            this.setItems(viewItem,modifyItem,SimulationItem, downloadItem);
+            this.setItems(viewItem, SimulationItem, downloadItem);
     }
   
     private void downloadModel(String modelURI, boolean test){
