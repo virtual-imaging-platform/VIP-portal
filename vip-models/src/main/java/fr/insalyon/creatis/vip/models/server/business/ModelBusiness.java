@@ -89,13 +89,13 @@ public class ModelBusiness {
     public List<String> getFiles(String modelZipFile, User user, String zipFullPath, boolean bUpload) throws BusinessException, DataManagerException {
 
         System.out.println("Calling getFiles " + modelZipFile);
-        
+
         if (modelZipFile.lastIndexOf(".zip") == -1) {
             throw new BusinessException("This is not a zip file");
         }
 
         try {
-            String rootDirectory =  getZipPath(user, zipFullPath,bUpload);
+            String rootDirectory = getZipPath(user, zipFullPath, bUpload);
             System.out.println("Calling getFiles " + rootDirectory);
             ZipInputStream zipinputstream = new ZipInputStream(new FileInputStream(rootDirectory + modelZipFile));
             ZipEntry zipentry = zipinputstream.getNextEntry();
@@ -142,7 +142,8 @@ public class ModelBusiness {
             throw new BusinessException(ex);
         }
     }
-   private boolean checkRDFEncoding(String file) throws FileNotFoundException, IOException {
+
+    private boolean checkRDFEncoding(String file) throws FileNotFoundException, IOException {
         File f = new File(file);
         boolean btest = false;
         InputStream ips = new FileInputStream(file);
@@ -150,31 +151,27 @@ public class ModelBusiness {
         BufferedReader br = new BufferedReader(ipsr);
         String temp = br.readLine();
         String tp = "";
-        if (temp.contains("windows"))
-        {
+        if (temp.contains("windows")) {
             System.out.println("windows encoding");
             temp = temp.replace("windows-1252", "UTF-8");
             btest = true;
-            while ((tp  = br.readLine()) != null)
-            {
+            while ((tp = br.readLine()) != null) {
                 temp += tp;
             }
             br.close();
             ips.close();
-            
-            OutputStream out = new FileOutputStream(f); 
+
+            OutputStream out = new FileOutputStream(f);
             out.write(temp.getBytes());
-            out.close();    
-        }
-        else
-        {
-             br.close();
+            out.close();
+        } else {
+            br.close();
             ips.close();
         }
         return btest;
     }
 
-        private void copyFile(String srFile, String dtFile) throws FileNotFoundException, IOException {
+    private void copyFile(String srFile, String dtFile) throws FileNotFoundException, IOException {
 
         File f1 = new File(srFile);
         File f2 = new File(dtFile);
@@ -193,28 +190,26 @@ public class ModelBusiness {
         out.close();
         System.out.println("File copied.");
     }
-    
 
-      private boolean checkEmptyRDF(String file) throws FileNotFoundException, IOException {
+
+    private boolean checkEmptyRDF(String file) throws FileNotFoundException, IOException {
         boolean bres = true;
         System.out.println("Empty file : " + file);
         File f1 = new File(file);
         InputStream ips = new FileInputStream(file);
         InputStreamReader ipsr = new InputStreamReader(ips);
         BufferedReader br = new BufferedReader(ipsr);
-        if (br.read() == -1)
-        {
+        if (br.read() == -1) {
             System.out.println("Empty file : " + file);
             bres = false;
         }
         br.close();
         return bres;
     }
-    
-    public void checkRDF(String zipName,User user, String zipFullPath, boolean bUpload) throws DataManagerException, FileNotFoundException, IOException
-    {
+
+    public void checkRDF(String zipName, User user, String zipFullPath, boolean bUpload) throws DataManagerException, FileNotFoundException, IOException {
         List<File> files = new ArrayList<File>();
-        String rootDirectory = getZipPath(user,zipFullPath, bUpload);
+        String rootDirectory = getZipPath(user, zipFullPath, bUpload);
         File zipFile = new File(rootDirectory + zipName);
         File zipdir = new File(rootDirectory + "/zip/");
         if (!zipdir.exists()) {
@@ -266,12 +261,12 @@ public class ModelBusiness {
             while ((len = in.read(buf)) > 0) {
                 out.write(buf, 0, len);
             }
-            // Complete the entry
-            out.closeEntry();
-            in.close();
-        }
-        // Complete the ZIP file
-        out.close();
+                // Complete the entry
+                out.closeEntry();
+                in.close();
+            }
+            // Complete the ZIP file
+            out.close();
         copyFile(rootDirectory + "zip/" + zipName, rootDirectory + zipName);
        }
        else
@@ -280,9 +275,8 @@ public class ModelBusiness {
        }
     
     }
-    
-    
-    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles, SimulationObjectModel model, String lfn, User user, String nwName,String zipFullPath, boolean bUpload) throws IOException, DataManagerException {
+
+    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles, SimulationObjectModel model, String lfn, User user, String nwName, String zipFullPath, boolean bUpload, boolean test) throws IOException, DataManagerException {
 
         List<File> files = new ArrayList<File>();
          String modelname = "";
@@ -290,27 +284,27 @@ public class ModelBusiness {
          File zipdir = new File(rootDirectory + "/zip");
          if (!zipdir.exists()) {
             zipdir.mkdirs();
-          }
+        }
         if (zipName == null) // to avoid crash for archive without rdf file
         {
             zipName = model.getModelName() + ".zip";
             modelname = model.getModelName() + ".rdf";
             files.add(new File(zipdir  + "/"+ modelname ));
         }
-        
+
 
         File zipFile = new File(rootDirectory + zipName);
         if (zipFile.exists())
-                    System.out.println("zipname :" + zipFile);
+            System.out.println("zipname :" + zipFile);
         else
             zipFile.createNewFile();
-       
+
         System.out.println("zipname :" + zipFile);
         System.out.println("zipdir :" + zipdir);
         copyFile(rootDirectory + zipName, zipdir + "/"+ zipName);
 
         byte[] buf = new byte[1024];
-       
+
         if(zipFile.length() != 0)
         {
         ZipInputStream zin = new ZipInputStream(new FileInputStream(zipdir + zipName));
@@ -352,14 +346,14 @@ public class ModelBusiness {
         }
         //copy rdf.
         // Create a new model
-       // SimulationObjectModel nwmodel = SimulationObjectModelFactory.createModel(model.getModelName());
+        // SimulationObjectModel nwmodel = SimulationObjectModelFactory.createModel(model.getModelName());
         if(!nwName.isEmpty())
         {
             //model.setModelName(nwName);
             SimulationObjectModelFactory.setName(model, nwName);
             System.out.println("new name:" + nwName);
         }
-        model.setModelOwner(user.getLastName());
+        model.setModelOwner(user.getFullName());
         //model.setModelDescription(model.getModelName());
         //modelCopy(model, nwmodel);
         System.out.println("timepoint " + model.getTimepoints().size());
@@ -374,13 +368,13 @@ public class ModelBusiness {
             File f = new File(zipdir  + "/"+ modelname);
             if (f.exists())
                 f.delete();
-        }
+            }
         model.setStorageURL(lfn);
         SimulationObjectModelFactory.setStorageURL(model, lfn);
         SimulationObjectModelFactory.inferModelSemanticAxes(model);
-       
+
         SimulationObjectModelFactory.dumpInFileModel(model,zipdir + "/"+ modelname);
-        SimulationObjectModelFactory.completeModel(model);
+        SimulationObjectModelFactory.completeModel(model,test);
         System.out.println("URI: " + model.getURI());
         System.out.println("URI: " + model.getStorageURL());
         File fz = new File(rootDirectory + "zip" +"/" + zipName);
@@ -435,20 +429,25 @@ public class ModelBusiness {
     public SimulationObjectModel.ObjectType getObjectType(String objectName) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
-     public SimulationObjectModel setDescription(SimulationObjectModel model, String description )
-     {
-         model.setModelDescription(description);
-         return model;
-     }
 
-    public List<SimulationObjectModelLight> listAllModels() throws BusinessException {
+    public SimulationObjectModel setDescription(SimulationObjectModel model, String description) {
+        model.setModelDescription(description);
+        return model;
+    }
+
+    public List<SimulationObjectModelLight> listAllModels(boolean test) throws BusinessException {
 
         try {
-            return SimulationObjectModelQueryer.getAllModels();
+            if(test)
+                System.out.println("Listing all models in repo test");
+            else
+                System.out.println("Listing all models in repo VIP");
+                      
+            return SimulationObjectModelQueryer.getAllModels(test);
 
         } catch (Exception ex) {
             logger.error(ex);
+            ex.printStackTrace();
             throw new BusinessException(ex);
         }
     }
@@ -463,33 +462,29 @@ public class ModelBusiness {
         }
     }
 
-        public void completeModel(SimulationObjectModel som) {
+    public void completeModel(SimulationObjectModel som, boolean test) {
         SimulationObjectModelFactory.inferModelSemanticAxes(som);
-        SimulationObjectModelFactory.completeModel(som);
+        SimulationObjectModelFactory.completeModel(som, test);
     }
 
-     public String getURLFromURI(String uri)
-     {
-            return SimulationObjectModelFactory.getURLFromURI(uri);
-     }
-     
-    public SimulationObjectModel rebuildObjectModelFromTripleStore(String uri) {
-        return SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri);
+    public String getURLFromURI(String uri, boolean test) {
+        return SimulationObjectModelFactory.getURLFromURI(uri,test);
+    }
+
+    public SimulationObjectModel rebuildObjectModelFromTripleStore(String uri, boolean test) {
+        return SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri,test);
     }
 
     public SimulationObjectModel rebuildObjectModelFromAnnotationFile(String fileName, String user) {
         try {
             System.out.println(fileName);
-            if(checkEmptyRDF(fileName))
-            {
-                String nwname = fileName.substring(0,fileName.indexOf(".rdf"))+ "_copy.rdf";
+            if (checkEmptyRDF(fileName)) {
+                String nwname = fileName.substring(0, fileName.indexOf(".rdf")) + "_copy.rdf";
                 SimulationObjectModelFactory.deepCopyModelFromAnnotationFile(fileName, nwname);
                 System.out.println(nwname);
                 return SimulationObjectModelFactory.rebuildObjectModelFromAnnotationFile(nwname, true);
-            }
-            else
-            {
-               return createModel("Empty", user);
+            } else {
+                return createModel("Empty", user);
             }
         } catch (Exception ex) {
             java.util.logging.Logger.getLogger(ModelBusiness.class.getName()).log(Level.SEVERE, null, ex);
@@ -499,21 +494,21 @@ public class ModelBusiness {
 
     public SimulationObjectModel setStorageUrl(SimulationObjectModel som, String url) {
         System.out.println("url" + url);
-     //   System.out.println("URI " + som.getURI());
+        //   System.out.println("URI " + som.getURI());
         som.setStorageURL(url);
         SimulationObjectModelFactory.setStorageURL(som, url);
         return som;
     }
 
-    public void deleteAllModelsInTheTripleStore() {
-        SimulationObjectModelFactory.deleteAllModelsInPersistentStore();
+    public void deleteAllModelsInTheTripleStore(boolean test) {
+        SimulationObjectModelFactory.deleteAllModelsInPersistentStore(test);
     }
 
-    public void deleteModel(String uri) throws BusinessException {
+    public void deleteModel(String uri, boolean test) throws BusinessException {
         try {
             System.out.println("Deleting model with uri " + uri);
-            SimulationObjectModel som = SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri);
-            SimulationObjectModelFactory.deleteModelInPersistentStore(som);
+            SimulationObjectModel som = SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri,test);
+            SimulationObjectModelFactory.deleteModelInPersistentStore(som,test);
         } catch (Exception e) {
             e.printStackTrace();
             throw new BusinessException(e);
@@ -521,7 +516,7 @@ public class ModelBusiness {
     }
 
     public List<SimulationObjectModelLight> searchModels(String query,
-            String[] types, String[] time) throws BusinessException {
+            String[] types, String[] time, boolean test) throws BusinessException {
 
         boolean anat = false;
         for (int i = 0; i < types.length; i++) {
@@ -573,9 +568,9 @@ public class ModelBusiness {
         }
         ArrayList<SimulationObjectModelLight> result = new ArrayList<SimulationObjectModelLight>();
 
-        List<SimulationObjectModelLight> somls = listAllModels();
+        List<SimulationObjectModelLight> somls = listAllModels(test);
         for (SimulationObjectModelLight soml : somls) {
-            SimulationObjectModel som = SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(soml.getURI());
+            SimulationObjectModel som = SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(soml.getURI(),test);
 
 //            System.out.println("looking at SOML " + soml.getModelName());
 //
@@ -657,9 +652,9 @@ public class ModelBusiness {
         return ((target.toLowerCase().indexOf(query.toLowerCase()) != -1) || (query.toLowerCase().indexOf(target.toLowerCase()) != -1));
     }
 
-    public String getStorageURL(String uri) throws BusinessException {
+    public String getStorageURL(String uri, boolean test) throws BusinessException {
         try {
-            return SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri).getStorageURL();
+            return SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri,test).getStorageURL();
         } catch (Exception e) {
             throw new BusinessException(e);
         }
@@ -745,35 +740,34 @@ public class ModelBusiness {
             }
             index++;
         }
-        
+
         index = 0;
         for (Timepoint tp : src.getTimepoints()) {
             timepointDeepCopy(tp, dest.getTimepoint(index), dest, index);
             index++;
         }
-        
-        
+
+
     }
 
     private void timepointCopy(Timepoint src, Timepoint dest, SimulationObjectModel model, int indtp) {
         int index = 0;
         for (Instant ins : src.getInstants()) {
-            if (index > 0)
-            {
-               dest.addInstant(SimulationObjectModelFactory.createAndAddInstant(dest, ins.getDuration()));
+            if (index > 0) {
+                dest.addInstant(SimulationObjectModelFactory.createAndAddInstant(dest, ins.getDuration()));
             }
             index++;
         }
     }
 
     private void timepointDeepCopy(Timepoint src, Timepoint dest, SimulationObjectModel model, int indtp) {
-        int index = 0; 
+        int index = 0;
         for (Instant ins : src.getInstants()) {
             instantCopy(ins, dest.getInstant(index), model, indtp, index);
             index++;
         }
     }
-    
+
     private void instantCopy(Instant src, Instant dest, SimulationObjectModel model, int indtp, int indins) {
 
         for (ObjectLayer obj : src.getObjectLayers()) {
@@ -821,7 +815,7 @@ public class ModelBusiness {
         }
         for (PhysicalParametersLayer ppl : src.getPhysicalParametersLayers()) {
             PhysicalParametersLayer ppldest = SimulationObjectModelFactory.createPhysicalParametersLayer(
-                    ppl.getType(), ppl.getFileName(), ppl.getB0(),ppl.getExternalAgentName(), ppl.getUnitOfMeasure());
+                    ppl.getType(), ppl.getFileName(), ppl.getB0(), ppl.getExternalAgentName(), ppl.getUnitOfMeasure());
             SimulationObjectModelFactory.addPhysicalParametersLayerToObjectLayer(ppldest, dest);
             dest.addPhysicalParametersLayer(ppldest);
         }
@@ -886,17 +880,17 @@ public class ModelBusiness {
         }
         return model;
     }
-    
+
     public SimulationObjectModel addMap(SimulationObjectModel model, String name,
             int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0, String externalAgent, String unitOfMeasure) {
-        
+
         ArrayList<String> filenames = new ArrayList<String>();
         filenames.add(name);
 
         PhysicalParametersLayer ppl = SimulationObjectModelFactory.createPhysicalParametersLayer(pptype, filenames, b0, externalAgent, unitOfMeasure);
         SimulationObjectModelFactory.addPhysicalParametersLayerToInstant(ppl, model.getInstant(tp, ins));
         model.getInstant(tp, ins).addPhysicalParametersLayer(ppl);
-         
+
         return model;
     }
 
@@ -914,7 +908,7 @@ public class ModelBusiness {
         if (type == 2) {
             addPhysicalParametersLUT(model, pptype, objects, -1, model.getInstant(tp, ins).getObjectLayers(index), tp, ins);
         } else if (type == 3) {
-            addPhysicalParametersLayer(model, pptype, objects, -1, model.getInstant(tp, ins).getObjectLayers(index), tp, ins,"","");
+            addPhysicalParametersLayer(model, pptype, objects, -1, model.getInstant(tp, ins).getObjectLayers(index), tp, ins, "", "");
         } else {
             //nothing
         }
@@ -1027,8 +1021,8 @@ public class ModelBusiness {
         System.out.println("layer removed");
         return objectModel;
     }
-    
-     /**
+
+    /**
      * Remove all objects from a specific layer
      *
      * @param model model to modify
@@ -1037,7 +1031,7 @@ public class ModelBusiness {
      * @param layer layer selected
      * @return the updated model
      */
-     public SimulationObjectModel removeObjects(SimulationObjectModel model, int tp, int ins, String layer) {
+    public SimulationObjectModel removeObjects(SimulationObjectModel model, int tp, int ins, String layer) {
         ArrayList<ObjectLayer> layers = model.getTimepoint(tp).getInstant(ins).getObjectLayers();
         ObjectLayer ind = null;// = new ObjectLayer();
         int j = 0;
@@ -1059,7 +1053,7 @@ public class ModelBusiness {
         return model;
     }
 
-      /**
+    /**
      * Remove all physical paramters from a specific layer
      *
      * @param model model to modify
@@ -1068,7 +1062,7 @@ public class ModelBusiness {
      * @param layer layer selected
      * @return the updated model
      */
-     public SimulationObjectModel removePhysicals(SimulationObjectModel model, int tp, int ins, String layer) {
+    public SimulationObjectModel removePhysicals(SimulationObjectModel model, int tp, int ins, String layer) {
         ArrayList<ObjectLayer> layers = model.getTimepoint(tp).getInstant(ins).getObjectLayers();
         ObjectLayer ind = null;// = new ObjectLayer();
         int j = 0;
@@ -1090,8 +1084,6 @@ public class ModelBusiness {
         return model;
     }
 
-     
-     
     /**
      * Remove an object from a specific layer
      *
@@ -1103,7 +1095,7 @@ public class ModelBusiness {
      * @return the updated model
      */
     public SimulationObjectModel removeObject(SimulationObjectModel objectModel, int tp, int ins, String layer, String name) {
-      
+
         ArrayList<ObjectLayer> layers = objectModel.getTimepoint(tp).getInstant(ins).getObjectLayers();
         ObjectLayer ind = null;// = new ObjectLayer();
         int j = 0;
@@ -1138,9 +1130,8 @@ public class ModelBusiness {
         System.out.println("object removed");
         return objectModel;
     }
-    
-    
-     /**
+
+    /**
      * Remove an object from a specific layer
      *
      * @param objectModel model to modify
@@ -1151,7 +1142,7 @@ public class ModelBusiness {
      * @return the updated model
      */
     public SimulationObjectModel removePhysical(SimulationObjectModel objectModel, int tp, int ins, String layer, PhysicalParametersLayer.PhysicalParameterType type) {
-      
+
         ArrayList<ObjectLayer> layers = objectModel.getTimepoint(tp).getInstant(ins).getObjectLayers();
         ObjectLayer ind = null;// = new ObjectLayer();
         int j = 0;
@@ -1169,9 +1160,9 @@ public class ModelBusiness {
             PhysicalParametersLayer.PhysicalParameterType pptype = part.getType();
             boolean bremove = false;
             if (pptype.equals(type)) {
-                    ppl = part;
-                    break;
-                }
+                ppl = part;
+                break;
+            }
             i++;
         }
         parts.remove(i);
@@ -1182,7 +1173,6 @@ public class ModelBusiness {
         return objectModel;
     }
 
-	
     public static void addPhysicalParametersLayer(SimulationObjectModel objectModel, PhysicalParametersLayer.PhysicalParameterType physicalParametersType, ArrayList<String> fileName, double b0, ObjectLayer objectLayer, int timePointIndex, int instantIndex, String externalAgentName, String unitOfMeasure) {
 
         // list the object layers of the current instant
@@ -1191,7 +1181,7 @@ public class ModelBusiness {
         // call the servlet to create the physical parameters layer
         // parameters : physical paramter type, filename
         PhysicalParametersLayer physicalParametersLayer = SimulationObjectModelFactory.createPhysicalParametersLayer(physicalParametersType, fileName, b0, externalAgentName, unitOfMeasure);
-		
+
         // if the user want to add it to the instant (not linked to an object layer)
         // in this example 0,0
         if (objectLayer == null) {
@@ -1212,28 +1202,25 @@ public class ModelBusiness {
         SimulationObjectModelFactory.addPhysicalParametersToObjectLayer(objectLayer, physicalParameter);
     }
 
-    private String getZipPath(User user,String zipFullPath, boolean bUpload) throws DataManagerException
-    {
+    private String getZipPath(User user, String zipFullPath, boolean bUpload) throws DataManagerException {
         String rootDirectory = "";
-            if(bUpload)
-            {
-                rootDirectory = Server.getInstance().getDataManagerPath() + "/uploads/";
-            }
-            else
-            {
-                String remotePath = DataManagerUtil.parseBaseDir(user, zipFullPath);
-                rootDirectory = Server.getInstance().getDataManagerPath()
+        if (bUpload) {
+            rootDirectory = Server.getInstance().getDataManagerPath() + "/uploads/";
+        } else {
+            String remotePath = DataManagerUtil.parseBaseDir(user, zipFullPath);
+            rootDirectory = Server.getInstance().getDataManagerPath()
                     + "/downloads" + FilenameUtils.getFullPath(remotePath);
-                System.out.println("model path " + zipFullPath);
-                System.out.println("remote path " + remotePath);
-                System.out.println("full path " + rootDirectory);
-            }
+            System.out.println("model path " + zipFullPath);
+            System.out.println("remote path " + remotePath);
+            System.out.println("full path " + rootDirectory);
+        }
         return rootDirectory;
     }
+
     public String extractRaw(String name, String zipname, User user, String zipFullPath, boolean bUpload) throws DataManagerException {
-        
-        String rootDirectory = getZipPath(user, zipFullPath,bUpload);
-         
+
+        String rootDirectory = getZipPath(user, zipFullPath, bUpload);
+
         File dir = new File(rootDirectory);
         boolean bfound = false;
         System.out.println("zip :" + zipname);
@@ -1322,7 +1309,7 @@ public class ModelBusiness {
         }
         return result;
     }
-    
+
     public String readLicense(String file) throws FileNotFoundException, IOException {
         String license = "";
 

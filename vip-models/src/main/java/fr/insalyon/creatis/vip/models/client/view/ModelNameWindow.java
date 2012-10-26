@@ -20,6 +20,7 @@ import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
@@ -80,7 +81,7 @@ public class ModelNameWindow extends Window {
          nwname = despItem.getValueAsString().trim();
         if (form.validate()) {
             if (modelGrid.getModelName().equals(nwname)) {
-                SC.warn("The specified name is the same as the original one.");
+                Layout.getInstance().setWarningMessage("The specified name is the same as the original one.");
             }
             else
             {

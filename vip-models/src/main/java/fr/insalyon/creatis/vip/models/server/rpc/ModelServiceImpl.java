@@ -98,10 +98,10 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public List<SimulationObjectModelLight> listAllModels() throws ModelException {
+    public List<SimulationObjectModelLight> listAllModels(boolean test) throws ModelException {
 
         try {
-            return modelBusiness.listAllModels();
+            return modelBusiness.listAllModels(test);
 
         } catch (BusinessException ex) {
             throw new ModelException(ex);
@@ -112,12 +112,12 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         return modelBusiness.getADAM();
     }
 
-    public void completeModel(SimulationObjectModel som) {
-        modelBusiness.completeModel(som);
+    public void completeModel(SimulationObjectModel som, boolean test) {
+        modelBusiness.completeModel(som, test);
     }
 
-    public SimulationObjectModel rebuildObjectModelFromTripleStore(String uri) {
-        return modelBusiness.rebuildObjectModelFromTripleStore(uri);
+    public SimulationObjectModel rebuildObjectModelFromTripleStore(String uri, boolean test) {
+        return modelBusiness.rebuildObjectModelFromTripleStore(uri,test);
     }
 
     public SimulationObjectModel rebuildObjectModelFromAnnotationFile(String fileName) throws ModelException {
@@ -132,11 +132,11 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         return modelBusiness.setStorageUrl(som, url);
     }
 
-    public void deleteAllModelsInTheTripleStore() throws ModelException {
+    public void deleteAllModelsInTheTripleStore(boolean test) throws ModelException {
 
         try {
             trace(logger, "Removing all models in the triple store.");
-            modelBusiness.deleteAllModelsInTheTripleStore();
+            modelBusiness.deleteAllModelsInTheTripleStore(test);
 
         } catch (CoreException ex) {
             throw new ModelException(ex);
@@ -144,37 +144,37 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
     }
 
     public List<SimulationObjectModelLight> searchModels(String query,
-            String[] types, String[] time) throws ModelException {
+            String[] types, String[] time,boolean test) throws ModelException {
 
         try {
-            return modelBusiness.searchModels(query, types, time);
+            return modelBusiness.searchModels(query, types, time,test);
 
         } catch (BusinessException ex) {
             throw new ModelException(ex);
         }
     }
 
-    public String getStorageURL(String uri) throws ModelException {
+    public String getStorageURL(String uri, boolean test) throws ModelException {
         try {
             try {
                 trace(logger, "Removing object model: " + uri);
             } catch (CoreException ex) {
                 java.util.logging.Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
-            return modelBusiness.getStorageURL(uri);
+            return modelBusiness.getStorageURL(uri,test);
         } catch (BusinessException ex) {
             throw new ModelException(ex);
         }
     }
 
-    public void deleteModel(String uri) throws ModelException {
+    public void deleteModel(String uri, boolean test) throws ModelException {
         try {
             try {
                 trace(logger, "Removing object model: " + uri);
             } catch (CoreException ex) {
                 java.util.logging.Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
-            modelBusiness.deleteModel(uri);
+            modelBusiness.deleteModel(uri,test);
         } catch (BusinessException ex) {
             throw new ModelException(ex);
         }
@@ -288,13 +288,13 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
     }
 
     public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles,
-            SimulationObjectModel model, String lfn, String nwName, String zipFullPath, boolean bUpload) throws ModelException {
+            SimulationObjectModel model, String lfn, String nwName, String zipFullPath, boolean bUpload, boolean test) throws ModelException {
 
         try {
             trace(logger, "add files to zip");
             try {
                 return modelBusiness.recordAddedFiles(zipName, addfiles, model, lfn,
-                        getSessionUser(), nwName, zipFullPath, bUpload);
+                        getSessionUser(), nwName, zipFullPath, bUpload,test);
             } catch (DataManagerException ex) {
                 throw new ModelException(ex);
             }
@@ -421,8 +421,8 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
 
     }
 
-    public String getURLFromURI(String uri) {
-        return modelBusiness.getURLFromURI(uri);
+    public String getURLFromURI(String uri, boolean test) {
+        return modelBusiness.getURLFromURI(uri, test);
 
     }
 

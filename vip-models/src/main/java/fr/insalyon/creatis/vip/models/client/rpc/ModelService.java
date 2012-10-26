@@ -71,25 +71,25 @@ public interface ModelService extends RemoteService {
 
     public SimulationObjectModel createEmptyModel() throws ModelException;
 
-    public List<SimulationObjectModelLight> listAllModels() throws ModelException;
+    public List<SimulationObjectModelLight> listAllModels(boolean test) throws ModelException;
 
     public SimulationObjectModel getADAM() throws ModelException;
 
-    public SimulationObjectModel rebuildObjectModelFromTripleStore(String uri) throws ModelException;
+    public SimulationObjectModel rebuildObjectModelFromTripleStore(String uri, boolean test) throws ModelException;
 
     public SimulationObjectModel rebuildObjectModelFromAnnotationFile(String fileName) throws ModelException;
 
-    public void completeModel(SimulationObjectModel som) throws ModelException;
+    public void completeModel(SimulationObjectModel som, boolean test) throws ModelException;
 
     public SimulationObjectModel setStorageUrl(SimulationObjectModel som, String url) throws ModelException;
 
-    public void deleteAllModelsInTheTripleStore() throws ModelException;
+    public void deleteAllModelsInTheTripleStore(boolean test) throws ModelException;
 
-    public List<SimulationObjectModelLight> searchModels(String query, String[] types, String[] time) throws ModelException;
+    public List<SimulationObjectModelLight> searchModels(String query, String[] types, String[] time, boolean test) throws ModelException;
 
-    public void deleteModel(String uri) throws ModelException;
+    public void deleteModel(String uri, boolean test) throws ModelException;
 
-    public String getStorageURL(String uri) throws ModelException;
+    public String getStorageURL(String uri, boolean test) throws ModelException;
 
     public SimulationObjectModel addTimePoint(SimulationObjectModel som, Date d) throws ModelException;
 
@@ -122,7 +122,7 @@ public interface ModelService extends RemoteService {
     public SimulationObjectModel removePhysicals(SimulationObjectModel model, int tp, int ins, String layer) throws ModelException;
     
     public SimulationObjectModel recordAddedFiles(String zipName, List<String> addFiles, 
-                            SimulationObjectModel model, String lfn, String nwName, String zipFullPath, boolean bUpload) throws ModelException;
+                            SimulationObjectModel model, String lfn, String nwName, String zipFullPath, boolean bUpload, boolean test) throws ModelException;
     
     public SimulationObjectModel renameTimepoint(SimulationObjectModel model, int tp, Date starting) throws ModelException;
     
@@ -136,7 +136,7 @@ public interface ModelService extends RemoteService {
     
     public void checkRDFEncoding(String files, String modelFullPath, boolean bUpload)throws ModelException;
     
-    public String getURLFromURI(String uri);
+    public String getURLFromURI(String uri, boolean test);
     
     public String readLicense(String file) throws ModelException;
 

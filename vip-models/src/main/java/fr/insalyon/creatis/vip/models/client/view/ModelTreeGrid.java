@@ -63,6 +63,7 @@ import com.smartgwt.client.widgets.tree.events.*;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.*;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.PhysicalParametersLayer.PhysicalParameterType;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.models.client.ModelConstants;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
@@ -152,7 +153,7 @@ public class ModelTreeGrid extends TreeGrid {
         setCanDragRecordsOut(true);
         setDragDataAction(DragDataAction.COPY);
 
-        tfg = new TreeGridField(model.getModelName());
+        tfg = new TreeGridField("Model name: "+model.getModelName()+" ("+model.getModelDescription()+")");
          tfg.setCanEdit(true);
         MenuItem modelNameItem = new MenuItem();
         modelNameItem.setTitle("Change model name ");
@@ -241,7 +242,7 @@ public class ModelTreeGrid extends TreeGrid {
                     final AsyncCallback<String> callback = new AsyncCallback<String>() {
 
                     public void onFailure(Throwable caught) {
-                        SC.say("The raw file associated with this mhd file is not available.");
+                        Layout.getInstance().setWarningMessage("The raw file associated with this mhd file is not available.");
                     }
 
                     public void onSuccess(String result) {
@@ -354,7 +355,7 @@ public class ModelTreeGrid extends TreeGrid {
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
                 public void onFailure(Throwable caught) {
-                    SC.say("Cannot remove timepoint");
+                    Layout.getInstance().setWarningMessage("Cannot remove timepoint");
                 }
 
                 public void onSuccess(SimulationObjectModel result) {
@@ -374,7 +375,7 @@ public class ModelTreeGrid extends TreeGrid {
        final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
                 public void onFailure(Throwable caught) {
-                    SC.say("Cannot remove instant");
+                    Layout.getInstance().setWarningMessage("Cannot remove instant");
                 }
 
                 public void onSuccess(SimulationObjectModel result) {
@@ -393,7 +394,7 @@ public class ModelTreeGrid extends TreeGrid {
             final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
                 public void onFailure(Throwable caught) {
-                    SC.say("Cannot remove Layer");
+                    Layout.getInstance().setWarningMessage("Cannot remove Layer");
                 }
 
                 public void onSuccess(SimulationObjectModel result) {
@@ -413,7 +414,7 @@ public class ModelTreeGrid extends TreeGrid {
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
                 public void onFailure(Throwable caught) {
-                    SC.say("Cannot remove Objects");
+                    Layout.getInstance().setWarningMessage("Cannot remove Objects");
                 }
 
                 public void onSuccess(SimulationObjectModel result) {
@@ -436,7 +437,7 @@ public class ModelTreeGrid extends TreeGrid {
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
                 public void onFailure(Throwable caught) {
-                    SC.say("Cannot remove all Physicals");
+                    Layout.getInstance().setWarningMessage("Cannot remove all Physicals");
                 }
 
                 public void onSuccess(SimulationObjectModel result) {
@@ -459,7 +460,7 @@ public class ModelTreeGrid extends TreeGrid {
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
                 public void onFailure(Throwable caught) {
-                    SC.say("Cannot remove Object");
+                    Layout.getInstance().setWarningMessage("Cannot remove Object");
                 }
 
                 public void onSuccess(SimulationObjectModel result) {
@@ -483,7 +484,7 @@ public class ModelTreeGrid extends TreeGrid {
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
                 public void onFailure(Throwable caught) {
-                    SC.say("Cannot remove Physical");
+                    Layout.getInstance().setWarningMessage("Cannot remove Physical");
                 }
 
                 public void onSuccess(SimulationObjectModel result) {
@@ -565,7 +566,7 @@ public class ModelTreeGrid extends TreeGrid {
         AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Cant add a timepoint");
+                Layout.getInstance().setWarningMessage("Cant add a timepoint");
             }
 
             public void onSuccess(SimulationObjectModel result) {
@@ -589,7 +590,7 @@ public class ModelTreeGrid extends TreeGrid {
         AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Cant add an instant");
+                Layout.getInstance().setWarningMessage("Cant add an instant");
             }
 
             public void onSuccess(SimulationObjectModel result) {
@@ -964,7 +965,7 @@ public class ModelTreeGrid extends TreeGrid {
         }
 
         if (bObjectExist) {
-            SC.say("Object already in the model");
+            Layout.getInstance().setWarningMessage("Object already in the model");
             return;
         } else if (type == 0 || type == 1) {
             String format = " (mesh";
@@ -1029,11 +1030,11 @@ public class ModelTreeGrid extends TreeGrid {
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
             public void onFailure(Throwable caught) {
-                SC.say("Cannot added object in model");
+                Layout.getInstance().setWarningMessage("Cannot added object in model");
             }
 
             public void onSuccess(SimulationObjectModel result) {
-                SC.say("object added to model");
+                Layout.getInstance().setNoticeMessage("object added to model");
                 model = result;
             }
         };
@@ -1188,11 +1189,11 @@ public class ModelTreeGrid extends TreeGrid {
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
             public void onFailure(Throwable caught) {
-                SC.say("Cannot added LUT to model");
+                Layout.getInstance().setWarningMessage("Cannot added LUT to model");
             }
 
             public void onSuccess(SimulationObjectModel result) {
-                SC.say("LUT added to model");
+                Layout.getInstance().setNoticeMessage("LUT added to model");
                 model = result;
             }
         };
@@ -1253,11 +1254,11 @@ public class ModelTreeGrid extends TreeGrid {
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
             public void onFailure(Throwable caught) {
-                SC.say("Cannot added MAP to model");
+                Layout.getInstance().setWarningMessage("Cannot added MAP to model");
             }
 
             public void onSuccess(SimulationObjectModel result) {
-                SC.say("MAP added to model");
+                Layout.getInstance().setNoticeMessage("MAP added to model");
                 model = result;
             }
         };
@@ -1285,11 +1286,11 @@ public class ModelTreeGrid extends TreeGrid {
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
             public void onFailure(Throwable caught) {
-                SC.say("Cannot duplicate Instant");
+                Layout.getInstance().setWarningMessage("Cannot duplicate Instant");
             }
 
             public void onSuccess(SimulationObjectModel result) {
-                SC.say("Instant duplicated");
+                Layout.getInstance().setNoticeMessage("Instant duplicated");
                 model = result;
                 bmodif = true;
                 checkModality();
@@ -1307,11 +1308,11 @@ public class ModelTreeGrid extends TreeGrid {
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
             public void onFailure(Throwable caught) {
-                SC.say("Cannot duplicate Timepoint");
+                Layout.getInstance().setWarningMessage("Cannot duplicate Timepoint");
             }
 
             public void onSuccess(SimulationObjectModel result) {
-                SC.say("Timepoint duplicated");
+                Layout.getInstance().setNoticeMessage("Timepoint duplicated");
                 model = result;
                 bmodif = true;
                 checkModality();
@@ -1596,7 +1597,7 @@ public class ModelTreeGrid extends TreeGrid {
                 final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
                     public void onFailure(Throwable caught) {
-                        SC.say("Cannot remove timepoint");
+                        Layout.getInstance().setWarningMessage("Cannot remove timepoint");
                     }
 
                     public void onSuccess(SimulationObjectModel result) {
@@ -1609,7 +1610,7 @@ public class ModelTreeGrid extends TreeGrid {
                 final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
                     public void onFailure(Throwable caught) {
-                        SC.say("Cannot remove instant");
+                        Layout.getInstance().setWarningMessage("Cannot remove instant");
                     }
 
                     public void onSuccess(SimulationObjectModel result) {

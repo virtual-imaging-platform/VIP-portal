@@ -43,12 +43,12 @@ import com.smartgwt.client.widgets.tab.Tab;
  */
 class ModelDisplayTab extends Tab {
 
-    public ModelDisplayTab(final String uri, String title) {
+    public ModelDisplayTab(final String uri, String title, boolean test) {
 
         this.setTitle(title);
        // this.setID(uri);
         this.setCanClose(true);
-        ModelDisplay md = new ModelDisplay(uri);
+        ModelDisplay md = new ModelDisplay(uri, test);
         md.disableCommit();
         this.setPane(md);
     }

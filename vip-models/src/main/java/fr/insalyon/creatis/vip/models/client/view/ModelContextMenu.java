@@ -11,9 +11,11 @@ import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
@@ -31,7 +33,7 @@ class ModelContextMenu extends Menu {
     private String modelURI;
     private String modelName;
 
-    public ModelContextMenu(ModalWindow modal, String uri,  String title, boolean bdelete) {
+    public ModelContextMenu(ModalWindow modal, String uri,  String title, boolean bdelete, final boolean test) {
         this.modal = modal;
         this.modelURI = uri;
         this.modelName = title;
@@ -50,7 +52,7 @@ class ModelContextMenu extends Menu {
 
                     public void execute(Boolean value) {
                         if (value != null && value) {
-                            deleteModel();
+                            deleteModel(test);
                         }
                     }
                 });
@@ -63,7 +65,7 @@ class ModelContextMenu extends Menu {
         viewItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new ModelDisplayTab(modelURI,modelName));
+                Layout.getInstance().addTab(new ModelDisplayTab(modelURI,modelName,test));
             }
         });
         
@@ -73,33 +75,64 @@ class ModelContextMenu extends Menu {
         modifyItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                     Layout.getInstance().addTab(new ModelImportTab(false, modelName, modelURI));
+                     Layout.getInstance().addTab(new ModelImportTab(false, modelName, modelURI,test));
             }
         });
         
-        MenuItem SimulationItem = new MenuItem("Launch Simulation GUI");
+        MenuItem SimulationItem = new MenuItem("Launch simulation GUI");
         SimulationItem.setIcon(SimulationGUIConstants.APP_IMG_EDITOR);
         SimulationItem.setEnabled(true);
         SimulationItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                      Layout.getInstance().addTab(new SimulationGUITab(modelURI.toString(), null));
+                      Layout.getInstance().addTab(new SimulationGUITab(modelURI.toString(), null,test));
             }
         });      
         
+        MenuItem downloadItem = new MenuItem("Download model");
+        downloadItem.setIcon(DataManagerConstants.ICON_DOWNLOAD);
+        downloadItem.setEnabled(true);
+        downloadItem.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(MenuItemClickEvent event) {
+               downloadModel(modelURI,test);
+            }
+        });
         
         if(bdelete)
-            this.setItems(viewItem, modifyItem,deleteItem, SimulationItem);
+            this.setItems(viewItem, modifyItem,deleteItem, SimulationItem,downloadItem);
         else
-            this.setItems(viewItem,modifyItem,SimulationItem);
+            this.setItems(viewItem,modifyItem,SimulationItem, downloadItem);
     }
-
-    private void deleteModel() {
+  
+    private void downloadModel(String modelURI, boolean test){
+   
         final ModelServiceAsync ms = ModelService.Util.getInstance();
         AsyncCallback<String> cb1 = new AsyncCallback<String>(){
 
             public void onFailure(Throwable caught) {
-            SC.warn("Cannot get model storage URL");
+            Layout.getInstance().setWarningMessage("Cannot get model storage URL");
+            }
+
+            public void onSuccess(String modelURL) {
+                  Layout.getInstance().setNoticeMessage("Added model to the transfer pool");
+                    
+                    ModelDisplay.downloadModel(modelURL);
+        };
+        };
+        ms.getStorageURL(modelURI, test, cb1);  
+        
+       
+    
+    }
+    
+    private void deleteModel(final boolean test) {
+        final ModelServiceAsync ms = ModelService.Util.getInstance();
+        AsyncCallback<String> cb1 = new AsyncCallback<String>(){
+
+            public void onFailure(Throwable caught) {
+            Layout.getInstance().setWarningMessage("Cannot get model storage URL");
             }
 
             public void onSuccess(String modelURL) {
@@ -107,19 +140,19 @@ class ModelContextMenu extends Menu {
                 AsyncCallback<Void> cb = new AsyncCallback<Void>() {
 
                     public void onFailure(Throwable caught) {
-                        SC.warn("Cannot delete model files.");
+                        Layout.getInstance().setWarningMessage("Cannot delete model files.");
                     }
 
                     public void onSuccess(Void result) {
-                        SC.say("Deleted model files.");
+                       Layout.getInstance().setNoticeMessage("Deleted model files.");
                         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                             public void onFailure(Throwable caught) {
-                                SC.warn("Cannot delete model annotations (" + caught.getMessage() + ")");
+                                Layout.getInstance().setWarningMessage("Cannot delete model annotations (" + caught.getMessage() + ")");
                             }
 
                             public void onSuccess(Void result) {
-                                SC.say("Deleted model annotations.");
+                                Layout.getInstance().setNoticeMessage("Deleted model annotations.");
                                 ModelListTab modelsTab = (ModelListTab) Layout.getInstance().getTab("model-browse-tab");
                                 if (modelsTab != null) {
                                     modelsTab.loadModels();
@@ -127,13 +160,13 @@ class ModelContextMenu extends Menu {
                             }
                         };
 
-                        ms.deleteModel(modelURI, callback);
+                        ms.deleteModel(modelURI, test, callback);
                     }
                 };
                 dm.delete(modelURL, cb);
             }
         };
-        ms.getStorageURL(modelURI, cb1);  
+        ms.getStorageURL(modelURI, test, cb1);  
         
        
     }

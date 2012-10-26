@@ -43,6 +43,10 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.HoverCustomizer;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -83,7 +87,7 @@ public class ModelListTab extends Tab {
     private HandlerRegistration rowContextClickHandler;
     private HandlerRegistration rowMouseDownHandler;
     private SearchStackSection searchSection;
-
+    private boolean test = true;
 
     public ModelListTab() {
 
@@ -119,12 +123,11 @@ public class ModelListTab extends Tab {
         createButton.setIcon(CoreConstants.ICON_ADD);
         createButton.setTitle("Create");
         createButton.addClickHandler(new ClickHandler() {
-
             public void onClick(ClickEvent event) {
-                Layout.getInstance().addTab(new ModelImportTab(true, "",""));
+                Layout.getInstance().addTab(new ModelImportTab(true, "","",test));
             }
         });
-          toolStrip.addButton(createButton);
+        toolStrip.addButton(createButton);
         
         ToolStripButton addButton = new ToolStripButton();
         addButton.setIcon(CoreConstants.ICON_ADD);
@@ -132,7 +135,7 @@ public class ModelListTab extends Tab {
         addButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-                Layout.getInstance().addTab(new ModelImportTab(true, "Import model",""));
+                Layout.getInstance().addTab(new ModelImportTab(true, "Import model","",test));
             }
         });
         toolStrip.addButton(addButton);
@@ -153,17 +156,17 @@ public class ModelListTab extends Tab {
                             AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                                 public void onFailure(Throwable caught) {
-                                    SC.warn("Failed to delete all models");
+                                    Layout.getInstance().setWarningMessage("Failed to delete all models");
                                 }
 
                                 public void onSuccess(Void result) {
-                                    SC.say("All models were deleted");
+                                    Layout.getInstance().setNoticeMessage("All models were deleted");
                                     loadModels();
                                 }
                             };
 
                             ModelServiceAsync ms = ModelService.Util.getInstance();
-                            ms.deleteAllModelsInTheTripleStore(callback);
+                            ms.deleteAllModelsInTheTripleStore(test,callback);
                         }
                     }
                 });
@@ -173,7 +176,7 @@ public class ModelListTab extends Tab {
         toolStrip.addButton(deleteButton);
 
         //Search
-        searchSection = new SearchStackSection(this.getID());
+        searchSection = new SearchStackSection(this.getID(),test);
         SectionStackSection gridSection = new SectionStackSection();
 
         gridSection.setCanCollapse(false);
@@ -197,8 +200,29 @@ public class ModelListTab extends Tab {
         });
         toolStrip.addButton(searchButton);
 
+        DynamicForm form = new DynamicForm();
+        final SelectItem typesPickList = new SelectItem();
+        typesPickList.setTitle("Model repository");
+        typesPickList.setMultiple(false);
+        typesPickList.setWidth(150);
+        String[] values = {"VIP", "Sandbox"};
+        typesPickList.setValueMap(values);
+        typesPickList.setValue("Sandbox");
+        form.setFields(typesPickList);
+        typesPickList.addChangedHandler(new ChangedHandler() {
+
+            @Override
+            public void onChanged(ChangedEvent event) {
+                test = ((String) typesPickList.getValue()).equals("Sandbox");
+                searchSection.setExpanded(false);
+                loadModels();
+                
+            }
+        });
+        
         loadModels();
 
+       // layout.addMember(form);
         layout.addMember(toolStrip);
         layout.addMember(sectionStack);
 
@@ -282,16 +306,16 @@ public class ModelListTab extends Tab {
                 String owner =  event.getRecord().getAttribute("owner");
 
                 boolean bdelete = false;
-                if (owner.equals( CoreModule.user.getLastName()))
+                if (owner.equals( CoreModule.user.getFullName()) || CoreModule.user.isSystemAdministrator() || CoreModule.user.isGroupAdmin(ModelConstants.GROUP_VIP))
                         bdelete = true;
-                new ModelContextMenu(modal, modelURI, title, bdelete).showContextMenu();
+                new ModelContextMenu(modal, modelURI, title, bdelete,test).showContextMenu();
             }
             
         });
         rowMouseDownHandler = grid.addRowMouseDownHandler(new RowMouseDownHandler() {
 
             public void onRowMouseDown(RowMouseDownEvent event) {
-                Layout.getInstance().addTab(new ModelDisplayTab(event.getRecord().getAttribute("uri"), event.getRecord().getAttribute("name")));
+                Layout.getInstance().addTab(new ModelDisplayTab(event.getRecord().getAttribute("uri"), event.getRecord().getAttribute("name"),test));
             }
         });
     }
@@ -301,7 +325,7 @@ public class ModelListTab extends Tab {
         final AsyncCallback<List<SimulationObjectModelLight>> callback = new AsyncCallback<List<SimulationObjectModelLight>>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Cannot list models:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Cannot list models:<br />" + caught.getMessage());
                 modal.hide();
             }
 
@@ -310,7 +334,7 @@ public class ModelListTab extends Tab {
                 modal.hide();
             }
         };
-        ms.listAllModels(callback);
+        ms.listAllModels(test,callback);
         modal.show("Loading Models...", true);
     }
 

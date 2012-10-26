@@ -54,25 +54,25 @@ public interface ModelServiceAsync {
 
     public void createEmptyModel(AsyncCallback<SimulationObjectModel> asyncCallback);
     
-    public void listAllModels(AsyncCallback<List<SimulationObjectModelLight>> asyncCallback);
+    public void listAllModels(boolean test, AsyncCallback<List<SimulationObjectModelLight>> asyncCallback);
 
     public void getADAM(AsyncCallback<SimulationObjectModel> asyncCallback);
 
-    public void completeModel(SimulationObjectModel som, AsyncCallback<Void> asyncCallback);
+    public void completeModel(SimulationObjectModel som, boolean test, AsyncCallback<Void> asyncCallback);
 
-    public void rebuildObjectModelFromTripleStore(String uri, AsyncCallback<SimulationObjectModel> callback);
+    public void rebuildObjectModelFromTripleStore(String uri, boolean test, AsyncCallback<SimulationObjectModel> callback);
 
     public void rebuildObjectModelFromAnnotationFile(String fileName, AsyncCallback<SimulationObjectModel> asyncCallback);
 
     public void setStorageUrl(SimulationObjectModel som, String url, AsyncCallback<SimulationObjectModel> asyncCallback);
 
-    public void deleteAllModelsInTheTripleStore(AsyncCallback<Void> asyncCallback);
+    public void deleteAllModelsInTheTripleStore(boolean test, AsyncCallback<Void> asyncCallback);
     
-    public void searchModels(String query, String[] types, String[] time, AsyncCallback<List<SimulationObjectModelLight>> asyncCallback);
+    public void searchModels(String query, String[] types, String[] time, boolean test, AsyncCallback<List<SimulationObjectModelLight>> asyncCallback);
     
-    public void deleteModel(String uri, AsyncCallback<Void> asyncCallback);
+    public void deleteModel(String uri, boolean test, AsyncCallback<Void> asyncCallback);
     
-     public void getStorageURL(String uri, AsyncCallback<String> asyncCallback);
+     public void getStorageURL(String uri, boolean test, AsyncCallback<String> asyncCallback);
      
      public void addTimePoint(SimulationObjectModel som, Date d, AsyncCallback<SimulationObjectModel> asyncCallback);
      
@@ -104,7 +104,7 @@ public interface ModelServiceAsync {
       
        public void removeObject(SimulationObjectModel model, int tp, int ins, String layer, String name,AsyncCallback<SimulationObjectModel> asyncCallback);
       
-      public void recordAddedFiles(String zipName, List<String> addFiles ,SimulationObjectModel model, String lfn, String nwName,String zipFullPath, boolean bUpload, AsyncCallback<SimulationObjectModel> asyncCallback);
+      public void recordAddedFiles(String zipName, List<String> addFiles ,SimulationObjectModel model, String lfn, String nwName,String zipFullPath, boolean bUpload, boolean test, AsyncCallback<SimulationObjectModel> asyncCallback);
       
       public void renameTimepoint(SimulationObjectModel model, int tp, Date start, AsyncCallback<SimulationObjectModel> asyncCallback);
       
@@ -118,7 +118,7 @@ public interface ModelServiceAsync {
       
       public void checkRDFEncoding(String files,String modelFullPath, boolean bUpload, AsyncCallback<SimulationObjectModel> asyncCallback);
       
-      public void getURLFromURI(String files, AsyncCallback<String> asyncCallback);
+      public void getURLFromURI(String files, boolean test,AsyncCallback<String> asyncCallback);
       
       public void readLicense(String file, AsyncCallback<String> asyncCallback);
 }

@@ -42,6 +42,7 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.TransferImgButton;
 import com.smartgwt.client.widgets.events.*;
+import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tree.TreeNode;
@@ -59,6 +60,7 @@ import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
@@ -94,10 +96,12 @@ class ModelImportTab extends Tab {
     private String dwnmodel;
     private String zipFullPath = "";
     private boolean mbUpload = true;
+    
+    private boolean test = true;
 
-    public ModelImportTab(boolean bTS, String nameTab, String modelURI) {
+    public ModelImportTab(boolean bTS, String nameTab, String modelURI, boolean test) {
 
-
+        this.test = test;
         this.setTitle(nameTab);
         //this.setID();
         this.setCanClose(true);
@@ -156,7 +160,7 @@ class ModelImportTab extends Tab {
         moveControls.setLayoutAlign(Alignment.CENTER);
 
         TransferImgButton rightArrow = new TransferImgButton(TransferImgButton.RIGHT, new ClickHandler() {
-
+      
             public void onClick(ClickEvent event) {
 
                 FolderDropEvent event3 = new FolderDropEvent(fileTree.getSelectedRecord().getJsObj());
@@ -165,7 +169,7 @@ class ModelImportTab extends Tab {
             }
         });
 
-        rightArrow.setTooltip("drop file to IAMF model");
+        //rightArrow.setTooltip("drop file to IAMF model");
 
         moveControls.addMember(rightArrow);
 
@@ -192,7 +196,7 @@ class ModelImportTab extends Tab {
             AsyncCallback<String> mscallback = new AsyncCallback<String>() {
 
                 public void onFailure(Throwable caught) {
-                    SC.warn("Cannot identify model URL");
+                    Layout.getInstance().setWarningMessage("Cannot identify model URL");
                 }
 
                 public void onSuccess(String result) {
@@ -203,18 +207,18 @@ class ModelImportTab extends Tab {
                     AsyncCallback<String> callback = new AsyncCallback<String>() {
 
                         public void onFailure(Throwable caught) {
-                            SC.warn("Cannot modify model file.");
+                            Layout.getInstance().setWarningMessage("Cannot modify model file.");
                         }
 
                         public void onSuccess(String result2) {
-                            SC.warn(dwnmodel);
+                            Layout.getInstance().setNoticeMessage(dwnmodel);
                             setZipFile(dwnmodel, zipFullPath, false);
                         }
                     };
                     service.downloadFile(result, callback);
                 }
             };
-            msa.getURLFromURI(modelURI, mscallback);
+            msa.getURLFromURI(modelURI, test, mscallback);
         }
 
 
@@ -249,7 +253,7 @@ class ModelImportTab extends Tab {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Error processing file");
+                Layout.getInstance().setWarningMessage("Error processing file");
             }
 
             public void onSuccess(List<String> result) {
@@ -294,7 +298,7 @@ class ModelImportTab extends Tab {
 
                 public void onFailure(Throwable caught) {
                     modal.hide();
-                    SC.warn("Couldn't build a simulation object model from file " + rdf.substring(rdf.lastIndexOf('/') + 1) + ". You will have to annotate the model yourself.");
+                    Layout.getInstance().setWarningMessage("Couldn't build a simulation object model from file " + rdf.substring(rdf.lastIndexOf('/') + 1) + ". You will have to annotate the model yourself.");
                     // Create an empty model
                     setEmptyModel();
                 }
@@ -317,7 +321,7 @@ class ModelImportTab extends Tab {
 
         modelDisplay = new ModelDisplay(result, true);
         modelDisplay.setZipFile(zipFile, zipFullPath, mbUpload);
-        modelDisplay.enableCommit();
+        modelDisplay.enableCommit(test);
         hl.addMember(modelDisplay);
 
     }
@@ -329,7 +333,7 @@ class ModelImportTab extends Tab {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Cant create an empty model. Please contact administrator");
+                Layout.getInstance().setWarningMessage("Cant create an empty model. Please contact administrator");
             }
 
             public void onSuccess(SimulationObjectModel result) {
@@ -343,7 +347,7 @@ class ModelImportTab extends Tab {
         modelDisplay = new ModelDisplay(result, true);
          modelDisplay.setZipFile(zipFile, zipFullPath, mbUpload);
         hl.addMember(modelDisplay);
-        modelDisplay.enableCommit();
+        modelDisplay.enableCommit(test);
     }
 
     public class addFileButton extends ToolStripButton {

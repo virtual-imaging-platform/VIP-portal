@@ -23,6 +23,7 @@ import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
@@ -103,7 +104,7 @@ public class RenameTimepointWindow extends Window{
 
                     public void onFailure(Throwable caught) {
                       
-                        SC.warn("Unable to rename");
+                        Layout.getInstance().setWarningMessage("Unable to rename");
                     }
 
                     public void onSuccess(SimulationObjectModel result) {
@@ -116,7 +117,7 @@ public class RenameTimepointWindow extends Window{
                 destroy();
 
             } else {
-                SC.warn("The specified name is the same as the original one.");
+                Layout.getInstance().setWarningMessage("The specified name is the same as the original one.");
             }
         }
     }

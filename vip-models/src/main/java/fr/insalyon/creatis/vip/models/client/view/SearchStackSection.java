@@ -69,7 +69,7 @@ public class SearchStackSection extends SectionStackSection {
     private SelectItem typesPickList;
     private SelectItem timePickList;
 
-    public SearchStackSection(String tabID) {
+    public SearchStackSection(String tabID, boolean test) {
 
         this.tabID = tabID;
         queryItem = new TextItem("query", "Model part");
@@ -79,7 +79,7 @@ public class SearchStackSection extends SectionStackSection {
         this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_SEARCH) + " Search");
         this.setExpanded(false);
 
-        configureForm();
+        configureForm(test);
 
         HLayout hLayout = new HLayout(5);
         hLayout.setMargin(5);
@@ -91,7 +91,7 @@ public class SearchStackSection extends SectionStackSection {
         this.addItem(vLayout);
     }
 
-    private void configureForm() {
+    private void configureForm(final boolean test) {
 
         form = new DynamicForm();
         modal = new ModalWindow(form);
@@ -123,7 +123,7 @@ public class SearchStackSection extends SectionStackSection {
                 final AsyncCallback<List<SimulationObjectModelLight>> callback = new AsyncCallback<List<SimulationObjectModelLight>>() {
 
                     public void onFailure(Throwable caught) {
-                        SC.warn("Cannot list models");
+                        Layout.getInstance().setWarningMessage("Cannot list models");
                         modal.hide();
                     }
 
@@ -136,7 +136,7 @@ public class SearchStackSection extends SectionStackSection {
                 modal.show("Searching Models...", true);
 
 
-                ms.searchModels(queryItem.getEnteredValue(), typesPickList.getValues(), timePickList.getValues(), callback);
+                ms.searchModels(queryItem.getEnteredValue(), typesPickList.getValues(), timePickList.getValues(), test, callback);
             }
         });
         form.setFields(queryItem, typesPickList, timePickList);

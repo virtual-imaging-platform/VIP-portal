@@ -82,10 +82,10 @@ public class ModelDisplay extends VLayout {
     private String zipFullPath = "";
     private boolean mbUpload = true;
 
-    ModelDisplay(String uri) {
+    ModelDisplay(String uri, boolean test) {
         super();
         muri = uri;
-        buildModel(uri);
+        buildModel(uri,test);
        //  enableAdd();
         //disableAdd();
     }
@@ -221,7 +221,7 @@ public class ModelDisplay extends VLayout {
 
     }
 
-    public void enableCommit() {
+    public void enableCommit(final boolean test) {
 //        ModelLicenseWindow mlw = new ModelLicenseWindow( "");
 //        mlw.show();
 //        mlw.getLicense();
@@ -239,12 +239,12 @@ public class ModelDisplay extends VLayout {
 //                }
 
                 if (model == null) {
-                    SC.warn("No simulation object model to commit.");
+                    Layout.getInstance().setWarningMessage("No simulation object model to commit.");
                     return;
                 }
 
                 if (bmodif || modelTreeGrid.isModif()) {
-                    addDatatoZip();
+                    addDatatoZip(test);
                 } else {
                     timeStamp = getTimeStampMilli()  + "-" ;
                     checkRDFEncoding();
@@ -260,7 +260,7 @@ public class ModelDisplay extends VLayout {
     {
          AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
          public void onFailure(Throwable caught) {
-                SC.warn("Cannot Modify the encoding of rdf file");
+                Layout.getInstance().setWarningMessage("Cannot Modify the encoding of rdf file");
             }
 
             public void onSuccess(SimulationObjectModel result) {
@@ -282,7 +282,7 @@ public class ModelDisplay extends VLayout {
         AsyncCallback<SimulationObjectModel> cbssu = new AsyncCallback<SimulationObjectModel>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Cannot set the model storage URL");
+                Layout.getInstance().setWarningMessage("Cannot set the model storage URL");
             }
 
             public void onSuccess(SimulationObjectModel result) {
@@ -324,13 +324,13 @@ public class ModelDisplay extends VLayout {
             //}
     }
     
-    private void addDatatoZip() {
+    private void addDatatoZip(boolean test) {
         //uploading zip file
       
         AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Cannot added files to  zip");
+                Layout.getInstance().setWarningMessage("Cannot add files to zip");
             }
 
             public void onSuccess(SimulationObjectModel result) {
@@ -352,7 +352,7 @@ public class ModelDisplay extends VLayout {
          {
             lfn +=  zipFile;
          }
-        ms.recordAddedFiles(zipFile, addFiles, model, lfn,modelTreeGrid.getModelName(), zipFullPath, mbUpload, callback);
+        ms.recordAddedFiles(zipFile, addFiles, model, lfn,modelTreeGrid.getModelName(), zipFullPath, mbUpload, test, callback);
     }
 
     private void enableDownload() {
@@ -365,7 +365,7 @@ public class ModelDisplay extends VLayout {
         download.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-              SC.say("Added zip file to the upload pool");
+              Layout.getInstance().setNoticeMessage("Added model to the transfer pool");
                     String lfn = model.getStorageURL();
                     downloadModel(lfn);
                // }
@@ -380,13 +380,14 @@ public class ModelDisplay extends VLayout {
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Cannot upload zip file");
+                Layout.getInstance().setWarningMessage("Cannot upload zip file");
             }
 
             public void onSuccess(Void result) {
                // SC.say("Added zip file to the upload pool");
-                ((DataManagerSection) Layout.getInstance().getMainSection(DataManagerConstants.SECTION_FILE_TRANSFER)).expand();
+                //((DataManagerSection) Layout.getInstance().getMainSection(DataManagerConstants.SECTION_FILE_TRANSFER)).expand();
                 BrowserLayout.getInstance().loadData(ModelConstants.MODEL_HOME, true);
+                Layout.getInstance().setNoticeMessage("Model committed");
             }
         };
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
@@ -450,17 +451,17 @@ public class ModelDisplay extends VLayout {
         return toolStrip;
     }
     
-    private void downloadModel(final String lfnModel) {
+    public static void downloadModel(final String lfnModel) {
 
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<String> callback = new AsyncCallback<String>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Cannot download model file. : " + lfnModel);
+                Layout.getInstance().setWarningMessage("Cannot download model file. : " + lfnModel);
             }
 
             public void onSuccess(String result) {
-                SC.say("Model file download is in progress.");
+               Layout.getInstance().setNoticeMessage("Model file download in progress.");
                  OperationLayout.getInstance().addOperation(result);
                 ((DataManagerSection) Layout.getInstance().getMainSection(DataManagerConstants.SECTION_FILE_TRANSFER)).expand();
             }
@@ -480,14 +481,14 @@ public class ModelDisplay extends VLayout {
         return ok;
     }
 
-    private void buildModel(final String uri) {
+    private void buildModel(final String uri, boolean test) {
         ModelServiceAsync ms = ModelService.Util.getInstance();
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
                 init(false,true);
-                SC.say("Cannot load model (" + uri + ")");
+                Layout.getInstance().setWarningMessage("Cannot load model (" + uri + ")");
             }
 
             public void onSuccess(SimulationObjectModel result) {
@@ -496,11 +497,11 @@ public class ModelDisplay extends VLayout {
                     model = result;
                     init(true,true);
                 } else {
-                    SC.say("Cannot load model");
+                    Layout.getInstance().setWarningMessage("Cannot load model");
                 }
             }
         };
-        modal.show("Loading model", true);
-        ms.rebuildObjectModelFromTripleStore(uri, callback);
+       modal.show("Loading model", true);
+        ms.rebuildObjectModelFromTripleStore(uri, test, callback);
     }
 }

@@ -43,6 +43,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
@@ -232,7 +233,7 @@ public class ModelCreateDialog extends Window {
             }
         }
         if (!bmix) {
-            SC.warn("we can't mix different types of layer for one object.");
+            Layout.getInstance().setWarningMessage("Can't mix different types of layer for one object.");
         } else {
             for (ListGridRecord rd : resultTG.getSelectedRecords()) {
                 int label = rd.getAttributeAsInt("label");
@@ -265,14 +266,14 @@ public class ModelCreateDialog extends Window {
         boolean bhide = true;
         ListGridRecord[] records = resultTG.getSelectedRecords();
         if (records.length == 0) {
-            SC.say("No entity selected.");
+            Layout.getInstance().setNoticeMessage("No entity selected.");
             bhide = false;
         } else {
             for (ListGridRecord rd : records) {
                 if (type == 1) {
                     String slabel = rd.getAttributeAsString("label");
                     if (slabel.isEmpty()) {
-                        SC.say("labels missing for entities. Cannot add object.");
+                        Layout.getInstance().setWarningMessage("labels missing for entities. Cannot add object.");
                         bhide = false;
                         break;
                     } else {
@@ -280,7 +281,7 @@ public class ModelCreateDialog extends Window {
                         for (String lb : labels) {
                             if (lb.equals(slabel)) {
 
-                                SC.say("Label already used for " + rd.getAttribute("name")
+                                Layout.getInstance().setWarningMessage("Label already used for " + rd.getAttribute("name")
                                         + ". Please choose another value.");
                                 bhide = false;
                                 break;
@@ -409,7 +410,7 @@ public class ModelCreateDialog extends Window {
 
                     for (String label : labels) {
                         if (label.equals(event.getValue().toString())) {
-                            SC.say("Label already used. Please choose another value.");
+                            Layout.getInstance().setWarningMessage("Label already used. Please choose another value.");
                         }
                     }
 
@@ -559,12 +560,12 @@ public class ModelCreateDialog extends Window {
                 String toSearch = searchText.getValueAsString();
 
                 if (toSearch == null || toSearch.isEmpty()) {
-                    SC.warn("can't search in the ontology.Please add a term.");
+                    Layout.getInstance().setWarningMessage("Can't search in the ontology.Please add a term.");
                 } else {
                     AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
 
                         public void onFailure(Throwable caught) {
-                            SC.warn("Cant search through the ontology");
+                            Layout.getInstance().setWarningMessage("Cant search through the ontology");
                         }
 
                         public void onSuccess(List<String[]> result) {

@@ -20,6 +20,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.models.client.ModelConstants;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
@@ -86,7 +87,7 @@ public class ModelCreateTab extends VLayout {
         AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
             public void onFailure(Throwable caught) {
-                SC.warn("Cant add a timepoint");
+                Layout.getInstance().setWarningMessage("Cant add a timepoint");
             }
 
             public void onSuccess(SimulationObjectModel result) {
@@ -102,7 +103,7 @@ public class ModelCreateTab extends VLayout {
             AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
                 public void onFailure(Throwable caught) {
-                    SC.warn("Cant add an instant");
+                    Layout.getInstance().setWarningMessage("Cant add an instant");
                 }
 
                 public void onSuccess(SimulationObjectModel result) {

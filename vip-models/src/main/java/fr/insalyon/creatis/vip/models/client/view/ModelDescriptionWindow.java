@@ -20,6 +20,7 @@ import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
@@ -84,18 +85,18 @@ public class ModelDescriptionWindow extends Window {
          nwdescription = despItem.getValueAsString().trim();
         if (form.validate()) {
             if (description.equals(nwdescription)) {
-                SC.warn("The specified name is the same as the original one.");
+                Layout.getInstance().setWarningMessage("The specified name is the same as the original one.");
             }
                 ModelServiceAsync ms = ModelService.Util.getInstance();
                  final AsyncCallback<SimulationObjectModel>  callback = new AsyncCallback<SimulationObjectModel>() {
 
                     public void onFailure(Throwable caught) {
                       
-                        SC.warn("Unable to rename");
+                        Layout.getInstance().setWarningMessage("Unable to rename");
                     }
 
                     public void onSuccess(SimulationObjectModel result) {
-                         SC.warn("Description changed.");
+                         Layout.getInstance().setNoticeMessage("Description changed.");
                        
                     }
                 };

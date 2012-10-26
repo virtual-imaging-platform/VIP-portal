@@ -20,6 +20,7 @@ import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
@@ -121,7 +122,7 @@ public class ModelLicenseWindow  extends Window {
                 despItem.setValue(nwLicence); 
             }
             public void onFailure(Throwable caught) {
-                SC.warn("Cannot set the model storage URL");
+                Layout.getInstance().setWarningMessage("Cannot set the model storage URL");
             }
         };
         service.readLicense(filename, callback);
