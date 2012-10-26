@@ -42,11 +42,8 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.TransferImgButton;
 import com.smartgwt.client.widgets.events.*;
-import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tree.TreeNode;
-import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.HStack;
 import com.smartgwt.client.widgets.layout.VStack;
@@ -60,14 +57,8 @@ import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
-import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
-import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
-import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
-import fr.insalyon.creatis.vip.models.client.ModelConstants;
 import fr.insalyon.creatis.vip.models.client.view.FileTree.FileTreeNode;
 import java.util.ArrayList;
 
@@ -181,7 +172,7 @@ class ModelImportTab extends Tab {
         this.setPane(hl);
 
         if (bTS) {
-            if(!nameTab.isEmpty() || !modelURI.isEmpty())
+            if(!(nameTab.isEmpty() || nameTab.equals("New model") ) || !modelURI.isEmpty())
             {
                 new FileUploadWindow("local", "uploadComplete").show();
             }
