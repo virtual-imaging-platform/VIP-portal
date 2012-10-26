@@ -57,7 +57,7 @@ public interface VTKControllerAsync {
     
     public void downloadModel(int i, int j, AsyncCallback<Data3Dij> callback);
     
-     public void listAllModels( AsyncCallback<List<SimulationObjectModelLight>> callback);
+     public void listAllModels(boolean test,AsyncCallback<List<SimulationObjectModelLight>> callback);
      
      public void rebuildObjectModelFromTripleStore(String uri, AsyncCallback<SimulationObjectModel> callback);
 }

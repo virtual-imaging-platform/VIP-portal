@@ -75,7 +75,7 @@ public interface VTKController extends RemoteService {
     
     public Data3Dij downloadModel(int i, int j) throws Exception;
     
-     public List<SimulationObjectModelLight> listAllModels() throws Exception;
+     public List<SimulationObjectModelLight> listAllModels(boolean test) throws Exception;
      
      public SimulationObjectModel rebuildObjectModelFromTripleStore(String uri);
 }

@@ -176,10 +176,10 @@ public class DownloadService {
     }
     
     
-    public static List<SimulationObjectModelLight> listAllModels() throws BusinessException {
+    public static List<SimulationObjectModelLight> listAllModels(boolean test) throws BusinessException {
 
         try {
-            return SimulationObjectModelQueryer.getAllModels();
+            return SimulationObjectModelQueryer.getAllModels(test);
 
         } catch (Exception ex) {
             logger.error(ex);

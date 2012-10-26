@@ -190,8 +190,8 @@ public class VTKControllerImpl extends AbstractRemoteServiceServlet implements V
         }
     }
     
-     public List<SimulationObjectModelLight> listAllModels() throws Exception{
-             return DownloadService.listAllModels();
+     public List<SimulationObjectModelLight> listAllModels(boolean test) throws Exception{
+             return DownloadService.listAllModels(test);
     }
      
      public SimulationObjectModel rebuildObjectModelFromTripleStore(String uri) {

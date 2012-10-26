@@ -90,15 +90,17 @@ public class SimulationGUITab extends Tab {
     int mod_lenght = 0;
     private boolean bReady = false;
 
+    private boolean test = true;
     public SimulationGUITab() {
 
         init();
         
     }
     
-    public SimulationGUITab(String i_uri, List<String> modalities)
+    public SimulationGUITab(String i_uri, List<String> modalities, boolean test)
     {
         init();
+        this.test = test;
         SC.say(i_uri);
         bReady = true;
         modelSelectItem.setValue(i_uri);
@@ -173,7 +175,7 @@ public class SimulationGUITab extends Tab {
             }
         });
         
-        VTK.listAllModels(new AsyncCallback<List<SimulationObjectModelLight>>() {
+        VTK.listAllModels(test, new AsyncCallback<List<SimulationObjectModelLight>>() {
 
             public void onSuccess(List<SimulationObjectModelLight> result) {
                 modal.hide();
