@@ -87,7 +87,7 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
 
         try {
             trace(logger, "Creating model: " + modelName);
-            return modelBusiness.createModel(modelName, getSessionUser().getLastName());
+            return modelBusiness.createModel(modelName, getSessionUser().getFullName());
 
         } catch (CoreException ex) {
             throw new ModelException(ex);
@@ -122,7 +122,7 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
 
     public SimulationObjectModel rebuildObjectModelFromAnnotationFile(String fileName) throws ModelException {
         try {
-            return modelBusiness.rebuildObjectModelFromAnnotationFile(fileName, getSessionUser().getLastName());
+            return modelBusiness.rebuildObjectModelFromAnnotationFile(fileName, getSessionUser().getFullName());
         } catch (CoreException ex) {
             throw new ModelException(ex);
         }
@@ -183,7 +183,7 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
     public SimulationObjectModel createEmptyModel() throws ModelException {
         try {
             trace(logger, "Creating an empty model ");
-            return modelBusiness.createModel("Empty_Model", getSessionUser().getLastName());
+            return modelBusiness.createModel("Empty_Model", getSessionUser().getFullName());
 
         } catch (CoreException ex) {
             throw new ModelException(ex);
