@@ -121,7 +121,8 @@ public class ModelListTab extends Tab {
         
         ToolStripButton createButton = new ToolStripButton();
         createButton.setIcon(CoreConstants.ICON_ADD);
-        createButton.setTitle("Create");
+        createButton.setTitle("New model");
+        createButton.setTooltip("Creates a new model from scratch");
         createButton.addClickHandler(new ClickHandler() {
             public void onClick(ClickEvent event) {
                 Layout.getInstance().addTab(new ModelImportTab(true, "New model","",test));
@@ -131,7 +132,8 @@ public class ModelListTab extends Tab {
         
         ToolStripButton addButton = new ToolStripButton();
         addButton.setIcon(CoreConstants.ICON_ADD);
-        addButton.setTitle("Upload");
+        addButton.setTitle("New model (from zip archive)");
+        addButton.setTooltip("Creates model from a zip archive containing model files");
         addButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {

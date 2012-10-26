@@ -55,7 +55,7 @@ public class ModelCreateTab extends VLayout {
         toolstrip.addSeparator();
         ToolStripButton addTimepoint = new ToolStripButton("Add timepoint");
         addTimepoint.setIcon(ModelConstants.APP_IMG_TIMEPOINT);
-        addTimepoint.setTooltip("It adds a TimePoint to current model");
+        addTimepoint.setTooltip("Adds a time-point to the current model");
 
 
         addTimepoint.addClickHandler(new ClickHandler() {
@@ -70,7 +70,7 @@ public class ModelCreateTab extends VLayout {
 
         ToolStripButton addInstant = new ToolStripButton("Add instant");
         addInstant.setIcon(ModelConstants.APP_IMG_INSTANT);
-        addInstant.setTooltip("It adds a Instant to current model");
+        addInstant.setTooltip("Adds an instant to the current model");
         addInstant.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {

@@ -139,7 +139,7 @@ public class ModelDisplay extends VLayout {
     {
         addTimepoint = new ToolStripButton("Add timepoint");
         addTimepoint.setIcon(ModelConstants.APP_IMG_TIMEPOINT);
-        addTimepoint.setTooltip("It adds a TimePoint to current model");
+        addTimepoint.setTooltip("Adds a time-point to current model");
         addTimepoint.addClickHandler(new ClickHandler() {
             public void onClick(ClickEvent event) {
                 addTimePoint(new Date(System.currentTimeMillis()));
@@ -149,7 +149,7 @@ public class ModelDisplay extends VLayout {
 
         addInstant = new ToolStripButton("Add instant");
         addInstant.setIcon(ModelConstants.APP_IMG_INSTANT);
-        addInstant.setTooltip("It adds a Instant to current model");
+        addInstant.setTooltip("Adds an instant to current model");
         addInstant.addClickHandler(new ClickHandler() {
          public void onClick(ClickEvent event) {
                 addInstant();

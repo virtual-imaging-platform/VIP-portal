@@ -112,7 +112,7 @@ class ModelImportTab extends Tab {
         // ToolStripButton addButton = new ToolStripButton("Add file");
         addFileButton addButton = new addFileButton("Add file");
         addButton.setIcon(CoreConstants.ICON_ADD);
-        addButton.setTooltip("It adds a File to complete the current model");
+        addButton.setTooltip("Adds a file to the current model");
         addButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
@@ -324,7 +324,7 @@ class ModelImportTab extends Tab {
 
             public void onFailure(Throwable caught) {
                 modal.hide();
-                Layout.getInstance().setWarningMessage("Cant create an empty model. Please contact administrator");
+                Layout.getInstance().setWarningMessage("Cannot create an empty model. Please contact administrator");
             }
 
             public void onSuccess(SimulationObjectModel result) {
@@ -348,7 +348,7 @@ class ModelImportTab extends Tab {
         public addFileButton(String name) {
             this.setTitle(name);
             this.setIcon(CoreConstants.ICON_ADD);
-            this.setTooltip("It adds a file to complete the current model");
+            this.setTooltip("Adds a file to the current model");
             this.addClickHandler(new ClickHandler() {
 
                 public void onClick(ClickEvent event) {
