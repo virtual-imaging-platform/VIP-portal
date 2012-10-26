@@ -65,7 +65,7 @@ class ModelContextMenu extends Menu {
         viewItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new ModelDisplayTab(modelURI,modelName,test));
+                Layout.getInstance().addTab(new ModelDisplayTab(modelURI,modelName,test,false));
             }
         });
         

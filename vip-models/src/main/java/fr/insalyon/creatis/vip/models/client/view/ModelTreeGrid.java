@@ -114,7 +114,7 @@ public class ModelTreeGrid extends TreeGrid {
     private Menu tfgMenu = null;
     private int iWidth = 100;
 
-    public ModelTreeGrid(final SimulationObjectModel model, boolean bFull) {
+    public ModelTreeGrid(final SimulationObjectModel model, boolean bFull, boolean bmenu) {
         super();
 
  
@@ -261,16 +261,18 @@ public class ModelTreeGrid extends TreeGrid {
             }
         });
 
-        nodeMenu = new ModelMenu();
-        this.addNodeContextClickHandler(new NodeContextClickHandler() {
+        if(bmenu)
+        {
+            nodeMenu = new ModelMenu();
+            this.addNodeContextClickHandler(new NodeContextClickHandler() {
 
-            public void onNodeContextClick(NodeContextClickEvent event) {
-                mnode = (ModelTreeNode) event.getNode();
-                ((ModelMenu) nodeMenu).setNode((ModelTreeNode) event.getNode());
-            }
-        });
-        this.setContextMenu(nodeMenu);
-  
+                public void onNodeContextClick(NodeContextClickEvent event) {
+                    mnode = (ModelTreeNode) event.getNode();
+                    ((ModelMenu) nodeMenu).setNode((ModelTreeNode) event.getNode());
+                }
+            });
+            this.setContextMenu(nodeMenu);
+        }
 
     }
 

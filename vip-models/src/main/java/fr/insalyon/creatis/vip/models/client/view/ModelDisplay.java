@@ -81,10 +81,11 @@ public class ModelDisplay extends VLayout {
     private String muri = "";
     private String zipFullPath = "";
     private boolean mbUpload = true;
-
-    ModelDisplay(String uri, boolean test) {
+    private boolean mbMenu = true;
+    ModelDisplay(String uri, boolean test, boolean bmenu) {
         super();
         muri = uri;
+        mbMenu = bmenu;
         buildModel(uri,test);
        //  enableAdd();
         //disableAdd();
@@ -174,7 +175,7 @@ public class ModelDisplay extends VLayout {
 
     private void updateTreeModel() {
         this.removeMember(modelTreeGrid);
-        modelTreeGrid = new ModelTreeGrid(model, true);
+        modelTreeGrid = new ModelTreeGrid(model, true, mbMenu);
         toolStrip = (ToolStrip) modelTreeGrid.getToolStrip();
         addMember(toolStrip);
         addMember(modelTreeGrid);
@@ -198,7 +199,7 @@ public class ModelDisplay extends VLayout {
 
     private void updateTreeGrid() {
         
-        modelTreeGrid = new ModelTreeGrid(model, true);
+        modelTreeGrid = new ModelTreeGrid(model, true, mbMenu);
         toolStrip = (ToolStrip) modelTreeGrid.getToolStrip();
         addMember(toolStrip);
 
@@ -208,7 +209,7 @@ public class ModelDisplay extends VLayout {
     }
 
     public void createTreeGrid() {
-        modelTreeGrid = new ModelTreeGrid(model, false);
+        modelTreeGrid = new ModelTreeGrid(model, false, mbMenu);
 
         addMember(modelTreeGrid);
         modelTreeGrid.setParentElement(this);

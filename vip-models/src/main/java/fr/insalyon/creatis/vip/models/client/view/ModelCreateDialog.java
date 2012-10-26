@@ -490,6 +490,7 @@ public class ModelCreateDialog extends Window {
         layerRadio.setVertical(false);
         layerRadio.setShowTitle(false);
         layerRadio.setValueMap(layerMap);
+        layerRadio.setValue("Anatomy");
         layerForm = new DynamicForm();
         layerForm.setFields(layerRadio);
 //        SearchLayout = new VLayout();
@@ -576,7 +577,7 @@ public class ModelCreateDialog extends Window {
         searchText.setWidth(400);
         searchText.setTitle("<nobr><b>Please, search the corresponding semantic term(s) for the object.</nobr></b>");
         searchText.setTitleOrientation(TitleOrientation.TOP);
-        searchText.setValue(filename.substring(0, filename.lastIndexOf(".")-1));
+        searchText.setValue(filename.substring(0, filename.lastIndexOf(".")));
         ButtonItem searchBt = new ButtonItem();
         searchBt.setTitle("Search");
         searchBt.setTooltip("search throught the VIP ontology the nearest term");

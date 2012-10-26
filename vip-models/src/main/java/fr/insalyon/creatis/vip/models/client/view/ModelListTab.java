@@ -317,7 +317,7 @@ public class ModelListTab extends Tab {
         rowMouseDownHandler = grid.addRowMouseDownHandler(new RowMouseDownHandler() {
 
             public void onRowMouseDown(RowMouseDownEvent event) {
-                Layout.getInstance().addTab(new ModelDisplayTab(event.getRecord().getAttribute("uri"), event.getRecord().getAttribute("name"),test));
+                Layout.getInstance().addTab(new ModelDisplayTab(event.getRecord().getAttribute("uri"), event.getRecord().getAttribute("name"),test,false));
             }
         });
     }

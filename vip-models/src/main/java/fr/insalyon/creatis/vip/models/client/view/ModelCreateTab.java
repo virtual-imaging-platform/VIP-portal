@@ -118,7 +118,7 @@ public class ModelCreateTab extends VLayout {
 
     private void updateTreeModel() {
         if (modelTree == null) {
-            modelTree = new ModelTreeGrid(objModel, false);
+            modelTree = new ModelTreeGrid(objModel, false,true);
             modelTree.editable = true;
             addMember(modelTree);
         } else {
