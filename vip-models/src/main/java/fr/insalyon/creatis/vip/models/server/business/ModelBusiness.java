@@ -414,7 +414,7 @@ public class ModelBusiness {
         model.setModelOwner(user);
         SimulationObjectModelFactory.setModelOwner(model, user);
 
-        String description = "Empty model";
+        String description = "Empty description";
         model.setModelDescription(description);
         SimulationObjectModelFactory.setModelDescription(model, description);
 

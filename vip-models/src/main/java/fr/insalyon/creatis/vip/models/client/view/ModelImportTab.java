@@ -52,6 +52,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import com.smartgwt.client.widgets.tree.events.FolderDropEvent;
 
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
@@ -331,7 +332,7 @@ class ModelImportTab extends Tab {
                 setCreateObjectModel(result);
             }
         };
-        ms.createModel("EmptyModel"+ String.valueOf((new Date()).getTime()),"cervenansky",callback);
+        ms.createModel("New model",CoreModule.user.getFullName(),callback);
     }
 
     public void setCreateObjectModel(SimulationObjectModel result) {

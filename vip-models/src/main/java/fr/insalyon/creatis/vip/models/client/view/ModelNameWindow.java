@@ -35,7 +35,7 @@ public class ModelNameWindow extends Window {
     private ModelTreeGrid modelGrid;
     private String nwname ="";
 
-    public ModelNameWindow(ModelTreeGrid grid) {
+    public ModelNameWindow(ModelTreeGrid grid, String name) {
         
         this.modelGrid = grid;
       //  this.description = this.modelGrid.getModel().getModelDescription();
@@ -54,7 +54,7 @@ public class ModelNameWindow extends Window {
         form.setPadding(5);
         form.setLayoutAlign(VerticalAlignment.BOTTOM);
         despItem = FieldUtil.getTextItem(200, true, "Rename", "[0-9A-Za-z-_. ]");
-        despItem.setValue(modelGrid.getModelName());
+        despItem.setValue(name);
         despItem.addKeyPressHandler(new KeyPressHandler() {
 
             public void onKeyPress(KeyPressEvent event) {

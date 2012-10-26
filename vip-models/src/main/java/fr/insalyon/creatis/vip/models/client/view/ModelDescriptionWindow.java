@@ -39,7 +39,7 @@ public class ModelDescriptionWindow extends Window {
     private int ins;
     private String nwdescription ="";
 
-    public ModelDescriptionWindow(ModelTreeGrid grid) {
+    public ModelDescriptionWindow(ModelTreeGrid grid, String description) {
         
         this.modelGrid = grid;
       //  this.description = this.modelGrid.getModel().getModelDescription();

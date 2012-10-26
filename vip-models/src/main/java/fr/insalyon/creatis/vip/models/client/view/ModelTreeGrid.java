@@ -304,13 +304,13 @@ public class ModelTreeGrid extends TreeGrid {
     
     private void setDescription()
     {
-          ModelDescriptionWindow dg = new ModelDescriptionWindow(ModelTreeGrid.this);
+          ModelDescriptionWindow dg = new ModelDescriptionWindow(ModelTreeGrid.this,model.getModelDescription());
           dg.show();
     }
     
         private void setName()
     {
-          ModelNameWindow dg = new ModelNameWindow(ModelTreeGrid.this);
+          ModelNameWindow dg = new ModelNameWindow(this, model.getModelName());
           dg.show();
     }
     

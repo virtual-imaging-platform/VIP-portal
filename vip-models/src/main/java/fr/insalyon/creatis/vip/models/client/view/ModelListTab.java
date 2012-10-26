@@ -146,7 +146,7 @@ public class ModelListTab extends Tab {
         deleteButton.setIcon(CoreConstants.ICON_CLEAR);
         deleteButton.setTitle("Delete all");
         if (!CoreModule.user.isGroupAdmin())
-            deleteButton.disable();
+            deleteButton.hide();
         deleteButton.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
