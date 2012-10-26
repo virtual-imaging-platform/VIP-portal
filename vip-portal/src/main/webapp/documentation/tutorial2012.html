@@ -24,37 +24,36 @@
             <img alt="three_models" src="tutorial2012/three.png"/>
         </ul>
         <ul><li>To view and explore a model, right click on one (the first to start) and select <b>View model annotations</b>.</li><img alt="view_model" src="tutorial2012/view_model.png"/>
-            <li>You can explore through the different layers (timepoint, instant, Objects Layer) to look at the different objects composing a model.
-                Each object is labelised by a semantic term. The first model <b>Adam</b> only contains voxels and meshes objects.
-            If you come back to the model repository and select to view the second (Extended Adam), you will see , too, <b>the physical parameters layers</b> used for the simulations.</li>
+            <li>Explore through the different layers (timepoint, instant, object layers) to look at the different objects composing a model.
+                The first model <b>Adam</b> only contains voxels and meshes objects. <b>TODO</b> explain time-scales.
+            <li> Come back to the model repository and inspect model <b>Extended Adam</b>.  You will see <b>physical parameters layers</b> used for the simulations.</li>
           <img alt="view_extended_adam" src="tutorial2012/view_extended_adam.png"/></li>
-             <li>Now, download a model by clicking the download button.</li><img alt="download_models" src="tutorial2012/download_models.png"/>
-             <li>Inspect the downloaded archive to control that voxel and meshes files are present. Note the presence of rdf file containing all semantic aspects of models.</li>
+             <li>Now, download a model by clicking the download button in the annotation panel.</li><img alt="download_models" src="tutorial2012/download_models.png"/>
+             <li>Inspect the downloaded archive to control that voxel and meshes files are present. Note the rdf file containing semantic annotations.</li>
              
-        <li>You can display a model by a right-click on launch simulation GUI.</li><img alt="launch_GUI" src="tutorial2012/launch_GUI.png"/>
-        <li> You can interact with the 3D model</li>
+        <li>Display a model by a right-clicking on launch simulation GUI.</li><img alt="launch_GUI" src="tutorial2012/launch_GUI.png"/>
+        <li> You can also interact with the 3D model</li>
         </ul> 
-         <h3>Create-Annotate YOUR own model</h3>
+         <h2>Import your own model</h2>
          <p>
-         <ul><li>First, download one of meshes object from the <a href="http://vip.creatis.insa-lyon.fr/tutorialEMSP2012/">website
-            </a>.
+         <ul><li>Download one a test mesh object from <a href="http://vip.creatis.insa-lyon.fr/tutorialEMSP2012/">here.</a>
         </li>
          </ul>
-         <ul><li>After, in the models repository tab, click on Create button:</li><img alt="create_button_models" src="tutorial2012/create.png"/>.
-             <li>An empty model is automatically created with one timepoint and one instant by default.
-                 <br>The page is divised in two sections: the left frame will contain the files you will add to your model. 
-                The right model will contain your on-going model.</li><img alt="create_model" src="tutorial2012/create_model.png"/>  
+         <ul><li>In the models repository tab, click on button Create:</li><img alt="create_button_models" src="tutorial2012/create.png"/>.
+             <li>An empty model is created with one time-point and one instant.
+                 <br>The page is divided in two sections: the left panel contains the files to be added to the model. 
+                The right panel contains the current status of your annotated model.</li><img alt="create_model" src="tutorial2012/create_model.png"/>  
         
-            <li>Now, you can add the previous meshes object.</li> <img alt="add_file" src="tutorial2012/add_file.png"/>.
-            <li>The selected file will be displayed in the left file.
+            <li>Add your test mesh object.</li> <img alt="add_file" src="tutorial2012/add_file.png"/>.
+            <li>The selected file is displayed in the left panel.
                 <br>You can add several files in the same way.</li><img alt="file_added" src="tutorial2012/file_added.png"/>
-            <li>To add an object to model, you have to drag and drop the file on the right frame.
-            A dialog box will appear. That box allows to associate semantic terms to your objects.</li>
-            <li>In our example, search the appropriate semantic term in text field:</li><img alt="dialog" src="tutorial2012/dialog.png"/>
-            <li>The results will be displayed in the spreadsheet below. You can try several terms.</li>
-            <li>At the end, you have to select the right term by clicking it and validate it with OK button.</li><img alt="results" src="tutorial2012/results.png"/>
-            <li>You have to rename your model by a right click on the right bar and select <b>Change model name</b>.</li> <img alt="rename" src="tutorial2012/change_name.png"/>
-            <li>Now, you can commit your model with the commit button. It will be automatically added in the model repository, as you can check it.</li><img alt="commit" src="tutorial2012/commit.png"/>            <li>Your model is now displayed in the model repository.</li>
+            <li>To annotate a file in your model, drag and drop the file from the left panel to the proper instant on the right. 
+            A dialog box appears. It allows to associate the name of an organ to your object.</li>
+            <li>Search for the appropriate semantic (e.g. "heart") term in text field:</li><img alt="dialog" src="tutorial2012/dialog.png"/>
+            <li>Available terms appear. You can try several terms.</li>
+            <li>Select the right term validate it with button OK.</li><img alt="results" src="tutorial2012/results.png"/>
+            <li>Rename your model by right clicking on the right bar and select <b>Change model name</b>.</li> <img alt="rename" src="tutorial2012/change_name.png"/>
+            <li>Now, you can commit your model with the commit button. It is added in the model repository.</li><img alt="commit" src="tutorial2012/commit.png"/>            <li>Your model is now displayed in the model repository.</li>
             
         </ul>        
         </p>
