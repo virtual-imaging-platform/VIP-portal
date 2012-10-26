@@ -61,7 +61,10 @@ class FileTree extends TreeGrid {
             if (name.endsWith(".rdf")) {
                 rdfFile = result.get(i);
             }
-            fileData[i] = new FileTreeNode(zipFile, name);
+            else
+            {
+                fileData[i] = new FileTreeNode(zipFile, name);
+            }
         }
 
         fileTree.setData(fileData);

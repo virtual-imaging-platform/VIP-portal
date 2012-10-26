@@ -12,6 +12,7 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 
@@ -58,6 +59,9 @@ import java.util.logging.Logger;
 public class ModelCreateDialog extends Window {
 
     private TextItem searchText = null;
+    private Label searchFilterLabel = null;
+    private Label selectFileLabel = null;
+    private Label selectLayerLabel = null;
     private ModelServiceAsync ms = null;
     private SelectItem physicalCombo = null;
     private CheckboxItem anaCheck = null;
@@ -441,6 +445,13 @@ public class ModelCreateDialog extends Window {
     }
 
     public void initPhysicalForms() {
+        selectFileLabel = new Label("<b>Select file type</b>");
+        selectFileLabel.setAlign(Alignment.LEFT);
+        selectFileLabel.setWidth100();
+        selectFileLabel.setHeight(20);
+        selectFileLabel.setBackgroundColor("#F2F2F2");
+        this.addItem(selectFileLabel);
+        
         LinkedHashMap<String, String> lutMap = new LinkedHashMap<String, String>();
         for (String lut : tree.getLutMap()) {
             lutMap.put(lut, lut);
@@ -457,6 +468,13 @@ public class ModelCreateDialog extends Window {
         extensionForm.setFields(typeRadio, physicalCombo);
         this.addItem(extensionForm);
 
+        selectLayerLabel = new Label("<b>Select Layer</b>");
+        selectLayerLabel.setAlign(Alignment.LEFT);
+        selectLayerLabel.setWidth100();
+        selectLayerLabel.setHeight(20);
+        selectLayerLabel.setBackgroundColor("#F2F2F2");
+        this.addItem(selectLayerLabel);
+        
         LinkedHashMap<String, String> layerMap = new LinkedHashMap<String, String>();
         layerMap.put("Anatomy", "Anatomy");
         layerMap.put("Pathology", "Pathology");
@@ -482,16 +500,19 @@ public class ModelCreateDialog extends Window {
     }
 
     private void removePhysicalForms() {
+        this.removeItem(selectFileLabel);
         this.removeItem(extensionForm);
         this.removeItem(layerForm);
         this.removeItem(validateForm);
+        this.removeItem(selectLayerLabel);
 
     }
 
     private void removeObjectForms() {
-
+        this.removeItem(selectFileLabel);
         this.removeItem(extensionForm);
         this.removeItem(searchForm);
+        this.removeItem(searchFilterLabel);
         this.removeItem(layerForm);
         this.removeItem(hLayout);
         this.removeItem(validateForm);
@@ -535,6 +556,14 @@ public class ModelCreateDialog extends Window {
     }
 
     public void initObjectForms() {
+        
+        selectFileLabel = new Label("<b>Select file type</b>");
+        selectFileLabel.setAlign(Alignment.LEFT);
+        selectFileLabel.setWidth100();
+        selectFileLabel.setHeight(20);
+        selectFileLabel.setBackgroundColor("#F2F2F2");
+        this.addItem(selectFileLabel);
+        
         extensionForm = new DynamicForm();
         extensionForm.setFields(typeRadio);
         this.addItem(extensionForm);
@@ -545,9 +574,9 @@ public class ModelCreateDialog extends Window {
         // search part
         searchText = new TextItem();
         searchText.setWidth(400);
-        searchText.setTitle("<nobr><b>Search - (add '~' at the end of the word for approximated search)</nobr></b>");
+        searchText.setTitle("<nobr><b>Please, search the corresponding semantic term(s) for the object.</nobr></b>");
         searchText.setTitleOrientation(TitleOrientation.TOP);
-
+        searchText.setValue(filename.substring(0, filename.lastIndexOf(".")-1));
         ButtonItem searchBt = new ButtonItem();
         searchBt.setTitle("Search");
         searchBt.setTooltip("search throught the VIP ontology the nearest term");
@@ -558,7 +587,7 @@ public class ModelCreateDialog extends Window {
                 boolean[] scope = new boolean[]{anaCheck.getValueAsBoolean(), pathoCheck.getValueAsBoolean(),
                     geoCheck.getValueAsBoolean(), forCheck.getValueAsBoolean(), exCheck.getValueAsBoolean()};
                 String toSearch = searchText.getValueAsString();
-
+                
                 if (toSearch == null || toSearch.isEmpty()) {
                     Layout.getInstance().setWarningMessage("Can't search in the ontology.Please add a term.");
                 } else {
@@ -582,6 +611,7 @@ public class ModelCreateDialog extends Window {
                             }
                         }
                     };
+                    toSearch += "~";
                     ms.searchWithScope(toSearch, scope, callback);
                 }
             }
@@ -600,7 +630,15 @@ public class ModelCreateDialog extends Window {
         searchForm.setFields(searchText, searchBt);
         this.addItem(searchForm);
 
+        // search part
+        searchFilterLabel = new Label("<b>Search filters</b>");
+        searchFilterLabel.setAlign(Alignment.LEFT);
+        searchFilterLabel.setWidth100();
+        searchFilterLabel.setHeight(20);
+        searchFilterLabel.setBackgroundColor("#F2F2F2");
+        this.addItem(searchFilterLabel);
 
+        
         // layer type
         anaCheck = new CheckboxItem();
         anaCheck.setValue(true);
