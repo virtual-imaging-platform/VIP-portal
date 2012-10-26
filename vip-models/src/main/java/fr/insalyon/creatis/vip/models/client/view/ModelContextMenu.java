@@ -47,8 +47,8 @@ class ModelContextMenu extends Menu {
         deleteItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                SC.confirm("Do you really want to delete this model ("
-                        + modelName +","+modelURI+ ")?", new BooleanCallback() {
+                SC.confirm("Do you really want to delete model "
+                        + modelName+"?", new BooleanCallback() {
 
                     public void execute(Boolean value) {
                         if (value != null && value) {
