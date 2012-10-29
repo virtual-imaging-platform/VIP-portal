@@ -198,13 +198,21 @@ public class ModelCreateDialog extends Window {
 
 
                     } else {
+                        SC.say("you have to select a semantic term.");
                     }
 
                 } else if (type == 2 || type == 3) {
-
-                    tree.addPhysicalItem(tp, ins, type, filename, getLayerforLUT(), physicalCombo.getValues());
-                    hide();
-                    refresh();
+                    if(physicalCombo.getValues().length != 0)
+                    {
+                        tree.addPhysicalItem(tp, ins, type, filename, getLayerforLUT(), physicalCombo.getValues());
+                        hide();
+                         refresh();
+                    }
+                    else
+                    {
+                        SC.say("you have to select at least one physical parameters."); 
+                    }
+                    
                 }
 
             }
