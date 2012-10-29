@@ -339,9 +339,9 @@ public class ModelBusiness {
         //copy additional file
         if (addfiles.size() > 0) {
             for (String file : addfiles) {
-                copyFile(rootDirectory + file, zipdir + file);
-                files.add(new File(zipdir + file));
-                System.out.println("filex added :" + zipdir + file);
+                copyFile(rootDirectory + file, zipdir + "/"  + file);
+                files.add(new File(zipdir + "/"+ file));
+                System.out.println("filex added :" + zipdir +"/" + file);
             }
         }
         //copy rdf.
