@@ -58,6 +58,8 @@ import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import java.io.File;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -656,7 +658,8 @@ public class WorkflowBusiness {
         if (path.startsWith(Server.getInstance().getDataManagerUsersHome())) {
 
             path = path.replace(Server.getInstance().getDataManagerUsersHome() + "/", "");
-            if (!path.startsWith(user.replaceAll(" ", "_").toLowerCase())) {
+            String cleanName = Normalizer.normalize(user.replaceAll(" ", "_").toLowerCase(),Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+            if (!path.startsWith(cleanName)) {
 
                 logger.error("User '" + user + "' tried to access data from another user: " + path + "");
                 throw new fr.insalyon.creatis.vip.core.server.business.BusinessException("Access denied to another user's home.");
