@@ -583,47 +583,21 @@ public class ModelCreateDialog extends Window {
         // search part
         searchText = new TextItem();
         searchText.setWidth(400);
-        searchText.setTitle("<nobr><b>Please, search the corresponding semantic term(s) for the object.</nobr></b>");
+        searchText.setTitle("<nobr><b>Associate object name(s) to the file.</nobr></b>");
         searchText.setTitleOrientation(TitleOrientation.TOP);
         searchText.setValue(filename.substring(0, filename.lastIndexOf(".")));
+        search();
         ButtonItem searchBt = new ButtonItem();
         searchBt.setTitle("Search");
-        searchBt.setTooltip("search throught the VIP ontology the nearest term");
+        searchBt.setTooltip("Search in OntoVIP");
         searchBt.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
-
-                boolean[] scope = new boolean[]{anaCheck.getValueAsBoolean(), pathoCheck.getValueAsBoolean(),
-                    geoCheck.getValueAsBoolean(), forCheck.getValueAsBoolean(), exCheck.getValueAsBoolean()};
-                String toSearch = searchText.getValueAsString();
+                search();
                 
-                if (toSearch == null || toSearch.isEmpty()) {
-                    Layout.getInstance().setWarningMessage("Can't search in the ontology.Please add a term.");
-                } else {
-                    AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
-
-                        public void onFailure(Throwable caught) {
-                            Layout.getInstance().setWarningMessage("Cant search through the ontology");
-                        }
-
-                        public void onSuccess(List<String[]> result) {
-                            int i = 0;
-                            if (type == 0) {
-                                for (Record rec : resultTreeGrid.getRecords()) {
-                                    resultTreeGrid.removeData(rec);
-                                }
-                            }
-                            resultData = new SearchTreeNode[result.size()];
-
-                            for (String[] ii : result) {
-                                resultTreeGrid.addData(new SearchTreeNode(ii[0], ii[1], ii[2]));
-                            }
-                        }
-                    };
-                    toSearch += "~";
-                    ms.searchWithScope(toSearch, scope, callback);
-                }
             }
+
+           
         });
 
         FormItemIcon icon = new FormItemIcon();
@@ -770,4 +744,36 @@ public class ModelCreateDialog extends Window {
             setAttribute("label", label);
         }
     }
+     private void search() {
+                boolean[] scope = new boolean[]{anaCheck.getValueAsBoolean(), pathoCheck.getValueAsBoolean(),
+                    geoCheck.getValueAsBoolean(), forCheck.getValueAsBoolean(), exCheck.getValueAsBoolean()};
+                String toSearch = searchText.getValueAsString();
+                
+                if (toSearch == null || toSearch.isEmpty()) {
+                    Layout.getInstance().setWarningMessage("Can't search in the ontology.Please add a term.");
+                } else {
+                    AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
+
+                        public void onFailure(Throwable caught) {
+                            Layout.getInstance().setWarningMessage("Cant search through the ontology");
+                        }
+
+                        public void onSuccess(List<String[]> result) {
+                            int i = 0;
+                            if (type == 0) {
+                                for (Record rec : resultTreeGrid.getRecords()) {
+                                    resultTreeGrid.removeData(rec);
+                                }
+                            }
+                            resultData = new SearchTreeNode[result.size()];
+
+                            for (String[] ii : result) {
+                                resultTreeGrid.addData(new SearchTreeNode(ii[0], ii[1], ii[2]));
+                            }
+                        }
+                    };
+                    toSearch += "~";
+                    ms.searchWithScope(toSearch, scope, callback);
+                }
+            }
 }

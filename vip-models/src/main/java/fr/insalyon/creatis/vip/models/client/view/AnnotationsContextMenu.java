@@ -10,14 +10,10 @@ import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Instant;
-import com.smartgwt.client.widgets.tree.TreeNode;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Instant;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.models.client.ModelConstants;
-import fr.insalyon.creatis.vip.models.client.view.ModelTreeGrid.ModelTreeNode;
 
 /**
  *
