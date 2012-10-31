@@ -74,6 +74,7 @@ public class Main implements EntryPoint {
         modulesInit.add(new SimulationGUIModule());
         modulesInit.add(new ApplicationModule());
         modulesInit.add(new GateLabModule());
+      //  modulesInit.add(new SimulatedDataModule());
         // End-Modules
 
         final String ticket = Window.Location.getParameter("ticket");

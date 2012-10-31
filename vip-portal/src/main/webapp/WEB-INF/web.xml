@@ -127,6 +127,17 @@
     </servlet-mapping>
     <!-- End Models Module -->
      
+       <!-- SimulatedData Module -->
+    <servlet>
+        <servlet-name>SimulatedDataService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.simulatedata.server.rpc.SimulatedDataServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SimulatedDataService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/simulateddataservice</url-pattern>
+    </servlet-mapping>
+    <!-- End SimulatedData Module -->
+     
      <!-- Models Module -->
     <servlet>
         <servlet-name>VTKController</servlet-name>

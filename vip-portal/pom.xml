@@ -5,7 +5,7 @@
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>0.8.8</version>
+        <version>0.8.9</version>
         <relativePath>..</relativePath>
     </parent>
     <groupId>fr.insalyon.creatis</groupId>
@@ -87,6 +87,12 @@
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-models</artifactId>
             <version>${vip.models.version}</version>
+        </dependency>
+        
+               <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-simulated-data</artifactId>
+            <version>${vip.simulated-data.version}</version>
         </dependency>
 
         <dependency>
