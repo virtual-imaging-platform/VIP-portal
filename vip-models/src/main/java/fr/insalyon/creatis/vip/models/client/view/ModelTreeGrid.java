@@ -256,6 +256,7 @@ public class ModelTreeGrid extends TreeGrid {
                 {}
                 dg.addInfo(typeDropped(dropname), tpSelected, insSelected, event.getNodes()[0].getAttribute("FileName"));
                 dg.show();
+                dg.search();
                 event.cancel();
 
             }
@@ -323,7 +324,7 @@ public class ModelTreeGrid extends TreeGrid {
        
     public void setModelName(String name) {
         nwName = name;
-        tfg.setPrompt("model name changed. You need to commit to record the modification.");
+        tfg.setPrompt("Model name changed. You need to commit to record the modification.");
         tfg.setTitle(nwName);
         // tricks to display new name. Firevent seems not to work.
         bmodif = true;

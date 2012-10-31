@@ -51,7 +51,9 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import fr.insalyon.creatis.vip.models.client.view.ModelException;
 import java.io.*;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -482,11 +484,15 @@ public class ModelBusiness {
         }
     }
 
-    public SimulationObjectModel setStorageUrl(SimulationObjectModel som, String url) {
+    public SimulationObjectModel setStorageUrl(SimulationObjectModel som, String url) throws ModelException {
         System.out.println("url" + url);
         //   System.out.println("URI " + som.getURI());
         som.setStorageURL(url);
-        SimulationObjectModelFactory.setStorageURL(som, url);
+        try {
+            SimulationObjectModelFactory.setStorageURL(som, URLEncoder.encode( url , "UTF8" ));
+        } catch (UnsupportedEncodingException ex) {
+            throw new ModelException(ex);
+        }
         return som;
     }
 

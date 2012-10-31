@@ -128,7 +128,7 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
     }
 
-    public SimulationObjectModel setStorageUrl(SimulationObjectModel som, String url) {
+    public SimulationObjectModel setStorageUrl(SimulationObjectModel som, String url) throws ModelException {
         return modelBusiness.setStorageUrl(som, url);
     }
 

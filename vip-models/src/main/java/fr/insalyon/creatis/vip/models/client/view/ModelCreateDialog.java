@@ -87,7 +87,7 @@ public class ModelCreateDialog extends Window {
     private TreeGrid resultTG = null;
     private Logger logger = null;
     DynamicForm validateForm = null;
-    private static final String HELPTEXT = "<br><b>Term : </b> Clicking the button search," 
+    private static final String HELPTEXT = "<br><b>Term : </b> Clicking the button search,"
             + "it allows to search the specified term"
             + " and after to select the wanted value in grid results."
             + "<br><br><b>Ontology : </b> the search will be performed through the Ontology"
@@ -95,17 +95,14 @@ public class ModelCreateDialog extends Window {
             + "<br><br><b>Search : </b>For meshes object, a new search will remove the previous search."
             + "For voxels object, the previous search  is not removed by the fact user can select different terms"
             + " represented by one organ. But only one type of layer is allowed by object.";
-    
-    
-    
     private static final String PRIORITYTEXT = "<br><b>Priority : </b>"
             + " the priority value is for the flattening. This ordering"
-            +"is based on a rough layer priority guess assuming that geometry"
-            +"and anatomy are always superseded by pathology that"
-            +"is in turn overlaid by external bodies and foreign agents."
-            +" The values are between 1 and 4. 1 is the default value and"
+            + "is based on a rough layer priority guess assuming that geometry"
+            + "and anatomy are always superseded by pathology that"
+            + "is in turn overlaid by external bodies and foreign agents."
+            + " The values are between 1 and 4. 1 is the default value and"
             + " 4 the high value."
-            +" <br>By default, the priority is set to 1. To change it, edit the value.";
+            + " <br>By default, the priority is set to 1. To change it, edit the value.";
 
     public ModelCreateDialog(ModelTreeGrid treegrid) {
         ms = ModelService.Util.getInstance();
@@ -189,12 +186,11 @@ public class ModelCreateDialog extends Window {
 
                 if (type == 0 || type == 1) {
                     if (isObjectsValidated() == true) {
-                       
-                              if (addObjectItem())
-                              {
-                                    hide();
-                                    refresh();
-                              }
+
+                        if (addObjectItem()) {
+                            hide();
+                            refresh();
+                        }
 
 
                     } else {
@@ -202,17 +198,14 @@ public class ModelCreateDialog extends Window {
                     }
 
                 } else if (type == 2 || type == 3) {
-                    if(physicalCombo.getValues().length != 0)
-                    {
+                    if (physicalCombo.getValues().length != 0) {
                         tree.addPhysicalItem(tp, ins, type, filename, getLayerforLUT(), physicalCombo.getValues());
                         hide();
-                         refresh();
+                        refresh();
+                    } else {
+                        SC.say("you have to select at least one physical parameters.");
                     }
-                    else
-                    {
-                        SC.say("you have to select at least one physical parameters."); 
-                    }
-                    
+
                 }
 
             }
@@ -236,7 +229,7 @@ public class ModelCreateDialog extends Window {
 
     private boolean addVoxelsItem() {
 
-  
+
         boolean bmix = true;
         for (ListGridRecord rd : resultTG.getSelectedRecords()) {
             if (rd.getAttributeAsString("type") != resultTG.getSelectedRecords()[0].getAttributeAsString("type")) {
@@ -261,7 +254,7 @@ public class ModelCreateDialog extends Window {
         int label;
         ListGridRecord[] records = resultTG.getSelectedRecords();
         for (ListGridRecord rd : records) {
-        String slabel = rd.getAttribute("priority");
+            String slabel = rd.getAttribute("priority");
             label = 1;
             if (slabel != null) {
                 label = Integer.parseInt(slabel);
@@ -459,7 +452,7 @@ public class ModelCreateDialog extends Window {
         selectFileLabel.setHeight(20);
         selectFileLabel.setBackgroundColor("#F2F2F2");
         this.addItem(selectFileLabel);
-        
+
         LinkedHashMap<String, String> lutMap = new LinkedHashMap<String, String>();
         for (String lut : tree.getLutMap()) {
             lutMap.put(lut, lut);
@@ -482,7 +475,7 @@ public class ModelCreateDialog extends Window {
         selectLayerLabel.setHeight(20);
         selectLayerLabel.setBackgroundColor("#F2F2F2");
         this.addItem(selectLayerLabel);
-        
+
         LinkedHashMap<String, String> layerMap = new LinkedHashMap<String, String>();
         layerMap.put("Anatomy", "Anatomy");
         layerMap.put("Pathology", "Pathology");
@@ -565,14 +558,14 @@ public class ModelCreateDialog extends Window {
     }
 
     public void initObjectForms() {
-        
+
         selectFileLabel = new Label("<b>Select file type</b>");
         selectFileLabel.setAlign(Alignment.LEFT);
         selectFileLabel.setWidth100();
         selectFileLabel.setHeight(20);
         selectFileLabel.setBackgroundColor("#F2F2F2");
         this.addItem(selectFileLabel);
-        
+
         extensionForm = new DynamicForm();
         extensionForm.setFields(typeRadio);
         this.addItem(extensionForm);
@@ -586,7 +579,6 @@ public class ModelCreateDialog extends Window {
         searchText.setTitle("<nobr><b>Associate object name(s) to the file.</nobr></b>");
         searchText.setTitleOrientation(TitleOrientation.TOP);
         searchText.setValue(filename.substring(0, filename.lastIndexOf(".")));
-        search();
         ButtonItem searchBt = new ButtonItem();
         searchBt.setTitle("Search");
         searchBt.setTooltip("Search in OntoVIP");
@@ -594,10 +586,8 @@ public class ModelCreateDialog extends Window {
 
             public void onClick(ClickEvent event) {
                 search();
-                
-            }
 
-           
+            }
         });
 
         FormItemIcon icon = new FormItemIcon();
@@ -621,7 +611,7 @@ public class ModelCreateDialog extends Window {
         searchFilterLabel.setBackgroundColor("#F2F2F2");
         this.addItem(searchFilterLabel);
 
-        
+
         // layer type
         anaCheck = new CheckboxItem();
         anaCheck.setValue(true);
@@ -663,6 +653,9 @@ public class ModelCreateDialog extends Window {
 
         hLayout.addMember(resultTreeGrid);
         this.addItem(hLayout);
+
+      
+
     }
 
     public static class SearchTreeNode extends TreeNode {
@@ -744,36 +737,37 @@ public class ModelCreateDialog extends Window {
             setAttribute("label", label);
         }
     }
-     private void search() {
-                boolean[] scope = new boolean[]{anaCheck.getValueAsBoolean(), pathoCheck.getValueAsBoolean(),
-                    geoCheck.getValueAsBoolean(), forCheck.getValueAsBoolean(), exCheck.getValueAsBoolean()};
-                String toSearch = searchText.getValueAsString();
-                
-                if (toSearch == null || toSearch.isEmpty()) {
-                    Layout.getInstance().setWarningMessage("Can't search in the ontology.Please add a term.");
-                } else {
-                    AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
 
-                        public void onFailure(Throwable caught) {
-                            Layout.getInstance().setWarningMessage("Cant search through the ontology");
-                        }
+    public void search() {
+        boolean[] scope = new boolean[]{anaCheck.getValueAsBoolean(), pathoCheck.getValueAsBoolean(),
+            geoCheck.getValueAsBoolean(), forCheck.getValueAsBoolean(), exCheck.getValueAsBoolean()};
+        String toSearch = searchText.getValueAsString().replaceAll("~", "");
 
-                        public void onSuccess(List<String[]> result) {
-                            int i = 0;
-                            if (type == 0) {
-                                for (Record rec : resultTreeGrid.getRecords()) {
-                                    resultTreeGrid.removeData(rec);
-                                }
-                            }
-                            resultData = new SearchTreeNode[result.size()];
+        if (toSearch == null || toSearch.isEmpty()) {
+            Layout.getInstance().setWarningMessage("Can't search in the ontology.Please add a term.");
+        } else {
+            AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
 
-                            for (String[] ii : result) {
-                                resultTreeGrid.addData(new SearchTreeNode(ii[0], ii[1], ii[2]));
-                            }
-                        }
-                    };
-                    toSearch += "~";
-                    ms.searchWithScope(toSearch, scope, callback);
+                public void onFailure(Throwable caught) {
+                    Layout.getInstance().setWarningMessage("Cant search through the ontology");
                 }
-            }
+
+                public void onSuccess(List<String[]> result) {
+                    int i = 0;
+                    if (type == 0) {
+                        for (Record rec : resultTreeGrid.getRecords()) {
+                            resultTreeGrid.removeData(rec);
+                        }
+                    }
+                    resultData = new SearchTreeNode[result.size()];
+
+                    for (String[] ii : result) {
+                        resultTreeGrid.addData(new SearchTreeNode(ii[0], ii[1], ii[2]));
+                    }
+                }
+            };
+            toSearch += "~";
+            ms.searchWithScope(toSearch, scope, callback);
+        }
+    }
 }
