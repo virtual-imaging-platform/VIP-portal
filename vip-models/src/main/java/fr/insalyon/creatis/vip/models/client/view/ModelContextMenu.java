@@ -23,6 +23,7 @@ import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 
 import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIConstants;
 import fr.insalyon.creatis.vip.simulationgui.client.view.SimulationGUITab;
+
 /**
  *
  * @author glatard
@@ -33,11 +34,11 @@ class ModelContextMenu extends Menu {
     private String modelURI;
     private String modelName;
 
-    public ModelContextMenu(ModalWindow modal, String uri,  String title, boolean bdelete, final boolean test) {
+    public ModelContextMenu(ModalWindow modal, String uri, String title, boolean bdelete, final boolean test) {
         this.modal = modal;
         this.modelURI = uri;
         this.modelName = title;
-    
+
         this.setShowShadow(true);
         this.setShadowDepth(10);
         this.setWidth(90);
@@ -48,7 +49,7 @@ class ModelContextMenu extends Menu {
 
             public void onClick(MenuItemClickEvent event) {
                 SC.confirm("Do you really want to delete model "
-                        + modelName+"?", new BooleanCallback() {
+                        + modelName + "?", new BooleanCallback() {
 
                     public void execute(Boolean value) {
                         if (value != null && value) {
@@ -58,37 +59,37 @@ class ModelContextMenu extends Menu {
                 });
             }
         });
-        
-        
+
+
         MenuItem viewItem = new MenuItem("View model annotations");
         viewItem.setIcon(ApplicationConstants.ICON_SIMULATION_VIEW);
         viewItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new ModelDisplayTab(modelURI,modelName,test,false));
+                Layout.getInstance().addTab(new ModelDisplayTab(modelURI, modelName, test, false));
             }
         });
-        
+
         MenuItem modifyItem = new MenuItem("Modify model");
         modifyItem.setIcon(ApplicationConstants.ICON_SIMULATION_VIEW);
         modifyItem.setEnabled(true);
         modifyItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                     Layout.getInstance().addTab(new ModelImportTab(false, modelName, modelURI,test));
+                Layout.getInstance().addTab(new ModelImportTab(false, modelName, modelURI, test));
             }
         });
-        
+
         MenuItem SimulationItem = new MenuItem("Launch simulation GUI");
         SimulationItem.setIcon(SimulationGUIConstants.APP_IMG_EDITOR);
         SimulationItem.setEnabled(true);
         SimulationItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                      Layout.getInstance().addTab(new SimulationGUITab(modelURI.toString(), null,test));
+                Layout.getInstance().addTab(new SimulationGUITab(modelURI.toString(), null, test));
             }
-        });      
-        
+        });
+
         MenuItem downloadItem = new MenuItem("Download model");
         downloadItem.setIcon(DataManagerConstants.ICON_DOWNLOAD);
         downloadItem.setEnabled(true);
@@ -96,43 +97,45 @@ class ModelContextMenu extends Menu {
 
             @Override
             public void onClick(MenuItemClickEvent event) {
-               downloadModel(modelURI,test);
+                downloadModel(modelURI, test);
             }
         });
-        
-        if(bdelete)
-            this.setItems(viewItem, deleteItem, SimulationItem,downloadItem);
-        else
+
+        if (bdelete) {
+            this.setItems(viewItem, deleteItem, SimulationItem, downloadItem);
+        } else {
             this.setItems(viewItem, SimulationItem, downloadItem);
+        }
     }
-  
-    private void downloadModel(String modelURI, boolean test){
-   
+
+    private void downloadModel(String modelURI, boolean test) {
+
         final ModelServiceAsync ms = ModelService.Util.getInstance();
-        AsyncCallback<String> cb1 = new AsyncCallback<String>(){
+        AsyncCallback<String> cb1 = new AsyncCallback<String>() {
 
             public void onFailure(Throwable caught) {
-            Layout.getInstance().setWarningMessage("Cannot get model storage URL");
+                Layout.getInstance().setWarningMessage("Cannot get model storage URL");
             }
 
             public void onSuccess(String modelURL) {
-                  Layout.getInstance().setNoticeMessage("Added model to the transfer pool");
-                    
-                    ModelDisplay.downloadModel(modelURL);
+                Layout.getInstance().setNoticeMessage("Added model to the transfer pool");
+
+                ModelDisplay.downloadModel(modelURL);
+            }
+        ;
         };
-        };
-        ms.getStorageURL(modelURI, test, cb1);  
-        
-       
-    
+        ms.getStorageURL(modelURI, test, cb1);
+
+
+
     }
-    
+
     private void deleteModel(final boolean test) {
         final ModelServiceAsync ms = ModelService.Util.getInstance();
-        AsyncCallback<String> cb1 = new AsyncCallback<String>(){
+        AsyncCallback<String> cb1 = new AsyncCallback<String>() {
 
             public void onFailure(Throwable caught) {
-            Layout.getInstance().setWarningMessage("Cannot get model storage URL");
+                Layout.getInstance().setWarningMessage("Cannot get model storage URL");
             }
 
             public void onSuccess(String modelURL) {
@@ -144,30 +147,31 @@ class ModelContextMenu extends Menu {
                     }
 
                     public void onSuccess(Void result) {
-                       Layout.getInstance().setNoticeMessage("Deleted model files.");
-                        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-                            public void onFailure(Throwable caught) {
-                                Layout.getInstance().setWarningMessage("Cannot delete model annotations (" + caught.getMessage() + ")");
-                            }
-
-                            public void onSuccess(Void result) {
-                                Layout.getInstance().setNoticeMessage("Deleted model annotations.");
-                                ModelListTab modelsTab = (ModelListTab) Layout.getInstance().getTab("model-browse-tab");
-                                if (modelsTab != null) {
-                                    modelsTab.loadModels();
-                                }
-                            }
-                        };
-
-                        ms.deleteModel(modelURI, test, callback);
+                        Layout.getInstance().setNoticeMessage("Deleted model files.");
                     }
                 };
                 dm.delete(modelURL, cb);
             }
         };
-        ms.getStorageURL(modelURI, test, cb1);  
-        
-       
+        ms.getStorageURL(modelURI, test, cb1);
+
+
+        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Cannot delete model annotations (" + caught.getMessage() + ")");
+            }
+
+            public void onSuccess(Void result) {
+                Layout.getInstance().setNoticeMessage("Deleted model annotations.");
+                ModelListTab modelsTab = (ModelListTab) Layout.getInstance().getTab("model-browse-tab");
+                if (modelsTab != null) {
+                    modelsTab.loadModels();
+                }
+            }
+        };
+
+        ms.deleteModel(modelURI, test, callback);
+
     }
 }
