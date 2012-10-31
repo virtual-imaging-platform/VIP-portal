@@ -578,7 +578,7 @@ public class ModelCreateDialog extends Window {
         searchText.setWidth(400);
         searchText.setTitle("<nobr><b>Associate object name(s) to the file.</nobr></b>");
         searchText.setTitleOrientation(TitleOrientation.TOP);
-        searchText.setValue(filename.substring(0, filename.lastIndexOf(".")));
+        searchText.setValue(filename.substring(0, filename.lastIndexOf(".")).replaceAll("_", " "));
         ButtonItem searchBt = new ButtonItem();
         searchBt.setTitle("Search");
         searchBt.setTooltip("Search in OntoVIP");
