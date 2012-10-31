@@ -278,7 +278,7 @@ public class ModelDisplay extends VLayout {
         modal.show("Uploading " + zipFile, true);
         modal.show("Committing annotations to the Triple Store", true);
         //commit rdf annotations
-
+        final String lfn = ModelConstants.MODEL_HOME +"/" + timeStamp +  zipFile;
         ModelServiceAsync ssu = ModelService.Util.getInstance();
         AsyncCallback<SimulationObjectModel> cbssu = new AsyncCallback<SimulationObjectModel>() {
 
@@ -287,13 +287,14 @@ public class ModelDisplay extends VLayout {
             }
 
             public void onSuccess(SimulationObjectModel result) {
+                Layout.getInstance().setNoticeMessage("Model storage URL set to "+lfn);
                 model = result;
                 uploadModelTTS();
             }
         };
 
        
-        String lfn = ModelConstants.MODEL_HOME +"/" + timeStamp +  zipFile;
+        
         
          model = modelTreeGrid.getModel();
         ssu.setStorageUrl(model, lfn, cbssu);

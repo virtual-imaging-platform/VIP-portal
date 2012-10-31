@@ -488,11 +488,9 @@ public class ModelBusiness {
         System.out.println("url" + url);
         //   System.out.println("URI " + som.getURI());
         som.setStorageURL(url);
-        try {
-            SimulationObjectModelFactory.setStorageURL(som, URLEncoder.encode( url , "UTF8" ));
-        } catch (UnsupportedEncodingException ex) {
-            throw new ModelException(ex);
-        }
+       
+            SimulationObjectModelFactory.setStorageURL(som, url);//.replaceAll(" ", ""));
+       
         return som;
     }
 
