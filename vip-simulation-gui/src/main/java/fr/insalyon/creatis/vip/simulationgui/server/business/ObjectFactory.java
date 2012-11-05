@@ -58,6 +58,12 @@ public class ObjectFactory {
             return null;
         }
     }
+    private static double[] initBounds()
+    {
+         double[] box = new double[6];
+         for(int i = 0; i < 6; i++) box[i] = 0;
+         return box;
+    }
 
     public static Data3D[][] buildMulti(String path, String[][] objectList, String[] type) {
 
@@ -82,44 +88,63 @@ public class ObjectFactory {
             i++;
         }
         i = 0;
-        System.out.println("got object List");
+        System.out.println("got object List " + objectList.length);
         for (String[] st : objectList) {
+             System.out.println(st);
             ArrayList<Data3D> temp = new ArrayList<Data3D>();
             for (String st1d : st) {
                 st1d = st1d.replace("[", "").replace("]", "");
-                String[] std = st1d.split("file://", -1);
-                if(std.length >2)
+                if(st1d.contains("file:"))
                 {
-                    String tmp = std[2].replace(",", "");
-                        System.out.println(tmp);
-                    if (tmp.endsWith(".zraw") || tmp.endsWith(".raw") || tmp.endsWith(".mhd")) {
-                        StringTokenizer st1dTokenize = new StringTokenizer(tmp);
-                        temp.add(addMHD(path, st1dTokenize.nextToken(","), type[i]));
-                        bbound[i] = true;
+                    String[] std = st1d.split("file://", -1);
+                    if(std.length >2)
+                    {
+                        String tmp = std[2].replace(",", "");
+                            System.out.println(tmp);
+                        //if (tmp.endsWith(".zraw") || tmp.endsWith(".raw") || tmp.endsWith(".mhd")) {
+                             if (tmp.endsWith(".mhd")) {
+                            StringTokenizer st1dTokenize = new StringTokenizer(tmp);
+                            temp.add(addMHD(path, st1dTokenize.nextToken(","), type[i]));
+                            bbound[i] = true;
+                        }
                     }
                 }
+                else
+                {
+                    String tmp = st1d.replace(",", "");
+                            System.out.println("no file: tag for " + tmp);
+                        if (tmp.endsWith(".zraw") || tmp.endsWith(".raw") || tmp.endsWith(".mhd")) {
+                            StringTokenizer st1dTokenize = new StringTokenizer(tmp);
+                            temp.add(addMHD(path, st1dTokenize.nextToken(","), type[i]));
+                            bbound[i] = true;
+                     }
+                }
             }
+                    System.out.println("bounding box to do");
             
             double[] box = new double[6];
-            for(Data3D d : temp)
+            if(temp.size() != 0)
             {
-                double[] bound_temp = d.getBoundingBox();
-                if(bound_temp[0]< box[0])
-                    box[0] = bound_temp[0];
-                if(bound_temp[1]> box[1])
-                    box[1] = bound_temp[1];
-                if(bound_temp[2]< box[2])
-                    box[2] = bound_temp[2];
-                if(bound_temp[3]> box[3])
-                    box[3] = bound_temp[3];
-                if(bound_temp[4]< box[4])
-                    box[4] = bound_temp[4];
-                if(bound_temp[5]> box[5])
-                    box[5] = bound_temp[5];
+                for(Data3D d : temp)
+                {
+                    double[] bound_temp = d.getBoundingBox();
+                    if(bound_temp[0]< box[0])
+                        box[0] = bound_temp[0];
+                    if(bound_temp[1]> box[1])
+                        box[1] = bound_temp[1];
+                    if(bound_temp[2]< box[2])
+                        box[2] = bound_temp[2];
+                    if(bound_temp[3]> box[3])
+                        box[3] = bound_temp[3];
+                    if(bound_temp[4]< box[4])
+                        box[4] = bound_temp[4];
+                    if(bound_temp[5]> box[5])
+                        box[5] = bound_temp[5];
+                }
+                objectTab[i][0] = temp.get(0);
+                objectTab[i][0].setBoundingBox(box);
+                i++;
             }
-            objectTab[i][0] = temp.get(0);
-            objectTab[i][0].setBoundingBox(box);
-            i++;
         }
         i = 0;
         System.out.println("bounding box done");
@@ -127,11 +152,25 @@ public class ObjectFactory {
             j = 1;
             
             for (String st2d : st2) {
+                if(st2d.contains("file://")){
+            
                 String tmp = st2d.replace("[", "").replace("]", "").replace("file://","");
                 if (tmp.endsWith(".vtp") || tmp.endsWith(".vtk")) {
                     System.out.println("object" + i + " " + j + " created");
                     objectTab[i][j] = addVTP(path, tmp, type[i], objectTab[i][0].getBoundingBox(), bbound[i]);
                     j++;
+                }
+                }
+                else
+                {
+                    String tmp = st2d.replace("[", "").replace("]", "");
+                            System.out.println("no file: tag for " + tmp);
+                        if (tmp.endsWith(".vtp") || tmp.endsWith(".vtk")) {
+                                        System.out.println("object" + i + " " + j + " created");
+                    objectTab[i][j] = addVTP(path, tmp, type[i], initBounds(), bbound[i]);
+                     System.out.println("object" + i + " " + j + " created");
+                    j++;
+                }
                 }
             }
             
@@ -219,12 +258,13 @@ public class ObjectFactory {
         float xgravit = 0;
         float ygravit = 0;
         float zgravit = 0;
-
+       System.out.println(path + " " + name + " " +type + " ");
         Data3D object = new Data3D(name);
         object.setType(type);
-
+   System.out.println(" pass 0 ");
         VTKEmulator DATA = new VTKEmulator(path + "/" + name);
-        System.out.println(path + " " + name + " " +type + " ");
+
+         System.out.println(" pass 1 " + DATA.getThereIsAnError());
         if (!DATA.getThereIsAnError()) {
             // if a mhd image is associated, we take the corresponding bounds
             //System.out.println(i + " x:" + vertex[i]+" y:"+ vertex[i + 1]+ " z:"+vertex[i + 2]);
@@ -242,14 +282,17 @@ public class ObjectFactory {
             }
             else
             {
-                bounds = new double[6];
+                  System.out.println(" pass 1 ");
+               // bounds = new double[6];
             }
+               System.out.println(" pass 1 ");
 
             Random r = new Random();
             float R = r.nextFloat();//Returns random float >= 0.0 and < 1.0
             float G = r.nextFloat();
             float B = r.nextFloat();
             int pointOfTriangle = 0;
+               System.out.println(" pass 12 ");
             for (int c = 0; c < DATA.getNumberOfPolys(); c++) {
                 if (DATA.getLinesOfPolys(c)[0] == 3) {
                     pointOfTriangle += 3; // 1 triangles => 3 points  
@@ -257,11 +300,11 @@ public class ObjectFactory {
                     pointOfTriangle += 6; // 2 triangles => 6 points
                 }
             }
-
+   System.out.println(" pass 1 ");
             float[] vertex = new float[DATA.getNumberOfPoints() * 3]; // 3 données par points !
             int[] indices = new int[pointOfTriangle]; // 3 données par lignes
             float[] colors = new float[DATA.getNumberOfPoints() * 4]; // 4 données par lignes : RGB et DETH
-
+System.out.println(" pass 2 ");
             int j = 0; // compteur
             // indices parsor
             for (int c = 0; c < DATA.getNumberOfPolys(); c++) {
@@ -287,7 +330,7 @@ public class ObjectFactory {
                     j++;
                 }
             }
-
+System.out.println(" pass 3 ");
             // vertex parsor
             j = 0;
             System.out.println(DATA.getNumberOfPoints());
@@ -306,7 +349,7 @@ public class ObjectFactory {
                 colors[i + 3] = 1.0f;
             }
             bounds = DATA.getBounds();
-
+System.out.println(" pass 4 ");
             // if no mhd image is associated, the bounds are coming from mesh bounds.
             bounds[0] = bounds[0] - xgravit;
             bounds[1] = bounds[1] - xgravit;

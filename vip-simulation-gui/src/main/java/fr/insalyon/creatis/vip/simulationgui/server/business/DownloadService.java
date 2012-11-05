@@ -207,6 +207,7 @@ public class DownloadService {
         for (ObjectLayer ol : it.getObjectLayers()) {
             entry[index] = new String[ol.getLayerParts().size()];
             type[index] = ol.getType().toString();
+             System.out.println(ol.getType().toString());
             int i = 0;
             for (ObjectLayerPart olp : ol.getLayerParts()) {
                 entry[index][i] = olp.getFileNames().toString();
