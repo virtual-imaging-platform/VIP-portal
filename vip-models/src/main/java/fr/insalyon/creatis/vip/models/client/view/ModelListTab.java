@@ -140,7 +140,7 @@ public class ModelListTab extends Tab {
                 Layout.getInstance().addTab(new ModelImportTab(true, "Import model","",test));
             }
         });
-        //toolStrip.addButton(addButton);
+        toolStrip.addButton(addButton);
 
         ToolStripButton deleteButton = new ToolStripButton();
         deleteButton.setIcon(CoreConstants.ICON_CLEAR);

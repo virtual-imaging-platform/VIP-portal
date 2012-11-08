@@ -93,28 +93,29 @@ public class ObjectFactory {
              System.out.println(st);
             ArrayList<Data3D> temp = new ArrayList<Data3D>();
             for (String st1d : st) {
-                st1d = st1d.replace("[", "").replace("]", "");
-                if(st1d.contains("file:"))
-                {
-                    String[] std = st1d.split("file://", -1);
-                    if(std.length >2)
+                st1d = st1d.replace("[", "").replace("]", "").replace("file://","");
+                
+                if(st1d.contains(","))
                     {
-                        String tmp = std[2].replace(",", "");
-                            System.out.println(tmp);
-                        //if (tmp.endsWith(".zraw") || tmp.endsWith(".raw") || tmp.endsWith(".mhd")) {
-                             if (tmp.endsWith(".mhd")) {
+                    String[] std = st1d.split(",", -1);
+                    String tmp;
+                    if (std[0].endsWith(".mhd"))
+                        tmp = std[0];
+                    else
+                        tmp = std[1];
+                     tmp = tmp.replace(" ", "");
+                        if (tmp.endsWith(".zraw") || tmp.endsWith(".raw") || tmp.endsWith(".mhd")) {
+                        
                             StringTokenizer st1dTokenize = new StringTokenizer(tmp);
                             temp.add(addMHD(path, st1dTokenize.nextToken(","), type[i]));
                             bbound[i] = true;
                         }
                     }
-                }
                 else
                 {
-                    String tmp = st1d.replace(",", "");
-                            System.out.println("no file: tag for " + tmp);
-                        if (tmp.endsWith(".zraw") || tmp.endsWith(".raw") || tmp.endsWith(".mhd")) {
-                            StringTokenizer st1dTokenize = new StringTokenizer(tmp);
+                   
+                if (st1d.endsWith(".zraw") || st1d.endsWith(".raw") || st1d.endsWith(".mhd")) {
+                    StringTokenizer st1dTokenize = new StringTokenizer(st1d);
                             temp.add(addMHD(path, st1dTokenize.nextToken(","), type[i]));
                             bbound[i] = true;
                      }
@@ -212,6 +213,7 @@ public class ObjectFactory {
         
         for(Data3D data : DATA)
         {
+            if (data != null)
             for(i = 0, j = 1; i <6; i+=2, j+=2)
             {
                 if(box[i] < data.getBoundingBox()[i])
@@ -236,6 +238,8 @@ public class ObjectFactory {
         
         for(Data3D data : DATA)
         {
+            if(data != null)
+            {
             // set the associated bounding box of data
             double[] bounds = data.getBoundingBox();
             for(int i = 0; i < 6; i++)
@@ -251,6 +255,7 @@ public class ObjectFactory {
             data.setBoundingBox(bounds);
             data.setLenghtInfo(l);
         }
+    }
     }
     
     private static Data3D addVTP(String path, String name, String type, double[] bounds, boolean bbound) {

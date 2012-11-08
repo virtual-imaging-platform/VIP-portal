@@ -299,7 +299,7 @@ public class ModelBusiness {
 
         if(zipFile.length() != 0)
         {
-        ZipInputStream zin = new ZipInputStream(new FileInputStream(zipdir + zipName));
+        ZipInputStream zin = new ZipInputStream(new FileInputStream(zipdir + "/"+  zipName));
 
 
         ZipEntry entry = zin.getNextEntry();
