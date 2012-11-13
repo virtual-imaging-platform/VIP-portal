@@ -48,7 +48,6 @@ public class SimulationTab extends AbstractSimulationTab {
     private SummaryTab summaryTab;
     private ChartsTab chartsTab;
     private LogsTab logsTab;
-    private SemanticTab semanticTab;
 
     public SimulationTab(String simulationID, String simulationName, SimulationStatus status) {
         
@@ -65,10 +64,6 @@ public class SimulationTab extends AbstractSimulationTab {
         if (CoreModule.user.isSystemAdministrator()) {
             logsTab = new LogsTab(simulationID);
             tabSet.addTab(logsTab);
-        }
-        if(CoreModule.user.hasGroupAccess("Semantics")){
-            semanticTab = new SemanticTab(simulationID);
-            tabSet.addTab(semanticTab);
         }
     }
 

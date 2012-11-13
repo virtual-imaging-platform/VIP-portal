@@ -60,7 +60,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
-//import fr.cnrs.i3s.neusemstore.provenance.expsummaries.SorteoExperimentSummary;
 
 /**
  *
@@ -717,30 +716,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         return null;
     }
     
-    @Override
-    public List<ExpeSummaryTriple> getSemantics(String baseDir) throws ApplicationException {
-        List<ExpeSummaryTriple> triples = new ArrayList<ExpeSummaryTriple>();
-        
-        //check that there's a Jena dir and sem descriptor in this directory
-        String semDescriptors = Server.getInstance().getWorkflowsPath()
-                + "/"+baseDir+"/sem-descriptors";
-        String jenaDir=getJenaDirName(Server.getInstance().getWorkflowsPath()
-                + "/"+baseDir);
-        if(jenaDir == null)
-            throw new ApplicationException("Can't find any Jena dir in "+baseDir);
-        if(!(new File(semDescriptors)).isDirectory())
-            throw new ApplicationException("Can't find any sem-descriptors dir in "+baseDir);
-        
-       // SorteoExperimentSummary expeSummary = new SorteoExperimentSummary();
-       // List<fr.cnrs.i3s.neusemstore.provenance.expsummaries.dto.ExpeSummaryTriple> triples_neu = expeSummary.generateSummaryBeans(semDescriptors,Server.getInstance().getWorkflowsPath()
-       //         + "/"+baseDir+"/"+jenaDir);
-       
-       // for (fr.cnrs.i3s.neusemstore.provenance.expsummaries.dto.ExpeSummaryTriple nt : triples_neu){
-       //    triples.add(new ExpeSummaryTriple(new ExpeSummaryEntity(nt.getSubject().getUri(),nt.getSubject().getLabel()), new ExpeSummaryEntity(nt.getPredicate().getUri(),nt.getPredicate().getLabel()),new ExpeSummaryEntity(nt.getObject().getUri(),nt.getObject().getLabel())));
-       // }
-        return triples;
-
-    }
     
     private String cleanse(String s) throws DataManagerException{
         if(s.startsWith("lfn://") || s.startsWith("/grid"))
