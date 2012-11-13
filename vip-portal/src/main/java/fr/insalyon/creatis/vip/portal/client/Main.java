@@ -51,6 +51,7 @@ import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
 import fr.insalyon.creatis.vip.docs.client.DocsModule;
 import fr.insalyon.creatis.vip.gatelab.client.GateLabModule;
 import fr.insalyon.creatis.vip.models.client.ModelModule;
+import fr.insalyon.creatis.vip.simulatedata.client.SimulatedDataModule;
 import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIModule;
 import fr.insalyon.creatis.vip.social.client.SocialModule;
 
@@ -74,7 +75,7 @@ public class Main implements EntryPoint {
         modulesInit.add(new SimulationGUIModule());
         modulesInit.add(new ApplicationModule());
         modulesInit.add(new GateLabModule());
-      //  modulesInit.add(new SimulatedDataModule());
+        modulesInit.add(new SimulatedDataModule());
         // End-Modules
 
         final String ticket = Window.Location.getParameter("ticket");
