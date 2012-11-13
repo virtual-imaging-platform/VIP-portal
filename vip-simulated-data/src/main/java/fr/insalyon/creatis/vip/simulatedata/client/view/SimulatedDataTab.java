@@ -4,11 +4,17 @@
  */
 package fr.insalyon.creatis.vip.simulatedata.client.view;
 
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.simulatedata.client.SimulatedDataConstants;
@@ -48,6 +54,21 @@ public class SimulatedDataTab extends Tab {
         ct = new SimulatedDataGrid("CT");
         mri = new SimulatedDataGrid("MRI");
 
+        ToolStrip toolStrip = new ToolStrip();
+        toolStrip.setWidth100();
+
+        ToolStripButton refreshButton = new ToolStripButton();
+        refreshButton.setIcon(CoreConstants.ICON_REFRESH);
+        refreshButton.setTitle("Refresh");
+        
+        refreshButton.addClickHandler(new ClickHandler() {
+            public void onClick(ClickEvent event) { 
+                loadData();
+            }
+        });
+        toolStrip.addButton(refreshButton);
+        
+        vLayout.addMember(toolStrip);
         vLayout.addMember(pet);
         vLayout.addMember(us);
         vLayout.addMember(ct);

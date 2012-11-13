@@ -5,12 +5,15 @@
 package fr.insalyon.creatis.vip.simulatedata.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import java.util.Date;
 
 /**
  *
  * @author glatard
  */
 public class SimulatedData implements IsSerializable {
+
+   
 
     public enum Modality {
 
@@ -22,7 +25,8 @@ public class SimulatedData implements IsSerializable {
     private String parameters;
     private String model;
     private String simulation;
-
+    private Date date;
+    
     public SimulatedData() {
     }
 
@@ -50,7 +54,12 @@ public class SimulatedData implements IsSerializable {
         }
         return null;
     }
-
+    public void setDate(Date date) {
+        this.date = date;
+    }
+    public Date getDate(){
+         return date;
+    }
     public String getFile() {
         return file;
     }

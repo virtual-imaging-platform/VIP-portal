@@ -5,6 +5,7 @@
 package fr.insalyon.creatis.vip.simulatedata.client;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import java.util.Date;
 
 /**
  *
@@ -15,7 +16,7 @@ public class SimulatedDataRecord extends ListGridRecord {
     public SimulatedDataRecord() {
     }
     
-    public SimulatedDataRecord(String file, String type, String parameters, String model,String simulation) {
+    public SimulatedDataRecord(String file, String type, String parameters, String model,String simulation,Date date) {
         
         setAttribute("icon", "icon-file");
         setAttribute("file", file);
@@ -23,6 +24,7 @@ public class SimulatedDataRecord extends ListGridRecord {
         setAttribute("parameters", parameters);
         setAttribute("model",model);
         setAttribute("simulation",simulation);
+        setAttribute("date",date);
         
         setAttribute("short-file",file.substring(file.lastIndexOf('/')+1));
         setAttribute("short-param",parameters.substring(parameters.lastIndexOf('/')+1));

@@ -98,7 +98,6 @@ public class SimulatedDataContextMenu extends Menu{
             @Override
             public void onSuccess(String result) {
                // modal.hide();
-                OperationLayout.getInstance().
                 OperationLayout.getInstance().addOperation(result);
                 DataManagerModule.dataManagerSection.expand();
             }

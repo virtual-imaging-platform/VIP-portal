@@ -10,10 +10,14 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
+import com.smartgwt.client.widgets.grid.events.RowMouseDownEvent;
+import com.smartgwt.client.widgets.grid.events.RowMouseDownHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.viewer.DetailViewer;
 import com.smartgwt.client.widgets.viewer.DetailViewerField;
@@ -59,6 +63,20 @@ public class SimulatedDataGrid extends VLayout {
         addMember(lab);
         configureGrid();
         
+        grid.addRowMouseDownHandler(new RowMouseDownHandler() {
+
+            @Override
+            public void onRowMouseDown(RowMouseDownEvent event) {
+                  event.cancel();
+                String file = event.getRecord().getAttribute("file");
+                String parameters = event.getRecord().getAttribute("parameters");
+                String model = event.getRecord().getAttribute("model");
+                String simulation = event.getRecord().getAttribute("simulation");
+             
+                new SimulatedDataContextMenu(file,parameters,model,simulation).showContextMenu();
+            }
+        });
+        
          rowContextClickHandler = grid.addRowContextClickHandler(new RowContextClickHandler() {
             @Override
             public void onRowContextClick(RowContextClickEvent event) {
@@ -90,11 +108,12 @@ public class SimulatedDataGrid extends VLayout {
         ListGridField icoField = FieldUtil.getIconGridField("icon");
         ListGridField fileField = new ListGridField("short-file", "Simulated Data File");
         ListGridField typeField = new ListGridField("type", "Type");
-        ListGridField paramField = new ListGridField("short-param", "Derives from parameters");
-        ListGridField modelField = new ListGridField("short-model", "Derives from model");
+        ListGridField paramField = new ListGridField("short-param", "Parameters");
+        ListGridField modelField = new ListGridField("short-model", "Model");
+        ListGridField dateField = new ListGridField("date","Simulation date");
       //  ListGridField simulationField = new ListGridField("simulation", "Produced by simulation");
 
-        grid.setFields(icoField, fileField, typeField, paramField, modelField);
+        grid.setFields(icoField, fileField, typeField, paramField, modelField,dateField);
         grid.setSortField("icon");
         grid.setSortDirection(SortDirection.DESCENDING);
 
@@ -108,7 +127,7 @@ public class SimulatedDataGrid extends VLayout {
         int i = 0;
         for (SimulatedData sd : result) {
             if(sd.getModality() == m)
-                data[i++] = new SimulatedDataRecord(sd.getFile().toString(), sd.getType(), sd.getParameters().toString(), sd.getModel().toString(), sd.getSimulation());
+                data[i++] = new SimulatedDataRecord(sd.getFile().toString(), sd.getType(), sd.getParameters().toString(), sd.getModel().toString(), sd.getSimulation(),sd.getDate());
         }
         grid.setData(data);
 
