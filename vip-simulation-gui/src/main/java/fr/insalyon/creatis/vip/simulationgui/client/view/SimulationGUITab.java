@@ -288,9 +288,8 @@ public class SimulationGUITab extends Tab {
 //                                }
 //                                
 //Data3D[][] d3d = 
-                                 // SC.say("done1");
+
                                 ObjectModel.getInstance().addModel(result2);
-                             SC.say("done1");
                                 SimulationGUIControlBoxModel.getInstance().setTreeNode(result2);
                                 refreshLaunchTabValue();
                             }

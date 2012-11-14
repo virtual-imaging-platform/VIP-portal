@@ -441,9 +441,7 @@ public class ObjectModel extends Object3D {
 
     public void reconstructor() {
         makeLabel(multiModel);
-              SC.say("done4");
         model = multiparsor(multiModel);
-              SC.say("done5");
         model.enable();
         /*  float[]tmp=null;
         float[]tmp2=null;
@@ -497,7 +495,6 @@ public class ObjectModel extends Object3D {
         buildNormalsMultiModel();
         reconstructor();
         box.disable();
-        SC.say("done6");
         Data3D temp = null;
         boolean bcontinue = true;
         for (int i = 0; i < DATA.length; i++)
@@ -517,13 +514,9 @@ public class ObjectModel extends Object3D {
             }
                         
         setBoundingBox(temp.getBoundingBox());
-        SC.say("done7");
         Scene.getInstance().refreshBuffer();
-        SC.say("done8");
         Scene.getInstance().changeCameraView(temp.getBoundingBox());
-        SC.say("done9");
         Scene.getInstance().refreshScreen();
-        SC.say("done10");
         SimulationGUIControlBoxModel.getInstance().uncheckBoxBox();
      //   SC.say("Load succes ! </br> This is an example of model for the simulation gui.</br> You can open the model and the simulator controller with the check box on the top right.</br>In the model controller you have a tree of layout, in each layout you can enable/disable an object or change the color of this object with a double-click on his name");
 
