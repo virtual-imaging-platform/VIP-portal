@@ -163,6 +163,11 @@ public class ModelBusiness {
         return btest;
     }
 
+    public SimulationObjectModel setModelName (String name, SimulationObjectModel model)
+    {
+        model.setModelName(name);
+      return model;   
+    }
     private void copyFile(String srFile, String dtFile) throws FileNotFoundException, IOException {
 
         File f1 = new File(srFile);

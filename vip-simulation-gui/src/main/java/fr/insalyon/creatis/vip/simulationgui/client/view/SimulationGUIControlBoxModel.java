@@ -70,6 +70,7 @@ import fr.insalyon.creatis.vip.simulationgui.client.bean.Data3D;
 import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.Object3D;
 import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.ObjectModel;
 import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.Scene;
+import java.util.logging.Logger;
 
 /**
  *
@@ -99,7 +100,8 @@ public class SimulationGUIControlBoxModel extends Portlet {
     private HLayout hLayout1 = new HLayout();
     private HLayout hLayout2 = new HLayout();
     static private SimulationGUIControlBoxModel instance;
-
+        private Logger logger = null;
+    
     public static SimulationGUIControlBoxModel getInstance() {
 
         if (instance == null) {
@@ -109,7 +111,7 @@ public class SimulationGUIControlBoxModel extends Portlet {
     }
 
     private SimulationGUIControlBoxModel() {
-
+        logger = Logger.getLogger("Simulation-model");
         this.setTitle("Model");
 
         id = "Model";
@@ -377,34 +379,51 @@ public class SimulationGUIControlBoxModel extends Portlet {
     }
 
     public void setTreeNode(Data3D[][] DATA) {
-
+        logger.info("size data ");
+        logger.info("size data " + String.valueOf(DATA.length));
         int i = 0;
         for (Data3D[] d : DATA) {
-            i += d.length;
+            if (d != null)
+            {
+                i += d.length;
+            }
         }
         String s = " i initial : " + i;
         elementData = new TreeNode[i];
         i = 0;
 
         for (Data3D[] d : DATA) {
-            for (Data3D d1 : d) {
-                if (d1.getID().endsWith(".mhd")) {
-                    elementData[i] = new ElementTreeNode(d1.getType(), "1", d1.getType(), false);
-                    s += "/////";
-                    i++;
+            if(d != null)
+            {
+                for (Data3D d1 : d) {
+                    if(d1 != null)
+                    {
+                        if (d1.getID().endsWith(".mhd")) {
+                            elementData[i] = new ElementTreeNode(d1.getType(), "1", d1.getType(), false);
+                            s += "/////";
+                            i++;
+                        }
+                    }
                 }
             }
         }
         for (Data3D[] d : DATA) {
-            for (Data3D d1 : d) {
-                if (d1.getID().endsWith(".vtp") || d1.getID().endsWith(".vtk") ) {
-                    Canvas canvas = new Canvas();
-                    canvas.setBackgroundColor("red");
+            if(d != null)
+            { //logger.info("size data " + String.valueOf(d.length));
+                for (Data3D d1 : d) {
+                    if(d1 != null)
+                    {
+                        if (d1.getID().endsWith(".vtp") || d1.getID().endsWith(".vtk") ) {
+                            //logger.info(d1.getID());
+                            Canvas canvas = new Canvas();
+                            canvas.setBackgroundColor("red");
 
-                    elementData[i] = new ElementTreeNode(d1.getID(), d1.getType(), d1.getID(), false);
-                    elementData[i].setBackgroundComponent(canvas);
-                    s += " [" + i + "] " + " Type : " + d1.getType() + " name " + d1.getID();
-                    i++;
+                            elementData[i] = new ElementTreeNode(d1.getID(), d1.getType(), d1.getID(), false);
+                            elementData[i].setBackgroundComponent(canvas);
+                            s += " [" + i + "] " + " Type : " + d1.getType() + " name " + d1.getID();
+                            i++;
+                        }
+                    }
                 }
             }
         }

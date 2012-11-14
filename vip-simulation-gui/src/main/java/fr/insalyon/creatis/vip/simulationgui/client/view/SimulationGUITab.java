@@ -279,7 +279,18 @@ public class SimulationGUITab extends Tab {
 
                             public void onSuccess(Data3D[][] result2) {
                                 defineSceneSection.hideModal();
+                                
+//                                int length = 0;
+//                                for (Data3D[] d : result2)
+//                                {
+//                                    if( d!= null)
+//                                        length++;
+//                                }
+//                                
+//Data3D[][] d3d = 
+                                 // SC.say("done1");
                                 ObjectModel.getInstance().addModel(result2);
+                             SC.say("done1");
                                 SimulationGUIControlBoxModel.getInstance().setTreeNode(result2);
                                 refreshLaunchTabValue();
                             }

@@ -121,5 +121,7 @@ public interface ModelServiceAsync {
       public void getURLFromURI(String files, boolean test,AsyncCallback<String> asyncCallback);
       
       public void readLicense(String file, AsyncCallback<String> asyncCallback);
+      
+      public void setModelName(String name, SimulationObjectModel model, AsyncCallback<SimulationObjectModel> asyncCallback);
 }
 

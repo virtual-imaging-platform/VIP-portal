@@ -147,9 +147,13 @@ public class Scene extends Canvas {
     private void init() {
          logger = Logger.getLogger("Simulation-gui");
         createShaderProgram();
+                logger.info("init Params");
         initParams();
+                logger.info("init Buffer");
         initBuffers();
+                logger.info("init Control");
         initControls();
+                logger.info("draw");
         drawObject();
     }
 
@@ -394,8 +398,9 @@ public class Scene extends Canvas {
         // Clear the color buffer and the depth buffer
         glContext.clear(WebGLRenderingContext.COLOR_BUFFER_BIT | WebGLRenderingContext.DEPTH_BUFFER_BIT);
         for (int i = 0; i <= NUM_OBJECT; i++) {
+            
             if (object[i] != null) {
-
+   logger.info("object " + String.valueOf(i));
                 glContext.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vertexBuffer[i]);
                 glContext.vertexAttribPointer(vertexPositionAttribute[i], object[i].getItemSizeVertex(), WebGLRenderingContext.FLOAT, false, 0, 0);
                 glContext.enableVertexAttribArray(vertexPositionAttribute[i]);
@@ -462,7 +467,8 @@ public class Scene extends Canvas {
         if (shaderProgram == null || glContext.getError() != WebGLRenderingContext.NO_ERROR) {
             log("Program errror");
             throw new RuntimeException("program error");
-        }
+        }logger.info("Created fragment shader1");
+        
 
         log("Shader program created");
         glContext.attachShader(shaderProgram, vertexShader);
@@ -470,6 +476,7 @@ public class Scene extends Canvas {
         glContext.attachShader(shaderProgram, fragmentShader);
         log("fragment shader attached to shader program");
 
+   
         // Link the Shader Program
         glContext.linkProgram(shaderProgram);
         if (!glContext.getProgramParameterb(shaderProgram,

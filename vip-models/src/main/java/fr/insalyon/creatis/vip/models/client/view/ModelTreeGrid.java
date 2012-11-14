@@ -323,6 +323,18 @@ public class ModelTreeGrid extends TreeGrid {
        }
        
     public void setModelName(String name) {
+          ModelServiceAsync ms = ModelService.Util.getInstance();
+         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
+
+                public void onFailure(Throwable caught) {
+                    Layout.getInstance().setWarningMessage("Cannot change name");
+                }
+
+                public void onSuccess(SimulationObjectModel result) {
+                   
+                }
+            };
+            ms.setModelName(name,model, callback);
         nwName = name;
         tfg.setPrompt("Model name changed. You need to commit to record the modification.");
         tfg.setTitle(nwName);

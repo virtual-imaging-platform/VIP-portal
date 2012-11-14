@@ -441,7 +441,9 @@ public class ObjectModel extends Object3D {
 
     public void reconstructor() {
         makeLabel(multiModel);
+              SC.say("done4");
         model = multiparsor(multiModel);
+              SC.say("done5");
         model.enable();
         /*  float[]tmp=null;
         float[]tmp2=null;
@@ -491,15 +493,37 @@ public class ObjectModel extends Object3D {
 
         elementMap = new HashMap<String, Data3D>();
         multiModel = DATA;
-
         enableAndMapAllElement();
         buildNormalsMultiModel();
         reconstructor();
         box.disable();
-        setBoundingBox(DATA[0][0].getBoundingBox());
+        SC.say("done6");
+        Data3D temp = null;
+        boolean bcontinue = true;
+        for (int i = 0; i < DATA.length; i++)
+            if (DATA[i] != null)
+            {
+                for (int j = 0; j < DATA[i].length; j++)
+                {
+                    if(DATA[i][j] != null)
+                    {
+                        temp = DATA[i][j];
+                        bcontinue = false;
+                        break;
+                     }
+                }
+                if(!bcontinue) break;
+                
+            }
+                        
+        setBoundingBox(temp.getBoundingBox());
+        SC.say("done7");
         Scene.getInstance().refreshBuffer();
-        Scene.getInstance().changeCameraView(DATA[0][0].getBoundingBox());
+        SC.say("done8");
+        Scene.getInstance().changeCameraView(temp.getBoundingBox());
+        SC.say("done9");
         Scene.getInstance().refreshScreen();
+        SC.say("done10");
         SimulationGUIControlBoxModel.getInstance().uncheckBoxBox();
      //   SC.say("Load succes ! </br> This is an example of model for the simulation gui.</br> You can open the model and the simulator controller with the check box on the top right.</br>In the model controller you have a tree of layout, in each layout you can enable/disable an object or change the color of this object with a double-click on his name");
 
@@ -523,8 +547,10 @@ public class ObjectModel extends Object3D {
     public void buildNormalsMultiModel() {
 
         for (int f = 0; f < multiModel.length; f++) {
+            if(multiModel[f] != null)
             for (int k = 0; k < multiModel[f].length; k++) {
-                multiModel[f][k].buildNormals();
+                if(multiModel[f][k] != null)
+                    multiModel[f][k].buildNormals();
             }
         }
 
@@ -533,9 +559,13 @@ public class ObjectModel extends Object3D {
     private void enableAndMapAllElement() {
 
         for (int j = 0; j < multiModel.length; j++) {
+            if(multiModel[j] != null)
             for (int i = 0; i < multiModel[j].length; i++) {
-                multiModel[j][i].enable();
-                elementMap.put(multiModel[j][i].getID(), multiModel[j][i]);
+                if(multiModel[j][i] !=null)
+                {
+                    multiModel[j][i].enable();
+                    elementMap.put(multiModel[j][i].getID(), multiModel[j][i]);
+                }
             }
         }
     }
@@ -593,8 +623,12 @@ public class ObjectModel extends Object3D {
 
     public void unsetElement(ListGridRecord[] e) {
         for (int j = 0; j < multiModel.length; j++) {
-            for (int i = 0; i < multiModel[j].length; i++) {
-                multiModel[j][i].disable();
+            if (multiModel[j] != null)
+            {
+                for (int i = 0; i < multiModel[j].length; i++) {
+                    if (multiModel[j][i] != null)
+                        multiModel[j][i].disable();
+                }
             }
         }
 
@@ -652,19 +686,24 @@ public class ObjectModel extends Object3D {
         int size = 0;
 
         for (Data3D d[] : object) {
-
-            for (Data3D d1 : d) {
-                if (d1.isEnable() && d1.getColors() != null) {
-                    tailleC += d1.getColors().length;
+            if (object != null)
+            {
+                for (Data3D d1 : d) {
+                    if (d1 !=null)
+                    {
+                        if (d1.isEnable() && d1.getColors() != null) {
+                            tailleC += d1.getColors().length;
+                        }
+                        if (d1.isEnable() && d1.getVertices() != null) {
+                            tailleV += d1.getVertices().length;
+                        }
+                        if (d1.isEnable() && d1.getColors() != null) {
+                            tailleN += d1.getNormals().length;
+                        }
+                        // if(d1.isDisable()&&d1.getIndices()!=null)tailleI+=d1.getIndices().length;
+                        size++;
+                    }
                 }
-                if (d1.isEnable() && d1.getVertices() != null) {
-                    tailleV += d1.getVertices().length;
-                }
-                if (d1.isEnable() && d1.getColors() != null) {
-                    tailleN += d1.getNormals().length;
-                }
-                // if(d1.isDisable()&&d1.getIndices()!=null)tailleI+=d1.getIndices().length;
-                size++;
             }
         }
 
@@ -714,14 +753,20 @@ public class ObjectModel extends Object3D {
         transparentMap = new HashMap<Integer, Data3D>();
 
         for (Data3D[] obj : object) {
-            for (Data3D obj1 : obj) {
-                if (obj1.getAlphaInfo() == 1.0f) {
-                    opaqueMap.put(i, obj1);
-                    i++;
-                } else {
-                    //opaqueMap.put((size-j),obj1);
-                    transparentMap.put(j, obj1);
-                    j++;
+            if (obj != null)
+            {
+                for (Data3D obj1 : obj) {
+                    if (obj1 != null)
+                    {
+                        if (obj1.getAlphaInfo() == 1.0f) {
+                            opaqueMap.put(i, obj1);
+                            i++;
+                        } else {
+                            //opaqueMap.put((size-j),obj1);
+                            transparentMap.put(j, obj1);
+                            j++;
+                        }
+                    }
                 }
             }
         }

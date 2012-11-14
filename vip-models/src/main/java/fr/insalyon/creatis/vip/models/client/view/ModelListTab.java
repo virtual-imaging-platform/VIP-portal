@@ -125,7 +125,7 @@ public class ModelListTab extends Tab {
         createButton.setTooltip("Creates a new model from scratch");
         createButton.addClickHandler(new ClickHandler() {
             public void onClick(ClickEvent event) {
-                Layout.getInstance().addTab(new ModelImportTab(true, "New model","",test));
+                Layout.getInstance().addTab(new ModelImportTab(true, "New_model","",test));
             }
         });
         toolStrip.addButton(createButton);

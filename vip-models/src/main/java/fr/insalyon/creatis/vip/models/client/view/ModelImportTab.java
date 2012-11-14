@@ -173,7 +173,7 @@ class ModelImportTab extends Tab {
         this.setPane(hl);
 
         if (bTS) {
-            if(!(nameTab.isEmpty() || nameTab.equals("New model") ) || !modelURI.isEmpty())
+            if(!(nameTab.isEmpty() || nameTab.equals("New_model") ) || !modelURI.isEmpty())
             {
                 new FileUploadWindow("local", "uploadComplete").show();
             }
@@ -332,7 +332,7 @@ class ModelImportTab extends Tab {
                 setCreateObjectModel(result);
             }
         };
-        ms.createModel("New model",CoreModule.user.getFullName(),callback);
+        ms.createModel("New_model",CoreModule.user.getFullName(),callback);
     }
 
     public void setCreateObjectModel(SimulationObjectModel result) {

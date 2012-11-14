@@ -437,4 +437,9 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
 
 
     }
+    
+      public SimulationObjectModel setModelName(String name, SimulationObjectModel model)
+      {
+           return modelBusiness.setModelName(name, model);
+      }
 }

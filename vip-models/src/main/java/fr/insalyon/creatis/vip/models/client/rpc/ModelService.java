@@ -139,5 +139,7 @@ public interface ModelService extends RemoteService {
     public String getURLFromURI(String uri, boolean test);
     
     public String readLicense(String file) throws ModelException;
+    
+     public SimulationObjectModel setModelName(String name, SimulationObjectModel model);
 
 }
