@@ -84,26 +84,15 @@ public class ModelDescriptionWindow extends Window {
 
          nwdescription = despItem.getValueAsString().trim();
         if (form.validate()) {
-            if (description.equals(nwdescription)) {
-                Layout.getInstance().setWarningMessage("The specified name is the same as the original one.");
-            }
-                ModelServiceAsync ms = ModelService.Util.getInstance();
-                 final AsyncCallback<SimulationObjectModel>  callback = new AsyncCallback<SimulationObjectModel>() {
-
-                    public void onFailure(Throwable caught) {
-                      
-                        Layout.getInstance().setWarningMessage("Unable to rename");
-                    }
-
-                    public void onSuccess(SimulationObjectModel result) {
-                         Layout.getInstance().setNoticeMessage("Description changed.");
-                       
-                    }
-                };
-                ms.setDescription(modelGrid.getModel(), nwdescription, callback);
-                destroy();
-
-            } 
+                if (description.equals(nwdescription)) {
+                    Layout.getInstance().setWarningMessage("The specified name is the same as the original one.");
+                }
+                else
+                {
+                    modelGrid.setModelDescription(nwdescription);
+                    destroy();
+                }
+      } 
         
     }
 }

@@ -322,6 +322,25 @@ public class ModelTreeGrid extends TreeGrid {
            return nwName;
        }
        
+       public void setModelDescription(String description)
+       {
+            ModelServiceAsync ms = ModelService.Util.getInstance();
+                 final AsyncCallback<SimulationObjectModel>  callback = new AsyncCallback<SimulationObjectModel>() {
+
+                    public void onFailure(Throwable caught) {
+                      
+                        Layout.getInstance().setWarningMessage("Unable to rename");
+                    }
+
+                    public void onSuccess(SimulationObjectModel result) {
+                        model = result;
+                         Layout.getInstance().setNoticeMessage("Description changed.");
+                       
+                    }
+                };
+                ms.setDescription(model, description, callback);
+       }
+       
     public void setModelName(String name) {
           ModelServiceAsync ms = ModelService.Util.getInstance();
          final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {

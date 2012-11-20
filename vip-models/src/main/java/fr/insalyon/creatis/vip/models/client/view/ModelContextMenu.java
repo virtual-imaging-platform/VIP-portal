@@ -102,7 +102,7 @@ class ModelContextMenu extends Menu {
         });
 
         if (bdelete) {
-            this.setItems(viewItem, deleteItem, SimulationItem, downloadItem);
+            this.setItems(viewItem,modifyItem, deleteItem, SimulationItem, downloadItem);
         } else {
             this.setItems(viewItem, SimulationItem, downloadItem);
         }

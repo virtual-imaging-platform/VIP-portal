@@ -295,7 +295,7 @@ public class ModelBusiness {
             System.out.println("zipname :" + zipFile);
         else
             zipFile.createNewFile();
-
+        System.out.println("model :" + model.getModelDescription());
         System.out.println("zipname :" + zipFile);
         System.out.println("zipdir :" + zipdir);
         copyFile(rootDirectory + zipName, zipdir + "/"+ zipName);
@@ -679,6 +679,8 @@ public class ModelBusiness {
 
     public SimulationObjectModel renameTimepoint(SimulationObjectModel model, int tp, Date starting) {
         System.out.println("starting changed");
+        System.out.println("tp " + tp);
+        System.out.println("Date " + starting);
         ArrayList<Timepoint> tps = model.getTimepoints();
         tps.get(tp).setStartingDate(starting);
         model.setTimepoints(tps);
@@ -696,7 +698,7 @@ public class ModelBusiness {
     public SimulationObjectModel duplicateTimePoint(SimulationObjectModel objectModel, int tp) {
         ArrayList<Timepoint> tps = objectModel.getTimepoints();
         Timepoint copy = SimulationObjectModelFactory.createAndAddTimepoint(objectModel, tps.get(tp).getStartingDate());
-        timepointCopy(tps.get(tp), copy, objectModel, tp);
+        timepointDeepCopy(tps.get(tp), copy, objectModel, tp);
         tps.add(tp + 1, copy);
         objectModel.setTimepoints(tps);
         System.out.println("timepoint copied");
