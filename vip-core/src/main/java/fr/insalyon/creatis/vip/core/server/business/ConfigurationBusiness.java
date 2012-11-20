@@ -358,9 +358,11 @@ public class ConfigurationBusiness {
              country = email.substring(email.lastIndexOf('.')+1);
             }catch(NullPointerException e){}
             
+            try{
             if(CountryCode.valueOf(country) != null)
                 cc = CountryCode.valueOf(country);
-                
+            }catch(IllegalArgumentException e){logger.info("Cannot determine country from email extension "+country+": user will be mapped to Antartica");
+            }
             
             User u = new User(
                     first.trim(),
