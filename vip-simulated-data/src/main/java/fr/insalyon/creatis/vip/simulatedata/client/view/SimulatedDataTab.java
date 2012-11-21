@@ -18,7 +18,6 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.simulatedata.client.SimulatedDataConstants;
-import fr.insalyon.creatis.vip.simulatedata.client.SimulatedDataRecord;
 import fr.insalyon.creatis.vip.simulatedata.client.bean.SimulatedData;
 import fr.insalyon.creatis.vip.simulatedata.client.rpc.SimulatedDataService;
 import fr.insalyon.creatis.vip.simulatedata.client.rpc.SimulatedDataServiceAsync;

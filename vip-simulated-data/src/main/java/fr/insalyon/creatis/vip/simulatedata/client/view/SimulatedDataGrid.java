@@ -10,8 +10,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
@@ -126,8 +124,9 @@ public class SimulatedDataGrid extends VLayout {
         SimulatedDataRecord[] data = new SimulatedDataRecord[result.size()];
         int i = 0;
         for (SimulatedData sd : result) {
-            if(sd.getModality() == m)
-                data[i++] = new SimulatedDataRecord(sd.getFile().toString(), sd.getType(), sd.getParameters().toString(), sd.getModel().toString(), sd.getSimulation(),sd.getDate());
+            if(sd.getModality() == m){
+                data[i++] = new SimulatedDataRecord(sd.getFile().toString(), sd.getType(), sd.getParameters(), sd.getModels(), sd.getSimulation(),sd.getDate());
+            }
         }
         grid.setData(data);
 

@@ -81,7 +81,8 @@ public class SimulatedDataContextMenu extends Menu{
         
         MenuItemSeparator separator = new MenuItemSeparator();
 
-        this.setItems(simuItem, separator, fileItem,paramItem,modelItem);
+        this.setItems(simuItem);
+       // this.setItems(simuItem, separator, fileItem,paramItem,modelItem);
     }
     
     private void downloadFile(String path) {
