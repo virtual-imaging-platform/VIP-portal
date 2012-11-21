@@ -224,7 +224,7 @@ public class ModelListTab extends Tab {
         
         loadModels();
 
-       // layout.addMember(form);
+        layout.addMember(form);
         layout.addMember(toolStrip);
         layout.addMember(sectionStack);
 
