@@ -104,7 +104,7 @@ public interface ModelServiceAsync {
       
        public void removeObject(SimulationObjectModel model, int tp, int ins, String layer, String name,AsyncCallback<SimulationObjectModel> asyncCallback);
       
-      public void recordAddedFiles(String zipName, List<String> addFiles ,SimulationObjectModel model, String lfn, String nwName,String zipFullPath, boolean bUpload, boolean test, AsyncCallback<SimulationObjectModel> asyncCallback);
+      public void recordAddedFiles(String zipName, List<String> addFiles ,SimulationObjectModel model, String lfn,String zipFullPath, boolean bUpload, boolean test, AsyncCallback<SimulationObjectModel> asyncCallback);
       
       public void renameTimepoint(SimulationObjectModel model, int tp, Date start, AsyncCallback<SimulationObjectModel> asyncCallback);
       

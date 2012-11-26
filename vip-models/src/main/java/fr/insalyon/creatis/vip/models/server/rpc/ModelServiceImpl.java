@@ -288,13 +288,13 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
     }
 
     public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles,
-            SimulationObjectModel model, String lfn, String nwName, String zipFullPath, boolean bUpload, boolean test) throws ModelException {
+            SimulationObjectModel model, String lfn,  String zipFullPath, boolean bUpload, boolean test) throws ModelException {
 
         try {
             trace(logger, "add files to zip");
             try {
                 return modelBusiness.recordAddedFiles(zipName, addfiles, model, lfn,
-                        getSessionUser(), nwName, zipFullPath, bUpload,test);
+                        getSessionUser(),  zipFullPath, bUpload,test);
             } catch (DataManagerException ex) {
                 throw new ModelException(ex);
             }

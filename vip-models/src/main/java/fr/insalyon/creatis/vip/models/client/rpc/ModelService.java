@@ -122,7 +122,7 @@ public interface ModelService extends RemoteService {
     public SimulationObjectModel removePhysicals(SimulationObjectModel model, int tp, int ins, String layer) throws ModelException;
     
     public SimulationObjectModel recordAddedFiles(String zipName, List<String> addFiles, 
-                            SimulationObjectModel model, String lfn, String nwName, String zipFullPath, boolean bUpload, boolean test) throws ModelException;
+                            SimulationObjectModel model, String lfn,  String zipFullPath, boolean bUpload, boolean test) throws ModelException;
     
     public SimulationObjectModel renameTimepoint(SimulationObjectModel model, int tp, Date starting) throws ModelException;
     

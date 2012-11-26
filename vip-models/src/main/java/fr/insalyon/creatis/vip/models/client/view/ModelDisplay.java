@@ -354,7 +354,8 @@ public class ModelDisplay extends VLayout {
          {
             lfn +=  zipFile;
          }
-        ms.recordAddedFiles(zipFile, addFiles, model, lfn,modelTreeGrid.getModelName(), zipFullPath, mbUpload, test, callback);
+        ms.recordAddedFiles(zipFile, addFiles, model, lfn,
+                zipFullPath, mbUpload, test, callback);
     }
 
     private void enableDownload() {

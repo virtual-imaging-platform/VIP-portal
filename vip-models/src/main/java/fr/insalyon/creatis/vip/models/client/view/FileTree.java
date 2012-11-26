@@ -55,18 +55,39 @@ class FileTree extends TreeGrid {
         fileTree.setParentIdField("ArchiveName");
         fileTree.setOpenProperty("isOpen");
         setCanDragRecordsOut(true);
-        TreeNode[] fileData = new TreeNode[result.size()];
-        for (int i = 0; i < result.size(); i++) {
-            String name = result.get(i).substring(result.get(i).lastIndexOf('/') + 1);
+        int length = result.size();
+        for(String res : result)
+        {
+            if (res.endsWith(".rdf"))
+            {
+                length = result.size() - 1;
+                break;
+            }
+            else
+            {
+             //
+            }
+        }
+
+        TreeNode[] fileData = new TreeNode[length];
+        int i = 0;
+        for(String res : result)
+        {
+            String name = res.substring(res.lastIndexOf('/') + 1);
             if (name.endsWith(".rdf")) {
-                rdfFile = result.get(i);
+                rdfFile = res;
             }
             else
             {
                 fileData[i] = new FileTreeNode(zipFile, name);
+                i++;
             }
+            
         }
-
+        if(fileData == null)
+        {
+            fileData[0] = new FileTreeNode(zipFile, ""); 
+        }
         fileTree.setData(fileData);
 
         setWidth(500);
@@ -80,8 +101,10 @@ class FileTree extends TreeGrid {
         setDropIconSuffix("into");
         setClosedIconSuffix("");
         setDragDataAction(DragDataAction.COPY);
+        
         setData(fileTree);
-    }
+   
+      }
 
     public String getRdfFile() {
         return rdfFile;

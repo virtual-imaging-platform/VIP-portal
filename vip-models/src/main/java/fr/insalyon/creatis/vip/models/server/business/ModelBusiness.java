@@ -163,17 +163,17 @@ public class ModelBusiness {
         return btest;
     }
 
-    public SimulationObjectModel setModelName (String name, SimulationObjectModel model)
-    {
+    public SimulationObjectModel setModelName(String name, SimulationObjectModel model) {
         model.setModelName(name);
-      return model;   
+        return model;
     }
+
     private void copyFile(String srFile, String dtFile) throws FileNotFoundException, IOException {
 
         File f1 = new File(srFile);
         File f2 = new File(dtFile);
         System.out.println(srFile);
-       System.out.println(dtFile); 
+        System.out.println(dtFile);
         InputStream in = new FileInputStream(f1);
 
         OutputStream out = new FileOutputStream(f2);
@@ -187,7 +187,6 @@ public class ModelBusiness {
         out.close();
         System.out.println("File copied.");
     }
-
 
     private boolean checkEmptyRDF(String file) throws FileNotFoundException, IOException {
         boolean bres = true;
@@ -240,145 +239,142 @@ public class ModelBusiness {
         // Close the streams        
         zin.close();
 
-       if (checkRDFEncoding(zipdir + "/"+ modelname))
-       {
-           File fz = new File(rootDirectory + "zip/" + zipName);
-             if (fz.exists())
-            fz.delete();
-         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(rootDirectory + "zip//" + zipName));
-       
-        // Compress the files
-        for (File i : files) {
-            System.out.println("files zipped :" + i);
-            InputStream in = new FileInputStream(i);
-            // Add ZIP entry to output stream.
-            out.putNextEntry(new ZipEntry(i.getName()));
-            // Transfer bytes from the file to the ZIP file
-            int len;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
+        if (checkRDFEncoding(zipdir + "/" + modelname)) {
+            File fz = new File(rootDirectory + "zip/" + zipName);
+            if (fz.exists()) {
+                fz.delete();
             }
+            ZipOutputStream out = new ZipOutputStream(new FileOutputStream(rootDirectory + "zip//" + zipName));
+
+            // Compress the files
+            for (File i : files) {
+                System.out.println("files zipped :" + i);
+                InputStream in = new FileInputStream(i);
+                // Add ZIP entry to output stream.
+                out.putNextEntry(new ZipEntry(i.getName()));
+                // Transfer bytes from the file to the ZIP file
+                int len;
+                while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
                 // Complete the entry
                 out.closeEntry();
                 in.close();
             }
             // Complete the ZIP file
             out.close();
-        copyFile(rootDirectory + "zip/" + zipName, rootDirectory + zipName);
-       }
-       else
-       {
-           //nothing           
-       }
-    
+            copyFile(rootDirectory + "zip/" + zipName, rootDirectory + zipName);
+        } else {
+            //nothing           
+        }
+
     }
 
-    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles, SimulationObjectModel model, String lfn, User user, String nwName, String zipFullPath, boolean bUpload, boolean test) throws IOException, DataManagerException {
+    public SimulationObjectModel recordAddedFiles(String zipName, List<String> addfiles,
+            SimulationObjectModel model, String lfn, User user,
+            String zipFullPath, boolean bUpload, boolean test) throws IOException, DataManagerException {
 
         List<File> files = new ArrayList<File>();
-         String modelname = "";
-         String rootDirectory = getZipPath(user, zipFullPath, bUpload);
-         File zipdir = new File(rootDirectory + "/zip");
-         if (!zipdir.exists()) {
+        String modelname = "";
+        String rootDirectory = getZipPath(user, zipFullPath, bUpload);
+        File zipdir = new File(rootDirectory + "/zip");
+        if (!zipdir.exists()) {
             zipdir.mkdirs();
         }
         if (zipName == null) // to avoid crash for archive without rdf file
         {
             zipName = model.getModelName() + ".zip";
             modelname = model.getModelName() + ".rdf";
-            files.add(new File(zipdir  + "/"+ modelname ));
+            files.add(new File(zipdir + "/" + modelname));
         }
 
 
         File zipFile = new File(rootDirectory + zipName);
-        if (zipFile.exists())
+        if (zipFile.exists()) {
             System.out.println("zipname :" + zipFile);
-        else
+        } else {
             zipFile.createNewFile();
+        }
         System.out.println("model :" + model.getModelDescription());
         System.out.println("zipname :" + zipFile);
         System.out.println("zipdir :" + zipdir);
-        copyFile(rootDirectory + zipName, zipdir + "/"+ zipName);
+        copyFile(rootDirectory + zipName, zipdir + "/" + zipName);
 
         byte[] buf = new byte[1024];
 
-        if(zipFile.length() != 0)
-        {
-        ZipInputStream zin = new ZipInputStream(new FileInputStream(zipdir + "/"+  zipName));
+        if (zipFile.length() != 0) {
+            ZipInputStream zin = new ZipInputStream(new FileInputStream(zipdir + "/" + zipName));
 
 
-        ZipEntry entry = zin.getNextEntry();
-        while (entry != null) {
-            String name = entry.getName();
-            if (name.contains(".rdf")) {
-                modelname = name;
+            ZipEntry entry = zin.getNextEntry();
+            while (entry != null) {
+                String name = entry.getName();
+                if (name.contains(".rdf")) {
+                    modelname = name;
+                }
+
+                FileOutputStream fileoutputstream;
+                int n;
+                System.out.println("Start to write");
+                fileoutputstream = new FileOutputStream(zipdir + "/" + name);
+                System.out.println("Writing " + zipdir + "/" + name);
+                while ((n = zin.read(buf, 0, 1024)) > -1) {
+                    fileoutputstream.write(buf, 0, n);
+                }
+                fileoutputstream.close();
+                zin.closeEntry();
+
+                files.add(new File(zipdir + "/" + name));
+                System.out.println("files present :" + rootDirectory + name);
+                entry = zin.getNextEntry();
             }
-
-            FileOutputStream fileoutputstream;
-            int n;
-            System.out.println("Start to write");
-            fileoutputstream = new FileOutputStream(zipdir + "/" + name);
-            System.out.println("Writing " + zipdir + "/" + name);
-            while ((n = zin.read(buf, 0, 1024)) > -1) {
-                fileoutputstream.write(buf, 0, n);
-            }
-            fileoutputstream.close();
-            zin.closeEntry();
-
-            files.add(new File(zipdir + "/" + name));
-            System.out.println("files present :" + rootDirectory + name);
-            entry = zin.getNextEntry();
-        }
-        // Close the streams        
-        zin.close();
+            // Close the streams        
+            zin.close();
         }
         System.out.println("time to add " + addfiles.size());
         //copy additional file
         if (addfiles.size() > 0) {
             for (String file : addfiles) {
-                copyFile(rootDirectory + file, zipdir + "/"  + file);
-                files.add(new File(zipdir + "/"+ file));
-                System.out.println("filex added :" + zipdir +"/" + file);
+                copyFile(rootDirectory + file, zipdir + "/" + file);
+                files.add(new File(zipdir + "/" + file));
+                System.out.println("filex added :" + zipdir + "/" + file);
             }
         }
         //copy rdf.
         // Create a new model
         // SimulationObjectModel nwmodel = SimulationObjectModelFactory.createModel(model.getModelName());
-        if(!nwName.isEmpty())
-        {
-            //model.setModelName(nwName);
-            SimulationObjectModelFactory.setName(model, nwName);
-            System.out.println("new name:" + nwName);
-        }
+
         model.setModelOwner(user.getFullName());
-        //model.setModelDescription(model.getModelName());
         //modelCopy(model, nwmodel);
         System.out.println("timepoint " + model.getTimepoints().size());
 
-        if(modelname.isEmpty())
-        {
+        if (modelname.isEmpty()) {
             modelname = model.getModelName() + ".rdf";
-            files.add(new File(zipdir  + "/"+ modelname ));
-        }
-        else
-        {
-            File f = new File(zipdir  + "/"+ modelname);
-            if (f.exists())
+            files.add(new File(zipdir + "/" + modelname));
+        } else {
+            File f = new File(zipdir + "/" + modelname);
+            if (f.exists()) {
                 f.delete();
             }
+        }
         model.setStorageURL(lfn);
+        SimulationObjectModelFactory.setName(model, model.getModelName());
+             System.out.println("name: " + model.getModelName());
+             System.out.println("nom du fichier: " + modelname);
         SimulationObjectModelFactory.setStorageURL(model, lfn);
+        SimulationObjectModelFactory.setModelDescription(model, model.getModelDescription());
+        SimulationObjectModelFactory.setModelOwner(model, model.getModelOwner());
         SimulationObjectModelFactory.inferModelSemanticAxes(model);
+        SimulationObjectModelFactory.dumpInFileModel(model, zipdir + "/" + modelname);
 
-        SimulationObjectModelFactory.dumpInFileModel(model,zipdir + "/"+ modelname);
-        SimulationObjectModelFactory.completeModel(model,test);
-        System.out.println("URI: " + model.getURI());
-        System.out.println("URI: " + model.getStorageURL());
-        File fz = new File(rootDirectory + "zip" +"/" + zipName);
-        if (fz.exists())
+
+        SimulationObjectModelFactory.completeModel(model, test);
+              File fz = new File(rootDirectory + "zip" + "/" + zipName);
+        if (fz.exists()) {
             fz.delete();
-         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(rootDirectory + "zip/" + zipName));
-       
+        }
+        ZipOutputStream out = new ZipOutputStream(new FileOutputStream(rootDirectory + "zip/" + zipName));
+
         // Compress the files
         for (File i : files) {
             System.out.println("files zipped :" + i);
@@ -429,17 +425,19 @@ public class ModelBusiness {
 
     public SimulationObjectModel setDescription(SimulationObjectModel model, String description) {
         model.setModelDescription(description);
+        System.out.println("description mise " + description);
         return model;
     }
 
     public List<SimulationObjectModelLight> listAllModels(boolean test) throws BusinessException {
 
         try {
-            if(test)
+            if (test) {
                 System.out.println("Listing all models in repo test");
-            else
+            } else {
                 System.out.println("Listing all models in repo VIP");
-                      
+            }
+
             return SimulationObjectModelQueryer.getAllModels(test);
 
         } catch (Exception ex) {
@@ -465,11 +463,11 @@ public class ModelBusiness {
     }
 
     public String getURLFromURI(String uri, boolean test) {
-        return SimulationObjectModelFactory.getURLFromURI(uri,test);
+        return SimulationObjectModelFactory.getURLFromURI(uri, test);
     }
 
     public SimulationObjectModel rebuildObjectModelFromTripleStore(String uri, boolean test) {
-        return SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri,test);
+        return SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri, test);
     }
 
     public SimulationObjectModel rebuildObjectModelFromAnnotationFile(String fileName, String user) {
@@ -493,9 +491,9 @@ public class ModelBusiness {
         System.out.println("url" + url);
         //   System.out.println("URI " + som.getURI());
         som.setStorageURL(url);
-       
-            SimulationObjectModelFactory.setStorageURL(som, url);//.replaceAll(" ", ""));
-       
+
+        SimulationObjectModelFactory.setStorageURL(som, url);//.replaceAll(" ", ""));
+
         return som;
     }
 
@@ -506,8 +504,8 @@ public class ModelBusiness {
     public void deleteModel(String uri, boolean test) throws BusinessException {
         try {
             System.out.println("Deleting model with uri " + uri);
-            SimulationObjectModel som = SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri,test);
-            SimulationObjectModelFactory.deleteModelInPersistentStore(som,test);
+            SimulationObjectModel som = SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri, test);
+            SimulationObjectModelFactory.deleteModelInPersistentStore(som, test);
         } catch (Exception e) {
             e.printStackTrace();
             throw new BusinessException(e);
@@ -568,36 +566,9 @@ public class ModelBusiness {
         ArrayList<SimulationObjectModelLight> result = new ArrayList<SimulationObjectModelLight>();
 
         List<SimulationObjectModelLight> somls = listAllModels(test);
+
         for (SimulationObjectModelLight soml : somls) {
-            SimulationObjectModel som = SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(soml.getURI(),test);
-
-//            System.out.println("looking at SOML " + soml.getModelName());
-//
-//            if (soml.isLongitudinal()) {
-//                System.out.println("SOML is longitudinal");
-//            }
-//            if (soml.isMoving()) {
-//                System.out.println("SOML is moving");
-//            }
-//
-//            if (soml.getSemanticAxes()[0]) {
-//                System.out.println("SOML is anatomical");
-//            }
-//
-//            if (soml.getSemanticAxes()[1]) {
-//                System.out.println("SOML is pathological");
-//            }
-//            if (soml.getSemanticAxes()[2]) {
-//                System.out.println("SOML is geometricaal");
-//            }
-//            if (soml.getSemanticAxes()[3]) {
-//                System.out.println("SOML is foreign");
-//            }
-//
-//            if (soml.getSemanticAxes()[4]) {
-//                System.out.println("SOML is external");
-//            }
-
+            SimulationObjectModel som = SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(soml.getURI(), test);
             if ((soml.isLongitudinal() || !longi)) {
 
                 if (soml.isMoving() || !move) {
@@ -653,7 +624,7 @@ public class ModelBusiness {
 
     public String getStorageURL(String uri, boolean test) throws BusinessException {
         try {
-            return SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri,test).getStorageURL();
+            return SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri, test).getStorageURL();
         } catch (Exception e) {
             throw new BusinessException(e);
         }
@@ -896,6 +867,7 @@ public class ModelBusiness {
     }
 
     public SimulationObjectModel addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type) {
+        System.out.println("timepoint " + tp + " instant " +  ins);
         ArrayList<ObjectLayer> aLayers = model.getInstant(tp, ins).getObjectLayers();
         int index = -1;
         for (ObjectLayer lay : aLayers) {
@@ -904,12 +876,19 @@ public class ModelBusiness {
                 break;
             }
         }
+         System.out.println("timepoint " + tp + " instant " +  ins);
         ArrayList<String> objects = new ArrayList<String>();
         objects.add(name);
+         ObjectLayer obj = null;
+        if (index == -1)
+             obj = SimulationObjectModelFactory.createObjectLayer(model, tp, ins, layer, Resolution.low);
+        else 
+             obj = model.getInstant(tp, ins).getObjectLayers(index);
+        
         if (type == 2) {
-            addPhysicalParametersLUT(model, pptype, objects, -1, model.getInstant(tp, ins).getObjectLayers(index), tp, ins);
+            addPhysicalParametersLUT(model, pptype, objects, -1, obj, tp, ins);
         } else if (type == 3) {
-            addPhysicalParametersLayer(model, pptype, objects, -1, model.getInstant(tp, ins).getObjectLayers(index), tp, ins, "", "");
+            addPhysicalParametersLayer(model, pptype, objects, -1, obj, tp, ins, "", "");
         } else {
             //nothing
         }
@@ -1202,6 +1181,7 @@ public class ModelBusiness {
         objectLayer.addPhysicalParameters(physicalParameter);
         SimulationObjectModelFactory.addPhysicalParametersToObjectLayer(objectLayer, physicalParameter);
     }
+    		
 
     private String getZipPath(User user, String zipFullPath, boolean bUpload) throws DataManagerException {
         String rootDirectory = "";

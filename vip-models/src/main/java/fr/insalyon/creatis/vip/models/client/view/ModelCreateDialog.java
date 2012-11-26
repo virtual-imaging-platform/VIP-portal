@@ -278,7 +278,7 @@ public class ModelCreateDialog extends Window {
                 if (type == 1) {
                     String slabel = rd.getAttributeAsString("label");
                     if (slabel.isEmpty()) {
-                        Layout.getInstance().setWarningMessage("labels missing for entities. Cannot add object.");
+                        SC.say("labels missing for entities. Cannot add object.");
                         bhide = false;
                         break;
                     } else {
@@ -286,7 +286,7 @@ public class ModelCreateDialog extends Window {
                         for (String lb : labels) {
                             if (lb.equals(slabel)) {
 
-                                Layout.getInstance().setWarningMessage("Label already used for " + rd.getAttribute("name")
+                                SC.say("Label already used for " + rd.getAttribute("name")
                                         + ". Please choose another value.");
                                 bhide = false;
                                 break;

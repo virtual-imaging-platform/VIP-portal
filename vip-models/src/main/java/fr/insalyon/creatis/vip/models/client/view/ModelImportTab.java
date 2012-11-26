@@ -249,11 +249,8 @@ class ModelImportTab extends Tab {
             }
 
             public void onSuccess(List<String> result) {
-                String message = "OK: ";
-                for (String s : result) {
-                    message += " - " + s;
-                }
                 modal.hide();
+                
                 displayFiles(zipName, result);
 
             }
@@ -265,8 +262,9 @@ class ModelImportTab extends Tab {
     public void displayFiles(String zipName, List<String> result) {
 
         // window.addItem(fileTreeGrid);
-        fileTree = new FileTree(zipFile, result);
-
+         
+        fileTree = new FileTree(zipName, result);
+ //SC.say(result.get(0)+ " " + result.get(1) + " " + result.get(2)+ " " +  " 0 bis");
 
 
         fileTree.addDragStartHandler(new DragStartHandler() {
@@ -278,13 +276,18 @@ class ModelImportTab extends Tab {
             }
         });
 
+       // SC.say(result.get(0)+ " " + result.get(1) + " " + result.get(2)+ " " +  " 1");
        files.addMember(fileTree);
+       //SC.say(result.get(0)+ " " + result.get(1) + " " + result.get(2)+ " " +  " 2");
         final String rdf = fileTree.getRdfFile();
+        //SC.say(result.get(0)+ " " + result.get(1) + " " + result.get(2)+ " " + rdf);
         if (rdf != null) {
+            
             label.setContents("(Initialized annotations from file: " + rdf.substring(rdf.lastIndexOf('/') + 1) + ")");
 
             //building object model
             modal.show("Building simulation object model.", true);
+            
             ModelServiceAsync ms = ModelService.Util.getInstance();
             AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 

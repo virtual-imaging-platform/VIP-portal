@@ -335,7 +335,11 @@ public class ModelTreeGrid extends TreeGrid {
                     public void onSuccess(SimulationObjectModel result) {
                         model = result;
                          Layout.getInstance().setNoticeMessage("Description changed.");
-                       
+                        tfg.setTitle("Model name: "+ model.getModelName() +" (" + model.getModelDescription()+")");
+                        bmodif = true;
+                        --iWidth;
+                        setWidth(String.valueOf(iWidth) + "%");
+                        redraw();
                     }
                 };
                 ms.setDescription(model, description, callback);
@@ -350,18 +354,18 @@ public class ModelTreeGrid extends TreeGrid {
                 }
 
                 public void onSuccess(SimulationObjectModel result) {
-                   
+                    nwName = result.getModelName();
+                    tfg.setPrompt("Model name changed. You need to commit to record the modification.");
+                    tfg.setTitle("Model name: "+ nwName +" (" + model.getModelDescription()+")");
+                    // tricks to display new name. Firevent seems not to work.
+                    bmodif = true;
+                    --iWidth;
+                    setWidth(String.valueOf(iWidth) + "%");
+                    redraw();
                 }
             };
             ms.setModelName(name,model, callback);
-        nwName = name;
-        tfg.setPrompt("Model name changed. You need to commit to record the modification.");
-        tfg.setTitle(nwName);
-        // tricks to display new name. Firevent seems not to work.
-        bmodif = true;
-        --iWidth;
-        this.setWidth(String.valueOf(iWidth) + "%");
-        redraw();
+            
     }
 
     public void setObjName(String name) {
