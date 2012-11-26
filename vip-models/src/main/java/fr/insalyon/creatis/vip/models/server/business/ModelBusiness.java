@@ -568,53 +568,58 @@ public class ModelBusiness {
         List<SimulationObjectModelLight> somls = listAllModels(test);
 
         for (SimulationObjectModelLight soml : somls) {
-            SimulationObjectModel som = SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(soml.getURI(), test);
-            if ((soml.isLongitudinal() || !longi)) {
+            try{
+                SimulationObjectModel som = SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(soml.getURI(), test);
+                  if ((soml.isLongitudinal() || !longi)) {
+                    if (soml.isMoving() || !move) {
+                        if (soml.getSemanticAxes()[0] || !anat) {
+                            if (soml.getSemanticAxes()[1] || !path) {
+                                if (soml.getSemanticAxes()[3] || !foreign) {
+                                    if (soml.getSemanticAxes()[2] || !geom) {
+                                        if (soml.getSemanticAxes()[4] || !external) {
 
-                if (soml.isMoving() || !move) {
-                    if (soml.getSemanticAxes()[0] || !anat) {
-                        if (soml.getSemanticAxes()[1] || !path) {
-                            if (soml.getSemanticAxes()[3] || !foreign) {
-                                if (soml.getSemanticAxes()[2] || !geom) {
-                                    if (soml.getSemanticAxes()[4] || !external) {
-
-                                        for (Timepoint t : som.getTimepoints()) {
-                                            for (Instant it : t.getInstants()) {
-                                                for (ObjectLayer ol : it.getObjectLayers()) {
-                                                    for (ObjectLayerPart olp : ol.getLayerParts()) {
-                                                        if (matches(olp.getReferredObject().getObjectName().replace("_", " ") + " (" + olp.getFormat() + ": ", query)) {
-                                                            if (!result.contains(soml)) {
-                                                                result.add(soml);
+                                            for (Timepoint t : som.getTimepoints()) {
+                                                for (Instant it : t.getInstants()) {
+                                                    for (ObjectLayer ol : it.getObjectLayers()) {
+                                                        for (ObjectLayerPart olp : ol.getLayerParts()) {
+                                                            if (matches(olp.getReferredObject().getObjectName().replace("_", " ") + " (" + olp.getFormat() + ": ", query)) {
+                                                                if (!result.contains(soml)) {
+                                                                    result.add(soml);
+                                                                }
                                                             }
                                                         }
                                                     }
                                                 }
                                             }
-                                        }
 
+                                        } else {
+                                            // System.out.println("Don't include " + soml.getModelName() + " because it has no exernal agent");
+                                        }
                                     } else {
-                                        // System.out.println("Don't include " + soml.getModelName() + " because it has no exernal agent");
+                                        // System.out.println("Don't include " + soml.getModelName() + " because it has no geometrical object");
                                     }
                                 } else {
-                                    // System.out.println("Don't include " + soml.getModelName() + " because it has no geometrical object");
+                                    // System.out.println("Don't include " + soml.getModelName() + " because it has no foreign body");
                                 }
                             } else {
-                                // System.out.println("Don't include " + soml.getModelName() + " because it has no foreign body");
+                                // System.out.println("Don't include " + soml.getModelName() + " because it's has not pathology");
                             }
                         } else {
-                            // System.out.println("Don't include " + soml.getModelName() + " because it's has not pathology");
+                            // System.out.println("Don't include " + soml.getModelName() + " because it has no anatomy");
                         }
                     } else {
-                        // System.out.println("Don't include " + soml.getModelName() + " because it has no anatomy");
+                        //System.out.println("Don't include " + soml.getModelName() + " because it's not moving");
                     }
-                } else {
-                    //System.out.println("Don't include " + soml.getModelName() + " because it's not moving");
-                }
 
-            } else {
-                // System.out.println("Don't include " + soml.getModelName() + " because it's not longitudinal");
+                } else {
+                    // System.out.println("Don't include " + soml.getModelName() + " because it's not longitudinal");
+                }
             }
-        }
+            catch(Exception ex)
+            {
+                System.out.println("cant rebuild " + soml.getModelName());
+            }
+         }
         return result;
     }
 

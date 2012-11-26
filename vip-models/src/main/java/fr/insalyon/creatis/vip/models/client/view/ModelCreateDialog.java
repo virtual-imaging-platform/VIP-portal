@@ -458,7 +458,7 @@ public class ModelCreateDialog extends Window {
             lutMap.put(lut, lut);
         }
         physicalCombo = new SelectItem();
-        physicalCombo.setTitle("PHYSICAL PARAMATERS:");
+        physicalCombo.setTitle("Physical parameters:");
         physicalCombo.setMultiple(true);
         physicalCombo.setMultipleAppearance(MultipleAppearance.PICKLIST);
         physicalCombo.setValueMap(lutMap);

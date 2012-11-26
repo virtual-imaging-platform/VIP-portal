@@ -1159,14 +1159,14 @@ public class ModelTreeGrid extends TreeGrid {
                                 if (physical.getAttribute(model.getModelName()).contains("Look-up tables") && type == 2) {
                                     bphysicalLutExist = true;
                                     nbChild = modelTree.getDescendantLeaves(physical).length;
-                                    logger.log(Level.SEVERE, "couche object trouv�: " + String.valueOf(nbChild));
+                                    logger.log(Level.SEVERE, "couche object trouve: " + String.valueOf(nbChild));
                                     physicalLutNode = (ModelTreeNode) physical;
                                     break;
 
                                 } else if (physical.getAttribute(model.getModelName()).contains("Maps") && type == 3) {
                                     bphysicalLutExist = true;
                                     nbChild = modelTree.getDescendantLeaves(physical).length;
-                                    logger.log(Level.SEVERE, "LUT trouv�: " + String.valueOf(nbChild));
+                                    logger.log(Level.SEVERE, "LUT trouve: " + String.valueOf(nbChild));
                                     physicalLutNode = (ModelTreeNode) physical;
                                     break;
                                 }
@@ -1186,13 +1186,8 @@ public class ModelTreeGrid extends TreeGrid {
 
 
         String format = name;
-        String description = "";
-        if (type == 2) { //LUT
-            description = label + "[file ://" + name + "]";
+        String description = label + "[file ://" + name + "]";
 
-        } else {
-            description += format + ": file ://" + name + ")";
-        }
 
         ModelTreeNode objectNode = new ModelTreeNode("", description, false, 1, null);
         objectNode.setIcon(getPhysicalIcon(lutTypeMap.get(label)));
@@ -1212,12 +1207,13 @@ public class ModelTreeGrid extends TreeGrid {
             } else {
                 //create the Object Layer
                 objectLayerPartsNode = new ModelTreeNode("", layerPartName, false, 1, physicalLutNode);
-                objectLayerPartsNode.setIcon(ModelConstants.APP_IMG_OBJECT);
+                objectLayerPartsNode.setIcon(ModelConstants.APP_IMG_PHYSICAL_PARAMS);
                 if (bLayerExist) {
                     modelTree.add(objectLayerPartsNode, LayerNode);
                 } else {
                     // create the Layer
                     LayerNode = new ModelTreeNode("", layer, false, 1, objectLayerPartsNode);
+                    LayerNode.setIcon(getIconObject(layerTypeMap.get(layer)));
                     modelTree.add(LayerNode, insnode);
                 }
             }
