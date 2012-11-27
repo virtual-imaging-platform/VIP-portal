@@ -140,6 +140,9 @@ public interface ModelService extends RemoteService {
     
     public String readLicense(String file) throws ModelException;
     
-     public SimulationObjectModel setModelName(String name, SimulationObjectModel model);
+    public SimulationObjectModel setModelName(String name, SimulationObjectModel model);
+     
+    public SimulationObjectModel addObjectLayer(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, int tp, int ins) throws ModelException;
+         
 
 }

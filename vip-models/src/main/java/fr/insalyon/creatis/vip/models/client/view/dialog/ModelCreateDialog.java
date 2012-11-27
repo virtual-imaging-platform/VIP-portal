@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.insalyon.creatis.vip.models.client.view;
+package fr.insalyon.creatis.vip.models.client.view.dialog;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.data.Record;
@@ -45,6 +45,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.models.client.view.ModelTreeGrid;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 

@@ -280,6 +280,7 @@ public class ModelListTab extends Tab {
         ListGridField longitudinalField = new ListGridField("longitudinal", "Longitudinal");
         ListGridField movementField = new ListGridField("movement", "Movement");
         ListGridField URIField = new ListGridField("uri", "URI");
+        ListGridField dateField = new ListGridField("date", "Date of last modification");
 
 
        // modelNameField.setPrompt(grid.getSelectedRecord().getAttribute("uri"));
@@ -293,7 +294,8 @@ public class ModelListTab extends Tab {
         
         
      
-        grid.setFields(modelNameField, ownerField,descriptionField,typeField, longitudinalField, movementField, URIField);
+        grid.setFields(modelNameField, ownerField,descriptionField,dateField,
+                typeField, longitudinalField, movementField, URIField);
         grid.hideField("types");
         grid.hideField("longitudinal");
         grid.hideField("movement");
@@ -381,7 +383,8 @@ public class ModelListTab extends Tab {
                 type += "external agent";
             }
             dataList.add(new SimulationObjectModelLightRecord(s.getModelName(), 
-                    s.getOwner(),s.getDescription(),type, "" + s.isLongitudinal(), "" + s.isMoving(), s.getURI()));
+                    s.getOwner(),s.getDescription(),type, "" + s.isLongitudinal(), "" + s.isMoving(),
+                    s.getURI(),s.getLastModificationDate()));
         }
         grid.setData(dataList.toArray(new SimulationObjectModelLightRecord[]{}));
     }

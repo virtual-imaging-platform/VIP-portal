@@ -248,6 +248,14 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
             throw new ModelException(ex);
         }
     }
+     public SimulationObjectModel addObjectLayer(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, int tp, int ins) throws ModelException {
+        try {
+            trace(logger, "add LUT");
+            return modelBusiness.addObjectLayer(model, layer,  tp, ins);
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        }
+    }
 
     public SimulationObjectModel addObject(SimulationObjectModel model, String ontoName, List<String> objName, int tp, int ins, int type, int label) throws ModelException {
         try {

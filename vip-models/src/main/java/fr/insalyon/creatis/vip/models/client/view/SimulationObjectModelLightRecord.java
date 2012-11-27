@@ -35,6 +35,7 @@
 package fr.insalyon.creatis.vip.models.client.view;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import java.util.Date;
 
 /**
  *
@@ -46,7 +47,7 @@ public class SimulationObjectModelLightRecord extends ListGridRecord {
     }
 
     public SimulationObjectModelLightRecord(String name, String owner, String description, String types, String longitudinal,
-            String movement, String URI) {
+            String movement, String URI, String date) {
         setName(name);
         setTypes(types);
         setLongitudinal(longitudinal);
@@ -54,6 +55,13 @@ public class SimulationObjectModelLightRecord extends ListGridRecord {
         setURI(URI);
         setOwner(owner);
         setDescription(description);
+        if(date != null)
+        {
+            date = date.replace("T", " ").replace("Z","");
+            setDate(date.substring(0,date.lastIndexOf(".")));
+        }
+        else
+            setDate("not available");
     }
 
     private void setName(String name) {
@@ -83,4 +91,9 @@ public class SimulationObjectModelLightRecord extends ListGridRecord {
     private void setDescription(String description) {
         setAttribute("description", description);
     }
+    
+    private void setDate(String date){
+        setAttribute("date", date);
+    }
+    
 }

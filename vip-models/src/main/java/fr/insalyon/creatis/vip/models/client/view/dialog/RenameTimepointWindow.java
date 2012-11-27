@@ -1,8 +1,11 @@
+
+
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.insalyon.creatis.vip.models.client.view;
+package fr.insalyon.creatis.vip.models.client.view.dialog;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.VerticalAlignment;
@@ -11,6 +14,7 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
+import com.smartgwt.client.widgets.form.fields.DateTimeItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
@@ -26,31 +30,30 @@ import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
-
+import fr.insalyon.creatis.vip.models.client.view.ModelTreeGrid;
 
 /**
  *
  * @author cervenansky
  */
-public class RenameInstantWindow extends Window {
+public class RenameTimepointWindow extends Window{
 
     private DynamicForm form;
-    private TextItem nameItem;
+    private DateTimeItem dateItem = null;
     private ModalWindow modal;
     private ModelTreeGrid modelGrid;
     private String name;
     private int tp;
-    private int ins;
     private String nwname ="";
 
-    public RenameInstantWindow(ModelTreeGrid grid, int itp, int iins, String name) {
+    public RenameTimepointWindow(ModelTreeGrid grid, int itp,  String name) {
         
         this.modelGrid = grid;
         this.name = name;
         this.tp = itp;
-        this.ins = iins;
 
-        this.setTitle(Canvas.imgHTML(CoreConstants.ICON_EDIT) + " Renaming: " + name);
+
+        this.setTitle(Canvas.imgHTML(CoreConstants.ICON_EDIT) + "Renaming: " + name);
         this.setWidth(350);
         this.setHeight(110);
         this.setShowMinimizeButton(false);
@@ -63,10 +66,15 @@ public class RenameInstantWindow extends Window {
         form.setWidth100();
         form.setPadding(5);
         form.setLayoutAlign(VerticalAlignment.BOTTOM);
-        String oldname = name.replace("Instant (", "").replace(")", "");
-        nameItem = FieldUtil.getTextItem(200, true, "Name", "[0-9A-Za-z-_.]");
-        nameItem.setValue(oldname);
-        nameItem.addKeyPressHandler(new KeyPressHandler() {
+        String oldname = name.replace("Timepoint (", "").replace(")", "");
+        
+        dateItem = new DateTimeItem("dateTimeItem", "Date Time");  
+        dateItem.setUseTextField(true);  
+        dateItem.setUseMask(true);  
+        
+      //  nameItem = FieldUtil.getTextItem(200, true, "Name", "[0-9A-Za-z-_.]");
+
+        dateItem.addKeyPressHandler(new KeyPressHandler() {
 
             public void onKeyPress(KeyPressEvent event) {
                 if (event.getKeyName().equals("Enter")) {
@@ -83,31 +91,28 @@ public class RenameInstantWindow extends Window {
                 rename();
             }
         });
-        form.setFields(nameItem, renameButton);
+        form.setFields(dateItem, renameButton);
         this.addItem(form);
     }
 
     private void rename() {
-
-         nwname = nameItem.getValueAsString().trim();
+        nwname = dateItem.getValueAsDate().toString();
         if (form.validate()) {
             if (!name.equals(nwname)) {
                 ModelServiceAsync ms = ModelService.Util.getInstance();
                  final AsyncCallback<SimulationObjectModel>  callback = new AsyncCallback<SimulationObjectModel>() {
 
                     public void onFailure(Throwable caught) {
-                      
                         Layout.getInstance().setWarningMessage("Unable to rename");
                     }
 
                     public void onSuccess(SimulationObjectModel result) {
-                         modelGrid.rename("Instant ("+nwname+")", result);
-                       
+                          Layout.getInstance().setNoticeMessage("rename done");
+                          modelGrid.rename("Timepoint ("+nwname+")", result);
                     }
                 };
-                 
-                  ms.renameInstant(modelGrid.getModel(), tp, ins,nwname, callback);
-                  destroy();
+                ms.renameTimepoint(modelGrid.getModel(), tp, dateItem.getValueAsDate(), callback);
+                hide();
 
             } else {
                 Layout.getInstance().setWarningMessage("The specified name is the same as the original one.");

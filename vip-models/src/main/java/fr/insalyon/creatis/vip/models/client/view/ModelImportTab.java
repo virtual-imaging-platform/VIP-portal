@@ -272,7 +272,7 @@ class ModelImportTab extends Tab {
             @Override
             public void onDragStart(DragStartEvent event) {
                 FileTreeNode node = (FileTreeNode) fileTree.getRecord(fileTree.getEventRow());
-                modelDisplay.getModelTree().setObjName(node.getAttribute("filename"));
+              
             }
         });
 

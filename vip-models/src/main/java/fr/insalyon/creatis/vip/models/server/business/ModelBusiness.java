@@ -658,8 +658,10 @@ public class ModelBusiness {
         System.out.println("tp " + tp);
         System.out.println("Date " + starting);
         ArrayList<Timepoint> tps = model.getTimepoints();
+        System.out.println(tps.size());
         tps.get(tp).setStartingDate(starting);
         model.setTimepoints(tps);
+        System.out.println("Date " + model.getTimepoint(tp).getStartingDate());
         return model;
     }
 
@@ -675,7 +677,7 @@ public class ModelBusiness {
         ArrayList<Timepoint> tps = objectModel.getTimepoints();
         Timepoint copy = SimulationObjectModelFactory.createAndAddTimepoint(objectModel, tps.get(tp).getStartingDate());
         timepointDeepCopy(tps.get(tp), copy, objectModel, tp);
-        tps.add(tp + 1, copy);
+        tps.add(copy);//(tp + 1, copy);
         objectModel.setTimepoints(tps);
         System.out.println("timepoint copied");
         return objectModel;
@@ -839,6 +841,16 @@ public class ModelBusiness {
         return action;
     }
 
+      public SimulationObjectModel addObjectLayer(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, 
+              int tp, int ins) 
+      {
+           System.out.println("object layer to add tp: " + tp  +" ins: "+ ins);
+        ObjectLayer obj = SimulationObjectModelFactory.createObjectLayer(model, tp, ins, layer, Resolution.low);
+        model.getTimepoint(tp).getInstant(ins).addObjectLayer(obj);
+        return model;
+      }
+      
+      
     public SimulationObjectModel addObject(SimulationObjectModel model, String ontoName, List<String> objName, int tp, int ins, int type, int label) {
         System.out.println("object to add");
         ArrayList<String> objects = new ArrayList<String>(objName);

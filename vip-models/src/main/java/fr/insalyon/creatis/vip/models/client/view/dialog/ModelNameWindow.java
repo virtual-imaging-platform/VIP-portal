@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.insalyon.creatis.vip.models.client.view;
+package fr.insalyon.creatis.vip.models.client.view.dialog;
 
 
 import com.smartgwt.client.types.VerticalAlignment;
@@ -18,6 +18,7 @@ import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.models.client.view.ModelTreeGrid;
 
 /**
  *
