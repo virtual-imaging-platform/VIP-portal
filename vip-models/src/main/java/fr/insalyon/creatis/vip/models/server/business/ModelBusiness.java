@@ -883,8 +883,10 @@ public class ModelBusiness {
         return model;
     }
 
+
+  
     public SimulationObjectModel addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type) {
-        System.out.println("timepoint " + tp + " instant " +  ins);
+
         ArrayList<ObjectLayer> aLayers = model.getInstant(tp, ins).getObjectLayers();
         int index = -1;
         for (ObjectLayer lay : aLayers) {
@@ -893,19 +895,30 @@ public class ModelBusiness {
                 break;
             }
         }
-         System.out.println("timepoint " + tp + " instant " +  ins);
         ArrayList<String> objects = new ArrayList<String>();
         objects.add(name);
-         ObjectLayer obj = null;
+        ObjectLayer obj = null;
+        
         if (index == -1)
+        {
+             System.out.println("create object layer");
              obj = SimulationObjectModelFactory.createObjectLayer(model, tp, ins, layer, Resolution.low);
+//             SimulationObjectModelFactory.
+//             model.getInstant(tp, ins).addObjectLayer(obj);
+            
+        }
         else 
+        {
+            System.out.println("find object layer");
              obj = model.getInstant(tp, ins).getObjectLayers(index);
+        }
         
         if (type == 2) {
-            addPhysicalParametersLUT(model, pptype, objects, -1, obj, tp, ins);
+            System.out.println("physical parameter added : " + pptype.toString());
+	    addPhysicalParametersLUT(model, pptype, objects, 0, obj, tp, ins);
         } else if (type == 3) {
-            addPhysicalParametersLayer(model, pptype, objects, -1, obj, tp, ins, "", "");
+             System.out.println("map added : " + pptype.toString());
+            addPhysicalParametersLayer(model, pptype, objects, 0, obj, tp, ins, "", "");
         } else {
             //nothing
         }

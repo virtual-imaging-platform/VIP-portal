@@ -96,40 +96,23 @@ public class ModelCreateObjectDialog extends Window {
             + "<br><br><b>Search : </b>For meshes object, a new search will remove the previous search."
             + "For voxels object, the previous search  is not removed by the fact user can select different terms"
             + " represented by one organ. But only one type of layer is allowed by object.";
-    private static final String PRIORITYTEXT = "<br><b>Priority : </b>"
-            + " the priority value is for the flattening. This ordering"
-            + "is based on a rough layer priority guess assuming that geometry"
-            + "and anatomy are always superseded by pathology that"
-            + "is in turn overlaid by external bodies and foreign agents."
-            + " The values are between 1 and 4. 1 is the default value and"
-            + " 4 the high value."
-            + " <br>By default, the priority is set to 1. To change it, edit the value.";
-
+ 
     public ModelCreateObjectDialog(ModelTreeGrid treegrid,  int timepoint, int instant) {
         ms = ModelService.Util.getInstance();
         tree = treegrid;
         tp = timepoint;
         ins = instant;
-        this.setTitle("add an Object at timepoint: " + timepoint + " instant: " + instant);
         init();
     }
 
-    public void addInfo(int extension, int timepoint, int instant, String name) {
-        
-        type = extension;
-        
-        filename = name;
-        this.setTitle("add an Object at timepoint: " + timepoint + " instant: " + instant);
-        initObjectForms();
-    }
+   
 
     public void updateTree(ModelTreeGrid treegrid) {
         tree = treegrid;
     }
 
     public void init() {
-
-        this.setTitle("add Object");
+        this.setTitle("add an Object at timepoint: " + tp + " instant: " + ins);
         this.setWidth(980);
         this.setHeight(610);
         this.setShowMinimizeButton(false);
@@ -155,19 +138,19 @@ public class ModelCreateObjectDialog extends Window {
 
             public void onClick(
                     com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-
+                    addObjectItem();
+                    hide();
+                    refresh();
                
-                    if (isObjectsValidated() == true) {
-
-                        if (addObjectItem()) {
-                            hide();
-                            refresh();
-                        }
-
-
-                    } else {
-                        SC.say("you have to select a semantic term.");
-                    }
+//                    if (isObjectsValidated() == true) {
+//                        addObjectItem();
+//                            hide();
+//                            refresh();
+//                        
+//
+//                    } else {
+//                        SC.say("you have to select a semantic term.");
+//                    }
             }
 
         });
@@ -181,30 +164,21 @@ public class ModelCreateObjectDialog extends Window {
 
   
 
-    private boolean addObjectItem() {
+    private void addObjectItem() {
 
 
-        boolean bmix = true;
-        for (ListGridRecord rd : resultTG.getSelectedRecords()) {
-            if (rd.getAttributeAsString("type") != resultTG.getSelectedRecords()[0].getAttributeAsString("type")) {
-                bmix = false;
-                break;
-            }
-        }
-        if (!bmix) {
-            Layout.getInstance().setWarningMessage("Can't mix different types of layer for one object.");
-        } else {
+      
+        
             for (ListGridRecord rd : resultTG.getSelectedRecords()) {
                 int label = rd.getAttributeAsInt("label");
                 tree.addVirtualItem(tp, ins,  rd.getAttribute("name"),                        rd.getAttribute("type"), label);
-                hide();
-                refresh();
+              
 //                tree.addObjectItem(tp, ins, 1, "none", rd.getAttribute("name"),
 //                        rd.getAttribute("type"), label);
 //                
             }
-        }
-        return bmix;
+        
+      
     }
 
    
@@ -279,7 +253,8 @@ public class ModelCreateObjectDialog extends Window {
         resultTG.setSelectionAppearance(SelectionAppearance.CHECKBOX);
        
             IntegerRangeValidator integerRangeValidator = new IntegerRangeValidator();
-            integerRangeValidator.setMin(0);
+            integerRangeValidator.setMin(-1);
+            integerRangeValidator.setMax(1000);
             //DoesntContainValidator val = new DoesntContainValidator();
             LabelValidator val = new LabelValidator();
             LabelEmptyValidator vale = new LabelEmptyValidator();
@@ -287,7 +262,7 @@ public class ModelCreateObjectDialog extends Window {
             labelField.setCanSort(false);
             labelField.setCanEdit(true);
 
-            labelField.setValidators(integerRangeValidator, val, vale);
+            //labelField.setValidators(integerRangeValidator, val, vale);
             labelField.setBaseStyle("myHighGridCell");
             //   labelField.setRequired(true);
 

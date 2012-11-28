@@ -75,6 +75,8 @@ import fr.insalyon.creatis.vip.models.client.ModelConstants;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 
+import fr.insalyon.creatis.vip.models.server.rpc.ModelServiceImpl;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -90,6 +92,14 @@ import java.util.logging.Logger;
  */
 public class ModelTreeGrid extends TreeGrid {
 
+    
+     private String []pplabels;
+     private int ppindex = 0;
+     private String ppobjLayer = "";
+     private String ppname= "";
+     private int pptype = 0;
+    
+    private boolean bwait = true;
     public boolean editable = true; // To allow to delete timepoints and instant
     private Menu nodeMenu = null;
     private SimulationObjectModel model = null;
@@ -222,7 +232,7 @@ public class ModelTreeGrid extends TreeGrid {
                     insSelected = index;
                     tpSelected = modelTree.getParent(node).getAttributeAsInt("number");
                 } else {
-                    while (node.getAttributeAsString(model.getModelName()).contains("Instant")) {
+                    while (!node.getAttributeAsString(model.getModelName()).contains("Instant")) {
                         node = (ModelTreeNode) modelTree.getParent(node);
                     }
                     insSelected = node.getAttributeAsInt("number");
@@ -535,6 +545,7 @@ public class ModelTreeGrid extends TreeGrid {
     }
     
     public void addObject() {
+
         ModelCreateObjectDialog dg = new ModelCreateObjectDialog(this, tpSelected, insSelected);
         dg.show();
     }
@@ -617,7 +628,7 @@ public class ModelTreeGrid extends TreeGrid {
                 checkModality();
                 ModelTreeNode instant = new ModelTreeNode("", "Instant (1000 )", true, 0, null);
                  instant.setIcon(ModelConstants.APP_IMG_INSTANT);
-                ModelTreeNode timepoint = new ModelTreeNode("", "Timepoint (" + new Date(System.currentTimeMillis()) + ")", true, tpnumber++, instant);
+                ModelTreeNode timepoint = new ModelTreeNode("", "Timepoint (" + new Date(System.currentTimeMillis()) + ")", true, ++tpnumber, instant);
                 timepoint.setIcon(ModelConstants.APP_IMG_TIMEPOINT);
                 modelTree.add(timepoint, modelTree.getRoot());
 
@@ -913,13 +924,11 @@ public class ModelTreeGrid extends TreeGrid {
         TreeNode[] nodes = modelTree.getFolders(insnode);
         ModelTreeNode objectLayerPartsNode = null;
         ModelTreeNode LayerNode = null;
-        ModelTreeNode objectLeaf = null;
-        // 
+    
 
         boolean bLayerExist = false;
         boolean bObjectLayerExist = false;
-        boolean bObjectExist = false;
-  
+    
         String layer = "";
         for (String key : layerTypeMap.keySet()) {
             if (layerTypeMap.get(key).toString() == objLayer) {
@@ -942,6 +951,7 @@ public class ModelTreeGrid extends TreeGrid {
                     if (obj.getAttribute(model.getModelName()).contains(layerPartName)) {
                             bObjectLayerExist = true;
                             nbChild = modelTree.getDescendantLeaves(obj).length;
+                            objectLayerPartsNode = (ModelTreeNode)obj;
                             break;
                             
                     }
@@ -955,9 +965,11 @@ public class ModelTreeGrid extends TreeGrid {
             }
         }
         
-        String format = " (voxel";
+        String format = " (no file";
         String description = OntoName + format +
-                          ": label " + String.valueOf(lab) + " in file ://, file://)";
+                          ": label " + String.valueOf(lab) + ")";
+        
+           logger.log(Level.SEVERE, "description :" + description);
         ModelTreeNode objectNode = new ModelTreeNode("", description, false, nbChild, null);
         objectNode.setIcon(ModelConstants.APP_IMG_OBJECT);
         if (bObjectLayerExist) {
@@ -1036,6 +1048,9 @@ public class ModelTreeGrid extends TreeGrid {
             Layout.getInstance().setWarningMessage("Object Layer already in the model");
             return;
         } else {
+            //create the Object Layer
+            objectLayerPartsNode = new ModelTreeNode("", "Objects", false, 1 - 1, null);
+            objectLayerPartsNode.setIcon(ModelConstants.APP_IMG_OBJECT);
             LayerNode = new ModelTreeNode("", layer, false, 1, objectLayerPartsNode);
             LayerNode.setIcon(getIconObject(layerTypeMap.get(layer)));
             modelTree.add(LayerNode, insnode);
@@ -1240,11 +1255,22 @@ public class ModelTreeGrid extends TreeGrid {
     
     public void addPhysicalItem(int tp, int ins, int type, String name, String objLayer, String[] labels)
     {
+//        pplabels = labels;
+//        ppindex = 0;
+//        ppobjLayer = objLayer;
+//        ppname = name;
+//        pptype = type;
+//        
+//        addPhysicalItem(tp,ins,type,name, objLayer, pplabels[ppindex]);
         for(String lb : labels)
-            addPhysicalItem(tp,ins,type,name, objLayer, lb);
+        {
+                addPhysicalItem(tp,ins,type,name, objLayer, lb);
+        }
     }
 
     public void addPhysicalItem(int tp, int ins, int type, String name, String objLayer, String label) {
+      
+
         int nbChild = 0;
         bmodif = true;
         checkModality();
@@ -1354,16 +1380,21 @@ public class ModelTreeGrid extends TreeGrid {
             }
         }
 
+
+//       /* 
         ModelServiceAsync ms = ModelService.Util.getInstance();
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
             public void onFailure(Throwable caught) {
+                bwait = true;
                 Layout.getInstance().setWarningMessage("Cannot added LUT to model");
             }
 
             public void onSuccess(SimulationObjectModel result) {
+                bwait = true;
                 Layout.getInstance().setNoticeMessage("LUT added to model");
                 model = result;
+              //  addPhysicalItem(tpSelected,insSelected,pptype,ppname, ppobjLayer, pplabels[ppindex++]);
             }
         };
 
@@ -1423,12 +1454,16 @@ public class ModelTreeGrid extends TreeGrid {
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
             public void onFailure(Throwable caught) {
+                bwait = true;
                 Layout.getInstance().setWarningMessage("Cannot added MAP to model");
             }
 
             public void onSuccess(SimulationObjectModel result) {
+                bwait = true;
                 Layout.getInstance().setNoticeMessage("MAP added to model");
                 model = result;
+                ppindex++;
+               // addPhysicalItem(tpSelected,insSelected,pptype,ppname, ppobjLayer, pplabels[ppindex]);
             }
         };
 
@@ -1624,7 +1659,6 @@ public class ModelTreeGrid extends TreeGrid {
     public class ModelMenu extends Menu {
 
         private ModelTreeNode mnode = null;
-        private ModelTreeGrid mgrid = null;
         private MenuItem removeItem = null;
         private MenuItem objectItem = null;
         private MenuItem objectsItem = null;
@@ -1763,9 +1797,6 @@ public class ModelTreeGrid extends TreeGrid {
             mnode = node;
         }
 
-        public void setTreeGrid(ModelTreeGrid grid) {
-            mgrid = grid;
-        }
 
         public void removeNode2() {
             ModelServiceAsync ms = ModelService.Util.getInstance();
