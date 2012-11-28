@@ -18,6 +18,7 @@ import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 import fr.insalyon.creatis.vip.simulatedata.client.SimulatedDataConstants;
+import fr.insalyon.creatis.vip.models.client.view.ModelDisplayTab;
 
 /**
  *
@@ -79,9 +80,19 @@ public class SimulatedDataContextMenu extends Menu{
             }});
        
         
+        MenuItem modelItem1 = new MenuItem("View model");
+        modelItem1.setIcon(SimulatedDataConstants.ICON_MODEL); 
+        modelItem1.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(MenuItemClickEvent event) {
+                Layout.getInstance().addTab(new ModelDisplayTab("http://vip.cosinus.anr.fr/vip-model.owl#medical-image-simulation-object-model-8142cdd21ecb4b719aaef7416493b441", "model", true, false));
+            }
+        });
+        
         MenuItemSeparator separator = new MenuItemSeparator();
 
-        this.setItems(simuItem);
+        this.setItems(simuItem);//,modelItem1);
        // this.setItems(simuItem, separator, fileItem,paramItem,modelItem);
     }
     
