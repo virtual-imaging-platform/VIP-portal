@@ -38,6 +38,7 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 
 /**
  *
@@ -74,7 +75,7 @@ public class MainToolStrip extends ToolStrip {
     
     private Label getVipLabel() {
         
-        Label vipLabel = new Label("VIP");
+        Label vipLabel = new Label("VIP "+CoreConstants.VERSION);
         vipLabel.setAlign(Alignment.CENTER);
         vipLabel.setWidth(30);
         
