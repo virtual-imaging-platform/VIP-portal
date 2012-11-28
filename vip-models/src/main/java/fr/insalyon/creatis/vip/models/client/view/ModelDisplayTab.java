@@ -41,7 +41,7 @@ import com.smartgwt.client.widgets.tab.Tab;
  *
  * @author Tristan Glatard
  */
-class ModelDisplayTab extends Tab {
+public class ModelDisplayTab extends Tab {
 
     public ModelDisplayTab(final String uri, String title, boolean test, boolean bmenu) {
 
