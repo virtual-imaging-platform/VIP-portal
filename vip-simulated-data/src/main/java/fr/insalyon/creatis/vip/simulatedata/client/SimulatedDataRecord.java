@@ -4,7 +4,12 @@
  */
 package fr.insalyon.creatis.vip.simulatedata.client;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
+import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
+import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 import fr.insalyon.creatis.vip.simulatedata.client.bean.SemEntity;
 import java.util.Date;
 import java.util.List;
@@ -18,18 +23,35 @@ public class SimulatedDataRecord extends ListGridRecord {
     public SimulatedDataRecord() {
     }
 
-    public SimulatedDataRecord(String file, String type, List<SemEntity> parameters, List<SemEntity> models, String simulation, Date date) {
+    public SimulatedDataRecord(List<SemEntity> files, List<SemEntity> parameters, List<SemEntity> models, String simulation, Date date) {
 
         setAttribute("icon", "icon-file");
-        setAttribute("file", file);
-        setAttribute("type", type);
+    
    
         setAttribute("simulation", simulation);
         setAttribute("date", date);
 
-        setAttribute("short-file", file.substring(file.lastIndexOf('/') + 1));
-        String shownParams = "", realParams = "";
+       
+        String shownFiles = "" , realFiles = "";
         boolean first = true;
+        for(SemEntity se : files){
+         if(!first){
+             shownFiles += " ; ";
+             realFiles += " ; ";
+         }
+         first = false;
+         realFiles += se.getLabel();
+         shownFiles += se.getLabel().substring(se.getLabel().lastIndexOf('/') + 1);
+         if(files.size() != 1){
+              realFiles += " (" + se.getUri().substring(se.getUri().lastIndexOf('#') + 1) + ")";
+              shownFiles += " (" + se.getUri().substring(se.getUri().lastIndexOf('#') + 1) + ")";
+         }
+        }
+         setAttribute("short-files", shownFiles);
+         setAttribute("files", realFiles);
+        
+        String shownParams = "", realParams = "";
+        first = true;
         for (SemEntity se : parameters) {
             if (!first) {
                 shownParams += " ; ";
@@ -41,7 +63,7 @@ public class SimulatedDataRecord extends ListGridRecord {
             if (parameters.size() != 1) {
 
                 realParams += " (" + se.getUri().substring(se.getUri().lastIndexOf('#') + 1) + ")";
-                shownParams += " (" + se.getUri().substring(se.getUri().lastIndexOf('#') + 1) + ")";
+                shownParams += " (" + se.getUri().substring(se.getUri().lastIndexOf('#') + 1).replace("-value-information", "") + ")";
 
             }
 
@@ -50,23 +72,32 @@ public class SimulatedDataRecord extends ListGridRecord {
         setAttribute("parameters", realParams);
 
         setAttribute("short-param", shownParams);
-        String shownModels = "", realModels ="";
-        first= true;
-        for (SemEntity se : models) {
-            if(!first){
-                shownModels += ";";
-                realModels += ";";
+        String shownModels = "", realModels = "", modelURI = null;
+        if (models.size() == 1 && models.get(0).getUri().equals("")) {
+            modelURI = models.get(0).getLabel();
+            setAttribute("short-model",models.get(0).getName());
+            setAttribute("model",models.get(0).getName()+" ("+modelURI+")");
+   
+        } else {
+            first = true;
+            for (SemEntity se : models) {
+                if (!first) {
+                    shownModels += ";";
+                    realModels += ";";
+                }
+                first = false;
+                shownModels += se.getLabel().substring(se.getLabel().lastIndexOf('/') + 1);
+                realModels += se.getLabel();
+                if (models.size() != 1) {
+                    shownModels += " (" + se.getUri().substring(se.getUri().lastIndexOf('#') + 1) + ")";
+                    realModels += " (" + se.getUri().substring(se.getUri().lastIndexOf('#') + 1) + ")";
+                }
             }
-            first = false;
-            shownModels += se.getLabel().substring(se.getLabel().lastIndexOf('/') + 1);
-            realModels += se.getLabel().substring(se.getLabel().lastIndexOf('/') + 1);;
-            if (models.size() != 1) {
-                shownModels += " (" + se.getUri().substring(se.getUri().lastIndexOf('#') + 1) + ")";
-                realModels += " (" + se.getUri().substring(se.getUri().lastIndexOf('#') + 1) + ")";
-            }
+            
+            setAttribute("short-model", shownModels);
+            setAttribute("model", realModels);
         }
-        setAttribute("short-model", shownModels);
-        setAttribute("model", realModels);
+        setAttribute("model-uri", modelURI);
 
 
     }
