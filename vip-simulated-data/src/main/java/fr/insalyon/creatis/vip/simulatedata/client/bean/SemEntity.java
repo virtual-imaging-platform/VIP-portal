@@ -14,6 +14,8 @@ public class SemEntity implements IsSerializable {
     private String type;
     private String value;
 
+    private String name;
+    
     public SemEntity(){}
     
     public  SemEntity(String value, String type) {
@@ -28,6 +30,8 @@ public class SemEntity implements IsSerializable {
     public String getUri() {
         return type;
     }
+    
+    
 
 //    @Override
 //    public boolean equals(Object obj) {
@@ -55,4 +59,12 @@ public class SemEntity implements IsSerializable {
 //    public String toString() {
 //        return "{" + value + "->" + type + '}';
 //    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

@@ -25,49 +25,17 @@ import fr.insalyon.creatis.vip.models.client.view.ModelDisplayTab;
  * @author glatard
  */
 public class SimulatedDataContextMenu extends Menu{
-    private String file;
-    private String parameters;
     private String model;
     private String simulation;
 
-    public SimulatedDataContextMenu(final String file, final String parameters, final String model, final String simulation) {
-        this.file = file;
-        this.parameters = parameters;
-        this.model = model;
+    public SimulatedDataContextMenu(final String modelURI, final String modelName, final String simulation) {
+       
+        this.model = modelURI;
         this.simulation = simulation;
         
          this.setShowShadow(true);
         this.setShadowDepth(10);
         this.setWidth(90);
-        
-        MenuItem fileItem = new MenuItem("Download data file");
-        fileItem.setIcon(SimulatedDataConstants.ICON_SD);
-        fileItem.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(MenuItemClickEvent event) {
-                downloadFile(file);
-            }
-        });
-        
-        MenuItem paramItem = new MenuItem("Download parameters");
-        paramItem.setIcon(SimulatedDataConstants.ICON_PARAM);
-        paramItem.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(MenuItemClickEvent event) {
-                downloadFile(parameters);
-            }
-        });
-        
-        MenuItem modelItem = new MenuItem("Download model");
-        modelItem.setIcon(SimulatedDataConstants.ICON_MODEL);
-        modelItem.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(MenuItemClickEvent event) {
-               downloadFile(model);
-            }
-        });
         
         MenuItem simuItem = new MenuItem("View simulation");
         simuItem.setIcon(SimulatedDataConstants.ICON_SIMU);
@@ -86,13 +54,16 @@ public class SimulatedDataContextMenu extends Menu{
 
             @Override
             public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new ModelDisplayTab("http://vip.cosinus.anr.fr/vip-model.owl#medical-image-simulation-object-model-8142cdd21ecb4b719aaef7416493b441", "model", true, false));
+                Layout.getInstance().addTab(new ModelDisplayTab(model, modelName, true, false));
             }
         });
         
         MenuItemSeparator separator = new MenuItemSeparator();
 
-        this.setItems(simuItem);//,modelItem1);
+        if(this.model == null )
+            this.setItems(simuItem);
+        else
+            this.setItems(simuItem,modelItem1);
        // this.setItems(simuItem, separator, fileItem,paramItem,modelItem);
     }
     

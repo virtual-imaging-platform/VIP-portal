@@ -49,9 +49,10 @@ public class SimulatedDataGrid extends VLayout {
                 DetailViewer detailViewer = new DetailViewer();
                 detailViewer.setWidth(400);
 
-                DetailViewerField idField = new DetailViewerField("file", "Simulated Data File");
+                DetailViewerField idField = new DetailViewerField("files", "Simulated Data File");
                 DetailViewerField statusField = new DetailViewerField("parameters", "Parameters");
                 DetailViewerField parametersField = new DetailViewerField("model", "Model");
+           //      DetailViewerField uriField = new DetailViewerField("model-uri", "Model URI");
 
                 detailViewer.setFields(idField, statusField, parametersField);
                 detailViewer.setData(new Record[]{record});
@@ -66,25 +67,24 @@ public class SimulatedDataGrid extends VLayout {
             @Override
             public void onRowMouseDown(RowMouseDownEvent event) {
                   event.cancel();
-                String file = event.getRecord().getAttribute("file");
-                String parameters = event.getRecord().getAttribute("parameters");
-                String model = event.getRecord().getAttribute("model");
+                 String model = event.getRecord().getAttribute("model-uri");
                 String simulation = event.getRecord().getAttribute("simulation");
-             
-                new SimulatedDataContextMenu(file,parameters,model,simulation).showContextMenu();
+                String name = event.getRecord().getAttribute("short-model");
+                new SimulatedDataContextMenu(model,name,simulation).showContextMenu();
+              
             }
+
+            
         });
         
          rowContextClickHandler = grid.addRowContextClickHandler(new RowContextClickHandler() {
             @Override
             public void onRowContextClick(RowContextClickEvent event) {
                 event.cancel();
-                String file = event.getRecord().getAttribute("file");
-                String parameters = event.getRecord().getAttribute("parameters");
-                String model = event.getRecord().getAttribute("model");
+              String model = event.getRecord().getAttribute("model-uri");
                 String simulation = event.getRecord().getAttribute("simulation");
-             
-                new SimulatedDataContextMenu(file,parameters,model,simulation).showContextMenu();
+                String name = event.getRecord().getAttribute("short-model");
+                new SimulatedDataContextMenu(model,name,simulation).showContextMenu();
             }
         });
          grid.setCanHover(true);
@@ -104,14 +104,13 @@ public class SimulatedDataGrid extends VLayout {
         grid.setEmptyMessage("<br>No data available.");
 
         ListGridField icoField = FieldUtil.getIconGridField("icon");
-        ListGridField fileField = new ListGridField("short-file", "Simulated Data File");
-        ListGridField typeField = new ListGridField("type", "Type");
+        ListGridField fileField = new ListGridField("short-files", "Simulated Data File");
         ListGridField paramField = new ListGridField("short-param", "Parameters");
         ListGridField modelField = new ListGridField("short-model", "Model");
         ListGridField dateField = new ListGridField("date","Simulation date");
       //  ListGridField simulationField = new ListGridField("simulation", "Produced by simulation");
 
-        grid.setFields(icoField, fileField, typeField, paramField, modelField,dateField);
+        grid.setFields(icoField, fileField, paramField, modelField,dateField);
         grid.setSortField("icon");
         grid.setSortDirection(SortDirection.DESCENDING);
 
@@ -125,11 +124,12 @@ public class SimulatedDataGrid extends VLayout {
         int i = 0;
         for (SimulatedData sd : result) {
             if(sd.getModality() == m){
-                data[i++] = new SimulatedDataRecord(sd.getFile().toString(), sd.getType(), sd.getParameters(), sd.getModels(), sd.getSimulation(),sd.getDate());
+                data[i++] = new SimulatedDataRecord(sd.getFiles(),  sd.getParameters(), sd.getModels(), sd.getSimulation(),sd.getDate());
             }
         }
         grid.setData(data);
 
 
     }
+ 
 }

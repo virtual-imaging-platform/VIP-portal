@@ -26,8 +26,7 @@ public class SimulatedData implements IsSerializable {
     
     private Modality modality;
     private String id;
-    private String file;
-    private String type;
+    private List <SemEntity> files;
     private List<SemEntity> parameters;
     private List<SemEntity> models;
     private String simulation;
@@ -35,16 +34,17 @@ public class SimulatedData implements IsSerializable {
     private Date date;
 
     public SimulatedData() {
+        files = new ArrayList<SemEntity>();
         parameters = new ArrayList<SemEntity>();
         models = new ArrayList<SemEntity>();
     }
 
-    public SimulatedData(String id, Modality modality, String file, String type, String simulation) {
+    public SimulatedData(String id, Modality modality, String simulation) {
         this.id = id;
         this.modality = modality;
-        this.file = file;
-        this.type = type;
+        
         this.simulation = simulation;
+        files = new ArrayList<SemEntity>();
         parameters = new ArrayList<SemEntity>();
         models = new ArrayList<SemEntity>();
     }
@@ -73,14 +73,6 @@ public class SimulatedData implements IsSerializable {
         this.id = id;
     }
 
-    public String getFile() {
-        return file;
-    }
-
-    public void setFile(String file) {
-        this.file = file;
-    }
-
     public Modality getModality() {
         return modality;
     }
@@ -97,20 +89,16 @@ public class SimulatedData implements IsSerializable {
         this.simulation = simulation;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public List<SemEntity> getParameters() {
         return parameters;
     }
 
     public List<SemEntity> getModels() {
         return models;
+    }
+    
+    public List<SemEntity> getFiles() {
+        return files;
     }
 
     public Date getDate() {
@@ -126,14 +114,16 @@ public class SimulatedData implements IsSerializable {
         String sout =
                 "SimulatedData{"
                 + "\n\tmodality=" + modality + ", "
-                + "\n\tfile=" + file + ", "
-                + "\n\ttype=" + type + ", "
                 + "\n\tparameters= ";
         for (Iterator<SemEntity> it = parameters.iterator(); it.hasNext();) {
             sout += it.next() + " | ";
         }
         sout += "\n\tmodel=";
         for (Iterator<SemEntity> it = models.iterator(); it.hasNext();) {
+            sout += it.next() + " | ";
+        }
+        sout += "\n\tfiles=";
+        for (Iterator<SemEntity> it = files.iterator(); it.hasNext();) {
             sout += it.next() + " | ";
         }
         sout += "\n}";
