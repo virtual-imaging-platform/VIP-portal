@@ -55,14 +55,13 @@ public class SimulationObjectModelLightRecord extends ListGridRecord {
         setURI(URI);
         setOwner(owner);
         setDescription(description);
-         setDate("not available");
-//        if(date != null)
-//        {
-//            date = date.replace("T", " ").replace("Z","");
-//            setDate(date.substring(0,date.lastIndexOf(".")));
-//        }
-//        else
-//            setDate("not available");
+        if(date != null)
+        {
+            date = date.replace("T", " ").replace("Z","");
+            setDate(date.substring(0,date.lastIndexOf(".")));
+        }
+        else
+            setDate("not available");
     }
 
     private void setName(String name) {

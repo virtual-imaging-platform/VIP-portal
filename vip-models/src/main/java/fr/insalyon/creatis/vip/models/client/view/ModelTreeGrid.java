@@ -92,6 +92,14 @@ import java.util.logging.Logger;
  */
 public class ModelTreeGrid extends TreeGrid {
 
+    private String[] objOnames;
+    private String[] objlayers;
+    private int[] objlabels ;
+    private String objName = "";
+    private int objIndex = 0;
+    private int objType = 0;
+    
+    
     
      private String []pplabels;
      private int ppindex = 0;
@@ -112,7 +120,7 @@ public class ModelTreeGrid extends TreeGrid {
     private int tpnumber = 0;
     private ModelTreeNode mnode = null;
     private HashMap<String, SimulationObjectModel.ObjectType> layerTypeMap = new HashMap<String, SimulationObjectModel.ObjectType>();
-    private HashMap<String, PhysicalParameterType> lutTypeMap = new HashMap<String, PhysicalParameterType>();
+    private HashMap<String,PhysicalParameterType> lutTypeMap = new HashMap<String, PhysicalParameterType>();
     private ModelCreateDialog dg = null;
     private String zipfile = "";
     private String zipFullPath = "";
@@ -1071,7 +1079,19 @@ public class ModelTreeGrid extends TreeGrid {
     }
      
      
-     
+public void addObjectItem(int tp, int ins, int type, String name, String[] OntoName, String[] objLayer, int[] lab) 
+{
+     objOnames = OntoName;
+    objlayers = objLayer;
+    objlabels = lab;
+    objName = name;
+    objIndex = 0;
+    objType = type;
+    addObjectItem(tpSelected, insSelected, objType, objName, objOnames[objIndex], objlayers[objIndex], objlabels[objIndex]);
+    
+    
+    
+}
     
     // add an object with:
     // tp: timepoint
@@ -1082,6 +1102,7 @@ public class ModelTreeGrid extends TreeGrid {
     // objLayer: Layer to add
     // lab: associated label if needed
     public void addObjectItem(int tp, int ins, int type, String name, String OntoName, String objLayer, int lab) {
+        objIndex ++;
         int nbChild = 0;
         bmodif = true;
         checkModality();
@@ -1224,6 +1245,9 @@ public class ModelTreeGrid extends TreeGrid {
             public void onSuccess(SimulationObjectModel result) {
                 Layout.getInstance().setNoticeMessage("object added to model");
                 model = result;
+                
+                if(objIndex < objOnames.length)
+                    addObjectItem(tpSelected, insSelected, objType, objName, objOnames[objIndex], objlayers[objIndex], objlabels[objIndex]);
             }
         };
 
@@ -1255,22 +1279,24 @@ public class ModelTreeGrid extends TreeGrid {
     
     public void addPhysicalItem(int tp, int ins, int type, String name, String objLayer, String[] labels)
     {
-//        pplabels = labels;
-//        ppindex = 0;
-//        ppobjLayer = objLayer;
-//        ppname = name;
-//        pptype = type;
-//        
-//        addPhysicalItem(tp,ins,type,name, objLayer, pplabels[ppindex]);
-        for(String lb : labels)
-        {
-                addPhysicalItem(tp,ins,type,name, objLayer, lb);
-        }
+        pplabels = labels;
+        ppindex = 0;
+        ppobjLayer = objLayer;
+        ppname = name;
+        pptype = type;
+        
+        addPhysicalItem(tp,ins,type,name, objLayer, pplabels[ppindex]);
+//        for(String lb : labels)
+//        {
+//                addPhysicalItem(tp,ins,type,name, objLayer, lb);
+//        }
     }
 
     public void addPhysicalItem(int tp, int ins, int type, String name, String objLayer, String label) {
       
-
+     
+             
+         ppindex++;
         int nbChild = 0;
         bmodif = true;
         checkModality();
@@ -1394,7 +1420,8 @@ public class ModelTreeGrid extends TreeGrid {
                 bwait = true;
                 Layout.getInstance().setNoticeMessage("LUT added to model");
                 model = result;
-              //  addPhysicalItem(tpSelected,insSelected,pptype,ppname, ppobjLayer, pplabels[ppindex++]);
+                if (ppindex < pplabels.length)
+                    addPhysicalItem(tpSelected,insSelected,pptype,ppname, ppobjLayer, pplabels[ppindex]);
             }
         };
 
@@ -1419,7 +1446,7 @@ public class ModelTreeGrid extends TreeGrid {
                         if (physical.getAttribute(model.getModelName()).contains("Maps")) {
                             bphysicalLutExist = true;
                             nbChild = modelTree.getDescendantLeaves(physical).length;
-                            logger.log(Level.SEVERE, "LUT trouv�: " + String.valueOf(nbChild));
+                            logger.log(Level.SEVERE, "LUT trouve: " + String.valueOf(nbChild));
                             physicalLutNode = (ModelTreeNode) physical;
                             break;
                         }
@@ -1462,13 +1489,13 @@ public class ModelTreeGrid extends TreeGrid {
                 bwait = true;
                 Layout.getInstance().setNoticeMessage("MAP added to model");
                 model = result;
-                ppindex++;
-               // addPhysicalItem(tpSelected,insSelected,pptype,ppname, ppobjLayer, pplabels[ppindex]);
+                addPhysicalItem(tpSelected,insSelected,pptype,ppname, ppobjLayer, pplabels[ppindex]);
             }
         };
 
             ms.addMap(model, name, tp, ins, lutTypeMap.get(label), 0,"","", callback);
         }
+   
     }
 
     public SimulationObjectModel getModel() {

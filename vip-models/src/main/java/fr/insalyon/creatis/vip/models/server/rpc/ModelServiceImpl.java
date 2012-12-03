@@ -450,4 +450,25 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
       {
            return modelBusiness.setModelName(name, model);
       }
+      
+       public String copyZipFile(String zippath)
+       {
+           String result ="";
+            try {
+            try {
+                try {
+                    result = modelBusiness.copyZipFile(getSessionUser(),zippath);
+                } catch (CoreException ex) {
+                    java.util.logging.Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } catch (DataManagerException ex) {
+                java.util.logging.Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (FileNotFoundException ex) {
+            java.util.logging.Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(ModelServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            return result;
+       }
 }

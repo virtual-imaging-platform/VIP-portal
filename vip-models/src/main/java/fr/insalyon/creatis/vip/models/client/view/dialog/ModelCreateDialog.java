@@ -187,11 +187,11 @@ public class ModelCreateDialog extends Window {
 
                 if (type == 0 || type == 1) {
                     if (isObjectsValidated() == true) {
-
-                        if (addObjectItem()) {
+                         addObjectItem();
+                        //if (addObjectItem()) {
                             hide();
                             refresh();
-                        }
+                        //}
 
 
                     } else {
@@ -219,16 +219,17 @@ public class ModelCreateDialog extends Window {
         this.addItem(validateForm);
     }
 
-    private boolean addObjectItem() {
+    private void addObjectItem() {
         if (type == 0) {
             addMeshesItem();
-            return true;
+            
         } else {
-            return addVoxelsItem();
+            addVoxelsItem();
+            
         }
     }
 
-    private boolean addVoxelsItem() {
+    private void addVoxelsItem() {
 
 
         boolean bmix = true;
@@ -241,13 +242,21 @@ public class ModelCreateDialog extends Window {
         if (!bmix) {
             Layout.getInstance().setWarningMessage("Can't mix different types of layer for one object.");
         } else {
+            String[] names = new String[resultTG.getSelectedRecords().length];
+            String[] types = new String[resultTG.getSelectedRecords().length];
+            int[] labels = new int[resultTG.getSelectedRecords().length];
+            int i = 0;
             for (ListGridRecord rd : resultTG.getSelectedRecords()) {
-                int label = rd.getAttributeAsInt("label");
-                tree.addObjectItem(tp, ins, type, filename, rd.getAttribute("name"),
-                        rd.getAttribute("type"), label);
+                names[i]= rd.getAttribute("name");
+                labels[i] = rd.getAttributeAsInt("label");
+                types[i] = rd.getAttribute("type");
+                i++;
             }
-        }
-        return bmix;
+                
+                tree.addObjectItem(tp, ins, type, filename,names, types, labels); 
+                        
+            }
+        
     }
 
     private void addMeshesItem() {

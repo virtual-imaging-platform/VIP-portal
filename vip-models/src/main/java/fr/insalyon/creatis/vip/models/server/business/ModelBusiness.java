@@ -359,8 +359,6 @@ public class ModelBusiness {
         }
         model.setStorageURL(lfn);
         SimulationObjectModelFactory.setName(model, model.getModelName());
-             System.out.println("name: " + model.getModelName());
-             System.out.println("nom du fichier: " + modelname);
         SimulationObjectModelFactory.setStorageURL(model, lfn);
         SimulationObjectModelFactory.setModelDescription(model, model.getModelDescription());
         SimulationObjectModelFactory.setModelOwner(model, model.getModelOwner());
@@ -845,7 +843,7 @@ public class ModelBusiness {
               int tp, int ins) 
       {
            System.out.println("object layer to add tp: " + tp  +" ins: "+ ins);
-        ObjectLayer obj = SimulationObjectModelFactory.createObjectLayer(model, tp, ins, layer, Resolution.low);
+        ObjectLayer obj = SimulationObjectModelFactory.createObjectLayer(model, tp, ins, layer, Resolution.none);
         model.getTimepoint(tp).getInstant(ins).addObjectLayer(obj);
         return model;
       }
@@ -901,21 +899,25 @@ public class ModelBusiness {
         
         if (index == -1)
         {
-             System.out.println("create object layer");
-             obj = SimulationObjectModelFactory.createObjectLayer(model, tp, ins, layer, Resolution.low);
-//             SimulationObjectModelFactory.
-//             model.getInstant(tp, ins).addObjectLayer(obj);
+             System.out.println("create object layer tp:" + tp  + " ins:" + ins);
+             obj = SimulationObjectModelFactory.createObjectLayer(model, tp, ins, layer, Resolution.none);
+             model.getInstant(tp, ins).addObjectLayer(obj);
             
         }
-        else 
+        else  if (index != -1)
         {
             System.out.println("find object layer");
              obj = model.getInstant(tp, ins).getObjectLayers(index);
         }
+        else
+        {
+            //
+        }
         
         if (type == 2) {
+            
             System.out.println("physical parameter added : " + pptype.toString());
-	    addPhysicalParametersLUT(model, pptype, objects, 0, obj, tp, ins);
+	    addPhysicalParametersLUT(model, pptype, objects, 69, obj, tp, ins);
         } else if (type == 3) {
              System.out.println("map added : " + pptype.toString());
             addPhysicalParametersLayer(model, pptype, objects, 0, obj, tp, ins, "", "");
@@ -924,7 +926,7 @@ public class ModelBusiness {
         }
         return model;
     }
-
+ 
     private static void addObjectNoResolutionHandling(SimulationObjectModel objectModel, int timePointIndex, int instantIndex, String objectName, ArrayList<String> fileName, int objectLabel, ObjectLayerPart.Format fileFormat, int objectPriority) {
 
         // found during fuzzy search (type field of SimulationObjectMatching
@@ -1336,5 +1338,20 @@ public class ModelBusiness {
         ips.close();
 
         return license;
+    }
+    
+    public String copyZipFile(User user,String zippath) throws FileNotFoundException, IOException, DataManagerException
+    {
+        String zipdirectory = getZipPath(user, zippath, false);
+        zipdirectory = zipdirectory.substring(0,zipdirectory.lastIndexOf("/"));
+        String name = zippath.substring(zippath.lastIndexOf("/")+1, zippath.length());
+        System.out.println("zippath  :" + zipdirectory + "/"+ name);
+        System.out.println("name  :" +name);
+        String rootDirectroy = Server.getInstance().getDataManagerPath() + "/uploads/";
+        System.out.println("rootDirectroy  :" +rootDirectroy);
+        String nwname = rootDirectroy +  name;
+        System.out.println("nwname  :" +nwname);
+        copyFile(zipdirectory +"/" +name,nwname);
+        return nwname;
     }
 }

@@ -144,5 +144,5 @@ public interface ModelService extends RemoteService {
      
     public SimulationObjectModel addObjectLayer(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, int tp, int ins) throws ModelException;
          
-
+    public String copyZipFile(String zippath);
 }

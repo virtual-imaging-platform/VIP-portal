@@ -384,7 +384,7 @@ public class ModelListTab extends Tab {
             }
             dataList.add(new SimulationObjectModelLightRecord(s.getModelName(), 
                     s.getOwner(),s.getDescription(),type, "" + s.isLongitudinal(), "" + s.isMoving(),
-                    s.getURI(),"not available"));
+                    s.getURI(),s.getLastModificationDate()));
         }
         grid.setData(dataList.toArray(new SimulationObjectModelLightRecord[]{}));
     }

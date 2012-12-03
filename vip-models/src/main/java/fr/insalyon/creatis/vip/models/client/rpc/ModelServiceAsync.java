@@ -125,6 +125,7 @@ public interface ModelServiceAsync {
       public void setModelName(String name, SimulationObjectModel model, AsyncCallback<SimulationObjectModel> asyncCallback);
       
       public void addObjectLayer(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, int tp, int ins, AsyncCallback<SimulationObjectModel> asyncCallback);
-
+      
+      public void copyZipFile(String zippath, AsyncCallback<String> asyncCallback);
 }
 

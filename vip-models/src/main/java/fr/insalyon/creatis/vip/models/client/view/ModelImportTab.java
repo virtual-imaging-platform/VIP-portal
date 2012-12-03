@@ -204,7 +204,18 @@ class ModelImportTab extends Tab {
 
                         public void onSuccess(String result2) {
                             Layout.getInstance().setNoticeMessage(dwnmodel);
-                            setZipFile(dwnmodel, zipFullPath, false);
+                            ModelServiceAsync ms = ModelService.Util.getInstance();
+                            AsyncCallback<String> mscallback = new AsyncCallback<String>() {
+                                 public void onFailure(Throwable caught) {
+                                        Layout.getInstance().setWarningMessage("Cannot modify model file.");
+                                 }
+
+                                public void onSuccess(String result2) {
+                                    zipFullPath = result2;
+                                    setZipFile(dwnmodel, result2, true);
+                                }
+                                };
+                                ms.copyZipFile(zipFullPath, mscallback);
                         }
                     };
                     service.downloadFile(result, callback);
