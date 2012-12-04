@@ -200,7 +200,7 @@ public class ModelCreateDialog extends Window {
 
                 } else if (type == 2 || type == 3) {
                     if (physicalCombo.getValues().length != 0) {
-                        tree.addPhysicalItem(tp, ins, type, filename, getLayerforLUT(), physicalCombo.getValues());
+                        tree.addPhysicalItems(tp, ins, type, filename, getLayerforLUT(), physicalCombo.getValues());
                         hide();
                         refresh();
                     } else {
@@ -253,7 +253,7 @@ public class ModelCreateDialog extends Window {
                 i++;
             }
                 
-                tree.addObjectItem(tp, ins, type, filename,names, types, labels); 
+                tree.addObjectItems(tp, ins, type, filename,names, types, labels); 
                         
             }
         
@@ -262,7 +262,11 @@ public class ModelCreateDialog extends Window {
     private void addMeshesItem() {
 
         int label;
+        String[] names = new String[resultTG.getSelectedRecords().length];
+        String[] types = new String[resultTG.getSelectedRecords().length];
+        int[] labels = new int[resultTG.getSelectedRecords().length];
         ListGridRecord[] records = resultTG.getSelectedRecords();
+        int i = 0;
         for (ListGridRecord rd : records) {
             String slabel = rd.getAttribute("priority");
             label = 1;
@@ -272,9 +276,13 @@ public class ModelCreateDialog extends Window {
             if (label > 4) {
                 label = 4;
             }
-            tree.addObjectItem(tp, ins, type, filename, rd.getAttribute("name"),
-                    rd.getAttribute("type"), label);
+            names[i] = rd.getAttribute("name");
+            types[i] = rd.getAttribute("type");
+            labels[i] = label;
+            i++;
         }
+        tree.addObjectItems(tp, ins, type, filename, names, types, labels);
+
     }
 
     private boolean isObjectsValidated() {

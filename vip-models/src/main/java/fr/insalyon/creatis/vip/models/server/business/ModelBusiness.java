@@ -749,7 +749,7 @@ public class ModelBusiness {
 
         for (ObjectLayer obj : src.getObjectLayers()) {
             ObjectLayer objdest = SimulationObjectModelFactory.createObjectLayer(model,
-                    indtp, indins, obj.getType(), Resolution.none);
+                    indtp, indins, obj.getType(), Resolution.high);
             objectLayerCopy(obj, objdest);
             dest.addObjectLayer(objdest);
         }
@@ -843,7 +843,7 @@ public class ModelBusiness {
               int tp, int ins) 
       {
            System.out.println("object layer to add tp: " + tp  +" ins: "+ ins);
-        ObjectLayer obj = SimulationObjectModelFactory.createObjectLayer(model, tp, ins, layer, Resolution.none);
+        ObjectLayer obj = SimulationObjectModelFactory.createObjectLayer(model, tp, ins, layer, Resolution.high);
         model.getTimepoint(tp).getInstant(ins).addObjectLayer(obj);
         return model;
       }
@@ -900,7 +900,7 @@ public class ModelBusiness {
         if (index == -1)
         {
              System.out.println("create object layer tp:" + tp  + " ins:" + ins);
-             obj = SimulationObjectModelFactory.createObjectLayer(model, tp, ins, layer, Resolution.none);
+             obj = SimulationObjectModelFactory.createObjectLayer(model, tp, ins, layer, Resolution.high);
              model.getInstant(tp, ins).addObjectLayer(obj);
             
         }
@@ -934,12 +934,12 @@ public class ModelBusiness {
 
         // check if there is a layer of the type of the layer part we want to add
         // in this example we do not check the resolution type, we add it to the layer with resolution "none"
-        ObjectLayer objectLayer = SimulationObjectModelUtil.getObjectLayerOfTypeOfResolution(objectModel, timePointIndex, instantIndex, SimulationObjectModelFactory.getObjectType(objectName), Resolution.none);
+        ObjectLayer objectLayer = SimulationObjectModelUtil.getObjectLayerOfTypeOfResolution(objectModel, timePointIndex, instantIndex, SimulationObjectModelFactory.getObjectType(objectName), Resolution.high);
 
         // if the object layer of the needed type doesn't exist we create it and add the part
         if (objectLayer == null) {
             // create a new layer
-            createLayerAndAddLayerPart(objectModel, timePointIndex, instantIndex, Resolution.none, objectName, fileName, objectLabel, fileFormat, objectPriority);
+            createLayerAndAddLayerPart(objectModel, timePointIndex, instantIndex, Resolution.high, objectName, fileName, objectLabel, fileFormat, objectPriority);
         } else {
             addLayerPartToExistingLayer(objectLayer, objectName, fileName, objectLabel, fileFormat, objectPriority);
         }
