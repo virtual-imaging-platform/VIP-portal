@@ -216,9 +216,9 @@ public class MessageBusiness {
                     + "</body>"
                     + "</html>";
 
-            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
+            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "Virtual Imaging Platform",
                     "VIP Message: " + subject + " (" + user.getFullName() + ")",
-                    emailContent, recipients);
+                    emailContent, recipients, false);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -260,9 +260,9 @@ public class MessageBusiness {
                     recipients.add(u.getEmail());
                 }
             }
-            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
+            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "Virtual Imaging Platform",
                     "VIP Message: " + subject + " (" + groupName + ")",
-                    emailContent, recipients.toArray(new String[]{}));
+                    emailContent, recipients.toArray(new String[]{}), false);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
