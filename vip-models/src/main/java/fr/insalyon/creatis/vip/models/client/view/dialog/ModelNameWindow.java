@@ -80,7 +80,7 @@ public class ModelNameWindow extends Window {
             }
             else
             {
-                modelGrid.setModelName(nwname);
+                modelGrid.setModelName(nwname.replace(" ", "_"));
                 destroy();
             }
 

@@ -147,12 +147,21 @@ public class ModelTreeGrid extends TreeGrid {
         lutTypeMap.put("T1", PhysicalParameterType.T1);
         lutTypeMap.put("T2", PhysicalParameterType.T2);
         lutTypeMap.put("T2s", PhysicalParameterType.T2s);
-        lutTypeMap.put("chemicalComposition", PhysicalParameterType.chemicalComposition);
         lutTypeMap.put("protonDensity", PhysicalParameterType.protonDensity);
-        lutTypeMap.put("radioactivity", PhysicalParameterType.radioactivity);
-        lutTypeMap.put("echogenicity", PhysicalParameterType.echogenicity);
-        lutTypeMap.put("concentration", PhysicalParameterType.concentration);
         lutTypeMap.put("susceptibility", PhysicalParameterType.susceptibility);
+        //radioactive-activity 
+        lutTypeMap.put("radiopharmaceutical Specific Activity", PhysicalParameterType.radiopharmaceuticalSpecificActivity);
+        lutTypeMap.put("radioactive_Concentration", PhysicalParameterType.radioactiveConcentration);
+        //  echogenicity-parameter 
+        lutTypeMap.put("scatterers_Reflexivity", PhysicalParameterType.scatterersReflexivity);
+        lutTypeMap.put("scatterers Density", PhysicalParameterType.scatterersDensity);
+        // mass-density
+        lutTypeMap.put("absolute Mass Density", PhysicalParameterType.absoluteMassDensity);
+        lutTypeMap.put("relative Mass Density", PhysicalParameterType.relativeMassDensity);
+       // external-agent-concentration
+        lutTypeMap.put("contrast Agent Concentration", PhysicalParameterType.contrastAgentConcentration);
+        lutTypeMap.put("radiopharmaceutical Concentration", PhysicalParameterType.radiopharmaceuticalConcentration);
+        
 
         this.model = model;
 
@@ -718,19 +727,36 @@ public class ModelTreeGrid extends TreeGrid {
 
                 for (PhysicalParametersLayer pl : it.getPhysicalParametersLayers()) {
                     String icon = ModelConstants.APP_IMG_MAGNETIC;
-                    if (pl.getType() == PhysicalParameterType.T1 || pl.getType() == PhysicalParameterType.T2 || pl.getType() == PhysicalParameterType.T2s || pl.getType() == PhysicalParameterType.protonDensity || pl.getType() == PhysicalParameterType.susceptibility) {
+                    if (pl.getType() == PhysicalParameterType.T1 || pl.getType() == PhysicalParameterType.T2 
+                            || pl.getType() == PhysicalParameterType.T2s || pl.getType() == PhysicalParameterType.protonDensity 
+                            || pl.getType() == PhysicalParameterType.susceptibility) {
                         icon = ModelConstants.APP_IMG_MAGNETIC;
                     }
-                    if (pl.getType() == PhysicalParameterType.chemicalComposition) {
+                    // mass density
+                    if ((pl.getType() == PhysicalParameterType.absoluteMassDensity)
+                    || (pl.getType() == PhysicalParameterType.relativeMassDensity)) {
                         icon = ModelConstants.APP_IMG_CHEMICAL;
                     }
-                    if (pl.getType() == PhysicalParameterType.radioactivity) {
+                    // radioactivity
+                    if (pl.getType() == PhysicalParameterType.radioactiveConcentration) {
                         icon = ModelConstants.APP_IMG_RADIO;
                     }
-                    if (pl.getType() == PhysicalParameterType.echogenicity) {
+                    
+                    if (pl.getType() == PhysicalParameterType.radiopharmaceuticalSpecificActivity) {
+                        icon = ModelConstants.APP_IMG_RADIO;
+                    }
+                    //echogenicity
+                    if (pl.getType() == PhysicalParameterType.scatterersDensity) {
                         icon = ModelConstants.APP_IMG_ECHO;
                     }
-                    if (pl.getType() == PhysicalParameterType.concentration) {
+                    if (pl.getType() == PhysicalParameterType.scatterersReflexivity) {
+                        icon = ModelConstants.APP_IMG_ECHO;
+                    }
+                    // external-agent-concentration 
+                    if (pl.getType() == PhysicalParameterType.contrastAgentConcentration) {
+                        icon = ModelConstants.APP_IMG_CONCENTRATION;
+                    }
+                    if (pl.getType() == PhysicalParameterType.radiopharmaceuticalConcentration) {
                         icon = ModelConstants.APP_IMG_CONCENTRATION;
                     }
 
@@ -758,19 +784,33 @@ public class ModelTreeGrid extends TreeGrid {
                         if (pp.getType() == PhysicalParameterType.T1 || pp.getType() == PhysicalParameterType.T2 || pp.getType() == PhysicalParameterType.T2s || pp.getType() == PhysicalParameterType.protonDensity || pp.getType() == PhysicalParameterType.susceptibility) {
                             icon = ModelConstants.APP_IMG_MAGNETIC;
                         }
-                        if (pp.getType() == PhysicalParameterType.chemicalComposition) {
-                            icon = ModelConstants.APP_IMG_CHEMICAL;
-                        }
-                        if (pp.getType() == PhysicalParameterType.radioactivity) {
-                            icon = ModelConstants.APP_IMG_RADIO;
-                        }
-                        if (pp.getType() == PhysicalParameterType.echogenicity) {
-                            icon = ModelConstants.APP_IMG_ECHO;
-                        }
-                        if (pp.getType() == PhysicalParameterType.concentration) {
+                       // mass density
+                    if ((pp.getType() == PhysicalParameterType.absoluteMassDensity)
+                    || (pp.getType() == PhysicalParameterType.relativeMassDensity)) {
+                        icon = ModelConstants.APP_IMG_CHEMICAL;
+                    }
+                    // radioactivity
+                    if (pp.getType() == PhysicalParameterType.radioactiveConcentration) {
+                        icon = ModelConstants.APP_IMG_RADIO;
+                    }
+                    
+                    if (pp.getType() == PhysicalParameterType.radiopharmaceuticalSpecificActivity) {
+                        icon = ModelConstants.APP_IMG_RADIO;
+                    }
+                    //echogenicity
+                    if (pp.getType() == PhysicalParameterType.scatterersDensity) {
+                        icon = ModelConstants.APP_IMG_ECHO;
+                    }
+                    if (pp.getType() == PhysicalParameterType.scatterersReflexivity) {
+                        icon = ModelConstants.APP_IMG_ECHO;
+                    }
+                    // external-agent-concentration 
+                    if (pp.getType() == PhysicalParameterType.contrastAgentConcentration) {
                         icon = ModelConstants.APP_IMG_CONCENTRATION;
-                        }
-
+                    }
+                    if (pp.getType() == PhysicalParameterType.radiopharmaceuticalConcentration) {
+                        icon = ModelConstants.APP_IMG_CONCENTRATION;
+                    }
                         objectLayerPhysParamsLUT[olppl++] = new ModelTreeNode("" + (2 + id++), description, false, olppl);
                         objectLayerPhysParamsLUT[olppl - 1].setIcon(icon);
                     }
@@ -907,19 +947,24 @@ public class ModelTreeGrid extends TreeGrid {
                 || type == PhysicalParameterType.T2s || type == PhysicalParameterType.protonDensity
                 || type == PhysicalParameterType.susceptibility) {
             return ModelConstants.APP_IMG_MAGNETIC;
-        } else if (type == PhysicalParameterType.chemicalComposition) {
+        } else if ((type == PhysicalParameterType.absoluteMassDensity) ||
+                (type == PhysicalParameterType.relativeMassDensity)){
             return ModelConstants.APP_IMG_CHEMICAL;
-        } else if (type == PhysicalParameterType.radioactivity) {
+        } else if ((type == PhysicalParameterType.radioactiveConcentration) ||
+                (type == PhysicalParameterType.radiopharmaceuticalSpecificActivity)){
             return ModelConstants.APP_IMG_RADIO;
-        } else if (type == PhysicalParameterType.echogenicity) {
+        } else if ((type == PhysicalParameterType.scatterersDensity) ||
+                (type == PhysicalParameterType.scatterersReflexivity)){
             return ModelConstants.APP_IMG_ECHO;
-        } else if (type == PhysicalParameterType.concentration) {
+        } else if ((type == PhysicalParameterType.contrastAgentConcentration) ||
+                    (type == PhysicalParameterType.radiopharmaceuticalConcentration)) {
             return ModelConstants.APP_IMG_CONCENTRATION;
         } else {
             return "";
         }
     }
-
+    
+    
      public void addVirtualItem(int tp, int ins,  String OntoName, String objLayer, int lab) {
         
         int nbChild = 0;
@@ -1272,7 +1317,7 @@ public void addObjectItem(int tp, int ins, int type, String name, String[] OntoN
     public ArrayList<String> getLutMap() {
         ArrayList<String> luts = new ArrayList<String>();
         for (Entry<String, PhysicalParameterType> entry : lutTypeMap.entrySet()) {
-            luts.add(entry.getValue().toString());
+            luts.add(entry.getKey());
         }
         return luts;
     }
@@ -1327,16 +1372,13 @@ public void addObjectItem(int tp, int ins, int type, String name, String[] OntoN
             String layerPartName = "Physical parameters";
      
             for (TreeNode nd : nodes) {
-                logger.log(Level.SEVERE, "nom des couches :" + nd.getAttribute(model.getModelName()));
-                // Find if the wanted layer exists
+                 // Find if the wanted layer exists
                 if (nd.getAttribute(model.getModelName()).contains(layer)) {
                     TreeNode[] objects = modelTree.getFolders(nd);
                     bLayerExist = true;
                     LayerNode = (ModelTreeNode) nd;
                     for (TreeNode obj : objects) {
-                        logger.log(Level.SEVERE, "nom des couches objects :" + obj.getAttribute(model.getModelName()));
-                        logger.log(Level.SEVERE, "layerpartName :" + layerPartName);
-                        // Find if the Object Layer exist
+                         // Find if the Object Layer exist
                         if (obj.getAttribute(model.getModelName()).contains(layerPartName)) {
                             bObjectLayerExist = true;
                             TreeNode[] physicalnodes = modelTree.getFolders(obj);
@@ -1346,15 +1388,13 @@ public void addObjectItem(int tp, int ins, int type, String name, String[] OntoN
                                 if (physical.getAttribute(model.getModelName()).contains("Look-up tables") && type == 2) {
                                     bphysicalLutExist = true;
                                     nbChild = modelTree.getDescendantLeaves(physical).length;
-                                    logger.log(Level.SEVERE, "couche object trouve: " + String.valueOf(nbChild));
-                                    physicalLutNode = (ModelTreeNode) physical;
+                                     physicalLutNode = (ModelTreeNode) physical;
                                     break;
 
                                 } else if (physical.getAttribute(model.getModelName()).contains("Maps") && type == 3) {
                                     bphysicalLutExist = true;
                                     nbChild = modelTree.getDescendantLeaves(physical).length;
-                                    logger.log(Level.SEVERE, "LUT trouve: " + String.valueOf(nbChild));
-                                    physicalLutNode = (ModelTreeNode) physical;
+                                     physicalLutNode = (ModelTreeNode) physical;
                                     break;
                                 }
 
@@ -1424,7 +1464,7 @@ public void addObjectItem(int tp, int ins, int type, String name, String[] OntoN
                     addPhysicalItem(tpSelected,insSelected,pptype,ppname, ppobjLayer, pplabels[ppindex]);
             }
         };
-
+          logger.log(Level.SEVERE, "!!!label :" + lutTypeMap.get(label).toString());  
             ms.addLUT(model, layerTypeMap.get(layer), name, tpSelected, insSelected, lutTypeMap.get(label), type, callback);
         }
         else
