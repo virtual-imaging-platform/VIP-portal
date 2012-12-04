@@ -59,7 +59,7 @@ public class CoreUtil {
     private static final Logger logger = Logger.getLogger(CoreUtil.class);
 
     public static void sendEmail(String ownerEmail, String owner, String subject,
-            String content, String[] recipients) throws BusinessException {
+            String content, String[] recipients, boolean direct) throws BusinessException {
 
         try {
             Server server = Server.getInstance();
@@ -91,7 +91,11 @@ public class CoreUtil {
                 for (int i = 0; i < recipients.length; i++) {
                     addressTo[i] = new InternetAddress(recipients[i]);
                 }
-                mimeMessage.setRecipients(Message.RecipientType.BCC, addressTo);
+                if (direct) {
+                    mimeMessage.setRecipients(Message.RecipientType.TO, addressTo);
+                } else {
+                    mimeMessage.setRecipients(Message.RecipientType.BCC, addressTo);
+                }
 
                 transport.sendMessage(mimeMessage, addressTo);
                 transport.close();

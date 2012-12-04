@@ -169,8 +169,8 @@ public class ConfigurationBusiness {
                         + "</html>";
 
                 logger.info("Sending confirmation email to '" + user.getEmail() + "'.");
-                CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
-                        "VIP account details", emailContent, new String[]{user.getEmail()});
+                CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "Virtual Imaging Platform",
+                        "VIP account details", emailContent, new String[]{user.getEmail()}, true);
 
                 String adminsEmailContents = "<html>"
                         + "<head></head>"
@@ -191,8 +191,8 @@ public class ConfigurationBusiness {
                         + "</body>"
                         + "</html>";
 
-                CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
-                        "[VIP Admin] Account Requested", adminsEmailContents, getAdministratorsEmails());
+                CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "Virtual Imaging Platform",
+                        "[VIP Admin] Account Requested", adminsEmailContents, getAdministratorsEmails(), false);
             } else {
 
                 String adminsEmailContents = "<html>"
@@ -214,8 +214,8 @@ public class ConfigurationBusiness {
                         + "</body>"
                         + "</html>";
 
-                CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
-                        "[VIP Admin] Automatic Account Creation", adminsEmailContents, getAdministratorsEmails());
+                CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "Virtual Imaging Platform",
+                        "[VIP Admin] Automatic Account Creation", adminsEmailContents, getAdministratorsEmails(), false);
             }
 
 
@@ -469,9 +469,9 @@ public class ConfigurationBusiness {
                     + "</body>"
                     + "</html>";
 
-            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
+            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "Virtual Imaging Platform",
                     "VIP activation code (reminder)", emailContent,
-                    new String[]{user.getEmail()});
+                    new String[]{user.getEmail()}, true);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -503,9 +503,9 @@ public class ConfigurationBusiness {
                     + "</body>"
                     + "</html>";
 
-            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
+            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "Virtual Imaging Platform",
                     "Code to reset your VIP password", emailContent,
-                    new String[]{user.getEmail()});
+                    new String[]{user.getEmail()}, true);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -551,8 +551,8 @@ public class ConfigurationBusiness {
                         + "</body>"
                         + "</html>";
 
-                CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
-                        "[VIP Admin] Account Removed", adminsEmailContents, getAdministratorsEmails());
+                CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "Virtual Imaging Platform",
+                        "[VIP Admin] Account Removed", adminsEmailContents, getAdministratorsEmails(), false);
             }
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -850,8 +850,8 @@ public class ConfigurationBusiness {
                 emails.add(u.getEmail());
             }
 
-            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
-                    "[VIP Contact] " + category, emailContent, emails.toArray(new String[]{}));
+            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "Virtual Imaging Platform",
+                    "[VIP Contact] " + category, emailContent, emails.toArray(new String[]{}), false);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
