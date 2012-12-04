@@ -174,8 +174,8 @@ public class GateLabBusiness {
                     + "</body>"
                     + "</html>";
 
-            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "VIP",
-                    "[VIP Contact] GATE-Lab Error", adminsEmailContents, emails.toArray(new String[]{}));
+            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "Virtual Imaging Platform",
+                    "[VIP Contact] GATE-Lab Error", adminsEmailContents, emails.toArray(new String[]{}), false);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
