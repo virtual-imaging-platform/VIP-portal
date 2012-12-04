@@ -42,11 +42,13 @@ public class SimulatedDataRecord extends ListGridRecord {
          first = false;
          realFiles += se.getLabel();
          shownFiles += se.getLabel().substring(se.getLabel().lastIndexOf('/') + 1);
-         if(files.size() != 1){
-              realFiles += " (" + se.getUri().substring(se.getUri().lastIndexOf('#') + 1) + ")";
-              shownFiles += " (" + se.getUri().substring(se.getUri().lastIndexOf('#') + 1) + ")";
-         }
+//         if(files.size() != 1){
+//              realFiles += " (" + se.getUri().substring(se.getUri().lastIndexOf('#') + 1) + ")";
+//              shownFiles += " (" + se.getUri().substring(se.getUri().lastIndexOf('#') + 1) + ")";
+//         }
+         setAttribute("type",se.getUri().substring(se.getUri().lastIndexOf('#') + 1));
         }
+         
          setAttribute("short-files", shownFiles);
          setAttribute("files", realFiles);
         
