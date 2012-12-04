@@ -34,15 +34,16 @@
  */
 package fr.insalyon.creatis.vip.core.client.view;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.Date;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class CoreConstants {
+public class CoreConstants implements IsSerializable {
 
-    public static final String VERSION = "v0.8.11";
+    public static final String VERSION = "v0.8.12";
     // Configuration Labels
     public static final String LAB_DB_HOST = "database.server.host";
     public static final String LAB_DB_PORT = "database.server.port";
@@ -148,7 +149,7 @@ public class CoreConstants {
     // Roles and Groups
     public static final String GROUP_SUPPORT = "Support";
 
-    public static enum GROUP_ROLE {
+    public static enum GROUP_ROLE implements IsSerializable {
 
         Admin, User, None
     };
