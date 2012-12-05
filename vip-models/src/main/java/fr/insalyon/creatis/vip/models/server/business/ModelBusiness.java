@@ -283,6 +283,7 @@ public class ModelBusiness {
         }
         if (zipName == null) // to avoid crash for archive without rdf file
         {
+            System.out.println("model name :" + model.getModelName());
             zipName = model.getModelName() + ".zip";
             modelname = model.getModelName() + ".rdf";
             files.add(new File(zipdir + "/" + modelname));

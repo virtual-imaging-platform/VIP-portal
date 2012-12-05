@@ -193,7 +193,7 @@ class ModelImportTab extends Tab {
 
                 public void onSuccess(String result) {
                     zipFullPath = result;
-                    mbUpload = false;
+                    mbUpload = true;
                     dwnmodel = result.substring(result.lastIndexOf("/") + 1, result.length());
                     DataManagerServiceAsync service = DataManagerService.Util.getInstance();
                     AsyncCallback<String> callback = new AsyncCallback<String>() {
