@@ -47,7 +47,7 @@ public class AnnotationsContextMenu extends Menu {
 //                addTimepoint();
 //            }
 //        });
-        MenuItem newInstant = new MenuItem("Add instat");
+        MenuItem newInstant = new MenuItem("Add instant");
         newInstant.setIcon(ModelConstants.APP_IMG_INSTANT);
         newInstant.addClickHandler(new ClickHandler() {
 

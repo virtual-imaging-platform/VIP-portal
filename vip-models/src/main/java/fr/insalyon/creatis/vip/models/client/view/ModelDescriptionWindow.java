@@ -5,9 +5,7 @@
 package fr.insalyon.creatis.vip.models.client.view;
 
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -17,13 +15,10 @@ import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
-import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
-import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 
 /**
  *
