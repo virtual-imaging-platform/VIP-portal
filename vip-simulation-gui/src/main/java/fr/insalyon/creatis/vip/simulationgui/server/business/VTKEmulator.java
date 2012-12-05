@@ -178,11 +178,8 @@ public class VTKEmulator {
             String element = "";
             int i = 0;
             int j = 0;
-             System.out.println(" pass 00 ");
             while ((str = in.readLine()) != null) {
-                {
-                     System.out.println(" pass 01 ");
-                    if (str.startsWith("POINTS")) {
+                {                    if (str.startsWith("POINTS")) {
                         String[] tokens = str.split(" ");
                         element = tokens[0];
                         numberOfPoint = Integer.valueOf(tokens[1]);
@@ -199,7 +196,6 @@ public class VTKEmulator {
                         str = in.readLine(); //jump to the next line
                     }
 
-            System.out.println(" pass 02 ");
                     if (element.equals("POINTS")) {
                         String[] tokens = str.split(" ");
                         for (String s : tokens) {
@@ -212,7 +208,6 @@ public class VTKEmulator {
                             }
                         }
                     }
-                     System.out.println(" pass 03 ");
                     if (element.equals("POLYGONS")) {
                         String[] tokens = str.split(" ");
                         for (String s : tokens) {
@@ -258,7 +253,6 @@ public class VTKEmulator {
                     minZ = point[k + 2];
                 }
             }
-             System.out.println(" pass 04 ");
             bounds = new double[]{(double) minX, (double) maxX, (double) minY, (double) maxY, (double) minZ, (double) maxZ};
             // Make polys per lines
             int v = 0;
