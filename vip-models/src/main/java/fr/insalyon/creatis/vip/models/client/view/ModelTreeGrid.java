@@ -1008,9 +1008,7 @@ public class ModelTreeGrid extends TreeGrid {
             }
         }
 
-        String format = " (no file";
-        String description = OntoName + format
-                + ": label " + String.valueOf(lab) + ")";
+        String description = OntoName;
 
         ModelTreeNode objectNode = new ModelTreeNode("", description, false, nbChild, null);
         objectNode.setIcon(ModelConstants.APP_IMG_OBJECT);
@@ -1203,16 +1201,16 @@ public class ModelTreeGrid extends TreeGrid {
             String description = OntoName;
             if (type == 1) { //voxel
                 format = " (voxel";
-                description += format + ": label " + String.valueOf(lab) + " in file ://";
+                description += format + ": label " + String.valueOf(lab) + " in ";
                 if (name.contains(".raw")) {
-                    description += name.substring(0, name.indexOf(".raw")) + ".mhd, file ://" + name + ")";
+                    description += name.substring(0, name.indexOf(".raw")) + ".mhd, " + name + ")";
                 } else if (name.contains(".zraw")) {
-                    description += name.substring(0, name.indexOf(".zraw")) + ".mhd, file ://" + name + ")";
+                    description += name.substring(0, name.indexOf(".zraw")) + ".mhd, " + name + ")";
                 } else {
                     description += name + ", " + associatedraw + ")";
                 }
             } else {
-                description += format + ": file://" + name + ")";
+                description += format + ": " + name + ")";
             }
 
             ModelTreeNode objectNode = new ModelTreeNode("", description, false, nbChild, null);
@@ -1404,7 +1402,7 @@ public class ModelTreeGrid extends TreeGrid {
 
 
             String format = name;
-            String description = label + "[file ://" + name + "]";
+            String description = label + " (" + name + ")";
 
 
             ModelTreeNode objectNode = new ModelTreeNode("", description, false, 1, null);
@@ -1469,7 +1467,7 @@ public class ModelTreeGrid extends TreeGrid {
 
 
             String format = name;
-            String description = label + "(file:// " + name + ")";
+            String description = label + " (" + name + ")";
 
             ModelTreeNode objectNode = new ModelTreeNode("", description, false, 1, null);
             objectNode.setIcon(getPhysicalIcon(lutTypeMap.get(label)));
@@ -1765,12 +1763,10 @@ public class ModelTreeGrid extends TreeGrid {
         private ModelTreeNode mnode = null;
         private MenuItem removeItem = null;
         private MenuItem objectItem = null;
-        private MenuItem objectsItem = null;
         private MenuItem instantItem = null;
         private MenuItem layerItem = null;
         private MenuItem durationIItem = null;
         private MenuItem durationTItem = null;
-        private MenuItem physicalItem = null;
         private MenuItem duplicateInsItem = null;
         private MenuItem duplicateTpItem = null;
 
@@ -1838,14 +1834,6 @@ public class ModelTreeGrid extends TreeGrid {
                 }
             });
 
-            physicalItem = new MenuItem();
-            physicalItem.setTitle("Add physical parameters ");
-            physicalItem.setIcon(ModelConstants.APP_IMG_OK);
-
-            objectsItem = new MenuItem();
-            objectsItem.setTitle("Add objects layer part");
-            objectsItem.setIcon(ModelConstants.APP_IMG_OK);
-
             objectItem = new MenuItem();
             objectItem.setTitle("Add object");
             objectItem.setIcon(ModelConstants.APP_IMG_OK);
@@ -1875,9 +1863,7 @@ public class ModelTreeGrid extends TreeGrid {
             this.removeItem(instantItem);
             this.removeItem(removeItem);
             this.removeItem(durationIItem);
-            this.removeItem(objectsItem);
             this.removeItem(objectItem);
-            this.removeItem(physicalItem);
             this.removeItem(duplicateInsItem);
             this.removeItem(duplicateTpItem);
             this.removeItem(durationTItem);
@@ -1889,7 +1875,7 @@ public class ModelTreeGrid extends TreeGrid {
             } else if (node.getAttribute(model.getModelName()).contains("Objects")) {
                 this.setItems(objectItem, removeItem);
             } else if (layerTypeMap.keySet().contains(node.getAttribute(model.getModelName()))) {
-                this.setItems(objectsItem, physicalItem, removeItem);
+                this.setItems(removeItem);
             } else {
                 this.setItems(removeItem);
             }
