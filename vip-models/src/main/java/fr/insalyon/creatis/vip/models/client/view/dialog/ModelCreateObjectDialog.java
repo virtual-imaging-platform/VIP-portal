@@ -62,9 +62,7 @@ public class ModelCreateObjectDialog extends Window {
     private TextItem searchText = null;
     private Label searchFilterLabel = null;
     private Label selectFileLabel = null;
-    private Label selectLayerLabel = null;
     private ModelServiceAsync ms = null;
-    private SelectItem physicalCombo = null;
     private CheckboxItem anaCheck = null;
     private CheckboxItem pathoCheck = null;
     private CheckboxItem geoCheck = null;
@@ -75,9 +73,6 @@ public class ModelCreateObjectDialog extends Window {
     private TreeGrid resultTreeGrid;
     private HLayout hLayout = null;
     private Record selectRecord = null;
-    private DynamicForm extensionForm = null;
-    private RadioGroupItem typeRadio = null;
-    private RadioGroupItem layerRadio = null;
     private ModelTreeGrid tree = null;
     private int tp = -1;
     private int ins = -1;
@@ -166,56 +161,43 @@ public class ModelCreateObjectDialog extends Window {
 
     private void addObjectItem() {
 
-
-      
+        int[] ilabels = new int[resultTG.getSelectedRecords().length];
+        String[] types = new String[resultTG.getSelectedRecords().length];
+        String[] names = new String[resultTG.getSelectedRecords().length];
+         ArrayList<String> labels = tree.getObjectsLabel(tp, ins, resultTG.getSelectedRecords()[0].getAttribute("type"));
+         int value = 0;
+         if(labels == null || labels.isEmpty())
+         {
+             value = 1000;
+         }
+         else
+         {
+             for(String lab : labels)
+             {
+                 if(value < Integer.parseInt(lab))
+                     value = Integer.parseInt(lab);
+             }
+         }
+         int index = 0;
+         for (ListGridRecord rd : resultTG.getSelectedRecords())
+         {
+            ilabels[index]= ++value;
+            names[index]= rd.getAttribute("name");
+            types[index]= rd.getAttribute("type");
+            index++;
+         }
+         tree.addVirtualItems(tp, ins,  names, types, ilabels);
         
-            for (ListGridRecord rd : resultTG.getSelectedRecords()) {
-                int label = rd.getAttributeAsInt("label");
-                tree.addVirtualItem(tp, ins,  rd.getAttribute("name"),                        rd.getAttribute("type"), label);
-              
-//                tree.addObjectItem(tp, ins, 1, "none", rd.getAttribute("name"),
-//                        rd.getAttribute("type"), label);
-//                
-            }
+//            for (ListGridRecord rd : resultTG.getSelectedRecords()) {
+//                int label = rd.getAttributeAsInt("label");
+//                tree.addVirtualItem(tp, ins,  rd.getAttribute("name"),                        rd.getAttribute("type"), label);
+               
+          //  }
         
       
     }
 
    
-
-    private boolean isObjectsValidated() {
-        boolean bhide = true;
-        ListGridRecord[] records = resultTG.getSelectedRecords();
-        if (records.length == 0) {
-            Layout.getInstance().setNoticeMessage("No entity selected.");
-            bhide = false;
-        } else {
-            for (ListGridRecord rd : records) {
-                if (type == 1) {
-                    String slabel = rd.getAttributeAsString("label");
-                    if (slabel.isEmpty()) {
-                        SC.say("labels missing for entities. Cannot add object.");
-                        bhide = false;
-                        break;
-                    } else {
-                        ArrayList<String> labels = tree.getObjectsLabel(tp, ins, rd.getAttribute("type"));
-                        for (String lb : labels) {
-                            if (lb.equals(slabel)) {
-
-                                SC.say("Label already used for " + rd.getAttribute("name")
-                                        + ". Please choose another value.");
-                                bhide = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-        }
-        return bhide;
-    }
-
    
     public String getOntoName() {
         return selectRecord.getAttribute("name");
@@ -282,7 +264,7 @@ public class ModelCreateObjectDialog extends Window {
                 }
             });
             resultTG.setSelectionType(SelectionStyle.SIMPLE);
-            resultTG.setFields(fieldname, fieldtype, fieldscore, labelField);
+            resultTG.setFields(fieldname, fieldtype, fieldscore);
         
         resultTG.addSelectionChangedHandler(new SelectionChangedHandler() {
 
@@ -471,9 +453,7 @@ public class ModelCreateObjectDialog extends Window {
             setAttribute("label", label);
         }
 
-        private void getLabel(String label) {
-            setAttribute("label", label);
-        }
+      
     }
 
     public void search() {

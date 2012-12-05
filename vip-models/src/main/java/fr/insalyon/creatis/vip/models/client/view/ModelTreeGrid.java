@@ -215,7 +215,7 @@ public class ModelTreeGrid extends TreeGrid {
             }
         });
 
-
+        nwName = model.getModelName();
         if (bFull) {
             setFields(tfg);
             // loadEmpty();
@@ -354,13 +354,15 @@ public class ModelTreeGrid extends TreeGrid {
                 Layout.getInstance().setNoticeMessage("Description changed.");
                 tfg.setTitle("Model name: " + model.getModelName() + " (" + model.getModelDescription() + ")");
                 bmodif = true;
-                --iWidth;
+                 --iWidth;
                 setWidth(String.valueOf(iWidth) + "%");
-                		for(Canvas child : getChildren()) {
-					child.setHeight100();
-					child.setWidth100();
-				}
-				draw();
+              mfdraw();
+//                setWidth(String.valueOf(iWidth) + "%");
+//                		for(Canvas child : getChildren()) {
+//					child.setHeight100();
+//					child.setWidth100();
+//				}
+//				draw();
             }
         };
         ms.setDescription(model, description, callback);
@@ -377,13 +379,13 @@ public class ModelTreeGrid extends TreeGrid {
             public void onSuccess(SimulationObjectModel result) {
                 nwName = result.getModelName();
                 Layout.getInstance().setNoticeMessage("Name changed.");
-                model = result;
+                //model = result;
                 tfg.setTitle("Model name: " + nwName + " (" + model.getModelDescription() + ")");
                 // tricks to display new name. Firevent seems not to work.
                 bmodif = true;
-                --iWidth;
+                 --iWidth;
                 setWidth(String.valueOf(iWidth) + "%");
-                markForRedraw();
+              mfdraw();
             }
         };
         ms.setModelName(name, model, callback);
@@ -946,16 +948,22 @@ public class ModelTreeGrid extends TreeGrid {
             return "";
         }
     }
-
-    public void addVirtualItem(int tp, int ins, String OntoName, String objLayer, int lab) {
+    
+    
+    public void addVirtualItems(int tp, int ins, String[] OntoName, String[] objLayer, int[] lab)
+    {
+        objOnames = OntoName;
+        objlayers = objLayer;
+        objlabels = lab;
+        objIndex = 0;
+        addVirtualItem(tpSelected, insSelected, objOnames[objIndex], objlayers[objIndex], objlabels[objIndex]);
+        
+    }
+    
+     public void addVirtualItemInTree(int tp, int ins, String OntoName, String objLayer, int lab) {
 
         int nbChild = 0;
-        bmodif = true;
-        checkModality();
-
         ModelTreeNode insnode = findNode(tp, ins);
-        // pour objet on doit regarder un niveau en dessous
-        //Check if the object layer exists for this instant
         TreeNode[] nodes = modelTree.getFolders(insnode);
         ModelTreeNode objectLayerPartsNode = null;
         ModelTreeNode LayerNode = null;
@@ -1021,8 +1029,11 @@ public class ModelTreeGrid extends TreeGrid {
                 modelTree.add(LayerNode, insnode);
             }
         }
+    }
 
+    public void addVirtualItem(int tp, int ins, String OntoName, String objLayer, int lab) {
 
+        objIndex++;
         ArrayList<String> objNames = new ArrayList<String>();
         objNames.add("none");
 
@@ -1035,6 +1046,14 @@ public class ModelTreeGrid extends TreeGrid {
 
             public void onSuccess(SimulationObjectModel result) {
                 Layout.getInstance().setNoticeMessage("semantic object added to model");
+                bmodif = true;
+                checkModality();
+                int i = objIndex - 1;
+                addVirtualItemInTree(tpSelected, insSelected,  objOnames[i], objlayers[i], objlabels[i]);
+                if (objIndex < objOnames.length) {
+                    addVirtualItem(tpSelected, insSelected,  objOnames[objIndex], objlayers[objIndex], objlabels[objIndex]);
+                }
+                
                 model = result;
             }
         };
@@ -1545,12 +1564,20 @@ public class ModelTreeGrid extends TreeGrid {
         {
             for (Instant ins : tp.getInstants())
             {
+                if(ins.getObjectLayers() == null)
+                {
+                     bPurePhysicalParametersLayer = true;
+                     break; 
+                }
                 for(ObjectLayer objl : ins.getObjectLayers())
                 {
                     if(objl.getPhysicalParameters() != null)
                     {
-                        if(objl.getLayerParts() == null)
+                          logger.log(Level.SEVERE, "one pppl!!");
+                        if((objl.getLayerParts() == null) || (objl.getLayerParts() != null && 
+                                objl.getLayerParts().size()==0))
                         {
+                            logger.log(Level.SEVERE, "no objl!!");
                             bPurePhysicalParametersLayer = true;
                             break;
                         }
@@ -1561,6 +1588,10 @@ public class ModelTreeGrid extends TreeGrid {
         return bPurePhysicalParametersLayer;
     }
 
+    public void mfdraw()
+    {
+        this.markForRedraw();
+    }
     public void rename(String name, SimulationObjectModel result) {
         model = result;
         bmodif = true;

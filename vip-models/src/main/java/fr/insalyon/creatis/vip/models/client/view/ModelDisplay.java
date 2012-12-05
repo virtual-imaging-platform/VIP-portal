@@ -233,14 +233,15 @@ public class ModelDisplay extends VLayout {
 
             public void onClick(ClickEvent event) {
 
-//                if (!modelTreeGrid.testModelPurelayer())
-//                {
-//                    Layout.getInstance().setWarningMessage("a model cannot contain only PhysicalParameter layers."
-//                            + "You have to add Object layers at least.");
-//                }
-//                else
-//                {
+                if (modelTreeGrid.testModelPurelayer())
+                {
+                    Layout.getInstance().setWarningMessage("a model cannot contain only PhysicalParameter layers."
+                            + "You have to add Object layers at least.");
+                }
+                else
+                {
                     model = modelTreeGrid.getModel();
+                    model.setModelName( modelTreeGrid.getModelName());
                     if (model == null) {
                         Layout.getInstance().setWarningMessage("No simulation object model to commit.");
                         return;
@@ -252,7 +253,7 @@ public class ModelDisplay extends VLayout {
                         timeStamp = getTimeStampMilli()  + "-" ;
                         checkRDFEncoding();
                     }
-               // }
+                }
             }
         });
         upload.setTooltip("Commit model to the repository");

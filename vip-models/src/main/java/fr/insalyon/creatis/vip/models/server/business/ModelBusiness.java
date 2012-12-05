@@ -1257,7 +1257,7 @@ public class ModelBusiness {
 
             fstream = new FileInputStream(name);
             BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
-            String line = "";
+            String line;
             while ((line = br.readLine()) != null) {
                 if (line.contains("ElementDataFile")) {
                     result = line.substring(line.indexOf("=")).replace("=", "").replace(" ", "");
