@@ -177,21 +177,6 @@ public class ModelTreeGrid extends TreeGrid {
 
         //tfg.setContextMenu(tfgMenu);
 
-        tfgMenu.addHeaderClickHandler(new HeaderClickHandler() {
-
-            @Override
-            public void onHeaderClick(HeaderClickEvent event) {
-                logger.log(Level.SEVERE, "Event{0}", event.toString());
-            }
-        });
-
-        tfgMenu.addHeaderDoubleClickHandler(new HeaderDoubleClickHandler() {
-
-            @Override
-            public void onHeaderDoubleClick(HeaderDoubleClickEvent event) {
-                // logger.log(Level.SEVERE, "EVVVVENTTTT    " + event.toString());
-            }
-        });
 
         if (bFull) {
             logger.log(Level.SEVERE, "model tree set fields");
@@ -228,7 +213,6 @@ public class ModelTreeGrid extends TreeGrid {
                     insSelected = node.getAttributeAsInt("number");
                     tpSelected = modelTree.getParent(node).getAttributeAsInt("number");
                 }
-                logger.log(Level.SEVERE, "tp : {0} ins : {1}", new Object[]{tpSelected, insSelected});
             }
         });
 
@@ -668,7 +652,6 @@ public class ModelTreeGrid extends TreeGrid {
     public ModelTreeNode findNode(int... index) {
         TreeNode[] tpnodes = modelTree.getFolders(modelTree.getRoot());
         ModelTreeNode node;
-        logger.log(Level.SEVERE, "index : {0} tp size :{1}", new Object[]{index[0], tpnodes.length});
         for (TreeNode tp : tpnodes) {
             if (tp.getAttributeAsInt("number") == index[0]) {
                 if (index.length == 1) {
@@ -695,7 +678,6 @@ public class ModelTreeGrid extends TreeGrid {
         int nit = 0;
 
         ModelTreeNode[] timepoints = new ModelTreeNode[model.getTimepoints().size()];
-        logger.log(Level.SEVERE, "TIMEPOINTS size : {0}", timepoints.length);
         //  SC.say(String.valueOf(model.getTimepoints().size()));
         for (Timepoint tp : model.getTimepoints()) {
             ModelTreeNode[] instants = new ModelTreeNode[tp.getInstants().size()];
@@ -864,10 +846,7 @@ public class ModelTreeGrid extends TreeGrid {
         modelTree.setChildrenProperty("Children");
         modelTree.setOpenProperty("isOpen");
         modelTree.setRoot(root);
-
-
-        logger.log(Level.SEVERE, "root size : {0}", modelTree.getFolders(modelTree.getRoot()).length);
-
+        
         setData(modelTree);
 
     }
@@ -974,7 +953,6 @@ public class ModelTreeGrid extends TreeGrid {
             }
         }
 
-        logger.log(Level.SEVERE, "layer :{0}", layer);
         String layerPartName = "Objects";
 
         for (TreeNode nd : nodes) {
@@ -1006,7 +984,6 @@ public class ModelTreeGrid extends TreeGrid {
         String description = OntoName + format
                 + ": label " + String.valueOf(lab) + ")";
 
-        logger.log(Level.SEVERE, "description :{0}", description);
         ModelTreeNode objectNode = new ModelTreeNode("", description, false, nbChild, (ModelTreeNode) null);
         objectNode.setIcon(ModelConstants.APP_IMG_OBJECT);
         if (bObjectLayerExist) {
@@ -1071,7 +1048,6 @@ public class ModelTreeGrid extends TreeGrid {
             }
         }
 
-        logger.log(Level.SEVERE, "layer: {0}", layer);
 
 
         for (TreeNode nd : nodes) {
@@ -1116,7 +1092,6 @@ public class ModelTreeGrid extends TreeGrid {
 
         int nbChild = 0;
 
-        logger.log(Level.SEVERE, "tp :{0}ins : {1}type : {2}name : {3}OntoName : {4}lab :{5}", new Object[]{String.valueOf(tp), String.valueOf(ins), String.valueOf(type), name, OntoName, String.valueOf(lab)});
         ModelTreeNode insnode = findNode(tp, ins);
         // pour objet on doit regarder un niveau en dessous
         //Check if the object layer exists for this instant
@@ -1137,7 +1112,6 @@ public class ModelTreeGrid extends TreeGrid {
             }
         }
 
-        logger.log(Level.SEVERE, "layer :{0}", layer);
         String layerPartName = "";
 
         if (type == 0 || type == 1) {
@@ -1160,7 +1134,6 @@ public class ModelTreeGrid extends TreeGrid {
 
                         bObjectLayerExist = true;
                         nbChild = modelTree.getDescendantLeaves(obj).length;
-                        logger.log(Level.SEVERE, "Found object layer: {0}", String.valueOf(nbChild));
                         objectLayerPartsNode = (ModelTreeNode) obj;
                         TreeNode[] leaves = modelTree.getLeaves(objectLayerPartsNode);
                         for (TreeNode leave : leaves) {
@@ -1326,11 +1299,9 @@ public class ModelTreeGrid extends TreeGrid {
 
     public void addPhysicalItemInTree(int tp, int ins, int type, String name, String objLayer, String label) {
         int nbChild = 0;
-        logger.log(Level.SEVERE, "tp :{0}ins : {1}type : {2}name : {3}lab :{4}", new Object[]{String.valueOf(tp), String.valueOf(ins), String.valueOf(type), name, label});
         ModelTreeNode insnode = findNode(tp, ins);
         // pour objet on doit regarder un niveau en dessous
         //Check if the object layer exists for this instant
-        logger.log(Level.SEVERE, "layer :{0}", objLayer);
         TreeNode[] nodes = modelTree.getFolders(insnode);
         ModelTreeNode objectLayerPartsNode = null;
         ModelTreeNode LayerNode = null;
@@ -1346,7 +1317,6 @@ public class ModelTreeGrid extends TreeGrid {
         if (!objLayer.equals("All")) {
             String layer = getLayerFromMap(objLayer);
 
-            logger.log(Level.SEVERE, "layer :{0}", layer);
             String layerPartName = "Physical parameters";
 
             for (TreeNode nd : nodes) {
@@ -1426,12 +1396,9 @@ public class ModelTreeGrid extends TreeGrid {
         } else {
 
 
-            logger.log(Level.SEVERE, "layer :{0}", objLayer);
             String layerPartName = "Physical parameters";
 
-            for (TreeNode nd : nodes) {
-                logger.log(Level.SEVERE, "layer names:{0}", nd.getAttribute(model.getModelName()));
-                // Find if the wanted layer exists
+            for (TreeNode nd : nodes) {                // Find if the wanted layer exists
                 if (nd.getAttribute(model.getModelName()).contains(layerPartName)) {
                     TreeNode[] physicalnodes = modelTree.getFolders(nd);
                     bLayerExist = true;
@@ -1441,7 +1408,6 @@ public class ModelTreeGrid extends TreeGrid {
                         if (physical.getAttribute(model.getModelName()).contains("Maps")) {
                             bphysicalLutExist = true;
                             nbChild = modelTree.getDescendantLeaves(physical).length;
-                            logger.log(Level.SEVERE, "LUT found: {0}", String.valueOf(nbChild));
                             physicalLutNode = (ModelTreeNode) physical;
                             break;
                         }
@@ -1663,7 +1629,6 @@ public class ModelTreeGrid extends TreeGrid {
 //               logger.log(Level.SEVERE, "label label:"+ getLayerFromMap(layerType));
 //                logger.log(Level.SEVERE, "label label2:" + olp.getType().toString());
                 if (olp.getType().toString().equals(layerType)) {
-                    logger.log(Level.SEVERE, "label label3: {0}", String.valueOf(olp.getLabel()));
                     results.add(String.valueOf(olp.getLabel()));
 
                 }
@@ -1878,7 +1843,6 @@ public class ModelTreeGrid extends TreeGrid {
             ModelServiceAsync ms = ModelService.Util.getInstance();
 
             String name = mnode.getAttribute(model.getModelName());
-            logger.log(Level.SEVERE, "name: {0}", name);
             if (name.contains("timepoint")) {
                 final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
 
