@@ -216,12 +216,10 @@ public class ModelTreeGrid extends TreeGrid {
 
 
         if (bFull) {
-            logger.log(Level.SEVERE, "model tree set fields");
             setFields(tfg);
             // loadEmpty();
             load(model);
         } else {
-            logger.log(Level.SEVERE, "load an empty model");
             setFields(tfg);
             loadEmpty();
         }
@@ -231,8 +229,7 @@ public class ModelTreeGrid extends TreeGrid {
         this.addSelectionChangedHandler(new SelectionChangedHandler() {
 
             public void onSelectionChanged(SelectionEvent event) {
-                logger.log(Level.SEVERE, "c'est pas le bon");
-                ModelTreeNode node = (ModelTreeNode) event.getSelectedRecord();
+                      ModelTreeNode node = (ModelTreeNode) event.getSelectedRecord();
 
                 int index = node.getAttributeAsInt("number");
                 String name = node.getAttributeAsString(model.getModelName());
@@ -358,7 +355,7 @@ public class ModelTreeGrid extends TreeGrid {
                 bmodif = true;
                 --iWidth;
                 setWidth(String.valueOf(iWidth) + "%");
-                redraw();
+                markForRedraw();
             }
         };
         ms.setDescription(model, description, callback);
@@ -381,7 +378,7 @@ public class ModelTreeGrid extends TreeGrid {
                 bmodif = true;
                 --iWidth;
                 setWidth(String.valueOf(iWidth) + "%");
-                redraw();
+                markForRedraw();
             }
         };
         ms.setModelName(name, model, callback);
@@ -652,9 +649,7 @@ public class ModelTreeGrid extends TreeGrid {
                 checkModality();
                 ModelTreeNode node = findNode(tpSelected);
                 int size = modelTree.getFolders(node).length;
-
                 ModelTreeNode instant = new ModelTreeNode("", "Instant (1000 )", true, size, null);
-
                 instant.setIcon(ModelConstants.APP_IMG_INSTANT);
                 modelTree.add(instant, node);
             }
@@ -1004,10 +999,7 @@ public class ModelTreeGrid extends TreeGrid {
         String description = OntoName + format
                 + ": label " + String.valueOf(lab) + ")";
 
-
-        logger.log(Level.SEVERE, "description :" + description);
         ModelTreeNode objectNode = new ModelTreeNode("", description, false, nbChild, null);
-
         objectNode.setIcon(ModelConstants.APP_IMG_OBJECT);
         if (bObjectLayerExist) {
             modelTree.add(objectNode, objectLayerPartsNode);
@@ -1199,9 +1191,7 @@ public class ModelTreeGrid extends TreeGrid {
                 description += format + ": file://" + name + ")";
             }
 
-
             ModelTreeNode objectNode = new ModelTreeNode("", description, false, nbChild, null);
-
             objectNode.setIcon(ModelConstants.APP_IMG_OBJECT);
             if (bObjectLayerExist) {
                 modelTree.add(objectNode, objectLayerPartsNode);
@@ -1644,31 +1634,23 @@ public class ModelTreeGrid extends TreeGrid {
 
         if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.IRM)) {
             mts.isOk("MRI");
-            logger.log(Level.SEVERE, "MRI ok?");
         } else {
             mts.isKo("MRI");
-            logger.log(Level.SEVERE, "MRI ko!");
         }
         if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.CT)) {
             mts.isOk("PET");
-            logger.log(Level.SEVERE, "PET ok?");
         } else {
             mts.isKo("PET");
-            logger.log(Level.SEVERE, "PET ko?");
         }
         if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.PET)) {
             mts.isOk("CT");
-            logger.log(Level.SEVERE, "CT ok?");
         } else {
             mts.isKo("CT");
-            logger.log(Level.SEVERE, "CT ko?");
         }
         if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.US)) {
             mts.isOk("UltraSound");
-            logger.log(Level.SEVERE, "US ok?");
         } else {
             mts.isKo("UltraSound");
-            logger.log(Level.SEVERE, "US ko?");
         }
         mts.redraw();
     }
@@ -1679,8 +1661,6 @@ public class ModelTreeGrid extends TreeGrid {
 
         for (ObjectLayer ol : ols) {
             for (ObjectLayerPart olp : ol.getLayerParts()) {
-//               logger.log(Level.SEVERE, "label label:"+ getLayerFromMap(layerType));
-//                logger.log(Level.SEVERE, "label label2:" + olp.getType().toString());
                 if (olp.getType().toString() == layerType) {
                     logger.log(Level.SEVERE, "label label3: " + String.valueOf(olp.getLabel()));
                     results.add(String.valueOf(olp.getLabel()));
@@ -1697,7 +1677,7 @@ public class ModelTreeGrid extends TreeGrid {
         ArrayList<ObjectLayer> ols = model.getTimepoint(tp).getInstant(ins).getObjectLayers();
         for (ObjectLayer ol : ols) {
             for (ObjectLayerPart olp : ol.getLayerParts()) {
-                if (olp.getType().equals(layerType)) {
+                if (olp.getType().toString().equals(layerType)) {
                     results.add(olp.getReferredObject().getObjectName());
                 }
             }
