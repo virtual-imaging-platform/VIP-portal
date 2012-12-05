@@ -43,6 +43,7 @@ import fr.insalyon.creatis.vip.models.client.view.dialog.ModelCreateObjectLayerD
 
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.visualization.client.visualizations.corechart.ColumnChart;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.TreeModelType;
 import com.smartgwt.client.widgets.tree.Tree;
@@ -355,7 +356,11 @@ public class ModelTreeGrid extends TreeGrid {
                 bmodif = true;
                 --iWidth;
                 setWidth(String.valueOf(iWidth) + "%");
-                markForRedraw();
+                		for(Canvas child : getChildren()) {
+					child.setHeight100();
+					child.setWidth100();
+				}
+				draw();
             }
         };
         ms.setDescription(model, description, callback);
@@ -1239,7 +1244,7 @@ public class ModelTreeGrid extends TreeGrid {
                 names.add(name);
                 names.add(associatedraw);
             } else {
-            //nothing
+                names.add(name);
             }
         }else {}
             return names;
