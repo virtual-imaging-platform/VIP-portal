@@ -868,13 +868,10 @@ public class ModelBusiness {
         return model;
     }
 
-    public SimulationObjectModel addMap(SimulationObjectModel model, String name,
+    public SimulationObjectModel addMap(SimulationObjectModel model, ArrayList<String> objects,
             int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0, String externalAgent, String unitOfMeasure) {
 
-        ArrayList<String> filenames = new ArrayList<String>();
-        filenames.add(name);
-
-        PhysicalParametersLayer ppl = SimulationObjectModelFactory.createPhysicalParametersLayer(pptype, filenames, b0, externalAgent, unitOfMeasure);
+        PhysicalParametersLayer ppl = SimulationObjectModelFactory.createPhysicalParametersLayer(pptype, objects, b0, externalAgent, unitOfMeasure);
         SimulationObjectModelFactory.addPhysicalParametersLayerToInstant(ppl, model.getInstant(tp, ins));
         model.getInstant(tp, ins).addPhysicalParametersLayer(ppl);
 
@@ -883,7 +880,7 @@ public class ModelBusiness {
 
 
   
-    public SimulationObjectModel addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type) {
+    public SimulationObjectModel addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, ArrayList<String> objects, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type) {
 
         ArrayList<ObjectLayer> aLayers = model.getInstant(tp, ins).getObjectLayers();
         int index = -1;
@@ -893,8 +890,7 @@ public class ModelBusiness {
                 break;
             }
         }
-        ArrayList<String> objects = new ArrayList<String>();
-        objects.add(name);
+
         ObjectLayer obj = null;
         
         if (index == -1)
@@ -1021,7 +1017,7 @@ public class ModelBusiness {
         layers = objectModel.getTimepoint(tp).getInstant(ins).getObjectLayers();
         int ind = 0;
         System.out.println("layers size " + layer);
-        for (ObjectLayer lay : layers) {
+        for (ObjectLayer lay : objectModel.getTimepoint(tp).getInstant(ins).getObjectLayers()) {
             System.out.println("layer type : " + lay.getType());
             if (lay.getType().toString().equals(layer)) {
                 layers.remove(lay);
@@ -1238,7 +1234,7 @@ public class ModelBusiness {
         boolean bfound = false;
         System.out.println("zip :" + zipname);
         System.out.println("name" + name);
-        String raw = "";
+       
         for (String fi : dir.list()) {
             if (fi.equals(name)) {
                 bfound = true;
@@ -1247,11 +1243,11 @@ public class ModelBusiness {
 
         }
         if (bfound) {
-            raw = extractRawfromFile(rootDirectory + name);
+            return extractRawfromFile(rootDirectory + name);
         } else {
-            raw = extractRawfromZipFile(name, rootDirectory + zipname);
+            return extractRawfromZipFile(name, rootDirectory + zipname);
         }
-        return raw;
+        
     }
 
     public String extractRawfromFile(String name) {

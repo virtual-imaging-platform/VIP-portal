@@ -46,6 +46,7 @@ import fr.insalyon.creatis.vip.models.client.view.ModelException;
 import fr.insalyon.creatis.vip.models.server.business.ModelBusiness;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -266,10 +267,10 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
     }
 
-    public SimulationObjectModel addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type) throws ModelException {
+    public SimulationObjectModel addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, ArrayList<String> objects, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type) throws ModelException {
         try {
             trace(logger, "add LUT");
-            return modelBusiness.addLUT(model, layer, name, tp, ins, pptype, type);
+            return modelBusiness.addLUT(model, layer, objects, tp, ins, pptype, type);
         } catch (CoreException ex) {
             throw new ModelException(ex);
         }
@@ -399,11 +400,11 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
     }
 
-    public SimulationObjectModel addMap(SimulationObjectModel model, String name,
+    public SimulationObjectModel addMap(SimulationObjectModel model, ArrayList<String> objects,
             int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0, String externalAgent, String unitOfMeasure) throws ModelException {
         try {
             trace(logger, "add map of type " + pptype.toString());
-            return modelBusiness.addMap(model, name, tp, ins, pptype, b0, externalAgent, unitOfMeasure);
+            return modelBusiness.addMap(model, objects, tp, ins, pptype, b0, externalAgent, unitOfMeasure);
         } catch (CoreException ex) {
             throw new ModelException(ex);
         }

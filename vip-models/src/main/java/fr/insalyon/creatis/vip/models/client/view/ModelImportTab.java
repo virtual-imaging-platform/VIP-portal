@@ -275,9 +275,6 @@ class ModelImportTab extends Tab {
         // window.addItem(fileTreeGrid);
          
         fileTree = new FileTree(zipName, result);
- //SC.say(result.get(0)+ " " + result.get(1) + " " + result.get(2)+ " " +  " 0 bis");
-
-
         fileTree.addDragStartHandler(new DragStartHandler() {
 
             @Override
@@ -287,12 +284,9 @@ class ModelImportTab extends Tab {
             }
         });
 
-       // SC.say(result.get(0)+ " " + result.get(1) + " " + result.get(2)+ " " +  " 1");
        files.addMember(fileTree);
-       //SC.say(result.get(0)+ " " + result.get(1) + " " + result.get(2)+ " " +  " 2");
-        final String rdf = fileTree.getRdfFile();
-        //SC.say(result.get(0)+ " " + result.get(1) + " " + result.get(2)+ " " + rdf);
-        if (rdf != null) {
+       final String rdf = fileTree.getRdfFile();
+       if (rdf != null) {
             
             label.setContents("(Initialized annotations from file: " + rdf.substring(rdf.lastIndexOf('/') + 1) + ")");
 

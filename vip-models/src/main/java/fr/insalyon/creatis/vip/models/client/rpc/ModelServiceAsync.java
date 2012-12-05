@@ -39,6 +39,7 @@ import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Physica
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
 import fr.insalyon.creatis.vip.models.client.view.ModelException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -88,7 +89,7 @@ public interface ModelServiceAsync {
      
      public void addObject(SimulationObjectModel model, String ontoName, List<String> objName, int tp, int ins, int type, int label, AsyncCallback<SimulationObjectModel> asyncCallback);
    
-     public void addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type, AsyncCallback<SimulationObjectModel> asyncCallback);
+     public void addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, ArrayList<String> objects, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type, AsyncCallback<SimulationObjectModel> asyncCallback);
       
       public void removeTimePoint(SimulationObjectModel model, int tp, AsyncCallback<SimulationObjectModel> asyncCallback);
       
@@ -114,7 +115,7 @@ public interface ModelServiceAsync {
       
       public void setDescription(SimulationObjectModel model,  String description,  AsyncCallback<SimulationObjectModel> asyncCallback);
       
-      public void addMap(SimulationObjectModel model, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0, String externalAgent, String unitOfMeasure, AsyncCallback<SimulationObjectModel> asyncCallback);
+      public void addMap(SimulationObjectModel model, ArrayList<String> objects, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0, String externalAgent, String unitOfMeasure, AsyncCallback<SimulationObjectModel> asyncCallback);
       
       public void checkRDFEncoding(String files,String modelFullPath, boolean bUpload, AsyncCallback<SimulationObjectModel> asyncCallback);
       

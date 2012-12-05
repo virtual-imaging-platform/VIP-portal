@@ -233,23 +233,26 @@ public class ModelDisplay extends VLayout {
 
             public void onClick(ClickEvent event) {
 
-                model = modelTreeGrid.getModel();
-//                if (zipFile == null) {
-//                    SC.warn("No zip file");//TODO: build it
-//                    return;
+//                if (!modelTreeGrid.testModelPurelayer())
+//                {
+//                    Layout.getInstance().setWarningMessage("a model cannot contain only PhysicalParameter layers."
+//                            + "You have to add Object layers at least.");
 //                }
+//                else
+//                {
+                    model = modelTreeGrid.getModel();
+                    if (model == null) {
+                        Layout.getInstance().setWarningMessage("No simulation object model to commit.");
+                        return;
+                    }
 
-                if (model == null) {
-                    Layout.getInstance().setWarningMessage("No simulation object model to commit.");
-                    return;
-                }
-
-                if (bmodif || modelTreeGrid.isModif()) {
-                    addDatatoZip(test);
-                } else {
-                    timeStamp = getTimeStampMilli()  + "-" ;
-                    checkRDFEncoding();
-                }
+                    if (bmodif || modelTreeGrid.isModif()) {
+                        addDatatoZip(test);
+                    } else {
+                        timeStamp = getTimeStampMilli()  + "-" ;
+                        checkRDFEncoding();
+                    }
+               // }
             }
         });
         upload.setTooltip("Commit model to the repository");

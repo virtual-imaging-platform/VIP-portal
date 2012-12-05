@@ -233,6 +233,7 @@ public class ModelTreeGrid extends TreeGrid {
 
                         @Override
                         public void onSuccess(String result) {
+                             logger.log(Level.SEVERE, "associate : " + associatedraw);
                             associatedraw = result;
 
                         }
@@ -864,7 +865,7 @@ public class ModelTreeGrid extends TreeGrid {
             return 1; //voxels
         } else if (drop.contains("vtk") || drop.contains("vtp")) {
             return 0; //meshes
-        } else if (drop.contains(".txt")) {
+        } else if (drop.contains(".txt") || drop.contains(".xml")) {
             return 2;
         } else {
             return -1;
@@ -1206,8 +1207,28 @@ public class ModelTreeGrid extends TreeGrid {
         addObjectItem(tpSelected, insSelected, objType, objName, objOnames[objIndex], objlayers[objIndex], objlabels[objIndex]);
     }
 
-    // add an object with:
-    // tp: timepoint
+    public ArrayList<String> associatedFilesToLayer(int type, String name)
+    {
+        ArrayList<String> names = new ArrayList<String>();
+
+        if (type == 0 || type == 2) {
+            names.add(name);
+        } else if (type == 1 || type == 3){
+            if (name.contains(".raw")) {
+                names.add(name.substring(0, name.lastIndexOf(".raw")) + ".mhd");
+                names.add(name);
+            } else if (name.contains(".zraw")) {
+                names.add(name.substring(0, name.lastIndexOf(".zraw")) + ".mhd");
+                names.add(name);
+            } else if (name.contains(".mhd")) {
+                names.add(name);
+                names.add(associatedraw);
+            } else {
+            //nothing
+            }
+        }else {}
+            return names;
+    }
     // ins: instant
     // type: mexh, voxel, or physical parameters
     // name: name of object to add
@@ -1217,26 +1238,7 @@ public class ModelTreeGrid extends TreeGrid {
     public void addObjectItem(int tp, int ins, int type, String name, String OntoName, String objLayer, int lab) {
         objIndex++;
 
-        ArrayList<String> objNames = new ArrayList<String>();
-
-        if (type == 0) {
-            objNames.add(name);
-        } else {
-            if (name.contains(".raw")) {
-                objNames.add(name.substring(0, name.lastIndexOf(".raw")) + ".mhd");
-                objNames.add(name);
-            } else if (name.contains(".zraw")) {
-                objNames.add(name.substring(0, name.lastIndexOf(".zraw")) + ".mhd");
-                objNames.add(name);
-            } else if (name.contains(".mhd")) {
-                objNames.add(name);
-                objNames.add(associatedraw);
-            } else {
-            }
-        }
-
-
-
+        ArrayList<String> objNames = associatedFilesToLayer(type, name);
 
         ModelServiceAsync ms = ModelService.Util.getInstance();
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
@@ -1443,7 +1445,7 @@ public class ModelTreeGrid extends TreeGrid {
 
         bmodif = true;
         checkModality();
-
+        ArrayList<String> objNames = associatedFilesToLayer(type, name);
 
         if (!objLayer.equals("All")) {
             String layer = getLayerFromMap(objLayer);
@@ -1472,7 +1474,7 @@ public class ModelTreeGrid extends TreeGrid {
                 }
             };
 
-            ms.addLUT(model, layerTypeMap.get(layer), name, tpSelected, insSelected, lutTypeMap.get(label), type, callback);
+            ms.addLUT(model, layerTypeMap.get(layer), objNames, tpSelected, insSelected, lutTypeMap.get(label), type, callback);
         } else {
 
 
@@ -1499,14 +1501,40 @@ public class ModelTreeGrid extends TreeGrid {
                     }
                 }
             };
-
-            ms.addMap(model, name, tp, ins, lutTypeMap.get(label), 0, "", "", callback);
+            
+            ms.addMap(model, objNames, tp, ins, lutTypeMap.get(label), 0, "", "", callback);
         }
 
     }
 
     public SimulationObjectModel getModel() {
         return model;
+    }
+    
+    
+    
+    // test to know if the model contains only PhysicalParameterLaye(model is not validated)
+    public boolean testModelPurelayer()
+    {
+        boolean bPurePhysicalParametersLayer = false;
+        for(Timepoint tp : model.getTimepoints())
+        {
+            for (Instant ins : tp.getInstants())
+            {
+                for(ObjectLayer objl : ins.getObjectLayers())
+                {
+                    if(objl.getPhysicalParameters() != null)
+                    {
+                        if(objl.getLayerParts() == null)
+                        {
+                            bPurePhysicalParametersLayer = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return bPurePhysicalParametersLayer;
     }
 
     public void rename(String name, SimulationObjectModel result) {

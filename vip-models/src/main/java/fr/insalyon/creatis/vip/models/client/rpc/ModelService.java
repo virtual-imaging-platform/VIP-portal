@@ -43,6 +43,7 @@ import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.Physica
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
 import fr.insalyon.creatis.vip.models.client.view.ModelException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -105,7 +106,7 @@ public interface ModelService extends RemoteService {
 
     public SimulationObjectModel addObject(SimulationObjectModel model, String ontoName, List<String> objName, int tp, int ins, int type, int label) throws ModelException;
 
-    public SimulationObjectModel addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type) throws ModelException;
+    public SimulationObjectModel addLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, ArrayList<String> objects, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int type) throws ModelException;
     
     public SimulationObjectModel removeTimePoint(SimulationObjectModel model, int tp) throws ModelException;
 
@@ -132,7 +133,7 @@ public interface ModelService extends RemoteService {
     
     public SimulationObjectModel setDescription(SimulationObjectModel model, String description)throws ModelException;
     
-    public SimulationObjectModel addMap(SimulationObjectModel model, String name, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0, String externalAgent, String unitOfMeasure)throws ModelException;
+    public SimulationObjectModel addMap(SimulationObjectModel model, ArrayList<String> objects, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0, String externalAgent, String unitOfMeasure)throws ModelException;
     
     public void checkRDFEncoding(String files, String modelFullPath, boolean bUpload)throws ModelException;
     
