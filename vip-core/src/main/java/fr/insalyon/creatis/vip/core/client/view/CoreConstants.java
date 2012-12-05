@@ -43,7 +43,7 @@ import java.util.Date;
  */
 public class CoreConstants implements IsSerializable {
 
-    public static final String VERSION = "v0.8.12";
+    public static final String VERSION = "v0.8.13";
     // Configuration Labels
     public static final String LAB_DB_HOST = "database.server.host";
     public static final String LAB_DB_PORT = "database.server.port";
