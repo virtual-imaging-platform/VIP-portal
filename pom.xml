@@ -4,7 +4,7 @@
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip</artifactId>
     <packaging>pom</packaging>
-    <version>0.8.12</version>
+    <version>0.8.13</version>
     <name>VIP</name>
     
     <properties>
