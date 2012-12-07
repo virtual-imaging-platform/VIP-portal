@@ -89,11 +89,14 @@ public class LaunchFormLayout extends AbstractFormLayout {
         this.addMember(sourcesLayout);
     }
 
+     public void addSource(AbstractSourceLayout sourceLayout) {
+         addSource(sourceLayout,false);
+     }
     /**
      *
      * @param sourceLayout
      */
-    public void addSource(AbstractSourceLayout sourceLayout) {
+    public void addSource(AbstractSourceLayout sourceLayout, boolean disabled) {
 
         Label sourceLabel = WidgetUtil.getLabel("<b>" + sourceLayout.getName() + "</b>", 15);
         String comment = sourceLayout.getComment();
@@ -101,6 +104,12 @@ public class LaunchFormLayout extends AbstractFormLayout {
             sourceLabel.setTooltip(comment);
             sourceLabel.setHoverWidth(500);
         }
+        if(disabled){
+            sourceLayout.setDisabled(true);
+            sourceLabel.setDisabled(true);
+
+        }
+            
         sourcesLayout.addMember(sourceLabel);
         sourcesLayout.addMember(sourceLayout);
     }
@@ -184,10 +193,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
                     } else {
                         conflictMap.put(source.getName(), inputValue);
                     }
-                } else {
-                    sb.append("Could not find value for parameter \"");
-                    sb.append(source.getName()).append("\".<br />");
-                }
+                } 
             }
         }
         if (!conflictMap.isEmpty()) {
@@ -297,4 +303,5 @@ public class LaunchFormLayout extends AbstractFormLayout {
         };
         ApplicationService.Util.getInstance().getCitation(applicationName, callback);
     }
+
 }

@@ -55,20 +55,34 @@ import java.util.Map;
  * @author Rafael Ferreira da Silva
  */
 public class LaunchTab extends AbstractLaunchTab {
+    private ArrayList<String> disabledSources;
+    
+  
     
     public LaunchTab(String applicationName) {
 
-        this(applicationName, null, null);
+        this(applicationName, null, null, null);
+        
     }
 
-    public LaunchTab(String applicationName, String simulationName, Map<String, String> inputs) {
+     public LaunchTab(String applicationName, String simulationName, Map<String, String> inputs) {
+         this(applicationName,simulationName,inputs,null);
+     }
+     
+    
+    public LaunchTab(String applicationName, String simulationName, Map<String, String> inputs, String[] disabled) {
 
         super(applicationName);
         layout.clear();
-
+        disabledSources = new ArrayList<String>();
+        disabledSources = new ArrayList<String>();
+        for(int i = 0 ; i < disabled.length ; i++)
+            disabledSources.add(disabled[i]);
         loadData(simulationName, inputs);
     }
+    
 
+    
     /**
      * Loads simulation sources list.
      */
@@ -89,7 +103,11 @@ public class LaunchTab extends AbstractLaunchTab {
                 layout.addMember(launchFormLayout);
 
                 for (Source source : descriptor.getSources()) {
-                    launchFormLayout.addSource(new InputHLayout(source.getName(), source.getDescription()));
+                    boolean disabled = false;
+                    for(String name : disabledSources)
+                        if(source.getName().equals(name))
+                            disabled = true;
+                    launchFormLayout.addSource(new InputHLayout(source.getName(), source.getDescription()),disabled);
                 }
                 
                 configureLaunchButton();
