@@ -49,7 +49,7 @@ public class ObjectSimulateur extends Object3D {
         box = new Data3D("area");
         axis = new Data3D("axis");
         id = contents;
-
+        
         angleX = 0;
         angleY = 0;
         angleZ = 0;

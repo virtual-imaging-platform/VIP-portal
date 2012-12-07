@@ -34,8 +34,6 @@
  */
 package fr.insalyon.creatis.vip.simulationgui.client.view;
 
-
-import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Slider;
@@ -60,19 +58,16 @@ import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIConstants;
 import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.Object3D;
 import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.ObjectModel;
 import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.ObjectSimulateur;
 import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.Scene;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+import java.util.Map;
+
 /**
  *
  * @author Kevin Moulin
@@ -95,19 +90,14 @@ public class SimulationGUIControlBox {
     private Slider hSlider = new Slider("Step");
     private String applicationClass;
     private Object3D simu;
-    private CheckboxItem modBox;
+    private CheckboxItem symBox;
     private CheckboxItem modAxis;
     private CheckboxItem masterCheckbox;
-    private boolean enable = false;
+    private boolean enabled = false;
     private SelectItem simulatorSelectItem;
     private LaunchTab launchTab = null;
     private static HashMap<String, SimulationGUIControlBox> instances = new HashMap<String, SimulationGUIControlBox>();
 
-    private String modname = "Model";
-    private String transname = "transformation";
-    private ArrayList<String> names = new ArrayList<String>();
-        private Logger logger = null;
-    
     public static synchronized SimulationGUIControlBox getInstance(String applicationClass) {
 
         SimulationGUIControlBox inst = instances.get(applicationClass);
@@ -159,12 +149,13 @@ public class SimulationGUIControlBox {
         form2.setFields(spinnerax, spinneray, spinneraz);
 
         modAxis = new CheckboxItem("Axis");
-        modBox = new CheckboxItem("Symbol");
+        symBox = new CheckboxItem("Symbol");
+        symBox.setValue(true);
         modAxis.setValue(true);
 
         form3.setAutoFocus(false);
         form3.setNumCols(6);
-        form3.setFields(modBox, modAxis);
+        form3.setFields(symBox, modAxis);
 
         hSlider.setVertical(false);
         hSlider.setMinValue(1f);
@@ -184,11 +175,9 @@ public class SimulationGUIControlBox {
         portletControl.addItem(form3);
         portletControl.addItem(hLayout1);
         simu = new ObjectSimulateur(applicationClass);
-        logger = Logger.getLogger("Simulation-gui");
-        loadFormSimulator();
+
         setControl();
 
-          
     }
 
     private void setControl() {
@@ -205,7 +194,7 @@ public class SimulationGUIControlBox {
         spinnerx.addChangedHandler(new ChangedHandler() {
 
             public void onChanged(ChangedEvent event) {
-                simu.setTranslateX(Float.valueOf(spinnerx.getValueAsString()));
+                updateSimu();
                 Scene.getInstance().refreshScreen();
                 refreshLaunchTabValue();
             }
@@ -213,7 +202,7 @@ public class SimulationGUIControlBox {
         spinnery.addChangedHandler(new ChangedHandler() {
 
             public void onChanged(ChangedEvent event) {
-                simu.setTranslateY(Float.valueOf(spinnery.getValueAsString()));
+                updateSimu();
                 Scene.getInstance().refreshScreen();
                 refreshLaunchTabValue();
             }
@@ -221,7 +210,7 @@ public class SimulationGUIControlBox {
         spinnerz.addChangedHandler(new ChangedHandler() {
 
             public void onChanged(ChangedEvent event) {
-                simu.setTranslateZ(Float.valueOf(spinnerz.getValueAsString()));
+                updateSimu();
                 Scene.getInstance().refreshScreen();
                 refreshLaunchTabValue();
             }
@@ -229,7 +218,7 @@ public class SimulationGUIControlBox {
         spinnerax.addChangedHandler(new ChangedHandler() {
 
             public void onChanged(ChangedEvent event) {
-                simu.setAngleX(Integer.valueOf(spinnerax.getValueAsString()));
+                updateSimu();
                 Scene.getInstance().refreshScreen();
                 refreshLaunchTabValue();
             }
@@ -237,7 +226,7 @@ public class SimulationGUIControlBox {
         spinneray.addChangedHandler(new ChangedHandler() {
 
             public void onChanged(ChangedEvent event) {
-                simu.setAngleY(Integer.valueOf(spinneray.getValueAsString()));
+                updateSimu();
                 Scene.getInstance().refreshScreen();
                 refreshLaunchTabValue();
             }
@@ -245,67 +234,49 @@ public class SimulationGUIControlBox {
         spinneraz.addChangedHandler(new ChangedHandler() {
 
             public void onChanged(ChangedEvent event) {
-                simu.setAngleZ(Integer.valueOf(spinneraz.getValueAsString()));
+                updateSimu();
                 Scene.getInstance().refreshScreen();
                 refreshLaunchTabValue();
             }
         });
 
-        modBox.addChangeHandler(new ChangeHandler() {
+        symBox.addChangeHandler(new ChangeHandler() {
 
             public void onChange(ChangeEvent event) {
-                if (modBox.getValueAsBoolean()) {
-                    simu.disable("model");
-                    simu.disable("box");
-                    Scene.getInstance().refreshBuffer();
-                    Scene.getInstance().refreshScreen();
+                if (symBox.getValueAsBoolean()) {
+                    hideSymbol();
                 } else {
-                    simu.enable("model");
-                    simu.enable("box");
-                    Scene.getInstance().refreshBuffer();
-                    Scene.getInstance().refreshScreen();
+                    showSymbol();
                 }
-
             }
         });
+
         modAxis.addChangeHandler(new ChangeHandler() {
 
             public void onChange(ChangeEvent event) {
                 if (modAxis.getValueAsBoolean()) {
-                    simu.disable("axis");
-                    Scene.getInstance().refreshBuffer();
-                    Scene.getInstance().refreshScreen();
+                    hideAxis();
                 } else {
-                    simu.enable("axis");
-                    Scene.getInstance().refreshBuffer();
-                    Scene.getInstance().refreshScreen();
+                    showAxis();
                 }
 
             }
         });
-        
+
         simulatorSelectItem.addChangedHandler(new ChangedHandler() {
-         @Override
-            public void onChanged(ChangedEvent event) {
-            // avoid launch null simulation
-              if(simulatorSelectItem.getValueAsString() != "")
-                {
-                    launchTab = new LaunchTab(simulatorSelectItem.getValueAsString());
-                    Layout.getInstance().addTab(launchTab);
-                    launchTab.setCanClose(false);
-                    refreshLaunchTabValue();
-                }
 
+            @Override
+            public void onChanged(ChangedEvent event) {
+                hideLaunchTab();
+                showLaunchTab(simulatorSelectItem.getValueAsString());
             }
         });
-
-    
 
         //////////////////////////// Hover ///////////////////////
         simulatorSelectItem.addItemHoverHandler(new ItemHoverHandler() {
 
             public void onItemHover(ItemHoverEvent event) {
-                String prompt = "Change the version of simulator";
+                String prompt = "Available simulators for this modality";
                 simulatorSelectItem.setPrompt(prompt);
             }
         });
@@ -359,7 +330,7 @@ public class SimulationGUIControlBox {
                 spinnerz.setPrompt(prompt);
             }
         });
-        modBox.addItemHoverHandler(new ItemHoverHandler() {
+        symBox.addItemHoverHandler(new ItemHoverHandler() {
 
             public void onItemHover(ItemHoverEvent event) {
                 String prompt = "Show/hide the symbol for the following object";
@@ -376,18 +347,6 @@ public class SimulationGUIControlBox {
         });
     }
 
-    public void refreshLaunchTabValue() {
-
-        float x = simu.getTranslateX() - ObjectModel.getInstance().getTranslateX();
-        float y = simu.getTranslateY() - ObjectModel.getInstance().getTranslateY();
-        float z = simu.getTranslateZ() - ObjectModel.getInstance().getTranslateZ();
-        float ax = (ObjectModel.getInstance().getAngleX() - simu.getAngleX()) % 360;
-        float ay = (ObjectModel.getInstance().getAngleY() - simu.getAngleY()) % 360;
-        float az = (ObjectModel.getInstance().getAngleZ() - simu.getAngleZ()) % 360;
-        launchTab.setInputValue("Transformation", x + " " + y + " " + z + " " + ax + " " + ay + " " + az);
-        launchTab.setInputValue("Model", SimulationGUITab.getModelStorage());
-    }
-
     public float[] getTabValue() {
 
         return new float[]{
@@ -402,7 +361,7 @@ public class SimulationGUIControlBox {
 
     public Object3D getObjectSimulateur() {
 
-        if (enable) {
+        if (enabled) {
             return simu;
         }
         return null;
@@ -410,29 +369,16 @@ public class SimulationGUIControlBox {
 
     public void enableView() {
 
-        enable = true;
-//        if(simulatorSelectItem.getValueAsString() != "")
-//        {
-     //     launchTab = new LaunchTab(simulatorSelectItem.getValueAsString());
-//        }
-//        JavaScriptObject jsObj;
-//        ChangedEvent event = new ChangedEvent(jsObj);
-//        addChangedHandler(event);
-        if (launchTab != null) {
-         
-             Layout.getInstance().addTab(launchTab);
-            refreshLaunchTabValue();
-        }
+        enabled = true;
+        loadFormSimulator();
+        showSymbol();
+        showAxis();
+
     }
 
     public void disableView() {
-
-        enable = false;
-        if (launchTab != null) {
-            String s = launchTab.getTitle();
-            Layout.getInstance().removeTab(launchTab);
-            launchTab = new LaunchTab(s.replaceAll("Launch ", ""));
-        }
+        enabled = false;
+        hideLaunchTab();
     }
 
     public void setControlOnObject(Object3D mod) {
@@ -449,36 +395,116 @@ public class SimulationGUIControlBox {
 
     private void loadFormSimulator() {
 
-        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
-        final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
+        if (simulatorSelectItem.getValues().length == 0) {
+            ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+            final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
 
-            public void onFailure(Throwable caught) {
-                SC.warn("Error executing get workflow descriptors lists\n" + caught.getMessage());
-                simulatorSelectItem.setValue("No available Workflow");
-                launchTab = null;
-            }
-
-            public void onSuccess(List<Application> result) {
-
-                String dynaStringTab[] = new String[result.size()+1];
-                dynaStringTab[0] =""; //To allow a first simulator selection
-                for (int i = 0; i < result.size(); i++) {
-                    dynaStringTab[i+1] = result.get(i).getName();
-                  //  logger.log(Level.SEVERE, result.get(i).getName());
+                public void onFailure(Throwable caught) {
+                    SC.warn("Error executing get workflow descriptors lists\n" + caught.getMessage());
+                    simulatorSelectItem.setValue("Cannot get simulator list");
+                    launchTab = null;
                 }
-                
-                // logger.log(Level.SEVERE, simulatorSelectItem.getName());
-                simulatorSelectItem.setValueMap(dynaStringTab);
-                simulatorSelectItem.setDefaultToFirstOption(true);
-            //   launchTab = new LaunchTab(dynaStringTab[0]); 
-              //  Layout.getInstance().addTab(launchTab);//applicationclass a la place de Id si on veut lance que la classe "simulation"
-               // launchTab.setCanClose(false);
-                //refreshLaunchTabValue();
-                 launchTab = null;
-            }
-        };
-        service.getApplicationsByClass(applicationClass, callback);
+
+                public void onSuccess(List<Application> result) {
+                    String dynaStringTab[] = new String[result.size() + 1];
+                    dynaStringTab[0] = ""; //To allow a first simulator selection
+                    for (int i = 0; i < result.size(); i++) {
+                        dynaStringTab[i] = result.get(i).getName();
+
+                    }
+                    simulatorSelectItem.setValueMap(dynaStringTab);
+                    simulatorSelectItem.setDefaultToFirstOption(true);
+                    simulatorSelectItem.setValue(dynaStringTab[0]);
+                    showLaunchTab(dynaStringTab[0]);
+             
+                }
+            };
+            service.getApplicationsByClass(applicationClass, callback);
+        } else {
+            showLaunchTab(simulatorSelectItem.getValueAsString());
+        }
     }
-                 
-  
+
+    private void showLaunchTab(String name) {
+        Map<String, String> inputs = new HashMap<String, String>();
+        inputs.put("Transformation", getTransformation());
+        inputs.put("Model", SimulationGUITab.getModelStorage());
+        inputs.put("Model URI", SimulationGUITab.getModelURI().substring(SimulationGUITab.getModelURI().lastIndexOf('#') + 1));
+
+        String[] disabled = {"Transformation", "Model", "Model URI"};
+        launchTab = new LaunchTab(name, SimulationGUITab.getModelName() + " simulation", inputs, disabled);//simulatorSelectItem.getValueAsString());
+
+        Layout.getInstance().addTab(launchTab);
+        Layout.getInstance().setActiveCenterTab(SimulationGUIConstants.TAB_EDITOR);
+    }
+
+    private void hideLaunchTab() {
+        if (launchTab != null) {
+            String s = launchTab.getTitle();
+            Layout.getInstance().removeTab(launchTab);
+            launchTab = null;
+            //launchTab = new LaunchTab(s.replaceAll("Launch ", ""));
+        }
+    }
+
+    private void updateSimu() {
+        simu.setTranslateX(Float.valueOf(spinnerx.getValueAsString()));
+        simu.setTranslateY(Float.valueOf(spinnery.getValueAsString()));
+        simu.setTranslateZ(Float.valueOf(spinnerz.getValueAsString()));
+        simu.setAngleX(Integer.valueOf(spinnerax.getValueAsString()));
+        simu.setAngleY(Integer.valueOf(spinneray.getValueAsString()));
+        simu.setAngleZ(Integer.valueOf(spinneraz.getValueAsString()));
+    }
+
+    public void refreshLaunchTabValue() {
+
+        if (launchTab != null) {
+            launchTab.setInputValue("Transformation", getTransformation());
+            launchTab.setInputValue("Model", SimulationGUITab.getModelStorage());
+        }
+        if (SimulationGUITab.getModelURI() != null && launchTab != null) {
+            launchTab.setInputValue("Model URI", SimulationGUITab.getModelURI().substring(SimulationGUITab.getModelURI().lastIndexOf('#') + 1));
+        }
+    }
+
+    public void showSymbol() {
+        simu.enable("model");
+        simu.enable("box");
+        Scene.getInstance().refreshBuffer();
+        Scene.getInstance().refreshScreen();
+    }
+
+    public void hideSymbol() {
+        simu.disable("model");
+        simu.disable("box");
+        Scene.getInstance().refreshBuffer();
+        Scene.getInstance().refreshScreen();
+    }
+
+    public void hideAxis() {
+        simu.disable("axis");
+        Scene.getInstance().refreshBuffer();
+        Scene.getInstance().refreshScreen();
+    }
+
+    public void showAxis() {
+        simu.enable("axis");
+        Scene.getInstance().refreshBuffer();
+        Scene.getInstance().refreshScreen();
+    }
+
+    private String getTransformation() {
+
+        updateSimu();
+
+        float x = simu.getTranslateX() - ObjectModel.getInstance().getTranslateX();
+        float y = simu.getTranslateY() - ObjectModel.getInstance().getTranslateY();
+        float z = simu.getTranslateZ() - ObjectModel.getInstance().getTranslateZ();
+        float ax = (ObjectModel.getInstance().getAngleX() - simu.getAngleX()) % 360;
+        float ay = (ObjectModel.getInstance().getAngleY() - simu.getAngleY()) % 360;
+        float az = (ObjectModel.getInstance().getAngleZ() - simu.getAngleZ()) % 360;
+
+        return x + " " + y + " " + z + " " + ax + " " + ay + " " + az;
+
+    }
 }

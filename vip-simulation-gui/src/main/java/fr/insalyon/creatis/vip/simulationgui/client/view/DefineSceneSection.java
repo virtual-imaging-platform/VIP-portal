@@ -120,6 +120,9 @@ public class DefineSceneSection extends SectionStackSection {
         checkBoxCt = boxCt.getCheckbox();
         checkBoxPet = boxPet.getCheckbox();
 
+        showModelBox();
+        checkBoxModel.setValue(true);
+
         portalLayout1.setShowColumnMenus(false);
 
         Tab camera = new Tab();
@@ -192,20 +195,14 @@ public class DefineSceneSection extends SectionStackSection {
     }
 
     private void initControls() {
-        
+
         checkBoxPet.addChangeHandler(new ChangeHandler() {
 
             public void onChange(ChangeEvent event) {
                 if (checkBoxPet.getValueAsBoolean()) {
-                    boxPet.disableView();
-                    sceneDraw.addObject(boxPet.getObjectSimulateur(), 0);
-                    portalLayout1.removePortlet(boxPet.getControlPortlet());
-                    compteur--;
+                    hideBox(boxPet);
                 } else {
-                    boxPet.enableView();
-                    sceneDraw.addObject(boxPet.getObjectSimulateur(), 0);
-                    portalLayout1.addPortlet(boxPet.getControlPortlet(), compteur % 2, 0);
-                    compteur++;
+                    showBox(boxPet);
                 }
             }
         });
@@ -213,32 +210,20 @@ public class DefineSceneSection extends SectionStackSection {
 
             public void onChange(ChangeEvent event) {
                 if (checkBoxUs.getValueAsBoolean()) {
-                    boxUs.disableView();
-                    sceneDraw.addObject(boxUs.getObjectSimulateur(), 1);
-                    portalLayout1.removePortlet(boxUs.getControlPortlet());
-                    compteur--;
+                    hideBox(boxUs);
                 } else {
-                    boxUs.enableView();
-                   
-                    sceneDraw.addObject(boxUs.getObjectSimulateur(), 1);
-                    portalLayout1.addPortlet(boxUs.getControlPortlet(), compteur % 2, 0);
-                    compteur++;
+                    showBox(boxUs);
                 }
             }
         });
+        
         checkBoxMri.addChangeHandler(new ChangeHandler() {
 
             public void onChange(ChangeEvent event) {
                 if (checkBoxMri.getValueAsBoolean()) {
-                    boxMri.disableView();
-                    sceneDraw.addObject(boxMri.getObjectSimulateur(), 2);
-                    portalLayout1.removePortlet(boxMri.getControlPortlet());
-                    compteur--;
+                    hideBox(boxMri);
                 } else {
-                    boxMri.enableView();
-                    sceneDraw.addObject(boxMri.getObjectSimulateur(), 2);
-                    portalLayout1.addPortlet(boxMri.getControlPortlet(), compteur % 2, 0);
-                    compteur++;
+                    showBox(boxMri);
                 }
             }
         });
@@ -246,15 +231,9 @@ public class DefineSceneSection extends SectionStackSection {
 
             public void onChange(ChangeEvent event) {
                 if (checkBoxCt.getValueAsBoolean()) {
-                    boxCt.disableView();
-                    sceneDraw.addObject(boxCt.getObjectSimulateur(), 3);
-                    portalLayout1.removePortlet(boxCt.getControlPortlet());
-                    compteur--;
+                    hideBox(boxCt);
                 } else {
-                    boxCt.enableView();
-                    sceneDraw.addObject(boxCt.getObjectSimulateur(), 3);
-                    portalLayout1.addPortlet(boxCt.getControlPortlet(), compteur % 2, 0);
-                    compteur++;
+                    showBox(boxCt);
                 }
             }
         });
@@ -263,12 +242,10 @@ public class DefineSceneSection extends SectionStackSection {
 
             public void onChange(ChangeEvent event) {
                 if (checkBoxModel.getValueAsBoolean()) {
-
-                    portalLayout1.removePortlet(boxModel);
-                    compteur--;
+                    hideModelBox();
                 } else {
-                    portalLayout1.addPortlet(boxModel, compteur % 2, 0);
-                    compteur++;
+                    showModelBox();
+
                 }
             }
         });
@@ -419,39 +396,73 @@ public class DefineSceneSection extends SectionStackSection {
     }
 
     public void hideModal() {
-        
+
         modal.hide();
     }
 
     public void showModal(String contents) {
-        
+
         modal.show(contents, true);
     }
+
     
-    public void enableBox(String box) {
-        if (box == "MRI") {
-            checkBoxMri.disable();
-        } else if (box == "PET") {
-            checkBoxPet.disable();
-        } else if (box == "CT") {
-            checkBoxCt.disable();
-        } else if (box == "US") {
-            checkBoxUs.disable();
-        } else {
-        }
+    
+    private void hideModelBox() {
+        portalLayout1.removePortlet(boxModel);
+        compteur--;
 
     }
-    /* 
-    private BufferedImage canvasToImage(Canvas cnvs) {
-    int w = cnvs.getWidth();
-    int h = cnvs.getHeight();
-    int type = BufferedImage.TYPE_INT_RGB;
-    BufferedImage image = new BufferedImage(w,h,type);
-    Graphics2D g2 = image.createGraphics();
-    //cnvs.paint(g2);
-    //cnvs.printComponents(g2);
-    cnvs.g
-    g2.dispose();
-    return image;
-    }*/
+
+    private void showModelBox() {
+        portalLayout1.addPortlet(boxModel, compteur % 2, 0);
+        compteur++;
+    }
+
+    public void disableBox(String box) {
+
+        if (box == "MRI") {
+            this.checkBoxMri.setValue(false);
+            hideBox(boxMri);
+        } else if (box == "PET") {
+            this.checkBoxPet.setValue(false);
+            hideBox(boxPet);
+        } else if (box == "CT") {
+            this.checkBoxCt.setValue(false);
+            hideBox(boxCt);
+        } else if (box == "US") {
+            this.checkBoxUs.setValue(false);
+            hideBox(boxUs);
+        } 
+    }
+
+    public void enableBox(String box){
+    
+        if (box == "MRI") {
+            this.checkBoxMri.setValue(true);
+            showBox(boxMri);
+        } else if (box == "PET") {
+            this.checkBoxPet.setValue(true);
+            showBox(boxPet);
+        } else if (box == "CT") {
+            this.checkBoxCt.setValue(true);
+            showBox(boxCt);
+        } else if (box == "US") {
+            this.checkBoxUs.setValue(true);
+            showBox(boxUs);
+        } 
+    }
+    
+    private void hideBox(SimulationGUIControlBox box) {
+        box.disableView();
+        sceneDraw.addObject(box.getObjectSimulateur(), 0);
+        portalLayout1.removePortlet(box.getControlPortlet());
+        compteur--;
+    }
+
+    private void showBox(SimulationGUIControlBox box) {
+        box.enableView();
+        sceneDraw.addObject(box.getObjectSimulateur(), 0);
+        portalLayout1.addPortlet(box.getControlPortlet(), compteur % 2, 0);
+        compteur++;
+    }
 }

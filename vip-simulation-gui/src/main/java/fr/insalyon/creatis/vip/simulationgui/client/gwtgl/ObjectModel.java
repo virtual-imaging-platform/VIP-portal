@@ -565,7 +565,7 @@ public class ObjectModel extends Object3D {
 
     @Override
     public void setBoundingBox(double[] b) {
-
+   
         boundingBox = b;
         model.setBoundingBox(b);
         box.setBoundingBox(b);

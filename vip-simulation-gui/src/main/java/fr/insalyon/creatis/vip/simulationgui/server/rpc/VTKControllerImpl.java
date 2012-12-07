@@ -145,6 +145,7 @@ public class VTKControllerImpl extends AbstractRemoteServiceServlet implements V
 
 
         System.out.println("object got and garbage done " + object.length);
+        
         return object;
         //return service.getObject();
     }
