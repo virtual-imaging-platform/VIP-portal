@@ -308,11 +308,12 @@ public class ModelListTab extends Tab {
                 String modelURI = event.getRecord().getAttribute("uri");
                 String title = event.getRecord().getAttribute("name");
                 String owner =  event.getRecord().getAttribute("owner");
+                String surl = event.getRecord().getAttribute("surl");
 
                 boolean bdelete = false;
                 if (owner.equals( CoreModule.user.getFullName()) || CoreModule.user.isSystemAdministrator() || CoreModule.user.isGroupAdmin(ModelConstants.GROUP_VIP))
                         bdelete = true;
-                new ModelContextMenu(modal, modelURI, title, bdelete,test).showContextMenu();
+                new ModelContextMenu(modal, modelURI, title, surl,bdelete,test).showContextMenu();
             }
             
         });
@@ -335,6 +336,7 @@ public class ModelListTab extends Tab {
 
             public void onSuccess(List<SimulationObjectModelLight> result) {
                 setModelList(result);
+                
                 modal.hide();
             }
         };
@@ -384,7 +386,7 @@ public class ModelListTab extends Tab {
             }
             dataList.add(new SimulationObjectModelLightRecord(s.getModelName(), 
                     s.getOwner(),s.getDescription(),type, "" + s.isLongitudinal(), "" + s.isMoving(),
-                    s.getURI(),s.getLastModificationDate()));
+                    s.getURI(),s.getLastModificationDate(),s.getStorageURL()));
         }
         grid.setData(dataList.toArray(new SimulationObjectModelLightRecord[]{}));
     }

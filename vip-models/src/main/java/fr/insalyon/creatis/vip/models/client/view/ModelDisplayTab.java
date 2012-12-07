@@ -34,7 +34,6 @@
  */
 package fr.insalyon.creatis.vip.models.client.view;
 
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.tab.Tab;
 
 /**

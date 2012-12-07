@@ -33,12 +33,14 @@ class ModelContextMenu extends Menu {
     private ModalWindow modal;
     private String modelURI;
     private String modelName;
+    private String modelSURL;
 
-    public ModelContextMenu(ModalWindow modal, String uri, String title, boolean bdelete, final boolean test) {
+    public ModelContextMenu(ModalWindow modal, String uri, String title, String surl, boolean bdelete, final boolean test) {
         this.modal = modal;
         this.modelURI = uri;
         this.modelName = title;
-
+        this.modelSURL = surl;
+        
         this.setShowShadow(true);
         this.setShadowDepth(10);
         this.setWidth(90);
@@ -80,13 +82,13 @@ class ModelContextMenu extends Menu {
             }
         });
 
-        MenuItem SimulationItem = new MenuItem("Launch simulation GUI");
+        MenuItem SimulationItem = new MenuItem("Launch simulation from model");
         SimulationItem.setIcon(SimulationGUIConstants.APP_IMG_EDITOR);
         SimulationItem.setEnabled(true);
         SimulationItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new SimulationGUITab(modelURI.toString(), null, test));
+                Layout.getInstance().addTab(new SimulationGUITab(modelURI.toString(), modelName, modelSURL, null, test));
             }
         });
 

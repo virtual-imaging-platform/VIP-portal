@@ -47,7 +47,7 @@ public class SimulationObjectModelLightRecord extends ListGridRecord {
     }
 
     public SimulationObjectModelLightRecord(String name, String owner, String description, String types, String longitudinal,
-            String movement, String URI, String date) {
+            String movement, String URI, String date, String SURL) {
         setName(name);
         setTypes(types);
         setLongitudinal(longitudinal);
@@ -62,6 +62,7 @@ public class SimulationObjectModelLightRecord extends ListGridRecord {
         }
         else
             setDate("not available");
+        setSURL(SURL);
     }
 
     private void setName(String name) {
@@ -94,6 +95,10 @@ public class SimulationObjectModelLightRecord extends ListGridRecord {
     
     private void setDate(String date){
         setAttribute("date", date);
+    }
+
+    private void setSURL(String SURL) {
+        setAttribute("surl",SURL);
     }
     
 }
