@@ -34,13 +34,13 @@
         <dependency>
             <groupId>fr.cnrs.i3s</groupId>
             <artifactId>NeuSemStore-provenance</artifactId>
-            <version>0.1.6-SNAPSHOT</version>
+            <version>0.1.7-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>fr.cnrs.i3s</groupId>
             <artifactId>NeuSemStore-core</artifactId>
-            <version>0.1.6-SNAPSHOT</version>
+            <version>0.1.7-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
 
