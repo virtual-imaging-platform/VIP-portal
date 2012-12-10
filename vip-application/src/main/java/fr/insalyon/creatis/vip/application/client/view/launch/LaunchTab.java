@@ -76,8 +76,10 @@ public class LaunchTab extends AbstractLaunchTab {
         layout.clear();
         disabledSources = new ArrayList<String>();
         disabledSources = new ArrayList<String>();
+        if(disabled != null){
         for(int i = 0 ; i < disabled.length ; i++)
             disabledSources.add(disabled[i]);
+        }
         loadData(simulationName, inputs);
     }
     
