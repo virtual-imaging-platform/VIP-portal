@@ -4,12 +4,7 @@
  */
 package fr.insalyon.creatis.vip.simulatedata.client;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
-import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
-import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 import fr.insalyon.creatis.vip.simulatedata.client.bean.SemEntity;
 import java.util.Date;
 import java.util.List;
@@ -23,13 +18,14 @@ public class SimulatedDataRecord extends ListGridRecord {
     public SimulatedDataRecord() {
     }
 
-    public SimulatedDataRecord(List<SemEntity> files, List<SemEntity> parameters, List<SemEntity> models, String simulation, Date date) {
+    public SimulatedDataRecord(List<SemEntity> files, List<SemEntity> parameters, List<SemEntity> models, String simulation, Date date, String name) {
 
         setAttribute("icon", "icon-file");
     
    
         setAttribute("simulation", simulation);
         setAttribute("date", date);
+        setAttribute("simulation-name",name);
 
        
         String shownFiles = "" , realFiles = "";

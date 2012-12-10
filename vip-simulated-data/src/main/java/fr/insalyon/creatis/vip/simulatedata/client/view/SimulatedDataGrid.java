@@ -106,13 +106,13 @@ public class SimulatedDataGrid extends VLayout {
         ListGridField icoField = FieldUtil.getIconGridField("icon");
         ListGridField fileField = new ListGridField("short-files", "Simulated Data File");
         ListGridField typeField = new ListGridField("type", "Type");
-        ListGridField paramField = new ListGridField("short-param", "Parameters");
+        ListGridField paramField = new ListGridField("short-param", "Simulation Parameters");
         ListGridField modelField = new ListGridField("short-model", "Model");
-        ListGridField dateField = new ListGridField("date","Simulation date");
-      //  ListGridField simulationField = new ListGridField("simulation", "Produced by simulation");
+        ListGridField dateField = new ListGridField("date","Simulation Date");
+        ListGridField simulationField = new ListGridField("simulation-name", "Simulation Name");
 
-        grid.setFields(icoField, fileField, typeField, paramField, modelField,dateField);
-        grid.setSortField("icon");
+        grid.setFields(icoField, fileField, typeField, paramField, modelField,simulationField,dateField);
+        grid.setSortField("date");
         grid.setSortDirection(SortDirection.DESCENDING);
 
         addMember(grid);
@@ -125,7 +125,7 @@ public class SimulatedDataGrid extends VLayout {
         int i = 0;
         for (SimulatedData sd : result) {
             if(sd.getModality() == m){
-                data[i++] = new SimulatedDataRecord(sd.getFiles(),  sd.getParameters(), sd.getModels(), sd.getSimulation(),sd.getDate());
+                data[i++] = new SimulatedDataRecord(sd.getFiles(),  sd.getParameters(), sd.getModels(), sd.getSimulation(),sd.getDate(),sd.getName());
             }
         }
         grid.setData(data);

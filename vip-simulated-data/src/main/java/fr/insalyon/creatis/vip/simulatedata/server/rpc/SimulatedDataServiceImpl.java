@@ -16,14 +16,17 @@ import java.util.ArrayList;
 import java.util.List;
 import fr.insalyon.creatis.vip.application.server.rpc.WorkflowServiceImpl;
 import fr.insalyon.creatis.vip.simulatedata.client.bean.SimulatedData;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
+
 
 /**
  *
  * @author glatard
  */
 public class SimulatedDataServiceImpl extends AbstractRemoteServiceServlet implements SimulatedDataService{
+    
+ private static final Logger logger = Logger.getLogger(SimulatedDataServiceImpl.class);
+    
  public SimulatedDataServiceImpl() {
  }
  @Override
@@ -89,8 +92,12 @@ public class SimulatedDataServiceImpl extends AbstractRemoteServiceServlet imple
 
                     String name = "";
                     if (sse.getUri().equals("")) {
+                        try{
                         SimulationObjectModel som = SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(se.getLabel(), true);
                         name = som.getModelName();
+                        } catch(NullPointerException e){
+                            logger.warn("Cannot reconstruct model "+se.getLabel()+" from triple store");
+                        }
                     }
 
                     sse.setName(name);
@@ -101,8 +108,10 @@ public class SimulatedDataServiceImpl extends AbstractRemoteServiceServlet imple
                 WorkflowServiceImpl ws = new WorkflowServiceImpl();
                 try {
                     ssd.setDate(ws.getSimulation(ssd.getSimulation()).getDate());
+                    ssd.setName(ws.getSimulation(ssd.getSimulation()).getSimulationName());
+                    
                 } catch (ApplicationException ex) {
-                    Logger.getLogger(SimulatedDataServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.warn("Cannot set simulation date or name");
                 }
 
 

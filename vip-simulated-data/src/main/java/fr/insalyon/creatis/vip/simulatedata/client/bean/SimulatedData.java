@@ -17,6 +17,8 @@ import java.util.List;
 //public class SimulatedData implements IsSerializable {
 public class SimulatedData implements IsSerializable {
 
+   
+
  
 
     public enum Modality {
@@ -30,6 +32,7 @@ public class SimulatedData implements IsSerializable {
     private List<SemEntity> parameters;
     private List<SemEntity> models;
     private String simulation;
+    private String name;
     
     private Date date;
 
@@ -107,6 +110,14 @@ public class SimulatedData implements IsSerializable {
 
     public void setDate(Date data) {
         this.date = data;
+    }
+    
+     public String getName() {
+        return name;
+    }
+    
+    public void setName(String name){
+        this.name = name;
     }
 
     @Override
