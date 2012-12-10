@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -34,21 +34,24 @@
  */
 package fr.insalyon.creatis.vip.gatelab.client.view.monitor;
 
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.grid.events.RowMouseDownEvent;
 import com.smartgwt.client.widgets.grid.events.RowMouseDownHandler;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationsTab;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.gatelab.client.GateLabConstants;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class GateLabSimulationsTab extends SimulationsTab {
 
     public GateLabSimulationsTab() {
 
         super();
+        this.setTitle(Canvas.imgHTML(GateLabConstants.ICON_APPLICATION) + " Simulations");
        
         rowMouseDownHandler.removeHandler();
         grid.addRowMouseDownHandler(new RowMouseDownHandler() {
@@ -56,10 +59,10 @@ public class GateLabSimulationsTab extends SimulationsTab {
             public void onRowMouseDown(RowMouseDownEvent event) {
                 if (event.getColNum() != 1) {
                     String simulationID = event.getRecord().getAttribute("simulationId");
+                    String simulationName = event.getRecord().getAttribute("simulationName");
                     SimulationStatus status = SimulationStatus.valueOf(event.getRecord().getAttribute("status"));
                     String date = event.getRecord().getAttribute("date");
-                    String title = event.getRecord().getAttribute("simulationName");
-                    Layout.getInstance().addTab(new GateLabSimulationTab(simulationID, title, status, date));
+                    Layout.getInstance().addTab(new GateLabSimulationTab(simulationID, simulationName, status, date));
                 }
             }
         });

@@ -43,7 +43,7 @@ import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
-import fr.insalyon.creatis.vip.application.server.business.JobBusiness;
+import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -294,7 +294,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             ApplicationStatus status = new ApplicationStatus();
             status.setRunningWorkflows(runningSimulations.size());
             
-            JobBusiness jobBusiness = new JobBusiness();
+            SimulationBusiness jobBusiness = new SimulationBusiness();
             int[] tasks = jobBusiness.getNumberOfActiveTasks(runningSimulations);
             status.setRunningTasks(tasks[0]);
             status.setWaitingTasks(tasks[1]);

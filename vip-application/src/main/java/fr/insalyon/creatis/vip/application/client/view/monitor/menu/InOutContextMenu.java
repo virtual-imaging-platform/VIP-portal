@@ -42,7 +42,6 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.tree.Tree;
 import com.smartgwt.client.widgets.tree.TreeNode;
 import fr.insalyon.creatis.vip.application.client.view.monitor.general.InOutTreeNode;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
@@ -62,14 +61,12 @@ public class InOutContextMenu extends Menu {
     private String simulationID;
     private Tree tree;
     private InOutTreeNode node;
-    private ModalWindow modal;
 
-    public InOutContextMenu(String simulationID, Tree tree, final InOutTreeNode node, ModalWindow modal) {
+    public InOutContextMenu(String simulationID, Tree tree, final InOutTreeNode node) {
 
         this.simulationID = simulationID;
         this.tree = tree;
         this.node = node;
-        this.modal = modal;
 
         this.setShowShadow(true);
         this.setShadowDepth(10);
@@ -123,18 +120,15 @@ public class InOutContextMenu extends Menu {
 
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
                 Layout.getInstance().setWarningMessage("Unable to download file:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(String result) {
-                modal.hide();
                 OperationLayout.getInstance().addOperation(result);
                 DataManagerModule.dataManagerSection.expand();
             }
         };
-        modal.show("Adding file to transfer queue...", true);
         service.downloadFile(path, callback);
     }
 
@@ -162,18 +156,15 @@ public class InOutContextMenu extends Menu {
 
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
                 Layout.getInstance().setWarningMessage("Unable to download files:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(String result) {
-                modal.hide();
                 OperationLayout.getInstance().addOperation(result);
                 DataManagerModule.dataManagerSection.expand();
             }
         };
-        modal.show("Adding files to transfer queue...", true);
         service.downloadFiles(paths, packName, callback);
     }
 }

@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -38,6 +38,9 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.bean.Node;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.SimulationFileType;
+import fr.insalyon.creatis.vip.application.client.bean.Task;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
@@ -51,11 +54,110 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
-public class JobBusiness {
+public class SimulationBusiness {
 
-    private static final Logger logger = Logger.getLogger(JobBusiness.class);
+    private static final Logger logger = Logger.getLogger(SimulationBusiness.class);
+
+    /**
+     *
+     * @param simulationID
+     * @return
+     * @throws BusinessException
+     */
+    public List<Job> getList(String simulationID) throws BusinessException {
+
+        try {
+            return ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getList();
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param simulationID
+     * @param parameters
+     * @return
+     * @throws BusinessException
+     */
+    public List<Task> getTasks(String simulationID, String parameters) throws BusinessException {
+
+        try {
+            return ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getTasks(parameters);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param simulationID
+     * @param taskID
+     * @param fileType
+     * @return
+     * @throws BusinessException
+     */
+    public String[] readSimulationFile(String simulationID, String taskID,
+            SimulationFileType fileType) throws BusinessException {
+
+        try {
+            Task task = ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getTask(taskID);
+            String folder = null;
+            String extension = null;
+
+            switch (fileType) {
+                case OutputFile:
+                    folder = "out";
+                    extension = ".sh.out";
+                    break;
+                case ErrorFile:
+                    folder = "err";
+                    extension = ".sh.err";
+                    break;
+                case ApplicationOutputFile:
+                    folder = "out";
+                    extension = ".sh.app.out";
+                    break;
+                case ApplicationErrorFile:
+                    folder = "err";
+                    extension = ".sh.app.err";
+                    break;
+                case ScriptFile:
+                    folder = "sh";
+                    extension = ".sh";
+                default:
+            }
+            String[] result = new String[2];
+            result[0] = "/" + simulationID + "/" + folder + "/" + task.getFileName() + extension;
+            result[1] = readFile(simulationID, folder, task.getFileName(), extension);
+            return result;
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
+    /**
+     *
+     * @param simulationID
+     * @param taskID
+     * @param status
+     * @throws BusinessException
+     */
+    public void sendTaskSignal(String simulationID, String taskID, TaskStatus status)
+            throws BusinessException {
+
+        try {
+            ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).sendTaskSignal(taskID, status);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
 
     /**
      *
@@ -79,7 +181,7 @@ public class JobBusiness {
      * @return
      * @throws BusinessException
      */
-    public List<Job> getJobsList(String simulationID) throws BusinessException {
+    public List<Task> getJobsList(String simulationID) throws BusinessException {
 
         try {
             return ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getJobs();

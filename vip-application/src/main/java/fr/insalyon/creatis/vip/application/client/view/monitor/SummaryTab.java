@@ -57,13 +57,13 @@ import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.viewer.DetailViewer;
 import com.smartgwt.client.widgets.viewer.DetailViewerField;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.Job;
+import fr.insalyon.creatis.vip.application.client.bean.Task;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
+import fr.insalyon.creatis.vip.application.client.view.common.AbstractCornerTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.menu.JobsContextMenu;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.JobRecord;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.SummaryRecord;
@@ -77,7 +77,7 @@ import java.util.Map;
  *
  * @author Rafael Ferreira da Silva
  */
-public class SummaryTab extends Tab {
+public class SummaryTab extends AbstractCornerTab {
 
     private ModalWindow summaryModal;
     private ModalWindow detailModal;
@@ -96,7 +96,7 @@ public class SummaryTab extends Tab {
         this.completed = completed;
 
         this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_SUMMARY));
-        this.setPrompt("Jobs Summary");
+        this.setPrompt("Tasks Summary");
 
         configureChart();
         configureSummaryGrid();
@@ -123,7 +123,9 @@ public class SummaryTab extends Tab {
         vLayout.addMember(detailGrid);
 
         this.setPane(vLayout);
-        loadData();
+        
+        loadSummaryData();
+        loadDetailData();
     }
 
     private void configureChart() {
@@ -212,7 +214,8 @@ public class SummaryTab extends Tab {
         });
     }
 
-    public void loadData() {
+    @Override
+    public void update() {
 
         loadSummaryData();
         loadDetailData();
@@ -341,7 +344,7 @@ public class SummaryTab extends Tab {
     private void loadDetailData() {
 
         JobServiceAsync service = JobService.Util.getInstance();
-        final AsyncCallback<List<Job>> callback = new AsyncCallback<List<Job>>() {
+        final AsyncCallback<List<Task>> callback = new AsyncCallback<List<Task>>() {
             @Override
             public void onFailure(Throwable caught) {
                 detailModal.hide();
@@ -349,9 +352,9 @@ public class SummaryTab extends Tab {
             }
 
             @Override
-            public void onSuccess(List<Job> result) {
+            public void onSuccess(List<Task> result) {
                 List<JobRecord> dataList = new ArrayList<JobRecord>();
-                for (Job j : result) {
+                for (Task j : result) {
                     dataList.add(new JobRecord(j.getId(), j.getStatus(),
                             j.getCommand(), j.getFileName(), j.getExitCode(),
                             j.getSiteName(), j.getNodeName(), j.getParameters(),

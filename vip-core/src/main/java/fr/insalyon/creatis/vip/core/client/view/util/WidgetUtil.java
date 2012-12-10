@@ -99,6 +99,36 @@ public class WidgetUtil {
         label.setCursor(cursor);
         return label;
     }
+    
+    /**
+     * 
+     * @param height
+     * @return 
+     */
+    public static Label getSpaceLabel(int height) {
+        
+        Label label = new Label();
+        label.setWidth100();
+        label.setContents("");
+        return label;
+    }
+    
+    /**
+     * 
+     * @param icon
+     * @param prompt
+     * @param height
+     * @param clickHandler
+     * @return 
+     */
+    public static Label getIconLabel(String icon, String prompt, int height, ClickHandler clickHandler) {
+        
+        Label label = getLabel("", icon, height, Cursor.HAND);
+        label.setWidth(height);
+        label.setPrompt(prompt);
+        label.addClickHandler(clickHandler);
+        return label;
+    }
 
     /**
      *

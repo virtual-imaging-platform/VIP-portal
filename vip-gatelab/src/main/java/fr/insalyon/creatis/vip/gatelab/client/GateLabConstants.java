@@ -40,9 +40,13 @@ package fr.insalyon.creatis.vip.gatelab.client;
  */
 public class GateLabConstants {
 
+    // Tabs
+    public final static String TAB_MONITOR = "gatelab-monitor-tab";
     // Icons
     private final static String IMG_FOLDER = "gatelab/";
     public final static String ICON_APPLICATION = IMG_FOLDER + "icon-application.png";
+    public final static String ICON_DOWNLOAD_INPUT = IMG_FOLDER + "icon-download-input.png";
+    public final static String ICON_DOWNLOAD_OUTPUT = IMG_FOLDER + "icon-download-output.png";
     // Application Names
     public final static String APP_MONITOR = "Monitor GateLab";
     // Application Images

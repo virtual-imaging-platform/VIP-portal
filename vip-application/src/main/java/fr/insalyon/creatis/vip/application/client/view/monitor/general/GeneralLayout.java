@@ -35,75 +35,46 @@
 package fr.insalyon.creatis.vip.application.client.view.monitor.general;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.widgets.grid.ListGrid;
-import com.smartgwt.client.widgets.grid.ListGridField;
-import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.widgets.Label;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
+import fr.insalyon.creatis.vip.application.client.view.monitor.progress.ProgressLayout;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class GeneralInformationLayout extends AbstractFormLayout {
+public class GeneralLayout extends AbstractFormLayout {
 
     private String simulationID;
-    private ListGrid grid;
+    private Label generalLabel;
+    private ProgressLayout progressLayout;
 
-    public GeneralInformationLayout(String simulationID) {
+    public GeneralLayout(String simulationID, SimulationStatus status) {
 
-        super("100%", "200px");
-        addTitle("General Information", ApplicationConstants.ICON_GENERAL);
-
+        super("100%", "140px");
         this.simulationID = simulationID;
 
-        configureGrid();
+        generalLabel = new Label();
+        generalLabel.setHeight(25);
+        generalLabel.setIcon(ApplicationConstants.ICON_GENERAL);
+        generalLabel.setCanSelectText(true);
+        this.addMember(generalLabel);
+
+        addTitle("<font color=\"#333333\">Simulation Progress</font>", null);
+        progressLayout = new ProgressLayout(simulationID, status);
+        this.addMember(progressLayout);
+        
+        loadData();
     }
 
-    private void configureGrid() {
-
-        grid = new ListGrid() {
-            @Override
-            protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
-
-                if (getFieldName(colNum).equals("value")) {
-                    PropertyRecord propertyRecord = (PropertyRecord) record;
-                    SimulationStatus status = SimulationStatus.valueOf(propertyRecord.getValue());
-
-                    if (status == SimulationStatus.Running) {
-                        return "font-weight:bold; color:#009900;";
-
-                    } else if (status == SimulationStatus.Completed) {
-                        return "font-weight:bold; color:#287fd6;";
-
-                    } else if (status == SimulationStatus.Killed) {
-                        return "font-weight:bold; color:#d64949;";
-                    }
-                }
-                return super.getCellCSSText(record, rowNum, colNum);
-            }
-        };
-        grid.setWidth100();
-        grid.setHeight100();
-        grid.setShowAllRecords(true);
-        grid.setShowEmptyMessage(true);
-        grid.setEmptyMessage("<br>No data available.");
-
-        ListGridField propertyField = new ListGridField("property", "Properties");
-        ListGridField valueField = new ListGridField("value", "Value");
-
-        grid.setFields(propertyField, valueField);
-
-        this.addMember(grid);
-    }
-
-    public void loadData() {
+    private void loadData() {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Simulation> callback = new AsyncCallback<Simulation>() {
@@ -114,16 +85,27 @@ public class GeneralInformationLayout extends AbstractFormLayout {
 
             @Override
             public void onSuccess(Simulation result) {
-                grid.setData(new PropertyRecord[]{
-                            new PropertyRecord("Simulation Name", result.getSimulationName()),
-                            new PropertyRecord("Simulation Identifier", result.getID()),
-                            new PropertyRecord("Submission Time", result.getDate().toString()),
-                            new PropertyRecord("Owner", result.getUserName()),
-                            new PropertyRecord("Application", result.getApplication()),
-                            new PropertyRecord("Status", result.getMajorStatus())
-                        });
+                
+                StringBuilder sb = new StringBuilder();
+                sb.append("<font color=\"#333333\"><b>");
+                sb.append(result.getApplication());
+                sb.append("</b> launched on <b>");
+                sb.append(result.getDate().toString());
+                sb.append("</b>");
+                if (CoreModule.user.isSystemAdministrator()) {
+                    sb.append(" by <b>");
+                    sb.append(result.getUserName());
+                    sb.append("</b> (");
+                    sb.append(result.getID());
+                    sb.append(")</font>");
+                }              
+                generalLabel.setContents(sb.toString());
             }
         };
         service.getSimulation(simulationID, callback);
+    }
+
+    public void update() {
+        progressLayout.update();
     }
 }

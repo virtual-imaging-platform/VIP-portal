@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -34,8 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.server.business.simulation;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import static fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus.*;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.util.ProxyUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import java.io.File;
@@ -47,7 +46,7 @@ import org.apache.axis.configuration.FileProvider;
 
 /**
  *
- * @author Ibrahim kallel
+ * @author Rafael Ferreira da Silva, Ibrahim kallel
  */
 public class WebServiceEngine extends WorkflowEngineInstantiator {
 
@@ -144,7 +143,7 @@ public class WebServiceEngine extends WorkflowEngineInstantiator {
      * @throws ServiceException
      */
     @Override
-    public ApplicationConstants.SimulationStatus getStatus(String workflowID)
+    public SimulationStatus getStatus(String workflowID)
             throws
             java.rmi.RemoteException,
             javax.xml.rpc.ServiceException {
@@ -164,17 +163,17 @@ public class WebServiceEngine extends WorkflowEngineInstantiator {
 
             case RUNNING:
 
-                return Running;
+                return SimulationStatus.Running;
             case COMPLETE:
 
-                return Completed;
+                return SimulationStatus.Completed;
             case TERMINATED:
             case UNKNOWN:
 
-                return Killed;
+                return SimulationStatus.Killed;
             default:
 
-                return Unknown;
+                return SimulationStatus.Unknown;
         }
     }
 

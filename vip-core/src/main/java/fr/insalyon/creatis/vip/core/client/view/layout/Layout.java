@@ -38,6 +38,7 @@ import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.VisibilityMode;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -103,6 +104,10 @@ public class Layout {
         modal = new ModalWindow(vLayout);
 
         vLayout.draw();
+    }
+
+    public Canvas getLayoutCanvas() {
+        return vLayout;
     }
 
     public ModalWindow getModal() {

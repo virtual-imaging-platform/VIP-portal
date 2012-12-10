@@ -39,6 +39,7 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.RichTextEditor;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.FormItem;
@@ -67,7 +68,7 @@ public class ContactTab extends Tab {
     private TextItem emailField;
     private SelectItem categoryItem;
     private TextItem subjectField;
-    private TextAreaItem commentItem;
+    private RichTextEditor commentEditor;
     private IButton submitButton;
 
     public ContactTab() {
@@ -99,18 +100,23 @@ public class ContactTab extends Tab {
 
         categoryItem = new SelectItem("category", "Category");
         LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+        map.put("General contact", "General contact");
         map.put("General question", "General question");
         map.put("Report bug", "Report bug");
         map.put("Report missing term in ontologies", "Report missing term in ontologies");
         categoryItem.setValueMap(map);
-        categoryItem.setValue("General Contact");
+        categoryItem.setValue("General contact");
         categoryItem.setShowTitle(false);
 
         subjectField = FieldUtil.getTextItem(300, null);
 
-        commentItem = new TextAreaItem("comment");
-        commentItem.setWidth(300);
-        commentItem.setShowTitle(false);
+        commentEditor = new RichTextEditor();
+        commentEditor.setWidth(300);
+        commentEditor.setHeight(200);
+        commentEditor.setOverflow(Overflow.HIDDEN);
+        commentEditor.setShowEdges(true);
+        commentEditor.setControlGroups("styleControls", "editControls", 
+                "colorControls", "insertControls");        
 
         submitButton = new IButton("Submit");
         submitButton.addClickHandler(new ClickHandler() {
@@ -136,7 +142,7 @@ public class ContactTab extends Tab {
                     service.sendContactMail(
                             categoryItem.getValueAsString(),
                             subjectField.getValueAsString().trim(),
-                            commentItem.getValueAsString(), callback);
+                            commentEditor.getValue(), callback);
                 }
             }
         });
@@ -146,7 +152,8 @@ public class ContactTab extends Tab {
         addField("E-mail", emailField);
         addField("Category", categoryItem);
         addField("Subject", subjectField);
-        addField("Comments", commentItem);
+        contactLayout.addMember(WidgetUtil.getLabel("<b>Comments</b>", 15));
+        contactLayout.addMember(commentEditor);
         contactLayout.addMember(submitButton);
     }
 

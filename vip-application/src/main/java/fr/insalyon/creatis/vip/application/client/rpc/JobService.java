@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -32,7 +32,6 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-
 package fr.insalyon.creatis.vip.application.client.rpc;
 
 import com.google.gwt.core.client.GWT;
@@ -41,13 +40,16 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.bean.Node;
+import fr.insalyon.creatis.vip.application.client.bean.Task;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.SimulationFileType;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 import java.util.List;
 import java.util.Map;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public interface JobService extends RemoteService {
 
@@ -64,29 +66,38 @@ public interface JobService extends RemoteService {
         }
     }
 
-    public Map<String, Integer> getStatusMap(String simulationID) throws ApplicationException ;
+    public List<Job> getList(String simulationID) throws ApplicationException;
 
-    public List<Job> getJobsList(String simulationID) throws ApplicationException;
+    public List<Task> getTasks(String simulationID, String parameters) throws ApplicationException;
 
-    public String readFile(String simulationID, String dir, String fileName, String ext) throws ApplicationException ;
+    public String[] readSimulationFile(String simulationID, String taskID, SimulationFileType fileType) throws ApplicationException;
 
-    public List<String> getExecutionPerNumberOfJobs(String simulationID, int binSize) throws ApplicationException ;
+    public void sendTaskSignal(String simulationID, String taskID, TaskStatus status) throws ApplicationException;
 
-    public List<String> getDownloadPerNumberOfJobs(String simulationID, int binSize) throws ApplicationException ;
+    //
+    public Map<String, Integer> getStatusMap(String simulationID) throws ApplicationException;
 
-    public List<String> getUploadPerNumberOfJobs(String simulationID, int binSize) throws ApplicationException ;
+    public List<Task> getJobsList(String simulationID) throws ApplicationException;
 
-    public List<String> getJobFlow(String simulationID) throws ApplicationException ;
-    
-    public List<String> getCkptsPerJob(String simulationID) throws ApplicationException ;
+    public String readFile(String simulationID, String dir, String fileName, String ext) throws ApplicationException;
+
+    public List<String> getExecutionPerNumberOfJobs(String simulationID, int binSize) throws ApplicationException;
+
+    public List<String> getDownloadPerNumberOfJobs(String simulationID, int binSize) throws ApplicationException;
+
+    public List<String> getUploadPerNumberOfJobs(String simulationID, int binSize) throws ApplicationException;
+
+    public List<String> getJobFlow(String simulationID) throws ApplicationException;
+
+    public List<String> getCkptsPerJob(String simulationID) throws ApplicationException;
 
     public List<String> getSiteHistogram(String simulationID) throws ApplicationException;
-    
-    public Node getNode(String simulationID, String siteName, String nodeName) throws ApplicationException ;
-    
+
+    public Node getNode(String simulationID, String siteName, String nodeName) throws ApplicationException;
+
     public void sendSignal(String simulationID, String jobID, ApplicationConstants.JobStatus status) throws ApplicationException;
-    
+
     public void sendSignal(String simulationID, List<String> jobIDs, ApplicationConstants.JobStatus status) throws ApplicationException;
-    
+
     public Map<String, Integer> getCountriesMap(String simulationID) throws ApplicationException;
 }

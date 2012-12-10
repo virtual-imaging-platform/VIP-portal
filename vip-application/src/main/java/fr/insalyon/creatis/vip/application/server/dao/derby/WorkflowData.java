@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -34,12 +34,11 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao.derby;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants.ProcessorStatus;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Processor;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
+import fr.insalyon.creatis.vip.application.client.view.monitor.progress.ProcessorStatus;
 import fr.insalyon.creatis.vip.application.server.dao.WorkflowDAO;
 import fr.insalyon.creatis.vip.application.server.dao.derby.connection.WorkflowsConnection;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
@@ -51,7 +50,7 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class WorkflowData implements WorkflowDAO {
 
@@ -80,6 +79,7 @@ public class WorkflowData implements WorkflowDAO {
      * @param workflow
      * @throws DAOException
      */
+    @Override
     public void add(Simulation workflow) throws DAOException {
 
         try {
@@ -113,6 +113,7 @@ public class WorkflowData implements WorkflowDAO {
      * @param workflow
      * @throws DAOException
      */
+    @Override
     public void update(Simulation workflow) throws DAOException {
 
         try {
@@ -140,6 +141,7 @@ public class WorkflowData implements WorkflowDAO {
      * @return
      * @throws DAOException
      */
+    @Override
     public Simulation get(String workflowID) throws DAOException {
 
         try {
@@ -180,6 +182,7 @@ public class WorkflowData implements WorkflowDAO {
      * @param eDate End date
      * @return List of workflows filtered
      */
+    @Override
     public List<Simulation> getList(String user, String app, String status,
             Date sDate, Date eDate) throws DAOException {
 
@@ -236,6 +239,7 @@ public class WorkflowData implements WorkflowDAO {
      * @param eDate End date
      * @return List of workflows filtered
      */
+    @Override
     public List<Simulation> getList(List<String> users, String app, String status,
             Date sDate, Date eDate) throws DAOException {
 
@@ -248,7 +252,7 @@ public class WorkflowData implements WorkflowDAO {
                     if (sb.length() > 1) {
                         sb.append(" OR ");
                     }
-                    sb.append("username = '" + userName + "'");
+                    sb.append("username = '").append(userName).append("'");
                 }
                 sb.append(")");
             }
@@ -329,6 +333,7 @@ public class WorkflowData implements WorkflowDAO {
      *
      * @return List of applications
      */
+    @Override
     public List<String> getApplications() throws DAOException {
         try {
             List<String> users = new ArrayList<String>();
@@ -348,6 +353,7 @@ public class WorkflowData implements WorkflowDAO {
         }
     }
 
+    @Override
     public void updateStatus(String workflowID, String status) throws DAOException {
         try {
             PreparedStatement stat = connection.prepareStatement("UPDATE "
@@ -363,6 +369,7 @@ public class WorkflowData implements WorkflowDAO {
         }
     }
 
+    @Override
     public List<String> getOutputs(String workflowID) throws DAOException {
 
         try {
@@ -406,6 +413,7 @@ public class WorkflowData implements WorkflowDAO {
         }
     }
 
+    @Override
     public void delete(String workflowID) throws DAOException {
         try {
             PreparedStatement stat = connection.prepareStatement("DELETE "
@@ -458,6 +466,7 @@ public class WorkflowData implements WorkflowDAO {
      * @return
      * @throws DAOException
      */
+    @Override
     public int getRunningWorkflows(String user) throws DAOException {
 
         try {
@@ -481,6 +490,7 @@ public class WorkflowData implements WorkflowDAO {
      *
      * @return @throws DAOException
      */
+    @Override
     public List<Simulation> getRunningWorkflows() throws DAOException {
 
         try {
@@ -505,6 +515,7 @@ public class WorkflowData implements WorkflowDAO {
      * @return
      * @throws DAOException
      */
+    @Override
     public List<Processor> getProcessors(String simulationID) throws DAOException {
 
         try {
@@ -553,6 +564,7 @@ public class WorkflowData implements WorkflowDAO {
      * @return
      * @throws DAOException
      */
+    @Override
     public String getTimeAnalysis(List<Simulation> simulationList) throws DAOException {
 
         int executionTime = 0;
@@ -592,6 +604,7 @@ public class WorkflowData implements WorkflowDAO {
      * @return
      * @throws DAOException
      */
+    @Override
     public String getJobStatuses(List<Simulation> simulationList) throws DAOException {
 
         int completed = 0;
@@ -637,6 +650,7 @@ public class WorkflowData implements WorkflowDAO {
      * @param newUser
      * @throws DAOException
      */
+    @Override
     public void updateUser(String currentUser, String newUser) throws DAOException {
 
         try {

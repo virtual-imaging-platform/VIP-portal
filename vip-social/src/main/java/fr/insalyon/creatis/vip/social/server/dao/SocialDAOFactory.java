@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -38,18 +38,21 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public abstract class SocialDAOFactory {
     
     public static final int H2 = 1;
-    public static int factory = H2;
+    public static final int MYSQL = 2;
+    public static int factory = MYSQL;
 
     public static SocialDAOFactory getDAOFactory() {
 
         switch (factory) {
             case H2:
                 return H2DAOFactory.getInstance();
+            case MYSQL:
+                return MySQLDAOFactory.getInstance();
             default:
                 return null;
         }

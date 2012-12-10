@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -35,11 +35,11 @@
 package fr.insalyon.creatis.vip.application.client.view.monitor.record;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants.ProcessorStatus;
+import fr.insalyon.creatis.vip.application.client.view.monitor.progress.ProcessorStatus;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ProcessorRecord extends ListGridRecord {
 

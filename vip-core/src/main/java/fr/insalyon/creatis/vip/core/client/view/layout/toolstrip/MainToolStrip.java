@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -42,7 +42,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class MainToolStrip extends ToolStrip {
 
@@ -59,7 +59,7 @@ public class MainToolStrip extends ToolStrip {
 
         this.setWidth100();
         this.setPadding(2);
-        
+
         this.addMember(getVipLabel());
         this.addSeparator();
     }
@@ -72,13 +72,13 @@ public class MainToolStrip extends ToolStrip {
         this.addMember(getVipLabel());
         this.addSeparator();
     }
-    
+
     private Label getVipLabel() {
-        
-        Label vipLabel = new Label("VIP "+CoreConstants.VERSION);
+
+        Label vipLabel = new Label("VIP " + CoreConstants.VERSION);
         vipLabel.setAlign(Alignment.CENTER);
-        vipLabel.setWidth(30);
-        
+        vipLabel.setWidth(60);
+
         return vipLabel;
     }
 }

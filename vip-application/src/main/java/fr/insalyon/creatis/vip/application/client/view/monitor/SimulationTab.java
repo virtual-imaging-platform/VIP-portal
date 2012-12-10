@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -34,43 +34,40 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class SimulationTab extends AbstractSimulationTab {
 
     private GeneralTab generalTab;
-    private SummaryTab summaryTab;
+    private JobsTab jobsTab;
+    private SummaryTab tasksTab;
     private ChartsTab chartsTab;
     private LogsTab logsTab;
 
     public SimulationTab(String simulationID, String simulationName, SimulationStatus status) {
-        
+
         super(simulationID, simulationName, status);
 
-        generalTab = new GeneralTab(simulationID, simulationName);
-        summaryTab = new SummaryTab(simulationID, completed);
+        generalTab = new GeneralTab(simulationID, status);
+        jobsTab = new JobsTab(simulationID, completed);
         chartsTab = new ChartsTab(simulationID);
 
         tabSet.addTab(generalTab);
-        tabSet.addTab(summaryTab);
+        tabSet.addTab(jobsTab);
         tabSet.addTab(chartsTab);
-        
+
         if (CoreModule.user.isSystemAdministrator()) {
+            
+            tasksTab = new SummaryTab(simulationID, completed);
+            tabSet.addTab(tasksTab);
+            
             logsTab = new LogsTab(simulationID);
             tabSet.addTab(logsTab);
         }
-    }
-
-    @Override
-    protected void updateData() {
-
-        summaryTab.loadData();
-        generalTab.loadData();
     }
 }

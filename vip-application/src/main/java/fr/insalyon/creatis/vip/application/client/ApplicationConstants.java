@@ -58,6 +58,13 @@ public class ApplicationConstants {
     public static final String ICON_LOG = IMG_FOLDER + "icon-log.png";
     public static final String ICON_SEMANTICS = IMG_FOLDER + "icon-semantics.png";
     public static final String ICON_MONITOR = IMG_FOLDER + "icon-monitor.png";
+    public static final String ICON_MONITOR_DEBUG = IMG_FOLDER + "monitor/icon-debug.png";
+    public static final String ICON_MONITOR_DOWNLOAD = IMG_FOLDER + "monitor/icon-download.png";
+    public static final String ICON_MONITOR_ERROR_FILE = IMG_FOLDER + "monitor/icon-error-file.png";
+    public static final String ICON_MONITOR_JOB = IMG_FOLDER + "monitor/icon-job.png";
+    public static final String ICON_MONITOR_OUTPUT_FILE = IMG_FOLDER + "monitor/icon-output-file.png";
+    public static final String ICON_MONITOR_SEARCH = IMG_FOLDER + "monitor/icon-search.png";
+    public static final String ICON_MONITOR_TASKS = IMG_FOLDER + "monitor/icon-tasks.png";
     public static final String ICON_PICKER_MORE = IMG_FOLDER + "icon-picker-more.png";
     public static final String ICON_PICKER_LESS = IMG_FOLDER + "icon-picker-less.png";
     public static final String ICON_PREVIEW = IMG_FOLDER + "icon-preview.png";
@@ -97,16 +104,6 @@ public class ApplicationConstants {
         SUCCESSFULLY_SUBMITTED, QUEUED, RUNNING, COMPLETED,
         CANCELLED, CANCELLED_REPLICA, ERROR, STALLED,
         REPLICATE, KILL, KILL_REPLICA, RESCHEDULE
-    };
-
-    public static enum SimulationStatus {
-
-        Running, Completed, Killed, Cleaned, Queued, Unknown
-    };
-
-    public static enum ProcessorStatus {
-
-        Unstarted, Active, Completed, Failed
     };
 
     public static String getLaunchTabID(String applicationName) {

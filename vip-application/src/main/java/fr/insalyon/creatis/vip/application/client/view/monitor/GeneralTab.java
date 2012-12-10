@@ -34,205 +34,81 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.types.TreeModelType;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tree.Tree;
-import com.smartgwt.client.widgets.tree.TreeGrid;
-import com.smartgwt.client.widgets.tree.TreeGridField;
-import com.smartgwt.client.widgets.tree.TreeNode;
-import com.smartgwt.client.widgets.tree.events.NodeContextClickEvent;
-import com.smartgwt.client.widgets.tree.events.NodeContextClickHandler;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.InOutData;
-import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
-import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
-import fr.insalyon.creatis.vip.application.client.view.monitor.general.GeneralInformationLayout;
-import fr.insalyon.creatis.vip.application.client.view.monitor.general.InOutTreeNode;
-import fr.insalyon.creatis.vip.application.client.view.monitor.general.LocationLayout;
+import fr.insalyon.creatis.vip.application.client.view.common.AbstractCornerTab;
+import fr.insalyon.creatis.vip.application.client.view.monitor.general.GeneralLayout;
+import fr.insalyon.creatis.vip.application.client.view.monitor.general.InputTreeGrid;
 import fr.insalyon.creatis.vip.application.client.view.monitor.general.LogsLayout;
-import fr.insalyon.creatis.vip.application.client.view.monitor.menu.InOutContextMenu;
+import fr.insalyon.creatis.vip.application.client.view.monitor.general.OutputTreeGrid;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import java.util.List;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class GeneralTab extends Tab {
+public class GeneralTab extends AbstractCornerTab {
 
-    private String simulationID;
-    private String simulationName;
-    private ModalWindow inOutTreeModal;
-    private TreeGrid inOutTreeGrid;
-    private Tree inOutTree;
-    private InOutTreeNode inputs;
-    private InOutTreeNode outputs;
-    private GeneralInformationLayout generalWindow;
-    private LocationLayout locationWindow;
-
-    public GeneralTab(String simulationID, String simulationName) {
-
-        this.simulationID = simulationID;
-        this.simulationName = simulationName;
+    private GeneralLayout generalLayout;
+    private InputTreeGrid inputTreeGrid;
+    private OutputTreeGrid outputTreeGrid;
+    
+    public GeneralTab(String simulationID, SimulationStatus status) {
 
         this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_GENERAL));
         this.setPrompt("General Information");
 
-        HLayout hLayout = new HLayout(15);
+        VLayout vLayout = new VLayout(10);
+        vLayout.setWidth100();
+        vLayout.setHeight100();
+        vLayout.setOverflow(Overflow.AUTO);
+
+        generalLayout = new GeneralLayout(simulationID, status);
+        vLayout.addMember(generalLayout);
+
+        HLayout hLayout = new HLayout(10);
         hLayout.setWidth100();
         hLayout.setHeight100();
         hLayout.setOverflow(Overflow.AUTO);
-        hLayout.setPadding(10);
 
         // Left column
-        VLayout leftLayout = new VLayout(15);
-        leftLayout.setWidth("55%");
+        VLayout leftLayout = new VLayout(10);
+        leftLayout.setWidth("50%");
         leftLayout.setHeight100();
         leftLayout.setOverflow(Overflow.AUTO);
 
-        generalWindow = new GeneralInformationLayout(simulationID);
-        leftLayout.addMember(generalWindow);
-
+        inputTreeGrid = new InputTreeGrid(simulationID);
+        leftLayout.addMember(inputTreeGrid);
+        
         if (CoreModule.user.isSystemAdministrator()
                 || CoreModule.user.isGroupAdmin()) {
             leftLayout.addMember(new LogsLayout(simulationID));
         }
 
         // Right column
-        VLayout rightLayout = new VLayout(15);
-        rightLayout.setWidth("45%");
+        VLayout rightLayout = new VLayout(10);
+        rightLayout.setWidth("50%");
         rightLayout.setHeight100();
         rightLayout.setOverflow(Overflow.AUTO);
-
-        configureTreeGrid();
-        inOutTreeModal = new ModalWindow(inOutTreeGrid);
-        rightLayout.addMember(inOutTreeGrid);
-
-        locationWindow = new LocationLayout(simulationID);
-        rightLayout.addMember(locationWindow);
+        
+        outputTreeGrid = new OutputTreeGrid(simulationID);
+        rightLayout.addMember(outputTreeGrid);
 
         hLayout.addMember(leftLayout);
         hLayout.addMember(rightLayout);
+        vLayout.addMember(hLayout);
 
-        this.setPane(hLayout);
-        loadData();
+        this.setPane(vLayout);
     }
 
-    public void loadData() {
+    @Override
+    public void update() {
 
-        loadTreeData(inputs, InOutTreeNode.Icon.Input);
-        loadTreeData(outputs, InOutTreeNode.Icon.Output);
-        generalWindow.loadData();
-        locationWindow.loadData();
-    }
-
-    private void configureTreeGrid() {
-
-        inOutTree = new Tree();
-        inOutTree.setModelType(TreeModelType.CHILDREN);
-        inOutTree.setNameProperty("name");
-
-        InOutTreeNode root = new InOutTreeNode("Root", "String", InOutTreeNode.Icon.Simulation);
-        inOutTree.setRoot(root);
-
-        InOutTreeNode node = new InOutTreeNode("Simulation: " + simulationName, "Simulation", InOutTreeNode.Icon.Simulation);
-        inOutTree.add(node, root);
-
-        inputs = new InOutTreeNode("Inputs", "Simulation", InOutTreeNode.Icon.Input);
-        inOutTree.add(inputs, node);
-        outputs = new InOutTreeNode("Outputs", "Simulation", InOutTreeNode.Icon.Output);
-        inOutTree.add(outputs, node);
-        inOutTree.openFolder(node);
-
-        inOutTreeGrid = new TreeGrid();
-        inOutTreeGrid.setWidth100();
-        inOutTreeGrid.setHeight100();
-        inOutTreeGrid.setShowOpenIcons(false);
-        inOutTreeGrid.setShowDropIcons(false);
-        inOutTreeGrid.setShowHeader(true);
-        inOutTreeGrid.setFolderIcon(ApplicationConstants.ICON_TREE_SERVICE);
-        inOutTreeGrid.setCanHover(true);
-        inOutTreeGrid.setClosedIconSuffix("");
-        inOutTreeGrid.setLoadDataOnDemand(true);
-        inOutTreeGrid.setFields(new TreeGridField("name", "In/Output Data"));
-        inOutTreeGrid.addNodeContextClickHandler(new NodeContextClickHandler() {
-
-            @Override
-            public void onNodeContextClick(NodeContextClickEvent event) {
-                event.cancel();
-                InOutTreeNode node = (InOutTreeNode) event.getNode();
-                new InOutContextMenu(simulationID, inOutTree, node, inOutTreeModal).showContextMenu();
-            }
-        });
-        inOutTreeGrid.setData(inOutTree);
-    }
-
-    private void loadTreeData(final InOutTreeNode parent, final InOutTreeNode.Icon icon) {
-
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        AsyncCallback<List<InOutData>> callback = new AsyncCallback<List<InOutData>>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-                inOutTreeModal.hide();
-                Layout.getInstance().setWarningMessage("Unable to load data:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(List<InOutData> result) {
-
-                for (InOutData data : result) {
-
-                    InOutTreeNode processor = null;
-                    InOutTreeNode output = null;
-
-                    for (TreeNode n : inOutTree.getChildren(parent)) {
-                        InOutTreeNode node = (InOutTreeNode) n;
-                        if (node.getName().equals(data.getProcessor())) {
-                            processor = node;
-                            break;
-                        }
-                    }
-                    if (processor == null) {
-                        processor = addInOutTreeNode(data.getProcessor(), "String", parent, icon);
-                        addInOutTreeNode(data.getPath(), data.getType(), processor, icon);
-                        continue;
-                    }
-
-                    for (TreeNode n : inOutTree.getChildren(processor)) {
-                        InOutTreeNode node = (InOutTreeNode) n;
-                        if (node.getName().equals(data.getPath())) {
-                            output = node;
-                            break;
-                        }
-                    }
-                    if (output == null) {
-                        addInOutTreeNode(data.getPath(), data.getType(), processor, icon);
-                    }
-                }
-                inOutTreeModal.hide();
-            }
-        };
-        inOutTreeModal.show("Loading data...", true);
-        if (icon == InOutTreeNode.Icon.Input) {
-            service.getInputData(simulationID, callback);
-        } else {
-            service.getOutputData(simulationID, callback);
-        }
-    }
-
-    private InOutTreeNode addInOutTreeNode(String name, String type,
-            InOutTreeNode parent, InOutTreeNode.Icon icon) {
-
-        InOutTreeNode node = new InOutTreeNode(name, type, icon);
-        inOutTree.add(node, parent);
-        return node;
+        generalLayout.update();
+        inputTreeGrid.update();
+        outputTreeGrid.update();
     }
 }

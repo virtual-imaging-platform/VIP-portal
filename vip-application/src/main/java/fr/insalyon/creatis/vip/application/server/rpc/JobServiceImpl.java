@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -37,9 +37,12 @@ package fr.insalyon.creatis.vip.application.server.rpc;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.bean.Node;
+import fr.insalyon.creatis.vip.application.client.bean.Task;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
-import fr.insalyon.creatis.vip.application.server.business.JobBusiness;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.SimulationFileType;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
+import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
@@ -49,16 +52,92 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobService {
 
     private static Logger logger = Logger.getLogger(JobServiceImpl.class);
-    private JobBusiness jobBusiness;
+    private SimulationBusiness simulationBusiness;
 
     public JobServiceImpl() {
 
-        jobBusiness = new JobBusiness();
+        simulationBusiness = new SimulationBusiness();
+    }
+
+    /**
+     * Gets a list of jobs of a simulation.
+     *
+     * @param simulationID Simulation identification
+     * @return
+     * @throws ApplicationException
+     */
+    @Override
+    public List<Job> getList(String simulationID) throws ApplicationException {
+
+        try {
+            return simulationBusiness.getList(simulationID);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * Gets a list of tasks of a simulation with determined parameters.
+     *
+     * @param simulationID Simulation identification
+     * @param parameters Job parameters
+     * @return
+     * @throws ApplicationException
+     */
+    @Override
+    public List<Task> getTasks(String simulationID, String parameters) throws ApplicationException {
+
+        try {
+            return simulationBusiness.getTasks(simulationID, parameters);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * Reads a simulation file.
+     *
+     * @param simulationID Simulation identification
+     * @param taskID Task identification
+     * @param fileType Simulation file type
+     * @return
+     * @throws ApplicationException
+     */
+    @Override
+    public String[] readSimulationFile(String simulationID, String taskID,
+            SimulationFileType fileType) throws ApplicationException {
+
+        try {
+            return simulationBusiness.readSimulationFile(simulationID, taskID, fileType);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * Sends a signal to a task.
+     * 
+     * @param simulationID Simulation identification
+     * @param taskID Task identification
+     * @param status Simulation
+     */
+    @Override
+    public void sendTaskSignal(String simulationID, String taskID, TaskStatus status) throws ApplicationException {
+        
+        try {
+            simulationBusiness.sendTaskSignal(simulationID, taskID, status);
+            
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
     }
 
     /**
@@ -71,7 +150,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     public Map<String, Integer> getStatusMap(String simulationID) throws ApplicationException {
 
         try {
-            return jobBusiness.getStatusMap(simulationID);
+            return simulationBusiness.getStatusMap(simulationID);
 
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
@@ -85,10 +164,10 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      * @throws ApplicationException
      */
     @Override
-    public List<Job> getJobsList(String simulationID) throws ApplicationException {
+    public List<Task> getJobsList(String simulationID) throws ApplicationException {
 
         try {
-            return jobBusiness.getJobsList(simulationID);
+            return simulationBusiness.getJobsList(simulationID);
 
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
@@ -109,7 +188,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
             String extension) throws ApplicationException {
 
         try {
-            return jobBusiness.readFile(simulationID, folder, fileName, extension);
+            return simulationBusiness.readFile(simulationID, folder, fileName, extension);
 
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
@@ -128,7 +207,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
             int binSize) throws ApplicationException {
 
         try {
-            return jobBusiness.getExecutionPerNumberOfJobs(simulationID, binSize);
+            return simulationBusiness.getExecutionPerNumberOfJobs(simulationID, binSize);
 
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
@@ -147,7 +226,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
             int binSize) throws ApplicationException {
 
         try {
-            return jobBusiness.getDownloadPerNumberOfJobs(simulationID, binSize);
+            return simulationBusiness.getDownloadPerNumberOfJobs(simulationID, binSize);
 
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
@@ -166,7 +245,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
             int binSize) throws ApplicationException {
 
         try {
-            return jobBusiness.getUploadPerNumberOfJobs(simulationID, binSize);
+            return simulationBusiness.getUploadPerNumberOfJobs(simulationID, binSize);
 
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
@@ -183,7 +262,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     public List<String> getJobFlow(String simulationID) throws ApplicationException {
 
         try {
-            return jobBusiness.getJobsPerTime(simulationID);
+            return simulationBusiness.getJobsPerTime(simulationID);
 
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
@@ -196,10 +275,11 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      * @return
      * @throws ApplicationException
      */
+    @Override
     public List<String> getCkptsPerJob(String simulationID) throws ApplicationException {
 
         try {
-            return jobBusiness.getCkptsPerJob(simulationID);
+            return simulationBusiness.getCkptsPerJob(simulationID);
 
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
@@ -214,11 +294,12 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      * @return
      * @throws ApplicationException
      */
+    @Override
     public Node getNode(String simulationID, String siteName, String nodeName)
             throws ApplicationException {
 
         try {
-            return jobBusiness.getExecutionNode(simulationID, siteName, nodeName);
+            return simulationBusiness.getExecutionNode(simulationID, siteName, nodeName);
 
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
@@ -232,13 +313,14 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      * @param status
      * @throws ApplicationException
      */
+    @Override
     public void sendSignal(String simulationID, String jobID, JobStatus status)
             throws ApplicationException {
 
         try {
             trace(logger, "Sending '" + status.name() + "' signal to '" + jobID
                     + "' (" + simulationID + ").");
-            jobBusiness.sendSignal(simulationID, jobID, status);
+            simulationBusiness.sendSignal(simulationID, jobID, status);
 
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
@@ -253,10 +335,11 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      * @return
      * @throws ApplicationException
      */
+    @Override
     public List<String> getSiteHistogram(String simulationID) throws ApplicationException {
 
         try {
-            return jobBusiness.getSiteHistogram(simulationID);
+            return simulationBusiness.getSiteHistogram(simulationID);
 
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
@@ -277,8 +360,8 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
         try {
             trace(logger, "Sending '" + status.name() + "' signal to '"
                     + jobIDs.toString() + "' (" + simulationID + ").");
-            jobBusiness.sendSignal(simulationID, jobIDs, status);
-            
+            simulationBusiness.sendSignal(simulationID, jobIDs, status);
+
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
         } catch (BusinessException ex) {
@@ -287,17 +370,17 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     }
 
     /**
-     * 
+     *
      * @param simulationID
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     @Override
     public Map<String, Integer> getCountriesMap(String simulationID) throws ApplicationException {
-        
+
         try {
-            return jobBusiness.getCountriesMap(simulationID);
-            
+            return simulationBusiness.getCountriesMap(simulationID);
+
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }

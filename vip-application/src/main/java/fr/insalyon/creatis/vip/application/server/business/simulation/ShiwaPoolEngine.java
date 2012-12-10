@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -37,8 +37,7 @@ package fr.insalyon.creatis.vip.application.server.business.simulation;
 import fr.insalyon.creatis.shiwapool.client.services.ShiwaClientService;
 import fr.insalyon.creatis.shiwapool.common.BundleHelpers;
 import fr.insalyon.creatis.shiwapool.common.Connection;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import static fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus.*;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -133,12 +132,12 @@ public class ShiwaPoolEngine extends WorkflowEngineInstantiator {
     }
 
     @Override
-    public ApplicationConstants.SimulationStatus getStatus(String workflowID)
+    public SimulationStatus getStatus(String workflowID)
             throws
             java.rmi.RemoteException,
             javax.xml.rpc.ServiceException {
 
-        ApplicationConstants.SimulationStatus status = Unknown;
+        SimulationStatus status = SimulationStatus.Unknown;
         String workflowStatus = "UNKNOWN";
         try {
 
@@ -151,26 +150,26 @@ public class ShiwaPoolEngine extends WorkflowEngineInstantiator {
         switch (poolStatus) {
 
             case FINISHED:
-                return Completed;
+                return SimulationStatus.Completed;
 
             case CANCELLED:
             case FAILED:
             case KILLED:
-                return Killed;
+                return SimulationStatus.Killed;
 
             case SENDING:
             case SENT:
             case LAUNCHING:
             case RUNNING:
-                return Running;
+                return SimulationStatus.Running;
 
             case PENDING:
             case WAITING_INSTANCE:
             case QUEUED:
-                return Queued;
+                return SimulationStatus.Queued;
 
             default:
-                return Unknown;
+                return SimulationStatus.Unknown;
         }
     }
 

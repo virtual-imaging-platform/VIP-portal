@@ -41,13 +41,16 @@ package fr.insalyon.creatis.vip.core.server.dao;
 public abstract class CoreDAOFactory {
 
     public static final int H2 = 1;
-    public static int factory = H2;
+    public static final int MYSQL = 2;
+    public static int factory = MYSQL;
 
     public static CoreDAOFactory getDAOFactory() {
 
         switch (factory) {
             case H2:
                 return H2DAOFactory.getInstance();
+            case MYSQL:
+                return MySQLDAOFactory.getInstance();
             default:
                 return null;
         }

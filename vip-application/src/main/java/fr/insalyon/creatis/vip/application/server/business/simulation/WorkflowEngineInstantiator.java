@@ -34,7 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.server.business.simulation;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import java.io.File;
@@ -126,7 +126,7 @@ public abstract class WorkflowEngineInstantiator {
             java.rmi.RemoteException,
             javax.xml.rpc.ServiceException;
 
-    public abstract ApplicationConstants.SimulationStatus getStatus(String workflowID)
+    public abstract SimulationStatus getStatus(String workflowID)
             throws
             java.rmi.RemoteException,
             javax.xml.rpc.ServiceException;

@@ -34,8 +34,11 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao.h2;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
+import fr.insalyon.creatis.vip.application.client.bean.Task;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.JobStatus;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationDAO;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.sql.PreparedStatement;
@@ -59,6 +62,179 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
     public SimulationData(String dbPath) throws DAOException {
 
         super(dbPath);
+    }
+
+    /**
+     *
+     * @return @throws DAOException
+     */
+    @Override
+    public List<Job> getList() throws DAOException {
+
+        List<Job> list = new ArrayList<Job>();
+
+        try {
+            Statement stat = connection.createStatement();
+            ResultSet rs = stat.executeQuery("SELECT "
+                    + "j.status AS st, j.parameters AS pm, j.command AS cm "
+                    + "FROM Jobs j "
+                    + "LEFT OUTER JOIN Jobs AS jj "
+                    + "ON j.parameters = jj.parameters "
+                    + "AND jj.creation > j.creation "
+                    + "WHERE jj.creation IS NULL "
+                    + "ORDER BY j.id");
+
+            while (rs.next()) {
+                list.add(new Job(rs.getString("cm"),
+                        parseJobStatus(rs.getString("st")),
+                        rs.getString("pm")));
+            }
+            stat.close();
+
+        } catch (SQLException ex) {
+            if (!ex.getMessage().contains("Table \"JOBS\" not found")) {
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
+        } finally {
+            close(logger);
+        }
+        return list;
+    }
+
+    private JobStatus parseJobStatus(String taskStatus) {
+
+        switch (ApplicationConstants.JobStatus.valueOf(taskStatus)) {
+
+            case SUCCESSFULLY_SUBMITTED:
+            case QUEUED:
+                return JobStatus.Queued;
+            case CANCELLED:
+            case CANCELLED_REPLICA:
+            case COMPLETED:
+                return JobStatus.Completed;
+            case KILL:
+            case KILL_REPLICA:
+            case REPLICATE:
+            case RESCHEDULE:
+            case RUNNING:
+                return JobStatus.Running;
+            default:
+                return JobStatus.Failed;
+        }
+    }
+
+    /**
+     *
+     * @param parameters
+     * @return
+     * @throws DAOException
+     */
+    @Override
+    public List<Task> getTasks(String parameters) throws DAOException {
+
+        List<Task> list = new ArrayList<Task>();
+        try {
+            PreparedStatement ps = connection.prepareStatement(
+                    "SELECT j.id, status, command, file_name, exit_code, node_site, node_name, parameters, "
+                    + "ms FROM Jobs AS j LEFT JOIN ("
+                    + "  SELECT jm.id, minor_status AS ms FROM JobsMinorStatus AS jm RIGHT JOIN ( "
+                    + "    SELECT id, MAX(event_date) AS ed FROM JobsMinorStatus GROUP BY id "
+                    + "  ) AS jm1 ON jm1.id = jm.id AND jm1.ed = jm.event_date "
+                    + ") AS jm2 ON j.id = jm2.id "
+                    + "WHERE j.parameters = ? "
+                    + "ORDER BY j.id");
+            ps.setString(1, parameters);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                list.add(parseTask(rs));
+            }
+            ps.close();
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        } finally {
+            close(logger);
+        }
+        return list;
+    }
+
+    /**
+     *
+     * @param taskID
+     * @return
+     * @throws DAOException
+     */
+    @Override
+    public Task getTask(String taskID) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(
+                    "SELECT j.id, status, command, file_name, exit_code, node_site, node_name, parameters, "
+                    + "ms FROM Jobs AS j LEFT JOIN ("
+                    + "  SELECT jm.id, minor_status AS ms FROM JobsMinorStatus AS jm RIGHT JOIN ( "
+                    + "    SELECT id, MAX(event_date) AS ed FROM JobsMinorStatus GROUP BY id "
+                    + "  ) AS jm1 ON jm1.id = jm.id AND jm1.ed = jm.event_date "
+                    + ") AS jm2 ON j.id = jm2.id "
+                    + "WHERE j.id = ? "
+                    + "ORDER BY j.id");
+            ps.setString(1, taskID);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            Task task = parseTask(rs);
+            ps.close();
+            return task;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        } finally {
+            close(logger);
+        }
+    }
+
+    /**
+     *
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
+    private Task parseTask(ResultSet rs) throws SQLException {
+
+        ApplicationConstants.JobStatus status = ApplicationConstants.JobStatus.valueOf(rs.getString("status"));
+        int minorStatus = -1;
+
+        if (status == ApplicationConstants.JobStatus.RUNNING) {
+            minorStatus = parseMinorStatus(rs.getString("ms"));
+        }
+
+        return new Task(rs.getString("id"), status.name(),
+                rs.getString("command"), rs.getString("file_name"),
+                rs.getInt("exit_code"), rs.getString("node_site"),
+                rs.getString("node_name"), rs.getString("parameters"),
+                minorStatus);
+    }
+
+    @Override
+    public void sendTaskSignal(String taskID, TaskStatus status) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(
+                    "UPDATE Jobs SET status = ? WHERE id = ?");
+
+            ps.setString(1, status.name());
+            ps.setString(2, taskID);
+            ps.executeUpdate();
+            ps.close();
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        } finally {
+            close(logger);
+        }
     }
 
     @Override
@@ -89,9 +265,9 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
     }
 
     @Override
-    public List<Job> getJobs() throws DAOException {
+    public List<Task> getJobs() throws DAOException {
 
-        List<Job> list = new ArrayList<Job>();
+        List<Task> list = new ArrayList<Task>();
 
         try {
             Statement stat = connection.createStatement();
@@ -104,14 +280,14 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
                     + ") AS jm2 ON j.id = jm2.id ORDER BY j.id");
 
             while (rs.next()) {
-                JobStatus status = JobStatus.valueOf(rs.getString("status"));
+                ApplicationConstants.JobStatus status = ApplicationConstants.JobStatus.valueOf(rs.getString("status"));
                 int minorStatus = -1;
 
-                if (status == JobStatus.RUNNING) {
+                if (status == ApplicationConstants.JobStatus.RUNNING) {
                     minorStatus = parseMinorStatus(rs.getString("ms"));
                 }
 
-                list.add(new Job(rs.getString("id"), status.name(),
+                list.add(new Task(rs.getString("id"), status.name(),
                         rs.getString("command"), rs.getString("file_name"),
                         rs.getInt("exit_code"), rs.getString("node_site"),
                         rs.getString("node_name"), rs.getString("parameters"),
@@ -246,7 +422,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
     }
 
     @Override
-    public void sendSignal(String jobID, JobStatus status) throws DAOException {
+    public void sendSignal(String jobID, ApplicationConstants.JobStatus status) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement(
@@ -273,16 +449,16 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
                     + "status, count(id) AS num FROM Jobs "
                     + "WHERE status = ? OR status = ? "
                     + "GROUP BY status");
-            ps.setString(1, JobStatus.RUNNING.name());
-            ps.setString(2, JobStatus.QUEUED.name());
+            ps.setString(1, ApplicationConstants.JobStatus.RUNNING.name());
+            ps.setString(2, ApplicationConstants.JobStatus.QUEUED.name());
 
             ResultSet rs = ps.executeQuery();
             int[] tasks = new int[2];
 
             while (rs.next()) {
-                if (JobStatus.valueOf(rs.getString("status")) == JobStatus.RUNNING) {
+                if (ApplicationConstants.JobStatus.valueOf(rs.getString("status")) == ApplicationConstants.JobStatus.RUNNING) {
                     tasks[0] = rs.getInt("num");
-                } else if (JobStatus.valueOf(rs.getString("status")) == JobStatus.QUEUED) {
+                } else if (ApplicationConstants.JobStatus.valueOf(rs.getString("status")) == ApplicationConstants.JobStatus.QUEUED) {
                     tasks[1] = rs.getInt("num");
                 }
             }
@@ -308,7 +484,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
                     + "SUBSTR(node_name, -2) AS country, COUNT(id) AS num "
                     + "FROM Jobs WHERE status = ? "
                     + "GROUP BY country ORDER BY country");
-            ps.setString(1, JobStatus.COMPLETED.name());
+            ps.setString(1, ApplicationConstants.JobStatus.COMPLETED.name());
             ResultSet rs = ps.executeQuery();
 
             Map<String, Integer> map = new HashMap<String, Integer>();
@@ -355,7 +531,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
                     + "WHERE STATUS = ? AND TIMESTAMPDIFF('SECOND', " + startField + ", " + endField + ") >= 0 "
                     + "GROUP BY TIMESTAMPDIFF('SECOND', " + startField + ", " + endField + ")/" + binSize + "*" + binSize + " "
                     + "ORDER BY EXECUT");
-            ps.setString(1, JobStatus.COMPLETED.name());
+            ps.setString(1, ApplicationConstants.JobStatus.COMPLETED.name());
 
             ResultSet rs = ps.executeQuery();
 

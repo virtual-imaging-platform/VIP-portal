@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -35,39 +35,26 @@
 package fr.insalyon.creatis.vip.application.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.JobStatus;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class Job implements IsSerializable {
 
-    private String id;
-    private String status;
-    private int exitCode;
-    private String siteName;
-    private String nodeName;
     private String command;
-    private String fileName;
+    private JobStatus status;
     private String parameters;
-    private int minorStatus;
 
     public Job() {
     }
 
-    public Job(String id, String status, String command, String fileName,
-            int exitCode, String siteName, String nodeName, String parameters,
-            int minorStatus) {
+    public Job(String command, JobStatus status, String parameters) {
 
-        this.id = id;
-        this.status = status;
         this.command = command;
-        this.fileName = fileName;
-        this.exitCode = exitCode;
-        this.siteName = siteName;
-        this.nodeName = nodeName;
+        this.status = status;
         this.parameters = parameters;
-        this.minorStatus = minorStatus;
     }
 
     public String getCommand() {
@@ -78,59 +65,19 @@ public class Job implements IsSerializable {
         this.command = command;
     }
 
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getStatus() {
+    public JobStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(JobStatus status) {
         this.status = status;
-    }
-
-    public int getExitCode() {
-        return exitCode;
-    }
-
-    public String getNodeName() {
-        return nodeName;
-    }
-
-    public void setNodeName(String nodeName) {
-        this.nodeName = nodeName;
-    }
-
-    public String getSiteName() {
-        return siteName;
-    }
-
-    public void setSiteName(String siteName) {
-        this.siteName = siteName;
     }
 
     public String getParameters() {
         return parameters;
     }
 
-    public int getMinorStatus() {
-        return minorStatus;
-    }
-
-    public void setMinorStatus(int minorStatus) {
-        this.minorStatus = minorStatus;
+    public void setParameters(String parameters) {
+        this.parameters = parameters;
     }
 }

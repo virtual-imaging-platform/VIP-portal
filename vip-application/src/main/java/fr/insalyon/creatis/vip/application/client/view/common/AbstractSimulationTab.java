@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -45,11 +45,11 @@ import com.smartgwt.client.widgets.tab.events.TabDeselectedHandler;
 import com.smartgwt.client.widgets.tab.events.TabSelectedEvent;
 import com.smartgwt.client.widgets.tab.events.TabSelectedHandler;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants.SimulationStatus;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public abstract class AbstractSimulationTab extends Tab {
 
@@ -105,9 +105,21 @@ public abstract class AbstractSimulationTab extends Tab {
                 }
             }
         });
+        
+        tabSet.addTabSelectedHandler(new TabSelectedHandler() {
+
+            @Override
+            public void onTabSelected(TabSelectedEvent event) {
+                if (!completed) {
+                    ((AbstractCornerTab) tabSet.getSelectedTab()).update();
+                }
+            }
+        });
     }
 
-    protected abstract void updateData();
+    protected void updateData() {
+        ((AbstractCornerTab) tabSet.getSelectedTab()).update();
+    }
     
     public void destroy() {
         if (!completed) {

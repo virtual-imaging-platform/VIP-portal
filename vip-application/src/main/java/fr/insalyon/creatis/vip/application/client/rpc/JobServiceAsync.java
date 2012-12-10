@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -32,25 +32,36 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-
 package fr.insalyon.creatis.vip.application.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.bean.Node;
+import fr.insalyon.creatis.vip.application.client.bean.Task;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.SimulationFileType;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 import java.util.List;
 import java.util.Map;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public interface JobServiceAsync {
 
+    public void getList(String simulationID, AsyncCallback<List<Job>> asyncCallback);
+
+    public void getTasks(String simulationID, String parameters, AsyncCallback<List<Task>> asyncCallback);
+
+    public void readSimulationFile(String simulationID, String taskID, SimulationFileType fileType, AsyncCallback<String[]> asyncCallback);
+    
+    public void sendTaskSignal(String simulationID, String taskID, TaskStatus status, AsyncCallback<Void> asyncCallback);
+    
+    //
     public void getStatusMap(String simulationID, AsyncCallback<Map<String, Integer>> asyncCallback);
 
-    public void getJobsList(String simulationID, AsyncCallback<List<Job>> asyncCallback);
+    public void getJobsList(String simulationID, AsyncCallback<List<Task>> asyncCallback);
 
     public void readFile(String simulationID, String dir, String fileName, String ext, AsyncCallback<String> asyncCallback);
 
@@ -61,16 +72,16 @@ public interface JobServiceAsync {
     public void getUploadPerNumberOfJobs(String simulationID, int binSize, AsyncCallback<List<String>> asyncCallback);
 
     public void getJobFlow(String simulationID, AsyncCallback<List<String>> asyncCallback);
-    
+
     public void getCkptsPerJob(String simulationID, AsyncCallback<List<String>> asyncCallback);
 
     public void getSiteHistogram(String simulationID, AsyncCallback<List<String>> asyncCallback);
-    
+
     public void getNode(String simulationID, String siteName, String nodeName, AsyncCallback<Node> asyncCallback);
-    
+
     public void sendSignal(String simulationID, String jobID, ApplicationConstants.JobStatus status, AsyncCallback<Void> asyncCallback);
-    
+
     public void sendSignal(String simulationID, List<String> jobIDs, ApplicationConstants.JobStatus status, AsyncCallback<Void> asyncCallback);
-    
+
     public void getCountriesMap(String simulationID, AsyncCallback<Map<String, Integer>> asyncCallback);
 }

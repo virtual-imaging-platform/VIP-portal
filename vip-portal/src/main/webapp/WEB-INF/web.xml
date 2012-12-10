@@ -127,7 +127,7 @@
     </servlet-mapping>
     <!-- End Models Module -->
      
-       <!-- SimulatedData Module -->
+    <!-- SimulatedData Module -->
     <servlet>
         <servlet-name>SimulatedDataService</servlet-name>
         <servlet-class>fr.insalyon.creatis.vip.simulatedata.server.rpc.SimulatedDataServiceImpl</servlet-class>
@@ -138,7 +138,7 @@
     </servlet-mapping>
     <!-- End SimulatedData Module -->
      
-     <!-- Models Module -->
+    <!-- Models Module -->
     <servlet>
         <servlet-name>VTKController</servlet-name>
         <servlet-class>fr.insalyon.creatis.vip.simulationgui.server.rpc.VTKControllerImpl</servlet-class>
@@ -168,7 +168,7 @@
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
     
-<!--    <security-constraint>
+    <!--    <security-constraint>
         <web-resource-collection>
             <web-resource-name>site</web-resource-name>
             <description>Only HTTPS Access</description>
@@ -182,8 +182,16 @@
         </user-data-constraint>
     </security-constraint>-->
     
-<!--    <login-config>
+    <!--    <login-config>
         <auth-method>CLIENT-CERT</auth-method>
         <realm-name>Client Cert Users-only Area</realm-name>
     </login-config>-->
+    
+    <resource-ref>
+        <description>VIP MySQL Connection</description>
+        <res-ref-name>jdbc/vip</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+    
 </web-app>

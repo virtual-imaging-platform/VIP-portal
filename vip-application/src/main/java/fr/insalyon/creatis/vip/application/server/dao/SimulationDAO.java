@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -36,19 +36,30 @@ package fr.insalyon.creatis.vip.application.server.dao;
 
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
+import fr.insalyon.creatis.vip.application.client.bean.Task;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.util.List;
 import java.util.Map;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public interface SimulationDAO {
-   
+
+    public List<Job> getList() throws DAOException;
+
+    public List<Task> getTasks(String parameters) throws DAOException;
+
+    public Task getTask(String taskID) throws DAOException;
+
+    public void sendTaskSignal(String jobID, TaskStatus status) throws DAOException;
+
+    //
     public Map<String, Integer> getStatusMap() throws DAOException;
 
-    public List<Job> getJobs() throws DAOException;
+    public List<Task> getJobs() throws DAOException;
 
     public List<String> getExecutionPerNumberOfJobs(int binSize) throws DAOException;
 
@@ -65,6 +76,6 @@ public interface SimulationDAO {
     public List<String> getSiteHistogram() throws DAOException;
 
     public int[] getNumberOfActiveTasks() throws DAOException;
-    
+
     public Map<String, Integer> getNodeCountriesMap() throws DAOException;
 }
