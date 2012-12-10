@@ -53,7 +53,6 @@ import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.models.client.view.ModelException;
 import java.io.*;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -501,13 +500,21 @@ public class ModelBusiness {
     }
 
     public void deleteModel(String uri, boolean test) throws BusinessException {
-        try {
-            System.out.println("Deleting model with uri " + uri);
+        
+           logger.info("Deleting model with URI " + uri);
+        try{    
             SimulationObjectModel som = SimulationObjectModelFactory.rebuildObjectModelFromTripleStore(uri, test);
             SimulationObjectModelFactory.deleteModelInPersistentStore(som, test);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new BusinessException(e);
+            logger.error("Cannot delete model "+uri+", deleting only its URI");
+            try{
+            SimulationObjectModelFactory.deleteModelInPersistentStore(uri, test);
+            }catch(Exception ee){
+                logger.error("Cannot delete model URI "+uri);
+                ee.printStackTrace();
+                throw new BusinessException(ee);
+            }
         }
     }
 
