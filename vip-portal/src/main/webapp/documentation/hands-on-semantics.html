@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>VIP launching workshop - <i>sharing models for multi-modality medical image simulation with VIP</i></title>
+        <link rel="StyleSheet" href="../css/doc_main.css" type="text/css" />
+    </head>
+    <body>
+        <h1>Hands-on: sharing models for multi-modality medical image simulation with VIP</h1>
+        This hands-on introduces the main semantic features in VIP, namely the model repository and the simulated data repository. We will exemplify them on brain MRI simulation.
+        <a name="contents"></a>
+        Contents:
+        <ul><li><a href="#ex1">Exercise 1:</a> explore the model repository (10 min)</li>
+            <li><a href="#ex2">Exercise 2:</a> explore repository of simulated data (5 min)</li>
+            <li><a href="#ex3">Exercise 3:</a> import your own model (15 min)</li>
+            <li><a href="#ex4">Exercise 4:</a> launch simulations from model repository (10 min)</li>
+        </ul>
+        <h2><a name="ex1">Exercise 1</a>: explore the model repository (10 min)</h2>
+
+        <p><ul><li>In your home page, open the model repository in <b>Models</b>:</li></ul>
+        <img alt="home_models" src="workshop/home.png"/>
+        <ul>   
+            <li>A list of models appears, containing in particular:
+                <ol>
+                    <li><a href="http://www.sciencedirect.com/science/article/pii/S1297956205000884">Adam</a>, a thorax model</li>
+                    <li><a href="http://noodle.med.yale.edu/zubal">Zubal</a>, a full-body model</li>
+                    <li><a href="http://ieeexplore.ieee.org/xpl/login.jsp?tp=&arnumber=712135&url=http%3A%2F%2Fieeexplore.ieee.org%2Fxpls%2Fabs_all.jsp%3Farnumber%3D712135">Brainweb</a>, a brain model with different degrees of multiple-sclerosis:
+                        <ol><li><a href="http://brainweb.bic.mni.mcgill.ca/brainweb/anatomic_normal_20.html">Normal</a> (no lesion, subject 04)</li><li><a href="http://brainweb.bic.mni.mcgill.ca/brainweb/anatomic_ms1.html">Mild</a></li><li><a href="http://brainweb.bic.mni.mcgill.ca/brainweb/anatomic_ms.html">Moderate</a></li><li><a href="http://brainweb.bic.mni.mcgill.ca/brainweb/anatomic_ms3.html">Severe</a></li></ol></li>
+                    <li>A <a href="http://link.springer.com/chapter/10.1007%2F978-3-642-33530-3_18?LI=true">brain model developed at IRISA</a></li>
+                    <li>A <a href="http://www.ircad.fr/softwares/3Dircadb/3Dircadb1/index.php">liver model</a> from IRCAD, with cyst and tumors</li>
+                </ol>
+            </li>
+            <li>Open panel "Search" and search for the models containing object "Skull":</li></ul>
+    <img src="workshop/skull.png" alt="skull"/>
+    <ul>
+            <li>Click on "BrainWeb-Normal-with-T1-T2-PD-maps". The model has a single timepoint and instant, with 3 parameter maps defining the proton density, T1 and T2 values in every voxel of the model. It also has a list of anatomical objects describing the structures in the model. The toolbar on top of the panel shows that this model is ready for MRI simulation.</li>
+        </ul>
+    <img src="workshop/brainweb1.png" alt="brainweb 1"/> 
+        <ul>
+    <li>Click on "BrainWeb-Severe-Multiple-Sclerosis-with-Maps". The model has a pathological layer containing a demyelination:</li>
+        </ul>
+        <img src="workshop/brainweb2.png" alt="brainweb2"/>
+        <ul><li>With the "Download" button, you can download a model to inspect its files:</li></ul>
+        <img src="workshop/download1.png" alt="download"/>
+        <br/>
+        <a href="#contents">Back to top</a>
+        
+        <h2><a name="ex2">Exercise 2:</a> explore repository of simulated data (5 min)</h2>
+        <ul><li>In your home page, open the simulated data repository in application <b>Simulated data</b>:</li></ul>
+        <img src="workshop/simulated-data.png" alt="home_data"/>
+        <ul><li>Data are presented by modality, with their semantic type, list of parameters and model used to produce them.</li></ul>
+        <img src="workshop/simulated-data-mr.png" alt="mr_data"/>
+
+        <ul><li>Click on a simulated data and open its model by choosing "View model" in the contextual menu. You can see the corresponding entry in the model repository.</li>
+            <li>Click on a simulated data and open its simulation by choosing "View simulation" in the contextual menu. You can see the corresponding simulation and download its results.</li>
+        </ul>
+        <a href="#contents">Back to top</a>
+        
+        <h2><a name="ex3">Exercise 3:</a> import your own model (15 min)</h2>
+        In this exercise you will import a model composed of 4 parameter maps acquired in the <a href="https://www.irisa.fr/visages/">VISAGES</a> team at INRIA. This model will be used in an MRI simulation in the next exercise.
+        <ul>
+            <li>Download the model maps in your computer (to start the procedure as if *you* produced the model): <a href="workshop/T1.nii.gz">T1</a>, <a href="workshop/T2.nii.gz">T2</a>, <a href="workshop/T2s.nii.gz">T2 star</a> and <a href="workshop/M0.nii.gz">proton density</a></li>
+            <li>In your home, open the model repository</li>
+            <li>Click on "New model":</li>
+        </ul>
+        <img src="workshop/new-model1.png" alt="new model"/>
+        <ul>
+            <li>A tab containing two panels appears. The left panel will contain your model files. The right panel will contain the current status of your annotated model:</li>
+        </ul>
+        <img src="workshop/panels.png" alt="panels"/>
+        <ul>
+            <li>Click on button "Add file" to upload map M0.nii.gz (proton density). Repeat the operation for T1.nii.gz, T2.nii.gz and T2s.nii.gz:
+        </ul>
+        <img src="workshop/maps.png" alt="maps"/>
+        <ul>
+            <li>Drag and drop the proton density map (M0.nii.gz) from the left to the right panel:</li>
+        </ul>
+        <img src="workshop/drag.png" alt="drag"/>
+        <ul>
+            <li>The annotation panel appears. Select file type "Map", physical parameter "protonDensity", and layer "All":</li>
+        </ul>
+        <img src="workshop/annotation.png" alt="annotation"/>
+        <ul>
+            <li>Click "OK". The map has been added to your model:</li>
+        </ul>
+        <img src="workshop/added.png" alt="added"/>
+        <ul>
+            <li>Repeat this operation to add the T1, T2 and T2* maps. Your model is now valid for MRI:</li>
+        </ul>
+        <img src="workshop/all-maps.png" alt="all-maps"/>
+        <ul>
+            <li>We will now annotate the model with anatomical terms. Right-click on "Instant" to add an anatomical layer. Expand this layer, right-click on "Objects" and select "Add object". A panel appears where you can search for terms in the ontology:</li>
+        </ul><img src="workshop/annotation1.png" alt="annotation"/>
+        <ul>
+            <li>Select "Skull" and validate.</li>
+            <li>Right-click on the model name to change your model's name:</li>
+        </ul>
+        <img src="workshop/name.png" alt="name"/>
+        <ul><li>And finally, commit the model to the repository:</li>
+        </ul>
+        <img src="workshop/commit.png" alt="commit"/>
+        <ul>
+            <li>Your model should now be visible in the repository</li>
+        </ul>
+        <a href="#contents">Back to top</a>
+        <h2><a name="ex4">Exercise 4:</a> launch simulations from model repository (10 min)</h2>
+        In this exercise, you will simulate MRIs using the SimuBloch simulator developed in the <a href="https://www.irisa.fr/visages/">VISAGES</a> team at INRIA. 
+        <ul><li>Make sure that WebGL is properly configured in your web browser by checking the <a href="https://www.khronos.org/registry/webgl/sdk/demos/google/shiny-teapot/index.html">Teapot test</a> (you should see a 3D teapot). </li>
+            <li>In the model repository, select your model and choose "Launch simulation from model" in the contextual menu (right-click):</li></ul>
+        <img src="workshop/launch-1.png" alt="launch"/>
+        <ul><li>A 3D scene appears, showing a blue cube representing the bounding box of your model, and a representation of an MRI scanner. MRI was automatically selected since the model has magnetic parameters. Controls allow you to translate and rotate the model as well as the scanner:</li></ul>
+        <img src="workshop/3d.png" alt="3d"/>
+        <ul><li>Select a simulator among the available MR sequences:
+                <ol>
+                    <li>Spin Echo: SE</li>
+                    <li>Gradient Echo: GRE</li>
+                    <li>Inversion Recovery - Spin Echo: IR-SE</li>
+                    <li>Inversion Recovery - Gradient Echo (MPRAGE): IR-GRE</li>
+                    <li>Spoiled Gradient Echo (SPGR, FLASH, T1-FFE): SP-GRE</li>
+                    <li>Coherent Gradient Echo (Partially Refocused (Rewound) Gradient Echo, FISP, GRASS, FFE, FAST): CoherentGRE</li>
+                </ol>
+                For instance, GRE:
+            </li></ul>
+        <img src="workshop/select-simulator.png" alt="simulator selection"/>
+        <ul><li>A tab containing simulation parameters appears. Information about the model and its geometrical transformation w.r.t. the scanner is already filled in. Fill in the input parameters with plausible values, for instance TR=120, TE=8 and result directory="/vip/Home". You can also load an example for this MRI sequence:</li></ul>
+        <img src="workshop/params.png" alt="params"/>
+        <ul><li>Launch the simulation, and monitor it with "Simulation Monitor": <img src="workshop/monitor.png" alt="monitor"/></li>
+            <li>When the simulation is finished, download the resulting image, and open it e.g. with MRICRON (download here executables for Linux <a href="http://www.nitrc.org/frs/download.php/4785/lx32.zip">32 bits</a> or <a href="http://www.nitrc.org/frs/download.php/4786/lx64.zip">64 bits</a>, <a href="http://www.nitrc.org/frs/download.php/4784/win.zip">Windows</a> or <a href="http://www.nitrc.org/frs/download.php/4783/osx.zip">Mac</a>):</li></ul>
+        <img src="workshop/mricron.png" alt="view"/>
+        <ul><li>Your image should also appear in the repository of simulated data:
+        <img src="workshop/simulated.png" alt="simulated-icon"/>
+        </li></ul>
+        That's it, we hope you enjoyed the hands-on.<br/>
+        <a href="#contents">Back to top</a>
+    </body>
+</html>
