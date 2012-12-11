@@ -40,13 +40,16 @@ import com.smartgwt.client.widgets.form.validator.IsIntegerValidator;
 import com.smartgwt.client.widgets.form.validator.IntegerRangeValidator;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.widgets.layout.SectionStack;
 
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.models.client.ParserLUT.PhysicalParameterLUT;
 import fr.insalyon.creatis.vip.models.client.view.ModelTreeGrid;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 
@@ -88,6 +91,9 @@ public class ModelCreateDialog extends Window {
     private TreeGrid resultTG = null;
     private Logger logger = null;
     DynamicForm validateForm = null;
+    private PhysicalParameterLUT ppl;
+    private boolean bhasValidatedLUT = false;
+    SectionStack lutSStack;
     private static final String HELPTEXT = "<br><b>Term : </b> Clicking the button search,"
             + "it allows to search the specified term"
             + " and after to select the wanted value in grid results."
@@ -198,6 +204,11 @@ public class ModelCreateDialog extends Window {
                         SC.say("you have to select a semantic term.");
                     }
 
+                }else if (type == 2 && bhasValidatedLUT){
+                    tree.addMathematicalItems(tp, ins, filename, getLayerforLUT(), ppl, physicalCombo.getValues()) ;
+                    hide();
+                    refresh();
+                    bhasValidatedLUT = false;
                 } else if (type == 2 || type == 3) {
                     if (physicalCombo.getValues().length != 0) {
                         tree.addPhysicalItems(tp, ins, type, filename, getLayerforLUT(), physicalCombo.getValues());
@@ -375,7 +386,7 @@ public class ModelCreateDialog extends Window {
     }
 
     public TreeGrid createVoxelTreeGrid() {
-        resultTG = new TreeGrid();
+        
         TreeGridField fieldname = new TreeGridField("name");
         fieldname.setCanSort(false);
         fieldname.setCanEdit(false);
@@ -512,11 +523,44 @@ public class ModelCreateDialog extends Window {
         layerRadio.setValue("Anatomy");
         layerForm = new DynamicForm();
         layerForm.setFields(layerRadio);
-//        SearchLayout = new VLayout();
-//        SearchLayout.addMember(layerForm);
-//        this.addItem(SearchLayout);
         this.addItem(layerForm);
+        if(bhasValidatedLUT && type == 2)
+        {
+//            ModelLUTSection mldForm = new ModelLUTSection(ppl, "<b>Magnetic Luts</b>", fixLUTs());
+//            lutSStack = new SectionStack();
+//            lutSStack.setVisibilityMode(VisibilityMode.MULTIPLE);
+//            lutSStack.setAnimateSections(true);
+//            lutSStack.enable();
+//            lutSStack.setSections(mldForm);
+//            this.addMember(lutSStack);
+            fixLUTs();
+            physicalCombo.disable();
+        }
 
+    }
+         
+    private String[] fixLUTs()
+    {
+        String[] result;
+        int index = 0;
+        for (String lut : tree.getLutMapType())
+        {
+            if (ppl.hasParametersfor(lut))
+                index++;
+        }
+        result = new String[index];
+        int it = 0;
+        index =0;
+        for (String lut : tree.getLutMapType())
+        {
+            if (ppl.hasParametersfor(lut))
+            {
+                result[index++] = tree.getLutMap().get(it);
+            }
+            it++;
+        }
+         physicalCombo.setValues(result);
+        return result;
     }
 
     private void removePhysicalForms() {
@@ -525,6 +569,10 @@ public class ModelCreateDialog extends Window {
         this.removeItem(layerForm);
         this.removeItem(validateForm);
         this.removeItem(selectLayerLabel);
+        if(bhasValidatedLUT && type == 2)
+        {
+           // this.removeItem(lutSStack);
+        }
 
     }
 
@@ -536,6 +584,8 @@ public class ModelCreateDialog extends Window {
         this.removeItem(layerForm);
         this.removeItem(hLayout);
         this.removeItem(validateForm);
+        if(selectLayerLabel != null)
+            this.removeItem(selectLayerLabel);
     }
 
     private void removeForms() {
@@ -674,6 +724,14 @@ public class ModelCreateDialog extends Window {
 
       
 
+    }
+    public void addLUT(PhysicalParameterLUT PPL)
+    {
+        this.ppl = PPL;
+        bhasValidatedLUT = true;
+        removeForms();
+        initPhysicalForms();
+        createOKBt();
     }
 
     public static class SearchTreeNode extends TreeNode {

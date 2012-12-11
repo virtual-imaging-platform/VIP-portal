@@ -71,7 +71,9 @@ import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.*;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.PhysicalParametersLayer.PhysicalParameterType;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.models.client.ParserLUT.PhysicalParameterLUT;
 import fr.insalyon.creatis.vip.models.client.ModelConstants;
+import fr.insalyon.creatis.vip.models.client.ParserLUT.GenericParameter;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 
@@ -102,6 +104,7 @@ public class ModelTreeGrid extends TreeGrid {
     private int ppindex = 0;
     private String ppobjLayer = "";
     private String ppname = "";
+    private PhysicalParameterLUT ppLUT;
     private int pptype = 0;
     private boolean bwait = true;
     public boolean editable = true; // To allow to delete timepoints and instant
@@ -252,11 +255,13 @@ public class ModelTreeGrid extends TreeGrid {
         });
 
         dg = new ModelCreateDialog(this);
+        
         this.addFolderDropHandler(new FolderDropHandler() {
 
             @Override
             public void onFolderDrop(FolderDropEvent event) {
                 String dropname = event.getNodes()[0].getAttribute("FileName");
+                  dg.addInfo(typeDropped(dropname), tpSelected, insSelected, event.getNodes()[0].getAttribute("FileName"));
                 if (dropname.endsWith(".mhd")) {
                     ModelServiceAsync ms = ModelService.Util.getInstance();
                     final AsyncCallback<String> callback = new AsyncCallback<String>() {
@@ -268,15 +273,39 @@ public class ModelTreeGrid extends TreeGrid {
                         public void onSuccess(String result) {
                              logger.log(Level.SEVERE, "associate : " + associatedraw);
                             associatedraw = result;
+                             dg.show();
+                dg.search();
 
                         }
                     };
                     ms.extractRaw(dropname, zipfile, zipFullPath, mbUpload, callback);
-                } else {
+                } 
+                else  if (dropname.endsWith(".xml")) {
+                    ModelServiceAsync ms = ModelService.Util.getInstance();
+                    final AsyncCallback<PhysicalParameterLUT> callback = new AsyncCallback<PhysicalParameterLUT>() {
+
+                        public void onFailure(Throwable caught) {
+                            Layout.getInstance().setWarningMessage("The xml file is not in the correct LUT format.");
+                            dg.show();
+                        }
+
+                        public void onSuccess(PhysicalParameterLUT result) {
+                            dg.addLUT(result);
+                            dg.show();
+                           
+                        }
+                    };
+                    ms.extractLUT(dropname, zipfile, zipFullPath, mbUpload, callback);
+                     
                 }
-                dg.addInfo(typeDropped(dropname), tpSelected, insSelected, event.getNodes()[0].getAttribute("FileName"));
-                dg.show();
-                dg.search();
+                else
+                {
+                  dg.show();
+                  dg.search();
+                }
+               
+              
+               
                 event.cancel();
 
             }
@@ -472,10 +501,9 @@ public class ModelTreeGrid extends TreeGrid {
         };
         int ins = Integer.parseInt(modelTree.getParent(modelTree.getParent(mnode)).getAttribute("number"));
         int tp = Integer.parseInt(modelTree.getParent(modelTree.getParent(modelTree.getParent(mnode))).getAttribute("number"));
-        String layer = modelTree.getParent(mnode).getAttribute(model.getModelName());
-        if (layer.contains("Anatomy")) {
-            layer = "Anatomy";
-        }
+        String layer = modelTree.getParent(modelTree.getParent(mnode)).getAttribute(model.getModelName());
+            logger.log(Level.SEVERE, "LAYER !!!! : "+ layer);
+        
         ms.removeObjects(model, tp, ins, getTypeFromMap(layer).toString(), callback);
     }
 
@@ -516,13 +544,15 @@ public class ModelTreeGrid extends TreeGrid {
                 checkModality();
             }
         };
-        ModelTreeNode objects = (ModelTreeNode) modelTree.getParent(mnode);
-        int ins = Integer.parseInt(modelTree.getParent(modelTree.getParent(objects)).getAttribute("number"));
-        int tp = Integer.parseInt(modelTree.getParent(modelTree.getParent(modelTree.getParent(objects))).getAttribute("number"));
-        String layer = modelTree.getParent(objects).getAttribute(model.getModelName());
-        if (layer.contains("Anatomy")) {
-            layer = "Anatomy";
-        }
+        ModelTreeNode node = (ModelTreeNode) modelTree.getParent(mnode);
+         while (!node.getAttributeAsString(model.getModelName()).contains("Instant")) {
+                        node = (ModelTreeNode) modelTree.getParent(node);
+         }
+        
+        int ins = Integer.parseInt(node.getAttribute("number"));
+        int tp = Integer.parseInt(modelTree.getParent(node).getAttribute("number"));
+        
+        String layer = modelTree.getParent(modelTree.getParent(node)).getAttribute(model.getModelName());
         ms.removeObject(model, tp, ins, getTypeFromMap(layer).toString(), mnode.getAttribute(model.getModelName()), callback);
     }
 
@@ -535,6 +565,7 @@ public class ModelTreeGrid extends TreeGrid {
             }
 
             public void onSuccess(SimulationObjectModel result) {
+                Layout.getInstance().setNoticeMessage("removed Physical Parameters");
                 model = result;
                 bmodif = true;
                 checkModality();
@@ -690,13 +721,10 @@ public class ModelTreeGrid extends TreeGrid {
 
     private void load(SimulationObjectModel model) {
         //model timepoints
-        int id = 0;
-
-        int nit = 0;
+        int id=0;
+        int nit;
 
         ModelTreeNode[] timepoints = new ModelTreeNode[model.getTimepoints().size()];
-        logger.log(Level.SEVERE, "TIMEPOINTS size : " + timepoints.length);
-        //  SC.say(String.valueOf(model.getTimepoints().size()));
         for (Timepoint tp : model.getTimepoints()) {
             ModelTreeNode[] instants = new ModelTreeNode[tp.getInstants().size()];
             nit = 0;
@@ -1323,6 +1351,319 @@ public class ModelTreeGrid extends TreeGrid {
         return luts;
     }
 
+    public ArrayList<String> getLutMapType() {
+        ArrayList<String> luts = new ArrayList<String>();
+        for (Entry<String, PhysicalParameterType> entry : lutTypeMap.entrySet()) {
+            luts.add(entry.getValue().toString());
+        }
+        return luts;
+    }
+    
+    public void addMathematicalItems(int tp, int ins, String name, String objLayer, PhysicalParameterLUT ppl, String[] labels) {
+        pplabels = labels;
+        ppindex = 0;
+        ppobjLayer = objLayer;
+        ppname = name;
+        ppLUT = ppl;
+        addMathematicalItem(tp, ins, name, objLayer, ppLUT.getPhysicalParameters(pplabels[ppindex]), pplabels[ppindex]);
+    }
+
+        public void addMathematicalItem(int tp, int ins, String name, String objLayer, 
+                   HashMap<String, GenericParameter> params, String type) {
+        ppindex++;
+        bmodif = true;
+        checkModality();
+        ArrayList<String> objNames = associatedFilesToLayer(2, name);
+
+        String layer = getLayerFromMap(objLayer);
+        ModelServiceAsync ms = ModelService.Util.getInstance();
+        final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
+
+                public void onFailure(Throwable caught) {
+                    bwait = true;
+                    Layout.getInstance().setWarningMessage("Cannot added mathematical ditribution to model");
+                }
+
+                public void onSuccess(SimulationObjectModel result) {
+                    bwait = true;
+                    Layout.getInstance().setNoticeMessage("Mathematical ditribution added to model");
+                    model = result;
+                    bmodif = true;
+                    checkModality();
+                    int i = ppindex - 1;
+//                    addMathematicalItemInTree(tpSelected, insSelected, ppname, ppobjLayer, 
+//                            ppLUT.getPhysicalParameters(pplabels[i]), pplabels[i]);
+                   // addPhysicalItemInTree(tpSelected, insSelected, 2, ppname, ppobjLayer, pplabels[i]);
+                    addmathematicalItemInTree(tpSelected, insSelected, 2, ppname, ppobjLayer, pplabels[i],ppLUT.getPhysicalParameters(pplabels[ppindex]));
+                    if (ppindex < pplabels.length) {
+                        addMathematicalItem(tpSelected, insSelected, ppname, ppobjLayer, ppLUT.getPhysicalParameters(pplabels[ppindex]), pplabels[ppindex]);
+                    }
+                    else
+                    {
+                        int value = 1000;
+                    for(Entry<String, GenericParameter> ent:ppLUT.getPhysicalParameters(pplabels[ppindex]).entrySet())
+                        addVirtualItemInTree(tpSelected, insSelected,  ent.getKey(), ppobjLayer, value++);
+                    }
+                }
+            };
+
+        ms.addMathematicalLUT(model, layerTypeMap.get(layer), params, tp, ins, lutTypeMap.get(type), callback);
+        }  
+        
+    public void addmathematicalItemInTree(int tp, int ins, int type, String name, String objLayer, String label, HashMap<String, GenericParameter> params) {
+        int nbChild = 0;
+        logger.log(Level.SEVERE, "tp :" + String.valueOf(tp) + "ins : " + String.valueOf(ins) + "type : " + String.valueOf(type)
+                + "name : " + name + "lab :" + label);
+        ModelTreeNode insnode = findNode(tp, ins);
+        // pour objet on doit regarder un niveau en dessous
+        //Check if the object layer exists for this instant
+        logger.log(Level.SEVERE, "layer :" + objLayer);
+        TreeNode[] nodes = modelTree.getFolders(insnode);
+        ModelTreeNode objectLayerPartsNode = null;
+        ModelTreeNode LayerNode = null;
+        ModelTreeNode physicalLutNode = null;
+        ModelTreeNode objectLeaf = null;
+
+        boolean bLayerExist = false;
+        boolean bObjectLayerExist = false;
+        boolean bObjectExist = false;
+        boolean bphysicalLutExist = false;
+
+            String layer = getLayerFromMap(objLayer);
+
+            logger.log(Level.SEVERE, "layer :" + layer);
+            String layerPartName = "Physical parameters";
+
+            for (TreeNode nd : nodes) {
+                // Find if the wanted layer exists
+                if (nd.getAttribute(model.getModelName()).contains(layer)) {
+                    TreeNode[] objects = modelTree.getFolders(nd);
+                    bLayerExist = true;
+                    LayerNode = (ModelTreeNode) nd;
+                    for (TreeNode obj : objects) {
+                        // Find if the Object Layer exist
+                        if (obj.getAttribute(model.getModelName()).contains(layerPartName)) {
+                            bObjectLayerExist = true;
+                            TreeNode[] physicalnodes = modelTree.getFolders(obj);
+                            objectLayerPartsNode = (ModelTreeNode) obj;
+
+                            for (TreeNode physical : physicalnodes) {
+                                if (physical.getAttribute(model.getModelName()).contains("Look-up tables") && type == 2) {
+                                    bphysicalLutExist = true;
+                                    nbChild = modelTree.getDescendantLeaves(physical).length;
+                                    physicalLutNode = (ModelTreeNode) physical;
+                                    break;
+
+                                } else if (physical.getAttribute(model.getModelName()).contains("Maps") && type == 3) {
+                                    bphysicalLutExist = true;
+                                    nbChild = modelTree.getDescendantLeaves(physical).length;
+                                    physicalLutNode = (ModelTreeNode) physical;
+                                    break;
+                                }
+
+                            }
+                        }
+
+                    }
+                    if (bObjectLayerExist) {
+                        break;
+                    }
+                }
+                if (bLayerExist) {
+                    break;
+                }
+            }
+
+
+            String format = name;
+            String description = label + " (" + name + ")";
+
+            
+            ModelTreeNode[] distribNode =new ModelTreeNode[params.size()];
+            int index = 0;
+            for(Entry<String, GenericParameter> ent:params.entrySet())
+            {
+                String mean ="";
+                String std ="";
+                for (Entry<String, Double> dd :ent.getValue().getDistrib().getParameters().entrySet())
+                {
+                    if (dd.getKey().equals("mean"))
+                        mean = dd.getValue().toString();
+                    else
+                        std = dd.getValue().toString();
+                }
+                description = ent.getKey() + "("+ ent.getValue().getDistrib().getName() + " "+ mean + " +/- "+ std +")";
+                distribNode[index] = new ModelTreeNode("", description, false, 1, null);
+                distribNode[index].setIcon(ModelConstants.APP_IMG_OBJECT);
+                index++;
+            }
+            ModelTreeNode objectNode = new ModelTreeNode("", description, false, 1, distribNode);
+            objectNode.setIcon(getPhysicalIcon(lutTypeMap.get(label)));
+           
+            if (bphysicalLutExist) {
+                modelTree.add(objectNode, physicalLutNode);
+            } else {
+               
+                    physicalLutNode = new ModelTreeNode("", "Look-up tables", false, 1, objectNode);
+                    physicalLutNode.setIcon(ModelConstants.APP_IMG_LUT);
+                
+
+                if (bObjectLayerExist) {
+                    modelTree.add(physicalLutNode, objectLayerPartsNode);
+                } else {
+                    //create the Object Layer
+                    objectLayerPartsNode = new ModelTreeNode("", layerPartName, false, 1, physicalLutNode);
+                    objectLayerPartsNode.setIcon(ModelConstants.APP_IMG_PHYSICAL_PARAMS);
+                    if (bLayerExist) {
+                        modelTree.add(objectLayerPartsNode, LayerNode);
+                    } else {
+                        ModelTreeNode objectsNode = new ModelTreeNode("", "Objects", false, 1 - 1, null);
+                        objectsNode.setIcon(ModelConstants.APP_IMG_OBJECT);
+                        // create the Layer
+                        LayerNode = new ModelTreeNode("", layer, false, 1, objectLayerPartsNode,objectsNode);
+                        LayerNode.setIcon(getIconObject(layerTypeMap.get(layer)));
+                        // add Object Layer by default
+                        modelTree.add(LayerNode, insnode);
+                    }
+                }
+            }
+
+        
+    }
+        
+    
+        
+    public void addMathematicalItemInTree(int tp, int ins,  String name, 
+            String objLayer,HashMap<String, GenericParameter> params, String type) {
+        int nbChild = 0;
+        
+        ModelTreeNode insnode = findNode(tp, ins);
+        
+        TreeNode[] nodes = modelTree.getFolders(insnode);
+        ModelTreeNode objectLayerPartsNode = null;
+        ModelTreeNode LayerNode = null;
+        ModelTreeNode physicalLutNode = null;
+
+        boolean bLayerExist = false;
+        boolean bObjectLayerExist = false;
+
+        String layer = getLayerFromMap(objLayer);
+        logger.log(Level.SEVERE, "layer :" + layer);
+        String layerPartName = "Objects";
+        int mathObjectNode[] = new int[params.size()];
+        
+        for (TreeNode nd : nodes) {
+                // Find if the wanted layer exists
+                if (nd.getAttribute(model.getModelName()).contains(layer)) {
+                    TreeNode[] objects = modelTree.getFolders(nd);
+                    bLayerExist = true;
+                    LayerNode = (ModelTreeNode) nd;
+                    for (TreeNode obj : objects) {
+                        // Find if the Object Layer exist
+                        if (obj.getAttribute(model.getModelName()).contains(layerPartName)) {
+                            bObjectLayerExist = true;
+                            TreeNode[] objectnodes = modelTree.getFolders(obj);
+                            objectLayerPartsNode = (ModelTreeNode) obj;
+                            int index = 0;
+                            for(Entry<String, GenericParameter> ent: params.entrySet())
+                            {
+                                mathObjectNode[index] = 0; //by deafult no math distribution
+                                for (TreeNode object : objectnodes)
+                                {
+                                    if(object.getAttribute(model.getModelName()).equals(ent.getKey()))
+                                    {
+                                        mathObjectNode[index] = 1; // object alreay in the interface
+                                        TreeNode[] distributionnodes = modelTree.getFolders(object);
+                                        for (TreeNode dis : distributionnodes)
+                                        {
+                                            if(dis.getAttribute(model.getModelName()).equals(type))
+                                            {
+                                                mathObjectNode[index] = 2; // type for this object alreay in the interface
+                                                break;
+                                            }
+                                        }
+                                        break;
+                                    }
+                                            
+                                }
+                                index++;
+                            }
+                            
+                        }
+
+                    }
+                    if (bObjectLayerExist) {
+                        break;
+                    }
+                }
+                if (bLayerExist) {
+                    break;
+                }
+            }
+        
+            if(!bObjectLayerExist)
+            {
+                objectLayerPartsNode = new ModelTreeNode("", layerPartName, false, 1, null);
+                objectLayerPartsNode.setIcon(ModelConstants.APP_IMG_OBJECT);
+                if (bLayerExist) {
+                        modelTree.add(objectLayerPartsNode, LayerNode);
+                } else {
+                    // create the Layer
+                    LayerNode = new ModelTreeNode("", layer, false, 1, objectLayerPartsNode);
+                    LayerNode.setIcon(getIconObject(layerTypeMap.get(layer)));
+                    // add Object Layer by default
+                    modelTree.add(LayerNode, insnode);
+                 }
+             }
+
+             int index = 0;
+             for(Entry<String, GenericParameter> ent: params.entrySet())
+             {
+                 if(mathObjectNode[index] != 2)
+                 {
+                     String format = name;
+                     String description = type + " (" + ent.getValue().getDistrib().getName() + " ";
+                     for(Entry<String, Double> dis :  ent.getValue().getDistrib().getParameters().entrySet())
+                     {
+                         if (dis.getKey().equals("mean"))
+                            description +=  dis.getValue() + " +/- ";
+                         else if(dis.getKey().equals("standard"))
+                             description +=  dis.getValue();
+                         else{}
+                             
+                     }  
+                     description += " in " + name + ")";
+                    ModelTreeNode distributionNode = new ModelTreeNode("", description, false, 1, null);
+                    distributionNode.setIcon(ModelConstants.APP_IMG_DISTRIBUTION);
+                    if(mathObjectNode[index] == 1) // object alreay in treenode
+                    {
+                        TreeNode[] objectnodes = modelTree.getFolders(objectLayerPartsNode);
+                        for (TreeNode object : objectnodes)
+                        {
+                            if(object.getAttribute(model.getModelName()).equals(ent.getKey()))
+                            {
+                                modelTree.add(object,distributionNode);
+                                break;
+                            }
+                        }
+                    }
+                    else // need to create object first
+                    {description = ent.getKey().toString() + "(voxel : label " + String.valueOf(type) + " )";
+                        ModelTreeNode object = new ModelTreeNode("", description, false, 1, null);
+                        object.setIcon(ModelConstants.APP_IMG_OBJECT);
+                        modelTree.add(object,distributionNode);
+                        modelTree.add(objectLayerPartsNode,object);
+                    }
+                     index++;
+                 }
+                     
+             }
+        
+            
+        
+    }
+        
+    
     public void addPhysicalItems(int tp, int ins, int type, String name, String objLayer, String[] labels) {
         pplabels = labels;
         ppindex = 0;
@@ -1427,9 +1768,12 @@ public class ModelTreeGrid extends TreeGrid {
                     if (bLayerExist) {
                         modelTree.add(objectLayerPartsNode, LayerNode);
                     } else {
+                        ModelTreeNode objectsNode = new ModelTreeNode("", "Objects", false, 1 - 1, null);
+                        objectsNode.setIcon(ModelConstants.APP_IMG_OBJECT);
                         // create the Layer
-                        LayerNode = new ModelTreeNode("", layer, false, 1, objectLayerPartsNode);
+                        LayerNode = new ModelTreeNode("", layer, false, 1, objectLayerPartsNode,objectsNode);
                         LayerNode.setIcon(getIconObject(layerTypeMap.get(layer)));
+                        // add Object Layer by default
                         modelTree.add(LayerNode, insnode);
                     }
                 }
@@ -1562,14 +1906,20 @@ public class ModelTreeGrid extends TreeGrid {
         {
             for (Instant ins : tp.getInstants())
             {
-                if(ins.getObjectLayers() == null)
+                if(ins.getObjectLayers() == null  && ins.getPhysicalParametersLayers() == null)
                 {
+                     logger.log(Level.SEVERE, "empty instant!!");
                      bPurePhysicalParametersLayer = true;
                      break; 
                 }
+                else
+                {
+                     logger.log(Level.SEVERE, "maps!!");
+                }
+                
                 for(ObjectLayer objl : ins.getObjectLayers())
                 {
-                    if(objl.getPhysicalParameters() != null)
+                    if(objl.getPhysicalParameters() != null)// && objl.getPhysicalParameters().size()>0)
                     {
                           logger.log(Level.SEVERE, "one pppl!!");
                         if((objl.getLayerParts() == null) || (objl.getLayerParts() != null && 
@@ -1611,7 +1961,9 @@ public class ModelTreeGrid extends TreeGrid {
                 model = result;
                 bmodif = true;
                 checkModality();
-                modelTree.add(new ModelTreeNode(mnode), modelTree.getParent(mnode));
+                ModelTreeNode node = new ModelTreeNode(mnode);
+                node.setAttribute("number", modelTree.getFolders(modelTree.getParent(mnode)).length);
+                modelTree.add(node, modelTree.getParent(mnode));
             }
         };
 
@@ -1634,7 +1986,7 @@ public class ModelTreeGrid extends TreeGrid {
                 bmodif = true;
                 checkModality();
                 ModelTreeNode node = new ModelTreeNode(mnode);
-                node.setAttribute("number", tpnumber++);
+                node.setAttribute("number", modelTree.getFolders(modelTree.getParent(mnode)).length);
                 modelTree.add(node, modelTree.getParent(mnode));
             }
         };

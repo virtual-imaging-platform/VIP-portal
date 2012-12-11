@@ -41,6 +41,8 @@ import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+import fr.insalyon.creatis.vip.models.client.ParserLUT.GenericParameter;
+import fr.insalyon.creatis.vip.models.client.ParserLUT.PhysicalParameterLUT;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.view.ModelException;
 import fr.insalyon.creatis.vip.models.server.business.ModelBusiness;
@@ -48,6 +50,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import org.apache.log4j.Logger;
@@ -391,6 +394,18 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
     }
 
+    public PhysicalParameterLUT extractLUT(String name, String zipname, String modelFullPath, boolean bUpload) throws ModelException {
+        try {
+            try {
+                return modelBusiness.extractLUT(name, zipname, getSessionUser(), modelFullPath, bUpload);
+            } catch (DataManagerException ex) {
+                throw new ModelException(ex);
+            }
+        } catch (CoreException ex) {
+            throw new ModelException(ex);
+        }
+    }
+    
     public SimulationObjectModel setDescription(SimulationObjectModel model, String description) throws ModelException {
         try {
             trace(logger, "set description " + description);
@@ -472,4 +487,10 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         }
             return result;
        }
+       
+        public SimulationObjectModel addMathematicalLUT(SimulationObjectModel model, 
+                SimulationObjectModel.ObjectType layer, HashMap<String, GenericParameter> parameters, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype) throws ModelException
+        {
+            return modelBusiness.addMathematicalLUT(model,layer, parameters, tp, ins, pptype);
+        }
 }

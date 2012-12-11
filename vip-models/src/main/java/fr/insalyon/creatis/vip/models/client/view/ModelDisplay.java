@@ -35,11 +35,14 @@
 package fr.insalyon.creatis.vip.models.client.view;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.DateChooser;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.tab.Tab;
+import com.smartgwt.client.widgets.tab.TabSet;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
@@ -82,6 +85,8 @@ public class ModelDisplay extends VLayout {
     private String zipFullPath = "";
     private boolean mbUpload = true;
     private boolean mbMenu = true;
+     private final TabSet topTabSet = new TabSet();  
+     private Tab mtb;
     ModelDisplay(String uri, boolean test, boolean bmenu) {
         super();
         muri = uri;
@@ -109,6 +114,11 @@ public class ModelDisplay extends VLayout {
         modelTreeGrid.setZipFile(z,zipFullPath, mbUpload);
     }
 
+    public void settab(Tab tb)
+    {
+        mtb = tb;
+        topTabSet.addTab(mtb);
+    }
     private void init(boolean bfull, boolean bmodif) {
 
 
@@ -324,6 +334,7 @@ public class ModelDisplay extends VLayout {
                 if (modelsTab != null) {
                     modelsTab.loadModels();
                 }
+                topTabSet.removeTab(mtb);
             //}
 //                        };
 //                        mms.completeModel(result, callback1);

@@ -70,6 +70,7 @@ public class ModelConstants {
     public static final String APP_IMG_PHYSICAL_PARAMS = IMG_FOLDER + "icon-physparams.png";
     public static final String APP_IMG_OK = IMG_FOLDER + "icon-ok.png";
     public static final String APP_IMG_KO = IMG_FOLDER + "icon-ko.png";
+   public static final String APP_IMG_DISTRIBUTION = IMG_FOLDER + "icon-distribution.png";
     // Configuration Constants
     public static final String GROUP_VIP = "VIP";
     public static final String MODEL_HOME = DataManagerConstants.ROOT + "/VIP/Models";

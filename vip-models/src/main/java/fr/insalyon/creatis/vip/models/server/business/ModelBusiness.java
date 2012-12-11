@@ -38,6 +38,8 @@ import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectMod
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectModelQueryer;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectSearcher;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.*;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.MathematicalDistributionOfPhysicalQuality.MathematicalDistributionType;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.MathematicalDistributionParameter.MathematicalDistributionParameterType;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectLayer.Resolution;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.ObjectLayerPart.Format;
 
@@ -51,11 +53,18 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import fr.insalyon.creatis.vip.models.client.ParserLUT.Distribution;
+import fr.insalyon.creatis.vip.models.client.ParserLUT.GenericParameter;
+import fr.insalyon.creatis.vip.models.server.ParserLUT.Parser;
+import fr.insalyon.creatis.vip.models.client.ParserLUT.PhysicalParameterLUT;
+import fr.insalyon.creatis.vip.models.client.ParserLUT.Tissue;
 import fr.insalyon.creatis.vip.models.client.view.ModelException;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -666,6 +675,7 @@ public class ModelBusiness {
         ArrayList<Timepoint> tps = model.getTimepoints();
         System.out.println(tps.size());
         tps.get(tp).setStartingDate(starting);
+      
         model.setTimepoints(tps);
         System.out.println("Date " + model.getTimepoint(tp).getStartingDate());
         return model;
@@ -908,14 +918,10 @@ public class ModelBusiness {
              model.getInstant(tp, ins).addObjectLayer(obj);
             
         }
-        else  if (index != -1)
+        else 
         {
             System.out.println("find object layer");
              obj = model.getInstant(tp, ins).getObjectLayers(index);
-        }
-        else
-        {
-            //
         }
         
         if (type == 2) {
@@ -942,6 +948,7 @@ public class ModelBusiness {
 
         // if the object layer of the needed type doesn't exist we create it and add the part
         if (objectLayer == null) {
+            
             // create a new layer
             createLayerAndAddLayerPart(objectModel, timePointIndex, instantIndex, Resolution.high, objectName, fileName, objectLabel, fileFormat, objectPriority);
         } else {
@@ -1029,6 +1036,7 @@ public class ModelBusiness {
             System.out.println("layer type : " + lay.getType());
             if (lay.getType().toString().equals(layer)) {
                 layers.remove(lay);
+                SimulationObjectModelFactory.removeObjectLayer(lay);
                 break;
             }
             ind++;
@@ -1054,6 +1062,7 @@ public class ModelBusiness {
         for (ObjectLayer lay : layers) {
             if (lay.getType().toString().equals(layer)) {
                 ind = lay;
+                SimulationObjectModelFactory.removeObjectLayer(lay);
                 break;
             }
             j++;
@@ -1091,6 +1100,8 @@ public class ModelBusiness {
         }
 
         ArrayList<PhysicalParametersLayer> parts = ind.getPhysicalParametersLayers();
+        for(PhysicalParametersLayer ppl : parts)
+            SimulationObjectModelFactory.removePhysicalParametersLayer(ppl);
         parts.clear();
         ind.setPhysicalParametersLayers(parts);
         layers.set(j, ind);
@@ -1131,6 +1142,7 @@ public class ModelBusiness {
                 if (file.contains(name)) {
                     bremove = true;
                     files.remove(file);
+                    SimulationObjectModelFactory.removeObjectLayerPart(part);
                     break;
                 }
             }
@@ -1171,12 +1183,11 @@ public class ModelBusiness {
         }
         ArrayList<PhysicalParametersLayer> parts = ind.getPhysicalParametersLayers();
         int i = 0;
-        PhysicalParametersLayer ppl = null;
         for (PhysicalParametersLayer part : parts) {
             PhysicalParametersLayer.PhysicalParameterType pptype = part.getType();
             boolean bremove = false;
             if (pptype.equals(type)) {
-                ppl = part;
+                SimulationObjectModelFactory.removePhysicalParametersLayer(part);
                 break;
             }
             i++;
@@ -1212,10 +1223,99 @@ public class ModelBusiness {
         }
     }
 
+    public SimulationObjectModel addMathematicalLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, HashMap<String, GenericParameter> parameters, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype)
+    {
+        ArrayList<ObjectLayer> aLayers = model.getInstant(tp, ins).getObjectLayers();
+        int index = -1;
+        for (ObjectLayer lay : aLayers) {
+            index++;
+            if (lay.getType() == layer) {
+                break;
+            }
+        }
+
+        ObjectLayer obj = null;
+        
+        if (index == -1)
+        {
+//             obj = SimulationObjectModelFactory.createObjectLayer(model, tp, ins, layer, Resolution.high);
+//             model.getInstant(tp, ins).addObjectLayer(obj);
+            System.out.println("couche inexistante");
+             index = 0;
+        }
+        else 
+        {
+            System.out.println("couche trouvé");
+             obj = model.getInstant(tp, ins).getObjectLayers(index);
+        }
+        int value = 1000;
+        System.out.println("pptype: " + pptype.toString());
+        for(Entry<String, GenericParameter> ent : parameters.entrySet())
+        {
+            int indexolp  = findObjectLayerPart(model,tp,ins, ent.getKey());
+            ObjectLayerPart olp = null;
+            if(indexolp == -1)
+            {
+                ArrayList<String> files = new ArrayList<String>();
+                files.add("none");
+                model = addObject(model,ent.getKey(),files,tp,ins,1,value++);
+                indexolp  = findObjectLayerPart(model,tp,ins, ent.getKey());
+                System.out.println("object-layer-part: " + ent.getKey());
+                olp = model.getInstant(tp, ins).getObjectLayers(index).getObjectLayerPart(indexolp);
+            }
+            else
+            {
+                System.out.println("indexolp :" + indexolp);
+                olp = model.getInstant(tp, ins).getObjectLayers(index).getObjectLayerPart(indexolp);
+                System.out.println("distribution :" +olp.getMathematicalDistributions().get(0).getDistributionType().toString());
+            }
+            model.getInstant(tp, ins).getObjectLayers(index).getObjectLayerPart(indexolp).
+            addMathemicalDistribution(addMathematicalDistributionLUT(olp,ent.getValue().getDistrib(),pptype));
+            SimulationObjectModelFactory.inferModelSemanticAxes(model);
+        }
+        return model;
+    }
+    
+    public int findObjectLayerPart(SimulationObjectModel model,int tp, int ins, String object)
+    {
+        int result = -1;
+        int index = 0;
+        for(ObjectLayer ol : model.getInstant(tp, ins).getObjectLayers())
+        {
+            for(ObjectLayerPart olp : ol.getLayerParts(Format.voxel))
+            { 
+                if(olp.getReferredObject().getObjectName().equals(object))
+                {
+                    result = index;
+                    break;
+                }
+            }
+            index++;
+            if(result != -1) break;
+        }
+        return result;
+    }
+    
+    public static  MathematicalDistributionOfPhysicalQuality addMathematicalDistributionLUT(ObjectLayerPart olp, Distribution dis, PhysicalParametersLayer.PhysicalParameterType ppt)
+    {
+        ArrayList<MathematicalDistributionParameter> mathdps = new ArrayList<MathematicalDistributionParameter>();
+         for(Entry<String, Double> gen: dis.getParameters().entrySet())
+        {
+            System.out.println("distribution " + gen.getKey());
+            mathdps.add(new MathematicalDistributionParameter(MathematicalDistributionParameterType.valueOf(gen.getKey()),gen.getValue(),""));
+        }
+     //   MathematicalDistributionOfPhysicalQuality math = new MathematicalDistributionOfPhysicalQuality(MathematicalDistributionType.valueOf(dis.getName()+"Distribution"), ppt);
+         MathematicalDistributionOfPhysicalQuality math = 
+                 SimulationObjectModelFactory.createMathematicalDistributionOfPhysicalQuality(MathematicalDistributionType.valueOf(dis.getName()+"Distribution"), ppt, mathdps);
+        SimulationObjectModelFactory.addMathematicalDistributionOfPhysicalQualityToLayerPart(math, olp);
+        return math;
+    }
+    
     public static void addPhysicalParametersLUT(SimulationObjectModel objectModel, PhysicalParametersLayer.PhysicalParameterType physicalParametersType, ArrayList<String> fileName, double b0, ObjectLayer objectLayer, int timePointIndex, int instantIndex) {
         PhysicalParameter physicalParameter = SimulationObjectModelFactory.createPhysicalParameter(physicalParametersType, fileName, b0);
         objectLayer.addPhysicalParameters(physicalParameter);
         SimulationObjectModelFactory.addPhysicalParametersToObjectLayer(objectLayer, physicalParameter);
+        
     }
     		
 
@@ -1358,4 +1458,77 @@ public class ModelBusiness {
         copyFile(zipdirectory +"/" +name,nwname);
         return nwname;
     }
+    
+     public PhysicalParameterLUT extractLUT(String name, String zipname, User user, String zipFullPath, boolean bUpload) throws DataManagerException {
+
+        String rootDirectory = getZipPath(user, zipFullPath, bUpload);
+
+        File dir = new File(rootDirectory);
+        boolean bfound = false;
+        System.out.println("zip :" + zipname);
+        System.out.println("name" + name);
+       
+        for (String fi : dir.list()) {
+            if (fi.equals(name)) {
+                bfound = true;
+                break;
+            }
+
+        }
+        if (bfound) {
+            Parser luts = new Parser();
+            File fl = new File(rootDirectory + name);
+            return luts.parse(fl);
+
+        } else {
+            return extractLUTfromZipFile(name, rootDirectory + zipname);
+        }
+        
+    }
+
+   
+
+    public PhysicalParameterLUT extractLUTfromZipFile(String name, String zipname) {
+        ZipInputStream zipinputstream = null;
+        PhysicalParameterLUT result = null;
+        System.out.println(zipname);
+        try {
+
+            zipinputstream = new ZipInputStream(new FileInputStream(zipname));
+            ZipEntry zipentry = zipinputstream.getNextEntry();
+            ArrayList<String> files = new ArrayList<String>();
+            byte[] buf = new byte[1024];
+            while (zipentry != null) {
+                //for each entry to be extracted
+                String entryName = zipentry.getName();
+                if (entryName.equals(name)) { //extract only the annotations.
+                    FileOutputStream fileoutputstream;
+                    fileoutputstream = new FileOutputStream(
+                            zipname + "_temp");
+                    int n = 0;
+                    while ((n = zipinputstream.read(buf, 0, 1024)) > -1) {
+                        fileoutputstream.write(buf, 0, n);
+                    }
+                    fileoutputstream.close();
+                    
+                    Parser luts = new Parser();
+                    File fl = new File(zipname + "_temp");
+                    zipinputstream.closeEntry();
+                    return luts.parse(fl);
+                }
+                zipentry = zipinputstream.getNextEntry();
+            }
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(ModelBusiness.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                zipinputstream.close();
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(ModelBusiness.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return result;
+    }
+
+    
 }

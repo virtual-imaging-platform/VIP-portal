@@ -42,9 +42,12 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.PhysicalParametersLayer;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
+import fr.insalyon.creatis.vip.models.client.ParserLUT.GenericParameter;
+import fr.insalyon.creatis.vip.models.client.ParserLUT.PhysicalParameterLUT;
 import fr.insalyon.creatis.vip.models.client.view.ModelException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -131,6 +134,8 @@ public interface ModelService extends RemoteService {
     
     public String extractRaw(String name, String zipname, String modelFullPath, boolean bUpload) throws ModelException ;
     
+   public PhysicalParameterLUT extractLUT(String name, String zipname, String modelFullPath, boolean bUpload) throws ModelException ;
+    
     public SimulationObjectModel setDescription(SimulationObjectModel model, String description)throws ModelException;
     
     public SimulationObjectModel addMap(SimulationObjectModel model, ArrayList<String> objects, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0, String externalAgent, String unitOfMeasure)throws ModelException;
@@ -146,4 +151,6 @@ public interface ModelService extends RemoteService {
     public SimulationObjectModel addObjectLayer(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, int tp, int ins) throws ModelException;
          
     public String copyZipFile(String zippath);
+    
+    public SimulationObjectModel addMathematicalLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, HashMap<String, GenericParameter> parameters, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype) throws ModelException;
 }

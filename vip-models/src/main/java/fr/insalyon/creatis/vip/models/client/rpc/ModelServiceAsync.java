@@ -38,9 +38,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.PhysicalParametersLayer;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
+import fr.insalyon.creatis.vip.models.client.ParserLUT.GenericParameter;
+import fr.insalyon.creatis.vip.models.client.ParserLUT.PhysicalParameterLUT;
 import fr.insalyon.creatis.vip.models.client.view.ModelException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -113,6 +116,8 @@ public interface ModelServiceAsync {
       
       public void extractRaw(String name, String zipname, String modelFullPath, boolean bUpload, AsyncCallback< String > asyncCallback);
       
+      public void extractLUT(String name, String zipname, String modelFullPath, boolean bUpload, AsyncCallback< PhysicalParameterLUT > asyncCallback);
+      
       public void setDescription(SimulationObjectModel model,  String description,  AsyncCallback<SimulationObjectModel> asyncCallback);
       
       public void addMap(SimulationObjectModel model, ArrayList<String> objects, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, int b0, String externalAgent, String unitOfMeasure, AsyncCallback<SimulationObjectModel> asyncCallback);
@@ -128,5 +133,7 @@ public interface ModelServiceAsync {
       public void addObjectLayer(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, int tp, int ins, AsyncCallback<SimulationObjectModel> asyncCallback);
       
       public void copyZipFile(String zippath, AsyncCallback<String> asyncCallback);
+      
+        public void addMathematicalLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, HashMap<String, GenericParameter> parameters, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, AsyncCallback<SimulationObjectModel> asyncCallback);
 }
 
