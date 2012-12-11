@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.core.client;
 
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -137,6 +138,16 @@ public class CoreModule extends Module {
     public static void addApplicationsTileGrid(ApplicationsTileGrid tileGrid) {
 
         homeTab.addTileGrid(tileGrid);
+    }
+    
+    /**
+     * Adds a layout to the home tab.
+     * 
+     * @param layout 
+     */
+    public static void addLayoutToHomeTab(VLayout layout) {
+        
+        homeTab.addToRightLayout(layout);
     }
 
     private void init() {

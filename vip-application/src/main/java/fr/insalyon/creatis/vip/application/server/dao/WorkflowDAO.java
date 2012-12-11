@@ -70,6 +70,25 @@ public interface WorkflowDAO {
     public Simulation get(String workflowID) throws DAOException;
     
     /**
+     * Gets the list of simulations.
+     * 
+     * @param user
+     * @return
+     * @throws DAOException 
+     */
+    public List<Simulation> getList(String user) throws DAOException;
+    
+    /**
+     * Gets the list of simulations from a date.
+     * 
+     * @param user
+     * @param lastDate
+     * @return
+     * @throws DAOException 
+     */
+    public List<Simulation> getList(String user, Date lastDate) throws DAOException;
+    
+    /**
      * Gets the list of workflows submitted by a user filtered by application
      * name, status, start date and/or end date.
      * 

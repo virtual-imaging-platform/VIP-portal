@@ -171,6 +171,55 @@ public class WorkflowData implements WorkflowDAO {
         }
     }
 
+    @Override
+    public List<Simulation> getList(String user) throws DAOException {
+
+        try {
+            String query = user == null ? "" : "WHERE username='" + user + "' AND status != 'Cleaned' ";
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM ( "
+                    + "SELECT ROW_NUMBER() OVER() AS rownum, "
+                    + "id, application, username, launched, status, "
+                    + "minor_status, simulation_name  FROM ( "
+                    + "SELECT * "
+                    + "FROM Workflows " + query + " "
+                    + "ORDER BY launched desc) AS tmp "
+                    + ") AS a WHERE rownum <= 10 ");
+
+            List<Simulation> list = processResultSet(ps.executeQuery());
+            ps.close();
+            return list;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+    
+    @Override
+    public List<Simulation> getList(String user, Date lastDate) throws DAOException {
+
+        try {
+            String query = user == null ? "" : "AND username='" + user + "' AND status != 'Cleaned' ";
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM ( "
+                    + "SELECT ROW_NUMBER() OVER() AS rownum, "
+                    + "id, application, username, launched, status, "
+                    + "minor_status, simulation_name  FROM ( "
+                    + "SELECT * "
+                    + "FROM Workflows WHERE launched < ? " + query + " "
+                    + "ORDER BY launched desc) AS tmp "
+                    + ") AS a WHERE rownum <= 10 ");
+            ps.setTimestamp(1, new Timestamp(lastDate.getTime()));
+
+            List<Simulation> list = processResultSet(ps.executeQuery());
+            ps.close();
+            return list;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
     /**
      * Gets the list of workflows submitted by a user filtered by application
      * name, status, start date and/or end date.

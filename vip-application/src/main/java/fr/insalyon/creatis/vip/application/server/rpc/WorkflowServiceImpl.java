@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -63,7 +63,7 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements WorkflowService {
 
@@ -75,6 +75,51 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
         workflowBusiness = new WorkflowBusiness();
         inputBusiness = new InputBusiness();
+    }
+
+    /**
+     * Gets a list of recently launched simulations.
+     *
+     * @return
+     * @throws ApplicationException
+     */
+    @Override
+    public List<Simulation> getSimulations() throws ApplicationException {
+
+        try {
+            if (isSystemAdministrator()) {
+                return workflowBusiness.getSimulations(null);
+            } else {
+                return workflowBusiness.getSimulations(getSessionUser());
+            }
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * Gets a list of recently launched simulations from a date.
+     * 
+     * @param lastDate
+     * @return
+     * @throws ApplicationException 
+     */
+    @Override
+    public List<Simulation> getSimulations(Date lastDate) throws ApplicationException {
+
+        try {
+            if (isSystemAdministrator()) {
+                return workflowBusiness.getSimulations(null, lastDate);
+            } else {
+                return workflowBusiness.getSimulations(getSessionUser(), lastDate);
+            }
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
     }
 
     /**
@@ -704,24 +749,26 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         }
     }
 
-    private String getJenaDirName(String baseDir) throws ApplicationException{
+    private String getJenaDirName(String baseDir) throws ApplicationException {
         File dir = new File(baseDir);
-        
-        if(dir.isDirectory()){
-            for(String names : dir.list())
-                if(names.startsWith("JENA-TDB-dir"))
+
+        if (dir.isDirectory()) {
+            for (String names : dir.list()) {
+                if (names.startsWith("JENA-TDB-dir")) {
                     return names;
-        }else
-            throw new ApplicationException(baseDir+"is not a directory");
+                }
+            }
+        } else {
+            throw new ApplicationException(baseDir + "is not a directory");
+        }
         return null;
     }
-    
-    
-    private String cleanse(String s) throws DataManagerException{
-        if(s.startsWith("lfn://") || s.startsWith("/grid"))
-            return DataManagerUtil.parseBaseDir(CoreModule.user, s);
-        else
-            return s;
-    }
 
-   }
+    private String cleanse(String s) throws DataManagerException {
+        if (s.startsWith("lfn://") || s.startsWith("/grid")) {
+            return DataManagerUtil.parseBaseDir(CoreModule.user, s);
+        } else {
+            return s;
+        }
+    }
+}

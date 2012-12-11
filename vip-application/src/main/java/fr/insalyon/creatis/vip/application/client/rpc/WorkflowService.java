@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -45,7 +45,7 @@ import java.util.Map;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public interface WorkflowService extends RemoteService {
 
@@ -62,6 +62,11 @@ public interface WorkflowService extends RemoteService {
         }
     }
 
+    public List<Simulation> getSimulations() throws ApplicationException;
+    
+    public List<Simulation> getSimulations(Date lastDate) throws ApplicationException;
+
+    //
     public Descriptor getApplicationDescriptor(String applicationName) throws ApplicationException;
 
     public void launchSimulation(Map<String, String> parameters, String applicationName, String simulationName) throws ApplicationException;
@@ -95,7 +100,7 @@ public interface WorkflowService extends RemoteService {
     public void cleanWorkflow(String simulationID) throws ApplicationException;
 
     public void purgeWorkflow(String simulationID) throws ApplicationException;
-    
+
     public Map<String, String> relaunchSimulation(String simulationID) throws ApplicationException;
 
     public List<Simulation> getSimulations(String user, String application, String status, Date startDate, Date endDate) throws ApplicationException;
@@ -123,5 +128,4 @@ public interface WorkflowService extends RemoteService {
     public void validateInputs(List<String> inputs) throws ApplicationException;
 
     public void updateUser(String currentUser, String newUser) throws ApplicationException;
-    
 }

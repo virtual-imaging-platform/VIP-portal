@@ -56,6 +56,7 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import java.io.File;
@@ -93,6 +94,37 @@ public class WorkflowBusiness {
 
         String executionMode = Server.getInstance().getWorflowsExecMode();
         engine = WorkflowEngineInstantiator.create(executionMode);
+    }
+
+    /**
+     *
+     * @param user
+     * @return
+     * @throws BusinessException
+     */
+    public List<Simulation> getSimulations(User user) throws BusinessException {
+
+        try {
+            return workflowDB.getList(user != null ? user.getFullName() : null);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
+    /**
+     * 
+     * @param user
+     * @param lastDate
+     * @return
+     * @throws BusinessException 
+     */
+    public List<Simulation> getSimulations(User user, Date lastDate) throws BusinessException {
+
+        try {
+            return workflowDB.getList(user != null ? user.getFullName() : null, lastDate);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
     }
 
     /**
@@ -659,7 +691,7 @@ public class WorkflowBusiness {
         if (path.startsWith(Server.getInstance().getDataManagerUsersHome())) {
 
             path = path.replace(Server.getInstance().getDataManagerUsersHome() + "/", "");
-            String cleanName = Normalizer.normalize(user.replaceAll(" ", "_").toLowerCase(),Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+            String cleanName = Normalizer.normalize(user.replaceAll(" ", "_").toLowerCase(), Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
             if (!path.startsWith(cleanName)) {
 
                 logger.error("User '" + user + "' tried to access data from another user: " + path + "");

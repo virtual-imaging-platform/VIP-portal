@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -42,10 +42,14 @@ import java.util.Map;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public interface WorkflowServiceAsync {
 
+    public void getSimulations(AsyncCallback<List<Simulation>> asyncCallback);
+    
+    public void getSimulations(Date lastDate, AsyncCallback<List<Simulation>> asyncCallback);
+    //
     public void getApplicationDescriptor(String applicationName, AsyncCallback<Descriptor> asyncCallback);
 
     public void launchSimulation(Map<String, String> parameters, String applicationName, String simulationName, AsyncCallback<Void> asyncCallback);

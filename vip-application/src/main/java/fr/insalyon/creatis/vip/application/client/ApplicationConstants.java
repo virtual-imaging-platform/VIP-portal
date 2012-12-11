@@ -63,7 +63,13 @@ public class ApplicationConstants {
     public static final String ICON_MONITOR_ERROR_FILE = IMG_FOLDER + "monitor/icon-error-file.png";
     public static final String ICON_MONITOR_JOB = IMG_FOLDER + "monitor/icon-job.png";
     public static final String ICON_MONITOR_OUTPUT_FILE = IMG_FOLDER + "monitor/icon-output-file.png";
+    public static final String ICON_MONITOR_RELAUNCH = IMG_FOLDER + "monitor/icon-relaunch.png";
     public static final String ICON_MONITOR_SEARCH = IMG_FOLDER + "monitor/icon-search.png";
+    public static final String ICON_MONITOR_SIMULATION_CLEANED = IMG_FOLDER + "monitor/icon-simulation-cleaned.png";
+    public static final String ICON_MONITOR_SIMULATION_COMPLETED = IMG_FOLDER + "monitor/icon-simulation-completed.png";
+    public static final String ICON_MONITOR_SIMULATION_FAILED = IMG_FOLDER + "monitor/icon-simulation-failed.png";
+    public static final String ICON_MONITOR_SIMULATION_RUNNING = IMG_FOLDER + "monitor/icon-simulation-running.png";
+    public static final String ICON_MONITOR_TIMELINE = IMG_FOLDER + "monitor/icon-timeline.png";
     public static final String ICON_MONITOR_TASKS = IMG_FOLDER + "monitor/icon-tasks.png";
     public static final String ICON_PICKER_MORE = IMG_FOLDER + "icon-picker-more.png";
     public static final String ICON_PICKER_LESS = IMG_FOLDER + "icon-picker-less.png";
