@@ -151,7 +151,7 @@ public class SimulationBoxLayout extends HLayout {
                         loadData();
                     }
                 };
-                timer.scheduleRepeating(180000);
+                timer.scheduleRepeating(120000);
                 actionButton.setPrompt("Kill simulation");
                 img.setSrc(ApplicationConstants.ICON_MONITOR_SIMULATION_RUNNING);
                 break;
