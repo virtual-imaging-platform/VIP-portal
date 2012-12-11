@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>VIP launching workshop - <i>running multi-modality simulations with VIP</i></title>
+        <link rel="StyleSheet" href="../css/doc_main.css" type="text/css" />
+    </head>
+    <body>
+        <h1>Hands-on: running multi-modality simulations with VIP</h1>
+        This hands-on shows the main features used in VIP to run simulations.
+        <a name="contents"></a>
+        Contents:
+        <ul><li><a href="#ex1">Exercise 1:</a> account creation (5 min)</li>
+            <li><a href="#ex2">Exercise 2:</a> file transfer (5 min)</li>
+            <li><a href="#ex3">Exercise 3:</a> X-Ray simulation with Sindbad (10 min)</li>
+            <li><a href="#ex4">Exercise 4:</a> ultrasound simulation (5 min)</li>
+            <li><a href="#ex5">Exercise 5:</a> platform administration (demo, 15 min)</li>
+            <li><a href="#ex6">Exercise 6:</a> view ultrasound results (5 min)</li>
+        </ul>
+        <h2><a name="ex1">Exercise 1</a>: account creation (5 min)</h2>
+
+        <ul>
+            <li>Connect to <a href="http://vip.creatis.insa-lyon.fr">http://vip.creatis.insa-lyon.fr</a> and sign-in. Your home page should look exactly like this, with a "General", "SimuBloch" and "Simulators - tutorial" section:
+        </ul>
+        <img src="workshop/account3.png" alt="account3.png"/>
+        <ul>
+            <li>If this is not the case <b>and you don't have a VIP account</b>: click on "Sign-in" on the welcome page, fill in the form and ask for a "Tutorial" account. You should receive an activation code soon after:
+          
+        </ul>
+        <img src="workshop/account1.png" alt="account1"/><br/><img src="workshop/account2.png" alt="account2"/>
+        <ul>
+            <li>If <b>you already have a VIP account</b>, but some applications do not show on the home page, click on "My account" and join group "Tutorial":</li>
+        </ul>
+        <img src="workshop/account4.png" alt="account4"/>
+        <br/>
+        <a href="#contents">Back to top</a>
+        
+        <h2><a name="ex2">Exercise 2:</a> file transfer (5 min)</h2>
+        
+        VIP provides a file transfer interface to storage distributed on the <a href="http://www.egi.eu">European Grid Infrastructure</a>. 
+        It is used to store inputs and results of the simulations. 
+     
+        <ul>
+            <li>In your home, open the "File Transfer" tool"</li>
+        </ul>
+        <img src="workshop/file-transfer.png" alt="file transfer"/>
+        <ul>
+            <li>You can access 2 directories: "Home" is private, and "Tutorial (group)" is shared among group members.</li>
+            <li>Open directory "Tutorial (group)" and download file "hello.txt" using the contextual (right-click) menu or the selection box and <img src="workshop/download-icon.png" alt="upload"/>:
+        </ul>
+        <img src="workshop/download2.png" alt="download1"/>
+        <ul>
+            <li>The file is downloaded in two steps: first from the grid to the portal, then from the portal to your local machine. Click on the download link in the "Pool of Transfers" to get it:
+        </ul>
+        <img src="workshop/download3.png" alt="download3"/>
+        <ul>
+            <li>Open your home, create a new directory using <img src="workshop/mkdir.png" alt="mkdir"/>, and upload a file using <img src="workshop/upload-icon.png" alt="upload"/>. In the backend, the file is uploaded to EGI, and replicated to 3 locations.</li>
+        </ul>
+        <br/>
+        <a href="#contents">Back to top</a>
+        
+        <h2><a name="ex3">Exercise 3:</a> X-Ray simulation with Sindbad (10 min)</h2>
+        
+        The Sindbad X-Ray/CT simulator is available in VIP. In this exercise, we will simulate 1 X-Ray projection from the full-body XCAT model.
+        <ul><li>Open simulator "Sindbad 0.1.4 - local". A form appears, showing the simulation parameters which are described in tooltips:<ul></ul></li></ul>
+        <img src="workshop/tooltips.png" alt="tooltips"/>
+        <ul><li>Load example "XRAY"; all the inputs are filled in, except the result directory:</li></ul>
+        <img src="workshop/load-example.png" alt="load example"/>
+        <ul><li>To add a result directory, click on <img src="search-1.png" alt="search"/> and select your home:</li></ul>
+        <img src="workshop/select-home.png" alt="select home"/>
+        <ul>
+            <li>Launch the simulation.</li>
+            <li>The simulation is monitored from <img src="workshop/monitor-icon.png" alt="monitor-icon"/>:</li>   
+        </ul>
+        <img src="workshop/monitor-list.png" alt="monitor list"/>
+        <ul>
+            <li>Click on your simulation. A tab appears showing the progress of the execution:</li>
+        </ul>
+        <img src="workshop/monitor1.png" alt="monitor1"/>
+        <ul>
+            <li>On the left, tab "Jobs summary" shows information about jobs statuses:</li>
+        </ul>
+        <img src="workshop/monitor2.png" alt="monitor2"/>
+        <ul><li>When the simulation is finished (this should take around 5 minutes), download the results from the main simulation tab:</li></ul>
+        <img src="workshop/results-download.png" alt="results-download"/>
+        
+        <ul><li>To display the simulated image, uncompress results.tar.gz, install <a href="download/zips/ij146.zip">ImageJ</a>, launch it, and choose File-Import-Raw. Select image_0.sdt, and specify the following parameters:</li></ul>
+         <img src="workshop/imageJ.png" alt="imageJ"/>
+         <ul><li>Your simulated X-Ray should appear:</li></ul>
+         <img src="workshop/xray.png" alt="xray"/>
+         <br/>
+        <a href="#contents">Back to top</a>
+        
+        <h2><a name="ex4">Exercise 4:</a> ultrasound simulation (5 min)</h2>
+        The FIELD-II ultrasound simulator is available in VIP. In this exercise, we will simulate a parasternal short-axis echocardiography. As the simulated image is composed of 122 lines and each line requires a few minutes of CPU time, the execution will be parallelized on EGI.
+        <ul><li>Open simulator "FIELD-II v0.4" and load example "2Dt cardiac sequence - parasternal short axis - 1 frame".</li>
+            <li>Launch the simulation and open the simulation monitor. After some time, 6 jobs are submitted: 5 to compute the image lines, and 1 to merge them in a single image:</li>
+        </ul>
+        <b>TODO: add screenshot</b>.
+           
+        
+     
+        <br/>
+        <a href="#contents">Back to top</a>
+        
+        <h2><a name="ex5">Exercise 5:</a> platform administration (demo, 15 min)</h2>
+       
+        <a href="#contents">Back to top</a>
+        
+        <h2><a name="ex6">Exercise 6:</a> view ultrasound results (5 min)</h2>
+       
+        <a href="#contents">Back to top</a>
+        
+        That's it, we hope you enjoyed the hands-on.<br/>
+    </body>
+</html>
