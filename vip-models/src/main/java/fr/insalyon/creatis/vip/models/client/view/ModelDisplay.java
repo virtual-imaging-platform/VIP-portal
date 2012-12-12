@@ -85,8 +85,8 @@ public class ModelDisplay extends VLayout {
     private String zipFullPath = "";
     private boolean mbUpload = true;
     private boolean mbMenu = true;
-     private final TabSet topTabSet = new TabSet();  
-     private Tab mtb;
+     
+     private Tab mtb =null;
     ModelDisplay(String uri, boolean test, boolean bmenu) {
         super();
         muri = uri;
@@ -114,10 +114,10 @@ public class ModelDisplay extends VLayout {
         modelTreeGrid.setZipFile(z,zipFullPath, mbUpload);
     }
 
-    public void settab(Tab tb)
+    public void setTab(Tab tb)
     {
         mtb = tb;
-        topTabSet.addTab(mtb);
+        
     }
     private void init(boolean bfull, boolean bmodif) {
 
@@ -334,7 +334,12 @@ public class ModelDisplay extends VLayout {
                 if (modelsTab != null) {
                     modelsTab.loadModels();
                 }
-                topTabSet.removeTab(mtb);
+                if(mtb !=null)
+                {
+                  Layout.getInstance().removeTab(mtb);
+                  mtb =null;
+                }
+            
             //}
 //                        };
 //                        mms.completeModel(result, callback1);

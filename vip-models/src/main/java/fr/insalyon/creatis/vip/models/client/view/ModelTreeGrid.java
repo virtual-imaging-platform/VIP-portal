@@ -1478,7 +1478,7 @@ public class ModelTreeGrid extends TreeGrid {
             String format = name;
             String description = label + " (" + name + ")";
 
-            
+            String ddistribNode = "";
             ModelTreeNode[] distribNode =new ModelTreeNode[params.size()];
             int index = 0;
             for(Entry<String, GenericParameter> ent:params.entrySet())
@@ -1492,8 +1492,8 @@ public class ModelTreeGrid extends TreeGrid {
                     else
                         std = dd.getValue().toString();
                 }
-                description = ent.getKey() + "("+ ent.getValue().getDistrib().getName() + " "+ mean + " +/- "+ std +")";
-                distribNode[index] = new ModelTreeNode("", description, false, 1, null);
+                ddistribNode = ent.getKey() + "("+ ent.getValue().getDistrib().getName() + " "+ mean + " +/- "+ std +")";
+                distribNode[index] = new ModelTreeNode("", ddistribNode, false, 1, null);
                 distribNode[index].setIcon(ModelConstants.APP_IMG_OBJECT);
                 index++;
             }

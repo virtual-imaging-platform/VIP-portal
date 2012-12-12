@@ -48,6 +48,7 @@ public class ModelDisplayTab extends Tab {
        // this.setID(uri);
         this.setCanClose(true);
         ModelDisplay md = new ModelDisplay(uri, test, bmenu);
+      
         md.disableCommit();
         this.setPane(md);
     }
