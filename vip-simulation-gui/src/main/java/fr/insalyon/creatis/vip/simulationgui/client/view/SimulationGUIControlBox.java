@@ -439,11 +439,10 @@ public class SimulationGUIControlBox {
     }
 
     private void hideLaunchTab() {
-        if (launchTab != null) {
-            String s = launchTab.getTitle();
+        
+        if (launchTab != null && launchTab.hasID()) {
             Layout.getInstance().removeTab(launchTab);
             launchTab = null;
-            //launchTab = new LaunchTab(s.replaceAll("Launch ", ""));
         }
     }
 

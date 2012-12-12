@@ -78,6 +78,13 @@ public class LaunchTab extends AbstractLaunchTab {
         loadData(simulationName, inputs);
     }
 
+    public boolean hasID()
+    {
+        if(this.getAttributeAsString("ID") == null)
+            return false;
+        else 
+            return true;
+    }
     /**
      * Loads simulation sources list.
      */
