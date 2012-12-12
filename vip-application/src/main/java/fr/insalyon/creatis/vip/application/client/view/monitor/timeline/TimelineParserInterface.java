@@ -32,41 +32,18 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.gatelab.client;
+package fr.insalyon.creatis.vip.application.client.view.monitor.timeline;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationModule;
-import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineParser;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.Module;
-import fr.insalyon.creatis.vip.gatelab.client.view.GateLabTileGrid;
-import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabTimelineParser;
+import java.util.Date;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class GateLabModule extends Module {
+public interface TimelineParserInterface {
 
-    public GateLabModule() {
+    public boolean parse(String applicationName);
 
-        ApplicationModule.reservedClasses.add(GateLabConstants.GATELAB_CLASS);
-    }
-
-    @Override
-    public void load() {
-
-        if (CoreModule.user.isSystemAdministrator()
-                || CoreModule.user.hasGroupAccess(GateLabConstants.GROUP_GATELAB)) {
-            CoreModule.addApplicationsTileGrid(new GateLabTileGrid());
-        }
-        TimelineParser.getInstance().addParser(new GateLabTimelineParser());
-    }
-
-    @Override
-    public void postLoading() {
-    }
-
-    @Override
-    public void terminate() {
-    }
+    public SimulationBoxLayout getLayout(String id, String name, String applicationName,
+            String user, String status, Date launchedDate);
 }

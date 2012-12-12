@@ -32,41 +32,47 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.gatelab.client;
+package fr.insalyon.creatis.vip.application.client.view.monitor.timeline;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationModule;
-import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineParser;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.Module;
-import fr.insalyon.creatis.vip.gatelab.client.view.GateLabTileGrid;
-import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabTimelineParser;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class GateLabModule extends Module {
+public class TimelineParser {
 
-    public GateLabModule() {
+    public static TimelineParser instance;
+    public List<TimelineParserInterface> parsers;
 
-        ApplicationModule.reservedClasses.add(GateLabConstants.GATELAB_CLASS);
-    }
+    public static TimelineParser getInstance() {
 
-    @Override
-    public void load() {
-
-        if (CoreModule.user.isSystemAdministrator()
-                || CoreModule.user.hasGroupAccess(GateLabConstants.GROUP_GATELAB)) {
-            CoreModule.addApplicationsTileGrid(new GateLabTileGrid());
+        if (instance == null) {
+            instance = new TimelineParser();
         }
-        TimelineParser.getInstance().addParser(new GateLabTimelineParser());
+        return instance;
     }
 
-    @Override
-    public void postLoading() {
+    private TimelineParser() {
+
+        parsers = new ArrayList<TimelineParserInterface>();
     }
 
-    @Override
-    public void terminate() {
+    public void addParser(TimelineParserInterface parser) {
+        
+        parsers.add(parser);
+    }
+
+    public SimulationBoxLayout parse(String id, String name, String applicationName,
+            String user, String status, Date launchedDate) {
+        
+        for (TimelineParserInterface parser : parsers) {
+            if (parser.parse(applicationName)) {
+                return parser.getLayout(id, name, applicationName, user, status, launchedDate);
+            }
+        }
+        return new SimulationBoxLayout(id, name, applicationName, user, status, launchedDate);
     }
 }

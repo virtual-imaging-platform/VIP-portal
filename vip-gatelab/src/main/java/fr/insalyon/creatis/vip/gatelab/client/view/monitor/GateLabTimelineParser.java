@@ -32,41 +32,41 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.gatelab.client;
+package fr.insalyon.creatis.vip.gatelab.client.view.monitor;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationModule;
-import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineParser;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.Module;
-import fr.insalyon.creatis.vip.gatelab.client.view.GateLabTileGrid;
-import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabTimelineParser;
+import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.SimulationBoxLayout;
+import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineParserInterface;
+import fr.insalyon.creatis.vip.gatelab.client.GateLabConstants;
+import java.util.Date;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class GateLabModule extends Module {
+public class GateLabTimelineParser implements TimelineParserInterface {
 
-    public GateLabModule() {
-
-        ApplicationModule.reservedClasses.add(GateLabConstants.GATELAB_CLASS);
+    /**
+     * 
+     * @param applicationName
+     * @return 
+     */
+    public boolean parse(String applicationName) {
+        return applicationName.toLowerCase().contains(GateLabConstants.GROUP_GATELAB.toLowerCase());
     }
 
-    @Override
-    public void load() {
+    /**
+     *
+     * @param id
+     * @param name
+     * @param applicationName
+     * @param user
+     * @param status
+     * @param launchedDate
+     * @return
+     */
+    public SimulationBoxLayout getLayout(String id, String name, String applicationName,
+            String user, String status, Date launchedDate) {
 
-        if (CoreModule.user.isSystemAdministrator()
-                || CoreModule.user.hasGroupAccess(GateLabConstants.GROUP_GATELAB)) {
-            CoreModule.addApplicationsTileGrid(new GateLabTileGrid());
-        }
-        TimelineParser.getInstance().addParser(new GateLabTimelineParser());
-    }
-
-    @Override
-    public void postLoading() {
-    }
-
-    @Override
-    public void terminate() {
+        return new GateLabSimulationBoxLayout(id, name, applicationName, user, status, launchedDate);
     }
 }

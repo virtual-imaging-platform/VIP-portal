@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor.timeline;
 
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -66,15 +67,17 @@ import java.util.Map;
  */
 public class SimulationBoxLayout extends HLayout {
 
-    private String simulationID;
-    private String simulationName;
-    private String applicationName;
-    private SimulationStatus simulationStatus;
-    private Date launchedDate;
+    protected String simulationID;
+    protected String simulationName;
+    protected String applicationName;
+    protected SimulationStatus simulationStatus;
+    protected Date launchedDate;
     private Img img;
     private Label nameLabel;
     private Label actionButton;
     private Timer timer;
+    protected VLayout mainLayout;
+    protected HandlerRegistration handler;
 
     public SimulationBoxLayout(String id, String name, String applicationName,
             String user, String status, Date launchedDate) {
@@ -105,7 +108,7 @@ public class SimulationBoxLayout extends HLayout {
         parseStatus();
         this.addMember(img);
 
-        VLayout mainLayout = new VLayout(3);
+        mainLayout = new VLayout(3);
         mainLayout.setWidth100();
         mainLayout.setHeight100();
         mainLayout.setCursor(Cursor.HAND);
@@ -118,7 +121,7 @@ public class SimulationBoxLayout extends HLayout {
             sb.append(" - (").append(user).append(")");
         }
         mainLayout.addMember(WidgetUtil.getLabel(sb.toString(), 12, Cursor.HAND));
-        mainLayout.addClickHandler(new ClickHandler() {
+        handler = mainLayout.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
                 Layout.getInstance().addTab(new SimulationTab(simulationID,

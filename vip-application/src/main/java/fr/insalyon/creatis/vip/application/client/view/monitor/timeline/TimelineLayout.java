@@ -137,7 +137,7 @@ public class TimelineLayout extends VLayout {
                             }
                         }
                         if (!exists) {
-                            simulationsLayout.addMember(new SimulationBoxLayout(
+                            simulationsLayout.addMember(TimelineParser.getInstance().parse(
                                     simulation.getID(),
                                     simulation.getSimulationName(),
                                     simulation.getApplication(),
@@ -169,7 +169,7 @@ public class TimelineLayout extends VLayout {
                 if (!result.isEmpty()) {    
                     simulationsLayout.removeChild(loadMoreLabel);
                     for (Simulation simulation : result) {
-                        simulationsLayout.addMember(new SimulationBoxLayout(
+                        simulationsLayout.addMember(TimelineParser.getInstance().parse(
                                 simulation.getID(),
                                 simulation.getSimulationName(),
                                 simulation.getApplication(),
@@ -200,7 +200,7 @@ public class TimelineLayout extends VLayout {
             loadMoreLabel.setDisabled(false);
         }
     }
-
+   
     public void update() {
         loadData();
     }

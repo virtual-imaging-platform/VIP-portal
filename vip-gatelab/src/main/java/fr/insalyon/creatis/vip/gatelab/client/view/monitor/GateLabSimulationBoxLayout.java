@@ -32,41 +32,32 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.gatelab.client;
+package fr.insalyon.creatis.vip.gatelab.client.view.monitor;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationModule;
-import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineParser;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.Module;
-import fr.insalyon.creatis.vip.gatelab.client.view.GateLabTileGrid;
-import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabTimelineParser;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
+import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.SimulationBoxLayout;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import java.util.Date;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class GateLabModule extends Module {
+public class GateLabSimulationBoxLayout extends SimulationBoxLayout {
 
-    public GateLabModule() {
+    public GateLabSimulationBoxLayout(String id, String name, String applicationName,
+            String user, String status, Date date) {
 
-        ApplicationModule.reservedClasses.add(GateLabConstants.GATELAB_CLASS);
-    }
+        super(id, name, applicationName, user, status, date);
 
-    @Override
-    public void load() {
-
-        if (CoreModule.user.isSystemAdministrator()
-                || CoreModule.user.hasGroupAccess(GateLabConstants.GROUP_GATELAB)) {
-            CoreModule.addApplicationsTileGrid(new GateLabTileGrid());
-        }
-        TimelineParser.getInstance().addParser(new GateLabTimelineParser());
-    }
-
-    @Override
-    public void postLoading() {
-    }
-
-    @Override
-    public void terminate() {
+        handler.removeHandler();
+        mainLayout.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                Layout.getInstance().addTab(new GateLabSimulationTab(simulationID,
+                        simulationName, simulationStatus, launchedDate.toString()));
+            }
+        });
     }
 }

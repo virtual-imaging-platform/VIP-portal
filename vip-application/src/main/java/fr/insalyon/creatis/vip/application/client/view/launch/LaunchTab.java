@@ -177,7 +177,6 @@ public class LaunchTab extends AbstractLaunchTab {
      */
     private void submit() {
 
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -192,7 +191,7 @@ public class LaunchTab extends AbstractLaunchTab {
                 TimelineLayout.getInstance().update();
             }
         };
-        service.launchSimulation(getParametersMap(), applicationName,
+        WorkflowService.Util.getInstance().launchSimulation(getParametersMap(), applicationName,
                 getSimulationName(), callback);
     }
 }

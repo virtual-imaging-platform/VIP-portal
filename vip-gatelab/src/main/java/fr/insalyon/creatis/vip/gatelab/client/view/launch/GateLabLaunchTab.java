@@ -92,7 +92,7 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
                 launchFormLayout.setSourcesLayoutVisibible(false);
 
                 for (Source source : descriptor.getSources()) {
-                    launchFormLayout.addSource(new GateLabSourceLayout(source.getName(), source.getDescription(),modal));
+                    launchFormLayout.addSource(new GateLabSourceLayout(source.getName(), source.getDescription(), modal));
                 }
                 modal.show("Configuring mac button ", true);
                 configureLoadMacButton();
@@ -142,10 +142,10 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
 
             loadMacButton.hide();
             launchFormLayout.setSourcesLayoutVisibible(true);
-            
+
             configureLaunchButton();
             configureSaveInputsButton();
-            
+
             launchFormLayout.addButtons(launchButton, saveInputsButton);
         }
     }
@@ -199,9 +199,6 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
     @Override
     protected void launch() {
 
-        WidgetUtil.setLoadingIButton(launchButton, "Launching...");
-        
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             public void onFailure(Throwable caught) {
                 resetLaunchButton();
@@ -214,7 +211,8 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
                 TimelineLayout.getInstance().update();
             }
         };
-        service.launchSimulation(getParametersMap(), applicationName,
+        WidgetUtil.setLoadingIButton(launchButton, "Launching...");
+        WorkflowService.Util.getInstance().launchSimulation(getParametersMap(), applicationName,
                 getSimulationName(), callback);
     }
 }
