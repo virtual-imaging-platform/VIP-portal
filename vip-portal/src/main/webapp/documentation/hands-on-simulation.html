@@ -29,7 +29,7 @@
         </ul>
         <img src="workshop/account1.png" alt="account1"/><br/><img src="workshop/account2.png" alt="account2"/>
         <ul>
-            <li>If <b>you already have a VIP account</b>, but some applications do not show on the home page, <span style="font-weight:bold; background-color:#e3e3ff;">click</span> on "My account" and join group "Tutorial":</li>
+            <li>If <b>you already have a VIP account</b>, but some applications do not show on the home page, <span style="font-weight:bold; background-color:#e3e3ff;">click</span> on "My account" and join group "Tutorial", then refresh the portal:</li>
         </ul>
         <img src="workshop/account4.png" alt="account4"/>
         <br/>
@@ -54,7 +54,8 @@
         </ul>
         <img src="workshop/download3.png" alt="download3"/>
         <ul>
-            <li><span style="font-weight:bold; background-color:#e3e3ff;">Open</span> your home, <span style="font-weight:bold; background-color:#e3e3ff;">create</span> a new directory using <img src="workshop/mkdir.png" alt="mkdir"/>, and <span style="font-weight:bold; background-color:#e3e3ff;">upload</span> a file using <img src="workshop/upload-icon.png" alt="upload"/>. In the backend, the file is uploaded to EGI, and replicated to 3 locations.</li>
+            <li><span style="font-weight:bold; background-color:#e3e3ff;">Open</span> your "Home" folder, <span style="font-weight:bold; background-color:#e3e3ff;">create</span> a new directory using <img src="workshop/mkdir.png" alt="mkdir"/>, and <span style="font-weight:bold; background-color:#e3e3ff;">upload</span> a file using <img src="workshop/upload-icon.png" alt="upload"/>. In the backend, the file is uploaded to EGI, and replicated to 3 locations.</li>
+            <li>Once uploaded, <span style="font-weight:bold; background-color:#e3e3ff;">Refresh</span> <img src="workshop/refresh.png" alt="refresh"/> your folder to see the file.</li>
         </ul>
         <br/>
         <a href="#contents">Back to top</a>
@@ -62,7 +63,7 @@
         <h2><a name="ex3">Exercise 3:</a> X-Ray simulation with Sindbad (10 min)</h2>
         
         The Sindbad X-Ray/CT simulator is available in VIP. In this exercise, we will simulate 1 X-Ray projection from the full-body XCAT model.
-        <ul><li>In your home, <span style="font-weight:bold; background-color:#e3e3ff;">open</span> simulator "Sindbad 0.1.4 - local". A form appears, showing the simulation parameters which are described in tooltips:<ul></ul></li></ul>
+        <ul><li>In your home tab, <span style="font-weight:bold; background-color:#e3e3ff;">open</span> simulator "Sindbad 0.1.4 - local". A form appears, showing the simulation parameters which are described in tooltips:<ul></ul></li></ul>
         <img src="workshop/tooltips.png" alt="tooltips"/>
         <ul><li><span style="font-weight:bold; background-color:#e3e3ff;">Load</span> example "XRAY" by clicking on <img src="workshop/load-1.png" alt="load"/> in section Examples; all the inputs are filled in, except the result directory:</li></ul>
         <img src="workshop/load-example.png" alt="load example"/>
@@ -81,7 +82,8 @@
             <li>On the left, tab "Jobs summary" shows information about jobs statuses:</li>
         </ul>
         <img src="workshop/monitor2.png" alt="monitor2"/>
-                    <li><b>Known bug:</b> if no simulation job is created after a few minutes, i.e. the "Jobs summary" tab in your simulation still has no job:
+        <ul>
+            <li><b>Known bug:</b> if no simulation job is created after a few minutes, i.e. the "Jobs summary" tab in your simulation still has no job:
         </ul>
         <img src="workshop/bug1.png" alt="bug"/>
         <ul>
@@ -100,14 +102,15 @@
         
         <h2><a name="ex4">Exercise 4:</a> ultrasound simulation (5 min)</h2>
         The FIELD-II ultrasound simulator is available in VIP. In this exercise, we will simulate a parasternal short-axis echocardiography. As the simulated image is composed of 122 lines and each line requires a few minutes of CPU time, the execution will be parallelized on EGI.
-        <ul><li>In your home, <span style="font-weight:bold; background-color:#e3e3ff;">open</span> simulator "FIELD-II v0.4" and <span style="font-weight:bold; background-color:#e3e3ff;">load</span> example "2Dt cardiac sequence - parasternal short axis - 1 frame".</li>
+        <ul><li>In your home tab, <span style="font-weight:bold; background-color:#e3e3ff;">open</span> simulator "FIELD-II v0.4" and <span style="font-weight:bold; background-color:#e3e3ff;">load</span> example "2Dt cardiac sequence - parasternal short axis - 1 frame".</li>
         </ul>
         <img src="workshop/load-field.png" alt="load-field"/>
         <ul>
             <li><span style="font-weight:bold; background-color:#e3e3ff;">Launch</span> the simulation and <span style="font-weight:bold; background-color:#e3e3ff;">open</span> the simulation monitor. After some time, 6 jobs are submitted: 5 to compute the image lines, and 1 to merge them in a single image:</li>
         </ul>
         <img src="workshop/field-running.png" alt="field-running"/>
-                       <li><b>Known bug:</b> if no simulation job is created after a few minutes, i.e. the "Jobs summary" tab in your simulation still has no job:
+        <ul>
+            <li><b>Known bug:</b> if no simulation job is created after a few minutes, i.e. the "Jobs summary" tab in your simulation still has no job:
         </ul>
         <img src="workshop/bug1.png" alt="bug"/>
         <ul>
