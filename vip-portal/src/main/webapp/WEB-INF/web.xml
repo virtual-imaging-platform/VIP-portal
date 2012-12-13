@@ -94,7 +94,7 @@
     </servlet-mapping>
     <!-- End Application Module -->
     
-<!--     GateLab Module 
+    <!-- GateLab Module -->
     <servlet>
         <servlet-name>GatelabService</servlet-name>
         <servlet-class>fr.insalyon.creatis.vip.gatelab.server.rpc.GateLabServiceImpl</servlet-class>
@@ -103,8 +103,8 @@
         <servlet-name>GatelabService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/gatelabservice</url-pattern>
     </servlet-mapping>
-     End GateLab Module 
-    -->
+    <!-- End GateLab Module -->
+    
     <!-- Physical Properties Module -->
     <servlet>
         <servlet-name>TissueService</servlet-name>
