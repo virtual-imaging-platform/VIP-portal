@@ -215,7 +215,7 @@ public class WorkflowBusiness {
 
                         String parsedPath = DataManagerUtil.parseBaseDir(user, v.trim());
                         if (!user.isSystemAdministrator()) {
-                            checkFolderACL(user.getFullName(), groups, parsedPath);
+                            checkFolderACL(user, groups, parsedPath);
                         }
 
                         ps.addValue(parsedPath);
@@ -225,7 +225,7 @@ public class WorkflowBusiness {
 
                     String parsedPath = DataManagerUtil.parseBaseDir(user, valuesStr.trim());
                     if (!user.isSystemAdministrator()) {
-                        checkFolderACL(user.getFullName(), groups, parsedPath);
+                        checkFolderACL(user, groups, parsedPath);
                     }
 
                     ps.addValue(parsedPath);
@@ -683,7 +683,7 @@ public class WorkflowBusiness {
         return list;
     }
 
-    private void checkFolderACL(String user, List<String> groups, String path)
+    private void checkFolderACL(User user, List<String> groups, String path)
             throws
             fr.insalyon.creatis.vip.core.server.business.BusinessException {
 
@@ -691,8 +691,7 @@ public class WorkflowBusiness {
         if (path.startsWith(Server.getInstance().getDataManagerUsersHome())) {
 
             path = path.replace(Server.getInstance().getDataManagerUsersHome() + "/", "");
-            String cleanName = Normalizer.normalize(user.replaceAll(" ", "_").toLowerCase(), Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-            if (!path.startsWith(cleanName)) {
+            if (!path.startsWith(user.getFolder())) {
 
                 logger.error("User '" + user + "' tried to access data from another user: " + path + "");
                 throw new fr.insalyon.creatis.vip.core.server.business.BusinessException("Access denied to another user's home.");
