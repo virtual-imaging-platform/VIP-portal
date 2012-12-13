@@ -117,7 +117,11 @@ public class ModelDisplay extends VLayout {
     public void setTab(Tab tb)
     {
         mtb = tb;
-        
+    }
+    
+    public void setTitle(String name)
+    {
+        mtb.setTitle(name);
     }
     private void init(boolean bfull, boolean bmodif) {
 

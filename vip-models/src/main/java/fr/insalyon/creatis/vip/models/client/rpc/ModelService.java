@@ -118,6 +118,10 @@ public interface ModelService extends RemoteService {
     public SimulationObjectModel removeObjectLayer(SimulationObjectModel model, int tp, int ins, String layer) throws ModelException;
 
     public SimulationObjectModel removeObject(SimulationObjectModel model, int tp, int ins, String layer, String name) throws ModelException;
+    
+    public SimulationObjectModel removeMap(SimulationObjectModel model, int tp, int ins, String layer, PhysicalParametersLayer.PhysicalParameterType type) throws ModelException;
+    
+    public SimulationObjectModel removeMapAll(SimulationObjectModel model, int tp, int ins,  PhysicalParametersLayer.PhysicalParameterType type) throws ModelException;
 
     public SimulationObjectModel removePhysical(SimulationObjectModel objectModel, int tp, int ins, String layer, PhysicalParametersLayer.PhysicalParameterType type) throws ModelException;
     

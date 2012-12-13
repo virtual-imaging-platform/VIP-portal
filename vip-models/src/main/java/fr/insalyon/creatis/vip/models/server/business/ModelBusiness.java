@@ -1111,6 +1111,66 @@ public class ModelBusiness {
         return model;
     }
 
+    
+    
+    
+      public SimulationObjectModel removeMap(SimulationObjectModel model, int tp, int ins, 
+              String layer, PhysicalParametersLayer.PhysicalParameterType type) {
+       
+        ArrayList<ObjectLayer> layers = model.getTimepoint(tp).getInstant(ins).getObjectLayers();
+        ObjectLayer ind = null;// = new ObjectLayer();
+        int j = 0;
+        int i= 0;
+        for (ObjectLayer lay : layers) {
+            if (lay.getType().toString().equals(layer)) {
+                ind = lay;
+                break;
+            }
+            j++;
+        }
+        PhysicalParametersLayer pplremove = null;
+        ArrayList<PhysicalParametersLayer> ppls = model.getTimepoint(tp).getInstant(ins).getObjectLayers(j).getPhysicalParametersLayers();
+        for ( PhysicalParametersLayer ppl : ppls) 
+        { 
+            if (ppl.getType().toString().equals(type.toString())) {
+                       
+                pplremove = ppl;
+                break;
+            }
+            i++;
+        }
+        SimulationObjectModelFactory.removePhysicalParametersLayer(pplremove);
+        ppls.remove(j);
+         model.getTimepoint(tp).getInstant(ins).getObjectLayers(j).setPhysicalParametersLayers(ppls);
+        
+        return model;
+    }
+
+    
+    
+    
+     public SimulationObjectModel removeMapAll(SimulationObjectModel objectModel, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType type) {
+
+        ArrayList<PhysicalParametersLayer> layers = objectModel.getTimepoint(tp).getInstant(ins).getPhysicalParametersLayers();
+        PhysicalParametersLayer ind = null;// = new ObjectLayer();
+          System.out.println("type : " + type.toString());
+        int j = 0;
+        for (PhysicalParametersLayer lay : layers) {
+            if (lay.getType().toString().equals(type.toString())) {
+                ind = lay;
+                break;
+            }
+            j++;
+        }
+        SimulationObjectModelFactory.removePhysicalParametersLayer(ind);
+        layers.remove(j);
+         objectModel.getTimepoint(tp).getInstant(ins).setPhysicalParametersLayers(layers);
+        System.out.println("physical parameter layer removed");
+        return objectModel;
+    }
+    
+    
+    
     /**
      * Remove an object from a specific layer
      *
@@ -1123,6 +1183,7 @@ public class ModelBusiness {
      */
     public SimulationObjectModel removeObject(SimulationObjectModel objectModel, int tp, int ins, String layer, String name) {
 
+           System.out.println("object to removed");
         ArrayList<ObjectLayer> layers = objectModel.getTimepoint(tp).getInstant(ins).getObjectLayers();
         ObjectLayer ind = null;// = new ObjectLayer();
         int j = 0;

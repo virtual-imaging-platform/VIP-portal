@@ -107,6 +107,10 @@ public interface ModelServiceAsync {
       public void removePhysicals(SimulationObjectModel model, int tp, int ins, String layer, AsyncCallback<SimulationObjectModel> asyncCallback);
       
        public void removeObject(SimulationObjectModel model, int tp, int ins, String layer, String name,AsyncCallback<SimulationObjectModel> asyncCallback);
+       
+       public void removeMap(SimulationObjectModel model, int tp, int ins, String layer, PhysicalParametersLayer.PhysicalParameterType type,AsyncCallback<SimulationObjectModel> asyncCallback);
+       
+       public void removeMapAll(SimulationObjectModel model, int tp, int ins,  PhysicalParametersLayer.PhysicalParameterType type,AsyncCallback<SimulationObjectModel> asyncCallback);
       
       public void recordAddedFiles(String zipName, List<String> addFiles ,SimulationObjectModel model, String lfn,String zipFullPath, boolean bUpload, boolean test, AsyncCallback<SimulationObjectModel> asyncCallback);
       

@@ -328,15 +328,24 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
 
     }
 
-    public SimulationObjectModel removeObject(SimulationObjectModel model, int tp, int ins, String layer, String name) throws ModelException {
-        try {
+    public SimulationObjectModel removeMap(SimulationObjectModel model, int tp, int ins, String layer, PhysicalParametersLayer.PhysicalParameterType type) throws ModelException {
+             return modelBusiness.removeMap(model, tp, ins, layer, type);
+         
+    }
+     public SimulationObjectModel removeMapAll(SimulationObjectModel model, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType type) throws ModelException {
+            return modelBusiness.removeMapAll(model, tp, ins, type);
+      
+    }
+
+      public SimulationObjectModel removeObject(SimulationObjectModel model, int tp, int ins, String layer, String name) throws ModelException {
+       
+          try {
             trace(logger, "remove object: " + name);
             return modelBusiness.removeObject(model, tp, ins, layer, name);
         } catch (CoreException ex) {
             throw new ModelException(ex);
         }
     }
-
     public SimulationObjectModel removePhysical(SimulationObjectModel objectModel, int tp, int ins, String layer, PhysicalParametersLayer.PhysicalParameterType type) throws ModelException {
         try {
             trace(logger, "remove physical paramters " + type.toString());

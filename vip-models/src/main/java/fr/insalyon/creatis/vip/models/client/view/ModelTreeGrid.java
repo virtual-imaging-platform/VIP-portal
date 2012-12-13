@@ -530,6 +530,68 @@ public class ModelTreeGrid extends TreeGrid {
         ms.removePhysicals(model, tp, ins, getTypeFromMap(layer).toString(), callback);
     }
 
+    public void removeMap() {
+         ModelServiceAsync ms = ModelService.Util.getInstance();
+        final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
+
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Cannot remove physical parameter.");
+            }
+
+            public void onSuccess(SimulationObjectModel result) {
+                Layout.getInstance().setNoticeMessage("Physical parameter removed.");
+                model = result;
+                bmodif = true;
+                checkModality();
+            }
+        };
+        ModelTreeNode node = (ModelTreeNode) modelTree.getParent(mnode);
+         while (!node.getAttributeAsString(model.getModelName()).contains("Instant")) {
+                        node = (ModelTreeNode) modelTree.getParent(node);
+         }
+        
+        int ins = Integer.parseInt(node.getAttribute("number"));
+        int tp = Integer.parseInt(modelTree.getParent(node).getAttribute("number"));
+        String name =  mnode.getAttribute(model.getModelName());
+        name = name.substring(0, name.indexOf("(")-1).replace(" ","");
+        node = (ModelTreeNode) modelTree.getParent(mnode); //Maps
+        node = (ModelTreeNode) modelTree.getParent(node); //PhysicalParameter
+        node = (ModelTreeNode) modelTree.getParent(node); //Layer
+        String layername =  node.getAttribute(model.getModelName());
+        
+        ms.removeMap(model, tp, ins, getTypeFromMap(layername).toString(), lutTypeMap.get(name) , callback);
+  
+    }
+    
+    public void removeMapAll()
+    {
+        ModelServiceAsync ms = ModelService.Util.getInstance();
+        final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
+
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Cannot remove physical parameter.");
+            }
+
+            public void onSuccess(SimulationObjectModel result) {
+                Layout.getInstance().setNoticeMessage("Physical parameter removed.");
+                model = result;
+                bmodif = true;
+                checkModality();
+            }
+        };
+        ModelTreeNode node = (ModelTreeNode) modelTree.getParent(mnode);
+         while (!node.getAttributeAsString(model.getModelName()).contains("Instant")) {
+                        node = (ModelTreeNode) modelTree.getParent(node);
+         }
+        int ins = Integer.parseInt(node.getAttribute("number"));
+        int tp = Integer.parseInt(modelTree.getParent(node).getAttribute("number"));
+        String name =  mnode.getAttribute(model.getModelName());
+        name = name.substring(0, name.indexOf("(")-1).replace(" ","");
+
+        ms.removeMapAll(model, tp, ins,lutTypeMap.get(name) , callback);
+  
+    }
+    
     public void removeObject() {
         ModelServiceAsync ms = ModelService.Util.getInstance();
         final AsyncCallback<SimulationObjectModel> callback = new AsyncCallback<SimulationObjectModel>() {
@@ -613,7 +675,16 @@ public class ModelTreeGrid extends TreeGrid {
             removeObject();
         } else if (modelTree.getParent(mnode).getAttribute(model.getModelName()).contains("Physicals")) {
             removePhysical();
-        } else {
+        } else if( modelTree.getParent(mnode).getAttribute(model.getModelName()).contains("Maps")){
+            TreeNode mapnode = modelTree.getParent(mnode);
+            name = modelTree.getParent(modelTree.getParent(mapnode)).getAttribute(model.getModelName());
+            if (name.contains("Anatomy") || name.contains("External agent") || name.contains("Foreign body")
+                || name.contains("Pathology") || name.contains("Geometry")) 
+                removeMap();
+            else
+                removeMapAll();
+        }
+        else{
             //nothing
         }
         modelTree.remove(mnode);
@@ -1409,12 +1480,11 @@ public class ModelTreeGrid extends TreeGrid {
         
     public void addMathematicalItemInTree(int tp, int ins, int type, String name, String objLayer, String label, HashMap<String, GenericParameter> params) {
         int nbChild = 0;
-        logger.log(Level.SEVERE, "tp :" + String.valueOf(tp) + "ins : " + String.valueOf(ins) + "type : " + String.valueOf(type)
-                + "name : " + name + "lab :" + label);
+
         ModelTreeNode insnode = findNode(tp, ins);
         // pour objet on doit regarder un niveau en dessous
         //Check if the object layer exists for this instant
-        logger.log(Level.SEVERE, "layer :" + objLayer);
+   
         TreeNode[] nodes = modelTree.getFolders(insnode);
         ModelTreeNode objectLayerPartsNode = null;
         ModelTreeNode LayerNode = null;
@@ -1527,10 +1597,6 @@ public class ModelTreeGrid extends TreeGrid {
 
         
     }
-        
-    
-        
-  
     
     public void addPhysicalItems(int tp, int ins, int type, String name, String objLayer, String[] labels) {
         pplabels = labels;
@@ -1806,6 +1872,7 @@ public class ModelTreeGrid extends TreeGrid {
 
     public void mfdraw()
     {
+        ((ModelDisplay)(this.getParent())).setTitle(nwName);
         this.markForRedraw();
     }
     public void rename(String name, SimulationObjectModel result) {
