@@ -204,4 +204,9 @@ public class TimelineLayout extends VLayout {
     public void update() {
         loadData();
     }
+    
+    public void terminate() {
+        destroy();
+        instance = null;
+    }
 }

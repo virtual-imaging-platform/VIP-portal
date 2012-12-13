@@ -134,6 +134,7 @@ public class ApplicationModule extends Module {
             }
         };
         service.signout(callback);
+        TimelineLayout.getInstance().terminate();
     }
 
     @Override
