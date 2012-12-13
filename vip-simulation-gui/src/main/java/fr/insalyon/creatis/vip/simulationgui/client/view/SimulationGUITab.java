@@ -82,6 +82,7 @@ public class SimulationGUITab extends Tab {
     Data3D[][] res_mod;
     int mod_const = 0;
     int mod_lenght = 0;
+    private SimulationObjectModel tempModel = null;
 
     private boolean test = true;
     static String modelName;
@@ -114,6 +115,7 @@ public class SimulationGUITab extends Tab {
         sectionStack.showSection(0);
         sectionStack.hideSection(1);
         defineSceneSection = new DefineSceneSection();
+        sectionStack.setScrollSectionIntoView(true);
         sectionStack.setSections(defineSceneSection);
 
         toolStrip = new ToolStrip();
@@ -127,9 +129,11 @@ public class SimulationGUITab extends Tab {
         VLayout vLayout = new VLayout();
         vLayout.addMember(toolStrip);
         vLayout.addMember(sectionStack);
-
+          vLayout.setScrollbarSize(20);
         this.setPane(vLayout);
+
         initControl();
+      
 //        SimulationGUIControlBoxModel.getInstance().checkBoxBox();
 
     }
@@ -148,7 +152,7 @@ public class SimulationGUITab extends Tab {
 
             public void onSuccess(final SimulationObjectModel result) {
 
-                showModalityBoxes(result);
+               
 
                 modelStorageURL = result.getStorageURL();
                 modelURI = result.getURI();
@@ -160,10 +164,10 @@ public class SimulationGUITab extends Tab {
                     public void onSuccess(Data3D[][] result2) {
                         defineSceneSection.hideModal();
 
-                        if(result2.length>=4)
+                        if(result2 != null & result2[0].length>2)
                             ObjectModel.getInstance().addModel(result2);
                         SimulationGUIControlBoxModel.getInstance().setTreeNode(result2);
-
+                         showModalityBoxes(result);
                     }
 
                     public void onFailure(Throwable caught) {
@@ -211,26 +215,27 @@ public class SimulationGUITab extends Tab {
     }
 
     private void showModalityBoxes(SimulationObjectModel model) {
-        if(SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.IRM))
-            defineSceneSection.enableBox("MRI");
-        else 
-            defineSceneSection.disableBox("MRI");
-        
-
-        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.PET))
-            defineSceneSection.enableBox("PET");
-        else
+        // in two steps, to avoid redrawing scene
+        if(!SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.IRM))
+          defineSceneSection.disableBox("MRI");
+    
+        if (!SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.PET))
             defineSceneSection.disableBox("PET");
             
-        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.CT)) 
-            defineSceneSection.enableBox("CT");
-        else
+        if (!SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.CT)) 
             defineSceneSection.disableBox("CT");
         
-        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.US)) 
-            defineSceneSection.enableBox("US");
-        else
+        if (!SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.US)) 
             defineSceneSection.disableBox("US");
+        
+         if(SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.IRM))
+            defineSceneSection.enableBox("MRI");
+         if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.PET))
+            defineSceneSection.enableBox("PET");
+          if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.CT)) 
+            defineSceneSection.enableBox("CT");
+          if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.US)) 
+            defineSceneSection.enableBox("US");
     }
     
      static String getModelName() {
