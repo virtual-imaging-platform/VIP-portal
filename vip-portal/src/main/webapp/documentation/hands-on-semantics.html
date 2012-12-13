@@ -15,6 +15,7 @@
             <li><a href="#ex2">Exercise 2:</a> explore repository of simulated data (5 min)</li>
             <li><a href="#ex3">Exercise 3:</a> import your own model (15 min)</li>
             <li><a href="#ex4">Exercise 4:</a> launch simulations from model repository (10 min)</li>
+             <li><a href="#ref">References and acknowledgments</a></li>
         </ul>
         <h2><a name="ex1">Exercise 1</a>: explore the model repository (10 min)</h2>
 
@@ -64,7 +65,7 @@
         <h2><a name="ex3">Exercise 3:</a> import your own model (15 min)</h2>
         In this exercise you will import a model composed of 4 parameter maps acquired in the <a href="https://www.irisa.fr/visages/">VISAGES</a> team at INRIA. This model will be used in an MRI simulation in the next exercise.
         <ul>
-            <li><span style="font-weight:bold; background-color:#e3e3ff;">Download</span> the model maps in your computer (to start the procedure as if *you* produced the model): <a href="workshop/T1.nii.gz">T1</a>, <a href="workshop/T2.nii.gz">T2</a>, <a href="workshop/T2s.nii.gz">T2 star</a> and <a href="workshop/M0.nii.gz">proton density</a></li>
+            <li>To start the procedure as if *you* produced the model, <span style="font-weight:bold; background-color:#e3e3ff;">download</span> the following model maps in your computer (right-click on the links and choose "Save link As"): <a href="workshop/T1.nii.gz">T1</a>, <a href="workshop/T2.nii.gz">T2</a>, <a href="workshop/T2s.nii.gz">T2 star</a> and <a href="workshop/M0.nii.gz">proton density</a></li>
             <li>In your home, <span style="font-weight:bold; background-color:#e3e3ff;">open</span> the model repository <img src="workshop/modelrepositoryicon.png" alt="model repository"/>.</li>
             <li><span style="font-weight:bold; background-color:#e3e3ff;">Click</span> on "New model":</li>
         </ul>
@@ -134,14 +135,23 @@
         <ul><li>A tab containing simulation parameters appears. Information about the model and its geometrical transformation w.r.t. the scanner is already filled in. Fill in the input parameters with plausible values, for instance TR=120, TE=8 and result directory="/vip/Home". You can also load an example (from <img src="workshop/examples.png" alt="examples"/> list available for the different simulations) for this MRI sequence:</li></ul>
         <img src="workshop/params.png" alt="params"/>
 
-
- <ul><li><span style="font-weight:bold; background-color:#e3e3ff;">Launch</span> the simulation, and <span style="font-weight:bold; background-color:#e3e3ff;">monitor</span> it with "Simulation Monitor": <img src="workshop/monitor.png" alt="monitor"/></li>
-  <li>When the simulation is finished, download the resulting image (.nii.gz), and open it for visualization. If you don't have a .nii.gz viewer on your computer, you can use for instance VV (<a href="http://www.creatis.insa-lyon.fr/rio/vv?action=AttachFile&do=get&target=vv-1.3-win64.zip">Windows</a>, <a href="http://www.creatis.insa-lyon.fr/rio/vv?action=AttachFile&do=get&target=vv-1.3-linux64.sh">Linux 64 bits</a>) or medInria (<a href="http://med.inria.fr/the-app/downloads">all platforms</a>).</li></ul>
+        <ul><li><span style="font-weight:bold; background-color:#e3e3ff;">Launch</span> the simulation, and monitor it with "Simulation Monitor": <img src="workshop/monitor.png" alt="monitor"/></li>
+            <li>When the simulation is finished, download the resulting image (.nii.gz), and open it for visualization. If you don't have a .nii.gz viewer on your computer, you can use VV (<a href="http://www.creatis.insa-lyon.fr/rio/vv?action=AttachFile&do=get&target=vv-1.3-win64.zip">Windows</a>, <a href="http://www.creatis.insa-lyon.fr/rio/vv?action=AttachFile&do=get&target=vv-1.3-linux64.sh">Linux 64 bits</a>) or medInria (<a href="http://med.inria.fr/the-app/downloads">all platforms</a>).</li></ul>
         <img height="500" src="workshop/vv.png" alt="view"/>
         <ul><li>Your image should also appear in the repository of simulated data:
         <img src="workshop/simulated.png" alt="simulated-icon"/>
         </li></ul>
         That's it, we hope you enjoyed the hands-on.<br/>
         <a href="#contents">Back to top</a>
+        
+        <h2><a name="ref">References and acknowledgments:</a></h2>
+        <ul>
+            <li>About SimuBloch and the T1, and T2 maps used in the model: Fang Cao; Olivier Commowick; Elise Bannier; Jean-Christophe Ferr&eacute;; Gilles Edan; Christian Barillot, "MRI Estimation of T1 Relaxation Time Using a Constrained Optimization Algorithm", MBIA 2012, Oct 2012, Nice, France. pp. 203-214 (<a href="http://hal.inria.fr/inserm-00723849/en">pdf</a>)</li>
+            <li>About OntoVIP's design: B. Gibaud, G. Forestier, H. Benoit-Cattin, F. Cervenansky, P. Clarysse, D. Friboulet, A. Gaignard, P. Hugonnard, C. Lartizien, H. Liebgott, et al., "OntoVIP: an ontology for the annotation of object models used for medical image simulation", IEEE International Conference on Healthcare Informatics, Imaging and Systems Biology (HISB), La Jolla, California, USA, 2012.</a></li>
+            <li>About the VIP platform:  "A Virtual Imaging Platform for multi-modality medical image simulation", Tristan Glatard, Carole Lartizien, Bernard Gibaud, Rafael Ferreira da Silva, Germain Forestier, Fr&eacute;d&eacute;ric Cervenansky, Martino Alessandrini, Hugues Benoit-Cattin, Olivier Bernard, Sorina Camarasu-Pop, Nadia Cerezo, Patrick Clarysse, Alban Gaignard, Patrick Hugonnard, Herv&eacute; Liebgott, Simon Marache, Adrien Marion, Johan Montagnat, Joachim Tabary, and Denis Friboulet, IEEE Transactions on Medical Imaging, in press, 2012</li>
+            <li>The 3D scene interface was developed by <a href="mailto:kevmoulin@wanadoo.fr">Kevin Moulin</a> using WebGL</li>
+            <li><a href="http://brainweb.bic.mni.mcgill.ca/brainweb/">Brainweb</a> is from the McGill university in Montr&eacute;al</li>
+            <li><a href="http://www.creatis.insa-lyon.fr/rio/vv">VV</a> is from CREATIS, <a href="http://med.inria.fr/">medInria</a> is from INRIA</li>
+        </ul>
     </body>
 </html>
