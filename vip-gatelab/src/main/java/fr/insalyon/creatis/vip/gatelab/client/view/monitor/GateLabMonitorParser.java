@@ -32,44 +32,42 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.gatelab.client;
+package fr.insalyon.creatis.vip.gatelab.client.view.monitor;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationModule;
-import fr.insalyon.creatis.vip.application.client.view.monitor.MonitorParser;
-import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineParser;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.Module;
-import fr.insalyon.creatis.vip.gatelab.client.view.GateLabTileGrid;
-import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabMonitorParser;
-import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabTimelineParser;
+import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
+import fr.insalyon.creatis.vip.application.client.view.monitor.MonitorParserInterface;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
+import fr.insalyon.creatis.vip.gatelab.client.GateLabConstants;
+import java.util.Date;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class GateLabModule extends Module {
+public class GateLabMonitorParser implements MonitorParserInterface {
 
-    public GateLabModule() {
-
-        ApplicationModule.reservedClasses.add(GateLabConstants.GATELAB_CLASS);
+    /**
+     *
+     * @param applicationName
+     * @return
+     */
+    @Override
+    public boolean parse(String applicationName) {
+        return applicationName.toLowerCase().contains(GateLabConstants.GROUP_GATELAB.toLowerCase());
     }
 
+    /**
+     * 
+     * @param simulationId
+     * @param simulatioName
+     * @param status
+     * @param launchedDate
+     * @return 
+     */
     @Override
-    public void load() {
+    public AbstractSimulationTab getTab(String simulationId, String simulatioName,
+            SimulationStatus status, Date launchedDate) {
 
-        if (CoreModule.user.isSystemAdministrator()
-                || CoreModule.user.hasGroupAccess(GateLabConstants.GROUP_GATELAB)) {
-            CoreModule.addApplicationsTileGrid(new GateLabTileGrid());
-        }
-        TimelineParser.getInstance().addParser(new GateLabTimelineParser());
-        MonitorParser.getInstance().addParser(new GateLabMonitorParser());
-    }
-
-    @Override
-    public void postLoading() {
-    }
-
-    @Override
-    public void terminate() {
+        return new GateLabSimulationTab(simulationId, simulatioName, status, launchedDate.toString());
     }
 }

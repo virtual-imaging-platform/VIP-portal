@@ -32,44 +32,48 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.gatelab.client;
+package fr.insalyon.creatis.vip.application.client.view.monitor;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationModule;
-import fr.insalyon.creatis.vip.application.client.view.monitor.MonitorParser;
-import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineParser;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.Module;
-import fr.insalyon.creatis.vip.gatelab.client.view.GateLabTileGrid;
-import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabMonitorParser;
-import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabTimelineParser;
+import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class GateLabModule extends Module {
+public class MonitorParser {
 
-    public GateLabModule() {
+    public static MonitorParser instance;
+    public List<MonitorParserInterface> parsers;
 
-        ApplicationModule.reservedClasses.add(GateLabConstants.GATELAB_CLASS);
-    }
+    public static MonitorParser getInstance() {
 
-    @Override
-    public void load() {
-
-        if (CoreModule.user.isSystemAdministrator()
-                || CoreModule.user.hasGroupAccess(GateLabConstants.GROUP_GATELAB)) {
-            CoreModule.addApplicationsTileGrid(new GateLabTileGrid());
+        if (instance == null) {
+            instance = new MonitorParser();
         }
-        TimelineParser.getInstance().addParser(new GateLabTimelineParser());
-        MonitorParser.getInstance().addParser(new GateLabMonitorParser());
+        return instance;
     }
 
-    @Override
-    public void postLoading() {
+    private MonitorParser() {
+
+        parsers = new ArrayList<MonitorParserInterface>();
     }
 
-    @Override
-    public void terminate() {
+    public void addParser(MonitorParserInterface parser) {
+        
+        parsers.add(parser);
+    }
+
+    public AbstractSimulationTab parse(String simulationId, String simulationName, String applicationName,
+            SimulationStatus status, Date launchedDate) {
+        
+        for (MonitorParserInterface parser : parsers) {
+            if (parser.parse(applicationName)) {
+                return parser.getTab(simulationId, simulationName, status, launchedDate);
+            }
+        }
+        return new SimulationTab(simulationId, simulationName, status);
     }
 }

@@ -156,12 +156,14 @@ public class SimulationsTab extends Tab {
             public void onRowMouseDown(RowMouseDownEvent event) {
                 if (event.getColNum() != 1) {
                     String simulationID = event.getRecord().getAttribute("simulationId");
-                    String title = event.getRecord().getAttribute("simulationName");
+                    String simulationName = event.getRecord().getAttribute("simulationName");
+                    String applicationName = event.getRecord().getAttribute("application");
+                    Date date = event.getRecord().getAttributeAsDate("date");
                     SimulationStatus status = SimulationStatus.valueOf(
                             event.getRecord().getAttribute("status"));
 
-                    Layout.getInstance().addTab(new SimulationTab(simulationID,
-                            title, status));
+                    Layout.getInstance().addTab(MonitorParser.getInstance().parse(simulationID,
+                            simulationName, applicationName, status, date));
                 }
             }
         });

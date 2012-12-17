@@ -35,15 +35,12 @@
 package fr.insalyon.creatis.vip.gatelab.client.view;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.gatelab.client.GateLabConstants;
 import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabService;
-import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabServiceAsync;
 import fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab;
-import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabSimulationsTab;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,27 +61,22 @@ public class GateLabTileGrid extends ApplicationsTileGrid {
 
     private void loadApplications() {
 
-        GateLabServiceAsync service = GateLabService.Util.getInstance();
         final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
-
+            @Override
             public void onFailure(Throwable caught) {
-                SC.say("Unable to load applications:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to load gatelab:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(List<Application> result) {
 
-                if (!result.isEmpty()) {
-                    addApplication(GateLabConstants.APP_MONITOR,
-                            GateLabConstants.APP_IMG_MONITOR);
-
-                    for (Application app : result) {
-                        addApplication(app.getName(), GateLabConstants.APP_IMG_APPLICATION);
-                        applicationNames.add(app.getName());
-                    }
+                for (Application app : result) {
+                    addApplication(app.getName(), GateLabConstants.APP_IMG_APPLICATION);
+                    applicationNames.add(app.getName());
                 }
             }
         };
-        service.getApplications(callback);
+        GateLabService.Util.getInstance().getApplications(callback);
     }
 
     @Override
@@ -92,9 +84,6 @@ public class GateLabTileGrid extends ApplicationsTileGrid {
 
         if (applicationNames.contains(applicationName)) {
             Layout.getInstance().addTab(new GateLabLaunchTab(applicationName));
-
-        } else if (applicationName.equals(GateLabConstants.APP_MONITOR)) {
-            Layout.getInstance().addTab(new GateLabSimulationsTab());
         }
     }
 }

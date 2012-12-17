@@ -50,6 +50,7 @@ public class GateLabTimelineParser implements TimelineParserInterface {
      * @param applicationName
      * @return 
      */
+    @Override
     public boolean parse(String applicationName) {
         return applicationName.toLowerCase().contains(GateLabConstants.GROUP_GATELAB.toLowerCase());
     }
@@ -64,6 +65,7 @@ public class GateLabTimelineParser implements TimelineParserInterface {
      * @param launchedDate
      * @return
      */
+    @Override
     public SimulationBoxLayout getLayout(String id, String name, String applicationName,
             String user, String status, Date launchedDate) {
 
