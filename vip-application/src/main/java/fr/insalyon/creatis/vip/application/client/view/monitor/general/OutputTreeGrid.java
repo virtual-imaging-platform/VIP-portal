@@ -37,7 +37,6 @@ package fr.insalyon.creatis.vip.application.client.view.monitor.general;
 
 import com.smartgwt.client.widgets.tree.events.NodeContextClickEvent;
 import com.smartgwt.client.widgets.tree.events.NodeContextClickHandler;
-import fr.insalyon.creatis.vip.application.client.view.monitor.menu.InOutContextMenu;
 
 /**
  *

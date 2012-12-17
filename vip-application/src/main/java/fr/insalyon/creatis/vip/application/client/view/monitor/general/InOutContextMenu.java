@@ -32,7 +32,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.monitor.menu;
+package fr.insalyon.creatis.vip.application.client.view.monitor.general;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -41,12 +41,10 @@ import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.tree.Tree;
 import com.smartgwt.client.widgets.tree.TreeNode;
-import fr.insalyon.creatis.vip.application.client.view.monitor.general.InOutTreeNode;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 import java.util.ArrayList;
@@ -82,7 +80,7 @@ public class InOutContextMenu extends Menu {
             }
         });
 
-        MenuItem downloadFileItem = new MenuItem("Download File");
+        MenuItem downloadFileItem = new MenuItem("Download");
         downloadFileItem.setIcon(DataManagerConstants.ICON_DOWNLOAD);
         downloadFileItem.addClickHandler(new ClickHandler() {
 
@@ -105,7 +103,7 @@ public class InOutContextMenu extends Menu {
         });
 
         if (!node.getType().equals("Simulation")) {
-            if (node.getType().equals("URI")) {
+            if (node.getName().startsWith(DataManagerConstants.ROOT + "/")) {
                 this.setItems(downloadFileItem, jumpToItem);
             } else {
                 this.setItems(downloadFilesItem);
@@ -115,7 +113,6 @@ public class InOutContextMenu extends Menu {
 
     private void downloadFile(String path) {
 
-        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<String> callback = new AsyncCallback<String>() {
 
             @Override
@@ -129,7 +126,7 @@ public class InOutContextMenu extends Menu {
                 DataManagerModule.dataManagerSection.expand();
             }
         };
-        service.downloadFile(path, callback);
+        DataManagerService.Util.getInstance().downloadFile(path, callback);
     }
 
     private void download() {
@@ -137,7 +134,7 @@ public class InOutContextMenu extends Menu {
         List<String> paths = new ArrayList<String>();
         for (TreeNode n : tree.getChildren(node)) {
             InOutTreeNode output = (InOutTreeNode) n;
-            if (output.getType().equals("URI")) {
+            if (output.getName().startsWith(DataManagerConstants.ROOT + "/")) {
                 paths.add(output.getName());
             }
         }
@@ -151,7 +148,6 @@ public class InOutContextMenu extends Menu {
 
     private void downloadFiles(List<String> paths, String packName) {
 
-        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<String> callback = new AsyncCallback<String>() {
 
             @Override
@@ -165,6 +161,6 @@ public class InOutContextMenu extends Menu {
                 DataManagerModule.dataManagerSection.expand();
             }
         };
-        service.downloadFiles(paths, packName, callback);
+        DataManagerService.Util.getInstance().downloadFiles(paths, packName, callback);
     }
 }
