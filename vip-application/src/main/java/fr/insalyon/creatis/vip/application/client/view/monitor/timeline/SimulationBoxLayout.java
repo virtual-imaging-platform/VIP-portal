@@ -48,6 +48,7 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
@@ -134,7 +135,7 @@ public class SimulationBoxLayout extends HLayout {
         buttonsLayout.setWidth(20);
         buttonsLayout.setHeight100();
         buttonsLayout.addMember(actionButton);
-        buttonsLayout.addMember(WidgetUtil.getIconLabel(ApplicationConstants.ICON_MONITOR_RELAUNCH, 
+        buttonsLayout.addMember(WidgetUtil.getIconLabel(ApplicationConstants.ICON_MONITOR_RELAUNCH,
                 "Relaunch simulation", 16, new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
@@ -300,7 +301,7 @@ public class SimulationBoxLayout extends HLayout {
         WorkflowService.Util.getInstance().purgeWorkflow(simulationID, callback);
         setLoading(true, "Purging");
     }
-    
+
     /**
      * Relaunches the simulation.
      */
@@ -316,8 +317,13 @@ public class SimulationBoxLayout extends HLayout {
             @Override
             public void onSuccess(Map<String, String> result) {
                 setLoading(false, null);
-                LaunchTab launchTab = new LaunchTab(applicationName, simulationName, result);
-                Layout.getInstance().addTab(launchTab);
+                Tab tab = Layout.getInstance().getTab(ApplicationConstants.getLaunchTabID(applicationName));
+                if (tab == null) {
+                    LaunchTab launchTab = new LaunchTab(applicationName, simulationName, result);
+                    Layout.getInstance().addTab(launchTab);
+                } else {
+                    ((LaunchTab) tab).loadInput(simulationName, result);
+                }
             }
         };
         WorkflowService.Util.getInstance().relaunchSimulation(simulationID, callback);

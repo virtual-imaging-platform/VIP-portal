@@ -105,10 +105,11 @@ public abstract class AbstractLaunchTab extends Tab {
 
     /**
      * Loads input values from string.
-     *
+     * 
+     * @param simulationName Simulation name
      * @param values Input values
      */
-    public void loadInput(String name, String values) {
+    public void loadInput(String simulationName, String values) {
 
         Map<String, String> valuesMap = new HashMap<String, String>();
 
@@ -116,7 +117,18 @@ public abstract class AbstractLaunchTab extends Tab {
             String[] s = input.split(" = ");
             valuesMap.put(s[0], s[1] != null ? s[1] : "");
         }
-        launchFormLayout.loadInputs(name, valuesMap);
+        loadInput(simulationName, valuesMap);
+    }
+    
+    /**
+     * Loads input values from map.
+     * 
+     * @param simulationName Simulation name
+     * @param values Input values map
+     */
+    public void loadInput(String simulationName, Map<String, String> values) {
+        
+        launchFormLayout.loadInputs(simulationName, values);
     }
 
     /**

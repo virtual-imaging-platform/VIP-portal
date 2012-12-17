@@ -34,7 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor.job;
 
-import com.smartgwt.client.types.BkgndRepeat;
+import com.smartgwt.client.types.BackgroundRepeat;
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -76,7 +76,7 @@ public class JobLayout extends VLayout {
         this.setPadding(3);
         this.setMembersMargin(3);
         this.setBackgroundImage(ApplicationConstants.ICON_MONITOR_JOB);
-        this.setBackgroundRepeat(BkgndRepeat.NO_REPEAT);
+        this.setBackgroundRepeat(BackgroundRepeat.NO_REPEAT);
         this.setBackgroundPosition("center center");
         this.setCursor(Cursor.HAND);
 

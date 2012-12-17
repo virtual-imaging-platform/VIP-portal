@@ -4,14 +4,14 @@
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip</artifactId>
     <packaging>pom</packaging>
-    <version>0.9</version>
+    <version>0.9.1</version>
     <name>VIP</name>
     
     <properties>
-        <vip.core.version>0.9</vip.core.version>
-        <vip.portal.version>0.9</vip.portal.version>
+        <vip.core.version>0.9.1</vip.core.version>
+        <vip.portal.version>0.9.1</vip.portal.version>
         <vip.docs.version>0.9</vip.docs.version>
-        <vip.application.version>0.9</vip.application.version>
+        <vip.application.version>0.9.1</vip.application.version>
         <vip.datamanager.version>0.8.7</vip.datamanager.version>
         <vip.datamanager-applet.version>0.3.1</vip.datamanager-applet.version>
         <vip.gatelab.version>0.9</vip.gatelab.version>
@@ -108,7 +108,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.0.2</version>
+                <version>3.0</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
