@@ -19,4 +19,5 @@ public class SimulatedDataConstants {
     public static final String ICON_PARAM = IMG_FOLDER +"icon-params.png";
     public static final String ICON_MODEL = IMG_FOLDER + "icon-model.png";
     public static final String ICON_SIMU = IMG_FOLDER + "icon-simulation-view.png";
+    public static final String ICON_DUMP = IMG_FOLDER + "icon-dump.png";
 }

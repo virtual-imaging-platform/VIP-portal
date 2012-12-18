@@ -5,6 +5,9 @@
 package fr.insalyon.creatis.vip.simulatedata.client.view;
 
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Cookies;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Canvas;
@@ -14,6 +17,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -66,6 +70,42 @@ public class SimulatedDataTab extends Tab {
             }
         });
         toolStrip.addButton(refreshButton);
+        
+           ToolStripButton dumpRdf = new ToolStripButton();
+        dumpRdf.setIcon(SimulatedDataConstants.ICON_DUMP);
+        dumpRdf.setTitle("Get RDF dump");
+        if(!CoreModule.user.isGroupAdmin())
+            dumpRdf.hide();
+        dumpRdf.addClickHandler(new ClickHandler(){
+
+            @Override
+            public void onClick(ClickEvent event) {
+                modal.show("Creating RDF dump of simulated data repository", true);
+                SimulatedDataServiceAsync msa = SimulatedDataService.Util.getInstance();
+                AsyncCallback<String> ac = new AsyncCallback<String>(){
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        modal.hide();
+                        Layout.getInstance().setWarningMessage("Cannot get RDF dump file");
+                    }
+
+                    @Override
+                    public void onSuccess(String result) {
+                        modal.hide();
+                        Window.open(
+                        GWT.getModuleBaseURL()
+                        + "/getfileservice?filepath=" + result
+                                + "&" + CoreConstants.COOKIES_SESSION
+                                + "=" + Cookies.getCookie(CoreConstants.COOKIES_SESSION), "", "");
+                    }
+                };
+                
+                msa.getRdfDump(ac);
+                
+            }
+        });
+        toolStrip.addButton(dumpRdf);
         
         vLayout.addMember(toolStrip);
         vLayout.addMember(pet);

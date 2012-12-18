@@ -14,4 +14,5 @@ import java.util.List;
  */
 public interface SimulatedDataServiceAsync {
     public void getSimulatedData(AsyncCallback<List<SimulatedData>> asyncCallback);
+    public void getRdfDump(AsyncCallback<String> asyncCallback);
 }

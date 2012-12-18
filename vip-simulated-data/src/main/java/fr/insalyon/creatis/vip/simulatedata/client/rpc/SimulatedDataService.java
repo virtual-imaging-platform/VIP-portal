@@ -33,4 +33,6 @@ public interface SimulatedDataService extends RemoteService {
     
     public List<SimulatedData> getSimulatedData() throws SimulatedDataException;
     
+    public String getRdfDump() throws SimulatedDataException;
+    
 }
