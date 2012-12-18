@@ -57,7 +57,6 @@ import fr.insalyon.creatis.vip.models.client.ParserLUT.Distribution;
 import fr.insalyon.creatis.vip.models.client.ParserLUT.GenericParameter;
 import fr.insalyon.creatis.vip.models.server.ParserLUT.Parser;
 import fr.insalyon.creatis.vip.models.client.ParserLUT.PhysicalParameterLUT;
-import fr.insalyon.creatis.vip.models.client.ParserLUT.Tissue;
 import fr.insalyon.creatis.vip.models.client.view.ModelException;
 import java.io.*;
 import java.util.ArrayList;
@@ -1301,12 +1300,10 @@ public class ModelBusiness {
         {
 //             obj = SimulationObjectModelFactory.createObjectLayer(model, tp, ins, layer, Resolution.high);
 //             model.getInstant(tp, ins).addObjectLayer(obj);
-            System.out.println("couche inexistante");
              index = 0;
         }
         else 
         {
-            System.out.println("couche trouvé");
              obj = model.getInstant(tp, ins).getObjectLayers(index);
         }
         int value = 1000;
