@@ -11,7 +11,6 @@ import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
-import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -22,7 +21,6 @@ import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelServiceAsync;
 
 import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIConstants;
-import fr.insalyon.creatis.vip.simulationgui.client.view.SimulationGUITab;
 
 /**
  *
@@ -88,7 +86,7 @@ class ModelContextMenu extends Menu {
         SimulationItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new SimulationGUITab(modelURI.toString(), modelName, modelSURL, null, test));
+         //       Layout.getInstance().addTab(new SimulationGUITab(modelURI.toString(), modelName, modelSURL, null, test));
             }
         });
 

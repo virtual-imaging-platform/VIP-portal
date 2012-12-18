@@ -48,6 +48,7 @@ public class ModelConstants {
     // Icons
     private static final String IMG_FOLDER = "model/";
     public static final String ICON_MODEL = IMG_FOLDER + "icon-model.png";
+    public static final String ICON_DUMP = IMG_FOLDER + "icon-dump.png";
     // Names
     public static final String APP_MODEL = "Models";
     // Images

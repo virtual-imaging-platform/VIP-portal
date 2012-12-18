@@ -34,7 +34,10 @@
  */
 package fr.insalyon.creatis.vip.models.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.Cookies;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.VisibilityMode;
@@ -176,7 +179,43 @@ public class ModelListTab extends Tab {
         });
         //disable model deletion for now
         toolStrip.addButton(deleteButton);
+        
+        ToolStripButton dumpRdf = new ToolStripButton();
+        dumpRdf.setIcon(ModelConstants.ICON_DUMP);
+        dumpRdf.setTitle("Get RDF dump");
+        if(!CoreModule.user.isGroupAdmin())
+            dumpRdf.hide();
+        dumpRdf.addClickHandler(new ClickHandler(){
 
+            @Override
+            public void onClick(ClickEvent event) {
+                modal.show("Creating RDF dump of model repository", true);
+                ModelServiceAsync msa = ModelService.Util.getInstance();
+                AsyncCallback<String> ac = new AsyncCallback<String>(){
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        modal.hide();
+                        Layout.getInstance().setWarningMessage("Cannot get RDF dump file");
+                    }
+
+                    @Override
+                    public void onSuccess(String result) {
+                        modal.hide();
+                        Window.open(
+                        GWT.getModuleBaseURL()
+                        + "/getfileservice?filepath=" + result
+                                + "&" + CoreConstants.COOKIES_SESSION
+                                + "=" + Cookies.getCookie(CoreConstants.COOKIES_SESSION), "", "");
+                    }
+                };
+                
+                msa.getRdfDump(test,ac);
+                
+            }
+        });
+        toolStrip.addButton(dumpRdf);
+        
         //Search
         searchSection = new SearchStackSection(this.getID(),test);
         SectionStackSection gridSection = new SectionStackSection();

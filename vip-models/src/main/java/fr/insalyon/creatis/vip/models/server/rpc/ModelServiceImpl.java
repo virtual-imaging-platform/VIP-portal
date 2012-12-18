@@ -34,11 +34,14 @@
  */
 package fr.insalyon.creatis.vip.models.server.rpc;
 
+import fr.cnrs.i3s.neusemstore.persistence.RDFManagerFactory;
+import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectModelFactory;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.PhysicalParametersLayer;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModelLight;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.models.client.ParserLUT.GenericParameter;
@@ -46,6 +49,7 @@ import fr.insalyon.creatis.vip.models.client.ParserLUT.PhysicalParameterLUT;
 import fr.insalyon.creatis.vip.models.client.rpc.ModelService;
 import fr.insalyon.creatis.vip.models.client.view.ModelException;
 import fr.insalyon.creatis.vip.models.server.business.ModelBusiness;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -502,4 +506,23 @@ public class ModelServiceImpl extends AbstractRemoteServiceServlet implements Mo
         {
             return modelBusiness.addMathematicalLUT(model,layer, parameters, tp, ins, pptype);
         }
+
+    @Override
+    public String getRdfDump(boolean test) throws ModelException {
+          logger.trace("Getting RDF dump of model repository");
+        String subdir = "tmp";
+        File f = null;
+        try {
+            File dir = new File(Server.getInstance().getWorkflowsPath()+File.separator+subdir+File.separator);
+            if(!dir.exists())
+                dir.mkdir();
+            f = File.createTempFile("dump-", ".rdf", dir);
+            SimulationObjectModelFactory.getRDFManager(test).dumpToFile(f);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new ModelException(ex);
+        }
+        return File.separator+subdir+File.separator+f.getName();
+    }
 }

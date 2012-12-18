@@ -138,6 +138,8 @@ public interface ModelServiceAsync {
       
       public void copyZipFile(String zippath, AsyncCallback<String> asyncCallback);
       
-        public void addMathematicalLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, HashMap<String, GenericParameter> parameters, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, AsyncCallback<SimulationObjectModel> asyncCallback);
+      public void addMathematicalLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, HashMap<String, GenericParameter> parameters, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype, AsyncCallback<SimulationObjectModel> asyncCallback);
+      
+      public void getRdfDump(boolean test, AsyncCallback<String> asyncCallback);
 }
 

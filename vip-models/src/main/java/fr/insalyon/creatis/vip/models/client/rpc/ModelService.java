@@ -157,4 +157,6 @@ public interface ModelService extends RemoteService {
     public String copyZipFile(String zippath);
     
     public SimulationObjectModel addMathematicalLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, HashMap<String, GenericParameter> parameters, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype) throws ModelException;
+    
+    public String getRdfDump(boolean test) throws ModelException;
 }
