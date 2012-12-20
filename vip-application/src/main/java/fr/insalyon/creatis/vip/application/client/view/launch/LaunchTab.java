@@ -59,17 +59,20 @@ public class LaunchTab extends AbstractLaunchTab {
 
     private ArrayList<String> disabledSources;
 
-    public LaunchTab(String applicationName) {
-        this(applicationName, null, null, null);
+    public LaunchTab(String applicationName, String applicationVersion) {
+        this(applicationName, applicationVersion, null, null, null);
     }
 
-    public LaunchTab(String applicationName, String simulationName, Map<String, String> inputs) {
-        this(applicationName, simulationName, inputs, null);
+    public LaunchTab(String applicationName, String applicationVersion,
+            String simulationName, Map<String, String> inputs) {
+
+        this(applicationName, applicationVersion, simulationName, inputs, null);
     }
 
-    public LaunchTab(String applicationName, String simulationName, Map<String, String> inputs, String[] disabled) {
+    public LaunchTab(String applicationName, String applicationVersion,
+            String simulationName, Map<String, String> inputs, String[] disabled) {
 
-        super(applicationName);
+        super(applicationName, applicationVersion);
         layout.clear();
         disabledSources = new ArrayList<String>();
         if (disabled != null) {
@@ -78,19 +81,15 @@ public class LaunchTab extends AbstractLaunchTab {
         loadData(simulationName, inputs);
     }
 
-    public boolean hasID()
-    {
-        if(this.getAttributeAsString("ID") == null)
-            return false;
-        else 
-            return true;
+    public boolean hasID() {
+        return this.getAttributeAsString("ID") != null;
     }
+
     /**
      * Loads simulation sources list.
      */
     private void loadData(final String simulationName, final Map<String, String> inputs) {
 
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Descriptor> callback = new AsyncCallback<Descriptor>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -101,7 +100,7 @@ public class LaunchTab extends AbstractLaunchTab {
             @Override
             public void onSuccess(Descriptor descriptor) {
 
-                launchFormLayout = new LaunchFormLayout(applicationName, null, descriptor.getDescription());
+                launchFormLayout = new LaunchFormLayout(applicationName + " " + applicationVersion, null, descriptor.getDescription());
                 layout.addMember(launchFormLayout);
 
                 for (Source source : descriptor.getSources()) {
@@ -137,7 +136,7 @@ public class LaunchTab extends AbstractLaunchTab {
             }
         };
         modal.show("Loading launch panel...", true);
-        service.getApplicationDescriptor(applicationName, callback);
+        WorkflowService.Util.getInstance().getApplicationDescriptor(applicationName, applicationVersion, callback);
     }
 
     /**
@@ -198,7 +197,7 @@ public class LaunchTab extends AbstractLaunchTab {
                 TimelineLayout.getInstance().update();
             }
         };
-        WorkflowService.Util.getInstance().launchSimulation(getParametersMap(), applicationName,
-                getSimulationName(), callback);
+        WorkflowService.Util.getInstance().launchSimulation(getParametersMap(),
+                applicationName, applicationVersion, getSimulationName(), callback);
     }
 }

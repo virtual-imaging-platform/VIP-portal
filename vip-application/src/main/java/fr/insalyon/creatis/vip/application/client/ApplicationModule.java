@@ -36,15 +36,12 @@ package fr.insalyon.creatis.vip.application.client;
 
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.events.CloseClickHandler;
 import com.smartgwt.client.widgets.tab.events.TabCloseClickEvent;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
-import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
-import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationHomeParser;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationSystemParser;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationTileGrid;
@@ -54,6 +51,7 @@ import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Module;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.layout.CenterTabSet;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,12 +76,10 @@ public class ApplicationModule extends Module {
         CoreModule.addLayoutToHomeTab(TimelineLayout.getInstance());
 
         // Applications Tile Grid
-        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<List<AppClass>> callback = new AsyncCallback<List<AppClass>>() {
-
             @Override
             public void onFailure(Throwable caught) {
-                SC.say("Unable to load classes:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to load classes:<br />" + caught.getMessage());
             }
 
             @Override
@@ -97,11 +93,10 @@ public class ApplicationModule extends Module {
                 }
             }
         };
-        service.getClasses(callback);
+        ApplicationService.Util.getInstance().getClasses(callback);
 
         // Simulation close tab
         CenterTabSet.getInstance().addCloseClickHandler(new CloseClickHandler() {
-
             @Override
             public void onCloseClick(TabCloseClickEvent event) {
                 Tab tab = event.getTab();
@@ -121,57 +116,51 @@ public class ApplicationModule extends Module {
     @Override
     public void terminate() {
 
-        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
             @Override
             public void onFailure(Throwable caught) {
-                SC.say("Unable to signout:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to signout:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(Void result) {
             }
         };
-        service.signout(callback);
+        ApplicationService.Util.getInstance().signout(callback);
         TimelineLayout.getInstance().terminate();
     }
 
     @Override
     public void userRemoved(User user) {
 
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
             @Override
             public void onFailure(Throwable caught) {
-                SC.say("Unable to anonymize user data:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to anonymize user data:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(Void result) {
             }
         };
-        service.updateUser(user.getFullName(), "User-" + Random.nextInt(100000), callback);
+        WorkflowService.Util.getInstance().updateUser(user.getFullName(), "User-" + Random.nextInt(100000), callback);
     }
 
     @Override
     public void userUpdated(User oldUser, User updatedUser) {
 
         if (!oldUser.getFullName().equals(updatedUser.getFullName())) {
-            WorkflowServiceAsync service = WorkflowService.Util.getInstance();
             final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
                 @Override
                 public void onFailure(Throwable caught) {
-                    SC.say("Unable to anonymize user data:<br />" + caught.getMessage());
+                    Layout.getInstance().setWarningMessage("Unable to anonymize user data:<br />" + caught.getMessage());
                 }
 
                 @Override
                 public void onSuccess(Void result) {
                 }
             };
-            service.updateUser(oldUser.getFullName(), updatedUser.getFullName(), callback);
+            WorkflowService.Util.getInstance().updateUser(oldUser.getFullName(), updatedUser.getFullName(), callback);
         }
     }
 }

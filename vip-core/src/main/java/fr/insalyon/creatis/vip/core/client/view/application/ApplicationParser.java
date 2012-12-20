@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -39,7 +39,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public abstract class ApplicationParser {
 
@@ -53,7 +53,7 @@ public abstract class ApplicationParser {
 
     public abstract void loadApplications();
 
-    public abstract boolean parse(String applicationName);
+    public abstract boolean parse(String applicationName, String applicationVersion);
 
     /**
      * Adds an application.
@@ -63,7 +63,20 @@ public abstract class ApplicationParser {
      */
     protected void addApplication(String applicationName, String applicationImage) {
 
-        applications.add(new ApplicationTileRecord(applicationName,
+        applications.add(new ApplicationTileRecord(applicationName, 
+                applicationImage));
+    }
+    
+    /**
+     * Adds an application.
+     * 
+     * @param applicationName
+     * @param applicationVersion
+     * @param applicationImage 
+     */
+    protected void addApplication(String applicationName, String applicationVersion, String applicationImage) {
+
+        applications.add(new ApplicationTileRecord(applicationName, applicationVersion,
                 applicationImage));
     }
 

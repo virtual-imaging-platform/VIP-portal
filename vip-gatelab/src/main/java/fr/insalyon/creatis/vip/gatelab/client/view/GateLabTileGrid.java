@@ -35,11 +35,10 @@
 package fr.insalyon.creatis.vip.gatelab.client.view;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.gatelab.client.GateLabConstants;
-import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabService;
 import fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,29 +60,30 @@ public class GateLabTileGrid extends ApplicationsTileGrid {
 
     private void loadApplications() {
 
-        final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
+        final AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to load gatelab:<br />" + caught.getMessage());
             }
 
             @Override
-            public void onSuccess(List<Application> result) {
+            public void onSuccess(List<String[]> result) {
 
-                for (Application app : result) {
-                    addApplication(app.getName(), GateLabConstants.APP_IMG_APPLICATION);
-                    applicationNames.add(app.getName());
+                for (String[] app : result) {
+                    addApplication(app[0], app[1], GateLabConstants.APP_IMG_APPLICATION);
+                    applicationNames.add(app[0] + " " + app[1]);
                 }
             }
         };
-        GateLabService.Util.getInstance().getApplications(callback);
+        ApplicationService.Util.getInstance().getApplications(GateLabConstants.GATELAB_CLASS, callback);
     }
 
     @Override
-    public void parse(String applicationName) {
+    public void parse(String applicationName, String applicationVersion) {
 
-        if (applicationNames.contains(applicationName)) {
-            Layout.getInstance().addTab(new GateLabLaunchTab(applicationName));
+        String appName = applicationVersion == null ? applicationName : applicationName + " " + applicationVersion;
+        if (applicationNames.contains(appName)) {
+            Layout.getInstance().addTab(new GateLabLaunchTab(applicationName, applicationVersion));
         }
     }
 }

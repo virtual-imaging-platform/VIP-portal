@@ -32,46 +32,45 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.server.dao;
+package fr.insalyon.creatis.vip.application.client.bean;
 
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import java.util.List;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public interface ApplicationDAO {
+public class AppVersion implements IsSerializable {
 
-    public void add(Application workflowDescriptor) throws DAOException;
+    private String applicationName;
+    private String version;
+    private String lfn;
+    private boolean visible;
 
-    public void update(Application workflowDescriptor) throws DAOException;
+    public AppVersion() {
+    }
 
-    public void remove(String name) throws DAOException;
-    
-    public void remove(String email, String name) throws DAOException;
-    
-    public void addVersion(AppVersion version) throws DAOException;
+    public AppVersion(String applicationName, String version, String lfn, boolean visible) {
 
-    public void updateVersion(AppVersion version) throws DAOException;
+        this.applicationName = applicationName;
+        this.version = version;
+        this.lfn = lfn;
+        this.visible = visible;
+    }
 
-    public void removeVersion(String applicationName, String version) throws DAOException;
-    
-    public List<Application> getApplications() throws DAOException;
-    
-    public List<String[]> getApplications(String className) throws DAOException;
-    
-    public List<Application> getApplications(List<String> classes) throws DAOException;
-    
-    public List<String> getApplicationsName(String applicationClass) throws DAOException;
+    public String getApplicationName() {
+        return applicationName;
+    }
 
-    public Application getApplication(String name) throws DAOException;
-    
-    public String getCitation(String name) throws DAOException;
-    
-    public List<AppVersion> getVersions(String name) throws DAOException;
-    
-    public AppVersion getVersion(String applicationName, String applicationVersion) throws DAOException;
+    public String getVersion() {
+        return version;
+    }
+
+    public String getLfn() {
+        return lfn;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
 }

@@ -51,10 +51,12 @@ public class InputsLayout extends VLayout {
 
     private AbstractInputsLayout mainLayout;
     private String tabID;
+    private String applicationName;
 
-    public InputsLayout(String tabID, boolean showExamples) {
+    public InputsLayout(String tabID, String applicationName, boolean showExamples) {
 
         this.tabID = tabID;
+        this.applicationName = applicationName;
         this.setMembersMargin(10);
 
         configureButtons(showExamples);
@@ -73,7 +75,7 @@ public class InputsLayout extends VLayout {
                 if (mainLayout != null) {
                     mainLayout.destroy();
                 }
-                mainLayout = new SavedInputsLayout(tabID);
+                mainLayout = new SavedInputsLayout(tabID, applicationName);
                 addMember(mainLayout);
             }
         });
@@ -87,7 +89,7 @@ public class InputsLayout extends VLayout {
                     if (mainLayout != null) {
                         mainLayout.destroy();
                     }
-                    mainLayout = new ExampleInputsLayout(tabID);
+                    mainLayout = new ExampleInputsLayout(tabID, applicationName);
                     addMember(mainLayout);
                 }
             });

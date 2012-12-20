@@ -76,58 +76,60 @@ public class WorkflowData implements WorkflowDAO {
 
     /**
      *
-     * @param workflow
+     * @param simulation
      * @throws DAOException
      */
     @Override
-    public void add(Simulation workflow) throws DAOException {
+    public void add(Simulation simulation) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("INSERT INTO "
-                    + "Workflows(id, application, simulation_name, "
-                    + "username, launched, status) "
-                    + "VALUES(?, ?, ?, ?, ?, ?)");
+                    + "Workflows(id, application, application_version, "
+                    + "simulation_name, username, launched, status) "
+                    + "VALUES(?, ?, ?, ?, ?, ?, ?)");
 
-            ps.setString(1, workflow.getID());
-            ps.setString(2, workflow.getApplication());
-            ps.setString(3, workflow.getSimulationName());
-            ps.setString(4, workflow.getUserName());
-            ps.setTimestamp(5, new Timestamp(workflow.getDate().getTime()));
-            ps.setString(6, workflow.getMajorStatus());
-
+            ps.setString(1, simulation.getID());
+            ps.setString(2, simulation.getApplicationName());
+            ps.setString(3, simulation.getApplicationVersion());
+            ps.setString(4, simulation.getSimulationName());
+            ps.setString(5, simulation.getUserName());
+            ps.setTimestamp(6, new Timestamp(simulation.getDate().getTime()));
+            ps.setString(7, simulation.getStatus().name());
             ps.execute();
+            ps.close();
 
         } catch (SQLException ex) {
             if (!ex.getMessage().contains("duplicate key value")) {
                 logger.error(ex);
                 throw new DAOException(ex);
             } else {
-                update(workflow);
+                update(simulation);
             }
-
         }
     }
 
     /**
      *
-     * @param workflow
+     * @param simulation
      * @throws DAOException
      */
     @Override
-    public void update(Simulation workflow) throws DAOException {
+    public void update(Simulation simulation) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
                     + "Workflows "
-                    + "SET application=?, simulation_name=?, username = ? "
+                    + "SET application=?, application_version = ?, "
+                    + "simulation_name=?, username = ? "
                     + "WHERE id=?");
 
-            ps.setString(1, workflow.getApplication());
-            ps.setString(2, workflow.getSimulationName());
-            ps.setString(3, workflow.getUserName());
-            ps.setString(4, workflow.getID());
-
+            ps.setString(1, simulation.getApplicationName());
+            ps.setString(2, simulation.getApplicationVersion());
+            ps.setString(3, simulation.getSimulationName());
+            ps.setString(4, simulation.getUserName());
+            ps.setString(5, simulation.getID());
             ps.executeUpdate();
+            ps.close();
 
         } catch (SQLException ex) {
             logger.error(ex);
@@ -137,33 +139,34 @@ public class WorkflowData implements WorkflowDAO {
 
     /**
      *
-     * @param workflowID
+     * @param simulationID
      * @return
      * @throws DAOException
      */
     @Override
-    public Simulation get(String workflowID) throws DAOException {
+    public Simulation get(String simulationID) throws DAOException {
 
         try {
 
-            PreparedStatement stat = connection.prepareStatement("SELECT "
-                    + "id, application, username, launched, status, "
-                    + "minor_status, simulation_name "
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "id, application, application_version, username, launched, "
+                    + "status, simulation_name "
                     + "FROM Workflows WHERE id = ?");
+            ps.setString(1, simulationID);
 
-            stat.setString(1, workflowID);
-
-            ResultSet rs = stat.executeQuery();
+            ResultSet rs = ps.executeQuery();
             rs.next();
 
-            return new Simulation(
+            Simulation simulation = new Simulation(
                     rs.getString("application"),
+                    rs.getString("application_version"),
                     rs.getString("id"),
                     rs.getString("username"),
                     new Date(rs.getTimestamp("launched").getTime()),
-                    rs.getString("status"),
-                    rs.getString("minor_status"),
-                    rs.getString("simulation_name"));
+                    rs.getString("simulation_name"),
+                    rs.getString("status"));
+            ps.close();
+            return simulation;
 
         } catch (SQLException ex) {
             logger.error(ex);
@@ -178,8 +181,8 @@ public class WorkflowData implements WorkflowDAO {
             String query = user == null ? "" : "WHERE username='" + user + "' AND status != 'Cleaned' ";
             PreparedStatement ps = connection.prepareStatement("SELECT * FROM ( "
                     + "SELECT ROW_NUMBER() OVER() AS rownum, "
-                    + "id, application, username, launched, status, "
-                    + "minor_status, simulation_name  FROM ( "
+                    + "id, application, application_version, username, launched, "
+                    + "status, simulation_name  FROM ( "
                     + "SELECT * "
                     + "FROM Workflows " + query + " "
                     + "ORDER BY launched desc) AS tmp "
@@ -194,7 +197,7 @@ public class WorkflowData implements WorkflowDAO {
             throw new DAOException(ex);
         }
     }
-    
+
     @Override
     public List<Simulation> getList(String user, Date lastDate) throws DAOException {
 
@@ -202,8 +205,8 @@ public class WorkflowData implements WorkflowDAO {
             String query = user == null ? "" : "AND username='" + user + "' AND status != 'Cleaned' ";
             PreparedStatement ps = connection.prepareStatement("SELECT * FROM ( "
                     + "SELECT ROW_NUMBER() OVER() AS rownum, "
-                    + "id, application, username, launched, status, "
-                    + "minor_status, simulation_name  FROM ( "
+                    + "id, application, application_version, username, launched, "
+                    + "status, simulation_name  FROM ( "
                     + "SELECT * "
                     + "FROM Workflows WHERE launched < ? " + query + " "
                     + "ORDER BY launched desc) AS tmp "
@@ -247,8 +250,8 @@ public class WorkflowData implements WorkflowDAO {
             }
 
             PreparedStatement stat = connection.prepareStatement("SELECT "
-                    + "id, application, username, launched, status, "
-                    + "minor_status, simulation_name "
+                    + "id, application, application_version, username, launched, "
+                    + "status, simulation_name "
                     + "FROM Workflows " + query + " "
                     + "ORDER BY launched DESC");
 
@@ -317,8 +320,8 @@ public class WorkflowData implements WorkflowDAO {
             }
 
             PreparedStatement stat = connection.prepareStatement("SELECT "
-                    + "id, application, username, launched, status, "
-                    + "minor_status, simulation_name "
+                    + "id, application, application_version, username, launched, "
+                    + "status, simulation_name "
                     + "FROM Workflows " + query + " "
                     + "ORDER BY launched DESC");
 
@@ -362,19 +365,19 @@ public class WorkflowData implements WorkflowDAO {
      * @throws SQLException
      */
     private List<Simulation> processResultSet(ResultSet rs) throws SQLException {
-        List<Simulation> workflows = new ArrayList<Simulation>();
+        List<Simulation> simulations = new ArrayList<Simulation>();
 
         while (rs.next()) {
-            workflows.add(new Simulation(
+            simulations.add(new Simulation(
                     rs.getString("application"),
+                    rs.getString("application_version"),
                     rs.getString("id"),
                     rs.getString("username"),
                     new Date(rs.getTimestamp("launched").getTime()),
-                    rs.getString("status"),
-                    rs.getString("minor_status"),
-                    rs.getString("simulation_name")));
+                    rs.getString("simulation_name"),
+                    rs.getString("status")));
         }
-        return workflows;
+        return simulations;
     }
 
     /**
@@ -544,8 +547,8 @@ public class WorkflowData implements WorkflowDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "id, application, username, launched, status, "
-                    + "minor_status, simulation_name "
+                    + "id, application, application_version, username, launched, "
+                    + "status, simulation_name "
                     + "FROM Workflows WHERE status = ?");
 
             ps.setString(1, SimulationStatus.Running.name());

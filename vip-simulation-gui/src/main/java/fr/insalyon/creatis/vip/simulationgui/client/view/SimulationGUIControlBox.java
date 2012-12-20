@@ -35,7 +35,6 @@
 package fr.insalyon.creatis.vip.simulationgui.client.view;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Slider;
 import com.smartgwt.client.widgets.events.HoverEvent;
 import com.smartgwt.client.widgets.events.HoverHandler;
@@ -53,9 +52,7 @@ import com.smartgwt.client.widgets.form.fields.events.ItemHoverEvent;
 import com.smartgwt.client.widgets.form.fields.events.ItemHoverHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Portlet;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
-import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIConstants;
@@ -64,6 +61,7 @@ import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.ObjectModel;
 import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.ObjectSimulateur;
 import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.Scene;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import java.util.Map;
@@ -97,6 +95,7 @@ public class SimulationGUIControlBox {
     private SelectItem simulatorSelectItem;
     private LaunchTab launchTab = null;
     private static HashMap<String, SimulationGUIControlBox> instances = new HashMap<String, SimulationGUIControlBox>();
+    private final String SEPARATOR = "###";
 
     public static synchronized SimulationGUIControlBox getInstance(String applicationClass) {
 
@@ -182,7 +181,6 @@ public class SimulationGUIControlBox {
 
     private void setControl() {
         hSlider.addValueChangedHandler(new ValueChangedHandler() {
-
             public void onValueChanged(ValueChangedEvent event) {
                 int value = event.getValue();
                 spinnerx.setStep(value);
@@ -192,7 +190,6 @@ public class SimulationGUIControlBox {
         });
 
         spinnerx.addChangedHandler(new ChangedHandler() {
-
             public void onChanged(ChangedEvent event) {
                 updateSimu();
                 Scene.getInstance().refreshScreen();
@@ -200,7 +197,6 @@ public class SimulationGUIControlBox {
             }
         });
         spinnery.addChangedHandler(new ChangedHandler() {
-
             public void onChanged(ChangedEvent event) {
                 updateSimu();
                 Scene.getInstance().refreshScreen();
@@ -208,7 +204,6 @@ public class SimulationGUIControlBox {
             }
         });
         spinnerz.addChangedHandler(new ChangedHandler() {
-
             public void onChanged(ChangedEvent event) {
                 updateSimu();
                 Scene.getInstance().refreshScreen();
@@ -216,7 +211,6 @@ public class SimulationGUIControlBox {
             }
         });
         spinnerax.addChangedHandler(new ChangedHandler() {
-
             public void onChanged(ChangedEvent event) {
                 updateSimu();
                 Scene.getInstance().refreshScreen();
@@ -224,7 +218,6 @@ public class SimulationGUIControlBox {
             }
         });
         spinneray.addChangedHandler(new ChangedHandler() {
-
             public void onChanged(ChangedEvent event) {
                 updateSimu();
                 Scene.getInstance().refreshScreen();
@@ -232,7 +225,6 @@ public class SimulationGUIControlBox {
             }
         });
         spinneraz.addChangedHandler(new ChangedHandler() {
-
             public void onChanged(ChangedEvent event) {
                 updateSimu();
                 Scene.getInstance().refreshScreen();
@@ -241,7 +233,6 @@ public class SimulationGUIControlBox {
         });
 
         symBox.addChangeHandler(new ChangeHandler() {
-
             public void onChange(ChangeEvent event) {
                 if (symBox.getValueAsBoolean()) {
                     hideSymbol();
@@ -252,7 +243,6 @@ public class SimulationGUIControlBox {
         });
 
         modAxis.addChangeHandler(new ChangeHandler() {
-
             public void onChange(ChangeEvent event) {
                 if (modAxis.getValueAsBoolean()) {
                     hideAxis();
@@ -264,17 +254,15 @@ public class SimulationGUIControlBox {
         });
 
         simulatorSelectItem.addChangedHandler(new ChangedHandler() {
-
             @Override
             public void onChanged(ChangedEvent event) {
                 hideLaunchTab();
-                showLaunchTab(simulatorSelectItem.getValueAsString());
+                showLaunchTab(simulatorSelectItem.getValueAsString().split(SEPARATOR));
             }
         });
 
         //////////////////////////// Hover ///////////////////////
         simulatorSelectItem.addItemHoverHandler(new ItemHoverHandler() {
-
             public void onItemHover(ItemHoverEvent event) {
                 String prompt = "Available simulators for this modality";
                 simulatorSelectItem.setPrompt(prompt);
@@ -282,56 +270,48 @@ public class SimulationGUIControlBox {
         });
 
         spinnerx.addItemHoverHandler(new ItemHoverHandler() {
-
             public void onItemHover(ItemHoverEvent event) {
                 String prompt = "Translate the following object to this value in millimeter";
                 spinnerx.setPrompt(prompt);
             }
         });
         spinnery.addItemHoverHandler(new ItemHoverHandler() {
-
             public void onItemHover(ItemHoverEvent event) {
                 String prompt = "Translate the following object to this value in millimeter";
                 spinnery.setPrompt(prompt);
             }
         });
         spinnerz.addItemHoverHandler(new ItemHoverHandler() {
-
             public void onItemHover(ItemHoverEvent event) {
                 String prompt = "Translate the following object to this value in millimeter";
                 spinnerz.setPrompt(prompt);
             }
         });
         spinnerax.addItemHoverHandler(new ItemHoverHandler() {
-
             public void onItemHover(ItemHoverEvent event) {
                 String prompt = "Rotate the following object to this value in degree with XYZ convention";
                 spinnerx.setPrompt(prompt);
             }
         });
         spinneray.addItemHoverHandler(new ItemHoverHandler() {
-
             public void onItemHover(ItemHoverEvent event) {
                 String prompt = "Rotate the following object to this value in degree with XYZ convention";
                 spinnery.setPrompt(prompt);
             }
         });
         spinneraz.addItemHoverHandler(new ItemHoverHandler() {
-
             public void onItemHover(ItemHoverEvent event) {
                 String prompt = "Rotate the following object to this value in degree with XYZ convention";
                 spinnerz.setPrompt(prompt);
             }
         });
         modAxis.addItemHoverHandler(new ItemHoverHandler() {
-
             public void onItemHover(ItemHoverEvent event) {
                 String prompt = "Show/hide the axis for the following object";
                 spinnerz.setPrompt(prompt);
             }
         });
         symBox.addItemHoverHandler(new ItemHoverHandler() {
-
             public void onItemHover(ItemHoverEvent event) {
                 String prompt = "Show/hide the symbol for the following object";
                 spinnerz.setPrompt(prompt);
@@ -339,7 +319,6 @@ public class SimulationGUIControlBox {
         });
         hSlider.setCanHover(Boolean.TRUE);
         hSlider.addHoverHandler(new HoverHandler() {
-
             public void onHover(HoverEvent event) {
                 String prompt = "Set the step for translation spinners";
                 hSlider.setPrompt(prompt);
@@ -396,50 +375,52 @@ public class SimulationGUIControlBox {
     private void loadFormSimulator() {
 
         if (simulatorSelectItem.getValues().length == 0) {
-            ApplicationServiceAsync service = ApplicationService.Util.getInstance();
-            final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
-
+            final AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
+                @Override
                 public void onFailure(Throwable caught) {
-                    SC.warn("Error executing get workflow descriptors lists\n" + caught.getMessage());
+                    Layout.getInstance().setWarningMessage("Error executing get workflow descriptors lists:<br />" + caught.getMessage());
                     simulatorSelectItem.setValue("Cannot get simulator list");
                     launchTab = null;
                 }
 
-                public void onSuccess(List<Application> result) {
-                    String dynaStringTab[] = new String[result.size() + 1];
-                    dynaStringTab[0] = ""; //To allow a first simulator selection
-                    for (int i = 0; i < result.size(); i++) {
-                        dynaStringTab[i] = result.get(i).getName();
+                @Override
+                public void onSuccess(List<String[]> result) {
 
+                    LinkedHashMap map = new LinkedHashMap();
+                    for (String[] app : result) {
+                        map.put(app[0] + SEPARATOR + app[1], app[0] + " " + app[1]);
                     }
-                    simulatorSelectItem.setValueMap(dynaStringTab);
+                    simulatorSelectItem.setValueMap(map);
                     simulatorSelectItem.setDefaultToFirstOption(true);
-                    simulatorSelectItem.setValue(dynaStringTab[0]);
-                    showLaunchTab(dynaStringTab[0]);
-             
+                    if (!result.isEmpty()) {
+                        simulatorSelectItem.setValue(result.get(0)[0] + " " + result.get(0)[1]);
+                        showLaunchTab(result.get(0));
+                    }
                 }
             };
-            service.getApplicationsByClass(applicationClass, callback);
+            ApplicationService.Util.getInstance().getApplicationsByClass(applicationClass, callback);
         } else {
-            showLaunchTab(simulatorSelectItem.getValueAsString());
+            showLaunchTab(simulatorSelectItem.getValueAsString().split(SEPARATOR));
         }
     }
 
-    private void showLaunchTab(String name) {
+    private void showLaunchTab(String[] application) {
+
         Map<String, String> inputs = new HashMap<String, String>();
         inputs.put("Transformation", getTransformation());
         inputs.put("Model", SimulationGUITab.getModelStorage());
         inputs.put("Model URI", SimulationGUITab.getModelURI().substring(SimulationGUITab.getModelURI().lastIndexOf('#') + 1));
 
         String[] disabled = {"Transformation", "Model", "Model URI"};
-        launchTab = new LaunchTab(name, SimulationGUITab.getModelName() + " simulation", inputs, disabled);//simulatorSelectItem.getValueAsString());
+        launchTab = new LaunchTab(application[0], application[1],
+                SimulationGUITab.getModelName() + " simulation", inputs, disabled);//simulatorSelectItem.getValueAsString());
 
         Layout.getInstance().addTab(launchTab);
         Layout.getInstance().setActiveCenterTab(SimulationGUIConstants.TAB_EDITOR);
     }
 
     private void hideLaunchTab() {
-        
+
         if (launchTab != null && launchTab.hasID()) {
             Layout.getInstance().removeTab(launchTab);
             launchTab = null;

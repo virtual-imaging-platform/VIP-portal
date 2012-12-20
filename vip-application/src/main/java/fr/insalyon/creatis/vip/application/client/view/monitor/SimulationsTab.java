@@ -54,7 +54,6 @@ import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
-import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.menu.SimulationsContextMenu;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.SimulationRecord;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
@@ -126,16 +125,14 @@ public class SimulationsTab extends Tab {
         grid.setSelectionType(SelectionStyle.SIMPLE);
         grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
         grid.setEmptyMessage("<br>No data available.");
-
-        ListGridField statusIcoField = FieldUtil.getIconGridField("statusIco");
-        ListGridField simulationNameField = new ListGridField("simulationName", "Simulation Name");
-        ListGridField statusField = new ListGridField("status", "Status");
-        ListGridField applicationField = new ListGridField("application", "Application");
-        ListGridField userField = new ListGridField("user", "User");
-        ListGridField dateField = FieldUtil.getDateField();
-
-        grid.setFields(statusIcoField, simulationNameField, statusField,
-                applicationField, userField, dateField);
+        grid.setFields(
+                FieldUtil.getIconGridField("statusIco"),
+                new ListGridField("simulationName", "Simulation Name"),
+                new ListGridField("status", "Status"),
+                new ListGridField("application", "Application"),
+                new ListGridField("applicationVersion", "Version"),
+                new ListGridField("user", "User"),
+                FieldUtil.getDateField());
 
         rowContextClickHandler = grid.addRowContextClickHandler(new RowContextClickHandler() {
             @Override
@@ -144,11 +141,12 @@ public class SimulationsTab extends Tab {
                 String simulationId = event.getRecord().getAttribute("simulationId");
                 String title = event.getRecord().getAttribute("simulationName");
                 String applicationName = event.getRecord().getAttribute("application");
+                String applicationVersion = event.getRecord().getAttribute("application_version");
                 SimulationStatus status = SimulationStatus.valueOf(
                         event.getRecord().getAttribute("status"));
 
                 new SimulationsContextMenu(modal, simulationId, title,
-                        status, applicationName).showContextMenu();
+                        status, applicationName, applicationVersion).showContextMenu();
             }
         });
         rowMouseDownHandler = grid.addRowMouseDownHandler(new RowMouseDownHandler() {
@@ -171,7 +169,6 @@ public class SimulationsTab extends Tab {
 
     public void loadData() {
 
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<List<Simulation>> callback = new AsyncCallback<List<Simulation>>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -184,12 +181,13 @@ public class SimulationsTab extends Tab {
                 List<SimulationRecord> dataList = new ArrayList<SimulationRecord>();
 
                 for (Simulation sim : result) {
-                    if (!sim.getMajorStatus().equals(SimulationStatus.Cleaned.name())
+                    if (sim.getStatus() != SimulationStatus.Cleaned
                             || CoreModule.user.isSystemAdministrator()
                             || CoreModule.user.isGroupAdmin()) {
 
                         dataList.add(new SimulationRecord(sim.getSimulationName(),
-                                sim.getApplication(), sim.getMajorStatus(), sim.getID(),
+                                sim.getApplicationName(), sim.getApplicationVersion(), 
+                                sim.getStatus(), sim.getID(),
                                 sim.getUserName(), sim.getDate()));
                     }
                 }
@@ -203,7 +201,7 @@ public class SimulationsTab extends Tab {
             }
         };
         modal.show("Loading Simulations...", true);
-        service.getSimulations(user, app, status, startDate, endDate, callback);
+        WorkflowService.Util.getInstance().getSimulations(user, app, status, startDate, endDate, callback);
         Layout.getInstance().setActiveCenterTab(ApplicationConstants.TAB_MONITOR);
     }
 

@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.gatelab.client.view.monitor;
 
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.SimulationBoxLayout;
 import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineParserInterface;
 import fr.insalyon.creatis.vip.gatelab.client.GateLabConstants;
@@ -56,19 +57,20 @@ public class GateLabTimelineParser implements TimelineParserInterface {
     }
 
     /**
-     *
+     * 
      * @param id
      * @param name
      * @param applicationName
+     * @param applicationVersion
      * @param user
      * @param status
      * @param launchedDate
-     * @return
+     * @return 
      */
     @Override
     public SimulationBoxLayout getLayout(String id, String name, String applicationName,
-            String user, String status, Date launchedDate) {
+            String applicationVersion, String user, SimulationStatus status, Date launchedDate) {
 
-        return new GateLabSimulationBoxLayout(id, name, applicationName, user, status, launchedDate);
+        return new GateLabSimulationBoxLayout(id, name, applicationName, applicationVersion, user, status, launchedDate);
     }
 }

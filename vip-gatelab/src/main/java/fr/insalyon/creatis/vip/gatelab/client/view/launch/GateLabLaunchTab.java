@@ -41,7 +41,6 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
-import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchFormLayout;
 import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineLayout;
@@ -62,9 +61,9 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
     private String baseDir;
     private IButton loadMacButton;
 
-    public GateLabLaunchTab(String applicationName) {
+    public GateLabLaunchTab(String applicationName, String applicationVersion) {
 
-        super(applicationName);
+        super(applicationName, applicationVersion);
         layout.clear();
         initComplete(this);
 
@@ -75,7 +74,6 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
 
     private void loadData() {
 
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Descriptor> callback = new AsyncCallback<Descriptor>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -86,7 +84,7 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
             @Override
             public void onSuccess(Descriptor descriptor) {
 
-                launchFormLayout = new LaunchFormLayout(applicationName, null, descriptor.getDescription());
+                launchFormLayout = new LaunchFormLayout(applicationName + " " + applicationVersion, null, descriptor.getDescription());
                 layout.addMember(launchFormLayout);
 
                 launchFormLayout.setSourcesLayoutVisibible(false);
@@ -105,7 +103,7 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
             }
         };
         modal.show("Loading launch panel...", true);
-        service.getApplicationDescriptor(applicationName, callback);
+        WorkflowService.Util.getInstance().getApplicationDescriptor(applicationName, applicationVersion, callback);
     }
 
     private void configureLoadMacButton() {
@@ -200,11 +198,13 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
     protected void launch() {
 
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
             public void onFailure(Throwable caught) {
                 resetLaunchButton();
                 Layout.getInstance().setWarningMessage("Unable to launch the simulation:<br />" + caught.getMessage(), 10);
             }
 
+            @Override
             public void onSuccess(Void result) {
                 resetLaunchButton();
                 Layout.getInstance().setNoticeMessage("Simulation '<b>" + getSimulationName() + "</b>' successfully launched.", 10);
@@ -212,7 +212,7 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
             }
         };
         WidgetUtil.setLoadingIButton(launchButton, "Launching...");
-        WorkflowService.Util.getInstance().launchSimulation(getParametersMap(), applicationName,
-                getSimulationName(), callback);
+        WorkflowService.Util.getInstance().launchSimulation(getParametersMap(),
+                applicationName, applicationVersion, getSimulationName(), callback);
     }
 }

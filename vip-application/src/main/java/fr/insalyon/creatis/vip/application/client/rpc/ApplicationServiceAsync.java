@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.application.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
 import java.util.List;
@@ -50,17 +51,23 @@ public interface ApplicationServiceAsync {
     
     public void getApplications(AsyncCallback<List<Application>> asyncCallback);
     
-    public void getApplications(String className, AsyncCallback<List<Application>> asyncCallback);
+    public void getApplications(String className, AsyncCallback<List<String[]>> asyncCallback);
     
-    public void getApplications(List<String> reservedClasses, AsyncCallback<List<Application>> asyncCallback);
+    public void getApplicationsByClass(String className, AsyncCallback<List<String[]>> asyncCallback);
     
-    public void getApplicationsByClass(String applicationClass, AsyncCallback<List<Application>> asyncCallback);
+    public void getVersions(String applicationName, AsyncCallback<List<AppVersion>> asyncCallback);
 
-    public void add(Application workflowDescriptor, AsyncCallback<Void> asyncCallback);
+    public void add(Application application, AsyncCallback<Void> asyncCallback);
 
-    public void update(Application workflowDescriptor, AsyncCallback<Void> asyncCallback);
+    public void update(Application application, AsyncCallback<Void> asyncCallback);
 
     public void remove(String name, AsyncCallback<Void> asyncCallback);
+    
+    public void addVersion(AppVersion version, AsyncCallback<Void> asyncCallback);
+
+    public void updateVersion(AppVersion version, AsyncCallback<Void> asyncCallback);
+
+    public void removeVersion(String applicationName, String version, AsyncCallback<Void> asyncCallback);
 
     public void removeClass(String name, AsyncCallback<Void> asyncCallback);
 

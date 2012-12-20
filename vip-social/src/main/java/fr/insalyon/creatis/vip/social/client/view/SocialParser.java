@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -40,7 +40,7 @@ import fr.insalyon.creatis.vip.social.client.SocialConstants;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class SocialParser extends ApplicationParser {
 
@@ -51,7 +51,7 @@ public class SocialParser extends ApplicationParser {
     }
 
     @Override
-    public boolean parse(String applicationName) {
+    public boolean parse(String applicationName, String applicationVersion) {
         
         if (applicationName.equals(SocialConstants.APP_SOCIAL)) {
             Layout.getInstance().addTab(new SocialTab());

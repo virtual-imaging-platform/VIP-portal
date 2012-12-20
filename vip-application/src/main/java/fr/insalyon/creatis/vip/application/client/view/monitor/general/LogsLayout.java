@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -45,7 +45,7 @@ import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class LogsLayout extends AbstractFormLayout {
 
@@ -90,8 +90,8 @@ public class LogsLayout extends AbstractFormLayout {
             }
         });
         tileGrid.setData(new ApplicationTileRecord[]{
-                    new ApplicationTileRecord(ApplicationConstants.APP_SIMULATION_OUT, ApplicationConstants.APP_IMG_SIMULATION_OUT),
-                    new ApplicationTileRecord(ApplicationConstants.APP_SIMULATION_ERROR, ApplicationConstants.APP_IMG_SIMULATION_ERROR)
+                    new ApplicationTileRecord(ApplicationConstants.APP_SIMULATION_OUT, "", ApplicationConstants.APP_IMG_SIMULATION_OUT),
+                    new ApplicationTileRecord(ApplicationConstants.APP_SIMULATION_ERROR, "", ApplicationConstants.APP_IMG_SIMULATION_ERROR)
                 });
         
         this.addMember(tileGrid);

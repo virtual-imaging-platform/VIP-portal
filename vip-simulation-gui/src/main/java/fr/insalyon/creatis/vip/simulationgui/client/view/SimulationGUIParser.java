@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -37,12 +37,11 @@ package fr.insalyon.creatis.vip.simulationgui.client.view;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-
 import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIConstants;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class SimulationGUIParser extends ApplicationParser {
 
@@ -50,15 +49,14 @@ public class SimulationGUIParser extends ApplicationParser {
     public void loadApplications() {
 
         if (CoreModule.user.isSystemAdministrator()
-    //            || CoreModule.user.hasGroupAccess(ModelConstants.GROUP_VIP)
                 || CoreModule.user.hasGroupAccess("Tutorial")) {
-            
+
             addApplication(SimulationGUIConstants.APP_EDITOR, SimulationGUIConstants.APP_IMG_EDITOR);
         }
     }
 
     @Override
-    public boolean parse(String applicationName) {
+    public boolean parse(String applicationName, String applicationVersion) {
 
         if (applicationName.equals(SimulationGUIConstants.APP_EDITOR)) {
             Layout.getInstance().addTab(new SimulationGUITab());

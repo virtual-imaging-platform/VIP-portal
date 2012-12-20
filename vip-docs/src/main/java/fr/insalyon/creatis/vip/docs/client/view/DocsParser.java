@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -39,7 +39,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class DocsParser extends ApplicationParser {
 
@@ -51,8 +51,7 @@ public class DocsParser extends ApplicationParser {
     }
 
     @Override
-    public boolean parse(String applicationName) {
-
+    public boolean parse(String applicationName, String applicationVersion) {
 
         if (applicationName.equals(DocsConstants.APP_DOCUMENTATION)) {
             Layout.getInstance().addTab(new DocumentationTab());

@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -40,7 +40,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public interface ApplicationInputDAO {
 
@@ -58,7 +58,7 @@ public interface ApplicationInputDAO {
 
     public SimulationInput getInputByNameUserApp(String email, String name, String appName) throws DAOException;
 
-    public List<SimulationInput> getSimulationInputExamples() throws DAOException;
+    public List<SimulationInput> getSimulationInputExamples(String applicationName) throws DAOException;
 
     public void removeSimulationInputExample(String inputName, String application) throws DAOException;
 }

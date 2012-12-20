@@ -67,9 +67,9 @@ public interface WorkflowService extends RemoteService {
     public List<Simulation> getSimulations(Date lastDate) throws ApplicationException;
 
     //
-    public Descriptor getApplicationDescriptor(String applicationName) throws ApplicationException;
+    public Descriptor getApplicationDescriptor(String applicationName, String applicationVersion) throws ApplicationException;
 
-    public void launchSimulation(Map<String, String> parameters, String applicationName, String simulationName) throws ApplicationException;
+    public void launchSimulation(Map<String, String> parameters, String applicationName, String applicationVersion, String simulationName) throws ApplicationException;
 
     public SimulationInput getInputByNameUserApp(String inputName, String appName) throws ApplicationException;
 
@@ -85,7 +85,7 @@ public interface WorkflowService extends RemoteService {
 
     public void saveInputsAsExamples(SimulationInput simulationInput) throws ApplicationException;
 
-    public List<SimulationInput> getSimulationInputExamples() throws ApplicationException;
+    public List<SimulationInput> getSimulationInputExamples(String applicationName) throws ApplicationException;
 
     public void removeSimulationInputExample(String inputName, String applicationName) throws ApplicationException;
 

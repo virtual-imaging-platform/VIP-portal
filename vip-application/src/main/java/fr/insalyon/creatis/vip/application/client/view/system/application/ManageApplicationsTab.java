@@ -46,26 +46,46 @@ public class ManageApplicationsTab extends AbstractManageTab {
 
     private ApplicationsLayout appsLayout;
     private EditApplicationLayout editLayout;
+    private VersionsLayout versionsLayout;
+    private EditVersionLayout editVersionLayout;
 
     public ManageApplicationsTab() {
 
         super(ApplicationConstants.ICON_APPLICATION, ApplicationConstants.APP_APPLICATION, ApplicationConstants.TAB_MANAGE_APPLICATION);
-        
+               
         appsLayout = new ApplicationsLayout();
         editLayout = new EditApplicationLayout();
         
-        HLayout hLayout = new HLayout(5);
-        hLayout.addMember(appsLayout);
-        hLayout.addMember(editLayout);
+        HLayout appLayout = new HLayout(5);
+        appLayout.setHeight("50%");
+        appLayout.addMember(appsLayout);
+        appLayout.addMember(editLayout);
+        vLayout.addMember(appLayout);
         
-        vLayout.addMember(hLayout);
+        versionsLayout = new VersionsLayout();
+        editVersionLayout = new EditVersionLayout();
+        
+        HLayout versionLayout = new HLayout(5);
+        versionLayout.setHeight("50%");
+        versionLayout.addMember(versionsLayout);
+        versionLayout.addMember(editVersionLayout);
+        vLayout.addMember(versionLayout);
     }
     
     public void loadApplications() {
         appsLayout.loadData();
     }
+    
+    public void loadVersions(String applicationName) {
+        versionsLayout.setApplication(applicationName);
+        editVersionLayout.setApplication(applicationName);
+    }
 
-    public void setApplication(String name, String lfn, String classes, String citation) {
-        editLayout.setApplication(name, lfn, classes, citation);
+    public void setApplication(String name, String classes, String citation) {
+        editLayout.setApplication(name, classes, citation);
+    }
+    
+    public void setVersion(String version, String lfn, boolean isVisible) {
+        editVersionLayout.setVersion(version, lfn, isVisible);
     }
 }

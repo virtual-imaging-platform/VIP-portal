@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -35,11 +35,8 @@
 package fr.insalyon.creatis.vip.application.client.view;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
-import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -48,12 +45,12 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ApplicationTileGrid extends ApplicationsTileGrid {
 
     private List<String> applicationNames;
-    
+
     public ApplicationTileGrid(String className) {
 
         super(className);
@@ -62,32 +59,31 @@ public class ApplicationTileGrid extends ApplicationsTileGrid {
     }
 
     @Override
-    public void parse(String applicationName) {
-        
-        if (applicationNames.contains(applicationName)) {
-            Layout.getInstance().addTab(new LaunchTab(applicationName));
+    public void parse(String applicationName, String applicationVersion) {
+
+        String appName = applicationVersion == null ? applicationName : applicationName + " " + applicationVersion;
+        if (applicationNames.contains(appName)) {
+            Layout.getInstance().addTab(new LaunchTab(applicationName, applicationVersion));
         }
     }
 
     private void loadApplications(String className) {
 
-        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
-        final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
-
+        final AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
             @Override
             public void onFailure(Throwable caught) {
-                SC.say("Unable to load applications:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to load applications:<br />" + caught.getMessage());
             }
 
             @Override
-            public void onSuccess(List<Application> result) {
+            public void onSuccess(List<String[]> result) {
 
-                for (Application app : result) {
-                    addApplication(app.getName(), ApplicationConstants.APP_IMG_APPLICATION);
-                    applicationNames.add(app.getName());
+                for (String[] app : result) {
+                    addApplication(app[0], app[1], ApplicationConstants.APP_IMG_APPLICATION);
+                    applicationNames.add(app[0] + " " + app[1]);
                 }
             }
         };
-        service.getApplications(className, callback);
+        ApplicationService.Util.getInstance().getApplications(className, callback);
     }
 }

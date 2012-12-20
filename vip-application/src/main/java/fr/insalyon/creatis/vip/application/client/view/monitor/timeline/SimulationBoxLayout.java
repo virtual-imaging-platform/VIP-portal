@@ -71,6 +71,7 @@ public class SimulationBoxLayout extends HLayout {
     protected String simulationID;
     protected String simulationName;
     protected String applicationName;
+    protected String applicationVersion;
     protected SimulationStatus simulationStatus;
     protected Date launchedDate;
     private Img img;
@@ -81,12 +82,14 @@ public class SimulationBoxLayout extends HLayout {
     protected HandlerRegistration handler;
 
     public SimulationBoxLayout(String id, String name, String applicationName,
-            String user, String status, Date launchedDate) {
+            String applicationVersion, String user, SimulationStatus status,
+            Date launchedDate) {
 
         this.simulationID = id;
         this.simulationName = name;
         this.applicationName = applicationName;
-        this.simulationStatus = SimulationStatus.valueOf(status);
+        this.applicationVersion = applicationVersion;
+        this.simulationStatus = status;
         this.launchedDate = launchedDate;
 
         this.setMembersMargin(10);
@@ -115,7 +118,9 @@ public class SimulationBoxLayout extends HLayout {
         mainLayout.setCursor(Cursor.HAND);
         nameLabel = WidgetUtil.getLabel("<b>" + simulationName + "</b>", 12, Cursor.HAND);
         mainLayout.addMember(nameLabel);
-        mainLayout.addMember(WidgetUtil.getLabel(applicationName, 12, Cursor.HAND));
+        mainLayout.addMember(WidgetUtil.getLabel(
+                applicationVersion == null ? applicationName : applicationName + " " + applicationVersion,
+                12, Cursor.HAND));
         StringBuilder sb = new StringBuilder();
         sb.append("<font color=\"#333333\">").append(DateTimeFormat.getFormat("MM/dd/yyyy HH:mm").format(launchedDate)).append("</font>");
         if (CoreModule.user.isSystemAdministrator()) {
@@ -194,7 +199,7 @@ public class SimulationBoxLayout extends HLayout {
             @Override
             public void onSuccess(Simulation result) {
 
-                SimulationStatus status = SimulationStatus.valueOf(result.getMajorStatus());
+                SimulationStatus status = result.getStatus();
                 if (status != simulationStatus) {
                     simulationStatus = status;
                     parseStatus();
@@ -319,7 +324,7 @@ public class SimulationBoxLayout extends HLayout {
                 setLoading(false, null);
                 Tab tab = Layout.getInstance().getTab(ApplicationConstants.getLaunchTabID(applicationName));
                 if (tab == null) {
-                    LaunchTab launchTab = new LaunchTab(applicationName, simulationName, result);
+                    LaunchTab launchTab = new LaunchTab(applicationName, applicationVersion, simulationName, result);
                     Layout.getInstance().addTab(launchTab);
                 } else {
                     ((LaunchTab) tab).loadInput(simulationName, result);
@@ -342,10 +347,10 @@ public class SimulationBoxLayout extends HLayout {
         }
     }
 
-    public void updateStatus(String status) {
+    public void updateStatus(SimulationStatus status) {
 
-        if (SimulationStatus.valueOf(status) != simulationStatus) {
-            simulationStatus = SimulationStatus.valueOf(status);
+        if (status != simulationStatus) {
+            simulationStatus = status;
             parseStatus();
         }
     }

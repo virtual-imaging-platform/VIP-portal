@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -44,7 +44,7 @@ import fr.insalyon.creatis.vip.datamanager.client.view.system.zombie.ManageZombi
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class DataManagerSystemParser extends ApplicationParser {
 
@@ -59,7 +59,7 @@ public class DataManagerSystemParser extends ApplicationParser {
     }
 
     @Override
-    public boolean parse(String applicationName) {
+    public boolean parse(String applicationName, String applicationVersion) {
 
         if (applicationName.equals(DataManagerConstants.APP_OPERATIONS)) {
             Layout.getInstance().addTab(new ManageOperationsTab());

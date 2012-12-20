@@ -10,16 +10,16 @@
     <properties>
         <vip.core.version>0.9.1</vip.core.version>
         <vip.portal.version>0.9.1</vip.portal.version>
-        <vip.docs.version>0.9</vip.docs.version>
+        <vip.docs.version>0.9.1</vip.docs.version>
         <vip.application.version>0.9.1</vip.application.version>
-        <vip.datamanager.version>0.8.7</vip.datamanager.version>
+        <vip.datamanager.version>0.9.1</vip.datamanager.version>
         <vip.datamanager-applet.version>0.3.1</vip.datamanager-applet.version>
         <vip.gatelab.version>0.9.1</vip.gatelab.version>
         <vip.gatelab-applet.version>0.3.1</vip.gatelab-applet.version>
-        <vip.simulation-gui.version>0.4</vip.simulation-gui.version>
-        <vip.models.version>0.9</vip.models.version>
-        <vip.simulated-data.version>0.3</vip.simulated-data.version>
-        <vip.social.version>0.3.5</vip.social.version>
+        <vip.simulation-gui.version>0.4.1</vip.simulation-gui.version>
+        <vip.models.version>0.9.1</vip.models.version>
+        <vip.simulated-data.version>0.3.1</vip.simulated-data.version>
+        <vip.social.version>0.3.6</vip.social.version>
         <vip.provenance.version>0.1.2</vip.provenance.version>
         <vip.physical-properties.version>0.1</vip.physical-properties.version>
     </properties>

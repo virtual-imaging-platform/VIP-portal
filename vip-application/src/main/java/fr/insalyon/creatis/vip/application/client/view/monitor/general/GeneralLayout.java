@@ -88,7 +88,9 @@ public class GeneralLayout extends AbstractFormLayout {
                 
                 StringBuilder sb = new StringBuilder();
                 sb.append("<font color=\"#333333\"><b>");
-                sb.append(result.getApplication());
+                sb.append(result.getApplicationName());
+                sb.append(" ");
+                sb.append(result.getApplicationVersion());
                 sb.append("</b> launched on <b>");
                 sb.append(result.getDate().toString());
                 sb.append("</b>");

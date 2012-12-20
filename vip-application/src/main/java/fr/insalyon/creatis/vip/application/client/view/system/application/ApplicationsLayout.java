@@ -47,6 +47,8 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.widgets.grid.events.CellClickEvent;
+import com.smartgwt.client.widgets.grid.events.CellClickHandler;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -54,10 +56,12 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
-import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.common.LabelButton;
+import fr.insalyon.creatis.vip.core.client.view.common.ToolstripLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,13 +82,42 @@ public class ApplicationsLayout extends VLayout {
         this.setHeight100();
         this.setOverflow(Overflow.AUTO);
 
+        configureActions();
         configureGrid();
         modal = new ModalWindow(grid);
 
-        this.addMember(new ApplicationsToolStrip());
-        this.addMember(grid);
-
         loadData();
+    }
+
+    private void configureActions() {
+
+        ToolstripLayout toolstrip = new ToolstripLayout();
+
+        toolstrip.addMember(WidgetUtil.getSpaceLabel(15));
+
+        LabelButton addButton = new LabelButton("Add Application", CoreConstants.ICON_ADD);
+        addButton.setWidth(150);
+        addButton.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
+                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
+                appsTab.setApplication(null, null, null);
+            }
+        });
+        toolstrip.addMember(addButton);
+        
+        LabelButton refreshButton = new LabelButton("Refresh", CoreConstants.ICON_REFRESH);
+        refreshButton.setWidth(150);
+        refreshButton.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                loadData();
+            }
+        });
+        toolstrip.addMember(refreshButton);
+
+        this.addMember(toolstrip);
     }
 
     private void configureGrid() {
@@ -105,7 +138,6 @@ public class ApplicationsLayout extends VLayout {
                         @Override
                         public void onClick(ClickEvent event) {
                             edit(rollOverRecord.getAttribute("name"),
-                                    rollOverRecord.getAttribute("lfn"),
                                     rollOverRecord.getAttribute("classes"),
                                     rollOverRecord.getAttribute("citation"));
                         }
@@ -162,15 +194,23 @@ public class ApplicationsLayout extends VLayout {
             @Override
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 edit(event.getRecord().getAttribute("name"),
-                        event.getRecord().getAttribute("lfn"),
                         event.getRecord().getAttribute("classes"),
                         event.getRecord().getAttribute("citation"));
             }
         });
+        grid.addCellClickHandler(new CellClickHandler() {
+            @Override
+            public void onCellClick(CellClickEvent event) {
+                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
+                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
+                appsTab.loadVersions(event.getRecord().getAttribute("name"));
+            }
+        });
+        this.addMember(grid);
     }
 
     public void loadData() {
-        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+
         final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -191,19 +231,17 @@ public class ApplicationsLayout extends VLayout {
                         }
                         sb.append(className);
                     }
-                    dataList.add(new ApplicationRecord(app.getName(), app.getLfn(),
-                            sb.toString(), app.getCitation()));
+                    dataList.add(new ApplicationRecord(app.getName(), sb.toString(), app.getCitation()));
                 }
                 grid.setData(dataList.toArray(new ApplicationRecord[]{}));
             }
         };
         modal.show("Loading applications...", true);
-        service.getApplications(callback);
+        ApplicationService.Util.getInstance().getApplications(callback);
     }
 
     private void remove(String name) {
 
-        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -219,12 +257,13 @@ public class ApplicationsLayout extends VLayout {
             }
         };
         modal.show("Removing application '" + name + "'...", true);
-        service.remove(name, callback);
+        ApplicationService.Util.getInstance().remove(name, callback);
     }
 
-    private void edit(String name, String lfn, String classes, String citation) {
+    private void edit(String name, String classes, String citation) {
+
         ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                 getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-        appsTab.setApplication(name, lfn, classes, citation);
+        appsTab.setApplication(name, classes, citation);
     }
 }

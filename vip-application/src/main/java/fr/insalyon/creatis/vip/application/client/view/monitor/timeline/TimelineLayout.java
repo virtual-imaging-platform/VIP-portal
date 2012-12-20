@@ -129,7 +129,7 @@ public class TimelineLayout extends VLayout {
                                 SimulationBoxLayout sbl = (SimulationBoxLayout) canvas;
                                 if (sbl.getSimulationID().equals(simulation.getID())) {
                                     exists = true;
-                                    sbl.updateStatus(simulation.getMajorStatus());
+                                    sbl.updateStatus(simulation.getStatus());
                                     break;
                                 } else if (simulation.getDate().before(sbl.getLaunchedDate())) {
                                     position = simulationsLayout.getMemberNumber(canvas) + 1;
@@ -140,9 +140,10 @@ public class TimelineLayout extends VLayout {
                             simulationsLayout.addMember(TimelineParser.getInstance().parse(
                                     simulation.getID(),
                                     simulation.getSimulationName(),
-                                    simulation.getApplication(),
+                                    simulation.getApplicationName(),
+                                    simulation.getApplicationVersion(),
                                     simulation.getUserName(),
-                                    simulation.getMajorStatus(),
+                                    simulation.getStatus(),
                                     simulation.getDate()), position);
                         }
                     }
@@ -172,9 +173,10 @@ public class TimelineLayout extends VLayout {
                         simulationsLayout.addMember(TimelineParser.getInstance().parse(
                                 simulation.getID(),
                                 simulation.getSimulationName(),
-                                simulation.getApplication(),
+                                simulation.getApplicationName(),
+                                simulation.getApplicationVersion(),
                                 simulation.getUserName(),
-                                simulation.getMajorStatus(),
+                                simulation.getStatus(),
                                 simulation.getDate()));
                     }
                     simulationsLayout.addMember(loadMoreLabel);

@@ -34,48 +34,18 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.system.application;
 
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.toolbar.ToolStrip;
-import com.smartgwt.client.widgets.toolbar.ToolStripButton;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class ApplicationsToolStrip extends ToolStrip {
+public class VersionRecord extends ListGridRecord {
 
-    public ApplicationsToolStrip() {
-        
-        this.setWidth100();
+    public VersionRecord(String version, String lfn, boolean isVisible) {
 
-        ToolStripButton addButton = new ToolStripButton("Add Application");
-        addButton.setIcon(CoreConstants.ICON_ADD);
-        addButton.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(ClickEvent event) {
-                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
-                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                appsTab.setApplication(null, null, null, null);
-            }
-        });
-        this.addButton(addButton);
-
-        ToolStripButton refreshButton = new ToolStripButton("Refresh");
-        refreshButton.setIcon(CoreConstants.ICON_REFRESH);
-        refreshButton.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(ClickEvent event) {
-                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
-                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                appsTab.loadApplications();
-            }
-        });
-        this.addButton(refreshButton);
+        setAttribute("version", version);
+        setAttribute("lfn", lfn);
+        setAttribute("visible", isVisible);
     }
 }

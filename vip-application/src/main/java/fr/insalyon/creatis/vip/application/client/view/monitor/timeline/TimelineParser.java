@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor.timeline;
 
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -66,13 +67,13 @@ public class TimelineParser {
     }
 
     public SimulationBoxLayout parse(String id, String name, String applicationName,
-            String user, String status, Date launchedDate) {
+            String applicationVersion, String user, SimulationStatus status, Date launchedDate) {
         
         for (TimelineParserInterface parser : parsers) {
             if (parser.parse(applicationName)) {
-                return parser.getLayout(id, name, applicationName, user, status, launchedDate);
+                return parser.getLayout(id, name, applicationName, applicationVersion, user, status, launchedDate);
             }
         }
-        return new SimulationBoxLayout(id, name, applicationName, user, status, launchedDate);
+        return new SimulationBoxLayout(id, name, applicationName, applicationVersion, user, status, launchedDate);
     }
 }

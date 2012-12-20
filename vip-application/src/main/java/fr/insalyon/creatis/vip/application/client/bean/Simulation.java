@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -35,50 +35,44 @@
 package fr.insalyon.creatis.vip.application.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import java.util.Date;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class Simulation implements IsSerializable {
 
     private String id;
-    private String application;
+    private String applicationName;
+    private String applicationVersion;
     private String simulationName;
     private String userName;
     private Date date;
-    private String majorStatus;
-    private String minorStatus;
+    private SimulationStatus status;
 
     public Simulation() {
     }
 
-    public Simulation(String application, String id, String userName, 
-            Date date, String simulationName, String majorStatus) {
-        
-        this.application = application;
+    public Simulation(String application, String applicationVersion, String id,
+            String userName, Date date, String simulationName, String status) {
+
+        this.applicationName = application;
+        this.applicationVersion = applicationVersion;
         this.id = id;
         this.userName = userName;
         this.date = date;
         this.simulationName = simulationName;
-        this.majorStatus = majorStatus;
+        this.status = SimulationStatus.valueOf(status);
     }
 
-    public Simulation(String application, String id, String userName, 
-            Date date, String majorStatus, String minorStatus, String simulationName) {
-        
-        this.application = application;
-        this.id = id;
-        this.userName = userName;
-        this.date = date;
-        this.majorStatus = majorStatus;
-        this.minorStatus = minorStatus;
-        this.simulationName = simulationName;
+    public String getApplicationName() {
+        return applicationName;
     }
 
-    public String getApplication() {
-        return application;
+    public String getApplicationVersion() {
+        return applicationVersion;
     }
 
     public Date getDate() {
@@ -93,16 +87,12 @@ public class Simulation implements IsSerializable {
         return id;
     }
 
-    public String getMajorStatus() {
-        return majorStatus;
+    public SimulationStatus getStatus() {
+        return status;
     }
 
-    public void setMajorStatus(String majorStatus) {
-        this.majorStatus = majorStatus;
-    }
-
-    public String getMinorStatus() {
-        return minorStatus;
+    public void setStatus(SimulationStatus status) {
+        this.status = status;
     }
 
     public String getSimulationName() {
@@ -111,6 +101,6 @@ public class Simulation implements IsSerializable {
 
     @Override
     public String toString() {
-        return application + "\n" + id + "\n" + userName + "\n" + date;
+        return applicationName + "\n" + id + "\n" + userName + "\n" + date;
     }
 }

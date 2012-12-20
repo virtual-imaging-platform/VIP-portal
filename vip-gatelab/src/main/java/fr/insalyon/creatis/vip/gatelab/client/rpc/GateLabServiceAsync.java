@@ -35,8 +35,6 @@
 package fr.insalyon.creatis.vip.gatelab.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -44,9 +42,7 @@ import java.util.Map;
  * @author Rafael Ferreira da Silva, Ibrahim Kallel
  */
 public interface GateLabServiceAsync {
-
-    public void getApplications(AsyncCallback<List<Application>> asyncCallback);
-    
+   
     public void getGatelabWorkflowInputs(String workflowID, AsyncCallback<Map<String, String>> asyncCallback);
 
     public void getNumberParticles(String workflowID, AsyncCallback<java.lang.Long> asyncCallback);

@@ -32,16 +32,18 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.launch;
+package fr.insalyon.creatis.vip.application.client.view.system.application;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ExpansionMode;
+import com.smartgwt.client.types.ListGridFieldType;
+import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.ImgButton;
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -50,13 +52,16 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
-import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
-import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.common.LabelButton;
+import fr.insalyon.creatis.vip.core.client.view.common.ToolstripLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,33 +69,63 @@ import java.util.List;
  *
  * @author Rafael Ferreira da Silva
  */
-public class SavedInputsLayout extends AbstractInputsLayout {
+public class VersionsLayout extends VLayout {
 
+    private String applicationName;
+    private Label applicationLabel;
+    private ModalWindow modal;
     private ListGrid grid;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
 
-    public SavedInputsLayout(String tabID, String applicationName) {
+    public VersionsLayout() {
 
-        super(tabID, applicationName, "Saved Inputs", CoreConstants.ICON_SAVED);
+        this.setWidth100();
+        this.setHeight100();
+        this.setOverflow(Overflow.AUTO);
 
+        configureActions();
         configureGrid();
         modal = new ModalWindow(grid);
-        this.addMember(grid);
+    }
 
-        loadData();
+    private void configureActions() {
+
+        ToolstripLayout toolstrip = new ToolstripLayout();
+
+        applicationLabel = WidgetUtil.getLabel("", 24);
+        applicationLabel.setWidth(250);
+        toolstrip.addMember(applicationLabel);
+        toolstrip.addMember(WidgetUtil.getSpaceLabel(15));
+
+        LabelButton addButton = new LabelButton("Add Version", CoreConstants.ICON_ADD);
+        addButton.setWidth(150);
+        addButton.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
+                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
+                appsTab.setVersion(null, null, true);
+            }
+        });
+        toolstrip.addMember(addButton);
+
+        LabelButton refreshButton = new LabelButton("Refresh", CoreConstants.ICON_REFRESH);
+        refreshButton.setWidth(150);
+        refreshButton.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                loadData();
+            }
+        });
+        toolstrip.addMember(refreshButton);
+
+        this.addMember(toolstrip);
     }
 
     private void configureGrid() {
 
         grid = new ListGrid() {
-            @Override
-            protected Canvas getExpansionComponent(ListGridRecord record) {
-                Canvas canvas = super.getExpansionComponent(record);
-                canvas.setMargin(5);
-                return canvas;
-            }
-
             @Override
             protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
                 rollOverRecord = this.getRecord(rowNum);
@@ -101,33 +136,31 @@ public class SavedInputsLayout extends AbstractInputsLayout {
                     rollOverCanvas.setWidth(50);
                     rollOverCanvas.setHeight(22);
 
-                    ImgButton loadImg = getImgButton("icon-load.png", "Load Input");
+                    ImgButton loadImg = getImgButton(CoreConstants.ICON_EDIT, "Edit");
                     loadImg.addClickHandler(new ClickHandler() {
                         @Override
                         public void onClick(ClickEvent event) {
-                            String values = rollOverRecord.getAttribute("values");
-                            AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().getTab(tabID);
-                            launchTab.loadInput(rollOverRecord.getAttribute("name"), values);
+                            edit(rollOverRecord.getAttribute("version"),
+                                    rollOverRecord.getAttribute("lfn"),
+                                    rollOverRecord.getAttributeAsBoolean("visible"));
                         }
                     });
-
                     ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
                     deleteImg.addClickHandler(new ClickHandler() {
                         @Override
                         public void onClick(ClickEvent event) {
-                            final String name = rollOverRecord.getAttribute("name");
-                            final String applicationName = rollOverRecord.getAttribute("application");
-                            SC.confirm("Do you really want to remove the entry \"" + name + "\"?", new BooleanCallback() {
+                            final String version = rollOverRecord.getAttribute("version");
+                            SC.ask("Do you really want to remove the application version \""
+                                    + version + "\"?", new BooleanCallback() {
                                 @Override
                                 public void execute(Boolean value) {
-                                    if (value != null && value) {
-                                        remove(name, applicationName);
+                                    if (value) {
+                                        remove(version);
                                     }
                                 }
                             });
                         }
                     });
-
                     rollOverCanvas.addMember(loadImg);
                     rollOverCanvas.addMember(deleteImg);
                 }
@@ -146,95 +179,104 @@ public class SavedInputsLayout extends AbstractInputsLayout {
                 return button;
             }
         };
-
         grid.setWidth100();
         grid.setHeight100();
-        grid.setCanExpandRecords(true);
-        grid.setExpansionMode(ExpansionMode.DETAIL_FIELD);
         grid.setShowRollOverCanvas(true);
         grid.setShowAllRecords(false);
         grid.setShowEmptyMessage(true);
+        grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
-
-        ListGridField applicationField = new ListGridField("application", "Application");
-        ListGridField nameField = new ListGridField("name", "Name");
-
-        grid.setFields(applicationField, nameField);
-        grid.setDetailField("values");
-        grid.setSortField("application");
+        
+        ListGridField isVisibleField = new ListGridField("visible", "Visible");
+        isVisibleField.setType(ListGridFieldType.BOOLEAN);
+        
+        grid.setFields(
+                isVisibleField,
+                new ListGridField("version", "Version"),
+                new ListGridField("lfn", "LFN"));
+        grid.setSortField("version");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
             @Override
             public void onCellDoubleClick(CellDoubleClickEvent event) {
-                grid.expandRecord(event.getRecord());
+                edit(event.getRecord().getAttribute("version"),
+                        event.getRecord().getAttribute("lfn"),
+                        event.getRecord().getAttributeAsBoolean("visible"));
             }
         });
+
+        this.addMember(grid);
     }
 
-    @Override
     public void loadData() {
 
-        AsyncCallback<List<SimulationInput>> callback = new AsyncCallback<List<SimulationInput>>() {
+        final AsyncCallback<List<AppVersion>> callback = new AsyncCallback<List<AppVersion>>() {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to get simulations inputs:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get list of applications:<br />" + caught.getMessage());
             }
 
             @Override
-            public void onSuccess(List<SimulationInput> result) {
-
-                List<InputRecord> dataList = new ArrayList<InputRecord>();
-
-                for (SimulationInput wi : result) {
-                    String[] inputs = wi.getInputs().split("--");
-                    StringBuilder values = new StringBuilder();
-
-                    for (String in : inputs) {
-
-                        if (!in.contains(ApplicationConstants.SEPARATOR_INPUT)) {
-                            in = in.replace("=", " = ");
-                        } else {
-                            in = in.replace("=", " = Start: ");
-                        }
-                        in = in.replace(ApplicationConstants.SEPARATOR_LIST, "; ");
-                        in = in.replaceFirst(ApplicationConstants.SEPARATOR_INPUT, " - Stop: ");
-                        in = in.replaceFirst(ApplicationConstants.SEPARATOR_INPUT, " - Step: ");
-                        values.append(in);
-                        values.append("<br />");
-                    }
-                    dataList.add(new InputRecord(wi.getApplication(),
-                            wi.getName(), values.toString()));
-                }
-                grid.setData(dataList.toArray(new InputRecord[]{}));
+            public void onSuccess(List<AppVersion> result) {
                 modal.hide();
+                List<VersionRecord> dataList = new ArrayList<VersionRecord>();
+
+                for (AppVersion version : result) {
+                    dataList.add(new VersionRecord(version.getVersion(), version.getLfn(), version.isVisible()));
+                }
+                grid.setData(dataList.toArray(new VersionRecord[]{}));
             }
         };
-        modal.show("Loading inputs...", true);
-        WorkflowService.Util.getInstance().getSimulationInputByUser(callback);
+        modal.show("Loading versions...", true);
+        ApplicationService.Util.getInstance().getVersions(applicationName, callback);
     }
 
     /**
-     * 
-     * @param name
-     * @param applicationName 
+     *
+     * @param applicationName
      */
-    private void remove(String name, String applicationName) {
+    public void setApplication(String applicationName) {
 
-        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+        this.applicationName = applicationName;
+        this.applicationLabel.setContents("<b>Application:</b> " + applicationName);
+        loadData();
+    }
+
+    /**
+     *
+     * @param version
+     * @param lfn
+     * @param isVisible
+     */
+    private void edit(String version, String lfn, boolean isVisible) {
+
+        ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
+                getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
+        appsTab.setVersion(version, lfn, isVisible);
+    }
+
+    /**
+     *
+     * @param version
+     */
+    private void remove(String version) {
+
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to remove simulation input:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to remove version:<br />" + caught.getMessage());
             }
 
             @Override
-            public void onSuccess(Void v) {
+            public void onSuccess(Void result) {
                 modal.hide();
+                Layout.getInstance().setNoticeMessage("The version was successfully removed!");
                 loadData();
             }
         };
-        modal.show("Removing simulation input...", true);
-        WorkflowService.Util.getInstance().removeSimulationInput(name, applicationName, callback);
+        modal.show("Removing version '" + version + "'...", true);
+        ApplicationService.Util.getInstance().removeVersion(applicationName, version, callback);
     }
 }

@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.gatelab.client.view.monitor;
 
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.SimulationBoxLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.Date;
@@ -47,9 +48,9 @@ import java.util.Date;
 public class GateLabSimulationBoxLayout extends SimulationBoxLayout {
 
     public GateLabSimulationBoxLayout(String id, String name, String applicationName,
-            String user, String status, Date date) {
+            String applicationVersion, String user, SimulationStatus status, Date date) {
 
-        super(id, name, applicationName, user, status, date);
+        super(id, name, applicationName, applicationVersion, user, status, date);
 
         handler.removeHandler();
         mainLayout.addClickHandler(new ClickHandler() {

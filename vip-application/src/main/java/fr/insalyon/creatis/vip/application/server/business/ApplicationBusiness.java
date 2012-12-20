@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.server.business;
 
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -48,10 +49,10 @@ import java.util.List;
 public class ApplicationBusiness {
 
     /**
-     * 
+     *
      * @param applicationName
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public Application getApplication(String applicationName) throws BusinessException {
 
@@ -64,9 +65,8 @@ public class ApplicationBusiness {
     }
 
     /**
-     * 
-     * @return
-     * @throws BusinessException 
+     *
+     * @return @throws BusinessException
      */
     public List<Application> getApplications() throws BusinessException {
 
@@ -79,26 +79,26 @@ public class ApplicationBusiness {
     }
 
     /**
-     * 
+     *
      * @param className
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
-    public List<Application> getApplications(String className) throws BusinessException {
-        
+    public List<String[]> getApplications(String className) throws BusinessException {
+
         try {
             return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getApplications(className);
-            
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
-     * 
+     *
      * @param classes
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public List<Application> getApplications(List<String> classes) throws BusinessException {
 
@@ -111,9 +111,8 @@ public class ApplicationBusiness {
     }
 
     /**
-     * 
-     * @return
-     * @throws BusinessException 
+     *
+     * @return @throws BusinessException
      */
     public List<String> getApplicationNames() throws BusinessException {
 
@@ -126,10 +125,10 @@ public class ApplicationBusiness {
     }
 
     /**
-     * 
+     *
      * @param classes
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public List<String> getApplicationNames(List<String> classes) throws BusinessException {
 
@@ -142,9 +141,9 @@ public class ApplicationBusiness {
     }
 
     /**
-     * 
+     *
      * @param application
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void add(Application application) throws BusinessException {
 
@@ -157,9 +156,9 @@ public class ApplicationBusiness {
     }
 
     /**
-     * 
+     *
      * @param application
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void update(Application application) throws BusinessException {
 
@@ -172,9 +171,9 @@ public class ApplicationBusiness {
     }
 
     /**
-     * 
+     *
      * @param name
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void remove(String name) throws BusinessException {
 
@@ -186,10 +185,10 @@ public class ApplicationBusiness {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param name
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void remove(String email, String name) throws BusinessException {
 
@@ -199,17 +198,77 @@ public class ApplicationBusiness {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
      * 
-     * @param name
-     * @return
+     * @param version
      * @throws BusinessException 
      */
+    public void addVersion(AppVersion version) throws BusinessException {
+
+        try {
+            ApplicationDAOFactory.getDAOFactory().getApplicationDAO().addVersion(version);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param version
+     * @throws BusinessException 
+     */
+    public void updateVersion(AppVersion version) throws BusinessException {
+
+        try {
+            ApplicationDAOFactory.getDAOFactory().getApplicationDAO().updateVersion(version);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @param applicationName
+     * @param version
+     * @throws BusinessException 
+     */
+    public void removeVersion(String applicationName, String version) throws BusinessException {
+
+        try {
+            ApplicationDAOFactory.getDAOFactory().getApplicationDAO().removeVersion(applicationName, version);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param name
+     * @return
+     * @throws BusinessException
+     */
     public String getCitation(String name) throws BusinessException {
-        
+
         try {
             return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getCitation(name);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param applicationName
+     * @return
+     * @throws BusinessException
+     */
+    public List<AppVersion> getVersions(String applicationName) throws BusinessException {
+
+        try {
+            return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getVersions(applicationName);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

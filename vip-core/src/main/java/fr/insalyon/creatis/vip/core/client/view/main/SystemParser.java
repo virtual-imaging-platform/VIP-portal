@@ -59,7 +59,7 @@ public class SystemParser extends ApplicationParser {
     }
 
     @Override
-    public boolean parse(String applicationName) {
+    public boolean parse(String applicationName, String applicationVersion) {
         
         if (applicationName.equals(CoreConstants.APP_USER)) {
             Layout.getInstance().addTab(new ManageUsersTab());

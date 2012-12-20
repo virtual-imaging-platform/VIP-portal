@@ -181,7 +181,7 @@ public class ApplicationInputData implements ApplicationInputDAO {
     @Override
     public List<SimulationInput> getWorkflowInputByUserAndAppName(String user,
             String appName) throws DAOException {
-        
+
         try {
             List<SimulationInput> inputs = new ArrayList<SimulationInput>();
             PreparedStatement ps = connection.prepareStatement("SELECT "
@@ -233,12 +233,12 @@ public class ApplicationInputData implements ApplicationInputDAO {
             ps.setString(3, appName);
             ResultSet rs = ps.executeQuery();
             rs.next();
-            
+
             SimulationInput simulationInput = new SimulationInput(
                     rs.getString("application"),
                     rs.getString("name"),
                     rs.getString("inputs"));
-            
+
             ps.close();
             return simulationInput;
 
@@ -280,18 +280,21 @@ public class ApplicationInputData implements ApplicationInputDAO {
 
     /**
      *
-     * @return 
+     * @param applicationName
+     * @return
      * @throws DAOException
      */
     @Override
-    public List<SimulationInput> getSimulationInputExamples() throws DAOException {
+    public List<SimulationInput> getSimulationInputExamples(String applicationName) throws DAOException {
 
         try {
 
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "application, name, inputs "
                     + "FROM VIPAppExamples "
+                    + "WHERE application = ?"
                     + "ORDER BY application, name");
+            ps.setString(1, applicationName);
 
             ResultSet rs = ps.executeQuery();
             List<SimulationInput> inputs = new ArrayList<SimulationInput>();

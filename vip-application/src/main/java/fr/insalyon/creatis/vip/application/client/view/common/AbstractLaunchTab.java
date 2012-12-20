@@ -64,6 +64,7 @@ public abstract class AbstractLaunchTab extends Tab {
 
     protected HLayout layout;
     protected String applicationName;
+    protected String applicationVersion;
     protected ModalWindow modal;
     protected LaunchFormLayout launchFormLayout;
     protected InputsLayout inputsLayout;
@@ -71,11 +72,13 @@ public abstract class AbstractLaunchTab extends Tab {
     protected IButton saveInputsButton;
     protected IButton saveAsExampleButton;
 
-    public AbstractLaunchTab(String applicationName) {
+    public AbstractLaunchTab(String applicationName, String applicationVersion) {
 
         this.applicationName = applicationName;
+        this.applicationVersion = applicationVersion;
+        
         this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_APPLICATION) + " "
-                + applicationName);
+                + applicationName + " " + applicationVersion);
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
         this.setID(ApplicationConstants.getLaunchTabID(applicationName));
@@ -152,7 +155,7 @@ public abstract class AbstractLaunchTab extends Tab {
      */
     protected void configureInputsLayout(boolean showExamples) {
 
-        inputsLayout = new InputsLayout(getAttribute("ID"), showExamples);
+        inputsLayout = new InputsLayout(getAttribute("ID"), applicationName, showExamples);
         layout.addMember(inputsLayout);
     }
 

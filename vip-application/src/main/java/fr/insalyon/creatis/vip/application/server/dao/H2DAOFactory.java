@@ -35,6 +35,9 @@
 package fr.insalyon.creatis.vip.application.server.dao;
 
 import fr.insalyon.creatis.vip.application.server.dao.h2.*;
+import fr.insalyon.creatis.vip.application.server.dao.mysql.ApplicationData;
+import fr.insalyon.creatis.vip.application.server.dao.mysql.ApplicationInputData;
+import fr.insalyon.creatis.vip.application.server.dao.mysql.ClassData;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.h2.PlatformConnection;
 import org.apache.log4j.Logger;

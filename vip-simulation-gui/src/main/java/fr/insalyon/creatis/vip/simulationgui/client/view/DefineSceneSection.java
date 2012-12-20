@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -34,7 +34,6 @@
  */
 package fr.insalyon.creatis.vip.simulationgui.client.view;
 
-import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.types.Side;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.ImgButton;
@@ -48,23 +47,24 @@ import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangeHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.PortalLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.layout.PortalLayout;
-import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.Camera;
-import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.Scene;
+import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIConstants;
+import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.Camera;
+import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.Scene;
 
 /**
  *
- * @author Kevin Moulin, Rafael Silva
+ * @author Kevin Moulin, Rafael Ferreira da Silva
  */
 public class DefineSceneSection extends SectionStackSection {
 
-    private int compteur = 2;
-    static public Scene sceneDraw = Scene.getInstance();
+    public static Scene sceneDraw = Scene.getInstance();
+    private int counter = 2;
     private SimulationGUIControlBox boxUs;
     private SimulationGUIControlBox boxMri;
     private SimulationGUIControlBox boxCt;
@@ -197,7 +197,7 @@ public class DefineSceneSection extends SectionStackSection {
     private void initControls() {
 
         checkBoxPet.addChangeHandler(new ChangeHandler() {
-
+            @Override
             public void onChange(ChangeEvent event) {
                 if (checkBoxPet.getValueAsBoolean()) {
                     hideBox(boxPet);
@@ -207,7 +207,7 @@ public class DefineSceneSection extends SectionStackSection {
             }
         });
         checkBoxUs.addChangeHandler(new ChangeHandler() {
-
+            @Override
             public void onChange(ChangeEvent event) {
                 if (checkBoxUs.getValueAsBoolean()) {
                     hideBox(boxUs);
@@ -216,9 +216,9 @@ public class DefineSceneSection extends SectionStackSection {
                 }
             }
         });
-        
-        checkBoxMri.addChangeHandler(new ChangeHandler() {
 
+        checkBoxMri.addChangeHandler(new ChangeHandler() {
+            @Override
             public void onChange(ChangeEvent event) {
                 if (checkBoxMri.getValueAsBoolean()) {
                     hideBox(boxMri);
@@ -228,7 +228,7 @@ public class DefineSceneSection extends SectionStackSection {
             }
         });
         checkBoxCt.addChangeHandler(new ChangeHandler() {
-
+            @Override
             public void onChange(ChangeEvent event) {
                 if (checkBoxCt.getValueAsBoolean()) {
                     hideBox(boxCt);
@@ -239,7 +239,7 @@ public class DefineSceneSection extends SectionStackSection {
         });
 
         checkBoxModel.addChangeHandler(new ChangeHandler() {
-
+            @Override
             public void onChange(ChangeEvent event) {
                 if (checkBoxModel.getValueAsBoolean()) {
                     hideModelBox();
@@ -250,7 +250,7 @@ public class DefineSceneSection extends SectionStackSection {
             }
         });
         buttonFront.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
+            @Override
             public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
                 Camera.getInstance().setTranslateX(0);
                 Camera.getInstance().setTranslateY(0);
@@ -261,7 +261,7 @@ public class DefineSceneSection extends SectionStackSection {
             }
         });
         buttonBack.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
+            @Override
             public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
                 Camera.getInstance().setTranslateX(0);
                 Camera.getInstance().setTranslateY(0);
@@ -272,7 +272,7 @@ public class DefineSceneSection extends SectionStackSection {
             }
         });
         buttonTop.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
+            @Override
             public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
                 Camera.getInstance().setTranslateX(0);
                 Camera.getInstance().setTranslateY(0);
@@ -283,7 +283,7 @@ public class DefineSceneSection extends SectionStackSection {
             }
         });
         buttonBottom.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
+            @Override
             public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
                 Camera.getInstance().setTranslateX(0);
                 Camera.getInstance().setTranslateY(0);
@@ -294,7 +294,7 @@ public class DefineSceneSection extends SectionStackSection {
             }
         });
         buttonLeft.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
+            @Override
             public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
                 Camera.getInstance().setTranslateX(0);
                 Camera.getInstance().setTranslateY(0);
@@ -305,7 +305,7 @@ public class DefineSceneSection extends SectionStackSection {
             }
         });
         buttonRight.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
-
+            @Override
             public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
                 Camera.getInstance().setTranslateX(0);
                 Camera.getInstance().setTranslateY(0);
@@ -316,153 +316,139 @@ public class DefineSceneSection extends SectionStackSection {
             }
         });
         hSlider1.addValueChangedHandler(new ValueChangedHandler() {
-
+            @Override
             public void onValueChanged(ValueChangedEvent event) {
                 Camera.getInstance().setStepOfViewScroll(event.getValue());
             }
         });
         hSlider2.addValueChangedHandler(new ValueChangedHandler() {
-
+            @Override
             public void onValueChanged(ValueChangedEvent event) {
                 Camera.getInstance().setStepOfViewTranslation(event.getValue());
             }
         });
         ///////////////////Hover ///////////////////////:
-
         buttonFront.setCanHover(Boolean.TRUE);
         buttonFront.addHoverHandler(new HoverHandler() {
-
+            @Override
             public void onHover(HoverEvent event) {
-                String prompt = "Preset of camera";
-                buttonFront.setPrompt(prompt);
+                buttonFront.setPrompt("Preset of camera");
             }
         });
         buttonBack.setCanHover(Boolean.TRUE);
         buttonBack.addHoverHandler(new HoverHandler() {
-
+            @Override
             public void onHover(HoverEvent event) {
-                String prompt = "Preset of camera";
-                buttonBack.setPrompt(prompt);
+                buttonBack.setPrompt("Preset of camera");
             }
         });
         buttonTop.setCanHover(Boolean.TRUE);
         buttonTop.addHoverHandler(new HoverHandler() {
-
+            @Override
             public void onHover(HoverEvent event) {
-                String prompt = "Preset of camera";
-                buttonTop.setPrompt(prompt);
+                buttonTop.setPrompt("Preset of camera");
             }
         });
         buttonBottom.setCanHover(Boolean.TRUE);
         buttonBottom.addHoverHandler(new HoverHandler() {
-
+            @Override
             public void onHover(HoverEvent event) {
-                String prompt = "Preset of camera";
-                buttonBottom.setPrompt(prompt);
+                buttonBottom.setPrompt("Preset of camera");
             }
         });
         buttonLeft.setCanHover(Boolean.TRUE);
         buttonLeft.addHoverHandler(new HoverHandler() {
-
+            @Override
             public void onHover(HoverEvent event) {
-                String prompt = "Preset of camera";
-                buttonLeft.setPrompt(prompt);
+                buttonLeft.setPrompt("Preset of camera");
             }
         });
         buttonRight.setCanHover(Boolean.TRUE);
         buttonRight.addHoverHandler(new HoverHandler() {
-
+            @Override
             public void onHover(HoverEvent event) {
-                String prompt = "Preset of camera";
-                buttonRight.setPrompt(prompt);
+                buttonRight.setPrompt("Preset of camera");
             }
         });
         hSlider1.setCanHover(Boolean.TRUE);
         hSlider1.addHoverHandler(new HoverHandler() {
-
+            @Override
             public void onHover(HoverEvent event) {
-                String prompt = "Set the sensitivity for the mouse scroll";
-                hSlider1.setPrompt(prompt);
+                hSlider1.setPrompt("Set the sensitivity for the mouse scroll");
             }
         });
         hSlider2.setCanHover(Boolean.TRUE);
         hSlider2.addHoverHandler(new HoverHandler() {
-
+            @Override
             public void onHover(HoverEvent event) {
-                String prompt = "Set the sensitivity for the mouse translation (CTRL+click to translate)";
-                hSlider2.setPrompt(prompt);
+                hSlider2.setPrompt("Set the sensitivity for the mouse translation (CTRL+click to translate)");
             }
         });
     }
 
     public void hideModal() {
-
         modal.hide();
     }
 
     public void showModal(String contents) {
-
         modal.show(contents, true);
     }
 
-    
-    
     private void hideModelBox() {
         portalLayout1.removePortlet(boxModel);
-        compteur--;
-
+        counter--;
     }
 
     private void showModelBox() {
-        portalLayout1.addPortlet(boxModel, compteur % 2, 0);
-        compteur++;
+        portalLayout1.addPortlet(boxModel, counter % 2, 0);
+        counter++;
     }
 
     public void disableBox(String box) {
 
-        if (box == "MRI") {
+        if ("MRI".equals(box)) {
             this.checkBoxMri.setValue(false);
             hideBox(boxMri);
-        } else if (box == "PET") {
+        } else if ("PET".equals(box)) {
             this.checkBoxPet.setValue(false);
             hideBox(boxPet);
-        } else if (box == "CT") {
+        } else if ("CT".equals(box)) {
             this.checkBoxCt.setValue(false);
             hideBox(boxCt);
-        } else if (box == "US") {
+        } else if ("US".equals(box)) {
             this.checkBoxUs.setValue(false);
             hideBox(boxUs);
-        } 
+        }
     }
 
-    public void enableBox(String box){
-    
-        if (box == "MRI") {
+    public void enableBox(String box) {
+
+        if ("MRI".equals(box)) {
             this.checkBoxMri.setValue(true);
             showBox(boxMri);
-        } else if (box == "PET") {
+        } else if ("PET".equals(box)) {
             this.checkBoxPet.setValue(true);
             showBox(boxPet);
-        } else if (box == "CT") {
+        } else if ("CT".equals(box)) {
             this.checkBoxCt.setValue(true);
             showBox(boxCt);
-        } else if (box == "US") {
+        } else if ("US".equals(box)) {
             this.checkBoxUs.setValue(true);
             showBox(boxUs);
-        } 
+        }
     }
-    
+
     private void hideBox(SimulationGUIControlBox box) {
         box.disableView();
         sceneDraw.addObject(box.getObjectSimulateur(), 0);
         portalLayout1.removePortlet(box.getControlPortlet());
-        compteur--;
+        counter--;
     }
 
     private void showBox(SimulationGUIControlBox box) {
         box.enableView();
         sceneDraw.addObject(box.getObjectSimulateur(), 0);
-        portalLayout1.addPortlet(box.getControlPortlet(), compteur % 2, 0);
-        compteur++;
+        portalLayout1.addPortlet(box.getControlPortlet(), counter % 2, 0);
+        counter++;
     }
 }

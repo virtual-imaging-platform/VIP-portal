@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor.timeline;
 
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import java.util.Date;
 
 /**
@@ -45,5 +46,5 @@ public interface TimelineParserInterface {
     public boolean parse(String applicationName);
 
     public SimulationBoxLayout getLayout(String id, String name, String applicationName,
-            String user, String status, Date launchedDate);
+            String applicationVersion, String user, SimulationStatus status, Date launchedDate);
 }

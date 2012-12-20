@@ -35,163 +35,129 @@
 package fr.insalyon.creatis.vip.application.client.view.system.application;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.MultipleAppearance;
-import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.RichTextEditor;
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.AppClass;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class EditApplicationLayout extends AbstractFormLayout {
+public class EditVersionLayout extends AbstractFormLayout {
 
-    private boolean newApplication = true;
-    private TextItem nameField;
-    private SelectItem classesPickList;
-    private RichTextEditor richTextEditor;
+    private boolean newVersion;
+    private String applicationName;
+    private Label applicationLabel;
+    private TextItem versionField;
+    private TextItem lfnField;
+    private CheckboxItem isVisibleField;
     private IButton saveButton;
     private IButton removeButton;
 
-    public EditApplicationLayout() {
+    public EditVersionLayout() {
 
         super(480, 200);
-        addTitle("Add/Edit Application", ApplicationConstants.ICON_APPLICATION);
+        addTitle("Add/Edit Version", ApplicationConstants.ICON_APPLICATION);
 
         configure();
-        loadClasses();
     }
 
     private void configure() {
 
-        nameField = FieldUtil.getTextItem(450, null);
-
-        classesPickList = new SelectItem();
-        classesPickList.setShowTitle(false);
-        classesPickList.setMultiple(true);
-        classesPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
-        classesPickList.setWidth(450);
-
-        richTextEditor = new RichTextEditor();
-        richTextEditor.setHeight(200);
-        richTextEditor.setOverflow(Overflow.HIDDEN);
-        richTextEditor.setShowEdges(true);
-        richTextEditor.setControlGroups("styleControls", "editControls",
-                "colorControls", "insertControls");
+        newVersion = true;
+        applicationLabel = WidgetUtil.getLabel("", 15);
+        
+        versionField = FieldUtil.getTextItem(450, null);
+        versionField.setDisabled(true);
+        
+        lfnField = FieldUtil.getTextItem(450, null);
+        lfnField.setDisabled(true);
+        
+        isVisibleField = new CheckboxItem();
+        isVisibleField.setTitle("Visible");
+        isVisibleField.setWidth(450);
+        isVisibleField.setValue(true);
 
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
                     @Override
                     public void onClick(ClickEvent event) {
-                        if (nameField.validate() & classesPickList.validate()) {
+                        if (versionField.validate() & lfnField.validate()) {
 
-                            List<String> values = new ArrayList<String>();
-                            values.addAll(Arrays.asList(classesPickList.getValues()));
-
-                            save(new Application(nameField.getValueAsString().trim(),
-                                    values, richTextEditor.getValue()));
+                            save(new AppVersion(applicationName, versionField.getValueAsString().trim(),
+                                    lfnField.getValueAsString().trim(), isVisibleField.getValueAsBoolean()));
                         }
                     }
                 });
+        saveButton.setDisabled(true);
 
         removeButton = WidgetUtil.getIButton("Remove", CoreConstants.ICON_DELETE,
                 new ClickHandler() {
                     @Override
                     public void onClick(ClickEvent event) {
-                        SC.ask("Do you really want to remove this application?", new BooleanCallback() {
+                        SC.ask("Do you really want to remove this version?", new BooleanCallback() {
                             @Override
                             public void execute(Boolean value) {
                                 if (value) {
-                                    remove(nameField.getValueAsString().trim());
+                                    remove(applicationName, versionField.getValueAsString().trim());
                                 }
                             }
                         });
                     }
                 });
         removeButton.setDisabled(true);
-
-        addField("Name", nameField);
-        addField("Classes", classesPickList);
-        this.addMember(WidgetUtil.getLabel("<b>Citation</b>", 15));
-        this.addMember(richTextEditor);
+        
+        this.addMember(applicationLabel);
+        addField("Version", versionField);
+        addField("LFN", lfnField);
+        this.addMember(FieldUtil.getForm(isVisibleField));
         addButtons(saveButton, removeButton);
     }
-
+    
     /**
-     * Sets an application to edit or creates a blank form.
      * 
-     * @param name Application name
-     * @param classes Application classes
-     * @param citation Application citation
+     * @param version 
      */
-    public void setApplication(String name, String classes, String citation) {
-
-        if (name != null) {
-            this.nameField.setValue(name);
-            this.nameField.setDisabled(true);
-            this.classesPickList.setValues(classes.split(", "));
-            this.richTextEditor.setValue(citation);
-            this.newApplication = false;
-            this.removeButton.setDisabled(false);
-
-        } else {
-            this.nameField.setValue("");
-            this.nameField.setDisabled(false);
-            this.classesPickList.setValues(new String[]{});
-            this.richTextEditor.setValue("");
-            this.newApplication = true;
-            this.removeButton.setDisabled(true);
-        }
-    }
-
-    /**
-     *
-     * @param app
-     */
-    private void save(Application app) {
-
+    private void save(AppVersion version) {
+        
         WidgetUtil.setLoadingIButton(saveButton, "Saving...");
 
-        if (newApplication) {
-            ApplicationService.Util.getInstance().add(app, getCallback("add"));
+        if (newVersion) {
+            ApplicationService.Util.getInstance().addVersion(version, getCallback("add"));
         } else {
-            ApplicationService.Util.getInstance().update(app, getCallback("update"));
+            ApplicationService.Util.getInstance().updateVersion(version, getCallback("update"));
         }
     }
-
+    
     /**
      * Removes an application.
      *
-     * @param name Application name
+     * @param applicationName Application name
+     * @param version Application version
      */
-    private void remove(String name) {
+    private void remove(String applicationName, String version) {
 
         WidgetUtil.setLoadingIButton(removeButton, "Removing...");
-        ApplicationService.Util.getInstance().remove(name, getCallback("remove"));
+        ApplicationService.Util.getInstance().removeVersion(applicationName, version, getCallback("remove"));
     }
-
+    
     /**
-     *
+     * 
      * @param text
-     * @return
+     * @return 
      */
     private AsyncCallback<Void> getCallback(final String text) {
 
@@ -207,34 +173,51 @@ public class EditApplicationLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setApplication(null, null, null);
+                setVersion(null, null, true);
                 ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                tab.loadApplications();
+                tab.loadVersions(applicationName);
             }
         };
     }
-
+    
     /**
-     * Loads classes list
+     * 
+     * @param applicationName 
      */
-    private void loadClasses() {
+    public void setApplication(String applicationName) {
+        
+        this.applicationName = applicationName;
+        this.applicationLabel.setContents("<b>Application:</b> " + applicationName);
+        this.versionField.setDisabled(false);
+        this.lfnField.setDisabled(false);
+        this.saveButton.setDisabled(false);
+    }
+    
+    /**
+     * Sets a version to edit or creates a blank form.
+     * 
+     * @param version
+     * @param lfn 
+     * @param isVisible 
+     */
+    public void setVersion(String version, String lfn, boolean isVisible) {
 
-        final AsyncCallback<List<AppClass>> callback = new AsyncCallback<List<AppClass>>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to get list of classes:<br />" + caught.getMessage());
-            }
+        if (version != null) {
+            this.versionField.setValue(version);
+            this.versionField.setDisabled(true);
+            this.lfnField.setValue(lfn);
+            this.isVisibleField.setValue(isVisible);
+            this.newVersion = false;
+            this.removeButton.setDisabled(false);
 
-            @Override
-            public void onSuccess(List<AppClass> result) {
-                List<String> dataList = new ArrayList<String>();
-                for (AppClass c : result) {
-                    dataList.add(c.getName());
-                }
-                classesPickList.setValueMap(dataList.toArray(new String[]{}));
-            }
-        };
-        ApplicationService.Util.getInstance().getClasses(callback);
+        } else {
+            this.versionField.setValue("");
+            this.versionField.setDisabled(false);
+            this.lfnField.setValue("");
+            this.isVisibleField.setValue(true);
+            this.newVersion = true;
+            this.removeButton.setDisabled(true);
+        }
     }
 }

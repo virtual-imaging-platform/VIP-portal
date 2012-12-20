@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -60,11 +60,9 @@ import java.util.List;
 
 /**
  *
- *  @author Kevin Moulin, Rafael Silva
+ * @author Kevin Moulin, Rafael Ferreira da Silva
  */
 public class SimulationGUITab extends Tab {
-
-   
 
     private ToolStrip toolStrip;
     private DefineSceneSection defineSceneSection;
@@ -83,10 +81,9 @@ public class SimulationGUITab extends Tab {
     int mod_const = 0;
     int mod_lenght = 0;
     private SimulationObjectModel tempModel = null;
-
     private boolean test = true;
     static String modelName;
-    
+
     public SimulationGUITab() {
         init();
     }
@@ -95,7 +92,7 @@ public class SimulationGUITab extends Tab {
         this.modelName = modelName;
         this.modelURI = modelURI;
         init();
-        this.test = test;      
+        this.test = test;
         loadModel(modelURI);
 
 //        for (String mod: modalities)
@@ -129,11 +126,11 @@ public class SimulationGUITab extends Tab {
         VLayout vLayout = new VLayout();
         vLayout.addMember(toolStrip);
         vLayout.addMember(sectionStack);
-          vLayout.setScrollbarSize(20);
+        vLayout.setScrollbarSize(20);
         this.setPane(vLayout);
 
         initControl();
-      
+
 //        SimulationGUIControlBoxModel.getInstance().checkBoxBox();
 
     }
@@ -146,35 +143,34 @@ public class SimulationGUITab extends Tab {
      * Hover
      */
     private void loadModel(String uri) {
-       
+
         defineSceneSection.showModal("Downloading model");
         VTK.rebuildObjectModelFromTripleStore(uri, new AsyncCallback<SimulationObjectModel>() {
-
             public void onSuccess(final SimulationObjectModel result) {
 
-               
+
 
                 modelStorageURL = result.getStorageURL();
                 modelURI = result.getURI();
                 defineSceneSection.showModal("Rendering model");
-               
-                
-                VTK.downloadAndUnzipModel(modelStorageURL, new AsyncCallback<Data3D[][]>() {
 
+
+                VTK.downloadAndUnzipModel(modelStorageURL, new AsyncCallback<Data3D[][]>() {
                     public void onSuccess(Data3D[][] result2) {
                         defineSceneSection.hideModal();
 
-                        if(result2 != null & result2[0].length>2)
+                        if (result2 != null & result2[0].length > 2) {
                             ObjectModel.getInstance().addModel(result2);
+                        }
                         SimulationGUIControlBoxModel.getInstance().setTreeNode(result2);
-                         showModalityBoxes(result);
+                        showModalityBoxes(result);
                     }
 
                     public void onFailure(Throwable caught) {
                         // Show the RPC error message to the user
                         defineSceneSection.hideModal();
                         Layout.getInstance().setWarningMessage("Error during the rendering: " + caught.getMessage());
-                         //refreshLaunchTabValue();
+                        //refreshLaunchTabValue();
                     }
                 });
 
@@ -192,7 +188,6 @@ public class SimulationGUITab extends Tab {
 
         exampleButton.setCanHover(Boolean.TRUE);
         exampleButton.addHoverHandler(new HoverHandler() {
-
             public void onHover(HoverEvent event) {
                 String prompt = "Show a standard model";
                 exampleButton.setPrompt(prompt);
@@ -216,29 +211,37 @@ public class SimulationGUITab extends Tab {
 
     private void showModalityBoxes(SimulationObjectModel model) {
         // in two steps, to avoid redrawing scene
-        if(!SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.IRM))
-          defineSceneSection.disableBox("MRI");
-    
-        if (!SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.PET))
+        if (!SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.IRM)) {
+            defineSceneSection.disableBox("MRI");
+        }
+
+        if (!SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.PET)) {
             defineSceneSection.disableBox("PET");
-            
-        if (!SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.CT)) 
+        }
+
+        if (!SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.CT)) {
             defineSceneSection.disableBox("CT");
-        
-        if (!SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.US)) 
+        }
+
+        if (!SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.US)) {
             defineSceneSection.disableBox("US");
-        
-         if(SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.IRM))
+        }
+
+        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.IRM)) {
             defineSceneSection.enableBox("MRI");
-         if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.PET))
+        }
+        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.PET)) {
             defineSceneSection.enableBox("PET");
-          if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.CT)) 
+        }
+        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.CT)) {
             defineSceneSection.enableBox("CT");
-          if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.US)) 
+        }
+        if (SimulationObjectModelUtil.isReadyForSimulation(model, SimulationObjectModelUtil.Modality.US)) {
             defineSceneSection.enableBox("US");
+        }
     }
-    
-     static String getModelName() {
+
+    static String getModelName() {
         return modelName;
     }
 }

@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -43,7 +43,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ApplicationSystemParser extends ApplicationParser {
 
@@ -59,7 +59,7 @@ public class ApplicationSystemParser extends ApplicationParser {
     }
 
     @Override
-    public boolean parse(String applicationName) {
+    public boolean parse(String applicationName, String applicationVersion) {
 
         if (applicationName.equals(ApplicationConstants.APP_APPLICATION)) {
             Layout.getInstance().addTab(new ManageApplicationsTab());

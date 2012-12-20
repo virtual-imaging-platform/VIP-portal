@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -42,7 +42,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class AbstractManageTab extends Tab {
 
@@ -55,7 +55,7 @@ public class AbstractManageTab extends Tab {
         this.setID(tabID);
         this.setCanClose(true);
 
-        vLayout = new VLayout();
+        vLayout = new VLayout(10);
         vLayout.setWidth100();
         vLayout.setHeight100();
         vLayout.setOverflow(Overflow.AUTO);

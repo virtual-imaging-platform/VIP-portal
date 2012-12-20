@@ -64,14 +64,17 @@ public class SimulationsContextMenu extends Menu {
     private String simulationID;
     private String simulationName;
     private String applicationName;
+    private String applicationVersion;
 
     public SimulationsContextMenu(ModalWindow modal, final String simulationID,
-            final String title, final SimulationStatus status, String applicationName) {
+            final String title, final SimulationStatus status, String applicationName,
+            String applicationVersion) {
 
         this.modal = modal;
         this.simulationID = simulationID;
         this.simulationName = title;
         this.applicationName = applicationName;
+        this.applicationVersion = applicationVersion;
 
         this.setShowShadow(true);
         this.setShadowDepth(10);
@@ -243,7 +246,7 @@ public class SimulationsContextMenu extends Menu {
             @Override
             public void onSuccess(Map<String, String> result) {
                 modal.hide();
-                LaunchTab launchTab = new LaunchTab(applicationName, simulationName, result);
+                LaunchTab launchTab = new LaunchTab(applicationName, applicationVersion, simulationName, result);
                 Layout.getInstance().addTab(launchTab);
             }
         };

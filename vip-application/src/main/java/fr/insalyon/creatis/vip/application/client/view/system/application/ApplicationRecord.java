@@ -42,11 +42,9 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class ApplicationRecord extends ListGridRecord {
 
-    public ApplicationRecord(String name, String lfn, String classes, 
-            String citation) {
-        
+    public ApplicationRecord(String name, String classes, String citation) {
+
         setAttribute("name", name);
-        setAttribute("lfn", lfn);
         setAttribute("classes", classes);
         setAttribute("citation", citation);
     }

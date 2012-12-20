@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -35,7 +35,6 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -47,16 +46,18 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public abstract class AbstractInputsLayout extends VLayout {
 
     protected ModalWindow modal;
     protected String tabID;
+    protected String applicationName;
 
-    public AbstractInputsLayout(String tabID, String title, String icon) {
+    public AbstractInputsLayout(String tabID, String applicationName, String title, String icon) {
 
         this.tabID = tabID;
+        this.applicationName = applicationName;
 
         this.setWidth100();
         this.setHeight100();
@@ -69,18 +70,14 @@ public abstract class AbstractInputsLayout extends VLayout {
         titleLabel.setWidth100();
         titleLabel.setAlign(Alignment.LEFT);
 
-        Label closeLabel = WidgetUtil.getLabel("<font color=\"#B0B0B0\">Close</font>", CoreConstants.ICON_CLOSE, 15, Cursor.HAND);
-        closeLabel.setWidth(50);
-        closeLabel.addClickHandler(new ClickHandler() {
-
+        HLayout titleLayout = new HLayout(5);
+        titleLayout.addMember(titleLabel);
+        titleLayout.addMember(WidgetUtil.getIconLabel(CoreConstants.ICON_CLOSE, "Close", 15, new ClickHandler() {
+            @Override
             public void onClick(ClickEvent event) {
                 destroy();
             }
-        });
-
-        HLayout titleLayout = new HLayout(5);
-        titleLayout.addMember(titleLabel);
-        titleLayout.addMember(closeLabel);
+        }));
         this.addMember(titleLayout);
     }
 

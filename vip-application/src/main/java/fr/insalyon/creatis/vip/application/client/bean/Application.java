@@ -44,28 +44,22 @@ import java.util.List;
 public class Application implements IsSerializable {
 
     private String name;
-    private String lfn;
     private List<String> applicationClasses;
     private String citation;
 
     public Application() {
     }
 
-    public Application(String name, String lfn, String citation) {
+    public Application(String name, String citation) {
 
-        this(name, lfn, null, citation);
+        this(name, null, citation);
     }
 
-    public Application(String name, String lfn, List<String> applicationClasses, String citation) {
+    public Application(String name, List<String> applicationClasses, String citation) {
 
         this.name = name;
-        this.lfn = lfn;
         this.applicationClasses = applicationClasses;
         this.citation = citation;
-    }
-
-    public String getLfn() {
-        return lfn;
     }
 
     public String getName() {

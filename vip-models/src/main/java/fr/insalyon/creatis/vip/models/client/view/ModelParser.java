@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -41,7 +41,7 @@ import fr.insalyon.creatis.vip.models.client.ModelConstants;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ModelParser extends ApplicationParser {
 
@@ -57,7 +57,7 @@ public class ModelParser extends ApplicationParser {
     }
 
     @Override
-    public boolean parse(String applicationName) {
+    public boolean parse(String applicationName, String applicationVersion) {
 
         if (applicationName.equals(ModelConstants.APP_MODEL)) {
             Layout.getInstance().addTab(new ModelListTab());

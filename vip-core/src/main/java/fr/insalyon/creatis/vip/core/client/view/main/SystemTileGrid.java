@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -42,7 +42,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class SystemTileGrid extends ApplicationsTileGrid {
 
@@ -55,10 +55,10 @@ public class SystemTileGrid extends ApplicationsTileGrid {
     }
 
     @Override
-    public void parse(String applicationName) {
+    public void parse(String applicationName, String applicationVersion) {
         
         for (ApplicationParser parser : parsers) {
-            if (parser.parse(applicationName)) {
+            if (parser.parse(applicationName, applicationVersion)) {
                 return;
             }
         }

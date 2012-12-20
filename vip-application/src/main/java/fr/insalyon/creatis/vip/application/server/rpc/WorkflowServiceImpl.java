@@ -101,10 +101,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
     /**
      * Gets a list of recently launched simulations from a date.
-     * 
+     *
      * @param lastDate
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     @Override
     public List<Simulation> getSimulations(Date lastDate) throws ApplicationException {
@@ -125,15 +125,16 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     /**
      *
      * @param applicationName
+     * @param applicationVersion
      * @return
      * @throws ApplicationException
      */
     @Override
-    public Descriptor getApplicationDescriptor(String applicationName) throws ApplicationException {
+    public Descriptor getApplicationDescriptor(String applicationName, String applicationVersion) throws ApplicationException {
 
         try {
-            return workflowBusiness.getApplicationDescriptor(
-                    getSessionUser(), applicationName);
+            return workflowBusiness.getApplicationDescriptor(getSessionUser(),
+                    applicationName, applicationVersion);
 
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
@@ -147,12 +148,14 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      *
      * @param parametersMap Simulation parameters map
      * @param applicationName Application name
+     * @param applicationVersion Application version
      * @param simulationName Simulation name
      * @throws ApplicationException
      */
     @Override
     public void launchSimulation(Map<String, String> parametersMap,
-            String applicationName, String simulationName) throws ApplicationException {
+            String applicationName, String applicationVersion,
+            String simulationName) throws ApplicationException {
 
         try {
             trace(logger, "Launching simulation '" + simulationName + "' (" + applicationName + ").");
@@ -163,10 +166,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
                 groups.add(group.getName());
             }
 
-            String workflowID = workflowBusiness.launch(user, groups,
-                    parametersMap, applicationName, simulationName);
+            String simulationID = workflowBusiness.launch(user, groups, parametersMap,
+                    applicationName, applicationVersion, simulationName);
 
-            trace(logger, "Simulation '" + simulationName + "' launched with ID '" + workflowID + "'.");
+            trace(logger, "Simulation '" + simulationName + "' launched with ID '" + simulationID + "'.");
 
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
@@ -320,12 +323,15 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
     /**
      *
-     * @return @throws ApplicationException
+     * @param applicationName
+     * @return
+     * @throws ApplicationException
      */
-    public List<SimulationInput> getSimulationInputExamples() throws ApplicationException {
+    @Override
+    public List<SimulationInput> getSimulationInputExamples(String applicationName) throws ApplicationException {
 
         try {
-            return inputBusiness.getSimulationInputExamples();
+            return inputBusiness.getSimulationInputExamples(applicationName);
 
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);

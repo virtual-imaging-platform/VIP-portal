@@ -32,46 +32,23 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.server.dao;
+package fr.insalyon.creatis.vip.core.client.view.common;
 
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import java.util.List;
+import com.smartgwt.client.widgets.layout.HLayout;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public interface ApplicationDAO {
+public class ToolstripLayout extends HLayout {
 
-    public void add(Application workflowDescriptor) throws DAOException;
+    public ToolstripLayout() {
 
-    public void update(Application workflowDescriptor) throws DAOException;
-
-    public void remove(String name) throws DAOException;
-    
-    public void remove(String email, String name) throws DAOException;
-    
-    public void addVersion(AppVersion version) throws DAOException;
-
-    public void updateVersion(AppVersion version) throws DAOException;
-
-    public void removeVersion(String applicationName, String version) throws DAOException;
-    
-    public List<Application> getApplications() throws DAOException;
-    
-    public List<String[]> getApplications(String className) throws DAOException;
-    
-    public List<Application> getApplications(List<String> classes) throws DAOException;
-    
-    public List<String> getApplicationsName(String applicationClass) throws DAOException;
-
-    public Application getApplication(String name) throws DAOException;
-    
-    public String getCitation(String name) throws DAOException;
-    
-    public List<AppVersion> getVersions(String name) throws DAOException;
-    
-    public AppVersion getVersion(String applicationName, String applicationVersion) throws DAOException;
+        this.setWidth100();
+        this.setHeight(30);
+        this.setBackgroundColor("#F7F7F7");
+        this.setBorder("1px solid #CCCCCC");
+        this.setPadding(3);
+        this.setMembersMargin(10);
+    }    
 }

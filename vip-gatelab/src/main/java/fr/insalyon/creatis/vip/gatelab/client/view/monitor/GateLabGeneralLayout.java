@@ -133,10 +133,12 @@ public class GateLabGeneralLayout extends AbstractFormLayout {
     private void loadData() {
 
         AsyncCallback<Map<String, String>> callback = new AsyncCallback<Map<String, String>>() {
+            @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to load general information:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Map<String, String> result) {
 
                 String gateVersion = result.get("gate_version");

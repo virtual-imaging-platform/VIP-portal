@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -41,7 +41,7 @@ import com.smartgwt.client.widgets.viewer.DetailViewerField;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public abstract class ApplicationsTileGrid extends TileGrid {
 
@@ -61,7 +61,7 @@ public abstract class ApplicationsTileGrid extends TileGrid {
         this.setShowAllRecords(true);
         this.setAnimateTileChange(true);
         this.setShowEdges(false);
-        
+
         DetailViewerField imageField = new DetailViewerField("picture");
         imageField.setType("image");
         DetailViewerField commonNameField = new DetailViewerField("commonName");
@@ -70,11 +70,10 @@ public abstract class ApplicationsTileGrid extends TileGrid {
         this.setData(new ApplicationTileRecord[]{});
 
         this.addRecordClickHandler(new RecordClickHandler() {
-
             @Override
             public void onRecordClick(RecordClickEvent event) {
                 ApplicationTileRecord record = (ApplicationTileRecord) event.getRecord();
-                parse(record.getName());
+                parse(record.getApplicationName(), record.getApplicationVersion());
             }
         });
     }
@@ -84,12 +83,17 @@ public abstract class ApplicationsTileGrid extends TileGrid {
         addApplication(new ApplicationTileRecord(applicationName, applicationImage));
     }
 
+    protected void addApplication(String applicationName, String version, String applicationImage) {
+
+        addApplication(new ApplicationTileRecord(applicationName, version, applicationImage));
+    }
+
     protected void addApplication(ApplicationTileRecord record) {
 
         this.addData(record);
     }
 
-    public abstract void parse(String applicationName);
+    public abstract void parse(String applicationName, String version);
 
     public String getTileName() {
         return tileName;

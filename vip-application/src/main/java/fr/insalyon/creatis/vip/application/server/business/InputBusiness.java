@@ -185,13 +185,15 @@ public class InputBusiness {
     }
 
     /**
-     *
-     * @return @throws BusinessException
+     * 
+     * @param applicationName
+     * @return
+     * @throws BusinessException 
      */
-    public List<SimulationInput> getSimulationInputExamples() throws BusinessException {
+    public List<SimulationInput> getSimulationInputExamples(String applicationName) throws BusinessException {
 
         try {
-            return ApplicationDAOFactory.getDAOFactory().getApplicationInputDAO().getSimulationInputExamples();
+            return ApplicationDAOFactory.getDAOFactory().getApplicationInputDAO().getSimulationInputExamples(applicationName);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);

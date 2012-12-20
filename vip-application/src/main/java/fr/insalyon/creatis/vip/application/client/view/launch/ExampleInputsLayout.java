@@ -53,7 +53,6 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
-import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -72,9 +71,9 @@ public class ExampleInputsLayout extends AbstractInputsLayout {
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
 
-    public ExampleInputsLayout(String tabID) {
+    public ExampleInputsLayout(String tabID, String applicationName) {
 
-        super(tabID, "Examples", CoreConstants.ICON_EXAMPLE);
+        super(tabID, applicationName, "Examples", CoreConstants.ICON_EXAMPLE);
 
         configureGrid();
         modal = new ModalWindow(grid);
@@ -159,11 +158,7 @@ public class ExampleInputsLayout extends AbstractInputsLayout {
         grid.setShowAllRecords(false);
         grid.setShowEmptyMessage(true);
         grid.setEmptyMessage("<br>No data available.");
-
-        ListGridField applicationField = new ListGridField("application", "Application");
-        ListGridField nameField = new ListGridField("name", "Name");
-
-        grid.setFields(applicationField, nameField);
+        grid.setFields(new ListGridField("application", "Application"), new ListGridField("name", "Name"));
         grid.setDetailField("values");
         grid.setSortField("application");
         grid.setSortDirection(SortDirection.ASCENDING);
@@ -178,7 +173,6 @@ public class ExampleInputsLayout extends AbstractInputsLayout {
     @Override
     public void loadData() {
 
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         AsyncCallback<List<SimulationInput>> callback = new AsyncCallback<List<SimulationInput>>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -216,26 +210,26 @@ public class ExampleInputsLayout extends AbstractInputsLayout {
             }
         };
         modal.show("Loading inputs...", true);
-        service.getSimulationInputExamples(callback);
+        WorkflowService.Util.getInstance().getSimulationInputExamples(applicationName, callback);
     }
 
     private void remove(String name, String applicationName) {
 
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         AsyncCallback<Void> callback;
         callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                SC.warn("Unable to remove simulation input:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to remove simulation input:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(Void v) {
                 modal.hide();
                 loadData();
             }
         };
         modal.show("Removing simulation input...", true);
-        service.removeSimulationInputExample(name, applicationName, callback);
+        WorkflowService.Util.getInstance().removeSimulationInputExample(name, applicationName, callback);
     }
 }

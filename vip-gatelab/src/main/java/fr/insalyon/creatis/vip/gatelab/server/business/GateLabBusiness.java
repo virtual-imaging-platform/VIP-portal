@@ -35,7 +35,6 @@
 package fr.insalyon.creatis.vip.gatelab.server.business;
 
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -64,7 +63,7 @@ public class GateLabBusiness {
      *
      * @return @throws BusinessException
      */
-    public List<Application> getApplications() throws BusinessException {
+    public List<String[]> getApplications() throws BusinessException {
 
         try {
             ApplicationDAOFactory.getDAOFactory().getClassDAO().add(new AppClass(
@@ -76,12 +75,7 @@ public class GateLabBusiness {
                 throw new BusinessException(ex);
             }
         }
-
-        ApplicationBusiness applicationBusiness = new ApplicationBusiness();
-        List<String> classes = new ArrayList<String>();
-        classes.add(GateLabConstants.GATELAB_CLASS);
-
-        return applicationBusiness.getApplications(classes);
+        return new ApplicationBusiness().getApplications(GateLabConstants.GATELAB_CLASS);
     }
 
     /**

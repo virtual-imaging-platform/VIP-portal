@@ -36,6 +36,7 @@ package fr.insalyon.creatis.vip.application.server.rpc;
 
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
@@ -51,7 +52,6 @@ import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
-import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
 
@@ -71,17 +71,22 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         applicationBusiness = new ApplicationBusiness();
     }
 
+    @Override
     public void signout() throws ApplicationException {
 
         getSession().removeAttribute(ApplicationConstants.SESSION_CLASSES);
     }
 
+    @Override
     public void add(Application application) throws ApplicationException {
 
         try {
-            trace(logger, "Adding application '" + application.getName() + "'.");
-            applicationBusiness.add(application);
-
+            if (isSystemAdministrator() || isGroupAdministrator()) {
+                trace(logger, "Adding application '" + application.getName() + "'.");
+                applicationBusiness.add(application);
+            } else {
+                throw new ApplicationException("You have no administrator rights.");
+            }
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
         } catch (BusinessException ex) {
@@ -89,6 +94,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
+    @Override
     public void update(Application application) throws ApplicationException {
 
         try {
@@ -99,7 +105,6 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             } else {
                 throw new ApplicationException("You have no administrator rights.");
             }
-
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
         } catch (BusinessException ex) {
@@ -107,6 +112,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
+    @Override
     public void remove(String name) throws ApplicationException {
 
         try {
@@ -125,6 +131,60 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
+    @Override
+    public void addVersion(AppVersion version) throws ApplicationException {
+
+        try {
+            if (isSystemAdministrator() || isGroupAdministrator()) {
+                trace(logger, "Adding version '" + version.getVersion() + "' ('" + version.getApplicationName() + "').");
+                applicationBusiness.addVersion(version);
+            } else {
+                throw new ApplicationException("You have no administrator rights.");
+            }
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    @Override
+    public void updateVersion(AppVersion version) throws ApplicationException {
+
+        try {
+            if (isSystemAdministrator() || isGroupAdministrator()) {
+                trace(logger, "Updating version '" + version.getVersion() + "' ('" + version.getApplicationName() + "').");
+                applicationBusiness.updateVersion(version);
+
+            } else {
+                throw new ApplicationException("You have no administrator rights.");
+            }
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    @Override
+    public void removeVersion(String applicationName, String version) throws ApplicationException {
+
+        try {
+            if (isSystemAdministrator() || isGroupAdministrator()) {
+                trace(logger, "Removing application '" + applicationName + "'.");
+                applicationBusiness.removeVersion(applicationName, version);
+
+            } else {
+                throw new ApplicationException("You have no administrator rights.");
+            }
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    @Override
     public List<Application> getApplications() throws ApplicationException {
 
         try {
@@ -134,7 +194,6 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             } else if (isGroupAdministrator()) {
                 List<String> classes = classBusiness.getUserClassesName(getSessionUser().getEmail(), true);
                 return applicationBusiness.getApplications(classes);
-
             }
             throw new ApplicationException("You have no administrator rights.");
 
@@ -146,7 +205,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public List<Application> getApplications(String className) throws ApplicationException {
+    public List<String[]> getApplications(String className) throws ApplicationException {
 
         try {
             return applicationBusiness.getApplications(className);
@@ -156,28 +215,17 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
-    public List<Application> getApplications(List<String> reservedClasses) throws ApplicationException {
+    /**
+     * 
+     * @param applicationClass
+     * @return
+     * @throws ApplicationException 
+     */
+    @Override
+    public List<String[]> getApplicationsByClass(String applicationClass) throws ApplicationException {
 
         try {
-            List<String> classes = classBusiness.getUserClassesName(getSessionUser().getEmail(), false);
-            classes.removeAll(reservedClasses);
-
-            return applicationBusiness.getApplications(classes);
-
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    public List<Application> getApplicationsByClass(String applicationClass) throws ApplicationException {
-
-        try {
-            List<String> classes = new ArrayList<String>();
-            classes.add(applicationClass);
-
-            return applicationBusiness.getApplications(classes);
+            return applicationBusiness.getApplications(applicationClass);
 
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
@@ -265,9 +313,9 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     /**
-     * 
+     *
      * @param className
-     * @return 
+     * @return
      */
     @Override
     public AppClass getClass(String className) {
@@ -280,9 +328,8 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     /**
-     * 
-     * @return
-     * @throws ApplicationException 
+     *
+     * @return @throws ApplicationException
      */
     @Override
     public ApplicationStatus getApplicationStatus() throws ApplicationException {
@@ -293,31 +340,48 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
 
             ApplicationStatus status = new ApplicationStatus();
             status.setRunningWorkflows(runningSimulations.size());
-            
+
             SimulationBusiness jobBusiness = new SimulationBusiness();
             int[] tasks = jobBusiness.getNumberOfActiveTasks(runningSimulations);
             status.setRunningTasks(tasks[0]);
             status.setWaitingTasks(tasks[1]);
 
             return status;
-            
+
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
 
     /**
-     * 
+     *
      * @param applicationName
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     @Override
     public String getCitation(String applicationName) throws ApplicationException {
-        
+
         try {
             return applicationBusiness.getCitation(applicationName);
-            
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param applicationName
+     * @return
+     * @throws ApplicationException
+     */
+    @Override
+    public List<AppVersion> getVersions(String applicationName) throws ApplicationException {
+
+        try {
+            return applicationBusiness.getVersions(applicationName);
+
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }

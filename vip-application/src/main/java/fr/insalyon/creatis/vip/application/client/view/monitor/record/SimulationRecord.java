@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -35,11 +35,12 @@
 package fr.insalyon.creatis.vip.application.client.view.monitor.record;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import java.util.Date;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class SimulationRecord extends ListGridRecord {
 
@@ -47,11 +48,13 @@ public class SimulationRecord extends ListGridRecord {
     }
 
     public SimulationRecord(String simulationName, String application,
-            String status, String simulationId, String user, Date date) {
+            String applicationVersion, SimulationStatus status, String simulationId, 
+            String user, Date date) {
 
-        setAttribute("statusIco", "ico_" + status.toLowerCase());
+        setAttribute("statusIco", "ico_" + status.name().toLowerCase());
         setAttribute("application", application);
-        setAttribute("status", status);
+        setAttribute("applicationVersion", applicationVersion);
+        setAttribute("status", status.name());
         setAttribute("simulationId", simulationId);
         setAttribute("user", user);
         setAttribute("date", date);

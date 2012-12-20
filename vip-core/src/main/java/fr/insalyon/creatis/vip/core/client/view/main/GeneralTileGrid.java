@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -45,7 +45,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class GeneralTileGrid extends ApplicationsTileGrid {
 
@@ -59,7 +59,7 @@ public class GeneralTileGrid extends ApplicationsTileGrid {
     }
 
     @Override
-    public void parse(String applicationName) {
+    public void parse(String applicationName, String applicationVersion) {
 
         if (applicationName.equals(CoreConstants.APP_ACCOUNT)) {
             Layout.getInstance().addTab(new AccountTab());
@@ -67,7 +67,7 @@ public class GeneralTileGrid extends ApplicationsTileGrid {
         }
         
         for (ApplicationParser parser : parsers) {
-            if (parser.parse(applicationName)) {
+            if (parser.parse(applicationName, applicationVersion)) {
                 return;
             }
         }
