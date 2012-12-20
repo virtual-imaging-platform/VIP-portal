@@ -55,7 +55,6 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
-import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.chart.CheckpointChart;
 import fr.insalyon.creatis.vip.application.client.view.monitor.chart.GeneralBarChart;
 import fr.insalyon.creatis.vip.application.client.view.monitor.chart.JobFlowChart;
@@ -222,7 +221,6 @@ public class ChartsTab extends Tab {
      */
     private void plotJobsPerTime() {
 
-        JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -236,8 +234,8 @@ public class ChartsTab extends Tab {
                 resetGenerateButton();
             }
         };
+        JobService.Util.getInstance().getJobFlow(simulationID, callback);
         setLoadingGenerateButton();
-        service.getJobFlow(simulationID, callback);
     }
 
     /**
@@ -245,7 +243,6 @@ public class ChartsTab extends Tab {
      */
     private void plotCkptsPerJob() {
 
-        JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -259,8 +256,8 @@ public class ChartsTab extends Tab {
                 resetGenerateButton();
             }
         };
+        JobService.Util.getInstance().getCkptsPerJob(simulationID, callback);
         setLoadingGenerateButton();
-        service.getCkptsPerJob(simulationID, callback);
     }
 
     /**
@@ -269,7 +266,6 @@ public class ChartsTab extends Tab {
      */
     private void plotExecutionPerNumberOfJobs(final int binSize) {
 
-        JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -283,8 +279,8 @@ public class ChartsTab extends Tab {
                 resetGenerateButton();
             }
         };
+        JobService.Util.getInstance().getExecutionPerNumberOfJobs(simulationID, binSize, callback);
         setLoadingGenerateButton();
-        service.getExecutionPerNumberOfJobs(simulationID, binSize, callback);
     }
 
     /**
@@ -293,7 +289,6 @@ public class ChartsTab extends Tab {
      */
     private void plotDownloadPerNumberOfJobs(final int binSize) {
 
-        JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -307,8 +302,8 @@ public class ChartsTab extends Tab {
                 resetGenerateButton();
             }
         };
+        JobService.Util.getInstance().getDownloadPerNumberOfJobs(simulationID, binSize, callback);
         setLoadingGenerateButton();
-        service.getDownloadPerNumberOfJobs(simulationID, binSize, callback);
     }
 
     /**
@@ -317,7 +312,6 @@ public class ChartsTab extends Tab {
      */
     private void plotUploadPerNumberOfJobs(final int binSize) {
 
-        JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -331,8 +325,8 @@ public class ChartsTab extends Tab {
                 resetGenerateButton();
             }
         };
+        JobService.Util.getInstance().getUploadPerNumberOfJobs(simulationID, binSize, callback);
         setLoadingGenerateButton();
-        service.getUploadPerNumberOfJobs(simulationID, binSize, callback);
     }
 
     /**
@@ -340,7 +334,6 @@ public class ChartsTab extends Tab {
      */
     private void plotSiteHistogram() {
 
-        JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -354,8 +347,8 @@ public class ChartsTab extends Tab {
                 resetGenerateButton();
             }
         };
+        JobService.Util.getInstance().getSiteHistogram(simulationID, callback);
         setLoadingGenerateButton();
-        service.getSiteHistogram(simulationID, callback);
     }
     
     /**

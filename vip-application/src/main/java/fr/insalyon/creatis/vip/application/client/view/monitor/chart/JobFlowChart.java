@@ -78,7 +78,6 @@ public class JobFlowChart extends AbstractChart {
         legendOptions.setPosition(LegendPosition.NORTH_WEST);
         legendOptions.setBackgroundOpacity(0.75);
         legendOptions.setLabelFormatter(new LabelFormatter() {
-
             @Override
             public String formatLabel(String label, Series series) {
                 return "<div style=\"font-size:8pt\">" + label + "</div>";
@@ -158,7 +157,7 @@ public class JobFlowChart extends AbstractChart {
         SimplePlot plot = new SimplePlot(model, plotOptions);
         plot.setWidth(700);
         plot.setHeight(400);
-        
+
         chartLayout.addMember(plot);
         chartLayout.addMember(getRowDataImg());
 
