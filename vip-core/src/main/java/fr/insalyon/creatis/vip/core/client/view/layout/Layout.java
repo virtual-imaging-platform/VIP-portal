@@ -37,7 +37,6 @@ package fr.insalyon.creatis.vip.core.client.view.layout;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.VisibilityMode;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
@@ -46,7 +45,6 @@ import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.Modules;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
-import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.auth.ActivationTab;
@@ -122,16 +120,21 @@ public class Layout {
 
         if (user != null) {
 
-            Cookies.setCookie(CoreConstants.COOKIES_USER, user.getEmail(),
-                    CoreConstants.COOKIES_EXPIRATION_DATE, null, "/", false);
-            Cookies.setCookie(CoreConstants.COOKIES_SESSION, user.getSession(),
-                    CoreConstants.COOKIES_EXPIRATION_DATE, null, "/", false);
+            if (Cookies.isCookieEnabled()) {
+                Cookies.setCookie(CoreConstants.COOKIES_USER, user.getEmail(),
+                        CoreConstants.COOKIES_EXPIRATION_DATE, null, "/", false);
+                Cookies.setCookie(CoreConstants.COOKIES_SESSION, user.getSession(),
+                        CoreConstants.COOKIES_EXPIRATION_DATE, null, "/", false);
 
-            if (user.isConfirmed()) {
-                Modules.getInstance().initializeModules(user);
+                if (user.isConfirmed()) {
+                    Modules.getInstance().initializeModules(user);
 
+                } else {
+                    addTab(new ActivationTab());
+                }
             } else {
-                addTab(new ActivationTab());
+                setWarningMessage("Unable to sign in: cookies must be enabled.");
+                addTab(new SignInTab());
             }
         } else {
             addTab(new SignInTab());
@@ -144,11 +147,10 @@ public class Layout {
      */
     public void signout() {
 
-        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
-                SC.warn("Error while signing out:<br />" + caught.getMessage());
+                setWarningMessage("Error while signing out:<br />" + caught.getMessage());
             }
 
             @Override
@@ -165,7 +167,7 @@ public class Layout {
                 Modules.getInstance().finalizeModules();
             }
         };
-        service.signout(callback);
+        ConfigurationService.Util.getInstance().signout(callback);
     }
 
     public void addTab(Tab tab) {
