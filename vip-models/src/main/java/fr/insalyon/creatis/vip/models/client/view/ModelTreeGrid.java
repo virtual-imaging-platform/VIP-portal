@@ -229,7 +229,7 @@ public class ModelTreeGrid extends TreeGrid {
                     insSelected = node.getAttributeAsInt("number");
                     tpSelected = modelTree.getParent(node).getAttributeAsInt("number");
                 }
-                logger.log(Level.SEVERE, "tp : " + tpSelected + " ins : " + insSelected);
+                
             }
         });
 
@@ -406,6 +406,8 @@ public class ModelTreeGrid extends TreeGrid {
                 model = result;
                 bmodif = true;
                 checkModality();
+                modelTree.remove(mnode);
+                mnode = (ModelTreeNode) modelTree.getRoot();
                 //TO DO Adjust all number of timepoints node
                 tpnumber--;
 
@@ -426,6 +428,8 @@ public class ModelTreeGrid extends TreeGrid {
                 model = result;
                 bmodif = true;
                 checkModality();
+                modelTree.remove(mnode);
+                mnode = (ModelTreeNode) modelTree.getRoot();
             }
         };
         ms.removeInstant(model, Integer.parseInt(modelTree.getParent(mnode).getAttribute("number")),
@@ -443,6 +447,8 @@ public class ModelTreeGrid extends TreeGrid {
                 model = result;
                 bmodif = true;
                 checkModality();
+                modelTree.remove(mnode);
+                mnode = (ModelTreeNode) modelTree.getRoot();
             }
         };
         int ins = Integer.parseInt(modelTree.getParent(mnode).getAttribute("number"));
@@ -461,6 +467,8 @@ public class ModelTreeGrid extends TreeGrid {
                 model = result;
                 bmodif = true;
                 checkModality();
+                modelTree.remove(mnode);
+                mnode = (ModelTreeNode) modelTree.getRoot();
             }
         };
         int ins = Integer.parseInt(modelTree.getParent(modelTree.getParent(mnode)).getAttribute("number"));
@@ -482,6 +490,8 @@ public class ModelTreeGrid extends TreeGrid {
                 model = result;
                 bmodif = true;
                 checkModality();
+                modelTree.remove(mnode);
+                mnode = (ModelTreeNode) modelTree.getRoot();
             }
         };
         int ins = Integer.parseInt(modelTree.getParent(modelTree.getParent(mnode)).getAttribute("number"));
@@ -505,6 +515,8 @@ public class ModelTreeGrid extends TreeGrid {
                 model = result;
                 bmodif = true;
                 checkModality();
+                modelTree.remove(mnode);
+                mnode = (ModelTreeNode) modelTree.getRoot();
             }
         };
         ModelTreeNode node = (ModelTreeNode) modelTree.getParent(mnode);
@@ -537,6 +549,8 @@ public class ModelTreeGrid extends TreeGrid {
                 model = result;
                 bmodif = true;
                 checkModality();
+                modelTree.remove(mnode);
+                mnode = (ModelTreeNode) modelTree.getRoot();
             }
         };
         ModelTreeNode node = (ModelTreeNode) modelTree.getParent(mnode);
@@ -560,9 +574,12 @@ public class ModelTreeGrid extends TreeGrid {
             }
 
             public void onSuccess(SimulationObjectModel result) {
+                Layout.getInstance().setNoticeMessage("Object removed.");
                 model = result;
                 bmodif = true;
                 checkModality();
+                modelTree.remove(mnode);
+                mnode = (ModelTreeNode) modelTree.getRoot();
             }
         };
         ModelTreeNode node = (ModelTreeNode) modelTree.getParent(mnode);
@@ -572,9 +589,14 @@ public class ModelTreeGrid extends TreeGrid {
 
         int ins = Integer.parseInt(node.getAttribute("number"));
         int tp = Integer.parseInt(modelTree.getParent(node).getAttribute("number"));
-
-        String layer = modelTree.getParent(modelTree.getParent(node)).getAttribute(model.getModelName());
-        ms.removeObject(model, tp, ins, getTypeFromMap(layer).toString(), mnode.getAttribute(model.getModelName()), callback);
+   
+        node = (ModelTreeNode) modelTree.getParent(mnode); //Objects
+        node = (ModelTreeNode) modelTree.getParent(node); //Layer
+     
+        String layer = node.getAttribute(model.getModelName());
+          String tmp = mnode.getAttribute(model.getModelName()).substring(0,
+                  mnode.getAttribute(model.getModelName()).indexOf("(")-1).replace(" ","");
+        ms.removeObject(model, tp, ins, getTypeFromMap(layer).toString(), tmp, callback);
     }
 
     public void removePhysical() {
@@ -612,9 +634,10 @@ public class ModelTreeGrid extends TreeGrid {
         dg.show();
     }
 
+    
     public void removeNode() {
         ModelServiceAsync ms = ModelService.Util.getInstance();
-
+  
         String name = mnode.getAttribute(model.getModelName());
         if (name.contains("Timepoint")) {
             removeTimepoint();
@@ -630,6 +653,7 @@ public class ModelTreeGrid extends TreeGrid {
             removePhysicals();
 
         } else if (modelTree.getParent(mnode).getAttribute(model.getModelName()).contains("Objects")) {
+       logger.log(Level.SEVERE, "nooooooooom :" +modelTree.getParent(mnode).getAttribute(model.getModelName()));
             removeObject();
         } else if (modelTree.getParent(mnode).getAttribute(model.getModelName()).contains("Physicals")) {
             removePhysical();
@@ -645,9 +669,6 @@ public class ModelTreeGrid extends TreeGrid {
         } else {
             //nothing
         }
-        modelTree.remove(mnode);
-        mnode = (ModelTreeNode) modelTree.getRoot();
-
     }
 
     private void loadEmpty() {
@@ -1172,7 +1193,18 @@ public class ModelTreeGrid extends TreeGrid {
         }
 
     }
-
+    
+    /**
+     * Adds an object to a node
+     * 
+     * @param tp timepoint where to add
+     * @param ins instant where to add
+     * @param type type of object to add: mesh 0, voxel 1
+     * @param name name of the file associated to this object
+     * @param OntoName semantic term
+     * @param objLayer layer part : anatomy, pathilogy,...
+     * @param lab label associated  for the object (for meshes the value designed a priority)
+     */
     public void addObjectItemInTree(int tp, int ins, int type, String name, String OntoName, String objLayer, int lab) {
 
         int nbChild = 0;
@@ -1973,6 +2005,7 @@ public class ModelTreeGrid extends TreeGrid {
         public ModelTreeNode(String entityId, String entityName, boolean display, int number, ModelTreeNode... children) {
             setAttribute(model.getModelName(), entityName);
             setAttribute("EntityId", entityId);
+            setAttribute("name", entityId);
             setAttribute("Children", children);
             setAttribute("isOpen", display);
             setAttribute("number", String.valueOf(number));

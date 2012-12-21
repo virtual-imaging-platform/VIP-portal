@@ -372,9 +372,8 @@ public class ModelBusiness {
         SimulationObjectModelFactory.setModelOwner(model, model.getModelOwner());
         SimulationObjectModelFactory.inferModelSemanticAxes(model);
         SimulationObjectModelFactory.dumpInFileModel(model, zipdir + "/" + modelname);
-
-
-        SimulationObjectModelFactory.completeModel(model, test);
+       SimulationObjectModelFactory.completeModel(model, test);
+       
               File fz = new File(rootDirectory + "zip" + "/" + zipName);
         if (fz.exists()) {
             fz.delete();
@@ -1182,7 +1181,6 @@ public class ModelBusiness {
      */
     public SimulationObjectModel removeObject(SimulationObjectModel objectModel, int tp, int ins, String layer, String name) {
 
-           System.out.println("object to removed");
         ArrayList<ObjectLayer> layers = objectModel.getTimepoint(tp).getInstant(ins).getObjectLayers();
         ObjectLayer ind = null;// = new ObjectLayer();
         int j = 0;
@@ -1195,26 +1193,21 @@ public class ModelBusiness {
         }
         ArrayList<ObjectLayerPart> parts = ind.getLayerParts();
         int i = 0;
+    
         for (ObjectLayerPart part : parts) {
-            ArrayList<String> files = part.getFileNames();
-            boolean bremove = false;
-            for (String file : files) {
-                if (file.contains(name)) {
-                    bremove = true;
-                    files.remove(file);
+            
+            if (part.getReferredObject().getObjectName().equals(name))
+            {
+                 System.out.println("name to removed " + name); 
                     SimulationObjectModelFactory.removeObjectLayerPart(part);
+                    
                     break;
-                }
-            }
-            if (bremove) {
-                part.setFileNames(files);
-                parts.set(i, part);
-                ind.setLayerParts(parts);
-                layers.set(j, ind);
-                objectModel.getTimepoint(tp).getInstant(ins).setObjectLayers(layers);
             }
             i++;
         }
+        parts.remove(i);
+      
+        objectModel.getTimepoint(tp).getInstant(ins).getObjectLayers(j).setLayerParts(parts);
         System.out.println("object removed");
         return objectModel;
     }
