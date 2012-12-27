@@ -99,9 +99,7 @@ public class JobsLayout extends VLayout {
 
         loadingLabel = WidgetUtil.getLabel("Loading jobs...", CoreConstants.ICON_LOADING, 16);
         commandsLayout.addMember(loadingLabel);
-        this.addMember(commandsLayout);
-        
-        loadData();
+        this.addMember(commandsLayout);        
     }
 
     private void buildPlot() {
@@ -210,7 +208,7 @@ public class JobsLayout extends VLayout {
                             }
                         }
                     }
-                }.scheduleRepeating(10);
+                }.scheduleRepeating(20);
             }
         };
         JobService.Util.getInstance().getList(simulationID, callback);
