@@ -38,16 +38,8 @@ import fr.insalyon.creatis.grida.client.GRIDACacheClient;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.grida.client.GRIDAZombieClient;
-import java.io.UnsupportedEncodingException;
-import java.security.Security;
-import java.util.Date;
-import java.util.Properties;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import fr.insalyon.creatis.sma.client.SMAClient;
+import fr.insalyon.creatis.sma.client.SMAClientException;
 import org.apache.log4j.Logger;
 
 /**
@@ -58,55 +50,14 @@ public class CoreUtil {
 
     private static final Logger logger = Logger.getLogger(CoreUtil.class);
 
-    public static void sendEmail(String ownerEmail, String owner, String subject,
-            String content, String[] recipients, boolean direct) throws BusinessException {
+    public static void sendEmail(String subject, String content, String[] recipients,
+            boolean direct, String username) throws BusinessException {
 
         try {
-            Server server = Server.getInstance();
-            Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
-            Properties props = new Properties();
-            props.setProperty("mail.transport.protocol", server.getMailTransportProtocol());
-            props.setProperty("mail.host", server.getMailHost());
+            SMAClient client = new SMAClient(Server.getInstance().getSMAHost(), Server.getInstance().getSMAPort());
+            client.sendEmail(subject, content, recipients, direct, username);
 
-            Session session = Session.getDefaultInstance(props);
-            session.setDebug(false);
-
-            MimeMessage mimeMessage = new MimeMessage(session);
-            mimeMessage.setContent(content, "text/html");
-            mimeMessage.addHeader("Content-Type", "text/html");
-
-            InternetAddress from = new InternetAddress(ownerEmail, owner);
-            mimeMessage.setReplyTo(new InternetAddress[]{from});
-            mimeMessage.setFrom(from);
-            mimeMessage.setSentDate(new Date());
-            mimeMessage.setSubject(subject);
-
-            Transport transport = session.getTransport();
-            transport.connect();
-
-            InternetAddress[] addressTo = null;
-
-            if (recipients != null && recipients.length > 0) {
-                addressTo = new InternetAddress[recipients.length];
-                for (int i = 0; i < recipients.length; i++) {
-                    addressTo[i] = new InternetAddress(recipients[i]);
-                }
-                if (direct) {
-                    mimeMessage.setRecipients(Message.RecipientType.TO, addressTo);
-                } else {
-                    mimeMessage.setRecipients(Message.RecipientType.BCC, addressTo);
-                }
-
-                transport.sendMessage(mimeMessage, addressTo);
-                transport.close();
-
-            } else {
-                logger.warn("There's no recipients to send the email.");
-            }
-        } catch (UnsupportedEncodingException ex) {
-            logger.error(ex);
-            throw new BusinessException(ex);
-        } catch (MessagingException ex) {
+        } catch (SMAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }

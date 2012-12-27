@@ -61,9 +61,6 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_MYPROXY_PASS = "myproxy.pass";
     public static final String LAB_MYPROXY_LIFETIME = "myproxy.lifetime";
     public static final String LAB_MYPROXY_MIN_HOURS = "myproxy.min.hours";
-    public static final String LAB_MAIL_HOST = "mail.host";
-    public static final String LAB_MAIL_PROTOCOL = "mail.transport.protocol";
-    public static final String LAB_MAIL_FROM = "mail.from";
     public static final String LAB_GRIDA_HOST = "grida.server.host";
     public static final String LAB_GRIDA_PORT = "grida.server.port";
     public static final String LAB_DATA_USERS_HOME = "datamanager.users.home";
@@ -72,6 +69,8 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_DATA_LFC_HOST = "datamanager.lfc.host";
     public static final String LAB_DATA_LFC_PORT = "datamanager.lfc.port";
     public static final String LAB_MOTEUR_HOST = "moteur.host";
+    public static final String LAB_SMA_HOST = "sma.host";
+    public static final String LAB_SMA_PORT = "sma.port";
     public static final String LAB_TRUSTSTORE_FILE = "truststore.file";
     public static final String LAB_TRUSTSTORE_PASS = "truststore.password";
     public static final String LAB_WORKFLOWS_DB_HOST = "workflows.db.host";

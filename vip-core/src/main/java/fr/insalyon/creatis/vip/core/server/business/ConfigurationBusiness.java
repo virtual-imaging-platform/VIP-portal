@@ -169,13 +169,13 @@ public class ConfigurationBusiness {
                         + "</html>";
 
                 logger.info("Sending confirmation email to '" + user.getEmail() + "'.");
-                CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "Virtual Imaging Platform",
-                        "VIP account details", emailContent, new String[]{user.getEmail()}, true);
+                CoreUtil.sendEmail("VIP account details", emailContent,
+                        new String[]{user.getEmail()}, true, user.getEmail());
 
                 String adminsEmailContents = "<html>"
                         + "<head></head>"
                         + "<body>"
-                        + "<p>Dear Administrators,</p>"
+                        + "<p>Dear Administrator,</p>"
                         + "<p>A new user requested an account:</p>"
                         + "<p><b>First Name:</b> " + user.getFirstName() + "</p>"
                         + "<p><b>Last Name:</b> " + user.getLastName() + "</p>"
@@ -191,10 +191,11 @@ public class ConfigurationBusiness {
                         + "</body>"
                         + "</html>";
 
-                CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "Virtual Imaging Platform",
-                        "[VIP Admin] Account Requested", adminsEmailContents, getAdministratorsEmails(), false);
+                for (String email : getAdministratorsEmails()) {
+                    CoreUtil.sendEmail("[VIP Admin] Account Requested", adminsEmailContents,
+                            new String[]{email}, true, user.getEmail());
+                }
             } else {
-
                 String adminsEmailContents = "<html>"
                         + "<head></head>"
                         + "<body>"
@@ -214,11 +215,11 @@ public class ConfigurationBusiness {
                         + "</body>"
                         + "</html>";
 
-                CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "Virtual Imaging Platform",
-                        "[VIP Admin] Automatic Account Creation", adminsEmailContents, getAdministratorsEmails(), false);
+                for (String email : getAdministratorsEmails()) {
+                    CoreUtil.sendEmail("[VIP Admin] Automatic Account Creation", adminsEmailContents,
+                            new String[]{email}, false, user.getEmail());
+                }
             }
-
-
         } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
@@ -349,21 +350,24 @@ public class ConfigurationBusiness {
             } else {
                 last = n[0];
             }
-            
+
             CountryCode cc = CountryCode.aq;
-            
-            String country ="";
-            
-            try{
-             country = email.substring(email.lastIndexOf('.')+1);
-            }catch(NullPointerException e){}
-            
-            try{
-            if(CountryCode.valueOf(country) != null)
-                cc = CountryCode.valueOf(country);
-            }catch(IllegalArgumentException e){logger.info("Cannot determine country from email extension "+country+": user will be mapped to Antartica");
+
+            String country = "";
+
+            try {
+                country = email.substring(email.lastIndexOf('.') + 1);
+            } catch (NullPointerException e) {
             }
-            
+
+            try {
+                if (CountryCode.valueOf(country) != null) {
+                    cc = CountryCode.valueOf(country);
+                }
+            } catch (IllegalArgumentException e) {
+                logger.info("Cannot determine country from email extension " + country + ": user will be mapped to Antartica");
+            }
+
             User u = new User(
                     first.trim(),
                     last.trim(),
@@ -460,7 +464,7 @@ public class ConfigurationBusiness {
             String emailContent = "<html>"
                     + "<head></head>"
                     + "<body>"
-                    + "<p>Dear " + user.getFirstName() + " " + user.getLastName() + ",</p>"
+                    + "<p>Dear " + user.getFullName() + ",</p>"
                     + "<p>You requested us to send you your personal activation code.</p>"
                     + "<p>Please use the following code to activate your account:</p>"
                     + "<p><b>" + user.getCode() + "</b></p>"
@@ -469,9 +473,8 @@ public class ConfigurationBusiness {
                     + "</body>"
                     + "</html>";
 
-            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "Virtual Imaging Platform",
-                    "VIP activation code (reminder)", emailContent,
-                    new String[]{user.getEmail()}, true);
+            CoreUtil.sendEmail("VIP activation code (reminder)", emailContent,
+                    new String[]{user.getEmail()}, true, user.getEmail());
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -494,7 +497,7 @@ public class ConfigurationBusiness {
             String emailContent = "<html>"
                     + "<head></head>"
                     + "<body>"
-                    + "<p>Dear " + user.getFirstName() + " " + user.getLastName() + ",</p>"
+                    + "<p>Dear " + user.getFullName() + ",</p>"
                     + "<p>You recently requested a new password to sign in to your VIP account.</p>"
                     + "<p>Please use the following code to reset your password:</p>"
                     + "<p><b>" + code + "</b></p>"
@@ -503,9 +506,8 @@ public class ConfigurationBusiness {
                     + "</body>"
                     + "</html>";
 
-            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "Virtual Imaging Platform",
-                    "Code to reset your VIP password", emailContent,
-                    new String[]{user.getEmail()}, true);
+            CoreUtil.sendEmail("Code to reset your VIP password", emailContent,
+                    new String[]{user.getEmail()}, true, user.getEmail());
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -551,8 +553,10 @@ public class ConfigurationBusiness {
                         + "</body>"
                         + "</html>";
 
-                CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "Virtual Imaging Platform",
-                        "[VIP Admin] Account Removed", adminsEmailContents, getAdministratorsEmails(), false);
+                for (String adminEmail : getAdministratorsEmails()) {
+                    CoreUtil.sendEmail("[VIP Admin] Account Removed", adminsEmailContents,
+                            new String[]{adminEmail}, true, user.getEmail());
+                }
             }
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -845,14 +849,10 @@ public class ConfigurationBusiness {
                     + "</body>"
                     + "</html>";
 
-            List<String> emails = new ArrayList<String>();
             for (User u : CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
-                emails.add(u.getEmail());
+                CoreUtil.sendEmail("[VIP Contact] " + category, emailContent,
+                        new String[]{u.getEmail()}, true, user.getEmail());
             }
-
-            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "Virtual Imaging Platform",
-                    "[VIP Contact] " + category, emailContent, emails.toArray(new String[]{}), false);
-
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

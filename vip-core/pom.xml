@@ -59,17 +59,17 @@
             <artifactId>bcprov-jdk16</artifactId>
             <version>1.41</version>
         </dependency>
-        
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <version>1.4.5</version>
-        </dependency>
-        
+                
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>grida-client</artifactId>
             <version>1.4</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>sma-client</artifactId>
+            <version>0.1</version>
         </dependency>
 
         <dependency>

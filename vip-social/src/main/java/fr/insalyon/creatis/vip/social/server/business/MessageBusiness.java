@@ -38,7 +38,6 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
-import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
 import fr.insalyon.creatis.vip.social.client.bean.GroupMessage;
@@ -216,10 +215,10 @@ public class MessageBusiness {
                     + "</body>"
                     + "</html>";
 
-            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "Virtual Imaging Platform",
-                    "VIP Message: " + subject + " (" + user.getFullName() + ")",
-                    emailContent, recipients, false);
-
+            for (String email : recipients) {
+                CoreUtil.sendEmail("VIP Message: " + subject + " (" + user.getFullName() + ")",
+                        emailContent, new String[]{email}, true, user.getEmail());
+            }
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -254,16 +253,12 @@ public class MessageBusiness {
                     + "</body>"
                     + "</html>";
 
-            List<String> recipients = new ArrayList<String>();
             for (User u : users) {
                 if (!u.getEmail().equals(user.getEmail())) {
-                    recipients.add(u.getEmail());
+                    CoreUtil.sendEmail("VIP Message: " + subject + " (" + groupName + ")",
+                            emailContent, new String[]{u.getEmail()}, true, user.getEmail());
                 }
             }
-            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "Virtual Imaging Platform",
-                    "VIP Message: " + subject + " (" + groupName + ")",
-                    emailContent, recipients.toArray(new String[]{}), false);
-
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

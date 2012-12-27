@@ -73,9 +73,8 @@ public class Server {
     private String myProxyLifeTime;
     private int myProxyMinHours;
     // Mail
-    private String mailHost;
-    private String mailTransportProtocol;
-    private String mailFrom;
+    private String SMAHost;
+    private int SMAPort;
     // GRIDA server
     private String gridaHost;
     private int gridaPort;
@@ -141,9 +140,8 @@ public class Server {
             myProxyLifeTime = config.getString(CoreConstants.LAB_MYPROXY_LIFETIME, "86400");
             myProxyMinHours = config.getInt(CoreConstants.LAB_MYPROXY_MIN_HOURS, 12);
 
-            mailHost = config.getString(CoreConstants.LAB_MAIL_HOST, "");
-            mailTransportProtocol = config.getString(CoreConstants.LAB_MAIL_PROTOCOL, "");
-            mailFrom = config.getString(CoreConstants.LAB_MAIL_FROM, "");
+            SMAHost = config.getString(CoreConstants.LAB_SMA_HOST, "localhost");
+            SMAPort = config.getInt(CoreConstants.LAB_SMA_PORT, 8082);
 
             gridaHost = config.getString(CoreConstants.LAB_GRIDA_HOST, "localhost");
             gridaPort = config.getInt(CoreConstants.LAB_GRIDA_PORT, 9006);
@@ -188,9 +186,8 @@ public class Server {
             config.setProperty(CoreConstants.LAB_MYPROXY_PASS, myProxyPass);
             config.setProperty(CoreConstants.LAB_MYPROXY_LIFETIME, myProxyLifeTime);
             config.setProperty(CoreConstants.LAB_MYPROXY_MIN_HOURS, myProxyMinHours);
-            config.setProperty(CoreConstants.LAB_MAIL_HOST, mailHost);
-            config.setProperty(CoreConstants.LAB_MAIL_PROTOCOL, mailTransportProtocol);
-            config.setProperty(CoreConstants.LAB_MAIL_FROM, mailFrom);
+            config.setProperty(CoreConstants.LAB_SMA_HOST, SMAHost);
+            config.setProperty(CoreConstants.LAB_SMA_PORT, SMAPort);
             config.setProperty(CoreConstants.LAB_GRIDA_HOST, gridaHost);
             config.setProperty(CoreConstants.LAB_GRIDA_PORT, gridaPort);
             config.setProperty(CoreConstants.LAB_DATA_USERS_HOME, dataManagerUsersHome);
@@ -309,12 +306,12 @@ public class Server {
         return apacheSSLPort;
     }
 
-    public String getMailFrom() {
-        return mailFrom;
+    public String getSMAHost() {
+        return SMAHost;
     }
 
-    public String getMailHost() {
-        return mailHost;
+    public int getSMAPort() {
+        return SMAPort;
     }
 
     public String getDataManagerPath() {
@@ -355,10 +352,6 @@ public class Server {
 
     public String getTruststorePass() {
         return truststorePass;
-    }
-
-    public String getMailTransportProtocol() {
-        return mailTransportProtocol;
     }
 
     public String getAdminEmail() {
