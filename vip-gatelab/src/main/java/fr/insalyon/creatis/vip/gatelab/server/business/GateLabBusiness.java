@@ -41,10 +41,10 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
-import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.gatelab.client.GateLabConstants;
+import fr.insalyon.creatis.vip.gatelab.client.view.GateLabException;
 import fr.insalyon.creatis.vip.gatelab.server.dao.DAOFactory;
 import java.util.ArrayList;
 import java.util.List;
@@ -146,11 +146,6 @@ public class GateLabBusiness {
         try {
             User user = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
 
-            List<String> emails = new ArrayList<String>();
-            for (User u : CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
-                emails.add(u.getEmail());
-            }
-
             String adminsEmailContents = "<html>"
                     + "<head></head>"
                     + "<body>"
@@ -168,9 +163,10 @@ public class GateLabBusiness {
                     + "</body>"
                     + "</html>";
 
-            CoreUtil.sendEmail(Server.getInstance().getMailFrom(), "Virtual Imaging Platform",
-                    "[VIP Contact] GATE-Lab Error", adminsEmailContents, emails.toArray(new String[]{}), false);
-
+            for (User u : CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
+                CoreUtil.sendEmail("[VIP Contact] GATE-Lab Error", adminsEmailContents,
+                        new String[]{u.getEmail()}, false, user.getEmail());
+            }
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
