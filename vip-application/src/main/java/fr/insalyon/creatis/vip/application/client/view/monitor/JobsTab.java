@@ -63,6 +63,10 @@ public class JobsTab extends AbstractCornerTab {
         layout.addMember(jobsLayout);
 
         setPane(layout);
+        
+        if (completed) {
+            jobsLayout.update();
+        }
     }
 
     @Override
