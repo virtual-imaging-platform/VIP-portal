@@ -205,9 +205,9 @@ public class SignInTab extends Tab {
                     Layout.getInstance().authenticate(result);
                 }
             };
-            WidgetUtil.setLoadingIButton(signinButton, "Signing in...");
             service.signin(emailField.getValueAsString().trim(),
                     passwordField.getValueAsString(), callback);
+            WidgetUtil.setLoadingIButton(signinButton, "Signing in...");
         }
     }
 }

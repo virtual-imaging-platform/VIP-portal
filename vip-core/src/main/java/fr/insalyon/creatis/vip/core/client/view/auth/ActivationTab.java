@@ -139,12 +139,13 @@ public class ActivationTab extends Tab {
 
                 @Override
                 public void onSuccess(User result) {
+                    WidgetUtil.resetIButton(validateButton, "Activate", null);
                     Layout.getInstance().removeTab(CoreConstants.TAB_ACTIVATION);
                     Layout.getInstance().authenticate(result);
                 }
             };
-            WidgetUtil.setLoadingIButton(validateButton, "Activating...");
             service.activate(codeField.getValueAsString().trim(), callback);
+            WidgetUtil.setLoadingIButton(validateButton, "Activating...");
         }
     }
 

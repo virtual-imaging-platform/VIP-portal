@@ -163,8 +163,6 @@ public class SignUpTab extends Tab {
                         passwordField.focusInItem();
                         return;
                     }
-
-                    WidgetUtil.setLoadingIButton(signupButton, "Signing up...");
                     
                     User user = new User(
                             firstNameField.getValueAsString().trim(),
@@ -195,6 +193,7 @@ public class SignUpTab extends Tab {
                     };
                     service.signup(user, commentsItem.getValueAsString(),
                             accountTypeField.getValueAsString(), callback);
+                    WidgetUtil.setLoadingIButton(signupButton, "Signing up...");
                 }
             }
         });

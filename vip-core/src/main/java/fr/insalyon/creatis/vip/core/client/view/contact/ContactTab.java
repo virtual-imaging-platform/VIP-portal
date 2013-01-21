@@ -130,19 +130,21 @@ public class ContactTab extends Tab {
 
                         @Override
                         public void onFailure(Throwable caught) {
+                            WidgetUtil.resetIButton(submitButton, "Submit", null);
                             Layout.getInstance().setWarningMessage("Unable to send contact email:<br />" + caught.getMessage());
                         }
 
                         @Override
                         public void onSuccess(Void result) {
+                            WidgetUtil.resetIButton(submitButton, "Submit", null);
                             Layout.getInstance().setNoticeMessage("Contact successfully sent.");
                         }
                     };
-                    WidgetUtil.setLoadingIButton(submitButton, "Sending messsage...");
                     service.sendContactMail(
                             categoryItem.getValueAsString(),
                             subjectField.getValueAsString().trim(),
                             commentEditor.getValue(), callback);
+                    WidgetUtil.setLoadingIButton(submitButton, "Sending messsage...");
                 }
             }
         });

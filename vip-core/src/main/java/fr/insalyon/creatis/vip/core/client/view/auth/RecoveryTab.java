@@ -145,13 +145,14 @@ public class RecoveryTab extends Tab {
 
                 @Override
                 public void onSuccess(Void result) {
+                    WidgetUtil.resetIButton(continueButton, "Continue", null);
                     configureResetLayout(email);
                     Layout.getInstance().setNoticeMessage("A reset code was sent to '" + email + "'.<br />"
                             + "Please use this code to reset the password.", 15);
                 }
             };
-            WidgetUtil.setLoadingIButton(continueButton, "Sending code...");
             service.sendResetCode(email, callback);
+            WidgetUtil.setLoadingIButton(continueButton, "Sending code...");
         }
     }
 
