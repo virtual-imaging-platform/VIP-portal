@@ -653,7 +653,7 @@ public class ModelTreeGrid extends TreeGrid {
             removePhysicals();
 
         } else if (modelTree.getParent(mnode).getAttribute(model.getModelName()).contains("Objects")) {
-       logger.log(Level.SEVERE, "nooooooooom :" +modelTree.getParent(mnode).getAttribute(model.getModelName()));
+ 
             removeObject();
         } else if (modelTree.getParent(mnode).getAttribute(model.getModelName()).contains("Physicals")) {
             removePhysical();
@@ -871,13 +871,14 @@ public class ModelTreeGrid extends TreeGrid {
                    
                    for (ObjectLayerPart olp :olps)
                    {
-                       String description; 
+                       String name = olp.getReferredObject().getObjectName(); 
                        logger.log(Level.SEVERE, "objet referent nom : " + olp.getReferredObject().getObjectName() );
                        for (MathematicalDistributionOfPhysicalQuality md : olp.getMathematicalDistributions())
                        {
-                          description  = olp.getReferredObject().getObjectName().replace("_", " ")  + "(";
+                         String description  = name.replace("_", " ")  + "(";
                           String mean ="";
                           String std ="";
+                              logger.log(Level.SEVERE, "description referent nom : " + olp.getMathematicalDistributions().size() );
                           description += md.getDistributionType().toString().replace("Distribution", "") + " ";
                           for(MathematicalDistributionParameter param : md.getParameters())
                           {
@@ -887,11 +888,13 @@ public class ModelTreeGrid extends TreeGrid {
                                     std = String.valueOf(param.getScalarValue());
                                 }
                           }
+                          
                           description += mean + " +/- " + std + ")";
                           int value = Integer.parseInt(mathdisType.get(md.getPhysicalParameterType()));
                           distTree.get(md.getPhysicalParameterType())[value]
-                                 = new ModelTreeNode("", olp.getReferredObject().getObjectName(), false, value);
-                     
+                                 = new ModelTreeNode("", description, false, value);
+                          logger.log(Level.SEVERE, "description REEferent nom : " + description );
+ 
                           distTree.get(md.getPhysicalParameterType())[value].setIcon(ModelConstants.APP_IMG_OBJECT);
                           mathdisType.put(md.getPhysicalParameterType(),String.valueOf(++value));
                        }
@@ -915,39 +918,6 @@ public class ModelTreeGrid extends TreeGrid {
                     ModelTreeNode[] objectLayerPhysParamsLUT = new ModelTreeNode[ol.getPhysicalParameters().size()];
                     for (PhysicalParameter pp : ol.getPhysicalParameters()) {
                         String description = pp.toString();
-//                        String icon = ModelConstants.APP_IMG_MAGNETIC;
-//                        if (pp.getType() == PhysicalParameterType.T1 || pp.getType() == PhysicalParameterType.T2 || pp.getType() == PhysicalParameterType.T2s || pp.getType() == PhysicalParameterType.protonDensity || pp.getType() == PhysicalParameterType.susceptibility) {
-//                            icon = ModelConstants.APP_IMG_MAGNETIC;
-//                        }
-//                        // mass density
-//                        if ((pp.getType() == PhysicalParameterType.absoluteMassDensity)
-//                                || (pp.getType() == PhysicalParameterType.relativeMassDensity)) {
-//                            icon = ModelConstants.APP_IMG_CHEMICAL;
-//                        }
-//                        // radioactivity
-//                        if (pp.getType() == PhysicalParameterType.radioactiveConcentration) {
-//                            icon = ModelConstants.APP_IMG_RADIO;
-//                        }
-//
-//                        if (pp.getType() == PhysicalParameterType.radiopharmaceuticalSpecificActivity) {
-//                            icon = ModelConstants.APP_IMG_RADIO;
-//                        }
-//                        //echogenicity
-//                        if (pp.getType() == PhysicalParameterType.scatterersDensity) {
-//                            icon = ModelConstants.APP_IMG_ECHO;
-//                        }
-//                        if (pp.getType() == PhysicalParameterType.scatterersReflexivity) {
-//                            icon = ModelConstants.APP_IMG_ECHO;
-//                        }
-//                        // external-agent-concentration 
-//                        if (pp.getType() == PhysicalParameterType.contrastAgentConcentration) {
-//                            icon = ModelConstants.APP_IMG_CONCENTRATION;
-//                        }
-//                        if (pp.getType() == PhysicalParameterType.radiopharmaceuticalConcentration) {
-//                            icon = ModelConstants.APP_IMG_CONCENTRATION;
-//                        }
-//                        
-                        
                         
                         objectLayerPhysParamsLUT[olppl++] = new ModelTreeNode("" + (2 + id++), description, false, olppl);
                         objectLayerPhysParamsLUT[olppl - 1].setIcon(getPhysicalIcon(pp.getType()));

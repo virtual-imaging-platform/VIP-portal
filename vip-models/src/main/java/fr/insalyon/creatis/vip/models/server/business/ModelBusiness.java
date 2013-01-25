@@ -1275,42 +1275,33 @@ public class ModelBusiness {
             //objectModel.getInstant(timePointIndex, instantIndex).getObjectLayers(0).addPhysicalParametersLayer(physicalParametersLayer);
         }
     }
+    
+    
 
     public SimulationObjectModel addMathematicalLUT(SimulationObjectModel model, SimulationObjectModel.ObjectType layer, HashMap<String, GenericParameter> parameters, int tp, int ins, PhysicalParametersLayer.PhysicalParameterType pptype)
     {
-        ArrayList<ObjectLayer> aLayers = model.getInstant(tp, ins).getObjectLayers();
-        int index = -1;
-        for (ObjectLayer lay : aLayers) {
-            index++;
-            if (lay.getType() == layer) {
-                break;
-            }
-        }
-
-        ObjectLayer obj = null;
-        
+       int index =  findLayer(model, tp, ins, layer);
         if (index == -1)
         {
-//             obj = SimulationObjectModelFactory.createObjectLayer(model, tp, ins, layer, Resolution.high);
-//             model.getInstant(tp, ins).addObjectLayer(obj);
              index = 0;
         }
         else 
         {
-             obj = model.getInstant(tp, ins).getObjectLayers(index);
+
         }
         int value = 1000;
         System.out.println("pptype: " + pptype.toString());
         for(Entry<String, GenericParameter> ent : parameters.entrySet())
         {
-            int indexolp  = findObjectLayerPart(model,tp,ins, ent.getKey());
+            int indexolp  = findObjectLayerPart(model,tp,ins,index, ent.getKey());
             ObjectLayerPart olp = null;
             if(indexolp == -1)
             {
                 ArrayList<String> files = new ArrayList<String>();
                 files.add("none");
                 model = addObject(model,ent.getKey(),files,tp,ins,1,value++);
-                indexolp  = findObjectLayerPart(model,tp,ins, ent.getKey());
+                index =  findLayer(model, tp, ins, layer);
+                indexolp  = findObjectLayerPart(model,tp,ins, index,ent.getKey());
                 System.out.println("object-layer-part: " + ent.getKey());
                 olp = model.getInstant(tp, ins).getObjectLayers(index).getObjectLayerPart(indexolp);
             }
@@ -1322,28 +1313,41 @@ public class ModelBusiness {
             }
             model.getInstant(tp, ins).getObjectLayers(index).getObjectLayerPart(indexolp).
             addMathemicalDistribution(addMathematicalDistributionLUT(olp,ent.getValue().getDistrib(),pptype));
-            SimulationObjectModelFactory.inferModelSemanticAxes(model);
+            //SimulationObjectModelFactory.inferModelSemanticAxes(model);
         }
         return model;
     }
     
-    public int findObjectLayerPart(SimulationObjectModel model,int tp, int ins, String object)
+    public int findLayer(SimulationObjectModel model,int tp, int ins, SimulationObjectModel.ObjectType layer)
+    {
+        ArrayList<ObjectLayer> aLayers = model.getInstant(tp, ins).getObjectLayers();
+        int index = -1;
+        for (ObjectLayer lay : aLayers) {
+            index++;
+            if (lay.getType() == layer) {
+                break;
+            }
+        }
+        return index;
+    }    
+    
+    public int findObjectLayerPart(SimulationObjectModel model,int tp, int ins,int ind, String object)
     {
         int result = -1;
         int index = 0;
-        for(ObjectLayer ol : model.getInstant(tp, ins).getObjectLayers())
-        {
-            for(ObjectLayerPart olp : ol.getLayerParts(Format.voxel))
+      if(model.getInstant(tp, ins).getObjectLayers().size() >0)
+      {
+            for(ObjectLayerPart olp : model.getInstant(tp, ins).getObjectLayers(ind).getLayerParts(Format.voxel))
             { 
                 if(olp.getReferredObject().getObjectName().equals(object))
                 {
+                    System.out.println("layer part trouvé " + object);
                     result = index;
                     break;
                 }
+                index++;
             }
-            index++;
-            if(result != -1) break;
-        }
+      }
         return result;
     }
     
@@ -1353,7 +1357,7 @@ public class ModelBusiness {
          for(Entry<String, Double> gen: dis.getParameters().entrySet())
         {
             System.out.println("distribution " + gen.getKey());
-            mathdps.add(new MathematicalDistributionParameter(MathematicalDistributionParameterType.valueOf(gen.getKey()),gen.getValue(),""));
+            mathdps.add(new MathematicalDistributionParameter(MathematicalDistributionParameterType.valueOf(gen.getKey()),gen.getValue()," "));
         }
      //   MathematicalDistributionOfPhysicalQuality math = new MathematicalDistributionOfPhysicalQuality(MathematicalDistributionType.valueOf(dis.getName()+"Distribution"), ppt);
          MathematicalDistributionOfPhysicalQuality math = 
