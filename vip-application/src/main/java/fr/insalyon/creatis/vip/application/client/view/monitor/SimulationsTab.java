@@ -141,7 +141,7 @@ public class SimulationsTab extends Tab {
                 String simulationId = event.getRecord().getAttribute("simulationId");
                 String title = event.getRecord().getAttribute("simulationName");
                 String applicationName = event.getRecord().getAttribute("application");
-                String applicationVersion = event.getRecord().getAttribute("application_version");
+                String applicationVersion = event.getRecord().getAttribute("applicationVersion");
                 SimulationStatus status = SimulationStatus.valueOf(
                         event.getRecord().getAttribute("status"));
 
