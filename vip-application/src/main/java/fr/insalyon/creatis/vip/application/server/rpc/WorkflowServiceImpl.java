@@ -185,6 +185,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @return
      * @throws ApplicationException
      */
+    @Override
     public SimulationInput getInputByNameUserApp(String name, String appName)
             throws ApplicationException {
 

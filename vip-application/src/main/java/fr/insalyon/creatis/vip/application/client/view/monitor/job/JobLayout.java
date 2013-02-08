@@ -59,7 +59,6 @@ public class JobLayout extends VLayout {
     private String command;
     private JobStatus status;
     private String parameters;
-    private VLayout mainLayout;
     private Label statusLabel;
     private HLayout statusLayout;
 
@@ -99,16 +98,11 @@ public class JobLayout extends VLayout {
             }
         });
 
-        mainLayout = new VLayout();
-        mainLayout.setWidth100();
-        mainLayout.setHeight(40);
-        this.addMember(mainLayout);
-
         Label jobIDLabel = WidgetUtil.getLabel("#" + jobID, 25, Cursor.HAND);
-        mainLayout.addMember(jobIDLabel);
+        this.addMember(jobIDLabel);
 
         statusLabel = WidgetUtil.getLabel("<b>" + status.name() + "</b>", 14, Cursor.HAND);
-        mainLayout.addMember(statusLabel);
+        this.addMember(statusLabel);
 
         statusLayout = new HLayout();
         statusLayout.setWidth100();
@@ -116,29 +110,6 @@ public class JobLayout extends VLayout {
         statusLayout.setBackgroundColor(status.getColor());
 
         this.addMember(statusLayout);
-    }
-
-//    /**
-//     * Gives a color according to the job status.
-//     *
-//     * @return
-//     */
-//    private String parseStatusBackgroundColor() {
-//
-//        switch (status) {
-//            case Queued:
-//                return "#DBA400";
-//            case Running:
-//                return "#8CC653";
-//            case Completed:
-//                return "#287fd6";
-//            default:
-//                return "#d64949";
-//        }
-//    }
-
-    public String getParameters() {
-        return parameters;
     }
 
     public JobStatus getStatus() {

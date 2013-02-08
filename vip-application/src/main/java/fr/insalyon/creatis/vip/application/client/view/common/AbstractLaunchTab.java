@@ -76,7 +76,7 @@ public abstract class AbstractLaunchTab extends Tab {
 
         this.applicationName = applicationName;
         this.applicationVersion = applicationVersion;
-        
+
         this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_APPLICATION) + " "
                 + applicationName + " " + applicationVersion);
         this.setCanClose(true);
@@ -108,7 +108,7 @@ public abstract class AbstractLaunchTab extends Tab {
 
     /**
      * Loads input values from string.
-     * 
+     *
      * @param simulationName Simulation name
      * @param values Input values
      */
@@ -122,15 +122,15 @@ public abstract class AbstractLaunchTab extends Tab {
         }
         loadInput(simulationName, valuesMap);
     }
-    
+
     /**
      * Loads input values from map.
-     * 
+     *
      * @param simulationName Simulation name
      * @param values Input values map
      */
     public void loadInput(String simulationName, Map<String, String> values) {
-        
+
         launchFormLayout.loadInputs(simulationName, values);
     }
 
@@ -275,7 +275,8 @@ public abstract class AbstractLaunchTab extends Tab {
         final AsyncCallback<SimulationInput> callback = new AsyncCallback<SimulationInput>() {
             @Override
             public void onFailure(Throwable caught) {
-                if (!caught.getMessage().contains("No data is available")) {
+                if (!caught.getMessage().contains("No data is available")
+                        && !caught.getMessage().contains("empty result set")) {
                     resetSaveInputsButton();
                     Layout.getInstance().setWarningMessage("Unable to verify simulation name:<br />" + caught.getMessage(), 10);
                 } else {

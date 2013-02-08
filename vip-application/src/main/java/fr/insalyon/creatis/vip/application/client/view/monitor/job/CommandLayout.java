@@ -45,6 +45,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -55,11 +57,13 @@ public class CommandLayout extends VLayout {
     private CommandLayout instance;
     private FlowLayout layout;
     private int jobsID;
+    private Map<String, JobLayout> jobsMap;
 
     public CommandLayout(String command) {
 
         this.instance = this;
         this.jobsID = 1;
+        this.jobsMap = new HashMap<String, JobLayout>();
 
         this.setWidth100();
         this.setHeight100();
@@ -100,20 +104,29 @@ public class CommandLayout extends VLayout {
      */
     public void addJob(String simulationID, Job job) {
 
-        boolean exist = false;
-        for (Canvas canvas : layout.getChildren()) {
-            if (canvas instanceof JobLayout) {
-                JobLayout jobLayout = (JobLayout) canvas;
-                if (job.getParameters().equals(jobLayout.getParameters())) {
-                    exist = true;
-                    jobLayout.updateStatus(job.getStatus());
-                    break;
-                }
-            }
+        String params = job.getParameters();
+        if (jobsMap.containsKey(job.getParameters())) {
+            jobsMap.get(params).updateStatus(job.getStatus());
+        } else {
+            JobLayout jobLayout = new JobLayout(jobsID++, simulationID, job);
+            jobsMap.put(params, jobLayout);
+            layout.addTile(jobLayout);
         }
-        if (!exist) {
-            layout.addTile(new JobLayout(jobsID++, simulationID, job));
-        }
+        
+//        boolean exist = false;
+//        for (Canvas canvas : layout.getChildren()) {
+//            if (canvas instanceof JobLayout) {
+//                JobLayout jobLayout = (JobLayout) canvas;
+//                if (job.getParameters().equals(jobLayout.getParameters())) {
+//                    exist = true;
+//                    jobLayout.updateStatus(job.getStatus());
+//                    break;
+//                }
+//            }
+//        }
+//        if (!exist) {
+//            layout.addTile(new JobLayout(jobsID++, simulationID, job));
+//        }
     }
 
     /**

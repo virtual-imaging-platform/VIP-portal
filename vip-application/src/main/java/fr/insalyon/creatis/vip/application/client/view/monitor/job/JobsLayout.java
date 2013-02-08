@@ -208,7 +208,7 @@ public class JobsLayout extends VLayout {
                             }
                         }
                     }
-                }.scheduleRepeating(20);
+                }.scheduleRepeating(5);
             }
         };
         JobService.Util.getInstance().getList(simulationID, callback);
