@@ -1,10 +1,8 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
- *
- * This software is a grid-enabled data-driven workflow manager and editor.
  *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -40,7 +38,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class AppletHTMLPane extends HTMLPane {
 
@@ -51,7 +49,7 @@ public class AppletHTMLPane extends HTMLPane {
         this.setWidth100();
         this.setHeight100();
         this.setShowEdges(true);
-
+       
         this.setContents(
                 "<html>"
                 + "<head>"
@@ -62,7 +60,7 @@ public class AppletHTMLPane extends HTMLPane {
                 + "<body>"
                 + "<applet width=\"" + width + "\" height=\"" + height + "\" "
                 + "code=\"" + code + "\" "
-                + "archive=\"applets/" + archive + "\">"
+                + "archive=\"applets/" + archive + "\" MAYSCRIPT>"
                 + "<param name=\"sessionId\" value=\"" + Cookies.getCookie(CoreConstants.COOKIES_SESSION) + "\"/>"
                 + "<param name=\"path\" value=\"" + path + "\"/>"
                 + "<param name=\"unzip\" value=\"" + unzip + "\"/>"
