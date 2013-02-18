@@ -47,13 +47,10 @@ import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.cowork.client.CoworkModule;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
 import fr.insalyon.creatis.vip.docs.client.DocsModule;
 import fr.insalyon.creatis.vip.gatelab.client.GateLabModule;
-import fr.insalyon.creatis.vip.models.client.ModelModule;
-import fr.insalyon.creatis.vip.simulatedata.client.SimulatedDataModule;
-import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIModule;
-import fr.insalyon.creatis.vip.social.client.SocialModule;
 
 /**
  *
@@ -76,6 +73,7 @@ public class Main implements EntryPoint {
         modulesInit.add(new GateLabModule());
         modulesInit.add(new SocialModule());
         modulesInit.add(new DataManagerModule());
+        modulesInit.add(new CoworkModule());
         // End-Modules
 
         final String ticket = Window.Location.getParameter("ticket");

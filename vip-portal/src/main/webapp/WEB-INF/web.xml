@@ -160,6 +160,18 @@
     </servlet-mapping>
     <!-- End Social Module -->
     
+     <!-- Cowork Module -->
+    <servlet>
+        <servlet-name>CoworkService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.cowork.server.rpc.CoworkServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CoworkService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/coworkservice</url-pattern>
+    </servlet-mapping>
+    
+    <!-- End Cowork Module -->
+    
     <session-config>
         <session-timeout>-1</session-timeout>
     </session-config>

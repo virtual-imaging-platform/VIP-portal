@@ -70,6 +70,16 @@
             <artifactId>vip-gatelab-applet</artifactId>
             <version>${vip.gatelab-applet.version}</version>
         </dependency>
+        <dependency>
+            <groupId>fr.insalyon.creatis.vip</groupId>
+            <artifactId>VIP-Cowork-Applet</artifactId>
+            <version>${vip.cowork-applet.version}</version>
+        </dependency>
+         <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-cowork</artifactId>
+            <version>${vip.cowork.version}</version>
+        </dependency>
 
         <!--        <dependency>
             <groupId>fr.insalyon.creatis</groupId>
@@ -186,7 +196,12 @@
                                     <overWrite>true</overWrite>
                                     <destFileName>vip-gatelab-applet.jar</destFileName>
                                 </artifactItem>
-                                
+                                <artifactItem>
+                                    <groupId>fr.insalyon.creatis.vip</groupId>
+                                    <artifactId>VIP-Cowork-Applet</artifactId>
+                                    <overWrite>true</overWrite>
+                                    <destFileName>vip-cowork-applet.jar</destFileName>
+                                </artifactItem>
                             </artifactItems>
                             
                             <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/applets</outputDirectory>
