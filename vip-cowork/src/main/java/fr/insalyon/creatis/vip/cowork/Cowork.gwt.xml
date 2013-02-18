@@ -5,6 +5,6 @@
 
     <!-- Servlets -->
     <servlet class="fr.insalyon.creatis.vip.cowork.server.rpc.CoworkServiceImpl" path="/coworkservice"/>
-     <set-property name="user.agent" value="safari" />
+<!--     <set-property name="user.agent" value="safari" />-->
     
 </module>
