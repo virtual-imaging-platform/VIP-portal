@@ -119,8 +119,8 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
         loadMacButton.setWidth(150);
     }
 
-    public void uploadMacComplete(String inputTgz, String simuType, String nbPart) {
-
+    public void uploadMacComplete(String inputTgz, String simuType, String nbPart, String phaseSpace) {
+       
         if (loadMacWindow != null) {
             loadMacWindow.destroy();
             loadMacWindow = null;
@@ -138,12 +138,15 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
             String[] st = simuType.split(" = ");
             setInputValue(st[0], st[1]);
 
+            String[] ps = phaseSpace.split(" = ");
+            setInputValue(ps[0], ps[1]);
+            
             loadMacButton.hide();
             launchFormLayout.setSourcesLayoutVisibible(true);
 
             configureLaunchButton();
             configureSaveInputsButton();
-
+            
             launchFormLayout.addButtons(launchButton, saveInputsButton);
         }
     }
@@ -180,8 +183,8 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
     }
 
     private native void initComplete(GateLabLaunchTab uploadMac) /*-{
-     $wnd.uploadMacComplete = function (inputTgz,simuType,nbPart) {
-     uploadMac.@fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab::uploadMacComplete(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)(inputTgz,simuType,nbPart);
+     $wnd.uploadMacComplete = function (inputTgz,simuType,nbPart,phaseSpace) {
+     uploadMac.@fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab::uploadMacComplete(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)(inputTgz,simuType,nbPart,phaseSpace);
      };
      $wnd.close = function () {
      uploadMac.@fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab::close()();

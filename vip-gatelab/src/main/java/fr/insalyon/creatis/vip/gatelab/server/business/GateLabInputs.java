@@ -94,13 +94,14 @@ public class GateLabInputs {
             String particles = inputsMap.get("NumberOfParticles");
             String simtype = inputsMap.get("ParallelizationType").equals("dyn") ?
                     "Dynamic" : "Static";
-
+            String phaseSpace = inputsMap.get("phaseSpace");
             Map<String, String> inputMap = new HashMap<String, String>();
             inputMap.put("inputlink", DataManagerUtil.parseRealDir(input, currentUserFolder));
             //inputMap.put("outputlink", DataManagerUtil.parseRealDir(outputlink));
             inputMap.put("gate_version", DataManagerUtil.parseRealDir(release, currentUserFolder));
             inputMap.put("particles", particles);
             inputMap.put("simulation", simtype);
+            inputMap.put("phaseSpace", phaseSpace);
 
             return inputMap;
 

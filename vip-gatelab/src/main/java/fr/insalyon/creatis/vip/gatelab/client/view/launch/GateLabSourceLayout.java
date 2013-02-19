@@ -108,12 +108,12 @@ public class GateLabSourceLayout extends AbstractSourceLayout {
                     Collections.sort(releases);
 
                     LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-                    String value = releaseDir + "/" +releases.get(0).getReleaseName();
+                    String value = releaseDir + "/" + releases.get(0).getReleaseName();
                     for (Release r : releases) {
                         map.put(releaseDir + "/" + r.getReleaseName(), r.getReleaseName());
                     }
                     configureSelectItem(map);
-                    
+
                     setValue(value);
                 }
             };
@@ -133,7 +133,14 @@ public class GateLabSourceLayout extends AbstractSourceLayout {
 
             configureTextItem();
             textItem.setDisabled(true);
+              
+         
+
+        } else if (name.equalsIgnoreCase("phaseSpace")) {
+            configureTextItem();
+            textItem.setDisabled(true);
         }
+        
     }
 
     /**
@@ -171,7 +178,9 @@ public class GateLabSourceLayout extends AbstractSourceLayout {
             selectItem.setValue(value);
             if (name.equalsIgnoreCase("ParallelizationType") && value.equals("stat")) {
                 this.selectItem.setDisabled(true);
-            }
+            } /*else if (name.equalsIgnoreCase("phaseSpace") && value.equals("dummy")) {
+                this.selectItem.setVisible(false);
+            }*/
         } else {
             textItem.setValue(value);
         }
