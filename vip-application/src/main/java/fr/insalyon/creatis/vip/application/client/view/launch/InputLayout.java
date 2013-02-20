@@ -51,7 +51,7 @@ import java.util.List;
  *
  * @author Rafael Ferreira da Silva
  */
-public class InputHLayout extends AbstractSourceLayout {
+public class InputLayout extends AbstractSourceLayout {
 
     private static enum InputType {
 
@@ -76,17 +76,17 @@ public class InputHLayout extends AbstractSourceLayout {
     private DynamicForm stopItemForm;
     private DynamicForm stepItemForm;
 
-    public InputHLayout(String name, String comment) {
+    public InputLayout(String name, String comment) {
 
         super(name, comment);
         
         configureTypeSelectItem();
-        this.addMember(FieldUtil.getForm(selectItem));
+        hLayout.addMember(FieldUtil.getForm(selectItem));
 
         // List
         listLayout = new VLayout();
         listLayout.addMember(new ListHLayout(listLayout, true));
-        this.addMember(listLayout);
+        hLayout.addMember(listLayout);
 
         // Range
         startItem = FieldUtil.getTextItem(70, true, "Start", "[0-9.]");
@@ -119,18 +119,18 @@ public class InputHLayout extends AbstractSourceLayout {
 
     private void setList() {
 
-        this.addMember(listLayout);
-        this.removeMember(startItemForm);
-        this.removeMember(stopItemForm);
-        this.removeMember(stepItemForm);
+        hLayout.addMember(listLayout);
+        hLayout.removeMember(startItemForm);
+        hLayout.removeMember(stopItemForm);
+        hLayout.removeMember(stepItemForm);
     }
 
     private void setRange() {
 
-        this.removeMember(listLayout);
-        this.addMember(startItemForm);
-        this.addMember(stopItemForm);
-        this.addMember(stepItemForm);
+        hLayout.removeMember(listLayout);
+        hLayout.addMember(startItemForm);
+        hLayout.addMember(stopItemForm);
+        hLayout.addMember(stepItemForm);
     }
 
     @Override

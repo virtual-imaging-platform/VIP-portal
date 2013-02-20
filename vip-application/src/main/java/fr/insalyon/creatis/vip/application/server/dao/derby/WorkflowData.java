@@ -589,9 +589,10 @@ public class WorkflowData implements WorkflowDAO {
                 ProcessorStatus status = ProcessorStatus.Unstarted;
 
                 if (completed + queued + failed > 0) {
-                    if (failed > 0) {
-                        status = ProcessorStatus.Failed;
-                    } else if (queued > 0) {
+//                    if (failed > 0) {
+//                        status = ProcessorStatus.Failed;
+//                    } else 
+                    if (queued > 0) {
                         status = ProcessorStatus.Active;
                     } else {
                         status = ProcessorStatus.Completed;

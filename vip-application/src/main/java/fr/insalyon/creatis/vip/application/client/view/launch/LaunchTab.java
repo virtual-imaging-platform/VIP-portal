@@ -110,7 +110,7 @@ public class LaunchTab extends AbstractLaunchTab {
                             disabled = true;
                         }
                     }
-                    launchFormLayout.addSource(new InputHLayout(source.getName(), source.getDescription()), disabled);
+                    launchFormLayout.addSource(new InputLayout(source.getName(), source.getDescription()), disabled);
                 }
 
                 configureLaunchButton();

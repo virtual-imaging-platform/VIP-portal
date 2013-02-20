@@ -89,28 +89,19 @@ public class LaunchFormLayout extends AbstractFormLayout {
         this.addMember(sourcesLayout);
     }
 
-     public void addSource(AbstractSourceLayout sourceLayout) {
-         addSource(sourceLayout,false);
-     }
+    public void addSource(AbstractSourceLayout sourceLayout) {
+        addSource(sourceLayout, false);
+    }
+
     /**
      *
      * @param sourceLayout
      */
     public void addSource(AbstractSourceLayout sourceLayout, boolean disabled) {
 
-        Label sourceLabel = WidgetUtil.getLabel("<b>" + sourceLayout.getName() + "</b>", 15);
-        String comment = sourceLayout.getComment();
-        if (comment != null) {
-            sourceLabel.setTooltip(comment);
-            sourceLabel.setHoverWidth(500);
-        }
-        if(disabled){
+        if (disabled) {
             sourceLayout.setDisabled(true);
-            sourceLabel.setDisabled(true);
-
         }
-            
-        sourcesLayout.addMember(sourceLabel);
         sourcesLayout.addMember(sourceLayout);
     }
 
@@ -193,7 +184,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
                     } else {
                         conflictMap.put(source.getName(), inputValue);
                     }
-                } 
+                }
             }
         }
         if (!conflictMap.isEmpty()) {
@@ -260,22 +251,21 @@ public class LaunchFormLayout extends AbstractFormLayout {
     }
 
     /**
-     * 
-     * @param visible 
+     *
+     * @param visible
      */
     public void setSourcesLayoutVisibible(boolean visible) {
 
         sourcesLayout.setVisible(visible);
     }
-    
+
     /**
-     * 
-     * @param applicationName 
+     *
+     * @param applicationName
      */
     public void configureCitation(String applicationName) {
-        
-        AsyncCallback<String> callback = new AsyncCallback<String>() {
 
+        AsyncCallback<String> callback = new AsyncCallback<String>() {
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to load citation:<br />" + caught.getMessage());
@@ -284,10 +274,10 @@ public class LaunchFormLayout extends AbstractFormLayout {
             @Override
             public void onSuccess(String result) {
                 if (result != null && !result.isEmpty()) {
-                    
+
                     VLayout citationLayout = new VLayout(5);
                     citationLayout.addMember(WidgetUtil.getLabel("<b>Please refer to the following publication:</b>", 20));
-                    
+
                     Label citation = new Label(result);
                     citation.setWidth100();
                     citation.setAutoHeight();
@@ -296,12 +286,11 @@ public class LaunchFormLayout extends AbstractFormLayout {
                     citation.setBackgroundColor("#FFFFFF");
                     citation.setBorder("1px solid #CCCCCC");
                     citationLayout.addMember(citation);
-                    
+
                     addMember(citationLayout);
                 }
             }
         };
         ApplicationService.Util.getInstance().getCitation(applicationName, callback);
     }
-
 }

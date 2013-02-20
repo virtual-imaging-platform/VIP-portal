@@ -34,34 +34,42 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.common;
 
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public abstract class AbstractSourceLayout extends HLayout {
+public abstract class AbstractSourceLayout extends VLayout {
 
     protected String name;
-    protected String comment;
+    protected Label sourceLabel;
+    protected HLayout hLayout;
 
     public AbstractSourceLayout(String name, String comment) {
 
         this.name = name;
-        this.comment = comment;
-
+        this.sourceLabel = WidgetUtil.getLabel("<b>" + name + "</b>", 15);
+        this.sourceLabel.setWidth(300);
+        if (comment != null) {
+            this.sourceLabel.setTooltip(comment);
+            this.sourceLabel.setHoverWidth(500);
+        }
         this.setAutoWidth();
-        this.setMembersMargin(3);
+        this.addMember(sourceLabel);
+        
+        this.hLayout = new HLayout(3);
+        this.hLayout.setAutoWidth();
+        this.addMember(hLayout);
     }
 
     public String getName() {
         return name;
     }
-
-    public String getComment() {
-        return comment;
-    }
-    
+   
     public abstract String getValue();
     
     public abstract void setValue(String value);
