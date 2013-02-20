@@ -35,11 +35,8 @@
 package fr.insalyon.creatis.vip.gatelab.client.view.launch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSourceLayout;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -47,7 +44,6 @@ import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
-import fr.insalyon.creatis.vip.datamanager.client.view.selection.PathSelectionWindow;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -67,8 +63,6 @@ public class GateLabSourceLayout extends AbstractSourceLayout {
     public GateLabSourceLayout(String name, String comment, final ModalWindow modal) {
 
         super(name, comment);
-
-
 
         if (name.equalsIgnoreCase("CPUestimation")) {
 
@@ -93,12 +87,13 @@ public class GateLabSourceLayout extends AbstractSourceLayout {
             //get list of available releases
             DataManagerServiceAsync service = DataManagerService.Util.getInstance();
             AsyncCallback<List<Data>> callback = new AsyncCallback<List<Data>>() {
-
+                @Override
                 public void onFailure(Throwable caught) {
                     modal.hide();
                     Layout.getInstance().setWarningMessage("Unable to list release folder:<br />" + caught.getMessage());
                 }
 
+                @Override
                 public void onSuccess(List<Data> result) {
                     modal.hide();
                     List<Release> releases = new ArrayList<Release>();
@@ -129,19 +124,13 @@ public class GateLabSourceLayout extends AbstractSourceLayout {
 //            browsePicker.setPrompt("Browse on the Grid");
 //            textItem.setIcons(browsePicker);
 
-        } else if (name.equalsIgnoreCase("GateInput") || name.equalsIgnoreCase("NumberOfParticles")) {
+        } else if (name.equalsIgnoreCase("GateInput")
+                || name.equalsIgnoreCase("NumberOfParticles")
+                || name.equalsIgnoreCase("phaseSpace")) {
 
             configureTextItem();
-            textItem.setDisabled(true);        
-         
-        } else if (name.equalsIgnoreCase("phaseSpace")) {
-            configureTextItem();
-            //TODO : setVisible(false) on the label also (entire SourceLayout)
-            if(this.getValue().equals("dummy")){
-                textItem.setVisible(false);
-            }
+            textItem.setDisabled(true);
         }
-        
     }
 
     /**
@@ -155,14 +144,14 @@ public class GateLabSourceLayout extends AbstractSourceLayout {
         selectItem.setShowTitle(false);
         selectItem.setWidth(200);
         selectItem.setRequired(true);
-        this.addMember(FieldUtil.getForm(selectItem));
+        hLayout.addMember(FieldUtil.getForm(selectItem));
         isSelectItem = true;
     }
 
     private void configureTextItem() {
 
         textItem = FieldUtil.getTextItem(400, false, "", null);
-        this.addMember(FieldUtil.getForm(textItem));
+        hLayout.addMember(FieldUtil.getForm(textItem));
         isSelectItem = false;
     }
 
@@ -178,11 +167,12 @@ public class GateLabSourceLayout extends AbstractSourceLayout {
         if (isSelectItem) {
             selectItem.setValue(value);
             if (name.equalsIgnoreCase("ParallelizationType") && value.equals("stat")) {
-                this.selectItem.setDisabled(true);
-            } /*else if (name.equalsIgnoreCase("phaseSpace") && value.equals("dummy")) {
-                this.selectItem.setVisible(false);
-            }*/
+                selectItem.setDisabled(true);
+            }
         } else {
+            if (name.equalsIgnoreCase("phaseSpace") && value.equals("dummy")) {
+                this.setVisible(false);
+            }
             textItem.setValue(value);
         }
     }
