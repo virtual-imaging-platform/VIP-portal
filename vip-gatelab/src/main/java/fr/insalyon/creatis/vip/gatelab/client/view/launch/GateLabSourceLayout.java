@@ -132,13 +132,14 @@ public class GateLabSourceLayout extends AbstractSourceLayout {
         } else if (name.equalsIgnoreCase("GateInput") || name.equalsIgnoreCase("NumberOfParticles")) {
 
             configureTextItem();
-            textItem.setDisabled(true);
-              
+            textItem.setDisabled(true);        
          
-
         } else if (name.equalsIgnoreCase("phaseSpace")) {
             configureTextItem();
-            textItem.setDisabled(true);
+            //TODO : setVisible(false) on the label also (entire SourceLayout)
+            if(this.getValue().equals("dummy")){
+                textItem.setVisible(false);
+            }
         }
         
     }
