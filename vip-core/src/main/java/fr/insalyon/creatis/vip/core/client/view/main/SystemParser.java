@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -60,7 +58,7 @@ public class SystemParser extends ApplicationParser {
 
     @Override
     public boolean parse(String applicationName, String applicationVersion) {
-        
+
         if (applicationName.equals(CoreConstants.APP_USER)) {
             Layout.getInstance().addTab(new ManageUsersTab());
             return true;
@@ -68,7 +66,7 @@ public class SystemParser extends ApplicationParser {
         } else if (applicationName.equals(CoreConstants.APP_GROUP)) {
             Layout.getInstance().addTab(new ManageGroupsTab());
             return true;
-        
+
         } else if (applicationName.equals(CoreConstants.APP_ACCOUNT_MANAGER)) {
             Layout.getInstance().addTab(new ManageAccountsTab());
             return true;

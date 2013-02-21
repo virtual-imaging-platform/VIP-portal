@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -57,22 +55,22 @@ public abstract class ApplicationParser {
 
     /**
      * Adds an application.
-     * 
+     *
      * @param applicationName
-     * @param applicationImage 
+     * @param applicationImage
      */
     protected void addApplication(String applicationName, String applicationImage) {
 
-        applications.add(new ApplicationTileRecord(applicationName, 
-                applicationImage));
+        applications.add(new ApplicationTileRecord(applicationName,
+            applicationImage));
     }
-    
+
     /**
      * Adds an application.
-     * 
+     *
      * @param applicationName
      * @param applicationVersion
-     * @param applicationImage 
+     * @param applicationImage
      */
     protected void addApplication(String applicationName, String applicationVersion, String applicationImage) {
 
@@ -82,8 +80,8 @@ public abstract class ApplicationParser {
 
     /**
      * Gets the list of applications.
-     * 
-     * @return 
+     *
+     * @return
      */
     public List<ApplicationTileRecord> getApplications() {
 
