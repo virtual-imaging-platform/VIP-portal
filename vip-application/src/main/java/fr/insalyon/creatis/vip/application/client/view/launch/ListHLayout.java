@@ -1,10 +1,8 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
- *
- * This software is a grid-enabled data-driven workflow manager and editor.
  *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -48,7 +46,7 @@ import fr.insalyon.creatis.vip.datamanager.client.view.selection.PathSelectionWi
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ListHLayout extends HLayout {
 
@@ -71,6 +69,7 @@ public class ListHLayout extends HLayout {
         
         PickerIcon browsePicker = new PickerIcon(PickerIcon.SEARCH, new FormItemClickHandler() {
 
+            @Override
             public void onFormItemClick(FormItemIconClickEvent event) {
                 new PathSelectionWindow(listItem).show();
             }
@@ -79,6 +78,7 @@ public class ListHLayout extends HLayout {
         
         PickerIcon morePicker = new PickerIcon(new PickerIcon.Picker(ApplicationConstants.ICON_PICKER_MORE), new FormItemClickHandler() {
 
+            @Override
             public void onFormItemClick(FormItemIconClickEvent event) {
                 parent.addMember(new ListHLayout(parent, false));
             }
@@ -87,6 +87,7 @@ public class ListHLayout extends HLayout {
         
         PickerIcon lessPicker = new PickerIcon(new PickerIcon.Picker(ApplicationConstants.ICON_PICKER_LESS), new FormItemClickHandler() {
 
+            @Override
             public void onFormItemClick(FormItemIconClickEvent event) {
                 parent.removeMember(instance);
             }
