@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -35,6 +33,7 @@
 package fr.insalyon.creatis.vip.application.server.business;
 
 import fr.insalyon.creatis.grida.client.GRIDAClient;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
@@ -44,7 +43,6 @@ import fr.insalyon.creatis.vip.application.client.bean.Processor;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
-import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.GwendiaParser;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputM2Parser;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.ScuflParser;
@@ -57,6 +55,7 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import java.io.File;
@@ -76,22 +75,110 @@ import org.apache.log4j.Logger;
 public class WorkflowBusiness {
 
     private static final Logger logger = Logger.getLogger(WorkflowBusiness.class);
-    private WorkflowEngineInstantiator engine;
     private static WorkflowDAO workflowDB;
     private static ApplicationDAO applicationDB;
 
     public WorkflowBusiness() {
 
         try {
-
             workflowDB = WorkflowDAOFactory.getDAOFactory().getWorkflowDAO();
             applicationDB = ApplicationDAOFactory.getDAOFactory().getApplicationDAO();
+
         } catch (fr.insalyon.creatis.vip.core.server.dao.DAOException ex) {
             logger.error(ex);
         }
+    }
 
-        String executionMode = Server.getInstance().getWorflowsExecMode();
-        engine = WorkflowEngineInstantiator.create(executionMode);
+    /**
+     *
+     * @param user
+     * @param groups
+     * @param parametersMap
+     * @param applicationName
+     * @param applicationVersion
+     * @param applicationClass
+     * @param simulationName
+     * @return
+     * @throws BusinessException
+     */
+    public synchronized String launch(User user, List<String> groups,
+            Map<String, String> parametersMap, String applicationName,
+            String applicationVersion, String applicationClass,
+            String simulationName) throws BusinessException {
+
+        String simulationID = null;
+        try {
+            int runningWorkflows = workflowDB.getRunningWorkflows(user.getFullName());
+            if (runningWorkflows >= user.getLevel().getMaxRunningSimulations()) {
+
+                logger.warn("Unable to launch simulation '" + simulationName + "': max "
+                        + "number of running workflows reached for user '" + user + "'.");
+                throw new fr.insalyon.creatis.vip.core.server.business.BusinessException(
+                        "Max number of running simulations reached.<br />You already have "
+                        + runningWorkflows + " running simulations.");
+            }
+
+            List<ParameterSweep> parameters = new ArrayList<ParameterSweep>();
+            for (String name : parametersMap.keySet()) {
+
+                ParameterSweep ps = new ParameterSweep(name);
+                String valuesStr = parametersMap.get(name);
+                if (valuesStr.contains(ApplicationConstants.SEPARATOR_INPUT)) {
+
+                    String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_INPUT);
+                    if (values.length != 3) {
+                        throw new fr.insalyon.creatis.vip.core.server.business.BusinessException("Error in range.");
+                    }
+
+                    Double start = Double.parseDouble(values[0]);
+                    Double stop = Double.parseDouble(values[1]);
+                    Double step = Double.parseDouble(values[2]);
+                    for (double d = start; d <= stop; d += step) {
+                        ps.addValue(d + "");
+                    }
+
+                } else if (valuesStr.contains(ApplicationConstants.SEPARATOR_LIST)) {
+
+                    String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_LIST);
+                    for (String v : values) {
+
+                        String parsedPath = DataManagerUtil.parseBaseDir(user, v.trim());
+                        if (!user.isSystemAdministrator()) {
+                            checkFolderACL(user, groups, parsedPath);
+                        }
+                        ps.addValue(parsedPath);
+                    }
+                } else {
+
+                    String parsedPath = DataManagerUtil.parseBaseDir(user, valuesStr.trim());
+                    if (!user.isSystemAdministrator()) {
+                        checkFolderACL(user, groups, parsedPath);
+                    }
+                    ps.addValue(parsedPath);
+                }
+                parameters.add(ps);
+            }
+
+            AppVersion version = applicationDB.getVersion(applicationName, applicationVersion);
+            DataManagerBusiness dmBusiness = new DataManagerBusiness();
+            String workflowPath = dmBusiness.getRemoteFile(user, version.getLfn(),
+                    Server.getInstance().getConfigurationFolder() + "workflows/"
+                    + FilenameUtils.getName(version.getLfn()));
+
+            WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(applicationClass);
+            Simulation simulation = executionBusiness.launch(applicationName,
+                    applicationVersion, applicationClass, user, simulationName, 
+                    workflowPath, parameters);
+            simulationID = simulation.getID();
+
+            workflowDB.add(simulation);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        } catch (DataManagerException ex) {
+            throw new BusinessException(ex);
+        }
+        return simulationID;
     }
 
     /**
@@ -162,125 +249,21 @@ public class WorkflowBusiness {
 
     /**
      *
-     * @param user
-     * @param groups
-     * @param parametersMap
-     * @param applicationName
-     * @param applicationVersion
-     * @param simulationName
-     * @return
+     * @param simulationID
      * @throws BusinessException
      */
-    public synchronized String launch(User user, List<String> groups,
-            Map<String, String> parametersMap, String applicationName,
-            String applicationVersion, String simulationName)
-            throws BusinessException {
-
-        String workflowID = null;
-        try {
-
-            int runningWorkflows = workflowDB.getRunningWorkflows(user.getFullName());
-            if (runningWorkflows >= user.getLevel().getMaxRunningSimulations()) {
-
-                logger.warn("Unable to launch simulation '" + simulationName + "': max "
-                        + "number of running workflows reached for user '" + user + "'.");
-                throw new fr.insalyon.creatis.vip.core.server.business.BusinessException(
-                        "Max number of running simulations reached.<br />You already have "
-                        + runningWorkflows + " running simulations.");
-            }
-
-            List<ParameterSweep> parameters = new ArrayList<ParameterSweep>();
-            for (String name : parametersMap.keySet()) {
-
-                ParameterSweep ps = new ParameterSweep(name);
-                String valuesStr = parametersMap.get(name);
-                if (valuesStr.contains(ApplicationConstants.SEPARATOR_INPUT)) {
-
-                    String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_INPUT);
-                    if (values.length != 3) {
-                        throw new fr.insalyon.creatis.vip.core.server.business.BusinessException("Error in range.");
-                    }
-
-                    Double start = Double.parseDouble(values[0]);
-                    Double stop = Double.parseDouble(values[1]);
-                    Double step = Double.parseDouble(values[2]);
-                    for (double d = start; d <= stop; d += step) {
-                        ps.addValue(d + "");
-                    }
-
-                } else if (valuesStr.contains(ApplicationConstants.SEPARATOR_LIST)) {
-
-                    String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_LIST);
-                    for (String v : values) {
-
-                        String parsedPath = DataManagerUtil.parseBaseDir(user, v.trim());
-                        if (!user.isSystemAdministrator()) {
-                            checkFolderACL(user, groups, parsedPath);
-                        }
-
-                        ps.addValue(parsedPath);
-                    }
-
-                } else {
-
-                    String parsedPath = DataManagerUtil.parseBaseDir(user, valuesStr.trim());
-                    if (!user.isSystemAdministrator()) {
-                        checkFolderACL(user, groups, parsedPath);
-                    }
-
-                    ps.addValue(parsedPath);
-                }
-
-                parameters.add(ps);
-            }
-
-            AppVersion version = applicationDB.getVersion(applicationName, applicationVersion);
-            DataManagerBusiness dmBusiness = new DataManagerBusiness();
-            String workflowPath = dmBusiness.getRemoteFile(user, version.getLfn(),
-                    Server.getInstance().getConfigurationFolder() + "workflows/"
-                    + FilenameUtils.getName(version.getLfn()));
-
-            engine.setWorkflow(new File(workflowPath));
-            engine.setInput(parameters);
-            String launchID = engine.launch(Server.getInstance().getServerProxy(), null);
-            workflowID = engine.getSimulationId(launchID);
-            Simulation simulation = new Simulation(applicationName, applicationVersion,
-                    workflowID, user.getFullName(), new Date(), simulationName,
-                    engine.getMode().equalsIgnoreCase("pool") ? SimulationStatus.Queued.name() : SimulationStatus.Running.name());
-            workflowDB.add(simulation);
-
-        } catch (javax.xml.rpc.ServiceException ex) {
-            WorkflowBusiness.logAndThrow(ex);
-        } catch (fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException ex) {
-            WorkflowBusiness.logAndThrow(ex);
-        } catch (fr.insalyon.creatis.vip.core.server.dao.DAOException ex) {
-            WorkflowBusiness.logAndThrow(ex);
-        } catch (java.rmi.RemoteException ex) {
-//             do nothing!
-        }
-
-        return workflowID;
-    }
-
-    /**
-     *
-     * @param simulationID
-     * @throws fr.insalyon.creatis.vip.core.server.business.BusinessException
-     */
-    public void kill(String simulationID)
-            throws
-            fr.insalyon.creatis.vip.core.server.business.BusinessException {
+    public void kill(String simulationID) throws BusinessException {
 
         try {
+            Simulation simulation = workflowDB.get(simulationID);
+            simulation.setStatus(SimulationStatus.Killed);
+            workflowDB.update(simulation);
+            WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(simulation.getApplicationClass());
+            executionBusiness.kill(simulationID);
 
-            workflowDB.updateStatus(simulationID, SimulationStatus.Killed.name());
-            engine.kill(simulationID);
-        } catch (fr.insalyon.creatis.vip.core.server.dao.DAOException ex) {
-            WorkflowBusiness.logAndThrow(ex);
-        } catch (javax.xml.rpc.ServiceException ex) {
-            WorkflowBusiness.logAndThrow(ex);
-        } catch (java.rmi.RemoteException ex) {
-            // do nothing!
+        } catch (DAOException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
         }
     }
 
@@ -290,24 +273,22 @@ public class WorkflowBusiness {
      * @param email
      * @throws BusinessException
      */
-    public void clean(String simulationID, String email)
-            throws
-            fr.insalyon.creatis.vip.core.server.business.BusinessException {
+    public void clean(String simulationID, String email) throws BusinessException {
 
         try {
 
             workflowDB.updateStatus(simulationID, SimulationStatus.Cleaned.name());
-            List<String> outputs = workflowDB.getOutputs(simulationID);
             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
-            for (String output : outputs) {
+            for (String output : workflowDB.getOutputs(simulationID)) {
                 client.delete(output, email);
             }
             workflowDB.cleanWorkflow(simulationID);
 
-        } catch (fr.insalyon.creatis.vip.core.server.dao.DAOException ex) {
-            WorkflowBusiness.logAndThrow(ex);
-        } catch (fr.insalyon.creatis.grida.client.GRIDAClientException ex) {
-            WorkflowBusiness.logAndThrow(ex);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        } catch (GRIDAClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
         }
     }
 
@@ -350,7 +331,7 @@ public class WorkflowBusiness {
     }
 
     /**
-     * Get the simulation information for a specific user
+     * Get the simulation information
      *
      * @param userName
      * @param application
@@ -361,12 +342,10 @@ public class WorkflowBusiness {
      * @throws BusinessException
      */
     public List<Simulation> getSimulations(String userName, String application,
-            String status, Date startDate, Date endDate)
-            throws fr.insalyon.creatis.vip.core.server.business.BusinessException {
+            String status, Date startDate, Date endDate) throws BusinessException {
 
         List<Simulation> simulations = null;
         try {
-
             if (endDate != null) {
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(endDate);
@@ -377,21 +356,20 @@ public class WorkflowBusiness {
             simulations = workflowDB.getList(userName, application, status, startDate, endDate);
             for (Simulation simulation : simulations) {
                 if (simulation.getStatus() == SimulationStatus.Running) {
-
-                    SimulationStatus simulationStatus = this.getStatus(simulation.getID());
+                    WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(simulation.getApplicationClass());
+                    SimulationStatus simulationStatus = executionBusiness.getStatus(simulation.getID());
                     workflowDB.updateStatus(simulation.getID(), simulationStatus.name());
                     simulation.setStatus(simulationStatus);
                 }
             }
-        } catch (fr.insalyon.creatis.vip.core.server.dao.DAOException ex) {
-            WorkflowBusiness.logAndThrow(ex);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
         }
-
         return simulations;
     }
 
     /**
-     * Get the simulation information for selected users
+     * Get the simulation information
      *
      * @param users list of users
      * @param application
@@ -402,34 +380,30 @@ public class WorkflowBusiness {
      * @throws BusinessException
      */
     public List<Simulation> getSimulations(List<String> users, String application,
-            String status, Date startDate, Date endDate)
-            throws
-            fr.insalyon.creatis.vip.core.server.business.BusinessException {
+            String status, Date startDate, Date endDate) throws BusinessException {
 
         List<Simulation> simulations = null;
         try {
-
             if (endDate != null) {
-
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(endDate);
                 calendar.add(Calendar.DATE, 1);
                 endDate = calendar.getTime();
             }
-
+            
             simulations = workflowDB.getList(users, application, status, startDate, endDate);
             for (Simulation simulation : simulations) {
                 if (simulation.getStatus() == SimulationStatus.Running) {
 
-                    SimulationStatus simulationStatus = this.getStatus(simulation.getID());
+                    WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(simulation.getApplicationClass());
+                    SimulationStatus simulationStatus = executionBusiness.getStatus(simulation.getID());
                     workflowDB.updateStatus(simulation.getID(), simulationStatus.name());
                     simulation.setStatus(simulationStatus);
                 }
             }
-        } catch (fr.insalyon.creatis.vip.core.server.dao.DAOException ex) {
-            WorkflowBusiness.logAndThrow(ex);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
         }
-
         return simulations;
     }
 
@@ -451,28 +425,6 @@ public class WorkflowBusiness {
         }
 
         return simulation;
-    }
-
-    /**
-     *
-     * @param simulationID
-     * @return
-     * @throws fr.insalyon.creatis.vip.core.server.business.BusinessException
-     */
-    public SimulationStatus getStatus(String simulationID)
-            throws
-            fr.insalyon.creatis.vip.core.server.business.BusinessException {
-
-        SimulationStatus status = SimulationStatus.Unknown;
-        try {
-            status = engine.getStatus(simulationID);
-        } catch (javax.xml.rpc.ServiceException ex) {
-            WorkflowBusiness.logAndThrow(ex);
-        } catch (java.rmi.RemoteException ex) {
-            // do nothing!
-        }
-
-        return status;
     }
 
     /**
@@ -685,9 +637,28 @@ public class WorkflowBusiness {
         return list;
     }
 
-    private void checkFolderACL(User user, List<String> groups, String path)
+    /**
+     *
+     * @param ex
+     * @throws fr.insalyon.creatis.vip.core.server.business.BusinessException
+     */
+    private static void logAndThrow(Exception ex)
             throws
             fr.insalyon.creatis.vip.core.server.business.BusinessException {
+
+        logger.error(ex);
+        throw new fr.insalyon.creatis.vip.core.server.business.BusinessException(ex);
+    }
+
+    /**
+     *
+     * @param user
+     * @param groups
+     * @param path
+     * @throws BusinessException
+     */
+    private void checkFolderACL(User user, List<String> groups, String path)
+            throws BusinessException {
 
 
         if (path.startsWith(Server.getInstance().getDataManagerUsersHome())) {
@@ -696,7 +667,7 @@ public class WorkflowBusiness {
             if (!path.startsWith(user.getFolder())) {
 
                 logger.error("User '" + user + "' tried to access data from another user: " + path + "");
-                throw new fr.insalyon.creatis.vip.core.server.business.BusinessException("Access denied to another user's home.");
+                throw new BusinessException("Access denied to another user's home.");
             }
         } else if (path.startsWith(Server.getInstance().getDataManagerGroupsHome())) {
 
@@ -706,18 +677,9 @@ public class WorkflowBusiness {
             }
 
             if (!groups.contains(path)) {
-
                 logger.error("User '" + user + "' tried to access data from a non-autorized group: " + path + "");
-                throw new fr.insalyon.creatis.vip.core.server.business.BusinessException("Access denied to group '" + path + "'.");
+                throw new BusinessException("Access denied to group '" + path + "'.");
             }
         }
-    }
-
-    private static void logAndThrow(Exception ex)
-            throws
-            fr.insalyon.creatis.vip.core.server.business.BusinessException {
-
-        logger.error(ex);
-        throw new fr.insalyon.creatis.vip.core.server.business.BusinessException(ex);
     }
 }

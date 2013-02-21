@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -65,6 +63,7 @@ public abstract class AbstractLaunchTab extends Tab {
     protected HLayout layout;
     protected String applicationName;
     protected String applicationVersion;
+    protected String applicationClass;
     protected ModalWindow modal;
     protected LaunchFormLayout launchFormLayout;
     protected InputsLayout inputsLayout;
@@ -72,10 +71,12 @@ public abstract class AbstractLaunchTab extends Tab {
     protected IButton saveInputsButton;
     protected IButton saveAsExampleButton;
 
-    public AbstractLaunchTab(String applicationName, String applicationVersion) {
+    public AbstractLaunchTab(String applicationName, String applicationVersion, 
+            String applicationClass) {
 
         this.applicationName = applicationName;
         this.applicationVersion = applicationVersion;
+        this.applicationClass = applicationClass;
 
         this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_APPLICATION) + " "
                 + applicationName + " " + applicationVersion);

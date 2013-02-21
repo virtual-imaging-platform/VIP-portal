@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -59,20 +57,22 @@ public class LaunchTab extends AbstractLaunchTab {
 
     private ArrayList<String> disabledSources;
 
-    public LaunchTab(String applicationName, String applicationVersion) {
-        this(applicationName, applicationVersion, null, null, null);
+    public LaunchTab(String applicationName, String applicationVersion, String applicationClass) {
+        this(applicationName, applicationVersion, applicationClass, null, null, null);
     }
 
     public LaunchTab(String applicationName, String applicationVersion,
-            String simulationName, Map<String, String> inputs) {
+            String applicationClass, String simulationName, Map<String, String> inputs) {
 
-        this(applicationName, applicationVersion, simulationName, inputs, null);
+        this(applicationName, applicationVersion, simulationName, 
+                applicationClass, inputs, null);
     }
 
     public LaunchTab(String applicationName, String applicationVersion,
-            String simulationName, Map<String, String> inputs, String[] disabled) {
+            String applicationClass, String simulationName, 
+            Map<String, String> inputs, String[] disabled) {
 
-        super(applicationName, applicationVersion);
+        super(applicationName, applicationVersion, applicationClass);
         layout.clear();
         disabledSources = new ArrayList<String>();
         if (disabled != null) {
@@ -198,6 +198,7 @@ public class LaunchTab extends AbstractLaunchTab {
             }
         };
         WorkflowService.Util.getInstance().launchSimulation(getParametersMap(),
-                applicationName, applicationVersion, getSimulationName(), callback);
+                applicationName, applicationVersion, applicationClass, 
+                getSimulationName(), callback);
     }
 }

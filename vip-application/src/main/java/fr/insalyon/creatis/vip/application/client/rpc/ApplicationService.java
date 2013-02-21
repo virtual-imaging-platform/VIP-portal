@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -41,6 +39,7 @@ import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
+import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import java.util.List;
 
@@ -93,11 +92,17 @@ public interface ApplicationService extends RemoteService {
 
     public List<AppClass> getClasses() throws ApplicationException;
     
-    public AppClass getClass(String className) throws ApplicationException;
-
     public List<String>[] getApplicationsAndUsers(List<String> reservedClasses) throws ApplicationException;
     
     public ApplicationStatus getApplicationStatus() throws ApplicationException;
     
     public String getCitation(String applicationName) throws ApplicationException;
+    
+    public void addEngine(Engine engine) throws ApplicationException;
+    
+    public void updateEngine(Engine engine) throws ApplicationException;
+    
+    public void removeEngine(String engineName) throws ApplicationException;
+    
+    public List<Engine> getEngines() throws ApplicationException;
 }

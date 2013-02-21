@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -72,6 +70,7 @@ public class SimulationBoxLayout extends HLayout {
     protected String simulationName;
     protected String applicationName;
     protected String applicationVersion;
+    protected String applicationClass;
     protected SimulationStatus simulationStatus;
     protected Date launchedDate;
     private Img img;
@@ -82,13 +81,14 @@ public class SimulationBoxLayout extends HLayout {
     protected HandlerRegistration handler;
 
     public SimulationBoxLayout(String id, String name, String applicationName,
-            String applicationVersion, String user, SimulationStatus status,
-            Date launchedDate) {
+            String applicationVersion, String applicationClass, String user,
+            SimulationStatus status, Date launchedDate) {
 
         this.simulationID = id;
         this.simulationName = name;
         this.applicationName = applicationName;
         this.applicationVersion = applicationVersion;
+        this.applicationClass = applicationClass;
         this.simulationStatus = status;
         this.launchedDate = launchedDate;
 
@@ -324,7 +324,8 @@ public class SimulationBoxLayout extends HLayout {
                 setLoading(false, null);
                 Tab tab = Layout.getInstance().getTab(ApplicationConstants.getLaunchTabID(applicationName));
                 if (tab == null) {
-                    LaunchTab launchTab = new LaunchTab(applicationName, applicationVersion, simulationName, result);
+                    LaunchTab launchTab = new LaunchTab(applicationName, 
+                            applicationVersion, applicationClass, simulationName, result);
                     Layout.getInstance().addTab(launchTab);
                 } else {
                     ((LaunchTab) tab).loadInput(simulationName, result);

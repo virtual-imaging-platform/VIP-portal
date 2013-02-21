@@ -30,77 +30,57 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.system.classes;
+package fr.insalyon.creatis.vip.application.client.view.system.engine;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
-import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class EditClassLayout extends AbstractFormLayout {
+public class EditEngineLayout extends AbstractFormLayout {
 
-    private boolean newClass = true;
+    private boolean newEngine = true;
     private TextItem nameField;
-    private SelectItem enginesPickList;
-    private SelectItem groupsPickList;
+    private TextItem endpointField;
     private IButton saveButton;
     private IButton removeButton;
 
-    public EditClassLayout() {
+    public EditEngineLayout() {
 
-        super(380, 200);
-        addTitle("Add/Edit Class", ApplicationConstants.ICON_CLASSES);
+        super(480, 200);
+        addTitle("Add/Edit Engine", ApplicationConstants.ICON_ENGINE);
 
         configure();
-        loadData();
     }
 
     private void configure() {
 
-        nameField = FieldUtil.getTextItem(350, null);
-
-        enginesPickList = new SelectItem();
-        enginesPickList.setShowTitle(false);
-        enginesPickList.setWidth(350);
-        
-        groupsPickList = new SelectItem();
-        groupsPickList.setShowTitle(false);
-        groupsPickList.setMultiple(true);
-        groupsPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
-        groupsPickList.setWidth(350);
+        nameField = FieldUtil.getTextItem(450, null);
+        endpointField = FieldUtil.getTextItem(450, null);
 
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
                     @Override
                     public void onClick(ClickEvent event) {
-                        if (nameField.validate()) {
-                            save(new AppClass(nameField.getValueAsString().trim(),
-                                    enginesPickList.getValueAsString(),
-                                    Arrays.asList(groupsPickList.getValues())));
+                        if (nameField.validate() & endpointField.validate()) {
+
+                            save(new Engine(nameField.getValueAsString().trim(),
+                                    endpointField.getValueAsString().trim()));
                         }
                     }
                 });
@@ -109,7 +89,7 @@ public class EditClassLayout extends AbstractFormLayout {
                 new ClickHandler() {
                     @Override
                     public void onClick(ClickEvent event) {
-                        SC.ask("Do you really want to remove this class?", new BooleanCallback() {
+                        SC.ask("Do you really want to remove this engine?", new BooleanCallback() {
                             @Override
                             public void execute(Boolean value) {
                                 if (value) {
@@ -122,64 +102,59 @@ public class EditClassLayout extends AbstractFormLayout {
         removeButton.setDisabled(true);
 
         addField("Name", nameField);
-        addField("Engine", enginesPickList);
-        addField("Groups", groupsPickList);
+        addField("End-Point", endpointField);
         addButtons(saveButton, removeButton);
     }
 
     /**
-     * Sets a class to edit or creates a blank form.
-     *
-     * @param name Class name
-     * @param groups Class groups
-     * @param engine Class engine
+     * Sets an engine to edit or creates a blank form.
+     * 
+     * @param name Engine name
+     * @param endpoint Engine endpoint
      */
-    public void setClass(String name, String groups, String engine) {
+    public void setEngine(String name, String endpoint) {
 
         if (name != null) {
             this.nameField.setValue(name);
             this.nameField.setDisabled(true);
-            this.enginesPickList.setValue(engine);
-            this.groupsPickList.setValues(groups.split(", "));
-            this.newClass = false;
+            this.endpointField.setValue(endpoint);
+            this.newEngine = false;
             this.removeButton.setDisabled(false);
 
         } else {
             this.nameField.setValue("");
             this.nameField.setDisabled(false);
-            this.enginesPickList.setValue("");
-            this.groupsPickList.setValues(new String[]{});
-            this.newClass = true;
+            this.endpointField.setValue("");
+            this.newEngine = true;
             this.removeButton.setDisabled(true);
         }
     }
 
     /**
-     *
-     * @param appClass
+     *  Adds or updates an engine.
+     * 
+     * @param engine
      */
-    private void save(AppClass appClass) {
+    private void save(Engine engine) {
 
-        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         WidgetUtil.setLoadingIButton(saveButton, "Saving...");
 
-        if (newClass) {
-            service.addClass(appClass, getCallback("add"));
+        if (newEngine) {
+            ApplicationService.Util.getInstance().addEngine(engine, getCallback("add"));
         } else {
-            service.updateClass(appClass, getCallback("update"));
+            ApplicationService.Util.getInstance().updateEngine(engine, getCallback("update"));
         }
     }
 
     /**
-     * Removes a class.
+     * Removes an engine.
      *
-     * @param name Class name
+     * @param name Engine name
      */
     private void remove(String name) {
 
-        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         WidgetUtil.setLoadingIButton(removeButton, "Removing...");
-        service.removeClass(name, getCallback("remove"));
+        ApplicationService.Util.getInstance().removeEngine(name, getCallback("remove"));
     }
 
     /**
@@ -194,58 +169,18 @@ public class EditClassLayout extends AbstractFormLayout {
             public void onFailure(Throwable caught) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                Layout.getInstance().setWarningMessage("Unable to " + text + " class:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to " + text + " engine:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setClass(null, null, null);
-                ManageClassesTab tab = (ManageClassesTab) Layout.getInstance().
-                        getTab(ApplicationConstants.TAB_MANAGE_CLASSES);
-                tab.loadClasses();
+                setEngine(null, null);
+                ManageEnginesTab tab = (ManageEnginesTab) Layout.getInstance().
+                        getTab(ApplicationConstants.TAB_MANAGE_ENGINE);
+                tab.loadEngines();
             }
         };
-    }
-
-    /**
-     * Loads groups and engines list.
-     */
-    private void loadData() {
-
-        AsyncCallback<List<Group>> callback = new AsyncCallback<List<Group>>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to get list of groups:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(List<Group> result) {
-                List<String> dataList = new ArrayList<String>();
-                for (Group group : result) {
-                    dataList.add(group.getName());
-                }
-                groupsPickList.setValueMap(dataList.toArray(new String[]{}));
-            }
-        };
-        ConfigurationService.Util.getInstance().getGroups(callback);
-        
-        AsyncCallback<List<Engine>> callback2 = new AsyncCallback<List<Engine>>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to get list of engines:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(List<Engine> result) {
-                List<String> dataList = new ArrayList<String>();
-                for (Engine engine : result) {
-                    dataList.add(engine.getName());
-                }
-                enginesPickList.setValueMap(dataList.toArray(new String[]{}));
-            }
-        };
-        ApplicationService.Util.getInstance().getEngines(callback2);
     }
 }

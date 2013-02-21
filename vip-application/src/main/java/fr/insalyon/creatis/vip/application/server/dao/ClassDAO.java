@@ -1,10 +1,8 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
- *
- * This software is a grid-enabled data-driven workflow manager and editor.
  *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -40,7 +38,7 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public interface ClassDAO {
 
@@ -51,8 +49,6 @@ public interface ClassDAO {
     public void remove(String className) throws DAOException;
 
     public List<AppClass> getClasses() throws DAOException;
-
-    public AppClass getClass(String className) throws DAOException;
-    
+   
     public List<AppClass> getUserClasses(String email, boolean validAdmin) throws DAOException;
 }

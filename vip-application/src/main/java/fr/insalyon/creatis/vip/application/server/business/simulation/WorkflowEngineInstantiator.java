@@ -1,10 +1,8 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
- *
- * This software is a grid-enabled data-driven workflow manager and editor.
  *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -36,7 +34,10 @@ package fr.insalyon.creatis.vip.application.server.business.simulation;
 
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,23 +46,23 @@ import org.shiwa.desktop.data.description.workflow.SHIWAProperty;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  * @author kboulebiar
  */
 public abstract class WorkflowEngineInstantiator {
 
     private static Logger logger = Logger.getLogger(WorkflowEngineInstantiator.class);
 
-    public static WorkflowEngineInstantiator create(String mode) {
+    public static WorkflowEngineInstantiator create(String className) throws BusinessException {
 
         WorkflowEngineInstantiator engine = null;
-        if (mode.equalsIgnoreCase("pool")) {
+        if (Server.getInstance().getWorflowsExecMode().equalsIgnoreCase("pool")) {
 
             try {
-
                 // setup the execution environment
                 ShiwaPoolEngineEnvironment.getInstance();
                 engine = new ShiwaPoolEngine(ShiwaPoolXMPPConnection.getInstance());
+                
             } catch (fr.insalyon.creatis.vip.core.server.business.BusinessException ex) {
                 logger.error(ex);
             } catch (org.jivesoftware.smack.XMPPException ex) {
@@ -79,14 +80,23 @@ public abstract class WorkflowEngineInstantiator {
 
         } else {
 
-            engine = new WebServiceEngine();
-            ((WebServiceEngine) engine).setAddressWS(Server.getInstance().getMoteurServer());
-            String settings = "GRID=DIRAC\n"
-                    + "SE=ccsrm02.in2p3.fr\n"
-                    + "TIMEOUT=100000\n"
-                    + "RETRYCOUNT=3\n"
-                    + "MULTIJOB=1";
-            ((WebServiceEngine) engine).setSettings(settings);
+            try {
+                engine = new WebServiceEngine();
+                String endpoint = ApplicationDAOFactory.getDAOFactory().getEngineDAO().getByClass(className).getEndpoint();
+                if (endpoint == null || endpoint.isEmpty()) {
+                    endpoint = Server.getInstance().getMoteurServer();
+                }
+                ((WebServiceEngine) engine).setAddressWS(endpoint);
+                String settings = "GRID=DIRAC\n"
+                        + "SE=ccsrm02.in2p3.fr\n"
+                        + "TIMEOUT=100000\n"
+                        + "RETRYCOUNT=3\n"
+                        + "MULTIJOB=1";
+                ((WebServiceEngine) engine).setSettings(settings);
+                
+            } catch (DAOException ex) {
+                throw new BusinessException(ex);
+            }
         }
 
         return engine;

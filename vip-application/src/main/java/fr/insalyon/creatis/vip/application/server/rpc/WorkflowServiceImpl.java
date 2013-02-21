@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -40,6 +38,7 @@ import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.InputBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
+import fr.insalyon.creatis.vip.application.server.business.WorkflowExecutionBusiness;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
@@ -149,13 +148,14 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param parametersMap Simulation parameters map
      * @param applicationName Application name
      * @param applicationVersion Application version
+     * @param applicationClass Application class
      * @param simulationName Simulation name
      * @throws ApplicationException
      */
     @Override
     public void launchSimulation(Map<String, String> parametersMap,
             String applicationName, String applicationVersion,
-            String simulationName) throws ApplicationException {
+            String applicationClass, String simulationName) throws ApplicationException {
 
         try {
             trace(logger, "Launching simulation '" + simulationName + "' (" + applicationName + ").");
@@ -166,8 +166,9 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
                 groups.add(group.getName());
             }
 
-            String simulationID = workflowBusiness.launch(user, groups, parametersMap,
-                    applicationName, applicationVersion, simulationName);
+            String simulationID = workflowBusiness.launch(user, groups,
+                    parametersMap, applicationName, applicationVersion, 
+                    applicationClass, simulationName);
 
             trace(logger, "Simulation '" + simulationName + "' launched with ID '" + simulationID + "'.");
 
@@ -344,6 +345,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param simulationIDs
      * @throws ApplicationException
      */
+    @Override
     public void killSimulations(List<String> simulationIDs) throws ApplicationException {
 
         try {
@@ -360,7 +362,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
                     sb.append(simulationID);
                 }
             }
-
             if (sb.length() > 0) {
                 logger.error("Unable to kill the following "
                         + "simulations: " + sb.toString());
@@ -445,6 +446,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param simulationID
      * @throws ApplicationException
      */
+    @Override
     public void killWorkflow(String simulationID) throws ApplicationException {
 
         try {

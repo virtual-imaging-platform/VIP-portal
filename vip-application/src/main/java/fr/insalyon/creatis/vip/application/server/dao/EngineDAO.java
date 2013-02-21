@@ -30,23 +30,26 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.system.classes;
 
-import com.smartgwt.client.widgets.grid.ListGridRecord;
+package fr.insalyon.creatis.vip.application.server.dao;
+
+import fr.insalyon.creatis.vip.application.client.bean.Engine;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import java.util.List;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class ClassRecord extends ListGridRecord {
+public interface EngineDAO {
 
-    public ClassRecord() {
-    }
+    public void add(Engine engine) throws DAOException;
 
-    public ClassRecord(String name, String groups, String engine) {
-        
-        setAttribute("name", name);
-        setAttribute("groups", groups);
-        setAttribute("engine", engine);
-    }
+    public void update(Engine engine) throws DAOException;
+
+    public void remove(String name) throws DAOException;
+    
+    public List<Engine> get() throws DAOException;
+    
+    public Engine getByClass(String className) throws DAOException;
 }

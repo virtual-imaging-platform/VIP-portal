@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -63,7 +61,7 @@ public class ApplicationTileGrid extends ApplicationsTileGrid {
 
         String appName = applicationVersion == null ? applicationName : applicationName + " " + applicationVersion;
         if (applicationNames.contains(appName)) {
-            Layout.getInstance().addTab(new LaunchTab(applicationName, applicationVersion));
+            Layout.getInstance().addTab(new LaunchTab(applicationName, applicationVersion, tileName));
         }
     }
 

@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -44,7 +42,6 @@ import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
-import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationTab;
@@ -65,16 +62,18 @@ public class SimulationsContextMenu extends Menu {
     private String simulationName;
     private String applicationName;
     private String applicationVersion;
+    private String applicationClass;
 
     public SimulationsContextMenu(ModalWindow modal, final String simulationID,
             final String title, final SimulationStatus status, String applicationName,
-            String applicationVersion) {
+            String applicationVersion, String applicationClass) {
 
         this.modal = modal;
         this.simulationID = simulationID;
         this.simulationName = title;
         this.applicationName = applicationName;
         this.applicationVersion = applicationVersion;
+        this.applicationClass = applicationClass;
 
         this.setShowShadow(true);
         this.setShadowDepth(10);
@@ -166,7 +165,6 @@ public class SimulationsContextMenu extends Menu {
      */
     private void killSimulation() {
 
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -180,7 +178,7 @@ public class SimulationsContextMenu extends Menu {
                 getSimulationsTab().loadData();
             }
         };
-        service.killWorkflow(simulationID, callback);
+        WorkflowService.Util.getInstance().killWorkflow(simulationID, callback);
         modal.show("Sending killing signal to " + simulationName + "...", true);
     }
 
@@ -189,7 +187,6 @@ public class SimulationsContextMenu extends Menu {
      */
     private void cleanSimulation() {
 
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -203,7 +200,7 @@ public class SimulationsContextMenu extends Menu {
                 getSimulationsTab().loadData();
             }
         };
-        service.cleanWorkflow(simulationID, callback);
+        WorkflowService.Util.getInstance().cleanWorkflow(simulationID, callback);
         modal.show("Cleaning simulation " + simulationName + "...", true);
     }
 
@@ -212,7 +209,6 @@ public class SimulationsContextMenu extends Menu {
      */
     private void purgeSimulation() {
 
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -226,7 +222,7 @@ public class SimulationsContextMenu extends Menu {
                 getSimulationsTab().loadData();
             }
         };
-        service.purgeWorkflow(simulationID, callback);
+        WorkflowService.Util.getInstance().purgeWorkflow(simulationID, callback);
         modal.show("Purging simulation " + simulationName + "...", true);
     }
 
@@ -235,8 +231,7 @@ public class SimulationsContextMenu extends Menu {
      */
     private void relaunchSimulation() {
 
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        final AsyncCallback<Map<String, String>> callback = new AsyncCallback<Map<String, String>>() {
+        AsyncCallback<Map<String, String>> callback = new AsyncCallback<Map<String, String>>() {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
@@ -246,11 +241,12 @@ public class SimulationsContextMenu extends Menu {
             @Override
             public void onSuccess(Map<String, String> result) {
                 modal.hide();
-                LaunchTab launchTab = new LaunchTab(applicationName, applicationVersion, simulationName, result);
+                LaunchTab launchTab = new LaunchTab(applicationName, 
+                        applicationVersion, applicationClass, simulationName, result);
                 Layout.getInstance().addTab(launchTab);
             }
         };
-        service.relaunchSimulation(simulationID, callback);
+        WorkflowService.Util.getInstance().relaunchSimulation(simulationID, callback);
         modal.show("Relaunching simulation " + simulationName + "...", true);
     }
 

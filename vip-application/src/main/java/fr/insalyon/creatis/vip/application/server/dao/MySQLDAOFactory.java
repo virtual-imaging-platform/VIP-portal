@@ -39,6 +39,7 @@ import fr.insalyon.creatis.vip.application.server.dao.h2.SimulationData;
 import fr.insalyon.creatis.vip.application.server.dao.mysql.ApplicationData;
 import fr.insalyon.creatis.vip.application.server.dao.mysql.ApplicationInputData;
 import fr.insalyon.creatis.vip.application.server.dao.mysql.ClassData;
+import fr.insalyon.creatis.vip.application.server.dao.mysql.EngineData;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import org.apache.log4j.Logger;
@@ -65,9 +66,17 @@ public class MySQLDAOFactory extends ApplicationDAOFactory {
         try {
             logger.info("Configuring VIP Application database.");
 
+            PlatformConnection.getInstance().createTable("VIPEngines",
+                    "name VARCHAR(255), "
+                    + "endpoint VARCHAR(255), "
+                    + "PRIMARY KEY (name)");
+
             PlatformConnection.getInstance().createTable("VIPClasses",
                     "name VARCHAR(255), "
-                    + "PRIMARY KEY (name)");
+                    + "engine VARCHAR(255), "
+                    + "PRIMARY KEY (name), "
+                    + "FOREIGN KEY (engine) REFERENCES VIPEngines(name) "
+                    + "ON DELETE CASCADE ON UPDATE RESTRICT");
 
             PlatformConnection.getInstance().createTable("VIPGroupsClasses",
                     "classname VARCHAR(255), "
@@ -82,7 +91,7 @@ public class MySQLDAOFactory extends ApplicationDAOFactory {
                     "name VARCHAR(255), "
                     + "citation TEXT, "
                     + "PRIMARY KEY (name)");
-            
+
             PlatformConnection.getInstance().createTable("VIPAppVersions",
                     "application VARCHAR(255), "
                     + "version VARCHAR(255), "
@@ -129,6 +138,11 @@ public class MySQLDAOFactory extends ApplicationDAOFactory {
     @Override
     public ClassDAO getClassDAO() throws DAOException {
         return new ClassData();
+    }
+
+    @Override
+    public EngineDAO getEngineDAO() throws DAOException {
+        return new EngineData();
     }
 
     @Override

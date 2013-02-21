@@ -32,48 +32,40 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.system.classes;
+package fr.insalyon.creatis.vip.application.client.view.system.engine;
 
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.toolbar.ToolStrip;
-import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import com.smartgwt.client.widgets.layout.HLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class ClassesToolStrip extends ToolStrip {
+public class ManageEnginesTab extends AbstractManageTab {
 
-    public ClassesToolStrip() {
+    private EnginesLayout enginesLayout;
+    private EditEngineLayout editLayout;
+    
+    public ManageEnginesTab() {
+        
+        super(ApplicationConstants.ICON_ENGINE, ApplicationConstants.APP_ENGINE, ApplicationConstants.TAB_MANAGE_ENGINE);
+        
+        enginesLayout = new EnginesLayout();
+        editLayout = new EditEngineLayout();
+        
+        HLayout hLayout = new HLayout(5);
+        hLayout.addMember(enginesLayout);
+        hLayout.addMember(editLayout);
+        
+        vLayout.addMember(hLayout);
+    }
+    
+    public void loadEngines() {
+        enginesLayout.loadData();
+    }
 
-        this.setWidth100();
-
-        ToolStripButton addButton = new ToolStripButton("Add Class", CoreConstants.ICON_ADD);
-        addButton.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(ClickEvent event) {
-                ManageClassesTab tab = (ManageClassesTab) Layout.getInstance().
-                        getTab(ApplicationConstants.TAB_MANAGE_CLASSES);
-                tab.setClass(null, null);
-            }
-        });
-        this.addButton(addButton);
-
-        ToolStripButton refreshButton = new ToolStripButton("Refresh", CoreConstants.ICON_REFRESH);
-        refreshButton.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(ClickEvent event) {
-                ManageClassesTab tab = (ManageClassesTab) Layout.getInstance().
-                        getTab(ApplicationConstants.TAB_MANAGE_CLASSES);
-                tab.loadClasses();
-            }
-        });
-        this.addButton(refreshButton);
+    public void setEngine(String name, String endpoint) {
+        editLayout.setEngine(name, endpoint);
     }
 }

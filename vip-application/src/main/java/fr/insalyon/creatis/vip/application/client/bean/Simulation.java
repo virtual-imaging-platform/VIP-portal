@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -47,6 +45,7 @@ public class Simulation implements IsSerializable {
     private String id;
     private String applicationName;
     private String applicationVersion;
+    private String applicationClass;
     private String simulationName;
     private String userName;
     private Date date;
@@ -55,11 +54,13 @@ public class Simulation implements IsSerializable {
     public Simulation() {
     }
 
-    public Simulation(String application, String applicationVersion, String id,
-            String userName, Date date, String simulationName, String status) {
+    public Simulation(String application, String applicationVersion,
+            String applicationClass, String id, String userName, Date date, 
+            String simulationName, String status) {
 
         this.applicationName = application;
         this.applicationVersion = applicationVersion;
+        this.applicationClass = applicationClass;
         this.id = id;
         this.userName = userName;
         this.date = date;
@@ -73,6 +74,10 @@ public class Simulation implements IsSerializable {
 
     public String getApplicationVersion() {
         return applicationVersion;
+    }
+    
+    public String getApplicationClass() {
+        return applicationClass;
     }
 
     public Date getDate() {

@@ -30,51 +30,77 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.monitor.timeline;
+package fr.insalyon.creatis.vip.application.server.business;
 
-import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
-import java.util.ArrayList;
-import java.util.Date;
+import fr.insalyon.creatis.vip.application.client.bean.Engine;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.util.List;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class TimelineParser {
+public class EngineBusiness {
 
-    public static TimelineParser instance;
-    public List<TimelineParserInterface> parsers;
+    /**
+     *
+     * @param engine
+     * @throws BusinessException
+     */
+    public void add(Engine engine) throws BusinessException {
 
-    public static TimelineParser getInstance() {
+        try {
+            ApplicationDAOFactory.getDAOFactory().getEngineDAO().add(engine);
 
-        if (instance == null) {
-            instance = new TimelineParser();
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
         }
-        return instance;
     }
 
-    private TimelineParser() {
+    /**
+     *
+     * @param engine
+     * @throws BusinessException
+     */
+    public void update(Engine engine) throws BusinessException {
 
-        parsers = new ArrayList<TimelineParserInterface>();
-    }
+        try {
+            ApplicationDAOFactory.getDAOFactory().getEngineDAO().update(engine);
 
-    public void addParser(TimelineParserInterface parser) {
-        
-        parsers.add(parser);
-    }
-
-    public SimulationBoxLayout parse(String id, String name, String applicationName,
-            String applicationVersion, String applicationClass, String user, 
-            SimulationStatus status, Date launchedDate) {
-        
-        for (TimelineParserInterface parser : parsers) {
-            if (parser.parse(applicationName)) {
-                return parser.getLayout(id, name, applicationName, applicationVersion, 
-                        applicationClass, user, status, launchedDate);
-            }
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
         }
-        return new SimulationBoxLayout(id, name, applicationName, applicationVersion, 
-                applicationClass, user, status, launchedDate);
+    }
+    
+    /**
+     * 
+     * @param name
+     * @throws BusinessException 
+     */
+    public void remove(String name) throws BusinessException {
+        
+        try {
+            ApplicationDAOFactory.getDAOFactory().getEngineDAO().remove(name);
+            
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
+    /**
+     * 
+     * @return
+     * @throws BusinessException 
+     */
+    public List<Engine> get() throws BusinessException {
+        
+        try {
+            return ApplicationDAOFactory.getDAOFactory().getEngineDAO().get();
+            
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
     }
 }

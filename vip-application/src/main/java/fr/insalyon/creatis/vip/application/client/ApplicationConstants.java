@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -44,6 +42,7 @@ public class ApplicationConstants {
     public final static String TAB_APPLICATION = "applications-tab";
     public final static String TAB_MANAGE_APPLICATION = "manage-application-tab";
     public final static String TAB_MANAGE_CLASSES = "manage-classes-tab";
+    public final static String TAB_MANAGE_ENGINE = "manage-engine-tab";
     public final static String TAB_MONITOR = "monitor-tab";
     public final static String TAB_STATS = "stats-tab";
     // Icons
@@ -71,6 +70,7 @@ public class ApplicationConstants {
     public static final String ICON_MONITOR_SIMULATION_RUNNING = IMG_FOLDER + "monitor/icon-simulation-running.png";
     public static final String ICON_MONITOR_TIMELINE = IMG_FOLDER + "monitor/icon-timeline.png";
     public static final String ICON_MONITOR_TASKS = IMG_FOLDER + "monitor/icon-tasks.png";
+    public static final String ICON_ENGINE = IMG_FOLDER + "icon-engines.png";
     public static final String ICON_PICKER_MORE = IMG_FOLDER + "icon-picker-more.png";
     public static final String ICON_PICKER_LESS = IMG_FOLDER + "icon-picker-less.png";
     public static final String ICON_PREVIEW = IMG_FOLDER + "icon-preview.png";
@@ -91,12 +91,14 @@ public class ApplicationConstants {
     public static final String APP_APPLICATION = "Applications";
     public static final String APP_CLASSES = "Classes";
     public static final String APP_MONITOR = "Simulation Monitor";
+    public static final String APP_ENGINE = "Engines";
     public static final String APP_SIMULATION_ERROR = "Error File";
     public static final String APP_SIMULATION_OUT = "Output File";
     // Application Images
     public static final String APP_IMG_APPLICATION = IMG_FOLDER + "app-application.png";
     public static final String APP_IMG_CLASSES = IMG_FOLDER + "app-classes.png";
     public static final String APP_IMG_MONITOR = IMG_FOLDER + "app-monitor.png";
+    public static final String APP_IMG_ENGINE = IMG_FOLDER + "app-engine.png";
     public static final String APP_IMG_SIMULATION_ERROR = IMG_FOLDER + "app-simulation-error.png";
     public static final String APP_IMG_SIMULATION_OUT = IMG_FOLDER + "app-simulation-out.png";
     // Configuration

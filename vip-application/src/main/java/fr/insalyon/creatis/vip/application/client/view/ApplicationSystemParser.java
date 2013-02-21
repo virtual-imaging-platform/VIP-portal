@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -37,6 +35,7 @@ package fr.insalyon.creatis.vip.application.client.view;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.view.system.application.ManageApplicationsTab;
 import fr.insalyon.creatis.vip.application.client.view.system.classes.ManageClassesTab;
+import fr.insalyon.creatis.vip.application.client.view.system.engine.ManageEnginesTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -55,6 +54,7 @@ public class ApplicationSystemParser extends ApplicationParser {
         }
         if (CoreModule.user.isSystemAdministrator()) {
             addApplication(ApplicationConstants.APP_CLASSES, ApplicationConstants.APP_IMG_CLASSES);
+            addApplication(ApplicationConstants.APP_ENGINE, ApplicationConstants.APP_IMG_ENGINE);
         }
     }
 
@@ -68,6 +68,11 @@ public class ApplicationSystemParser extends ApplicationParser {
         } else if (applicationName.equals(ApplicationConstants.APP_CLASSES)) {
             Layout.getInstance().addTab(new ManageClassesTab());
             return true;
+
+        } else if (applicationName.equals(ApplicationConstants.APP_ENGINE)) {
+            Layout.getInstance().addTab(new ManageEnginesTab());
+            return true;
+
         }
         return false;
     }

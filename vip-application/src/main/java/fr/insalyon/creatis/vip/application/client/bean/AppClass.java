@@ -1,10 +1,8 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
- *
- * This software is a grid-enabled data-driven workflow manager and editor.
  *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -39,18 +37,26 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class AppClass implements IsSerializable {
 
     private String name;
     private List<String> groups;
+    private String engine;
 
     public AppClass() {
     }
 
     public AppClass(String name, List<String> groups) {
+
+        this(name, null, groups);
+    }
+
+    public AppClass(String name, String engine, List<String> groups) {
+
         this.name = name;
+        this.engine = engine;
         this.groups = groups;
     }
 
@@ -60,5 +66,9 @@ public class AppClass implements IsSerializable {
 
     public String getName() {
         return name;
+    }
+
+    public String getEngine() {
+        return engine;
     }
 }

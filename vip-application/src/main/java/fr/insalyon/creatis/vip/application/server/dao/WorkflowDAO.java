@@ -1,10 +1,8 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
- *
- * This software is a grid-enabled data-driven workflow manager and editor.
  *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -43,31 +41,31 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public interface WorkflowDAO {
 
     /**
      * 
-     * @param workflow
+     * @param simulation
      * @throws DAOException 
      */
-    public void add(Simulation workflow) throws DAOException;
+    public void add(Simulation simulation) throws DAOException;
 
     /**
      * 
-     * @param workflow
+     * @param simulation
      * @throws DAOException 
      */
-    public void update(Simulation workflow) throws DAOException;
+    public void update(Simulation simulation) throws DAOException;
 
     /**
      * 
-     * @param workflowID
+     * @param simulationID
      * @return
      * @throws DAOException 
      */
-    public Simulation get(String workflowID) throws DAOException;
+    public Simulation get(String simulationID) throws DAOException;
     
     /**
      * Gets the list of simulations.
@@ -123,32 +121,32 @@ public interface WorkflowDAO {
 
     /**
      * 
-     * @param workflowID
+     * @param simulationID
      * @param status
      */
-    public void updateStatus(String workflowID, String status) throws DAOException;
+    public void updateStatus(String simulationID, String status) throws DAOException;
 
     /**
      *
-     * @param workflowID
+     * @param simulationID
      * @return
      * @throws DAOException
      */
-    public List<String> getOutputs(String workflowID) throws DAOException;
+    public List<String> getOutputs(String simulationID) throws DAOException;
 
     /**
      *
-     * @param workflowID
+     * @param simulationID
      * @throws DAOException
      */
-    public void cleanWorkflow(String workflowID) throws DAOException;
+    public void cleanWorkflow(String simulationID) throws DAOException;
 
     /**
      * 
-     * @param workflowID
+     * @param simulationID
      * @throws DAOException
      */
-    public void delete(String workflowID) throws DAOException;
+    public void delete(String simulationID) throws DAOException;
 
     /**
      * 

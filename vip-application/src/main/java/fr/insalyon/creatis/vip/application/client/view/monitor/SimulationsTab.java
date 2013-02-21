@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -138,30 +136,25 @@ public class SimulationsTab extends Tab {
             @Override
             public void onRowContextClick(RowContextClickEvent event) {
                 event.cancel();
-                String simulationId = event.getRecord().getAttribute("simulationId");
-                String title = event.getRecord().getAttribute("simulationName");
-                String applicationName = event.getRecord().getAttribute("application");
-                String applicationVersion = event.getRecord().getAttribute("applicationVersion");
-                SimulationStatus status = SimulationStatus.valueOf(
-                        event.getRecord().getAttribute("status"));
-
-                new SimulationsContextMenu(modal, simulationId, title,
-                        status, applicationName, applicationVersion).showContextMenu();
+                new SimulationsContextMenu(modal,
+                        event.getRecord().getAttribute("simulationId"),
+                        event.getRecord().getAttribute("simulationName"),
+                        SimulationStatus.valueOf(event.getRecord().getAttribute("status")),
+                        event.getRecord().getAttribute("application"),
+                        event.getRecord().getAttribute("applicationVersion"),
+                        event.getRecord().getAttribute("applicationClass")).showContextMenu();
             }
         });
         rowMouseDownHandler = grid.addRowMouseDownHandler(new RowMouseDownHandler() {
             @Override
             public void onRowMouseDown(RowMouseDownEvent event) {
                 if (event.getColNum() != 1) {
-                    String simulationID = event.getRecord().getAttribute("simulationId");
-                    String simulationName = event.getRecord().getAttribute("simulationName");
-                    String applicationName = event.getRecord().getAttribute("application");
-                    Date date = event.getRecord().getAttributeAsDate("date");
-                    SimulationStatus status = SimulationStatus.valueOf(
-                            event.getRecord().getAttribute("status"));
-
-                    Layout.getInstance().addTab(MonitorParser.getInstance().parse(simulationID,
-                            simulationName, applicationName, status, date));
+                    Layout.getInstance().addTab(MonitorParser.getInstance().parse(
+                            event.getRecord().getAttribute("simulationId"),
+                            event.getRecord().getAttribute("simulationName"),
+                            event.getRecord().getAttribute("application"),
+                            SimulationStatus.valueOf(event.getRecord().getAttribute("status")),
+                            event.getRecord().getAttributeAsDate("date")));
                 }
             }
         });
@@ -180,15 +173,20 @@ public class SimulationsTab extends Tab {
 
                 List<SimulationRecord> dataList = new ArrayList<SimulationRecord>();
 
-                for (Simulation sim : result) {
-                    if (sim.getStatus() != SimulationStatus.Cleaned
+                for (Simulation simulation : result) {
+                    if (simulation.getStatus() != SimulationStatus.Cleaned
                             || CoreModule.user.isSystemAdministrator()
                             || CoreModule.user.isGroupAdmin()) {
 
-                        dataList.add(new SimulationRecord(sim.getSimulationName(),
-                                sim.getApplicationName(), sim.getApplicationVersion(), 
-                                sim.getStatus(), sim.getID(),
-                                sim.getUserName(), sim.getDate()));
+                        dataList.add(new SimulationRecord(
+                                simulation.getSimulationName(),
+                                simulation.getApplicationName(),
+                                simulation.getApplicationVersion(),
+                                simulation.getApplicationClass(),
+                                simulation.getStatus(),
+                                simulation.getID(),
+                                simulation.getUserName(),
+                                simulation.getDate()));
                     }
                 }
                 grid.setData(dataList.toArray(new SimulationRecord[]{}));

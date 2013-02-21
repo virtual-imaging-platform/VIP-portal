@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -39,18 +37,18 @@ import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
+import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
+import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
 import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
-import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -64,9 +62,11 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     private static Logger logger = Logger.getLogger(ApplicationServiceImpl.class);
     private ClassBusiness classBusiness;
     private ApplicationBusiness applicationBusiness;
+    private EngineBusiness engineBusiness;
 
     public ApplicationServiceImpl() {
 
+        engineBusiness = new EngineBusiness();
         classBusiness = new ClassBusiness();
         applicationBusiness = new ApplicationBusiness();
     }
@@ -216,10 +216,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     /**
-     * 
+     *
      * @param applicationClass
      * @return
-     * @throws ApplicationException 
+     * @throws ApplicationException
      */
     @Override
     public List<String[]> getApplicationsByClass(String applicationClass) throws ApplicationException {
@@ -313,23 +313,9 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     /**
-     *
-     * @param className
+     * 
      * @return
-     */
-    @Override
-    public AppClass getClass(String className) {
-
-        try {
-            return ApplicationDAOFactory.getDAOFactory().getClassDAO().getClass(className);
-        } catch (DAOException ex) {
-            return null;
-        }
-    }
-
-    /**
-     *
-     * @return @throws ApplicationException
+     * @throws ApplicationException 
      */
     @Override
     public ApplicationStatus getApplicationStatus() throws ApplicationException {
@@ -382,6 +368,85 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             return applicationBusiness.getVersions(applicationName);
 
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param engine
+     * @throws ApplicationException
+     */
+    @Override
+    public void addEngine(Engine engine) throws ApplicationException {
+
+        try {
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Adding engine '" + engine.getName() + "'.");
+            engineBusiness.add(engine);
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param engine
+     * @throws ApplicationException
+     */
+    @Override
+    public void updateEngine(Engine engine) throws ApplicationException {
+
+        try {
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Updating engine '" + engine.getName() + "'.");
+            engineBusiness.update(engine);
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param engineName
+     * @throws ApplicationException
+     */
+    @Override
+    public void removeEngine(String engineName) throws ApplicationException {
+
+        try {
+            authenticateSystemAdministrator(logger);
+            trace(logger, "Removing engine '" + engineName + "'.");
+            engineBusiness.remove(engineName);
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     * 
+     * @return
+     * @throws ApplicationException 
+     */
+    @Override
+    public List<Engine> getEngines() throws ApplicationException {
+        
+        try {
+            authenticateSystemAdministrator(logger);
+            return engineBusiness.get();
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }

@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -39,6 +37,7 @@ import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
+import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import java.util.List;
 
 /**
@@ -77,11 +76,17 @@ public interface ApplicationServiceAsync {
 
     public void updateClass(AppClass c, AsyncCallback<Void> asyncCallback);
 
-    public void getClass(String className, AsyncCallback<AppClass> asyncCallback);
-
     public void getApplicationsAndUsers(List<String> reservedClasses, AsyncCallback<List<String>[]> asyncCallback);
     
     public void getApplicationStatus(AsyncCallback<ApplicationStatus> asyncCallback);
     
     public void getCitation(String applicationName, AsyncCallback<String> asyncCallback);
+    
+    public void addEngine(Engine engine, AsyncCallback<Void> asyncCallback);
+    
+    public void updateEngine(Engine engine, AsyncCallback<Void> asyncCallback);
+    
+    public void removeEngine(String engineName, AsyncCallback<Void> asyncCallback);
+    
+    public void getEngines(AsyncCallback<List<Engine>> asyncCallback);
 }

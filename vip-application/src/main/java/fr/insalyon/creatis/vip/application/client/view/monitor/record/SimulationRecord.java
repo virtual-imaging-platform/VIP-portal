@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -48,12 +46,13 @@ public class SimulationRecord extends ListGridRecord {
     }
 
     public SimulationRecord(String simulationName, String application,
-            String applicationVersion, SimulationStatus status, String simulationId, 
-            String user, Date date) {
+            String applicationVersion, String applicationClass,
+            SimulationStatus status, String simulationId, String user, Date date) {
 
         setAttribute("statusIco", "ico_" + status.name().toLowerCase());
         setAttribute("application", application);
         setAttribute("applicationVersion", applicationVersion);
+        setAttribute("applicationClass", applicationClass);
         setAttribute("status", status.name());
         setAttribute("simulationId", simulationId);
         setAttribute("user", user);
@@ -88,7 +87,7 @@ public class SimulationRecord extends ListGridRecord {
     public String getDate() {
         return getAttributeAsString("date");
     }
-    
+
     public String getSimulationName() {
         return getAttributeAsString("simulationName");
     }

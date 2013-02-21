@@ -30,23 +30,33 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.system.classes;
+package fr.insalyon.creatis.vip.application.client.bean;
 
-import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class ClassRecord extends ListGridRecord {
+public class Engine implements IsSerializable {
 
-    public ClassRecord() {
+    private String name;
+    private String endpoint;
+
+    public Engine() {
     }
 
-    public ClassRecord(String name, String groups, String engine) {
-        
-        setAttribute("name", name);
-        setAttribute("groups", groups);
-        setAttribute("engine", engine);
+    public Engine(String name, String endpoint) {
+
+        this.name = name;
+        this.endpoint = endpoint;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEndpoint() {
+        return endpoint;
     }
 }

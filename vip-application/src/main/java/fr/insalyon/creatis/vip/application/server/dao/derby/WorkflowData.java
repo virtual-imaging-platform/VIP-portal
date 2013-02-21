@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -85,16 +83,18 @@ public class WorkflowData implements WorkflowDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("INSERT INTO "
                     + "Workflows(id, application, application_version, "
-                    + "simulation_name, username, launched, status) "
-                    + "VALUES(?, ?, ?, ?, ?, ?, ?)");
+                    + "application_class, simulation_name, username, launched, "
+                    + "status) "
+                    + "VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
 
             ps.setString(1, simulation.getID());
             ps.setString(2, simulation.getApplicationName());
             ps.setString(3, simulation.getApplicationVersion());
-            ps.setString(4, simulation.getSimulationName());
-            ps.setString(5, simulation.getUserName());
-            ps.setTimestamp(6, new Timestamp(simulation.getDate().getTime()));
-            ps.setString(7, simulation.getStatus().name());
+            ps.setString(4, simulation.getApplicationClass());
+            ps.setString(5, simulation.getSimulationName());
+            ps.setString(6, simulation.getUserName());
+            ps.setTimestamp(7, new Timestamp(simulation.getDate().getTime()));
+            ps.setString(8, simulation.getStatus().name());
             ps.execute();
             ps.close();
 
@@ -120,14 +120,17 @@ public class WorkflowData implements WorkflowDAO {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
                     + "Workflows "
                     + "SET application=?, application_version = ?, "
+                    + "application_class = ?, status = ?, "
                     + "simulation_name=?, username = ? "
                     + "WHERE id=?");
 
             ps.setString(1, simulation.getApplicationName());
             ps.setString(2, simulation.getApplicationVersion());
-            ps.setString(3, simulation.getSimulationName());
-            ps.setString(4, simulation.getUserName());
-            ps.setString(5, simulation.getID());
+            ps.setString(3, simulation.getApplicationClass());
+            ps.setString(4, simulation.getStatus().name());
+            ps.setString(5, simulation.getSimulationName());
+            ps.setString(6, simulation.getUserName());
+            ps.setString(7, simulation.getID());
             ps.executeUpdate();
             ps.close();
 
@@ -149,8 +152,8 @@ public class WorkflowData implements WorkflowDAO {
         try {
 
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "id, application, application_version, username, launched, "
-                    + "status, simulation_name "
+                    + "id, application, application_version, application_class, "
+                    + "username, launched, status, simulation_name "
                     + "FROM Workflows WHERE id = ?");
             ps.setString(1, simulationID);
 
@@ -160,6 +163,7 @@ public class WorkflowData implements WorkflowDAO {
             Simulation simulation = new Simulation(
                     rs.getString("application"),
                     rs.getString("application_version"),
+                    rs.getString("application_class"),
                     rs.getString("id"),
                     rs.getString("username"),
                     new Date(rs.getTimestamp("launched").getTime()),
@@ -181,8 +185,8 @@ public class WorkflowData implements WorkflowDAO {
             String query = user == null ? "" : "WHERE username='" + user + "' AND status != 'Cleaned' ";
             PreparedStatement ps = connection.prepareStatement("SELECT * FROM ( "
                     + "SELECT ROW_NUMBER() OVER() AS rownum, "
-                    + "id, application, application_version, username, launched, "
-                    + "status, simulation_name  FROM ( "
+                    + "id, application, application_version, application_class, "
+                    + "username, launched, status, simulation_name  FROM ( "
                     + "SELECT * "
                     + "FROM Workflows " + query + " "
                     + "ORDER BY launched desc) AS tmp "
@@ -205,8 +209,8 @@ public class WorkflowData implements WorkflowDAO {
             String query = user == null ? "" : "AND username='" + user + "' AND status != 'Cleaned' ";
             PreparedStatement ps = connection.prepareStatement("SELECT * FROM ( "
                     + "SELECT ROW_NUMBER() OVER() AS rownum, "
-                    + "id, application, application_version, username, launched, "
-                    + "status, simulation_name  FROM ( "
+                    + "id, application, application_version, application_class, "
+                    + "username, launched, status, simulation_name  FROM ( "
                     + "SELECT * "
                     + "FROM Workflows WHERE launched < ? " + query + " "
                     + "ORDER BY launched desc) AS tmp "
@@ -250,8 +254,8 @@ public class WorkflowData implements WorkflowDAO {
             }
 
             PreparedStatement stat = connection.prepareStatement("SELECT "
-                    + "id, application, application_version, username, launched, "
-                    + "status, simulation_name "
+                    + "id, application, application_version, application_class, "
+                    + "username, launched, status, simulation_name "
                     + "FROM Workflows " + query + " "
                     + "ORDER BY launched DESC");
 
@@ -320,8 +324,8 @@ public class WorkflowData implements WorkflowDAO {
             }
 
             PreparedStatement stat = connection.prepareStatement("SELECT "
-                    + "id, application, application_version, username, launched, "
-                    + "status, simulation_name "
+                    + "id, application, application_version, application_class, "
+                    + "username, launched, status, simulation_name "
                     + "FROM Workflows " + query + " "
                     + "ORDER BY launched DESC");
 
@@ -371,6 +375,7 @@ public class WorkflowData implements WorkflowDAO {
             simulations.add(new Simulation(
                     rs.getString("application"),
                     rs.getString("application_version"),
+                    rs.getString("application_class"),
                     rs.getString("id"),
                     rs.getString("username"),
                     new Date(rs.getTimestamp("launched").getTime()),
@@ -406,13 +411,13 @@ public class WorkflowData implements WorkflowDAO {
     }
 
     @Override
-    public void updateStatus(String workflowID, String status) throws DAOException {
+    public void updateStatus(String simulationID, String status) throws DAOException {
         try {
             PreparedStatement stat = connection.prepareStatement("UPDATE "
                     + "Workflows SET status=? WHERE id=?");
 
             stat.setString(1, status);
-            stat.setString(2, workflowID);
+            stat.setString(2, simulationID);
             stat.executeUpdate();
 
         } catch (SQLException ex) {

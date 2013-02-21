@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -49,8 +47,6 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellClickHandler;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
@@ -106,7 +102,7 @@ public class ApplicationsLayout extends VLayout {
             }
         });
         toolstrip.addMember(addButton);
-        
+
         LabelButton refreshButton = new LabelButton("Refresh", CoreConstants.ICON_REFRESH);
         refreshButton.setWidth(150);
         refreshButton.addClickHandler(new ClickHandler() {
@@ -183,27 +179,17 @@ public class ApplicationsLayout extends VLayout {
         grid.setShowEmptyMessage(true);
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
-
-        ListGridField nameField = new ListGridField("name", "Application Name");
-        ListGridField groupsField = new ListGridField("classes", "Classes");
-
-        grid.setFields(nameField, groupsField);
+        grid.setFields(new ListGridField("name", "Application Name"),
+                new ListGridField("classes", "Classes"));
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
-        grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
-            @Override
-            public void onCellDoubleClick(CellDoubleClickEvent event) {
-                edit(event.getRecord().getAttribute("name"),
-                        event.getRecord().getAttribute("classes"),
-                        event.getRecord().getAttribute("citation"));
-            }
-        });
         grid.addCellClickHandler(new CellClickHandler() {
             @Override
             public void onCellClick(CellClickEvent event) {
-                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
-                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                appsTab.loadVersions(event.getRecord().getAttribute("name"));
+
+                edit(event.getRecord().getAttribute("name"),
+                        event.getRecord().getAttribute("classes"),
+                        event.getRecord().getAttribute("citation"));
             }
         });
         this.addMember(grid);
@@ -264,6 +250,8 @@ public class ApplicationsLayout extends VLayout {
 
         ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                 getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
+        
+        appsTab.loadVersions(name);
         appsTab.setApplication(name, classes, citation);
     }
 }

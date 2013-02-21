@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -61,19 +59,20 @@ public class ClassData implements ClassDAO {
     }
 
     /**
-     * 
+     *
      * @param appClass
-     * @throws DAOException 
+     * @throws DAOException
      */
     @Override
     public void add(AppClass appClass) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO VIPClasses(name) "
-                    + "VALUES (?)");
+                    "INSERT INTO VIPClasses(name, engine) "
+                    + "VALUES (?, ?)");
 
             ps.setString(1, appClass.getName());
+            ps.setString(2, appClass.getEngine());
             ps.execute();
             ps.close();
 
@@ -90,27 +89,36 @@ public class ClassData implements ClassDAO {
     }
 
     /**
-     * 
+     *
      * @param appClass
-     * @throws DAOException 
+     * @throws DAOException
      */
     @Override
     public void update(AppClass appClass) throws DAOException {
 
         try {
+            PreparedStatement ps = connection.prepareStatement(
+                    "UPDATE VIPClasses SET engine = ? "
+                    + "WHERE name = ?");
+
+            ps.setString(1, appClass.getEngine());
+            ps.setString(2, appClass.getName());
+            ps.executeUpdate();
+            ps.close();
+
             removeGroupsFromClass(appClass.getName());
             addGroupsToClass(appClass.getName(), appClass.getGroups());
 
-        } catch (DAOException ex) {
+        } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
         }
     }
 
     /**
-     * 
+     *
      * @param className
-     * @throws DAOException 
+     * @throws DAOException
      */
     @Override
     public void remove(String className) throws DAOException {
@@ -139,11 +147,11 @@ public class ClassData implements ClassDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "SELECT name FROM VIPClasses  ORDER BY name");
+                    "SELECT name, engine FROM VIPClasses ORDER BY name");
 
             ResultSet rs = ps.executeQuery();
             List<AppClass> classes = new ArrayList<AppClass>();
-            
+
             while (rs.next()) {
                 List<String> groups = new ArrayList<String>();
                 PreparedStatement ps2 = connection.prepareStatement(
@@ -155,10 +163,11 @@ public class ClassData implements ClassDAO {
                 while (r.next()) {
                     groups.add(r.getString("groupname"));
                 }
-                classes.add(new AppClass(rs.getString("name"), groups));
                 ps2.close();
+                classes.add(new AppClass(rs.getString("name"), 
+                        rs.getString("engine"), groups));
             }
-            
+
             ps.close();
             return classes;
 
@@ -169,53 +178,18 @@ public class ClassData implements ClassDAO {
     }
 
     /**
-     * 
-     * @param className
-     * @return
-     * @throws DAOException 
-     */
-    @Override
-    public AppClass getClass(String className) throws DAOException {
-
-        try {
-            List<String> groups = new ArrayList<String>();
-
-            PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "groupname "
-                    + "FROM VIPGroupsClasses "
-                    + "WHERE classname=?");
-
-            ps.setString(1, className);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                groups.add(rs.getString("groupname"));
-            }
-
-            AppClass appClass = new AppClass(className, groups);
-            
-            ps.close();
-            return appClass;
-
-        } catch (SQLException ex) {
-            logger.error(ex);
-            throw new DAOException(ex);
-        }
-    }
-
-    /**
-     * 
+     *
      * @param email
      * @param validAdmin
      * @return
-     * @throws DAOException 
+     * @throws DAOException
      */
     @Override
     public List<AppClass> getUserClasses(String email, boolean validAdmin) throws DAOException {
 
         try {
             String clause = validAdmin ? " AND ug.role = ?" : "";
-            
+
             PreparedStatement ps = connection.prepareStatement("SELECT DISTINCT classname "
                     + "FROM VIPGroupsClasses gc, VIPUsersGroups ug "
                     + "WHERE ug.groupname = gc.groupname AND ug.email = ?" + clause);
@@ -224,7 +198,7 @@ public class ClassData implements ClassDAO {
             if (validAdmin) {
                 ps.setString(2, GROUP_ROLE.Admin.name());
             }
-            
+
             ResultSet rs = ps.executeQuery();
             List<AppClass> classes = new ArrayList<AppClass>();
 
@@ -252,10 +226,10 @@ public class ClassData implements ClassDAO {
     }
 
     /**
-     * 
+     *
      * @param className
      * @param groups
-     * @throws DAOException 
+     * @throws DAOException
      */
     private void addGroupsToClass(String className, List<String> groups) throws DAOException {
 
@@ -283,9 +257,9 @@ public class ClassData implements ClassDAO {
     }
 
     /**
-     * 
+     *
      * @param className
-     * @throws DAOException 
+     * @throws DAOException
      */
     private void removeGroupsFromClass(String className) throws DAOException {
 
