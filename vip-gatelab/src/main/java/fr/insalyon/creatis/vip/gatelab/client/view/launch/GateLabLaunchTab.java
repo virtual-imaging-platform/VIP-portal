@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -61,9 +59,10 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
     private String baseDir;
     private IButton loadMacButton;
 
-    public GateLabLaunchTab(String applicationName, String applicationVersion) {
+    public GateLabLaunchTab(String applicationName, String applicationVersion, 
+            String applicationClass) {
 
-        super(applicationName, applicationVersion);
+        super(applicationName, applicationVersion, applicationClass);
         layout.clear();
         initComplete(this);
 
@@ -216,6 +215,7 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
         };
         WidgetUtil.setLoadingIButton(launchButton, "Launching...");
         WorkflowService.Util.getInstance().launchSimulation(getParametersMap(),
-                applicationName, applicationVersion, getSimulationName(), callback);
+                applicationName, applicationVersion, applicationClass, 
+                getSimulationName(), callback);
     }
 }

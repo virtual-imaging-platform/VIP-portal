@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -69,8 +67,10 @@ public class GateLabTimelineParser implements TimelineParserInterface {
      */
     @Override
     public SimulationBoxLayout getLayout(String id, String name, String applicationName,
-            String applicationVersion, String user, SimulationStatus status, Date launchedDate) {
+            String applicationVersion, String applicationClass, String user, 
+            SimulationStatus status, Date launchedDate) {
 
-        return new GateLabSimulationBoxLayout(id, name, applicationName, applicationVersion, user, status, launchedDate);
+        return new GateLabSimulationBoxLayout(id, name, applicationName, 
+                applicationVersion, applicationClass, user, status, launchedDate);
     }
 }
