@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -43,11 +41,11 @@ import fr.insalyon.creatis.vip.simulatedata.client.SimulatedDataConstants;
  *
  * @author Tristan Glatard
  */
-public class SimulatedDataParser extends ApplicationParser{
+public class SimulatedDataParser extends ApplicationParser {
 
     @Override
     public void loadApplications() {
-       if (CoreModule.user.isSystemAdministrator()
+        if (CoreModule.user.isSystemAdministrator()
                 || CoreModule.user.hasGroupAccess(SimulatedDataConstants.GROUP_VIP)
                 || CoreModule.user.hasGroupAccess("Tutorial")) {
 
@@ -57,11 +55,11 @@ public class SimulatedDataParser extends ApplicationParser{
 
     @Override
     public boolean parse(String applicationName, String applicationVersion) {
-         if (applicationName.equals(SimulatedDataConstants.APP_SD)) {
+        
+        if (applicationName.equals(SimulatedDataConstants.APP_SD)) {
             Layout.getInstance().addTab(new SimulatedDataTab());
             return true;
         }
         return false;
     }
-    
 }

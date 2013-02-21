@@ -1,10 +1,8 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
- *
- * This software is a grid-enabled data-driven workflow manager and editor.
  *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -63,12 +61,11 @@ import fr.insalyon.creatis.vip.simulationgui.client.gwtgl.Scene;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-
 import java.util.Map;
 
 /**
  *
- * @author Kevin Moulin
+ * @author Kevin Moulin, Rafael Ferreira da Silva
  */
 public class SimulationGUIControlBox {
 
@@ -412,7 +409,7 @@ public class SimulationGUIControlBox {
         inputs.put("Model URI", SimulationGUITab.getModelURI().substring(SimulationGUITab.getModelURI().lastIndexOf('#') + 1));
 
         String[] disabled = {"Transformation", "Model", "Model URI"};
-        launchTab = new LaunchTab(application[0], application[1],
+        launchTab = new LaunchTab(application[0], application[1], applicationClass,
                 SimulationGUITab.getModelName() + " simulation", inputs, disabled);//simulatorSelectItem.getValueAsString());
 
         Layout.getInstance().addTab(launchTab);
