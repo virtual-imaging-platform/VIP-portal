@@ -64,8 +64,8 @@ public class LaunchTab extends AbstractLaunchTab {
     public LaunchTab(String applicationName, String applicationVersion,
             String applicationClass, String simulationName, Map<String, String> inputs) {
 
-        this(applicationName, applicationVersion, simulationName, 
-                applicationClass, inputs, null);
+        this(applicationName, applicationVersion, applicationClass, 
+                simulationName, inputs, null);
     }
 
     public LaunchTab(String applicationName, String applicationVersion,
