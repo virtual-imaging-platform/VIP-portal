@@ -32,6 +32,7 @@
  */
 package fr.insalyon.creatis.vip.application.server.business.simulation;
 
+import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
@@ -62,7 +63,7 @@ public abstract class WorkflowEngineInstantiator {
                 // setup the execution environment
                 ShiwaPoolEngineEnvironment.getInstance();
                 engine = new ShiwaPoolEngine(ShiwaPoolXMPPConnection.getInstance());
-                
+
             } catch (fr.insalyon.creatis.vip.core.server.business.BusinessException ex) {
                 logger.error(ex);
             } catch (org.jivesoftware.smack.XMPPException ex) {
@@ -82,10 +83,11 @@ public abstract class WorkflowEngineInstantiator {
 
             try {
                 engine = new WebServiceEngine();
-                String endpoint = ApplicationDAOFactory.getDAOFactory().getEngineDAO().getByClass(className).getEndpoint();
-                if (endpoint == null || endpoint.isEmpty()) {
-                    endpoint = Server.getInstance().getMoteurServer();
-                }
+                Engine engineBean = ApplicationDAOFactory.getDAOFactory().getEngineDAO().getByClass(className);
+
+                String endpoint = engineBean == null || engineBean.getEndpoint().isEmpty()
+                        ? Server.getInstance().getMoteurServer()
+                        : engineBean.getEndpoint();
                 ((WebServiceEngine) engine).setAddressWS(endpoint);
                 String settings = "GRID=DIRAC\n"
                         + "SE=ccsrm02.in2p3.fr\n"
@@ -93,7 +95,7 @@ public abstract class WorkflowEngineInstantiator {
                         + "RETRYCOUNT=3\n"
                         + "MULTIJOB=1";
                 ((WebServiceEngine) engine).setSettings(settings);
-                
+
             } catch (DAOException ex) {
                 throw new BusinessException(ex);
             }
