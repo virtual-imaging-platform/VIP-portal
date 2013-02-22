@@ -75,7 +75,8 @@
             <artifactId>VIP-Cowork-Applet</artifactId>
             <version>${vip.cowork-applet.version}</version>
         </dependency>
-         <dependency>
+        
+        <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-cowork</artifactId>
             <version>${vip.cowork.version}</version>
@@ -99,7 +100,7 @@
             <version>${vip.models.version}</version>
         </dependency>
         
-               <dependency>
+        <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-simulated-data</artifactId>
             <version>${vip.simulated-data.version}</version>

@@ -51,6 +51,10 @@ import fr.insalyon.creatis.vip.cowork.client.CoworkModule;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
 import fr.insalyon.creatis.vip.docs.client.DocsModule;
 import fr.insalyon.creatis.vip.gatelab.client.GateLabModule;
+import fr.insalyon.creatis.vip.models.client.ModelModule;
+import fr.insalyon.creatis.vip.simulatedata.client.SimulatedDataModule;
+import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIModule;
+import fr.insalyon.creatis.vip.social.client.SocialModule;
 
 /**
  *
@@ -58,10 +62,11 @@ import fr.insalyon.creatis.vip.gatelab.client.GateLabModule;
  */
 public class Main implements EntryPoint {
 
+    @Override
     public void onModuleLoad() {
 
         Layout.getInstance().getModal().show("Loading VIP " + CoreConstants.VERSION, true);
-        
+
         // Modules
         Modules modulesInit = Modules.getInstance();
         modulesInit.add(new CoreModule());
@@ -89,7 +94,6 @@ public class Main implements EntryPoint {
     //redirect to N4U CAS authentication
     public void displayLoginView() {
         ConfigurationService.Util.getInstance().getCASLoginPageUrl(new AsyncCallback<String>() {
-
             @Override
             public void onFailure(Throwable caught) {
                 Window.alert(caught.toString());
@@ -117,12 +121,13 @@ public class Main implements EntryPoint {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<User> callback = new AsyncCallback<User>() {
-
+            @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().getModal().hide();
                 SC.warn("Error while configuring VIP:<br />" + caught.getMessage());
             }
 
+            @Override
             public void onSuccess(User user) {
                 Layout.getInstance().getModal().hide();
                 Layout.getInstance().authenticate(user);
@@ -141,7 +146,7 @@ public class Main implements EntryPoint {
             ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
 
             final AsyncCallback<User> callback = new AsyncCallback<User>() {
-
+                @Override
                 public void onFailure(Throwable caught) {
                     Layout.getInstance().getModal().hide();
                     if (caught.getMessage().contains("Authentication failed")) {
@@ -151,6 +156,7 @@ public class Main implements EntryPoint {
                     }
                 }
 
+                @Override
                 public void onSuccess(User result) {
                     Layout.getInstance().getModal().hide();
 
