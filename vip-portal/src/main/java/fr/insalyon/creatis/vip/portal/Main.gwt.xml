@@ -16,7 +16,7 @@
     <inherits name="fr.insalyon.creatis.vip.simulationgui.SimulationGUI" />
     <inherits name="fr.insalyon.creatis.vip.models.Models" />
     <inherits name="fr.insalyon.creatis.vip.social.Social" />
-    
+        <inherits name="fr.insalyon.creatis.vip.cardiac.Cardiac" />
     <!-- Specify the app entry point class.-->
     <entry-point class="fr.insalyon.creatis.vip.portal.client.Main"/>
 <!--     <set-property name="user.agent" value="gecko1_8" />
