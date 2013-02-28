@@ -45,7 +45,38 @@ public class CardiacSimulationLayout extends HLayout {
         this.setPadding(4);
 
 
-        VLayout left = new VLayout();
+        VLayout pictures = new VLayout();
+        if (s.getModalities().contains("CT")) {
+            Img ct = new Img(CardiacConstants.ICON_CT);
+            ct.setWidth(50);
+            ct.setHeight(50);
+            pictures.addMember(ct);
+            pictures.addMember(WidgetUtil.getLabel("<i><font color=\"grey\">CT</font></i>", 25));
+        }
+        if (s.getModalities().contains("MRI")) {
+            Img mri = new Img(CardiacConstants.ICON_MRI);
+            mri.setWidth(50);
+            mri.setHeight(50);
+            pictures.addMember(mri);
+            pictures.addMember(WidgetUtil.getLabel("<i><font color=\"grey\">MRI</font></i>", 25));
+        }
+        if (s.getModalities().contains("PET")) {
+            Img pet = new Img(CardiacConstants.ICON_PET);
+            pet.setWidth(50);
+            pet.setHeight(50);
+            pictures.addMember(pet);
+            pictures.addMember(WidgetUtil.getLabel("<i><font color=\"grey\">PET</font></i>", 25));
+        }
+        if (s.getModalities().contains("Ultrasound")) {
+            Img us = new Img(CardiacConstants.ICON_US);
+            us.setWidth(50);
+            us.setHeight(50);
+            pictures.addMember(us);
+            pictures.addMember(WidgetUtil.getLabel("<i><font color=\"grey\">Ultrasound</font></i>", 25));
+        }
+        this.addMember(pictures);
+
+        VLayout rightButtons = new VLayout();
 
         if (s.getSimulationID() == null || s.getSimulationID().equals("")) {
             goToSimulation = getImgButton(CardiacConstants.ICON_NOSIMU, "No simulation is available for this image");
@@ -61,14 +92,14 @@ public class CardiacSimulationLayout extends HLayout {
         }
         goToSimulation.setWidth(60);
         goToSimulation.setHeight(60);
-        left.addMember(goToSimulation);
+        rightButtons.addMember(goToSimulation);
 
-        left.addMember(WidgetUtil.getLabel("<br/>", 25));
+        rightButtons.addMember(WidgetUtil.getLabel("<br/>", 25));
 
         download = getImgButton(CardiacConstants.ICON_DOWNLOAD, "Download simulation files");
         download.setWidth(60);
         download.setHeight(60);
-        left.addMember(download);
+        rightButtons.addMember(download);
         download.addClickHandler(new ClickHandler() {
 
             @Override
@@ -77,41 +108,18 @@ public class CardiacSimulationLayout extends HLayout {
             }
         });
 
-        this.addMember(left);
+
 
         vLayout = new VLayout();
         vLayout.setWidth100();
         vLayout.setHeight(60);
         this.addMember(vLayout);
 
+        this.addMember(rightButtons);
 
 
-        HLayout pictures = new HLayout();
-        if (s.getModalities().contains("CT")) {
-            Img ct = new Img(CardiacConstants.ICON_CT);
-            ct.setWidth(50);
-            ct.setHeight(50);
-            pictures.addMember(ct);
-        }
-        if (s.getModalities().contains("MRI")) {
-            Img mri = new Img(CardiacConstants.ICON_MRI);
-            mri.setWidth(50);
-            mri.setHeight(50);
-            pictures.addMember(mri);
-        }
-        if (s.getModalities().contains("PET")) {
-            Img pet = new Img(CardiacConstants.ICON_PET);
-            pet.setWidth(50);
-            pet.setHeight(50);
-            pictures.addMember(pet);
-        }
-        if (s.getModalities().contains("Ultrasound")) {
-            Img us = new Img(CardiacConstants.ICON_US);
-            us.setWidth(50);
-            us.setHeight(50);
-            pictures.addMember(us);
-        }
-        this.addMember(pictures);
+
+
 
 
         if (CoreModule.user.isSystemAdministrator() || CoreModule.user.isGroupAdmin(CardiacConstants.CARDIAC_GROUP)) {
@@ -218,9 +226,10 @@ public class CardiacSimulationLayout extends HLayout {
     }
 
     private void viewSimulation(Simulation s) {
-               for (String id : s.getSimulationID().split("\\s+"))
-                       Layout.getInstance().addTab(new SimulationTab(id,
-                "Simulation " + id.substring(id.lastIndexOf("-")+1), SimulationStatus.Completed));
+        for (String id : s.getSimulationID().split("\\s+")) {
+            Layout.getInstance().addTab(new SimulationTab(id,
+                    "Simulation " + id.substring(id.lastIndexOf("-") + 1), SimulationStatus.Completed));
+        }
     }
 
     private ImgButton getImgButton(String imgSrc, String prompt) {
