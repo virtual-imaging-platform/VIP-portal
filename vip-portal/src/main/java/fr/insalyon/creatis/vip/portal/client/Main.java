@@ -40,6 +40,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.application.client.ApplicationModule;
+import fr.insalyon.creatis.vip.cardiac.client.CardiacModule;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Modules;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -79,6 +80,7 @@ public class Main implements EntryPoint {
         modulesInit.add(new SocialModule());
         modulesInit.add(new DataManagerModule());
         modulesInit.add(new CoworkModule());
+        modulesInit.add(new CardiacModule());
         // End-Modules
 
         final String ticket = Window.Location.getParameter("ticket");
