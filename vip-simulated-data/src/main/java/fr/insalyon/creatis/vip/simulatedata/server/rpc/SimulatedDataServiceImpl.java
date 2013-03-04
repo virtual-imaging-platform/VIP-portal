@@ -41,6 +41,7 @@ import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectMod
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.rpc.WorkflowServiceImpl;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.simulatedata.client.SimulatedDataException;
@@ -68,7 +69,7 @@ public class SimulatedDataServiceImpl extends AbstractRemoteServiceServlet imple
         ArrayList<SimulatedData> list = new ArrayList<SimulatedData>();
 
         //real data
-        ExperimentSummary expeSummary = new ExperimentSummary("root", "creatis2011", "jdbc:mysql://kingkong.grid.creatis.insa-lyon.fr:3306/vip_simulated_data");
+        ExperimentSummary expeSummary = new ExperimentSummary(Server.getInstance().getSimulatedDataDBUser(), Server.getInstance().getSimulatedDataDBPass(),Server.getInstance().getSimulatedDataDBURL());
 
 //        Model summaries = RDFManagerFactory.createSDBResultsRepository("root", "creatis2011", "jdbc:mysql://kingkong.grid.creatis.insa-lyon.fr:3306/vip_simulated_data").getBaseModel();
         List<fr.cnrs.i3s.neusemstore.provenance.expsummaries.dto.SimulatedData> beans = expeSummary.generateBeans();
