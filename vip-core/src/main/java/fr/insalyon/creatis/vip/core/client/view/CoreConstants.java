@@ -43,7 +43,7 @@ import java.util.Date;
  */
 public class CoreConstants implements IsSerializable {
 
-    public static final String VERSION = "v0.9.2";
+    public static final String VERSION = "v0.9.3";
     // Configuration Labels
     public static final String LAB_DB_HOST = "database.server.host";
     public static final String LAB_DB_PORT = "database.server.port";
@@ -78,6 +78,9 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_WORKFLOWS_DB_PORT = "workflows.db.port";
     public static final String LAB_WORKFLOWS_FOLDER = "workflows.directory";
     public static final String LAB_WORKFLOWS_EXEC_MODE = "workflows.exec.mode";
+    public static final String LAB_SIMULATED_DATA_DB_USER ="simulated-data.db.user";
+    public static final String LAB_SIMULATED_DATA_DB_PASSWORD ="simulated-data.db.pass";
+    public static final String LAB_SIMULATED_DATA_DB_URL ="simulated-data.db.url";
     // Tabs
     public static final String TAB_ACCOUNT = "account-tab";
     public static final String TAB_ACTIVATION = "activation-tab";
