@@ -49,7 +49,9 @@ public class CardiacTab extends Tab {
     }
 
     private void initLayout() {
-         ToolstripLayout toolstrip = new ToolstripLayout();
+        ToolstripLayout toolstrip = new ToolstripLayout();
+
+        
 
         toolstrip.addMember(WidgetUtil.getSpaceLabel(15));
 
@@ -65,10 +67,11 @@ public class CardiacTab extends Tab {
             });
             toolstrip.addMember(addButton);
         }
-        
+
         LabelButton refreshButton = new LabelButton("Refresh", CoreConstants.ICON_REFRESH);
         refreshButton.setWidth(150);
         refreshButton.addClickHandler(new ClickHandler() {
+
             @Override
             public void onClick(ClickEvent event) {
                 loadData();
@@ -76,12 +79,15 @@ public class CardiacTab extends Tab {
         });
         toolstrip.addMember(refreshButton);
 
-         mainPane = new VLayout();
+        mainPane = new VLayout();
         mainPane.setWidth100();
         mainPane.setHeight100();
         mainPane.setOverflow(Overflow.AUTO);
-        mainPane.addMember(toolstrip);
+
+        mainPane.addMember(WidgetUtil.getLabel("This database gathers multimodality (US, TEP, CT and MRI) simulations of the beating heart. It exploits VIP to access the modality simulators. The virtual heart model is the Anthropomorphic DynAmic Model of the beating heart and breathing thorax, ADAM in a healthy and a pathological versions [<a href=\"http://ieeexplore.ieee.org/xpl/articleDetails.jsp?arnumber=4353715\">1</a>-<a href=\"http://www.sudoc.abes.fr/DB=2.1/SRCH?IKT=12&TRM=119342014\">2</a>]. Such simulations can serve as a basis for the evaluation of image analysis methods e.g. segmentation, motion estimation...",30));
         
+        mainPane.addMember(toolstrip);
+
         vLayout = new VLayout();
         vLayout.setWidth100();
         vLayout.setHeight100();
@@ -93,7 +99,7 @@ public class CardiacTab extends Tab {
         hLayout.setOverflow(Overflow.AUTO);
 
         hLayout.addMember(vLayout);
-        
+
         if (CoreModule.user.isSystemAdministrator() || CoreModule.user.isGroupAdmin(CardiacConstants.CARDIAC_GROUP)) {
             simulationEditLayout = new SimulationEditLayout();
             hLayout.addMember(simulationEditLayout);
@@ -120,8 +126,9 @@ public class CardiacTab extends Tab {
                 public void onSuccess(List<Simulation> result) {
                     modal.hide();
                     initLayout();
-                    if(result.size()==0)
+                    if (result.size() == 0) {
                         vLayout.addMember(WidgetUtil.getLabel("<b>No data</b>", 15));
+                    }
                     for (Simulation s : result) {
                         vLayout.addMember(new CardiacSimulationLayout(s));
                     }
