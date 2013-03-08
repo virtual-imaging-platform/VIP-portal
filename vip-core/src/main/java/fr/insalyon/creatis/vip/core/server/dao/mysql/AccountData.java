@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -164,19 +162,27 @@ public class AccountData implements AccountDAO {
 
     /**
      *
-     * @param accountName
+     * @param accounts
      * @return
      * @throws DAOException
      */
-    public List<Group> getGroups(String accountName) throws DAOException {
+    @Override
+    public List<Group> getGroups(String... accounts) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            StringBuilder query = new StringBuilder();
+            for (String account : accounts) {
+                if (query.length() > 0) {
+                    query.append(" OR ");
+                }
+                query.append("name = '").append(account).append("'");
+            }
+
+            PreparedStatement ps = connection.prepareStatement("SELECT DISTINCT "
                     + "ag.groupname AS name, g.public AS pub "
                     + "FROM VIPAccountsGroups AS ag "
                     + "LEFT JOIN VIPGroups AS g ON ag.groupname = g.groupname "
-                    + "WHERE name = ?");
-            ps.setString(1, accountName);
+                    + "WHERE " + query.toString());
             ResultSet rs = ps.executeQuery();
 
             List<Group> groups = new ArrayList<Group>();

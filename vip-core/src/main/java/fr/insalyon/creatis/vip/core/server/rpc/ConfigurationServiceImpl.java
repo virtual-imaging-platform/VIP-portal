@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -101,11 +99,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      *
      * @param user User bean object
      * @param comments User's comments
-     * @param accountType User's account type
+     * @param accountType User's accounts type
      * @throws CoreException
      */
     @Override
-    public void signup(User user, String comments, String accountType) throws CoreException {
+    public void signup(User user, String comments, String[] accountType) throws CoreException {
 
         try {
             logger.info("Sign up request from '" + user.getEmail() + "'.");

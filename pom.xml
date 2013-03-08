@@ -4,16 +4,16 @@
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip</artifactId>
     <packaging>pom</packaging>
-    <version>0.9.4</version>
+    <version>1.0</version>
     <name>VIP</name>
     
     <properties>
-        <vip.core.version>0.9.4</vip.core.version>
-        <vip.portal.version>0.9.4</vip.portal.version>
-        <vip.docs.version>0.9.1</vip.docs.version>
-        <vip.application.version>0.9.2</vip.application.version>
-        <vip.datamanager.version>0.9.1</vip.datamanager.version>
-        <vip.datamanager-applet.version>0.3.1</vip.datamanager-applet.version>
+        <vip.core.version>1.0</vip.core.version>
+        <vip.portal.version>1.0</vip.portal.version>
+        <vip.docs.version>1.0</vip.docs.version>
+        <vip.application.version>1.0</vip.application.version>
+        <vip.datamanager.version>1.0</vip.datamanager.version>
+        <vip.datamanager-applet.version>1.0</vip.datamanager-applet.version>
         <vip.gatelab.version>0.9.1</vip.gatelab.version>
         <vip.gatelab-applet.version>0.3.2</vip.gatelab-applet.version>
         <vip.simulation-gui.version>0.4.1</vip.simulation-gui.version>
@@ -64,12 +64,12 @@
         <module>vip-simulation-gui</module>
         <module>vip-models</module>
         <module>vip-simulated-data</module>
-<!--        <module>vip-provenance</module>-->
-<!--        <module>vip-physical-properties</module>-->
+        <!--        <module>vip-provenance</module>-->
+        <!--        <module>vip-physical-properties</module>-->
         <module>vip-social</module>
         <module>vip-cowork</module>
         <module>vip-cardiac</module>
-  </modules>
+    </modules>
     
     <repositories>
         
@@ -109,9 +109,9 @@
     </distributionManagement>
     
     <scm>
-        <connection>scm:svn:https://svn.creatis.insa-lyon.fr/svn/vip/Portal</connection>
-        <developerConnection>scm:svn:https://svn.creatis.insa-lyon.fr/svn/vip/Portal</developerConnection>
-        <url>http://vip.creatis.insa-lyon.fr:9002/projects/vip</url>
+        <connection>scm:svn:https://svn.creatis.insa-lyon.fr/svn/vip/Portal/trunk</connection>
+        <developerConnection>scm:svn:https://svn.creatis.insa-lyon.fr/svn/vip/Portal/trunk</developerConnection>
+        <url>http://vip.creatis.insa-lyon.fr:9002/projects/vip/trunk</url>
     </scm>
     
     <build>
@@ -123,6 +123,26 @@
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <tagBase>svn+ssh://svn.creatis.insa-lyon.fr/svn/vip/Portal/branches</tagBase>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-plugin</artifactId>
+                <version>1.9-SNAPSHOT</version>
+                <configuration>
+                    <connectionType>developerconnection</connectionType>
                 </configuration>
             </plugin>
         </plugins>

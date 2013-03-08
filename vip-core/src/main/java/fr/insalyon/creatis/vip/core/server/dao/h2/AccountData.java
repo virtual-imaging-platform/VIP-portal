@@ -168,7 +168,7 @@ public class AccountData implements AccountDAO {
      * @return
      * @throws DAOException
      */
-    public List<Group> getGroups(String accountName) throws DAOException {
+    public List<Group> getGroups(String... accountName) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
@@ -176,7 +176,7 @@ public class AccountData implements AccountDAO {
                     + "FROM VIPAccountsGroups AS ag "
                     + "LEFT JOIN VIPGroups AS g ON ag.groupname = g.groupname "
                     + "WHERE name = ?");
-            ps.setString(1, accountName);
+//            ps.setString(1, accountName);
             ResultSet rs = ps.executeQuery();
 
             List<Group> groups = new ArrayList<Group>();

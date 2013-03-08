@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -130,7 +128,7 @@ public class ConfigurationBusiness {
         }
     }
 
-    public void signup(User user, String comments, String accountType, boolean auto) throws BusinessException {
+    public void signup(User user, String comments, boolean auto, String... accountType) throws BusinessException {
         try {
             user.setCode(UUID.randomUUID().toString());
             user.setPassword(MD5.get(user.getPassword()));
@@ -241,8 +239,8 @@ public class ConfigurationBusiness {
      * @param accountType
      * @throws BusinessException
      */
-    public void signup(User user, String comments, String accountType) throws BusinessException {
-        signup(user, comments, accountType, false);
+    public void signup(User user, String comments, String...accountType) throws BusinessException {
+        signup(user, comments, false, accountType);
 
     }
 
@@ -302,7 +300,7 @@ public class ConfigurationBusiness {
                 user = userDAO.getUser(user.getEmail());
             } catch (DAOException ex) {
                 try {
-                    signup(user, "Automatically generated from CAS login", Server.getInstance().getCasAccountType(), true);
+                    signup(user, "Automatically generated from CAS login", true, Server.getInstance().getCasAccountType());
                     this.activateUser(user.getEmail());
                     user = userDAO.getUser(user.getEmail());
 

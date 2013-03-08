@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -52,7 +50,7 @@ public interface ConfigurationServiceAsync {
 
     public void configure(String email, String session, AsyncCallback<User> asyncCallback);
 
-    public void signup(User user, String comments, String accountType, AsyncCallback<Void> asyncCallback);
+    public void signup(User user, String comments, String[] accountType, AsyncCallback<Void> asyncCallback);
 
     public void signin(String email, String password, AsyncCallback<User> asyncCallback);
 

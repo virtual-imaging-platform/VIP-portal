@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -37,6 +35,7 @@ package fr.insalyon.creatis.vip.core.client.view.auth;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -47,7 +46,6 @@ import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
-import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
@@ -127,6 +125,8 @@ public class SignUpTab extends Tab {
         accountTypeField = new SelectItem();
         accountTypeField.setShowTitle(false);
         accountTypeField.setRequired(true);
+        accountTypeField.setMultiple(true);
+        accountTypeField.setMultipleAppearance(MultipleAppearance.PICKLIST);
 
         commentsItem = new TextAreaItem("comment", "");
         commentsItem.setHeight(80);
@@ -173,7 +173,6 @@ public class SignUpTab extends Tab {
                             phoneField.getValueAsString().trim(),
                             CountryCode.valueOf(countryField.getValueAsString()));
 
-                    ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
                     final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
                         @Override
@@ -191,8 +190,8 @@ public class SignUpTab extends Tab {
                             signin();
                         }
                     };
-                    service.signup(user, commentsItem.getValueAsString(),
-                            accountTypeField.getValueAsString(), callback);
+                    ConfigurationService.Util.getInstance().signup(user, commentsItem.getValueAsString(),
+                            accountTypeField.getValues(), callback);
                     WidgetUtil.setLoadingIButton(signupButton, "Signing up...");
                 }
             }
@@ -216,7 +215,6 @@ public class SignUpTab extends Tab {
 
     private void signin() {
 
-        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<User> callback = new AsyncCallback<User>() {
 
             @Override
@@ -243,13 +241,12 @@ public class SignUpTab extends Tab {
                 Layout.getInstance().authenticate(result);
             }
         };
-        service.signin(emailField.getValueAsString().trim(),
+        ConfigurationService.Util.getInstance().signin(emailField.getValueAsString().trim(),
                 passwordField.getValueAsString(), callback);
     }
 
     private void loadAccountTypes() {
 
-        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<List<Account>> callback = new AsyncCallback<List<Account>>() {
 
             @Override
@@ -267,6 +264,6 @@ public class SignUpTab extends Tab {
                 accountTypeField.setValueMap(values);
             }
         };
-        service.getAccounts(callback);
+        ConfigurationService.Util.getInstance().getAccounts(callback);
     }
 }
