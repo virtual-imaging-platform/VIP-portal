@@ -41,6 +41,7 @@ import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.tree.Tree;
 import com.smartgwt.client.widgets.tree.TreeNode;
+import fr.insalyon.creatis.vip.datamanager.client.view.image.ImageViewTab;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
@@ -80,6 +81,16 @@ public class InOutContextMenu extends Menu {
             }
         });
 
+        MenuItem viewFileItem = new MenuItem("View Image");
+        viewFileItem.setIcon(DataManagerConstants.ICON_VIEW);
+        viewFileItem.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(MenuItemClickEvent event) {
+                Layout.getInstance().addTab(new ImageViewTab(node.getName()));
+            }
+        });
+        
         MenuItem downloadFileItem = new MenuItem("Download");
         downloadFileItem.setIcon(DataManagerConstants.ICON_DOWNLOAD);
         downloadFileItem.addClickHandler(new ClickHandler() {
@@ -104,7 +115,11 @@ public class InOutContextMenu extends Menu {
 
         if (!node.getType().equals("Simulation")) {
             if (node.getName().startsWith(DataManagerConstants.ROOT + "/")) {
-                this.setItems(downloadFileItem, jumpToItem);
+                if(ImageViewTab.isSupported(node.getName())){
+                    this.setItems(viewFileItem,downloadFileItem, jumpToItem);
+                }
+                else
+                    this.setItems(downloadFileItem, jumpToItem);
             } else {
                 this.setItems(downloadFilesItem);
             }
