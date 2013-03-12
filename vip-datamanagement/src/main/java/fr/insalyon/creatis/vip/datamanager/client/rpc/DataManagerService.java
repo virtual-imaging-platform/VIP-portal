@@ -40,6 +40,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
+import fr.insalyon.creatis.vip.datamanager.client.bean.Image;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import java.util.Date;
@@ -109,4 +110,6 @@ public interface DataManagerService extends RemoteService {
     public List<DMZombieFile> getZombieFiles() throws DataManagerException;
     
     public void deleteZombieFiles(List<String> surls) throws DataManagerException;
+    
+    public Image getImageSlicesURL(String imageLFN) throws DataManagerException;
 }

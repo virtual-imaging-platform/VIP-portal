@@ -38,6 +38,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
+import fr.insalyon.creatis.vip.datamanager.client.bean.Image;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import java.util.Date;
 import java.util.List;
@@ -93,4 +94,6 @@ public interface DataManagerServiceAsync {
     public void getZombieFiles(AsyncCallback<List<DMZombieFile>> asyncCallback);
     
     public void deleteZombieFiles(List<String> surls, AsyncCallback<Void> asyncCallback);
+    
+     public void getImageSlicesURL(String imageLFN, AsyncCallback<Image> asyncCallback);
 }

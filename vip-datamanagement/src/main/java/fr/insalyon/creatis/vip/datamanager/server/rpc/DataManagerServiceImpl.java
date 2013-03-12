@@ -42,6 +42,7 @@ import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
+import fr.insalyon.creatis.vip.datamanager.client.bean.Image;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
@@ -408,5 +409,20 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         } catch (BusinessException ex) {
             throw new DataManagerException(ex);
         }
+    }
+
+    @Override
+    public Image getImageSlicesURL(String imageLFN) throws DataManagerException {
+
+        try {
+            trace(logger, "viewing image: " + imageLFN);
+            User user = getSessionUser();
+            return  dataManagerBusiness.getImageSlicesURL(imageLFN,this.getServletContext().getRealPath("."),user);
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
+        }
+
     }
 }

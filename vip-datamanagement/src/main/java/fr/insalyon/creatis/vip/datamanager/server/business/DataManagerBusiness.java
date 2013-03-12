@@ -36,20 +36,27 @@ package fr.insalyon.creatis.vip.datamanager.server.business;
 
 import fr.insalyon.creatis.devtools.FileUtils;
 import fr.insalyon.creatis.grida.client.GRIDACacheClient;
-import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAZombieClient;
 import fr.insalyon.creatis.grida.common.bean.CachedFile;
 import fr.insalyon.creatis.grida.common.bean.ZombieFile;
+import java.util.ArrayList;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
+import fr.insalyon.creatis.vip.datamanager.client.bean.Image;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import java.io.BufferedReader;
 import java.io.File;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -137,20 +144,20 @@ public class DataManagerBusiness {
      * @throws BusinessException 
      */
     public List<DMZombieFile> getZombieFiles() throws BusinessException {
-        
+
         try {
             List<DMZombieFile> list = new ArrayList<DMZombieFile>();
             for (ZombieFile zf : CoreUtil.getGRIDAZombieClient().getList()) {
                 list.add(new DMZombieFile(zf.getSurl(), zf.getRegistration()));
             }
             return list;
-            
+
         } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
      * Deletes a list of zombie files.
      * 
@@ -169,5 +176,77 @@ public class DataManagerBusiness {
             logger.error(ex);
             throw new BusinessException(ex);
         }
+    }
+
+    public Image getImageSlicesURL(String imageLFN, String localDir, User user) throws BusinessException {
+        String relativeDirString = "/images/viewer" + System.getProperty("file.separator") + (new File(imageLFN)).getParent().replaceAll(" ", "_").replaceAll("\\([^\\(]*\\)", "");
+        String imageDirString = localDir +relativeDirString;
+        File imageDir = new File(imageDirString);
+        String imageFileName = imageDir.getAbsolutePath() + System.getProperty("file.separator") + imageLFN.substring(imageLFN.lastIndexOf('/') + 1);
+
+        if (!imageDir.exists()) { //if it exists, assume that the file is being downloaded and don't do it again
+            imageDir.mkdirs();
+            if (!imageDir.exists()) {
+                throw new BusinessException("Cannot create viewer dir: " + imageDir.getAbsolutePath());
+            }
+            try {
+                CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(user, imageLFN), imageDir.getAbsolutePath());
+            } catch (GRIDAClientException ex) {
+                imageDir.delete();
+                throw new BusinessException(ex);
+            } catch (DataManagerException ex) {
+                throw new BusinessException(ex);
+            }
+
+            //split slices
+            ProcessBuilder builder = new ProcessBuilder("slice.sh", imageFileName, imageDir.getAbsolutePath());
+            builder.redirectErrorStream(true);
+            try {
+
+                builder.start();
+                try {
+                    //wait for the first slice to be produced but not for all slices ;)
+                    Thread.currentThread().sleep(1000);
+                } catch (InterruptedException ex) {
+                    imageDir.delete();
+                    throw new BusinessException(ex);
+                }
+
+            } catch (IOException ex) {
+                imageDir.delete();
+                throw new BusinessException(ex);
+            }
+        }
+        //get z value
+        ProcessBuilder builderZ = new ProcessBuilder("getz.sh", imageFileName);
+        builderZ.redirectErrorStream(true);
+        String number = "";
+        try {
+            try {
+                Process process = builderZ.start();
+                process.waitFor();
+
+                InputStream stdout = process.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(stdout));
+
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    System.out.println("Stdout: " + line);
+                    number += line;
+                }
+            } catch (InterruptedException ex) {
+                imageDir.delete();
+                throw new BusinessException(ex);
+            }
+
+
+        } catch (IOException ex) {
+            imageDir.delete();
+            throw new BusinessException(ex);
+        }
+        System.out.println(relativeDirString);
+        return new Image(relativeDirString, Integer.parseInt(number.trim()));//tempDir.listFiles().length -1);
+
     }
 }

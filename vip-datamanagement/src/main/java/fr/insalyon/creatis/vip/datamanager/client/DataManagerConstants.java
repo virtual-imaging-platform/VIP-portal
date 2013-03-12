@@ -66,6 +66,7 @@ public class DataManagerConstants {
     public static final String ICON_UPLOAD = IMG_FOLDER + "icon-upload.png";
     public static final String ICON_UPLOAD_MULTIPLE = IMG_FOLDER + "icon-upload-multiple.png";
     public static final String ICON_WARNING = IMG_FOLDER + "icon-warning.png";
+        public static final String ICON_VIEW = IMG_FOLDER+"icon-view.png";
     // Application Names
     public final static String APP_CACHED_FILES = "Cached Files";
     public final static String APP_FILE_TRANSFER = "File Transfer";
@@ -90,4 +91,5 @@ public class DataManagerConstants {
     public static final String BIOMED_HOME = "Biomed";
     public static final String GROUP_APPEND = " (group)";
     public static final int MAX_OPERATIONS_LIMIT = 10;
+
 }

@@ -51,6 +51,7 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.ValidatorUtil;
+import fr.insalyon.creatis.vip.datamanager.client.view.image.ImageViewTab;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,6 +68,16 @@ public class BrowserContextMenu extends Menu {
         this.setShowShadow(true);
         this.setShadowDepth(10);
         this.setWidth(90);
+
+        MenuItem imageViewItem = new MenuItem("View Image");
+        imageViewItem.setIcon(DataManagerConstants.ICON_VIEW);
+        imageViewItem.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(MenuItemClickEvent event) {
+                Layout.getInstance().addTab(new ImageViewTab(baseDir + "/" + data.getName()));
+            }
+        });
 
         MenuItem uploadItem = new MenuItem("Upload");
         uploadItem.setIcon(DataManagerConstants.ICON_UPLOAD);
@@ -145,7 +156,7 @@ public class BrowserContextMenu extends Menu {
             public void onClick(MenuItemClickEvent event) {
                 if (ValidatorUtil.validateRootPath(baseDir, "delete from")
                         && ValidatorUtil.validateUserLevel(baseDir, "delete from")) {
-                    
+
                     delete(modal, baseDir, data.getName());
                 }
             }
@@ -167,11 +178,21 @@ public class BrowserContextMenu extends Menu {
         MenuItemSeparator separator = new MenuItemSeparator();
 
         if (DataManagerContext.getInstance().hasCutAction()) {
-            this.setItems(uploadItem, downloadItem, separator, cutItem, pasteItem,
-                    separator, renameItem, deleteItem, separator, propertiesItem);
+            if (ImageViewTab.isSupported(data.getName())) {
+                this.setItems(imageViewItem, separator, uploadItem, downloadItem, separator, cutItem, pasteItem,
+                        separator, renameItem, deleteItem, separator, propertiesItem);
+            } else {
+                this.setItems(uploadItem, downloadItem, separator, cutItem, pasteItem,
+                        separator, renameItem, deleteItem, separator, propertiesItem);
+            }
         } else {
-            this.setItems(uploadItem, downloadItem, separator, cutItem, separator,
-                    renameItem, deleteItem, separator, propertiesItem);
+            if (ImageViewTab.isSupported(data.getName())) {
+                this.setItems(imageViewItem, separator, uploadItem, downloadItem, separator, cutItem, separator,
+                        renameItem, deleteItem, separator, propertiesItem);
+            } else {
+                this.setItems(uploadItem, downloadItem, separator, cutItem, separator,
+                        renameItem, deleteItem, separator, propertiesItem);
+            }
         }
     }
 
