@@ -126,4 +126,8 @@ public interface ConfigurationService extends RemoteService {
     public void removeAccount(String name) throws CoreException;
     
     public String getCASLoginPageUrl() throws CoreException;
+    
+    public int getNUsers() throws CoreException;
+    
+    public int getNCountries() throws CoreException;
 }

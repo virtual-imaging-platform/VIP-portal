@@ -77,4 +77,8 @@ public interface UserDAO {
     public void updateCode(String email, String code) throws DAOException;
     
     public void resetPassword(String email, String newPassword) throws DAOException;
+    
+    public int getNUsers() throws DAOException;
+    
+    public int getNCountries() throws DAOException;
 }

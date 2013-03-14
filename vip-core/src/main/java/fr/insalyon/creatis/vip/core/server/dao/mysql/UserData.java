@@ -43,6 +43,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -580,5 +581,37 @@ public class UserData implements UserDAO {
             logger.error(ex);
             throw new DAOException(ex);
         }
+    }
+
+    @Override
+    public int getNUsers() throws DAOException {
+        try {
+            PreparedStatement ps = connection.prepareStatement("select COUNT(*) as count from VIPUsers");
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                return rs.getInt("count");
+            }
+            ps.close();
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+        return -1;
+    }
+
+    @Override
+    public int getNCountries() throws DAOException {
+        try {
+            PreparedStatement ps = connection.prepareStatement("select COUNT(distinct country_code) as count from VIPUsers");
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                return rs.getInt("count");
+            }
+            ps.close();
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+        return -1;
     }
 }

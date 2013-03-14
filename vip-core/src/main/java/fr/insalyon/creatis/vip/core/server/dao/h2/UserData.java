@@ -581,4 +581,36 @@ public class UserData implements UserDAO {
             throw new DAOException(ex);
         }
     }
+    
+     @Override
+    public int getNUsers() throws DAOException {
+        try {
+            PreparedStatement ps = connection.prepareStatement("select COUNT(*) as count from VIPUsers");
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                return rs.getInt("count");
+            }
+            ps.close();
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+        return -1;
+    }
+
+    @Override
+    public int getNCountries() throws DAOException {
+        try {
+            PreparedStatement ps = connection.prepareStatement("select COUNT(distinct country_code) as count from VIPUsers");
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                return rs.getInt("count");
+            }
+            ps.close();
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+        return -1;
+    }
 }

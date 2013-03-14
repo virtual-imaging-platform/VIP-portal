@@ -110,4 +110,8 @@ public interface ConfigurationServiceAsync {
     public void removeAccount(String name, AsyncCallback<Void> asyncCallback);
 
     public void getCASLoginPageUrl(AsyncCallback<String> asyncCallback);
+    
+    public void getNUsers(AsyncCallback<Integer> asyncCallback);
+    
+    public void getNCountries(AsyncCallback<Integer> asyncCallback);
 }

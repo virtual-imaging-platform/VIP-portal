@@ -43,11 +43,14 @@ import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 
@@ -720,5 +723,23 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                     + request.getContextPath());
         }
         return url;
+    }
+
+    @Override
+    public int getNUsers() throws CoreException {
+        try {
+            return CoreDAOFactory.getDAOFactory().getUserDAO().getNUsers();
+        } catch (DAOException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    @Override
+    public int getNCountries() throws CoreException {
+        try {
+            return CoreDAOFactory.getDAOFactory().getUserDAO().getNCountries();
+        } catch (DAOException ex) {
+            throw new CoreException(ex);
+        }
     }
 }
