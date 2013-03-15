@@ -34,6 +34,7 @@ package fr.insalyon.creatis.vip.core.server.rpc;
 
 import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -726,20 +727,15 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     @Override
-    public int getNUsers() throws CoreException {
+    public UsageStats getUsageStats() throws CoreException {
         try {
-            return CoreDAOFactory.getDAOFactory().getUserDAO().getNUsers();
+            Integer users = CoreDAOFactory.getDAOFactory().getUserDAO().getNUsers();
+            Integer countries = CoreDAOFactory.getDAOFactory().getUserDAO().getNCountries();
+            return new UsageStats(users, countries);
         } catch (DAOException ex) {
             throw new CoreException(ex);
         }
-    }
 
-    @Override
-    public int getNCountries() throws CoreException {
-        try {
-            return CoreDAOFactory.getDAOFactory().getUserDAO().getNCountries();
-        } catch (DAOException ex) {
-            throw new CoreException(ex);
-        }
     }
 }
+
