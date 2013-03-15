@@ -37,6 +37,7 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
@@ -127,7 +128,6 @@ public interface ConfigurationService extends RemoteService {
     
     public String getCASLoginPageUrl() throws CoreException;
     
-    public int getNUsers() throws CoreException;
+    public UsageStats getUsageStats() throws CoreException;
     
-    public int getNCountries() throws CoreException;
 }
