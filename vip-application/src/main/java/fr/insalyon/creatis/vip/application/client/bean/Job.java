@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -43,18 +41,18 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.job.JobStatus;
  */
 public class Job implements IsSerializable {
 
+    private int id;
     private String command;
     private JobStatus status;
-    private String parameters;
 
     public Job() {
     }
 
-    public Job(String command, JobStatus status, String parameters) {
+    public Job(int id, String command, JobStatus status) {
 
         this.command = command;
         this.status = status;
-        this.parameters = parameters;
+        this.id = id;
     }
 
     public String getCommand() {
@@ -73,11 +71,11 @@ public class Job implements IsSerializable {
         this.status = status;
     }
 
-    public String getParameters() {
-        return parameters;
+    public int getId() {
+        return id;
     }
 
-    public void setParameters(String parameters) {
-        this.parameters = parameters;
+    public void setId(int id) {
+        this.id = id;
     }
 }

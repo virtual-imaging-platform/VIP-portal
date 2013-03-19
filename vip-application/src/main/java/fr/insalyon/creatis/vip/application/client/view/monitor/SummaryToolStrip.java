@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -47,6 +45,7 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.JobRecord;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -71,15 +70,15 @@ public class SummaryToolStrip extends ToolStrip {
         this.setWidth100();
 
         this.addButton(getToolStripButton("Replicate",
-                ApplicationConstants.ICON_TASK_REPLICATE, JobStatus.REPLICATE));
+                ApplicationConstants.ICON_TASK_REPLICATE, TaskStatus.REPLICATE));
         this.addButton(getToolStripButton("Reschedule",
-                ApplicationConstants.ICON_TASK_RESCHEDULE, JobStatus.RESCHEDULE));
+                ApplicationConstants.ICON_TASK_RESCHEDULE, TaskStatus.RESCHEDULE));
         this.addButton(getToolStripButton("Kill",
-                ApplicationConstants.ICON_TASK_KILL, JobStatus.KILL));
+                ApplicationConstants.ICON_TASK_KILL, TaskStatus.KILL));
     }
 
     private ToolStripButton getToolStripButton(final String title, String icon,
-            final JobStatus status) {
+            final TaskStatus status) {
 
         ToolStripButton button = new ToolStripButton(title, icon);
         button.setPrompt(title + " all selected not completed tasks.");
@@ -118,7 +117,7 @@ public class SummaryToolStrip extends ToolStrip {
         return selected;
     }
 
-    private void sendSignal(final List<String> jobIDs, final JobStatus status) {
+    private void sendSignal(final List<String> jobIDs, final TaskStatus status) {
 
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {

@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -43,15 +41,15 @@ import ca.nanometrics.gflot.client.options.BarSeriesOptions;
 import ca.nanometrics.gflot.client.options.GlobalSeriesOptions;
 import ca.nanometrics.gflot.client.options.LegendOptions;
 import ca.nanometrics.gflot.client.options.PlotOptions;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,43 +61,68 @@ import java.util.Map;
 public class JobsLayout extends VLayout {
 
     private String simulationID;
-    private Label loadingLabel;
+    private HLayout mainLayout;
     private VLayout chartLayout;
-    private VLayout commandsLayout;
-    private Map<String, CommandLayout> commandsMap;
-    private int counter;
+    private JobInfoLayout infoLayout;
+    private HLayout commandsLayout;
+    private VLayout displayLayout;
     private SimplePlot plot;
     private SeriesHandler queuedSeries;
     private SeriesHandler runningSeries;
     private SeriesHandler completedSeries;
     private SeriesHandler failedSeries;
-    private int queued;
-    private int running;
-    private int completed;
-    private int failed;
-    private boolean updating;
+    private Map<String, Command> commandsMap;
 
     public JobsLayout(String simulationID) {
 
         this.simulationID = simulationID;
-        this.setMembersMargin(10);
+        this.commandsMap = new HashMap<String, Command>();
+        this.setOverflow(Overflow.AUTO);
+        this.setMembersMargin(5);
 
-        this.commandsMap = new HashMap<String, CommandLayout>();
-        this.counter = 0;
-        this.updating = false;
+        mainLayout = new HLayout(10);
+        mainLayout.setWidth100();
+        mainLayout.setHeight(220);
+        this.addMember(mainLayout);
 
         chartLayout = new VLayout();
+        chartLayout.setWidth(420);
+        chartLayout.setHeight(220);
         buildPlot();
         chartLayout.addMember(plot);
-        this.addMember(chartLayout);
+        mainLayout.addMember(chartLayout);
 
-        commandsLayout = new VLayout(5);
+        infoLayout = new JobInfoLayout();
+        mainLayout.addMember(infoLayout);
+
+        commandsLayout = new HLayout(10);
         commandsLayout.setWidth100();
-        commandsLayout.setHeight100();
+        commandsLayout.setHeight(35);
+        commandsLayout.setBorder("1px solid #CCCCCC");
+        commandsLayout.setBackgroundColor("#F7F7F7");
+        commandsLayout.setPadding(3);
+        commandsLayout.setVisible(false);
+        this.addMember(commandsLayout);
 
-        loadingLabel = WidgetUtil.getLabel("Loading jobs...", CoreConstants.ICON_LOADING, 16);
-        commandsLayout.addMember(loadingLabel);
-        this.addMember(commandsLayout);        
+        displayLayout = new VLayout(5);
+        displayLayout.setWidth100();
+        displayLayout.setHeight100();
+        displayLayout.setVisible(false);
+        this.addMember(displayLayout);
+        
+        infoLayout.getInfoLayout().addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                if (commandsLayout.isVisible()) {
+                    commandsLayout.setVisible(false);
+                    displayLayout.setVisible(false);
+                } else {
+                    commandsLayout.setVisible(true);
+                    displayLayout.setVisible(true);
+                }
+            }
+        });
+
     }
 
     private void buildPlot() {
@@ -123,35 +146,6 @@ public class JobsLayout extends VLayout {
         plot = new SimplePlot(model, plotOptions);
         plot.setWidth(400);
         plot.setHeight(200);
-
-//        if (!completed) {
-//            model = new PlotModel(PlotModelStrategy.slidingWindowStrategy(20));
-//            plotOptions.setGlobalSeriesOptions(new GlobalSeriesOptions()
-//                    .setLineSeriesOptions(new LineSeriesOptions().setLineWidth(1).setShow(true))
-//                    .setPointsOptions(new PointsSeriesOptions().setRadius(2).setShow(true))
-//                    .setShadowSize(0d));
-//            plotOptions.addXAxisOptions(new TimeSeriesAxisOptions());
-//        
-//        } else {
-//            plotOptions.setGlobalSeriesOptions(new GlobalSeriesOptions()
-//                    .setPieSeriesOptions(new PieSeriesOptions()
-//                    .setShow(true)
-//                    .setRadius(1)
-//                    .setInnerRadius(0.2)
-//                    .setLabel(
-//                    new ca.nanometrics.gflot.client.options.PieSeriesOptions.Label()
-//                    .setShow(true).setRadius(3d / 4d)
-//                    .setBackground(new Background().setOpacity(0.8))
-//                    .setThreshold(0.05).setFormatter(new Formatter() {
-//                @Override
-//                public String format(String label, Series series) {
-//                    return "<div style=\"font-size:8pt;text-align:center;padding:2px;color:white;\">" + label
-//                            + "<br/>" + series.getData().getY(0) + " / " + series.getPercent() + "%</div>";
-//                }
-//            }))));
-//            plotOptions.setLegendOptions(new LegendOptions().setShow(false));
-//            plotOptions.setGridOptions(new GridOptions().setHoverable(true));
-//        }
     }
 
     private void loadData() {
@@ -159,84 +153,75 @@ public class JobsLayout extends VLayout {
         AsyncCallback<List<Job>> callback = new AsyncCallback<List<Job>>() {
             @Override
             public void onFailure(Throwable caught) {
-
-                commandsLayout.removeMember(loadingLabel);
                 Layout.getInstance().setWarningMessage("Unable to load jobs:<br />" + caught.getMessage());
-                updating = false;
             }
 
             @Override
             public void onSuccess(final List<Job> result) {
 
-                queued = 0;
-                running = 0;
-                completed = 0;
-                failed = 0;
+                int queued = 0;
+                int queuedWE = 0;
+                int running = 0;
+                int runningWE = 0;
+                int completed = 0;
+                int failed = 0;
 
-                commandsLayout.removeMember(loadingLabel);
-                new Timer() {
-                    @Override
-                    public void run() {
-                        if (counter == result.size()) {
-                            counter = 0;
-                            cancel();
-                            updatePlot();
-                        } else {
-                            Job job = result.get(counter++);
-                            if (commandsMap.containsKey(job.getCommand())) {
-                                commandsMap.get(job.getCommand()).addJob(simulationID, job);
+                for (Job job : result) {
 
-                            } else {
-                                CommandLayout cLayout = new CommandLayout(job.getCommand());
-                                cLayout.addJob(simulationID, job);
-                                commandsMap.put(job.getCommand(), cLayout);
-                                commandsLayout.addMember(cLayout);
-                            }
-                            switch (job.getStatus()) {
-                                case Queued:
-                                    queued++;
-                                    break;
-                                case Running:
-                                    running++;
-                                    break;
-                                case Completed:
-                                    completed++;
-                                    break;
-                                default:
-                                    failed++;
-                                    break;
-                            }
-                        }
+                    Command cl;
+                    if (commandsMap.containsKey(job.getCommand())) {
+                        cl = commandsMap.get(job.getCommand());
+                    } else {
+                        cl = new Command(simulationID, job.getCommand(),
+                                commandsMap, displayLayout);
+                        commandsMap.put(job.getCommand(), cl);
+                        commandsLayout.addMember(cl);
                     }
-                }.scheduleRepeating(5);
+                    cl.addJob(job);
+
+                    switch (job.getStatus()) {
+                        case Queued:
+                            queued++;
+                            break;
+                        case Queued_with_errors:
+                            queuedWE++;
+                            break;
+                        case Running:
+                            running++;
+                            break;
+                        case Running_with_erros:
+                            runningWE++;
+                            break;
+                        case Completed:
+                            completed++;
+                            break;
+                        case Failed:
+                            failed++;
+                            break;
+                    }
+                }
+
+                chartLayout.removeMembers(chartLayout.getMembers());
+                buildPlot();
+                queuedSeries.add(new DataPoint(1, queued + queuedWE));
+                runningSeries.add(new DataPoint(1, running + runningWE));
+                completedSeries.add(new DataPoint(1, completed));
+                failedSeries.add(new DataPoint(1, failed));
+                chartLayout.addMember(plot);
+
+                if (failed > 0) {
+                    infoLayout.setStatus(2);
+                } else if (queuedWE > 0 || runningWE > 0) {
+                    infoLayout.setStatus(1);
+                } else {
+                    infoLayout.setStatus(0);
+                }
             }
         };
         JobService.Util.getInstance().getList(simulationID, callback);
-        updating = true;
-    }
-
-    private void updatePlot() {
-
-        chartLayout.removeMembers(chartLayout.getMembers());
-        buildPlot();
-//        Date currentDate = new Date();
-//        queuedSeries.add(new DataPoint(currentDate.getTime(), queued));
-//        runningSeries.add(new DataPoint(currentDate.getTime(), running));
-//        completedSeries.add(new DataPoint(currentDate.getTime(), completed));
-//        failedSeries.add(new DataPoint(currentDate.getTime(), failed));
-        queuedSeries.add(new DataPoint(1, queued));
-        runningSeries.add(new DataPoint(1, running));
-        completedSeries.add(new DataPoint(1, completed));
-        failedSeries.add(new DataPoint(1, failed));
-        chartLayout.addMember(plot);
-
-        updating = false;
     }
 
     public void update() {
-
-        if (!updating) {
-            loadData();
-        }
+        loadData();
     }
 }

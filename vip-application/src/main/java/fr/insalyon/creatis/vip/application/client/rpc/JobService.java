@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -37,7 +35,6 @@ package fr.insalyon.creatis.vip.application.client.rpc;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.bean.Node;
 import fr.insalyon.creatis.vip.application.client.bean.Task;
@@ -68,7 +65,7 @@ public interface JobService extends RemoteService {
 
     public List<Job> getList(String simulationID) throws ApplicationException;
 
-    public List<Task> getTasks(String simulationID, String parameters) throws ApplicationException;
+    public List<Task> getTasks(String simulationID, int jobID) throws ApplicationException;
 
     public String[] readSimulationFile(String simulationID, String taskID, SimulationFileType fileType) throws ApplicationException;
 
@@ -95,9 +92,9 @@ public interface JobService extends RemoteService {
 
     public Node getNode(String simulationID, String siteName, String nodeName) throws ApplicationException;
 
-    public void sendSignal(String simulationID, String jobID, ApplicationConstants.JobStatus status) throws ApplicationException;
+    public void sendSignal(String simulationID, String jobID, TaskStatus status) throws ApplicationException;
 
-    public void sendSignal(String simulationID, List<String> jobIDs, ApplicationConstants.JobStatus status) throws ApplicationException;
+    public void sendSignal(String simulationID, List<String> jobIDs, TaskStatus status) throws ApplicationException;
 
     public Map<String, Integer> getCountriesMap(String simulationID) throws ApplicationException;
 }

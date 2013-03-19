@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -35,7 +33,6 @@
 package fr.insalyon.creatis.vip.application.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.bean.Node;
 import fr.insalyon.creatis.vip.application.client.bean.Task;
@@ -52,7 +49,7 @@ public interface JobServiceAsync {
 
     public void getList(String simulationID, AsyncCallback<List<Job>> asyncCallback);
 
-    public void getTasks(String simulationID, String parameters, AsyncCallback<List<Task>> asyncCallback);
+    public void getTasks(String simulationID, int jobID, AsyncCallback<List<Task>> asyncCallback);
 
     public void readSimulationFile(String simulationID, String taskID, SimulationFileType fileType, AsyncCallback<String[]> asyncCallback);
     
@@ -79,9 +76,9 @@ public interface JobServiceAsync {
 
     public void getNode(String simulationID, String siteName, String nodeName, AsyncCallback<Node> asyncCallback);
 
-    public void sendSignal(String simulationID, String jobID, ApplicationConstants.JobStatus status, AsyncCallback<Void> asyncCallback);
+    public void sendSignal(String simulationID, String jobID, TaskStatus status, AsyncCallback<Void> asyncCallback);
 
-    public void sendSignal(String simulationID, List<String> jobIDs, ApplicationConstants.JobStatus status, AsyncCallback<Void> asyncCallback);
+    public void sendSignal(String simulationID, List<String> jobIDs, TaskStatus status, AsyncCallback<Void> asyncCallback);
 
     public void getCountriesMap(String simulationID, AsyncCallback<Map<String, Integer>> asyncCallback);
 }

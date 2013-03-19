@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -40,22 +38,39 @@ package fr.insalyon.creatis.vip.application.client.view.monitor.job;
  */
 public enum TaskStatus {
 
-    SUCCESSFULLY_SUBMITTED,
-    QUEUED,
-    RUNNING,
-    COMPLETED,
-    CANCELLED,
-    CANCELLED_REPLICA,
-    ERROR,
-    STALLED,
-    REPLICATE,
-    KILL,
-    KILL_REPLICA,
-    RESCHEDULE;
+    SUCCESSFULLY_SUBMITTED("#DBA400", "Submitted"),
+    QUEUED("#DBA400", "Queued"),
+    RUNNING("#8CC653", "Running"),
+    COMPLETED("#287fd6", "Completed"),
+    CANCELLED("#287fd6", "Cancelled"),
+    CANCELLED_REPLICA("#287fd6", "Cancelled (Replica)"),
+    ERROR("#d64949", "Failed"),
+    STALLED("#d64949", "Stalled"),
+    REPLICATE("#8CC653", "Replicate"),
+    KILL("#8CC653", "Kill"),
+    KILL_REPLICA("#8CC653", "Kill"),
+    RESCHEDULE("#8CC653", "Reschedule");
+    //
+    private String color;
+    private String description;
+
+    private TaskStatus(String color, String description) {
+
+        this.color = color;
+        this.description = description;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 
     /**
      * Checks if the status is a running state.
-     * 
+     *
      * @return
      */
     public boolean isRunningState() {
@@ -74,8 +89,8 @@ public enum TaskStatus {
 
     /**
      * Checks if the status is a completed state with outputs.
-     * 
-     * @return 
+     *
+     * @return
      */
     public boolean isCompletedStateWithOutputs() {
 

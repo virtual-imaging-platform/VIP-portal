@@ -1,10 +1,8 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
- *
- * This software is a grid-enabled data-driven workflow manager and editor.
  *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -47,7 +45,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class WidgetUtil {
 
@@ -99,30 +97,30 @@ public class WidgetUtil {
         label.setCursor(cursor);
         return label;
     }
-    
+
     /**
-     * 
+     *
      * @param height
-     * @return 
+     * @return
      */
     public static Label getSpaceLabel(int height) {
-        
+
         Label label = new Label();
         label.setWidth100();
         label.setContents("");
         return label;
     }
-    
+
     /**
-     * 
+     *
      * @param icon
      * @param prompt
      * @param height
      * @param clickHandler
-     * @return 
+     * @return
      */
     public static Label getIconLabel(String icon, String prompt, int height, ClickHandler clickHandler) {
-        
+
         Label label = getLabel("", icon, height, Cursor.HAND);
         label.setWidth(height);
         label.setPrompt(prompt);
@@ -318,5 +316,18 @@ public class WidgetUtil {
         button.setTitle(title);
         button.setIcon(icon);
         button.setDisabled(false);
+    }
+
+    /**
+     * Gets a blank layout.
+     * 
+     * @return 
+     */
+    public static VLayout getBlankLayout() {
+        
+        VLayout blankLayout = new VLayout();
+        blankLayout.setWidth100();
+        blankLayout.setHeight100();
+        return blankLayout;
     }
 }

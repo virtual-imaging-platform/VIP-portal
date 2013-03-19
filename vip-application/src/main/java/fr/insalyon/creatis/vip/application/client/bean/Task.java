@@ -51,8 +51,16 @@ public class Task implements IsSerializable {
     private String fileName;
     private String parameters;
     private int minorStatus;
+    private int jobID;
 
     public Task() {
+    }
+
+    public Task(int jobID, String status, String command) {
+
+        this.jobID = jobID;
+        this.status = status;
+        this.command = command;
     }
 
     public Task(String id, String status, String command, String fileName,
@@ -132,5 +140,13 @@ public class Task implements IsSerializable {
 
     public void setMinorStatus(int minorStatus) {
         this.minorStatus = minorStatus;
+    }
+
+    public int getJobID() {
+        return jobID;
+    }
+
+    public void setJobID(int jobID) {
+        this.jobID = jobID;
     }
 }

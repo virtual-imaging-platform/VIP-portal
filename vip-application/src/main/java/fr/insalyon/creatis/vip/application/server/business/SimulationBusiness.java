@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -34,12 +32,12 @@
  */
 package fr.insalyon.creatis.vip.application.server.business;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.bean.Node;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.SimulationFileType;
 import fr.insalyon.creatis.vip.application.client.bean.Task;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.JobStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -47,6 +45,8 @@ import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -69,7 +69,67 @@ public class SimulationBusiness {
     public List<Job> getList(String simulationID) throws BusinessException {
 
         try {
-            return ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getList();
+            Map<Integer, Job> jobsMap = new HashMap<Integer, Job>();
+
+            for (Task task : ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getTasks()) {
+
+                TaskStatus ts = TaskStatus.valueOf(task.getStatus());
+
+                switch (ts) {
+                    case COMPLETED:
+                    case CANCELLED:
+                    case CANCELLED_REPLICA:
+                        if (jobsMap.containsKey(task.getJobID())) {
+                            jobsMap.get(task.getJobID()).setStatus(JobStatus.Completed);
+                        } else {
+                            jobsMap.put(task.getJobID(), new Job(task.getJobID(), task.getCommand(), JobStatus.Completed));
+                        }
+                        break;
+                    case ERROR:
+                    case STALLED:
+                        if (jobsMap.containsKey(task.getJobID())) {
+                            Job job = jobsMap.get(task.getJobID());
+                            if (job.getStatus() == JobStatus.Queued) {
+                                job.setStatus(JobStatus.Queued_with_errors);
+                            } else if (job.getStatus() == JobStatus.Running) {
+                                job.setStatus(JobStatus.Running_with_erros);
+                            }
+                        } else {
+                            jobsMap.put(task.getJobID(), new Job(task.getJobID(), task.getCommand(), JobStatus.Failed));
+                        }
+                        break;
+                    case RUNNING:
+                    case REPLICATE:
+                    case RESCHEDULE:
+                    case KILL:
+                    case KILL_REPLICA:
+                        if (jobsMap.containsKey(task.getJobID())) {
+                            Job job = jobsMap.get(task.getJobID());
+                            if (job.getStatus() == JobStatus.Queued) {
+                                job.setStatus(JobStatus.Running);
+                            } else if (job.getStatus() == JobStatus.Queued_with_errors
+                                    || job.getStatus() == JobStatus.Failed) {
+                                job.setStatus(JobStatus.Running_with_erros);
+                            }
+                        } else {
+                            jobsMap.put(task.getJobID(), new Job(task.getJobID(), task.getCommand(), JobStatus.Running));
+                        }
+                        break;
+                    case QUEUED:
+                    case SUCCESSFULLY_SUBMITTED:
+                        if (jobsMap.containsKey(task.getJobID())) {
+                            Job job = jobsMap.get(task.getJobID());
+                            if (job.getStatus() == JobStatus.Failed) {
+                                job.setStatus(JobStatus.Queued_with_errors);
+                            }
+                        } else {
+                            jobsMap.put(task.getJobID(), new Job(task.getJobID(), task.getCommand(), JobStatus.Queued));
+                        }
+                        break;
+                }
+            }
+
+            return new ArrayList<Job>(jobsMap.values());
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -79,14 +139,14 @@ public class SimulationBusiness {
     /**
      *
      * @param simulationID
-     * @param parameters
+     * @param jobID
      * @return
      * @throws BusinessException
      */
-    public List<Task> getTasks(String simulationID, String parameters) throws BusinessException {
+    public List<Task> getTasks(String simulationID, int jobID) throws BusinessException {
 
         try {
-            return ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getTasks(parameters);
+            return ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getTasks(jobID);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -140,7 +200,7 @@ public class SimulationBusiness {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
      *
      * @param simulationID
@@ -332,7 +392,7 @@ public class SimulationBusiness {
      * @param status
      * @throws BusinessException
      */
-    public void sendSignal(String simulationID, String jobID, JobStatus status)
+    public void sendSignal(String simulationID, String jobID, TaskStatus status)
             throws BusinessException {
 
         try {
@@ -351,7 +411,7 @@ public class SimulationBusiness {
      * @throws BusinessException
      */
     public void sendSignal(String simulationID, List<String> jobIDs,
-            JobStatus status) throws BusinessException {
+            TaskStatus status) throws BusinessException {
 
         for (String jobID : jobIDs) {
             sendSignal(simulationID, jobID, status);

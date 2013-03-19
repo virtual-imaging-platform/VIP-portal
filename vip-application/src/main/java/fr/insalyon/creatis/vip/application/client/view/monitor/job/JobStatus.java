@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -43,20 +41,28 @@ import java.util.List;
  */
 public enum JobStatus {
 
-    Queued("#DBA400"),
-    Running("#8CC653"),
-    Failed("#d64949"),
-    Completed("#287fd6");
+    Failed("#d64949", "Failed"),
+    Running_with_erros("#DDC352", "Running with errors"),
+    Queued_with_errors("#D3864C", "Queued with errors"),
+    Running("#8CC653", "Running"),
+    Queued("#DBA400", "Queued"),
+    Completed("#287fd6", "Completed");
     //
     private String color;
+    private String description;
 
-    private JobStatus(String color) {
+    private JobStatus(String color, String description) {
 
         this.color = color;
+        this.description = description;
     }
 
     public String getColor() {
         return color;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public static List<String> valuesAsList() {

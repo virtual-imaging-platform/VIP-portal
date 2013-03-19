@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -35,9 +33,7 @@
 package fr.insalyon.creatis.vip.application.server.dao.h2;
 
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.bean.Task;
-import fr.insalyon.creatis.vip.application.client.view.monitor.job.JobStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationDAO;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
@@ -69,25 +65,21 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
      * @return @throws DAOException
      */
     @Override
-    public List<Job> getList() throws DAOException {
+    public List<Task> getTasks() throws DAOException {
 
-        List<Job> list = new ArrayList<Job>();
+        List<Task> list = new ArrayList<Task>();
 
         try {
             Statement stat = connection.createStatement();
             ResultSet rs = stat.executeQuery("SELECT "
-                    + "j.status AS st, j.parameters AS pm, j.command AS cm "
-                    + "FROM Jobs j "
-                    + "LEFT OUTER JOIN Jobs AS jj "
-                    + "ON j.parameters = jj.parameters "
-                    + "AND jj.creation > j.creation "
-                    + "WHERE jj.creation IS NULL "
-                    + "ORDER BY j.id");
+                    + "invocation_id, status, command "
+                    + "FROM Jobs "
+                    + "ORDER BY creation");
 
             while (rs.next()) {
-                list.add(new Job(rs.getString("cm"),
-                        parseJobStatus(rs.getString("st")),
-                        rs.getString("pm")));
+                list.add(new Task(rs.getInt("invocation_id"),
+                        rs.getString("status"),
+                        rs.getString("command")));
             }
             stat.close();
 
@@ -102,36 +94,14 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
         return list;
     }
 
-    private JobStatus parseJobStatus(String taskStatus) {
-
-        switch (ApplicationConstants.JobStatus.valueOf(taskStatus)) {
-
-            case SUCCESSFULLY_SUBMITTED:
-            case QUEUED:
-                return JobStatus.Queued;
-            case CANCELLED:
-            case CANCELLED_REPLICA:
-            case COMPLETED:
-                return JobStatus.Completed;
-            case KILL:
-            case KILL_REPLICA:
-            case REPLICATE:
-            case RESCHEDULE:
-            case RUNNING:
-                return JobStatus.Running;
-            default:
-                return JobStatus.Failed;
-        }
-    }
-
     /**
      *
-     * @param parameters
+     * @param jobID
      * @return
      * @throws DAOException
      */
     @Override
-    public List<Task> getTasks(String parameters) throws DAOException {
+    public List<Task> getTasks(int jobID) throws DAOException {
 
         List<Task> list = new ArrayList<Task>();
         try {
@@ -142,9 +112,9 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
                     + "    SELECT id, MAX(event_date) AS ed FROM JobsMinorStatus GROUP BY id "
                     + "  ) AS jm1 ON jm1.id = jm.id AND jm1.ed = jm.event_date "
                     + ") AS jm2 ON j.id = jm2.id "
-                    + "WHERE j.parameters = ? "
+                    + "WHERE j.invocation_id = ? "
                     + "ORDER BY j.id");
-            ps.setString(1, parameters);
+            ps.setInt(1, jobID);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -422,7 +392,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
     }
 
     @Override
-    public void sendSignal(String jobID, ApplicationConstants.JobStatus status) throws DAOException {
+    public void sendSignal(String jobID, TaskStatus status) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement(

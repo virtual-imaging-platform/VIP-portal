@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -37,6 +35,10 @@ package fr.insalyon.creatis.vip.core.client.view.common;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.events.MouseOutEvent;
+import com.smartgwt.client.widgets.events.MouseOutHandler;
+import com.smartgwt.client.widgets.events.MouseOverEvent;
+import com.smartgwt.client.widgets.events.MouseOverHandler;
 
 /**
  *
@@ -45,7 +47,7 @@ import com.smartgwt.client.widgets.Label;
 public class LabelButton extends Label {
 
     private String label;
-    
+
     public LabelButton(String label, String icon) {
 
         this.label = label;
@@ -55,11 +57,27 @@ public class LabelButton extends Label {
         this.setBorder("1px solid #E2E2E2");
         this.setAlign(Alignment.CENTER);
         this.setDisabled(false);
+        this.addMouseOverHandler(new MouseOverHandler() {
+            @Override
+            public void onMouseOver(MouseOverEvent event) {
+                if (!isDisabled()) {
+                    setBackgroundColor("#DEDEDE");
+                }
+            }
+        });
+        this.addMouseOutHandler(new MouseOutHandler() {
+            @Override
+            public void onMouseOut(MouseOutEvent event) {
+                if (!isDisabled()) {
+                    setBackgroundColor("#F2F2F2");
+                }
+            }
+        });
     }
 
     @Override
     public void setDisabled(boolean disabled) {
-        
+
         super.setDisabled(disabled);
         if (disabled) {
             this.setContents("<font color=\"#CCCCCC\">" + label + "</font>");
@@ -69,6 +87,19 @@ public class LabelButton extends Label {
             this.setContents("<font color=\"#666666\">" + label + "</font>");
             this.setBackgroundColor("#F2F2F2");
             this.setCursor(Cursor.HAND);
+        }
+    }
+    
+    public void setSelected(boolean selected) {
+        
+        if (selected) {
+            this.setBackgroundColor("#DEDEDE");
+        } else {
+            if (isDisabled()) {
+                this.setBackgroundColor("#F9F9F9");
+            } else {
+                this.setBackgroundColor("#F2F2F2");
+            }
         }
     }
 }

@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -46,7 +44,6 @@ import com.smartgwt.client.widgets.events.MouseOverHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
@@ -55,22 +52,19 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
  */
 public class JobLayout extends VLayout {
 
+    private int jobID;
     private String simuID;
-    private String command;
     private JobStatus status;
-    private String parameters;
-    private Label statusLabel;
     private HLayout statusLayout;
 
-    public JobLayout(final int jobID, String simulationID, Job job) {
+    public JobLayout(final int jobID, String simulationID, JobStatus status) {
 
+        this.jobID = jobID;
         this.simuID = simulationID;
-        this.command = job.getCommand();
-        this.status = job.getStatus();
-        this.parameters = job.getParameters();
+        this.status = status;
 
-        this.setWidth(70);
-        this.setHeight(50);
+        this.setWidth(40);
+        this.setHeight(40);
         this.setBorder("1px solid #F2F2F2");
         this.setPadding(3);
         this.setMembersMargin(3);
@@ -82,7 +76,7 @@ public class JobLayout extends VLayout {
         this.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                new DebugLayout(simuID, jobID, parameters, command).show();
+                new DebugLayout(simuID, jobID).show();
             }
         });
         this.addMouseOverHandler(new MouseOverHandler() {
@@ -101,9 +95,6 @@ public class JobLayout extends VLayout {
         Label jobIDLabel = WidgetUtil.getLabel("#" + jobID, 25, Cursor.HAND);
         this.addMember(jobIDLabel);
 
-        statusLabel = WidgetUtil.getLabel("<b>" + status.name() + "</b>", 14, Cursor.HAND);
-        this.addMember(statusLabel);
-
         statusLayout = new HLayout();
         statusLayout.setWidth100();
         statusLayout.setHeight(2);
@@ -112,16 +103,15 @@ public class JobLayout extends VLayout {
         this.addMember(statusLayout);
     }
 
-    public JobStatus getStatus() {
-        return status;
-    }
-
     public void updateStatus(JobStatus jobStatus) {
 
         if (status != jobStatus) {
             status = jobStatus;
-            statusLabel.setContents("<b>" + status.name() + "</b>");
             statusLayout.setBackgroundColor(status.getColor());
         }
+    }
+
+    public int getJobID() {
+        return jobID;
     }
 }

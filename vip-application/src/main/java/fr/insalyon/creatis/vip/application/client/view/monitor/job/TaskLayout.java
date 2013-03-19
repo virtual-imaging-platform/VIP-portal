@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -88,7 +86,7 @@ public class TaskLayout extends HLayout {
         idLabel.setWidth100();
         this.addMember(idLabel);
 
-        statusLabel = WidgetUtil.getLabel(status.name(), 16, Cursor.HAND);
+        statusLabel = WidgetUtil.getLabel("<font color=\"" + status.getColor() + "\">" + status.getDescription() + "</font>", 16, Cursor.HAND);
         statusLabel.setWidth(180);
         this.addMember(statusLabel);
 
@@ -260,7 +258,7 @@ public class TaskLayout extends HLayout {
         this.exitCode = exitCode;
         this.minorStatus = minorStatus;
 
-        this.statusLabel.setContents(status.name());
+        this.statusLabel.setContents("<font color=\"" + status.getColor() + "\">" + status.getDescription() + "</font>");
         this.minorStatusLabel.setContents("<font color=\"#666666\">" + parseMinorStatus() + "</font>");
         configureActionLabels();
     }

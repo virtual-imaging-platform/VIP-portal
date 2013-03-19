@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -64,7 +62,7 @@ public class DebugLayout extends VLayout {
 
     private DebugLayout instance;
     private String simulationID;
-    private String parameters;
+    private int jobID;
     private VLayout tasksLayout;
     private HLayout menuLayout;
     private LabelButton outputLabel;
@@ -79,11 +77,11 @@ public class DebugLayout extends VLayout {
     private Timer refresher;
     private String loadedFile;
 
-    public DebugLayout(String simulationID, int jobID, String parameters, String command) {
+    public DebugLayout(String simulationID, int jobID) {
 
         this.instance = this;
         this.simulationID = simulationID;
-        this.parameters = parameters;
+        this.jobID = jobID;
 
         this.setWidth(800);
         this.setHeight((int) (Layout.getInstance().getLayoutCanvas().getVisibleHeight() * 0.8));
@@ -97,7 +95,7 @@ public class DebugLayout extends VLayout {
         titleLayout.setWidth100();
         titleLayout.setHeight(20);
 
-        Label titleLabel = WidgetUtil.getLabel("<b>Debugging #" + jobID + "</b> (" + command + ")",
+        Label titleLabel = WidgetUtil.getLabel("<b>Debugging #" + jobID + "</b>",
                 ApplicationConstants.ICON_MONITOR_DEBUG, 30);
         titleLabel.setWidth100();
         titleLayout.addMember(titleLabel);
@@ -154,6 +152,11 @@ public class DebugLayout extends VLayout {
             @Override
             public void onClick(ClickEvent event) {
                 loadFile(SimulationFileType.ApplicationOutputFile);
+                appOutputLabel.setSelected(true);
+                appErrorLabel.setSelected(false);
+                outputLabel.setSelected(false);
+                errorLabel.setSelected(false);
+                scriptLabel.setSelected(false);
             }
         });
         menuLayout.addMember(appOutputLabel);
@@ -165,6 +168,11 @@ public class DebugLayout extends VLayout {
             @Override
             public void onClick(ClickEvent event) {
                 loadFile(SimulationFileType.ApplicationErrorFile);
+                appOutputLabel.setSelected(false);
+                appErrorLabel.setSelected(true);
+                outputLabel.setSelected(false);
+                errorLabel.setSelected(false);
+                scriptLabel.setSelected(false);
             }
         });
         menuLayout.addMember(appErrorLabel);
@@ -175,6 +183,11 @@ public class DebugLayout extends VLayout {
             @Override
             public void onClick(ClickEvent event) {
                 loadFile(SimulationFileType.OutputFile);
+                appOutputLabel.setSelected(false);
+                appErrorLabel.setSelected(false);
+                outputLabel.setSelected(true);
+                errorLabel.setSelected(false);
+                scriptLabel.setSelected(false);
             }
         });
         menuLayout.addMember(outputLabel);
@@ -185,6 +198,11 @@ public class DebugLayout extends VLayout {
             @Override
             public void onClick(ClickEvent event) {
                 loadFile(SimulationFileType.ErrorFile);
+                appOutputLabel.setSelected(false);
+                appErrorLabel.setSelected(false);
+                outputLabel.setSelected(false);
+                errorLabel.setSelected(true);
+                scriptLabel.setSelected(false);
             }
         });
         menuLayout.addMember(errorLabel);
@@ -195,6 +213,11 @@ public class DebugLayout extends VLayout {
             @Override
             public void onClick(ClickEvent event) {
                 loadFile(SimulationFileType.ScriptFile);
+                appOutputLabel.setSelected(false);
+                appErrorLabel.setSelected(false);
+                outputLabel.setSelected(false);
+                errorLabel.setSelected(false);
+                scriptLabel.setSelected(true);
             }
         });
         menuLayout.addMember(scriptLabel);
@@ -272,7 +295,7 @@ public class DebugLayout extends VLayout {
                 selectTask(t.getId(), TaskStatus.valueOf(t.getStatus()));
             }
         };
-        JobService.Util.getInstance().getTasks(simulationID, parameters, callback);
+        JobService.Util.getInstance().getTasks(simulationID, jobID, callback);
     }
 
     /**
@@ -372,7 +395,7 @@ public class DebugLayout extends VLayout {
                         }
                     }
                 };
-                JobService.Util.getInstance().getTasks(simulationID, parameters, callback);
+                JobService.Util.getInstance().getTasks(simulationID, jobID, callback);
             }
         };
         refresher.scheduleRepeating(20000);

@@ -69,6 +69,9 @@ public class ApplicationConstants {
     public static final String ICON_MONITOR_SIMULATION_FAILED = IMG_FOLDER + "monitor/icon-simulation-failed.png";
     public static final String ICON_MONITOR_SIMULATION_RUNNING = IMG_FOLDER + "monitor/icon-simulation-running.png";
     public static final String ICON_MONITOR_TIMELINE = IMG_FOLDER + "monitor/icon-timeline.png";
+    public static final String ICON_MONITOR_TASK_CRITICAL = IMG_FOLDER + "monitor/icon-critical.png";
+    public static final String ICON_MONITOR_TASK_NONCRITICAL = IMG_FOLDER + "monitor/icon-noncritical.png";
+    public static final String ICON_MONITOR_TASK_OK = IMG_FOLDER + "monitor/icon-ok.png";
     public static final String ICON_MONITOR_TASKS = IMG_FOLDER + "monitor/icon-tasks.png";
     public static final String ICON_ENGINE = IMG_FOLDER + "icon-engines.png";
     public static final String ICON_PICKER_MORE = IMG_FOLDER + "icon-picker-more.png";

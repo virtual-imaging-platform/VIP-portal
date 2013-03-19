@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -34,7 +32,6 @@
  */
 package fr.insalyon.creatis.vip.application.server.rpc;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.bean.Node;
 import fr.insalyon.creatis.vip.application.client.bean.Task;
@@ -86,15 +83,15 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      * Gets a list of tasks of a simulation with determined parameters.
      *
      * @param simulationID Simulation identification
-     * @param parameters Job parameters
+     * @param jobID Job identification
      * @return
      * @throws ApplicationException
      */
     @Override
-    public List<Task> getTasks(String simulationID, String parameters) throws ApplicationException {
+    public List<Task> getTasks(String simulationID, int jobID) throws ApplicationException {
 
         try {
-            return simulationBusiness.getTasks(simulationID, parameters);
+            return simulationBusiness.getTasks(simulationID, jobID);
 
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
@@ -314,7 +311,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      * @throws ApplicationException
      */
     @Override
-    public void sendSignal(String simulationID, String jobID, JobStatus status)
+    public void sendSignal(String simulationID, String jobID, TaskStatus status)
             throws ApplicationException {
 
         try {
@@ -355,7 +352,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      */
     @Override
     public void sendSignal(String simulationID, List<String> jobIDs,
-            JobStatus status) throws ApplicationException {
+            TaskStatus status) throws ApplicationException {
 
         try {
             trace(logger, "Sending '" + status.name() + "' signal to '"

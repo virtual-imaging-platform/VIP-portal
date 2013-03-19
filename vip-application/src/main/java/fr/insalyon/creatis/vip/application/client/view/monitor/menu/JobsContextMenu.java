@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -48,6 +46,7 @@ import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.NodeInfoWindow;
 import fr.insalyon.creatis.vip.application.client.view.monitor.ViewerWindow;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.JobRecord;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -129,13 +128,13 @@ public class JobsContextMenu extends Menu {
         });
 
         MenuItem replicateItem = getSignalItem("Replicate", ApplicationConstants.ICON_TASK_REPLICATE,
-                job.getID(), JobStatus.REPLICATE);
+                job.getID(), TaskStatus.REPLICATE);
 
         MenuItem killItem = getSignalItem("Kill", ApplicationConstants.ICON_TASK_KILL,
-                job.getID(), JobStatus.KILL);
+                job.getID(), TaskStatus.KILL);
 
         MenuItem rescheduleItem = getSignalItem("Reschedule", ApplicationConstants.ICON_TASK_RESCHEDULE,
-                job.getID(), JobStatus.RESCHEDULE);
+                job.getID(), TaskStatus.RESCHEDULE);
 
         MenuItemSeparator separator = new MenuItemSeparator();
 
@@ -154,7 +153,7 @@ public class JobsContextMenu extends Menu {
     }
 
     private MenuItem getSignalItem(final String title, String icon,
-            final String jobID, final JobStatus status) {
+            final String jobID, final TaskStatus status) {
 
         MenuItem menuItem = new MenuItem("Send " + title + " Signal", icon);
         menuItem.addClickHandler(new ClickHandler() {
@@ -174,7 +173,7 @@ public class JobsContextMenu extends Menu {
         return menuItem;
     }
 
-    private void sendSignal(String jobID, JobStatus status) {
+    private void sendSignal(String jobID, TaskStatus status) {
 
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
