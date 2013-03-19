@@ -47,10 +47,12 @@ import com.smartgwt.client.widgets.events.MouseOverHandler;
 public class LabelButton extends Label {
 
     private String label;
+    private boolean selected;
 
     public LabelButton(String label, String icon) {
 
         this.label = label;
+        this.selected = false;
         this.setIcon(icon);
         this.setHeight(16);
         this.setPadding(3);
@@ -69,7 +71,11 @@ public class LabelButton extends Label {
             @Override
             public void onMouseOut(MouseOutEvent event) {
                 if (!isDisabled()) {
-                    setBackgroundColor("#F2F2F2");
+                    if (selected) {
+                        setBackgroundColor("#DEDEDE");
+                    } else {
+                        setBackgroundColor("#F2F2F2");
+                    }
                 }
             }
         });
@@ -89,9 +95,10 @@ public class LabelButton extends Label {
             this.setCursor(Cursor.HAND);
         }
     }
-    
+
     public void setSelected(boolean selected) {
-        
+
+        this.selected = selected;
         if (selected) {
             this.setBackgroundColor("#DEDEDE");
         } else {

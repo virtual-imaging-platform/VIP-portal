@@ -329,8 +329,9 @@ public class DebugLayout extends VLayout {
     }
     
     /**
-     *
+     * 
      * @param taskID
+     * @param status 
      */
     public void selectTask(String taskID, TaskStatus status) {
 
@@ -344,6 +345,7 @@ public class DebugLayout extends VLayout {
                         outputLabel.setDisabled(false);
                         errorLabel.setDisabled(false);
                         appOutputLabel.setDisabled(false);
+                        appOutputLabel.setSelected(true);
                         appErrorLabel.setDisabled(false);
                         loadFile(SimulationFileType.ApplicationOutputFile);
                     } else {
@@ -351,6 +353,7 @@ public class DebugLayout extends VLayout {
                         errorLabel.setDisabled(true);
                         appOutputLabel.setDisabled(true);
                         appErrorLabel.setDisabled(true);
+                        scriptLabel.setSelected(true);
                         loadFile(SimulationFileType.ScriptFile);
                     }
                     scriptLabel.setDisabled(false);
