@@ -8,7 +8,7 @@
     <inherits name="fr.insalyon.creatis.vip.core.Core" />
     <inherits name="fr.insalyon.creatis.vip.docs.Docs" />
     <inherits name="fr.insalyon.creatis.vip.datamanager.DataManager" />
-<!--    <inherits name="fr.insalyon.creatis.vip.provenance.Provenance" />-->
+    <!--    <inherits name="fr.insalyon.creatis.vip.provenance.Provenance" />-->
     <inherits name="fr.insalyon.creatis.vip.application.Application" />
     <inherits name="fr.insalyon.creatis.vip.simulatedata.SimulatedData" />
     <inherits name="fr.insalyon.creatis.vip.gatelab.GateLab" />
@@ -16,10 +16,10 @@
     <inherits name="fr.insalyon.creatis.vip.simulationgui.SimulationGUI" />
     <inherits name="fr.insalyon.creatis.vip.models.Models" />
     <inherits name="fr.insalyon.creatis.vip.social.Social" />
-        <inherits name="fr.insalyon.creatis.vip.cardiac.Cardiac" />
+    <inherits name="fr.insalyon.creatis.vip.cardiac.Cardiac" />
     <!-- Specify the app entry point class.-->
     <entry-point class="fr.insalyon.creatis.vip.portal.client.Main"/>
-<!--     <set-property name="user.agent" value="gecko1_8" />
+    <!--     <set-property name="user.agent" value="gecko1_8" />
     -->
     
 </module>
