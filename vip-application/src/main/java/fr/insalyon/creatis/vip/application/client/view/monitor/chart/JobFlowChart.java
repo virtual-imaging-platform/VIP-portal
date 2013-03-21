@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -34,13 +32,23 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor.chart;
 
-import ca.nanometrics.gflot.client.*;
-import ca.nanometrics.gflot.client.options.*;
-import ca.nanometrics.gflot.client.options.LegendOptions.LabelFormatter;
-import ca.nanometrics.gflot.client.options.LegendOptions.LegendPosition;
+import com.googlecode.gflot.client.DataPoint;
+import com.googlecode.gflot.client.PlotModel;
+import com.googlecode.gflot.client.Series;
+import com.googlecode.gflot.client.SeriesHandler;
+import com.googlecode.gflot.client.SimplePlot;
+import com.googlecode.gflot.client.options.AxisOptions;
+import com.googlecode.gflot.client.options.BarSeriesOptions;
+import com.googlecode.gflot.client.options.GlobalSeriesOptions;
+import com.googlecode.gflot.client.options.GridOptions;
+import com.googlecode.gflot.client.options.LegendOptions;
+import com.googlecode.gflot.client.options.LegendOptions.LabelFormatter;
+import com.googlecode.gflot.client.options.LegendOptions.LegendPosition;
+import com.googlecode.gflot.client.options.LineSeriesOptions;
+import com.googlecode.gflot.client.options.PlotOptions;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
 import java.util.List;
 
@@ -60,21 +68,21 @@ public class JobFlowChart extends AbstractChart {
 
         PlotModel model = new PlotModel();
 
-        LineSeriesOptions lineSeriesOptions = new LineSeriesOptions();
+        LineSeriesOptions lineSeriesOptions = LineSeriesOptions.create();
         lineSeriesOptions.setShow(false);
         lineSeriesOptions.setFill(true);
 
-        BarSeriesOptions barSeriesOptions = new BarSeriesOptions();
+        BarSeriesOptions barSeriesOptions = BarSeriesOptions.create();
         barSeriesOptions.setShow(true);
         barSeriesOptions.setBarWidth(0.6);
         barSeriesOptions.setLineWidth(0.5);
 
-        GlobalSeriesOptions globalSeriesOptions = new GlobalSeriesOptions();
+        GlobalSeriesOptions globalSeriesOptions = GlobalSeriesOptions.create();
         globalSeriesOptions.setLineSeriesOptions(lineSeriesOptions);
         globalSeriesOptions.setBarsSeriesOptions(barSeriesOptions);
         globalSeriesOptions.setStack(true);
 
-        LegendOptions legendOptions = new LegendOptions();
+        LegendOptions legendOptions = LegendOptions.create();
         legendOptions.setPosition(LegendPosition.NORTH_WEST);
         legendOptions.setBackgroundOpacity(0.75);
         legendOptions.setLabelFormatter(new LabelFormatter() {
@@ -84,22 +92,22 @@ public class JobFlowChart extends AbstractChart {
             }
         });
 
-        PlotOptions plotOptions = new PlotOptions();
+        PlotOptions plotOptions = PlotOptions.create();
         plotOptions.setGlobalSeriesOptions(globalSeriesOptions);
         plotOptions.setLegendOptions(legendOptions);
-        plotOptions.addXAxisOptions(new AxisOptions().setLabel("Jobs"));
-        plotOptions.addYAxisOptions(new AxisOptions().setLabel("Time (s)"));
-        plotOptions.setGridOptions(new GridOptions().setBorderWidth(0));
+        plotOptions.addXAxisOptions(AxisOptions.create().setLabel("Jobs"));
+        plotOptions.addYAxisOptions(AxisOptions.create().setLabel("Time (s)"));
+        plotOptions.setGridOptions(GridOptions.create().setBorderWidth(0));
 
         // create series
-        SeriesHandler series1 = model.addSeries("Submitted", "#8C8063");
-        SeriesHandler series2 = model.addSeries("Queued", "#FFC682");
-        SeriesHandler series3 = model.addSeries("Input", "#2388E8");
-        SeriesHandler series4 = model.addSeries("Execution", "#33AA82");
-        SeriesHandler series5 = model.addSeries("Output", "#7F667F");
-        SeriesHandler series6 = model.addSeries("Checkpoint Init", "#3E6864");
-        SeriesHandler series7 = model.addSeries("Checkpoint Upload", "#1F3533");
-        SeriesHandler series8 = model.addSeries("Error", "#7F263D");
+        SeriesHandler series1 = model.addSeries(Series.of("Submitted", "#8C8063"));
+        SeriesHandler series2 = model.addSeries(Series.of("Queued", "#FFC682"));
+        SeriesHandler series3 = model.addSeries(Series.of("Input", "#2388E8"));
+        SeriesHandler series4 = model.addSeries(Series.of("Execution", "#33AA82"));
+        SeriesHandler series5 = model.addSeries(Series.of("Output", "#7F667F"));
+        SeriesHandler series6 = model.addSeries(Series.of("Checkpoint Init", "#3E6864"));
+        SeriesHandler series7 = model.addSeries(Series.of("Checkpoint Upload", "#1F3533"));
+        SeriesHandler series8 = model.addSeries(Series.of("Error", "#7F263D"));
 
         // add data
         int row = 0;
@@ -112,7 +120,7 @@ public class JobFlowChart extends AbstractChart {
 
             addRowData(values);
             String[] v = values.split("##");
-            JobStatus status = JobStatus.valueOf(v[0]);
+            TaskStatus status = TaskStatus.valueOf(v[0]);
 
             int creation = Integer.parseInt(v[1]);
             int queued = Integer.parseInt(v[2]);
@@ -123,7 +131,7 @@ public class JobFlowChart extends AbstractChart {
             int checkpointUpload = Integer.parseInt(v[7]);
             int failedTime = Integer.parseInt(v[8]);
 
-            if (status == JobStatus.ERROR) {
+            if (status == TaskStatus.ERROR) {
                 failedTime = input + execution + output + checkpointInit + checkpointUpload;
                 input = 0;
                 execution = 0;
@@ -132,14 +140,14 @@ public class JobFlowChart extends AbstractChart {
                 checkpointUpload = 0;
             }
 
-            series1.add(new DataPoint(row, creation));
-            series2.add(new DataPoint(row, queued));
-            series3.add(new DataPoint(row, input));
-            series4.add(new DataPoint(row, execution));
-            series5.add(new DataPoint(row, output));
-            series6.add(new DataPoint(row, checkpointInit));
-            series7.add(new DataPoint(row, checkpointUpload));
-            series8.add(new DataPoint(row, failedTime));
+            series1.add(DataPoint.of(row, creation));
+            series2.add(DataPoint.of(row, queued));
+            series3.add(DataPoint.of(row, input));
+            series4.add(DataPoint.of(row, execution));
+            series5.add(DataPoint.of(row, output));
+            series6.add(DataPoint.of(row, checkpointInit));
+            series7.add(DataPoint.of(row, checkpointUpload));
+            series8.add(DataPoint.of(row, failedTime));
 
             row++;
             cpuTime += execution;
@@ -162,11 +170,11 @@ public class JobFlowChart extends AbstractChart {
         chartLayout.addMember(getRowDataImg());
 
         grid.setData(new PropertyRecord[]{
-                    new PropertyRecord("Makespan (s)", max + ""),
-                    new PropertyRecord("Cumulated CPU time (s)", cpuTime + ""),
-                    new PropertyRecord("Speed-up", (cpuTime / (float) max) + ""),
-                    new PropertyRecord("Efficiency", (cpuTime / (float) sequentialTime) + ""),
-                    new PropertyRecord("Mean Waiting Time (s)", (waitingTime / (float) data.size()) + "")
-                });
+            new PropertyRecord("Makespan (s)", max + ""),
+            new PropertyRecord("Cumulated CPU time (s)", cpuTime + ""),
+            new PropertyRecord("Speed-up", (cpuTime / (float) max) + ""),
+            new PropertyRecord("Efficiency", (cpuTime / (float) sequentialTime) + ""),
+            new PropertyRecord("Mean Waiting Time (s)", (waitingTime / (float) data.size()) + "")
+        });
     }
 }

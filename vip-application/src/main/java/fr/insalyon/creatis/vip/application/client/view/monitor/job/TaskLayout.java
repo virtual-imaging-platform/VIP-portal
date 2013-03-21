@@ -71,7 +71,7 @@ public class TaskLayout extends HLayout {
 
         this.simulationID = simulationID;
         this.taskID = task.getId();
-        this.status = TaskStatus.valueOf(task.getStatus());
+        this.status = task.getStatus();
         this.exitCode = task.getExitCode();
         this.minorStatus = task.getMinorStatus();
         this.selected = false;

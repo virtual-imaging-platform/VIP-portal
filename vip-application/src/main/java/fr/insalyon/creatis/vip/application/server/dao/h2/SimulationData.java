@@ -32,7 +32,6 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao.h2;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Task;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationDAO;
@@ -78,7 +77,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
 
             while (rs.next()) {
                 list.add(new Task(rs.getInt("invocation_id"),
-                        rs.getString("status"),
+                        TaskStatus.valueOf(rs.getString("status")),
                         rs.getString("command")));
             }
             stat.close();
@@ -173,14 +172,14 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
      */
     private Task parseTask(ResultSet rs) throws SQLException {
 
-        ApplicationConstants.JobStatus status = ApplicationConstants.JobStatus.valueOf(rs.getString("status"));
+        TaskStatus status = TaskStatus.valueOf(rs.getString("status"));
         int minorStatus = -1;
 
-        if (status == ApplicationConstants.JobStatus.RUNNING) {
+        if (status == TaskStatus.RUNNING) {
             minorStatus = parseMinorStatus(rs.getString("ms"));
         }
 
-        return new Task(rs.getString("id"), status.name(),
+        return new Task(rs.getString("id"), status,
                 rs.getString("command"), rs.getString("file_name"),
                 rs.getInt("exit_code"), rs.getString("node_site"),
                 rs.getString("node_name"), rs.getString("parameters"),
@@ -208,33 +207,6 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
     }
 
     @Override
-    public Map<String, Integer> getStatusMap() throws DAOException {
-
-        Map<String, Integer> statusMap = new HashMap<String, Integer>();
-
-        try {
-            Statement stat = connection.createStatement();
-            ResultSet rs = stat.executeQuery("SELECT "
-                    + "status, COUNT(id) AS total FROM Jobs "
-                    + "GROUP BY status");
-
-            while (rs.next()) {
-                statusMap.put(rs.getString("status"), rs.getInt("total"));
-            }
-            stat.close();
-
-        } catch (SQLException ex) {
-            if (!ex.getMessage().contains("Table \"JOBS\" not found")) {
-                logger.error(ex);
-                throw new DAOException(ex);
-            }
-        } finally {
-            close(logger);
-        }
-        return statusMap;
-    }
-
-    @Override
     public List<Task> getJobs() throws DAOException {
 
         List<Task> list = new ArrayList<Task>();
@@ -250,14 +222,14 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
                     + ") AS jm2 ON j.id = jm2.id ORDER BY j.id");
 
             while (rs.next()) {
-                ApplicationConstants.JobStatus status = ApplicationConstants.JobStatus.valueOf(rs.getString("status"));
+                TaskStatus status = TaskStatus.valueOf(rs.getString("status"));
                 int minorStatus = -1;
 
-                if (status == ApplicationConstants.JobStatus.RUNNING) {
+                if (status == TaskStatus.RUNNING) {
                     minorStatus = parseMinorStatus(rs.getString("ms"));
                 }
 
-                list.add(new Task(rs.getString("id"), status.name(),
+                list.add(new Task(rs.getString("id"), status,
                         rs.getString("command"), rs.getString("file_name"),
                         rs.getInt("exit_code"), rs.getString("node_site"),
                         rs.getString("node_name"), rs.getString("parameters"),
@@ -419,16 +391,16 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
                     + "status, count(id) AS num FROM Jobs "
                     + "WHERE status = ? OR status = ? "
                     + "GROUP BY status");
-            ps.setString(1, ApplicationConstants.JobStatus.RUNNING.name());
-            ps.setString(2, ApplicationConstants.JobStatus.QUEUED.name());
+            ps.setString(1, TaskStatus.RUNNING.name());
+            ps.setString(2, TaskStatus.QUEUED.name());
 
             ResultSet rs = ps.executeQuery();
             int[] tasks = new int[2];
 
             while (rs.next()) {
-                if (ApplicationConstants.JobStatus.valueOf(rs.getString("status")) == ApplicationConstants.JobStatus.RUNNING) {
+                if (TaskStatus.valueOf(rs.getString("status")) == TaskStatus.RUNNING) {
                     tasks[0] = rs.getInt("num");
-                } else if (ApplicationConstants.JobStatus.valueOf(rs.getString("status")) == ApplicationConstants.JobStatus.QUEUED) {
+                } else if (TaskStatus.valueOf(rs.getString("status")) == TaskStatus.QUEUED) {
                     tasks[1] = rs.getInt("num");
                 }
             }
@@ -454,7 +426,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
                     + "SUBSTR(node_name, -2) AS country, COUNT(id) AS num "
                     + "FROM Jobs WHERE status = ? "
                     + "GROUP BY country ORDER BY country");
-            ps.setString(1, ApplicationConstants.JobStatus.COMPLETED.name());
+            ps.setString(1, TaskStatus.COMPLETED.name());
             ResultSet rs = ps.executeQuery();
 
             Map<String, Integer> map = new HashMap<String, Integer>();
@@ -501,7 +473,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
                     + "WHERE STATUS = ? AND TIMESTAMPDIFF('SECOND', " + startField + ", " + endField + ") >= 0 "
                     + "GROUP BY TIMESTAMPDIFF('SECOND', " + startField + ", " + endField + ")/" + binSize + "*" + binSize + " "
                     + "ORDER BY EXECUT");
-            ps.setString(1, ApplicationConstants.JobStatus.COMPLETED.name());
+            ps.setString(1, TaskStatus.COMPLETED.name());
 
             ResultSet rs = ps.executeQuery();
 

@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -35,14 +33,15 @@
 package fr.insalyon.creatis.vip.application.client.view.monitor;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
-import com.google.gwt.visualization.client.DataTable;
-import com.google.gwt.visualization.client.VisualizationUtils;
-import com.google.gwt.visualization.client.visualizations.corechart.AxisOptions;
-import com.google.gwt.visualization.client.visualizations.corechart.BarChart;
-import com.google.gwt.visualization.client.visualizations.corechart.Options;
-import com.google.gwt.visualization.client.visualizations.corechart.PieChart;
-import com.google.gwt.visualization.client.visualizations.corechart.PieChart.PieOptions;
+import com.googlecode.gflot.client.DataPoint;
+import com.googlecode.gflot.client.PlotModel;
+import com.googlecode.gflot.client.Series;
+import com.googlecode.gflot.client.SeriesHandler;
+import com.googlecode.gflot.client.SimplePlot;
+import com.googlecode.gflot.client.options.BarSeriesOptions;
+import com.googlecode.gflot.client.options.GlobalSeriesOptions;
+import com.googlecode.gflot.client.options.LegendOptions;
+import com.googlecode.gflot.client.options.PlotOptions;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.GroupStartOpen;
 import com.smartgwt.client.types.Overflow;
@@ -64,6 +63,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Task;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractCornerTab;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.menu.JobsContextMenu;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.JobRecord;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.SummaryRecord;
@@ -71,7 +71,6 @@ import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -79,26 +78,32 @@ import java.util.Map;
  */
 public class SummaryTab extends AbstractCornerTab {
 
-    private ModalWindow summaryModal;
     private ModalWindow detailModal;
     private String simulationID;
-    private boolean completed;
-    private String[] states = {"Error", "Completed", "Running", "Queued",
-        "Successfully_Submitted", "Cancelled", "Stalled"};
     private VLayout chartLayout;
-    private VLayout innerChartLayout;
+    private SimplePlot plot;
+    private SeriesHandler submittedSeries;
+    private SeriesHandler queuedSeries;
+    private SeriesHandler runningSeries;
+    private SeriesHandler completedSeries;
+    private SeriesHandler failedSeries;
+    private SeriesHandler cancelledSeries;
+    private SeriesHandler stalledSeries;
     private ListGrid summaryGrid;
     private ListGrid detailGrid;
 
-    public SummaryTab(String simulationID, boolean completed) {
+    public SummaryTab(String simulationID) {
 
         this.simulationID = simulationID;
-        this.completed = completed;
 
         this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_SUMMARY));
         this.setPrompt("Tasks Summary");
 
-        configureChart();
+        chartLayout = new VLayout();
+        chartLayout.setWidth(550);
+        chartLayout.setHeight(250);
+        buildPlot();
+
         configureSummaryGrid();
         configureDetailGrid();
 
@@ -108,13 +113,12 @@ public class SummaryTab extends AbstractCornerTab {
 
         HLayout summaryLayout = new HLayout(10);
         summaryLayout.setPadding(10);
-        summaryLayout.setHeight(330);
+        summaryLayout.setHeight(270);
         summaryLayout.setWidth100();
-        summaryLayout.setOverflow(Overflow.AUTO);
+        summaryLayout.setOverflow(Overflow.VISIBLE);
         summaryLayout.addMember(chartLayout);
         summaryLayout.addMember(summaryGrid);
 
-        summaryModal = new ModalWindow(summaryLayout);
         vLayout.addMember(summaryLayout);
 
         detailModal = new ModalWindow(detailGrid);
@@ -123,22 +127,34 @@ public class SummaryTab extends AbstractCornerTab {
         vLayout.addMember(detailGrid);
 
         this.setPane(vLayout);
-        
-        loadSummaryData();
-        loadDetailData();
     }
 
-    private void configureChart() {
+    private void buildPlot() {
 
-        chartLayout = new VLayout();
-        chartLayout.setWidth(600);
-        chartLayout.setHeight(300);
+        PlotOptions plotOptions = PlotOptions.create();
+        plotOptions.setGlobalSeriesOptions(GlobalSeriesOptions.create()
+                .setBarsSeriesOptions(BarSeriesOptions.create()
+                .setShow(true).setLineWidth(1).setBarWidth(1)
+                .setAlignment(BarSeriesOptions.BarAlignment.CENTER))
+                .setMultipleBars(true));
+        plotOptions.setLegendOptions(LegendOptions.create().setShow(true));
+        plotOptions.setMultipleBars(true);
+        plotOptions.addXAxisOptions(com.googlecode.gflot.client.options.AxisOptions.create().setShow(false));
+        plotOptions.addYAxisOptions(com.googlecode.gflot.client.options.AxisOptions.create().setLabel("Jobs"));
 
-        innerChartLayout = new VLayout();
-        innerChartLayout.setWidth(600);
-        innerChartLayout.setHeight(300);
+        PlotModel model = new PlotModel();
+        submittedSeries = model.addSeries(Series.of("<font size=\"1\">" + TaskStatus.SUCCESSFULLY_SUBMITTED.getDescription() + "</font>", TaskStatus.SUCCESSFULLY_SUBMITTED.getColor()));
+        queuedSeries = model.addSeries(Series.of("<font size=\"1\">" + TaskStatus.QUEUED.getDescription() + "</font>", TaskStatus.QUEUED.getColor()));
+        runningSeries = model.addSeries(Series.of("<font size=\"1\">" + TaskStatus.RUNNING.getDescription() + "</font>", TaskStatus.RUNNING.getColor()));
+        completedSeries = model.addSeries(Series.of("<font size=\"1\">" + TaskStatus.COMPLETED.getDescription() + "</font>", TaskStatus.COMPLETED.getColor()));
+        failedSeries = model.addSeries(Series.of("<font size=\"1\">" + TaskStatus.ERROR.getDescription() + "</font>", TaskStatus.ERROR.getColor()));
+        cancelledSeries = model.addSeries(Series.of("<font size=\"1\">" + TaskStatus.CANCELLED.getDescription() + "</font>", TaskStatus.CANCELLED.getColor()));
+        stalledSeries = model.addSeries(Series.of("<font size=\"1\">" + TaskStatus.STALLED.getDescription() + "</font>", TaskStatus.STALLED.getColor()));
 
-        chartLayout.addMember(innerChartLayout);
+        plot = new SimplePlot(model, plotOptions);
+        plot.setWidth(550);
+        plot.setHeight(250);
+        chartLayout.addMember(plot);
     }
 
     private void configureSummaryGrid() {
@@ -214,134 +230,7 @@ public class SummaryTab extends AbstractCornerTab {
         });
     }
 
-    @Override
-    public void update() {
-
-        loadSummaryData();
-        loadDetailData();
-    }
-
-    private void loadSummaryData() {
-
-        JobServiceAsync service = JobService.Util.getInstance();
-        final AsyncCallback<Map<String, Integer>> callback = new AsyncCallback<Map<String, Integer>>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                summaryModal.hide();
-                Layout.getInstance().setWarningMessage("Unable to get summary data:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(Map<String, Integer> result) {
-                SummaryRecord[] data = new SummaryRecord[states.length];
-                int maxValue = 0;
-
-                int j = 0;
-                for (int i = states.length - 1; i >= 0; i--) {
-                    int value = 0;
-                    if (result.containsKey(states[i].toUpperCase())) {
-                        value = result.get(states[i].toUpperCase());
-                        if (value > maxValue) {
-                            maxValue = value;
-                        }
-                    }
-                    data[j] = new SummaryRecord(states[i], value);
-                    j++;
-                }
-                summaryGrid.setData(data);
-
-                if (completed) {
-                    VisualizationUtils.loadVisualizationApi(getPieChartRunnable(data), PieChart.PACKAGE);
-                } else {
-                    VisualizationUtils.loadVisualizationApi(getBarChartRunnable(data), BarChart.PACKAGE);
-                }
-                summaryModal.hide();
-            }
-
-            private Runnable getPieChartRunnable(final SummaryRecord[] data) {
-
-                return new Runnable() {
-                    @Override
-                    public void run() {
-
-                        PieOptions options = PieOptions.create();
-                        options.setWidth(600);
-                        options.setHeight(300);
-                        options.set3D(true);
-                        options.setColors("#1A767F", "#FEA101", "#47A259", "#B00504");
-
-                        DataTable dataTable = DataTable.create();
-                        dataTable.addColumn(ColumnType.STRING, "Status");
-                        dataTable.addColumn(ColumnType.NUMBER, "Amount of Jobs");
-                        dataTable.addRows(4);
-
-                        dataTable.setValue(0, 0, "Stalled");
-                        dataTable.setValue(0, 1, new Integer(data[0].getJobs()));
-                        dataTable.setValue(1, 0, "Cancelled");
-                        dataTable.setValue(1, 1, new Integer(data[1].getJobs()));
-                        dataTable.setValue(2, 0, "Completed");
-                        dataTable.setValue(2, 1, new Integer(data[5].getJobs()));
-                        dataTable.setValue(3, 0, "Error");
-                        dataTable.setValue(3, 1, new Integer(data[6].getJobs()));
-
-                        PieChart pie = new PieChart(dataTable, options);
-
-                        chartLayout.removeMember(innerChartLayout);
-                        innerChartLayout = new VLayout();
-                        innerChartLayout.setWidth(600);
-                        innerChartLayout.setHeight(300);
-                        innerChartLayout.addMember(pie);
-                        chartLayout.addMember(innerChartLayout);
-                    }
-                };
-            }
-
-            private Runnable getBarChartRunnable(final SummaryRecord[] data) {
-
-                return new Runnable() {
-                    @Override
-                    public void run() {
-
-                        Options options = Options.create();
-                        options.setWidth(600);
-                        options.setHeight(300);
-                        options.setFontSize(10);
-                        options.setColors("#1A767F", "#FF8575", "#cc9933",
-                                "#E8DD80", "#64A1E8", "#47A259", "#B00504");
-
-                        AxisOptions hAxisOptions = AxisOptions.create();
-                        hAxisOptions.setTitle("Number of Jobs");
-                        options.setHAxisOptions(hAxisOptions);
-
-                        DataTable dataTable = DataTable.create();
-                        dataTable.addColumn(ColumnType.STRING, "Status");
-                        for (int i = 0; i < data.length; i++) {
-                            dataTable.addColumn(ColumnType.NUMBER, data[i].getState());
-                        }
-
-                        dataTable.addRows(1);
-                        dataTable.setValue(0, 0, "");
-                        for (int i = 1; i < dataTable.getNumberOfColumns(); i++) {
-                            dataTable.setValue(0, i, new Integer(data[i - 1].getJobs()));
-                        }
-
-                        BarChart bar = new BarChart(dataTable, options);
-
-                        chartLayout.removeMember(innerChartLayout);
-                        innerChartLayout = new VLayout();
-                        innerChartLayout.setWidth(600);
-                        innerChartLayout.setHeight(300);
-                        innerChartLayout.addMember(bar);
-                        chartLayout.addMember(innerChartLayout);
-                    }
-                };
-            }
-        };
-        summaryModal.show("Loading data...", true);
-        service.getStatusMap(simulationID, callback);
-    }
-
-    private void loadDetailData() {
+    private void loadData() {
 
         JobServiceAsync service = JobService.Util.getInstance();
         final AsyncCallback<List<Task>> callback = new AsyncCallback<List<Task>>() {
@@ -353,18 +242,87 @@ public class SummaryTab extends AbstractCornerTab {
 
             @Override
             public void onSuccess(List<Task> result) {
+
+                int submitted = 0;
+                int queued = 0;
+                int running = 0;
+                int completed = 0;
+                int failed = 0;
+                int cancelled = 0;
+                int stalled = 0;
+
                 List<JobRecord> dataList = new ArrayList<JobRecord>();
-                for (Task j : result) {
-                    dataList.add(new JobRecord(j.getId(), j.getStatus(),
-                            j.getCommand(), j.getFileName(), j.getExitCode(),
-                            j.getSiteName(), j.getNodeName(), j.getParameters(),
-                            j.getMinorStatus()));
+                for (Task task : result) {
+                    dataList.add(new JobRecord(task.getId(), task.getStatus().name(),
+                            task.getCommand(), task.getFileName(), task.getExitCode(),
+                            task.getSiteName(), task.getNodeName(), task.getParameters(),
+                            task.getMinorStatus()));
+
+                    switch (task.getStatus()) {
+                        case SUCCESSFULLY_SUBMITTED:
+                            submitted++;
+                            break;
+                        case QUEUED:
+                            queued++;
+                            break;
+                        case RUNNING:
+                        case KILL:
+                        case REPLICATE:
+                        case RESCHEDULE:
+                            running++;
+                            break;
+                        case COMPLETED:
+                            completed++;
+                            break;
+                        case ERROR:
+                            failed++;
+                            break;
+                        case CANCELLED:
+                            cancelled++;
+                            break;
+                        case STALLED:
+                            stalled++;
+                            break;
+                    }
                 }
                 detailGrid.setData(dataList.toArray(new JobRecord[]{}));
                 detailModal.hide();
+
+                summaryGrid.setData(new SummaryRecord[]{
+                    new SummaryRecord(TaskStatus.SUCCESSFULLY_SUBMITTED.getDescription(), submitted),
+                    new SummaryRecord(TaskStatus.QUEUED.getDescription(), queued),
+                    new SummaryRecord(TaskStatus.RUNNING.getDescription(), running),
+                    new SummaryRecord(TaskStatus.COMPLETED.getDescription(), completed),
+                    new SummaryRecord(TaskStatus.ERROR.getDescription(), failed),
+                    new SummaryRecord(TaskStatus.CANCELLED.getDescription(), cancelled),
+                    new SummaryRecord(TaskStatus.STALLED.getDescription(), stalled),});
+
+                if (queuedSeries.getData().isEmpty()) {
+                    submittedSeries.add(DataPoint.of(1, submitted));
+                    queuedSeries.add(DataPoint.of(1, queued));
+                    runningSeries.add(DataPoint.of(1, running));
+                    completedSeries.add(DataPoint.of(1, completed));
+                    failedSeries.add(DataPoint.of(1, failed));
+                    cancelledSeries.add(DataPoint.of(1, cancelled));
+                    stalledSeries.add(DataPoint.of(1, stalled));
+                } else {
+                    submittedSeries.getData().get(0).setY(submitted);
+                    queuedSeries.getData().get(0).setY(queued);
+                    runningSeries.getData().get(0).setY(running);
+                    completedSeries.getData().get(0).setY(completed);
+                    failedSeries.getData().get(0).setY(failed);
+                    cancelledSeries.getData().get(0).setY(cancelled);
+                    stalledSeries.getData().get(0).setY(stalled);
+                }
+                plot.redraw();
             }
         };
         detailModal.show("Loading data...", true);
         service.getJobsList(simulationID, callback);
+    }
+
+    @Override
+    public void update() {
+        loadData();
     }
 }

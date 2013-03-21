@@ -73,9 +73,7 @@ public class SimulationBusiness {
 
             for (Task task : ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getTasks()) {
 
-                TaskStatus ts = TaskStatus.valueOf(task.getStatus());
-
-                switch (ts) {
+                switch (task.getStatus()) {
                     case COMPLETED:
                     case CANCELLED:
                     case CANCELLED_REPLICA:
@@ -213,22 +211,6 @@ public class SimulationBusiness {
 
         try {
             ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).sendTaskSignal(taskID, status);
-
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    /**
-     *
-     * @param simulationID
-     * @return
-     * @throws BusinessException
-     */
-    public Map<String, Integer> getStatusMap(String simulationID) throws BusinessException {
-
-        try {
-            return ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getStatusMap();
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);

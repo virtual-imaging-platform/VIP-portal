@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -34,12 +32,19 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor.chart;
 
-import ca.nanometrics.gflot.client.DataPoint;
-import ca.nanometrics.gflot.client.PlotModel;
-import ca.nanometrics.gflot.client.SeriesHandler;
-import ca.nanometrics.gflot.client.SimplePlot;
-import ca.nanometrics.gflot.client.options.*;
-import ca.nanometrics.gflot.client.options.BarSeriesOptions.BarAlignment;
+import com.googlecode.gflot.client.DataPoint;
+import com.googlecode.gflot.client.PlotModel;
+import com.googlecode.gflot.client.Series;
+import com.googlecode.gflot.client.SeriesHandler;
+import com.googlecode.gflot.client.SimplePlot;
+import com.googlecode.gflot.client.options.AxisOptions;
+import com.googlecode.gflot.client.options.BarSeriesOptions;
+import com.googlecode.gflot.client.options.BarSeriesOptions.BarAlignment;
+import com.googlecode.gflot.client.options.GlobalSeriesOptions;
+import com.googlecode.gflot.client.options.GridOptions;
+import com.googlecode.gflot.client.options.LegendOptions;
+import com.googlecode.gflot.client.options.LineSeriesOptions;
+import com.googlecode.gflot.client.options.PlotOptions;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
@@ -61,37 +66,37 @@ public class SitesBarChart extends AbstractChart {
 
         PlotModel model = new PlotModel();
 
-        LineSeriesOptions lineSeriesOptions = new LineSeriesOptions();
+        LineSeriesOptions lineSeriesOptions = LineSeriesOptions.create();
         lineSeriesOptions.setShow(false);
         lineSeriesOptions.setFill(true);
 
-        BarSeriesOptions barSeriesOptions = new BarSeriesOptions();
+        BarSeriesOptions barSeriesOptions = BarSeriesOptions.create();
         barSeriesOptions.setShow(true);
         barSeriesOptions.setBarWidth(0.6);
         barSeriesOptions.setLineWidth(0.5);
         barSeriesOptions.setAlignment(BarAlignment.CENTER);
 
-        GlobalSeriesOptions globalSeriesOptions = new GlobalSeriesOptions();
+        GlobalSeriesOptions globalSeriesOptions = GlobalSeriesOptions.create();
         globalSeriesOptions.setLineSeriesOptions(lineSeriesOptions);
         globalSeriesOptions.setBarsSeriesOptions(barSeriesOptions);
         globalSeriesOptions.setStack(true);
 
-        PlotOptions plotOptions = new PlotOptions();
+        PlotOptions plotOptions = PlotOptions.create();
         plotOptions.setGlobalSeriesOptions(globalSeriesOptions);
-        plotOptions.setLegendOptions(new LegendOptions().setShow(false));
-        plotOptions.addXAxisOptions(new AxisOptions().setLabel("Sites"));
-        plotOptions.addYAxisOptions(new AxisOptions().setLabel("Number of Jobs"));
-        plotOptions.setGridOptions(new GridOptions().setBorderWidth(0));
+        plotOptions.setLegendOptions(LegendOptions.create().setShow(false));
+        plotOptions.addXAxisOptions(AxisOptions.create().setLabel("Sites"));
+        plotOptions.addYAxisOptions(AxisOptions.create().setLabel("Number of Jobs"));
+        plotOptions.setGridOptions(GridOptions.create().setBorderWidth(0));
 
         // create series
-        SeriesHandler series = model.addSeries("value", "#FF0000");
+        SeriesHandler series = model.addSeries(Series.of("value", "#FF0000"));
 
         int row = 0;
 
         for (String values : data) {
             addRowData(values);
             String[] res = values.split("##");
-            series.add(new DataPoint(row, Integer.parseInt(res[1])));
+            series.add(DataPoint.of(row, Integer.parseInt(res[1])));
             row++;
         }
 
@@ -99,7 +104,7 @@ public class SitesBarChart extends AbstractChart {
         SimplePlot plot = new SimplePlot(model, plotOptions);
         plot.setWidth(700);
         plot.setHeight(400);
-        
+
         chartLayout.addMember(plot);
         chartLayout.addMember(getRowDataImg());
 

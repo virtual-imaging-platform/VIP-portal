@@ -72,8 +72,6 @@ public interface JobService extends RemoteService {
     public void sendTaskSignal(String simulationID, String taskID, TaskStatus status) throws ApplicationException;
 
     //
-    public Map<String, Integer> getStatusMap(String simulationID) throws ApplicationException;
-
     public List<Task> getJobsList(String simulationID) throws ApplicationException;
 
     public String readFile(String simulationID, String dir, String fileName, String ext) throws ApplicationException;

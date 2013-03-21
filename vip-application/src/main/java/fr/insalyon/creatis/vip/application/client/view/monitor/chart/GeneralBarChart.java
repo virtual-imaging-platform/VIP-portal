@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -34,9 +32,21 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor.chart;
 
-import ca.nanometrics.gflot.client.*;
-import ca.nanometrics.gflot.client.options.*;
-import ca.nanometrics.gflot.client.options.BarSeriesOptions.BarAlignment;
+import com.googlecode.gflot.client.Axis;
+import com.googlecode.gflot.client.DataPoint;
+import com.googlecode.gflot.client.PlotModel;
+import com.googlecode.gflot.client.Series;
+import com.googlecode.gflot.client.SeriesHandler;
+import com.googlecode.gflot.client.SimplePlot;
+import com.googlecode.gflot.client.options.AxisOptions;
+import com.googlecode.gflot.client.options.BarSeriesOptions;
+import com.googlecode.gflot.client.options.BarSeriesOptions.BarAlignment;
+import com.googlecode.gflot.client.options.GlobalSeriesOptions;
+import com.googlecode.gflot.client.options.GridOptions;
+import com.googlecode.gflot.client.options.LegendOptions;
+import com.googlecode.gflot.client.options.LineSeriesOptions;
+import com.googlecode.gflot.client.options.PlotOptions;
+import com.googlecode.gflot.client.options.TickFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
@@ -57,34 +67,34 @@ public class GeneralBarChart extends AbstractChart {
 
         chartLayout.removeMembers(chartLayout.getMembers());
 
-        LineSeriesOptions lineSeriesOptions = new LineSeriesOptions();
+        LineSeriesOptions lineSeriesOptions = LineSeriesOptions.create();
         lineSeriesOptions.setShow(false);
         lineSeriesOptions.setFill(true);
 
-        BarSeriesOptions barSeriesOptions = new BarSeriesOptions();
+        BarSeriesOptions barSeriesOptions = BarSeriesOptions.create();
         barSeriesOptions.setShow(true);
         barSeriesOptions.setBarWidth(0.6);
         barSeriesOptions.setLineWidth(0.5);
         barSeriesOptions.setAlignment(BarAlignment.CENTER);
 
-        GlobalSeriesOptions globalSeriesOptions = new GlobalSeriesOptions();
+        GlobalSeriesOptions globalSeriesOptions = GlobalSeriesOptions.create();
         globalSeriesOptions.setLineSeriesOptions(lineSeriesOptions);
         globalSeriesOptions.setBarsSeriesOptions(barSeriesOptions);
         globalSeriesOptions.setStack(true);
 
-        AxisOptions xAxisOptions = new AxisOptions();
+        AxisOptions xAxisOptions = AxisOptions.create();
         xAxisOptions.setLabel(caption);
 
-        PlotOptions plotOptions = new PlotOptions();
+        PlotOptions plotOptions = PlotOptions.create();
         plotOptions.setGlobalSeriesOptions(globalSeriesOptions);
-        plotOptions.setLegendOptions(new LegendOptions().setShow(false));
+        plotOptions.setLegendOptions(LegendOptions.create().setShow(false));
         plotOptions.addXAxisOptions(xAxisOptions);
-        plotOptions.addYAxisOptions(new AxisOptions().setLabel("Number of Jobs"));
-        plotOptions.setGridOptions(new GridOptions().setBorderWidth(0));
+        plotOptions.addYAxisOptions(AxisOptions.create().setLabel("Number of Jobs"));
+        plotOptions.setGridOptions(GridOptions.create().setBorderWidth(0));
 
         // create series
         PlotModel model = new PlotModel();
-        SeriesHandler series = model.addSeries("value", color);
+        SeriesHandler series = model.addSeries(Series.of("value", color));
 
         int row = 0;
         int min = Integer.MAX_VALUE;
@@ -94,7 +104,7 @@ public class GeneralBarChart extends AbstractChart {
         final List<Integer> rangesList = new ArrayList<Integer>();
 
         for (String values : data) {
-            
+
             addRowData(values);
             String[] res = values.split("##");
             int range = Integer.parseInt(res[0]);
@@ -103,7 +113,7 @@ public class GeneralBarChart extends AbstractChart {
                 int estimatedRange = rangesList.get(rangesList.size() - 1) + binSize;
                 while (estimatedRange != range) {
                     rangesList.add(estimatedRange);
-                    series.add(new DataPoint(row, 0));
+                    series.add(DataPoint.of(row, 0));
                     row++;
                     estimatedRange += binSize;
                 }
@@ -112,7 +122,7 @@ public class GeneralBarChart extends AbstractChart {
             rangesList.add(range);
             if (res.length > 1) {
                 int numJobs = Integer.parseInt(res[1]);
-                series.add(new DataPoint(row, numJobs));
+                series.add(DataPoint.of(row, numJobs));
                 count += numJobs;
 
                 if (res.length > 2) {
@@ -136,10 +146,8 @@ public class GeneralBarChart extends AbstractChart {
 
         xAxisOptions.setTicks(rangesList.size());
         xAxisOptions.setTickFormatter(new TickFormatter() {
-
             @Override
             public String formatTickValue(double tickValue, Axis axis) {
-
                 if (tickValue >= 0 && tickValue < rangesList.size()) {
                     return rangesList.get((int) tickValue) + "";
                 }
@@ -151,15 +159,15 @@ public class GeneralBarChart extends AbstractChart {
         SimplePlot plot = new SimplePlot(model, plotOptions);
         plot.setWidth(700);
         plot.setHeight(400);
-        
+
         chartLayout.addMember(plot);
         chartLayout.addMember(getRowDataImg());
 
         grid.setData(new PropertyRecord[]{
-                    new PropertyRecord("Min (s)", min + ""),
-                    new PropertyRecord("Max (s)", max + ""),
-                    new PropertyRecord("Cumulated (s)", sum + ""),
-                    new PropertyRecord("Average (s)", (sum / (float) count) + "")
-                });
+            new PropertyRecord("Min (s)", min + ""),
+            new PropertyRecord("Max (s)", max + ""),
+            new PropertyRecord("Cumulated (s)", sum + ""),
+            new PropertyRecord("Average (s)", (sum / (float) count) + "")
+        });
     }
 }

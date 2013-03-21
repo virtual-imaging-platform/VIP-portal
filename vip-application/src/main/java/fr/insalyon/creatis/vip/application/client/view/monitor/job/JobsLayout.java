@@ -32,16 +32,17 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor.job;
 
-import ca.nanometrics.gflot.client.DataPoint;
-import ca.nanometrics.gflot.client.PlotModel;
-import ca.nanometrics.gflot.client.SeriesHandler;
-import ca.nanometrics.gflot.client.SimplePlot;
-import ca.nanometrics.gflot.client.options.AxisOptions;
-import ca.nanometrics.gflot.client.options.BarSeriesOptions;
-import ca.nanometrics.gflot.client.options.GlobalSeriesOptions;
-import ca.nanometrics.gflot.client.options.LegendOptions;
-import ca.nanometrics.gflot.client.options.PlotOptions;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.googlecode.gflot.client.DataPoint;
+import com.googlecode.gflot.client.PlotModel;
+import com.googlecode.gflot.client.Series;
+import com.googlecode.gflot.client.SeriesHandler;
+import com.googlecode.gflot.client.SimplePlot;
+import com.googlecode.gflot.client.options.AxisOptions;
+import com.googlecode.gflot.client.options.BarSeriesOptions;
+import com.googlecode.gflot.client.options.GlobalSeriesOptions;
+import com.googlecode.gflot.client.options.LegendOptions;
+import com.googlecode.gflot.client.options.PlotOptions;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -89,7 +90,6 @@ public class JobsLayout extends VLayout {
         chartLayout.setWidth(420);
         chartLayout.setHeight(220);
         buildPlot();
-        chartLayout.addMember(plot);
         mainLayout.addMember(chartLayout);
 
         infoLayout = new JobInfoLayout();
@@ -109,43 +109,46 @@ public class JobsLayout extends VLayout {
         displayLayout.setHeight100();
         displayLayout.setVisible(false);
         this.addMember(displayLayout);
-        
-        infoLayout.getInfoLayout().addClickHandler(new ClickHandler() {
+
+        infoLayout.getInfoButton().addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
                 if (commandsLayout.isVisible()) {
                     commandsLayout.setVisible(false);
                     displayLayout.setVisible(false);
+                    infoLayout.getInfoButton().setSelected(false);
                 } else {
                     commandsLayout.setVisible(true);
                     displayLayout.setVisible(true);
+                    infoLayout.getInfoButton().setSelected(true);
                 }
             }
         });
-
     }
 
     private void buildPlot() {
 
-        PlotModel model = new PlotModel();
-        PlotOptions plotOptions = new PlotOptions();
-
-        plotOptions.setGlobalSeriesOptions(new GlobalSeriesOptions()
-                .setBarsSeriesOptions(new BarSeriesOptions()
-                .setShow(true).setLineWidth(1).setBarWidth(1).setAlignment(BarSeriesOptions.BarAlignment.CENTER)).setMultipleBars(true));
-        plotOptions.setLegendOptions(new LegendOptions().setShow(true));
+        PlotOptions plotOptions = PlotOptions.create();
+        plotOptions.setGlobalSeriesOptions(GlobalSeriesOptions.create()
+                .setBarsSeriesOptions(BarSeriesOptions.create()
+                .setShow(true).setLineWidth(1).setBarWidth(1)
+                .setAlignment(BarSeriesOptions.BarAlignment.CENTER))
+                .setMultipleBars(true));
+        plotOptions.setLegendOptions(LegendOptions.create().setShow(true));
         plotOptions.setMultipleBars(true);
-        plotOptions.addXAxisOptions(new AxisOptions().setShow(false));
-        plotOptions.addYAxisOptions(new AxisOptions().setLabel("Jobs"));
+        plotOptions.addXAxisOptions(AxisOptions.create().setShow(false));
+        plotOptions.addYAxisOptions(AxisOptions.create().setLabel("Jobs"));
 
-        queuedSeries = model.addSeries("<font size=\"1\">" + JobStatus.Queued.name() + "</font>", JobStatus.Queued.getColor());
-        runningSeries = model.addSeries("<font size=\"1\">" + JobStatus.Running.name() + "</font>", JobStatus.Running.getColor());
-        completedSeries = model.addSeries("<font size=\"1\">" + JobStatus.Completed.name() + "</font>", JobStatus.Completed.getColor());
-        failedSeries = model.addSeries("<font size=\"1\">" + JobStatus.Failed.name() + "</font>", JobStatus.Failed.getColor());
+        PlotModel model = new PlotModel();
+        queuedSeries = model.addSeries(Series.of("<font size=\"1\">" + JobStatus.Queued.name() + "</font>", JobStatus.Queued.getColor()));
+        runningSeries = model.addSeries(Series.of("<font size=\"1\">" + JobStatus.Running.name() + "</font>", JobStatus.Running.getColor()));
+        completedSeries = model.addSeries(Series.of("<font size=\"1\">" + JobStatus.Completed.name() + "</font>", JobStatus.Completed.getColor()));
+        failedSeries = model.addSeries(Series.of("<font size=\"1\">" + JobStatus.Failed.name() + "</font>", JobStatus.Failed.getColor()));
 
         plot = new SimplePlot(model, plotOptions);
         plot.setWidth(400);
         plot.setHeight(200);
+        chartLayout.addMember(plot);
     }
 
     private void loadData() {
@@ -201,13 +204,18 @@ public class JobsLayout extends VLayout {
                     }
                 }
 
-                chartLayout.removeMembers(chartLayout.getMembers());
-                buildPlot();
-                queuedSeries.add(new DataPoint(1, queued + queuedWE));
-                runningSeries.add(new DataPoint(1, running + runningWE));
-                completedSeries.add(new DataPoint(1, completed));
-                failedSeries.add(new DataPoint(1, failed));
-                chartLayout.addMember(plot);
+                if (queuedSeries.getData().isEmpty()) {
+                    queuedSeries.add(DataPoint.of(1, queued + queuedWE));
+                    runningSeries.add(DataPoint.of(1, running + runningWE));
+                    completedSeries.add(DataPoint.of(1, completed));
+                    failedSeries.add(DataPoint.of(1, failed));
+                } else {
+                    queuedSeries.getData().get(0).setY(queued + queuedWE);
+                    runningSeries.getData().get(0).setY(running + runningWE);
+                    completedSeries.getData().get(0).setY(completed);
+                    failedSeries.getData().get(0).setY(failed);
+                }
+                plot.redraw();
 
                 if (failed > 0) {
                     infoLayout.setStatus(2);

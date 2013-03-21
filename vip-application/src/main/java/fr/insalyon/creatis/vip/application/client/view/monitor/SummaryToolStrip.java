@@ -42,7 +42,6 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
@@ -105,10 +104,10 @@ public class SummaryToolStrip extends ToolStrip {
 
         for (ListGridRecord record : grid.getSelectedRecords()) {
             JobRecord jobRecord = (JobRecord) record;
-            JobStatus status = JobStatus.valueOf(jobRecord.getStatus());
+            TaskStatus status = TaskStatus.valueOf(jobRecord.getStatus());
 
-            if (status == JobStatus.QUEUED || status == JobStatus.RUNNING
-                    || status == JobStatus.SUCCESSFULLY_SUBMITTED) {
+            if (status == TaskStatus.QUEUED || status == TaskStatus.RUNNING
+                    || status == TaskStatus.SUCCESSFULLY_SUBMITTED) {
 
                 selected.add(jobRecord.getID());
             }

@@ -32,13 +32,7 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor.job;
 
-import com.smartgwt.client.types.Cursor;
-import com.smartgwt.client.widgets.Img;
-import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
@@ -46,60 +40,22 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
  */
 public class JobInfoLayout extends VLayout {
 
-    private HLayout infoLayout;
-    private Img img;
-    private Label messageLabel;
+    private JobInfoButton infoButton;
 
     public JobInfoLayout() {
 
         this.setWidth100();
         this.setHeight100();
 
-        infoLayout = new HLayout(10);
-        infoLayout.setWidth(300);
-        infoLayout.setHeight(50);
-        infoLayout.setBorder("1px solid #CCCCCC");
-        infoLayout.setPadding(10);
-        infoLayout.setCursor(Cursor.HAND);
-        this.addMember(infoLayout);
-
-        img = new Img(ApplicationConstants.ICON_MONITOR_TASK_OK);
-        img.setWidth(32);
-        img.setHeight(32);
-        infoLayout.addMember(img);
-
-        VLayout vLayout = new VLayout();
-        vLayout.setWidth100();
-        vLayout.setHeight(40);
-        vLayout.setCursor(Cursor.HAND);
-        infoLayout.addMember(vLayout);
-
-        messageLabel = WidgetUtil.getLabel("<strong>No errors detected.</strong>", 40);
-        vLayout.addMember(messageLabel);
+        infoButton = new JobInfoButton();
+        this.addMember(infoButton);
     }
 
     public void setStatus(int status) {
-
-        switch (status) {
-            case 1:
-                messageLabel.setContents("<strong>Non-critical errors detected.</strong><br />"
-                        + "<font color=\"#666666\"><em>Click to debug.</em></font>");
-                img.setSrc(ApplicationConstants.ICON_MONITOR_TASK_NONCRITICAL);
-                break;
-            case 2:
-                messageLabel.setContents("<strong>Critical errors detected.</strong><br />"
-                        + "<font color=\"#666666\"><em>Click to debug.</em></font>");
-                img.setSrc(ApplicationConstants.ICON_MONITOR_TASK_CRITICAL);
-                break;
-            default:
-                messageLabel.setContents("<strong>No errors detected.</strong>");
-                img.setSrc(ApplicationConstants.ICON_MONITOR_TASK_OK);
-                break;
-        }
+        infoButton.setStatus(status);
     }
 
-    public HLayout getInfoLayout() {
-        
-        return infoLayout;
+    public JobInfoButton getInfoButton() {
+        return infoButton;
     }
 }

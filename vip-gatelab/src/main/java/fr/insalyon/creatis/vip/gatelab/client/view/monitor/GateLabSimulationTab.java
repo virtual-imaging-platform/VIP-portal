@@ -70,7 +70,7 @@ public class GateLabSimulationTab extends AbstractSimulationTab {
         
         if (CoreModule.user.isSystemAdministrator()) {
             
-            tasksTab = new SummaryTab(simulationID, completed);
+            tasksTab = new SummaryTab(simulationID);
             tabSet.addTab(tasksTab);
             
             logsTab = new LogsTab(simulationID);

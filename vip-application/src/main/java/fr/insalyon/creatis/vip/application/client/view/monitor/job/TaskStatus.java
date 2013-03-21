@@ -38,14 +38,14 @@ package fr.insalyon.creatis.vip.application.client.view.monitor.job;
  */
 public enum TaskStatus {
 
-    SUCCESSFULLY_SUBMITTED("#DBA400", "Submitted"),
+    SUCCESSFULLY_SUBMITTED("#CC9933", "Submitted"),
     QUEUED("#DBA400", "Queued"),
     RUNNING("#8CC653", "Running"),
     COMPLETED("#287fd6", "Completed"),
-    CANCELLED("#287fd6", "Cancelled"),
+    CANCELLED("#FF8575", "Cancelled"),
     CANCELLED_REPLICA("#287fd6", "Cancelled (Replica)"),
     ERROR("#d64949", "Failed"),
-    STALLED("#d64949", "Stalled"),
+    STALLED("#1A767F", "Stalled"),
     REPLICATE("#8CC653", "Replicate"),
     KILL("#8CC653", "Kill"),
     KILL_REPLICA("#8CC653", "Kill"),

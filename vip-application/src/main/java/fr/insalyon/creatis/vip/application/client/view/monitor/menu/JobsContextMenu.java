@@ -41,7 +41,6 @@ import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants.JobStatus;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.NodeInfoWindow;
@@ -138,9 +137,9 @@ public class JobsContextMenu extends Menu {
 
         MenuItemSeparator separator = new MenuItemSeparator();
 
-        JobStatus status = JobStatus.valueOf(job.getStatus());
-        if ((status == JobStatus.ERROR || status == JobStatus.COMPLETED
-                || status == JobStatus.CANCELLED || status == JobStatus.STALLED)
+        TaskStatus status = TaskStatus.valueOf(job.getStatus());
+        if ((status == TaskStatus.ERROR || status == TaskStatus.COMPLETED
+                || status == TaskStatus.CANCELLED || status == TaskStatus.STALLED)
                 && !job.getMinorStatus().equals("Retrieving Status")) {
 
             this.setItems(appOutputItem, appErrorItem, separator,

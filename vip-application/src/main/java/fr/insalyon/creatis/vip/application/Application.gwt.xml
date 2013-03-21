@@ -4,8 +4,7 @@
     <inherits name='fr.insalyon.creatis.vip.core.Core'/>
     <inherits name='fr.insalyon.creatis.vip.datamanager.DataManager'/>
 <!--    <inherits name='fr.insalyon.creatis.vip.provenance.Provenance'/>-->
-    <inherits name='ca.nanometrics.gflot.GFlot'/>
-    <inherits name='com.google.gwt.visualization.Visualization'/>
+    <inherits name='com.googlecode.gflot.GFlot'/>
 
     <!-- Servlets -->
     <servlet class="fr.insalyon.creatis.vip.application.server.rpc.ApplicationServiceImpl" path="/applicationservice"/>

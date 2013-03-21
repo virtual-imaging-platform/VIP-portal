@@ -52,9 +52,6 @@ public interface SimulationDAO {
 
     public void sendTaskSignal(String jobID, TaskStatus status) throws DAOException;
 
-    //
-    public Map<String, Integer> getStatusMap() throws DAOException;
-
     public List<Task> getJobs() throws DAOException;
 
     public List<String> getExecutionPerNumberOfJobs(int binSize) throws DAOException;

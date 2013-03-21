@@ -292,7 +292,7 @@ public class DebugLayout extends VLayout {
                     tasksLayout.addMember(new TaskLayout(instance, simulationID, task));
                 }
                 refresh();
-                selectTask(t.getId(), TaskStatus.valueOf(t.getStatus()));
+                selectTask(t.getId(), t.getStatus());
             }
         };
         JobService.Util.getInstance().getTasks(simulationID, jobID, callback);
@@ -385,8 +385,8 @@ public class DebugLayout extends VLayout {
                                     TaskLayout taskLayout = (TaskLayout) canvas;
                                     if (taskLayout.getTaskID().equals(task.getId())) {
                                         contains = true;
-                                        if (TaskStatus.valueOf(task.getStatus()) != taskLayout.getStatus()) {
-                                            taskLayout.setStatus(TaskStatus.valueOf(task.getStatus()), task.getExitCode(), task.getMinorStatus());
+                                        if (task.getStatus() != taskLayout.getStatus()) {
+                                            taskLayout.setStatus(task.getStatus(), task.getExitCode(), task.getMinorStatus());
                                         }
                                         break;
                                     }

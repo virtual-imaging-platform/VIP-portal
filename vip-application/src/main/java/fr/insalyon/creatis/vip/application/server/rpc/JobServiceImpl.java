@@ -144,23 +144,6 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      * @throws ApplicationException
      */
     @Override
-    public Map<String, Integer> getStatusMap(String simulationID) throws ApplicationException {
-
-        try {
-            return simulationBusiness.getStatusMap(simulationID);
-
-        } catch (BusinessException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    /**
-     *
-     * @param simulationID
-     * @return
-     * @throws ApplicationException
-     */
-    @Override
     public List<Task> getJobsList(String simulationID) throws ApplicationException {
 
         try {

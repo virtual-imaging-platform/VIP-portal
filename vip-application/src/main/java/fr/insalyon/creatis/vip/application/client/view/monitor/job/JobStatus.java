@@ -42,7 +42,7 @@ import java.util.List;
 public enum JobStatus {
 
     Failed("#d64949", "Failed"),
-    Running_with_erros("#DDC352", "Running with errors"),
+    Running_with_erros("#65D3A1", "Running with errors"),
     Queued_with_errors("#D3864C", "Queued with errors"),
     Running("#8CC653", "Running"),
     Queued("#DBA400", "Queued"),

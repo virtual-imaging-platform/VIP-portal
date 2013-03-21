@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -35,6 +33,7 @@
 package fr.insalyon.creatis.vip.application.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 
 /**
  *
@@ -43,7 +42,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class Task implements IsSerializable {
 
     private String id;
-    private String status;
+    private TaskStatus status;
     private int exitCode;
     private String siteName;
     private String nodeName;
@@ -56,14 +55,14 @@ public class Task implements IsSerializable {
     public Task() {
     }
 
-    public Task(int jobID, String status, String command) {
+    public Task(int jobID, TaskStatus status, String command) {
 
         this.jobID = jobID;
         this.status = status;
         this.command = command;
     }
 
-    public Task(String id, String status, String command, String fileName,
+    public Task(String id, TaskStatus status, String command, String fileName,
             int exitCode, String siteName, String nodeName, String parameters,
             int minorStatus) {
 
@@ -102,11 +101,11 @@ public class Task implements IsSerializable {
         this.id = id;
     }
 
-    public String getStatus() {
+    public TaskStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TaskStatus status) {
         this.status = status;
     }
 

@@ -108,14 +108,6 @@ public class ApplicationConstants {
     public static final String SESSION_CLASSES = "vip-classes";
     public static final String SEPARATOR_INPUT = "##";
     public static final String SEPARATOR_LIST = "@@";
-    // Enums
-
-    public static enum JobStatus {
-
-        SUCCESSFULLY_SUBMITTED, QUEUED, RUNNING, COMPLETED,
-        CANCELLED, CANCELLED_REPLICA, ERROR, STALLED,
-        REPLICATE, KILL, KILL_REPLICA, RESCHEDULE
-    };
 
     public static String getLaunchTabID(String applicationName) {
 

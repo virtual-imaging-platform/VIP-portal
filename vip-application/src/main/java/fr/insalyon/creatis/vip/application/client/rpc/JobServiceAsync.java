@@ -56,8 +56,6 @@ public interface JobServiceAsync {
     public void sendTaskSignal(String simulationID, String taskID, TaskStatus status, AsyncCallback<Void> asyncCallback);
     
     //
-    public void getStatusMap(String simulationID, AsyncCallback<Map<String, Integer>> asyncCallback);
-
     public void getJobsList(String simulationID, AsyncCallback<List<Task>> asyncCallback);
 
     public void readFile(String simulationID, String dir, String fileName, String ext, AsyncCallback<String> asyncCallback);
