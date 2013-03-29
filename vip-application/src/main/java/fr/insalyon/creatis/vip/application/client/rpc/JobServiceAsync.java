@@ -37,7 +37,6 @@ import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.bean.Node;
 import fr.insalyon.creatis.vip.application.client.bean.Task;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.SimulationFileType;
-import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +52,7 @@ public interface JobServiceAsync {
 
     public void readSimulationFile(String simulationID, String taskID, SimulationFileType fileType, AsyncCallback<String[]> asyncCallback);
     
-    public void sendTaskSignal(String simulationID, String taskID, TaskStatus status, AsyncCallback<Void> asyncCallback);
+    public void sendTaskSignal(String simulationID, String taskID, String status, AsyncCallback<Void> asyncCallback);
     
     //
     public void getJobsList(String simulationID, AsyncCallback<List<Task>> asyncCallback);
@@ -74,9 +73,9 @@ public interface JobServiceAsync {
 
     public void getNode(String simulationID, String siteName, String nodeName, AsyncCallback<Node> asyncCallback);
 
-    public void sendSignal(String simulationID, String jobID, TaskStatus status, AsyncCallback<Void> asyncCallback);
+    public void sendSignal(String simulationID, String jobID, String status, AsyncCallback<Void> asyncCallback);
 
-    public void sendSignal(String simulationID, List<String> jobIDs, TaskStatus status, AsyncCallback<Void> asyncCallback);
+    public void sendSignal(String simulationID, List<String> jobIDs, String status, AsyncCallback<Void> asyncCallback);
 
     public void getCountriesMap(String simulationID, AsyncCallback<Map<String, Integer>> asyncCallback);
 }

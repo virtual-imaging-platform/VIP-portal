@@ -40,7 +40,7 @@ import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.application.client.bean.Processor;
+import fr.insalyon.creatis.vip.application.client.bean.Activity;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.JobStatus;
@@ -104,20 +104,20 @@ public class ProgressLayout extends VLayout {
 
     protected void loadData() {
 
-        AsyncCallback<List<Processor>> callback = new AsyncCallback<List<Processor>>() {
+        AsyncCallback<List<Activity>> callback = new AsyncCallback<List<Activity>>() {
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to load progress:<br />" + caught.getMessage());
             }
 
             @Override
-            public void onSuccess(List<Processor> result) {
+            public void onSuccess(List<Activity> result) {
 
                 double completed = 0;
                 double active = 0;
                 StringBuilder sb = new StringBuilder();
 
-                for (Processor processor : result) {
+                for (Activity processor : result) {
                     
                     if (processor.getStatus() == ProcessorStatus.Completed) {
                         completed++;

@@ -30,42 +30,38 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.monitor;
+package fr.insalyon.creatis.vip.application.server.dao;
 
-import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOFactory;
+import fr.insalyon.creatis.vip.application.server.dao.hibernate.SimulationStatsData;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class SimulationTab extends AbstractSimulationTab {
+public class SimulationStatsDAOFactory {
 
-    private GeneralTab generalTab;
-    private JobsTab jobsTab;
-    private SummaryTab tasksTab;
-    private ChartsTab chartsTab;
-    private LogsTab logsTab;
+    private static SimulationStatsDAOFactory instance;
 
-    public SimulationTab(String simulationID, String simulationName, SimulationStatus status) {
+    public static SimulationStatsDAOFactory getInstance() {
 
-        super(simulationID, simulationName, status);
+        if (instance == null) {
+            instance = new SimulationStatsDAOFactory();
+        }
+        return instance;
+    }
 
-        generalTab = new GeneralTab(simulationID, status);
-        jobsTab = new JobsTab(simulationID, completed);
-        chartsTab = new ChartsTab(simulationID);
+    private SimulationStatsDAOFactory() {
+    }
 
-        tabSet.addTab(generalTab);
-        tabSet.addTab(jobsTab);
-        tabSet.addTab(chartsTab);
-
-        if (CoreModule.user.isSystemAdministrator()) {
+    public SimulationStatsDAO getSimulationStatsDAO() throws DAOException {
+        try {
+            return new SimulationStatsData(WorkflowsDBDAOFactory.getInstance().getSessionFactory());
             
-            tasksTab = new SummaryTab(simulationID, completed);
-            tabSet.addTab(tasksTab);
-            
-            logsTab = new LogsTab(simulationID);
-            tabSet.addTab(logsTab);
+        } catch (WorkflowsDBDAOException ex) {
+            throw new DAOException(ex);
         }
     }
 }

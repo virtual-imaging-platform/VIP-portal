@@ -92,7 +92,7 @@ public class SummaryTab extends AbstractCornerTab {
     private ListGrid summaryGrid;
     private ListGrid detailGrid;
 
-    public SummaryTab(String simulationID) {
+    public SummaryTab(String simulationID, boolean completed) {
 
         this.simulationID = simulationID;
 
@@ -127,6 +127,10 @@ public class SummaryTab extends AbstractCornerTab {
         vLayout.addMember(detailGrid);
 
         this.setPane(vLayout);
+        
+        if (completed) {
+            loadData();
+        }
     }
 
     private void buildPlot() {

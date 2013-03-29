@@ -104,7 +104,7 @@ public interface WorkflowServiceAsync {
 
     public void getInputData(String simulationID, AsyncCallback<List<InOutData>> asyncCallback);
     
-    public void getProcessors(String simulationID, AsyncCallback<List<Processor>> asyncCallback);
+    public void getProcessors(String simulationID, AsyncCallback<List<Activity>> asyncCallback);
     
     public void validateInputs(List<String> inputs, AsyncCallback<Void> asyncCallback);
     

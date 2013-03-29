@@ -134,6 +134,6 @@ public class SummaryToolStrip extends ToolStrip {
             }
         };
         modal.show("Sending signal to selected jobs...", true);
-        service.sendSignal(simulationID, jobIDs, status, callback);
+        service.sendSignal(simulationID, jobIDs, status.name(), callback);
     }
 }

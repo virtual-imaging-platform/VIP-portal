@@ -189,6 +189,6 @@ public class JobsContextMenu extends Menu {
             }
         };
         modal.show("Sending signal to job...", true);
-        service.sendSignal(simulationID, jobID, status, callback);
+        service.sendSignal(simulationID, jobID, status.name(), callback);
     }
 }

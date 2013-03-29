@@ -1,10 +1,8 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
- *
- * This software is a grid-enabled data-driven workflow manager and editor.
  *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -32,20 +30,54 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.server.dao;
+package fr.insalyon.creatis.vip.application.server.dao.hibernate;
 
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Stats;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
+import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAO;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import java.util.List;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
-public abstract class WorkflowDAOFactory {
+public class SimulationStatsData implements SimulationStatsDAO {
 
-    public static WorkflowDAOFactory getDAOFactory() {
+    private SessionFactory sessionFactory;
 
-        return DerbyDAOFactory.getInstance();
+    public SimulationStatsData(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
-    public abstract WorkflowDAO getWorkflowDAO() throws DAOException;
+    @Override
+    public List<Stats> getBySimulationID(String simulationID) throws DAOException {
+        
+        try {
+            Session session = sessionFactory.openSession();
+            session.beginTransaction();
+            Criteria criteria = session.createCriteria(Stats.class);
+
+            // 'workflowID' is the variable in the class Stats
+            criteria.add(Restrictions.eq("workflowID", simulationID));
+            criteria.addOrder(Order.desc("workflowID"));
+            
+            List<Stats> list = (List<Stats>) criteria.list();
+            session.getTransaction().commit();
+            session.close();
+
+            return list;
+
+        } catch (HibernateException ex) {
+            throw new DAOException(ex);
+        }
+    }
+    
+    
 }

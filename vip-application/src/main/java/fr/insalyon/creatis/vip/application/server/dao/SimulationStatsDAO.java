@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -32,52 +30,18 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.bean;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-import fr.insalyon.creatis.vip.application.client.view.monitor.progress.ProcessorStatus;
+package fr.insalyon.creatis.vip.application.server.dao;
+
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Stats;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import java.util.List;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class Processor implements IsSerializable {
+public interface SimulationStatsDAO {
 
-    private String name;
-    private ProcessorStatus status;
-    private int completed;
-    private int queued;
-    private int failed;
-
-    public Processor() {
-    }
-
-    public Processor(String name, ProcessorStatus status, int completed, int queued, int failed) {
-
-        this.name = name;
-        this.status = status;
-        this.completed = completed;
-        this.queued = queued;
-        this.failed = failed;
-    }
-
-    public int getCompleted() {
-        return completed;
-    }
-
-    public int getFailed() {
-        return failed;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getQueued() {
-        return queued;
-    }
-
-    public ProcessorStatus getStatus() {
-        return status;
-    }
+    public List<Stats> getBySimulationID(String simulationID) throws DAOException;
 }

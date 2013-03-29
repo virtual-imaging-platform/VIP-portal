@@ -38,7 +38,6 @@ import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.InputBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
-import fr.insalyon.creatis.vip.application.server.business.WorkflowExecutionBusiness;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
@@ -87,9 +86,9 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
         try {
             if (isSystemAdministrator()) {
-                return workflowBusiness.getSimulations(null);
+                return workflowBusiness.getSimulations(null, null);
             } else {
-                return workflowBusiness.getSimulations(getSessionUser());
+                return workflowBusiness.getSimulations(getSessionUser(), null);
             }
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
@@ -711,7 +710,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @return
      * @throws ApplicationException
      */
-    public List<Processor> getProcessors(String simulationID) throws ApplicationException {
+    public List<Activity> getProcessors(String simulationID) throws ApplicationException {
 
         try {
             return workflowBusiness.getProcessors(simulationID);

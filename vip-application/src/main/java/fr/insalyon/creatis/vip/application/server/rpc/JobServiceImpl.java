@@ -127,10 +127,10 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      * @param status Simulation
      */
     @Override
-    public void sendTaskSignal(String simulationID, String taskID, TaskStatus status) throws ApplicationException {
+    public void sendTaskSignal(String simulationID, String taskID, String status) throws ApplicationException {
         
         try {
-            simulationBusiness.sendTaskSignal(simulationID, taskID, status);
+            simulationBusiness.sendTaskSignal(simulationID, taskID, TaskStatus.valueOf(status));
             
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
@@ -294,13 +294,13 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      * @throws ApplicationException
      */
     @Override
-    public void sendSignal(String simulationID, String jobID, TaskStatus status)
+    public void sendSignal(String simulationID, String jobID, String status)
             throws ApplicationException {
 
         try {
-            trace(logger, "Sending '" + status.name() + "' signal to '" + jobID
+            trace(logger, "Sending '" + status + "' signal to '" + jobID
                     + "' (" + simulationID + ").");
-            simulationBusiness.sendSignal(simulationID, jobID, status);
+            simulationBusiness.sendSignal(simulationID, jobID, TaskStatus.valueOf(status));
 
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
@@ -335,12 +335,12 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      */
     @Override
     public void sendSignal(String simulationID, List<String> jobIDs,
-            TaskStatus status) throws ApplicationException {
+            String status) throws ApplicationException {
 
         try {
-            trace(logger, "Sending '" + status.name() + "' signal to '"
+            trace(logger, "Sending '" + status + "' signal to '"
                     + jobIDs.toString() + "' (" + simulationID + ").");
-            simulationBusiness.sendSignal(simulationID, jobIDs, status);
+            simulationBusiness.sendSignal(simulationID, jobIDs, TaskStatus.valueOf(status));
 
         } catch (CoreException ex) {
             throw new ApplicationException(ex);

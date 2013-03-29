@@ -1,6 +1,6 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
@@ -32,32 +32,52 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.server.dao;
+package fr.insalyon.creatis.vip.application.client.bean;
 
-import fr.insalyon.creatis.vip.application.server.dao.derby.WorkflowData;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import com.google.gwt.user.client.rpc.IsSerializable;
+import fr.insalyon.creatis.vip.application.client.view.monitor.progress.ProcessorStatus;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
-public class DerbyDAOFactory extends WorkflowDAOFactory {
+public class Activity implements IsSerializable {
 
-    private static WorkflowDAOFactory instance;
+    private String name;
+    private ProcessorStatus status;
+    private int completed;
+    private int queued;
+    private int failed;
 
-    // Singleton
-    protected static WorkflowDAOFactory getInstance() {
-        if (instance == null) {
-            instance = new DerbyDAOFactory();
-        }
-        return instance;
+    public Activity() {
     }
 
-    private DerbyDAOFactory() {
+    public Activity(String name, ProcessorStatus status, int completed, int queued, int failed) {
+
+        this.name = name;
+        this.status = status;
+        this.completed = completed;
+        this.queued = queued;
+        this.failed = failed;
     }
 
-    @Override
-    public WorkflowDAO getWorkflowDAO() throws DAOException {
-        return WorkflowData.getInstance();
+    public int getCompleted() {
+        return completed;
+    }
+
+    public int getFailed() {
+        return failed;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getQueued() {
+        return queued;
+    }
+
+    public ProcessorStatus getStatus() {
+        return status;
     }
 }

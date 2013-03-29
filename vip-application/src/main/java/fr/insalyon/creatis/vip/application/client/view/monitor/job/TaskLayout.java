@@ -238,7 +238,7 @@ public class TaskLayout extends HLayout {
                     statusLabel.setContents(taskStatus.name());
                     minorStatusLabel.setContents("<font color=\"#666666\">Sending signal...</font>");
                     minorStatusLabel.setIcon(CoreConstants.ICON_LOADING);
-                    JobService.Util.getInstance().sendTaskSignal(simulationID, taskID, taskStatus, callback);
+                    JobService.Util.getInstance().sendTaskSignal(simulationID, taskID, taskStatus.name(), callback);
                 }
             }
         });

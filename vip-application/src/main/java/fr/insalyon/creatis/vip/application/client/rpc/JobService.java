@@ -40,7 +40,6 @@ import fr.insalyon.creatis.vip.application.client.bean.Node;
 import fr.insalyon.creatis.vip.application.client.bean.Task;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.SimulationFileType;
-import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 import java.util.List;
 import java.util.Map;
 
@@ -69,7 +68,7 @@ public interface JobService extends RemoteService {
 
     public String[] readSimulationFile(String simulationID, String taskID, SimulationFileType fileType) throws ApplicationException;
 
-    public void sendTaskSignal(String simulationID, String taskID, TaskStatus status) throws ApplicationException;
+    public void sendTaskSignal(String simulationID, String taskID, String status) throws ApplicationException;
 
     //
     public List<Task> getJobsList(String simulationID) throws ApplicationException;
@@ -90,9 +89,9 @@ public interface JobService extends RemoteService {
 
     public Node getNode(String simulationID, String siteName, String nodeName) throws ApplicationException;
 
-    public void sendSignal(String simulationID, String jobID, TaskStatus status) throws ApplicationException;
+    public void sendSignal(String simulationID, String jobID, String status) throws ApplicationException;
 
-    public void sendSignal(String simulationID, List<String> jobIDs, TaskStatus status) throws ApplicationException;
+    public void sendSignal(String simulationID, List<String> jobIDs, String status) throws ApplicationException;
 
     public Map<String, Integer> getCountriesMap(String simulationID) throws ApplicationException;
 }

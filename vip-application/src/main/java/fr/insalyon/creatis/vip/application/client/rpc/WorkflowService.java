@@ -121,7 +121,7 @@ public interface WorkflowService extends RemoteService {
 
     public List<InOutData> getInputData(String simulationID) throws ApplicationException;
 
-    public List<Processor> getProcessors(String simulationID) throws ApplicationException;
+    public List<Activity> getProcessors(String simulationID) throws ApplicationException;
 
     public void validateInputs(List<String> inputs) throws ApplicationException;
 

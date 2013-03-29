@@ -32,7 +32,8 @@
  */
 package fr.insalyon.creatis.vip.application.server.business;
 
-import fr.insalyon.creatis.vip.application.client.bean.Simulation;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
@@ -70,7 +71,7 @@ public class WorkflowExecutionBusiness {
      * @return
      * @throws BusinessException 
      */
-    public Simulation launch(String applicationName, String applicationVersion,
+    public Workflow launch(String applicationName, String applicationVersion,
             String applicationClass, User user, String simulationName,
             String workflowPath, List<ParameterSweep> parameters) throws BusinessException {
 
@@ -80,9 +81,9 @@ public class WorkflowExecutionBusiness {
             String launchID = engine.launch(Server.getInstance().getServerProxy(), null);
             String workflowID = engine.getSimulationId(launchID);
 
-            return new Simulation(applicationName, applicationVersion, applicationClass,
-                    workflowID, user.getFullName(), new Date(), simulationName,
-                    engine.getMode().equalsIgnoreCase("pool") ? SimulationStatus.Queued.name() : SimulationStatus.Running.name());
+            return new Workflow(workflowID, user.getFullName(), 
+                    engine.getMode().equalsIgnoreCase("pool") ? WorkflowStatus.Queued : WorkflowStatus.Running,
+                    new Date(), null, simulationName, applicationName, applicationVersion, applicationClass);
 
         } catch (javax.xml.rpc.ServiceException ex) {
             logger.error(ex);
