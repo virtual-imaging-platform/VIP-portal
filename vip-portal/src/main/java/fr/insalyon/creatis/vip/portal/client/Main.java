@@ -38,11 +38,14 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Label;
 import fr.insalyon.creatis.vip.application.client.ApplicationModule;
 import fr.insalyon.creatis.vip.cardiac.client.CardiacModule;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Modules;
+import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
@@ -65,9 +68,16 @@ public class Main implements EntryPoint {
 
     @Override
     public void onModuleLoad() {
-
+        
+        final String ticket = Window.Location.getParameter("ticket");
+        String login = Window.Location.getParameter("login");
+        
+        if(login.equals("stats")){
+                configureStats();
+                return;
+        }
+        
         Layout.getInstance().getModal().show("Loading VIP " + CoreConstants.VERSION, true);
-
         // Modules
         Modules modulesInit = Modules.getInstance();
         modulesInit.add(new CoreModule());
@@ -83,11 +93,9 @@ public class Main implements EntryPoint {
         modulesInit.add(new CardiacModule());
         // End-Modules
 
-        final String ticket = Window.Location.getParameter("ticket");
-        String login = Window.Location.getParameter("login");
         if (ticket == null && (login == null || !login.equals("CASN4U"))) {
-            //regular VIP authentication
-            configureVIP();
+                //regular VIP authentication
+                configureVIP();
         } else {
             configureN4U(ticket);
         }
@@ -175,5 +183,26 @@ public class Main implements EntryPoint {
             Layout.getInstance().getModal().show("Signing in with CAS...", true);
             service.signin(ticket, callback);
         }
+    }
+
+    private void configureStats() {
+        final ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+        AsyncCallback<UsageStats> acb = new AsyncCallback<UsageStats>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                SC.say("Cannot get usage stats");
+            }
+
+            @Override
+            public void onSuccess(UsageStats result) {
+                final String message = "<center>Today <font color=\"red\" size=\"4\"><b>" + result.getnUsers() + "</b></font> users from <font color=\"red\" size=\"4\"><b>" + result.getnCountries() + "</b></font> countries can access VIP.</center>";
+
+                final Label label = new Label(message);
+                label.setWidth100();
+                RootPanel.get().add(label);
+            }
+        };
+        service.getUsageStats(acb);
     }
 }
