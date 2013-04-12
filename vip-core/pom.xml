@@ -4,7 +4,7 @@
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>1.0</version>
+        <version>1.1</version>
         <relativePath>..</relativePath>
     </parent>
     <groupId>fr.insalyon.creatis</groupId>
@@ -143,7 +143,12 @@
             <artifactId>xalan</artifactId>
             <version>2.3.1</version>
         </dependency>
-        
+        <dependency>
+            <groupId>com.dropbox.client2</groupId>
+            <artifactId>dropbox-client</artifactId>
+            <version>1.2</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
