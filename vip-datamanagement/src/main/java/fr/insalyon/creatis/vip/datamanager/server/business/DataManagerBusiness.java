@@ -184,11 +184,13 @@ public class DataManagerBusiness {
         File imageDir = new File(imageDirString);
         String imageFileName = imageDir.getAbsolutePath() + System.getProperty("file.separator") + imageLFN.substring(imageLFN.lastIndexOf('/') + 1);
 
-        if (!imageDir.exists()) { //if it exists, assume that the file is being downloaded and don't do it again
+        if (!imageDir.exists()) { 
             imageDir.mkdirs();
             if (!imageDir.exists()) {
                 throw new BusinessException("Cannot create viewer dir: " + imageDir.getAbsolutePath());
             }
+        }
+        if(!(new File(imageFileName)).exists()){
             try {
                 CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(user, imageLFN), imageDir.getAbsolutePath());
             } catch (GRIDAClientException ex) {
@@ -197,7 +199,6 @@ public class DataManagerBusiness {
             } catch (DataManagerException ex) {
                 throw new BusinessException(ex);
             }
-
             //split slices
             ProcessBuilder builder = new ProcessBuilder("slice.sh", imageFileName, imageDir.getAbsolutePath());
             builder.redirectErrorStream(true);
@@ -211,7 +212,6 @@ public class DataManagerBusiness {
                     imageDir.delete();
                     throw new BusinessException(ex);
                 }
-
             } catch (IOException ex) {
                 imageDir.delete();
                 throw new BusinessException(ex);

@@ -78,7 +78,8 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
             public void onClick(ClickEvent event) {
                 String path = pathItem.getValueAsString();
                 if (ValidatorUtil.validateRootPath(path, "cut from")
-                        && ValidatorUtil.validateUserLevel(path, "cut from")) {
+                        && ValidatorUtil.validateUserLevel(path, "cut from") 
+                        && ValidatorUtil.validateDropboxDir(path, "cut from")) {
 
                     cut();
                 }
@@ -148,7 +149,8 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
             public void onClick(ClickEvent event) {
                 String path = pathItem.getValueAsString();
                 if (ValidatorUtil.validateRootPath(path, "delete from")
-                        && ValidatorUtil.validateUserLevel(path, "delete from")) {
+                        && ValidatorUtil.validateUserLevel(path, "delete from")
+                        && ValidatorUtil.validateDropboxDir(path, "delete from")) {
 
                     delete();
                 }

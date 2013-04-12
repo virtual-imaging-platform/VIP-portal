@@ -112,7 +112,8 @@ public class BrowserContextMenu extends Menu {
             @Override
             public void onClick(MenuItemClickEvent event) {
                 if (ValidatorUtil.validateRootPath(baseDir, "cut from")
-                        && ValidatorUtil.validateUserLevel(baseDir, "cut from")) {
+                        && ValidatorUtil.validateUserLevel(baseDir, "cut from")
+                        && ValidatorUtil.validateDropboxDir(baseDir, "cut from")) {
 
                     DataManagerContext.getInstance().setCutAction(baseDir, data.getName());
                     BrowserLayout.getInstance().getToolStrip().enablePasteButton();
@@ -141,7 +142,8 @@ public class BrowserContextMenu extends Menu {
             @Override
             public void onClick(MenuItemClickEvent event) {
                 if (ValidatorUtil.validateRootPath(baseDir, "rename from")
-                        && ValidatorUtil.validateUserLevel(baseDir, "rename from")) {
+                        && ValidatorUtil.validateUserLevel(baseDir, "rename from")
+                        && ValidatorUtil.validateDropboxDir(baseDir, "rename from")) {
 
                     new RenameWindow(modal, baseDir, data.getName()).show();
                 }
@@ -155,7 +157,8 @@ public class BrowserContextMenu extends Menu {
             @Override
             public void onClick(MenuItemClickEvent event) {
                 if (ValidatorUtil.validateRootPath(baseDir, "delete from")
-                        && ValidatorUtil.validateUserLevel(baseDir, "delete from")) {
+                        && ValidatorUtil.validateUserLevel(baseDir, "delete from")
+                         && ValidatorUtil.validateDropboxDir(baseDir, "delete from")) {
 
                     delete(modal, baseDir, data.getName());
                 }

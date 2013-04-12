@@ -59,7 +59,7 @@ public class ValidatorUtil {
         }
         return true;
     }
-
+    
     /**
      *
      * @param baseDir
@@ -76,5 +76,13 @@ public class ValidatorUtil {
             return false;
         }
         return true;
+    }
+    
+     public static boolean validateDropboxDir(String name, String errorMessage){
+         if(name.endsWith("Dropbox")){
+             Layout.getInstance().setWarningMessage("You cannot " + errorMessage + " in a Dropbox folder.");
+             return false;
+         }
+         return true;
     }
 }
