@@ -21,5 +21,5 @@
     <entry-point class="fr.insalyon.creatis.vip.portal.client.Main"/>
     <!--     <set-property name="user.agent" value="gecko1_8" />
     -->
-    
+        
 </module>

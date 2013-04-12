@@ -129,7 +129,7 @@ public class Main implements EntryPoint {
         }
         // End-Cookies
 
-        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+        final ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<User> callback = new AsyncCallback<User>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -141,6 +141,22 @@ public class Main implements EntryPoint {
             public void onSuccess(User user) {
                 Layout.getInstance().getModal().hide();
                 Layout.getInstance().authenticate(user);
+                
+                //Dropbox account confirmation
+                String oauth_token = Window.Location.getParameter("oauth_token");
+                if(oauth_token != null && !oauth_token.equals(""))
+                    service.activateDropboxAccount(oauth_token,new AsyncCallback<Void>(){
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        Layout.getInstance().setWarningMessage("Cannot activate Dropbox account");
+                    }
+
+                    @Override
+                    public void onSuccess(Void result) {
+                     Layout.getInstance().setNoticeMessage("Successfully activated Dropbox account");
+                    }
+                });
             }
         };
         service.configure(email, session, callback);
