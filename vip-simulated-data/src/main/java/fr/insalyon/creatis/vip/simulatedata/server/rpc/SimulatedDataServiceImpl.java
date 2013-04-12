@@ -39,6 +39,7 @@ import fr.cnrs.i3s.neusemstore.provenance.expsummaries.ExperimentSummary;
 import fr.cnrs.i3s.neusemstore.provenance.expsummaries.dto.SemEntity;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.SimulationObjectModelFactory;
 import fr.cnrs.i3s.neusemstore.vip.semantic.simulation.model.client.bean.SimulationObjectModel;
+import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.rpc.WorkflowServiceImpl;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -127,8 +128,11 @@ public class SimulatedDataServiceImpl extends AbstractRemoteServiceServlet imple
 
             WorkflowServiceImpl ws = new WorkflowServiceImpl();
             try {
-                ssd.setDate(ws.getSimulation(ssd.getSimulation()).getDate());
-                ssd.setName(ws.getSimulation(ssd.getSimulation()).getSimulationName());
+                Simulation s = ws.getSimulation(ssd.getSimulation());
+                if(s!=null){
+                    ssd.setDate(s.getDate());
+                    ssd.setName(s.getSimulationName());
+                }
 
             } catch (ApplicationException ex) {
                 logger.warn("Cannot set simulation date or name");
