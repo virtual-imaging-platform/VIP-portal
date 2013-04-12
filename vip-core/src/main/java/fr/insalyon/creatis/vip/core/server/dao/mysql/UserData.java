@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.core.server.dao.mysql;
 
+import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
@@ -613,5 +614,93 @@ public class UserData implements UserDAO {
             throw new DAOException(ex);
         }
         return -1;
+    }
+
+    @Override
+    public void linkDropboxAccount(String email, String directory, String auth_key, String auth_secret) throws DAOException {
+        try {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO VIPDropboxAccounts("
+                    + "email, directory, token_key, token_secret, validated, auth_failed) "
+                    + "VALUES (?, ?, ?, ?, ?, ?)");
+
+            ps.setString(1, email);
+            ps.setString(2, directory);
+            ps.setString(3, auth_key);
+            ps.setString(4, auth_secret);
+            ps.setBoolean(5, false);
+            ps.setBoolean(6, true);
+            ps.execute();
+            ps.close();
+
+        } catch (SQLException ex) {
+            if (ex.getMessage().contains("Duplicate entry")) {
+                logger.error("There is an existing Dropbox account associated with the email: " + email);
+                throw new DAOException("There is an existing Dropbox account associated with this email.");
+            } else {
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
+        }
+    }
+
+    @Override
+    public void activateDropboxAccount(String email, String auth_key) throws DAOException {
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "VIPDropboxAccounts SET auth_failed = '0' WHERE email = ? and token_key = ?");
+
+            ps.setString(1, email);
+            ps.setString(2, auth_key);
+            ps.executeUpdate();
+            ps.close();
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+
+    }
+
+    @Override
+    public DropboxAccountStatus.AccountStatus getDropboxAccountStatus(String email) throws DAOException {
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "auth_failed,validated FROM VIPDropboxAccounts WHERE email=?");
+
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                boolean validated  = rs.getBoolean("validated");
+                if (!validated) {
+
+                   return DropboxAccountStatus.AccountStatus.UNCONFIRMED;
+                }
+                boolean failed = rs.getBoolean("auth_failed");
+                if(failed)
+                    return DropboxAccountStatus.AccountStatus.AUTHENTICATION_FAILED;
+                return DropboxAccountStatus.AccountStatus.OK;
+            }
+            return DropboxAccountStatus.AccountStatus.UNLINKED;
+        } catch (SQLException ex) {
+            throw new DAOException(ex);
+        }
+    }
+
+    @Override
+    public void unlinkDropboxAccount(String email) throws DAOException {
+         try {
+            PreparedStatement ps = connection.prepareStatement("DELETE "
+                    + "FROM VIPDropboxAccounts WHERE email=?");
+
+            ps.setString(1, email);
+            ps.execute();
+            ps.close();
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
     }
 }

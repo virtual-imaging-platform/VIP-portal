@@ -221,7 +221,7 @@ public class Server {
             config.setProperty(CoreConstants.LAB_SIMULATED_DATA_DB_URL, simulatedDataDBURL);
             config.setProperty(CoreConstants.LAB_CAS_URL, casURL);
             config.setProperty(CoreConstants.LAB_CAS_ACCOUNT_TYPE, casAccountType);
-
+            
             config.save();
 
         } catch (ConfigurationException ex) {
@@ -408,6 +408,6 @@ public class Server {
     public String getSimulatedDataDBUser() {
         return simulatedDataDBUser;
     }
-    
+
     
 }

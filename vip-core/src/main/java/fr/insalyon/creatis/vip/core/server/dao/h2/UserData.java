@@ -34,6 +34,7 @@
  */
 package fr.insalyon.creatis.vip.core.server.dao.h2;
 
+import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
@@ -612,5 +613,25 @@ public class UserData implements UserDAO {
             throw new DAOException(ex);
         }
         return -1;
+    }
+
+    @Override
+    public void linkDropboxAccount(String email, String directory, String auth_key, String auth_secret) throws DAOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void activateDropboxAccount(String email, String auth_key) throws DAOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public DropboxAccountStatus.AccountStatus getDropboxAccountStatus(String email) throws DAOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void unlinkDropboxAccount(String email) throws DAOException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

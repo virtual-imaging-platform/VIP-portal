@@ -36,6 +36,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.core.client.bean.Account;
+import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -130,4 +131,11 @@ public interface ConfigurationService extends RemoteService {
     
     public UsageStats getUsageStats() throws CoreException;
     
+    public String linkDropboxAccount() throws CoreException;
+    
+    public void activateDropboxAccount(String oauth_token) throws CoreException;
+    
+    public DropboxAccountStatus.AccountStatus getDropboxAccountStatus() throws CoreException;
+    
+    public void unlinkDropboxAccount() throws CoreException;
 }

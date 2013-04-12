@@ -53,6 +53,7 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_ADMIN_PASS = "admin.pass";
     public static final String LAB_CAS_ACCOUNT_TYPE = "cas.accounttype";
     public static final String LAB_CAS_URL = "cas.url";
+    public static final String LAB_CAS_GROUPS = "cas.groups";
     public static final String LAB_MYPROXY_HOST = "myproxy.host";
     public static final String LAB_MYPROXY_PORT = "myproxy.port";
     public static final String LAB_MYPROXY_USER = "myproxy.user";
@@ -123,6 +124,7 @@ public class CoreConstants implements IsSerializable {
     public static final String ICON_USER_INFO = IMG_FOLDER + "system/icon-user-info.png";
     public static final String ICON_WARNING = IMG_FOLDER + "icon-warning.png";
     public static final String ICON_WORLD = IMG_FOLDER + "flags/_world.png";
+    public static final String ICON_DROPBOX = IMG_FOLDER+"icon-dropbox.png";
     // Folders
     public static final String FOLDER_TRASH = "Trash";
     public static final String FOLDER_FLAGS = IMG_FOLDER + "flags/";
@@ -148,7 +150,8 @@ public class CoreConstants implements IsSerializable {
     public static final String ACCOUNT_OTHER = "Other";
     // Roles and Groups
     public static final String GROUP_SUPPORT = "Support";
-
+    public static final String GROUP_DROPBOX = "Dropbox";
+ 
     public static enum GROUP_ROLE implements IsSerializable {
 
         Admin, User, None

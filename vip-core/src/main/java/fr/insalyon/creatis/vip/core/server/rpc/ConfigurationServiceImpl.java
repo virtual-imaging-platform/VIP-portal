@@ -32,7 +32,14 @@
  */
 package fr.insalyon.creatis.vip.core.server.rpc;
 
+import com.dropbox.client2.exception.DropboxException;
+import com.dropbox.client2.session.AppKeyPair;
+import com.dropbox.client2.session.Session.AccessType;
+import com.dropbox.client2.session.WebAuthSession;
+import com.dropbox.client2.session.WebAuthSession.WebAuthInfo;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.bean.Account;
+import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -44,6 +51,8 @@ import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.net.MalformedURLException;
@@ -736,6 +745,67 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             throw new CoreException(ex);
         }
 
+    }
+
+    @Override
+    public String linkDropboxAccount() throws CoreException {
+       trace(logger, "Linking Dropbox account.");
+        User user = getSessionUser();
+       //TODO: put this key pair in config file
+       AppKeyPair consumerTokenPair = new AppKeyPair("wqkjwy11upck7vi", "euieqqi699m3zu6");
+       WebAuthSession session = new WebAuthSession(consumerTokenPair, AccessType.APP_FOLDER);
+        try {
+            //TODO: put server URL instead
+            WebAuthInfo wai = session.getAuthInfo("REDIRECT");
+            
+            try {
+                String dir = Server.getInstance().getDataManagerUsersHome()+"/"+user.getFolder();
+                CoreUtil.getGRIDAClient().createFolder(dir, "Dropbox");
+                CoreDAOFactory.getDAOFactory().getUserDAO().linkDropboxAccount(user.getEmail(), dir+"/Dropbox", wai.requestTokenPair.key, wai.requestTokenPair.secret);
+            } catch (DAOException ex) {
+                throw new CoreException(ex);
+            }
+             catch (GRIDAClientException ex) {
+                throw new CoreException(ex);
+            }
+            return wai.url;
+        } catch (DropboxException ex) {
+            throw new CoreException(ex);
+        }
+       
+    }
+
+    @Override
+    public void activateDropboxAccount(String oauth_token) throws CoreException {
+        trace(logger, "Activating Dropbox account.");
+        User user = getSessionUser();
+        try {
+            CoreDAOFactory.getDAOFactory().getUserDAO().activateDropboxAccount(user.getEmail(), oauth_token);
+        } catch (DAOException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    @Override
+    public DropboxAccountStatus.AccountStatus getDropboxAccountStatus() throws CoreException {
+        trace(logger, "Getting Dropbox account status.");
+        User user = getSessionUser();
+        try {
+            return CoreDAOFactory.getDAOFactory().getUserDAO().getDropboxAccountStatus(user.getEmail());
+        } catch (DAOException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    @Override
+    public void unlinkDropboxAccount() throws CoreException {
+           trace(logger, "Unlinking Dropbox account.");
+        User user = getSessionUser();
+        try {
+            CoreDAOFactory.getDAOFactory().getUserDAO().unlinkDropboxAccount(user.getEmail());
+        } catch (DAOException ex) {
+            throw new CoreException(ex);
+        }
     }
 }
 

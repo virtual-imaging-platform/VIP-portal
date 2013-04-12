@@ -39,7 +39,9 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.user.account.DropboxLayout;
 import fr.insalyon.creatis.vip.core.client.view.user.account.GroupLayout;
 import fr.insalyon.creatis.vip.core.client.view.user.account.PasswordLayout;
 import fr.insalyon.creatis.vip.core.client.view.user.account.PersonalLayout;
@@ -78,6 +80,11 @@ public class AccountTab extends Tab {
         rightLayout.setHeight100();
         
         rightLayout.addMember(new GroupLayout());
+        
+        if(CoreModule.user.isSystemAdministrator()
+                || CoreModule.user.hasGroupAccess(CoreConstants.GROUP_DROPBOX))
+            rightLayout.addMember(new DropboxLayout());
+        
         rightLayout.addMember(new RemoveAccountLayout());
 
         hLayout.addMember(leftLayout);

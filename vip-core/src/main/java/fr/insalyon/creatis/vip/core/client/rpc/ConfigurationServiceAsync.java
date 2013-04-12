@@ -34,6 +34,7 @@ package fr.insalyon.creatis.vip.core.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.core.client.bean.Account;
+import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -114,4 +115,11 @@ public interface ConfigurationServiceAsync {
     
     public void getUsageStats(AsyncCallback<UsageStats> asyncCallback);
     
+    public void linkDropboxAccount(AsyncCallback<String> asyncCallback);
+    
+    public void activateDropboxAccount(String oauth_token, AsyncCallback<Void> asyncCallback);
+    
+    public void getDropboxAccountStatus(AsyncCallback<DropboxAccountStatus.AccountStatus> asyncCallback);
+    
+    public void unlinkDropboxAccount(AsyncCallback<Void> asyncCallback);
 }
