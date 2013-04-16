@@ -51,7 +51,7 @@ public class GateLabTileGrid extends ApplicationsTileGrid {
 
     public GateLabTileGrid() {
 
-        super(GateLabConstants.GROUP_GATELAB);
+        super(GateLabConstants.GATELAB_CLASS);
         applicationNames = new ArrayList<String>();
         loadApplications();
     }

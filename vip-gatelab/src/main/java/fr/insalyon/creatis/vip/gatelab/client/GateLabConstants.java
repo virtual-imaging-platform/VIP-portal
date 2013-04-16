@@ -54,5 +54,5 @@ public class GateLabConstants {
     public final static String APP_IMG_APPLICATION = IMG_FOLDER + "app-application.png";
     // Configuration
     public final static String GROUP_GATELAB = "GateLab";
-    public final static String GATELAB_CLASS = "GATE";
+    public final static String GATELAB_CLASS = "GateLab";
 }
