@@ -128,7 +128,7 @@ public class ConfigurationBusiness {
         }
     }
 
-    public void signup(User user, String comments, boolean auto, String... accountType) throws BusinessException {
+    public void signup(User user, String comments, boolean createdFromCAS, boolean mapPrivateGroups, String... accountType) throws BusinessException {
         try {
             user.setCode(UUID.randomUUID().toString());
             user.setPassword(MD5.get(user.getPassword()));
@@ -148,10 +148,13 @@ public class ConfigurationBusiness {
 
             // Adding user to groups
             for (Group group : CoreDAOFactory.getDAOFactory().getAccountDAO().getGroups(accountType)) {
-                CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().add(user.getEmail(), group.getName(), GROUP_ROLE.User);
+                if(mapPrivateGroups || createdFromCAS || group.isPublicGroup())
+                    CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().add(user.getEmail(), group.getName(), GROUP_ROLE.User);
+                else
+                    logger.info("Don't map user "+user.getEmail()+" to private group "+group.getName());
             }
 
-            if (!auto) {
+            if (!createdFromCAS) {
                 String emailContent = "<html>"
                         + "<head></head>"
                         + "<body>"
@@ -189,7 +192,7 @@ public class ConfigurationBusiness {
                         + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
                         + "<p><b>Phone:</b> " + user.getPhone() + "</p>"
                         + "<p><b>Country:</b> " + user.getCountryCode().getCountryName() + "</p>"
-                        + "<p><b>Account Type:</b> " + accounts.toString() + "</p>"
+                        + "<p><b>Accounts:</b> " + accounts.toString() + "</p>"
                         + "<p><b>Comments:</b><br />" + comments + "</p>"
                         + "<p>&nbsp;</p>"
                         + "<p>Best Regards,</p>"
@@ -213,7 +216,7 @@ public class ConfigurationBusiness {
                         + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
                         + "<p><b>Phone:</b> " + user.getPhone() + "</p>"
                         + "<p><b>Country:</b> " + user.getCountryCode().getCountryName() + "</p>"
-                        + "<p><b>Account Type:</b> " + accountType.toString() + "</p>"
+                        + "<p><b>Account Type:</b> " + accountType + "</p>"
                         + "<p><b>Comments:</b><br />" + comments + "</p>"
                         + "<p>&nbsp;</p>"
                         + "<p>Best Regards,</p>"
@@ -248,7 +251,7 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public void signup(User user, String comments, String...accountType) throws BusinessException {
-        signup(user, comments, false, accountType);
+        signup(user, comments, false, false, accountType);
 
     }
 
@@ -308,7 +311,7 @@ public class ConfigurationBusiness {
                 user = userDAO.getUser(user.getEmail());
             } catch (DAOException ex) {
                 try {
-                    signup(user, "Automatically generated from CAS login", true, Server.getInstance().getCasAccountType());
+                    signup(user, "Generated from CAS login", true, true, Server.getInstance().getCasAccountType());
                     this.activateUser(user.getEmail());
                     user = userDAO.getUser(user.getEmail());
 
