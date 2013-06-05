@@ -156,6 +156,7 @@ public class SimulationsContextMenu extends Menu {
         } else if (status == SimulationStatus.Completed || status == SimulationStatus.Killed) {
             this.setItems(viewItem, cleanItem, separator, relauchItem);
         } else if (status == SimulationStatus.Cleaned) {
+            
             this.setItems(viewItem, purgeItem);
         }
     }

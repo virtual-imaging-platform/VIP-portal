@@ -435,6 +435,7 @@ public class WorkflowBusiness {
         Simulation simulation = null;
         try {
             Workflow workflow = workflowDAO.get(simulationID);
+            if(workflow!=null){
             simulation = new Simulation(
                     workflow.getApplication(),
                     workflow.getApplicationVersion(),
@@ -444,6 +445,8 @@ public class WorkflowBusiness {
                     workflow.getStartedTime(),
                     workflow.getDescription(),
                     workflow.getStatus().name());
+            }else
+                logger.warn("Warning: simulation "+simulationID+" is not here anymore");
 
         } catch (WorkflowsDBDAOException ex) {
             logger.error(ex);
