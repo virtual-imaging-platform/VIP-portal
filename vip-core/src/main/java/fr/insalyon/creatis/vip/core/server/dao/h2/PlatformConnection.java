@@ -122,7 +122,7 @@ public class PlatformConnection {
                     + "last_login TIMESTAMP, "
                     + "level VARCHAR(50), "
                     + "country_code VARCHAR(2), "
-                    + "PRIMARY KEY(email)")) {
+                    + "PRIMARY KEY(email), UNIQUE KEY(first_name,last_name)")) {
 
                 Server server = Server.getInstance();
                 String folder = server.getAdminFirstName().toLowerCase() + "_"
