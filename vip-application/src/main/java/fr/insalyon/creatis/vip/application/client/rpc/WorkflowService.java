@@ -92,12 +92,16 @@ public interface WorkflowService extends RemoteService {
     public void cleanSimulations(List<String> simulationIDs) throws ApplicationException;
 
     public void purgeSimulations(List<String> simulationIDs) throws ApplicationException;
+    
+    public void markSimulationsCompleted(List<String> simulationIDs) throws ApplicationException;
 
     public void killWorkflow(String simulationID) throws ApplicationException;
 
     public void cleanWorkflow(String simulationID) throws ApplicationException;
 
     public void purgeWorkflow(String simulationID) throws ApplicationException;
+    
+    public void markWorkflowCompleted(String simulationID) throws ApplicationException;
 
     public Map<String, String> relaunchSimulation(String simulationID) throws ApplicationException;
 

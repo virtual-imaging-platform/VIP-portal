@@ -69,7 +69,6 @@ public class SimulationsToolStrip extends ToolStrip {
         // Refresh Button
         this.addButton(WidgetUtil.getToolStripButton("Refresh",
                 CoreConstants.ICON_REFRESH, null, new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 getSimulationsTab().loadData();
@@ -79,7 +78,6 @@ public class SimulationsToolStrip extends ToolStrip {
         // Search Button
         this.addButton(WidgetUtil.getToolStripButton("Search",
                 ApplicationConstants.ICON_SEARCH, null, new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 getSimulationsTab().expandSearchSection();
@@ -89,11 +87,9 @@ public class SimulationsToolStrip extends ToolStrip {
         //Kill Simulations Button
         this.addButton(WidgetUtil.getToolStripButton("Kill Simulations",
                 ApplicationConstants.ICON_KILL, null, new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 SC.ask("Do you really want to kill the selected running simulations?", new BooleanCallback() {
-
                     @Override
                     public void execute(Boolean value) {
                         if (value) {
@@ -107,11 +103,9 @@ public class SimulationsToolStrip extends ToolStrip {
         // Clean Simulations Button
         this.addButton(WidgetUtil.getToolStripButton("Clean Simulations",
                 ApplicationConstants.ICON_CLEAN, null, new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 SC.confirm("Do you really want to clean the selected completed/killed simulations?", new BooleanCallback() {
-
                     @Override
                     public void execute(Boolean value) {
                         if (value) {
@@ -127,11 +121,9 @@ public class SimulationsToolStrip extends ToolStrip {
             // Purge Simulations
             this.addButton(WidgetUtil.getToolStripButton("Purge Simulations",
                     CoreConstants.ICON_CLEAR, null, new ClickHandler() {
-
                 @Override
                 public void onClick(ClickEvent event) {
                     SC.ask("Do you really want to purge the selected cleaned simulations?", new BooleanCallback() {
-
                         @Override
                         public void execute(Boolean value) {
                             if (value) {
@@ -142,11 +134,27 @@ public class SimulationsToolStrip extends ToolStrip {
                 }
             }));
 
+            // Mark Simulation as Completed
+            this.addButton(WidgetUtil.getToolStripButton("Mark Completed",
+                    ApplicationConstants.ICON_MARK_COMPLETED, null, new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    SC.ask("Do you really want to mark as completed the selected killed simulations?", new BooleanCallback() {
+                        @Override
+                        public void execute(Boolean value) {
+                            if (value) {
+                                markSimulationsCompleted();
+                            }
+                        }
+                    });
+                }
+            }));
+
+
             // Stats Button
             this.addSeparator();
             this.addButton(WidgetUtil.getToolStripButton("Performance Statistics",
                     ApplicationConstants.ICON_CHART, null, new ClickHandler() {
-
                 @Override
                 public void onClick(ClickEvent event) {
                     Layout.getInstance().addTab(new StatsTab());
@@ -160,7 +168,6 @@ public class SimulationsToolStrip extends ToolStrip {
         this.addFill();
         this.addButton(WidgetUtil.getToolStripButton("System Load",
                 ApplicationConstants.ICON_STATUS, "Current status of the system.", new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 new SystemLoadLayout(event.getX(), event.getY()).show();
@@ -188,7 +195,6 @@ public class SimulationsToolStrip extends ToolStrip {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
@@ -227,7 +233,6 @@ public class SimulationsToolStrip extends ToolStrip {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
@@ -264,7 +269,6 @@ public class SimulationsToolStrip extends ToolStrip {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
@@ -279,6 +283,37 @@ public class SimulationsToolStrip extends ToolStrip {
         };
         service.purgeSimulations(simulationIDs, callback);
         modal.show("Purging selected simulations...", true);
+    }
+
+    private void markSimulationsCompleted() {
+        ListGridRecord[] records = getSimulationsTab().getGridSelection();
+        List<String> simulationIDs = new ArrayList<String>();
+
+        for (ListGridRecord record : records) {
+            SimulationRecord data = (SimulationRecord) record;
+            SimulationStatus status = SimulationStatus.valueOf(data.getStatus());
+
+            if (status == SimulationStatus.Killed) {
+                simulationIDs.add(data.getSimulationId());
+            }
+        }
+
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                Layout.getInstance().setWarningMessage("Unable to mark simulations completed:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                modal.hide();
+                getSimulationsTab().loadData();
+            }
+        };
+        service.markSimulationsCompleted(simulationIDs, callback);
+        modal.show("Marking selected simulations completed...", true);
     }
 
     private SimulationsTab getSimulationsTab() {

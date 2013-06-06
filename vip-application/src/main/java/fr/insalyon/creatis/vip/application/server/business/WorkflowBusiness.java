@@ -749,4 +749,17 @@ public class WorkflowBusiness {
             }
         }
     }
+
+    public void markCompleted(String simulationID) throws BusinessException {
+        try {
+            Workflow workflow = workflowDAO.get(simulationID);
+            workflow.setStatus(WorkflowStatus.Completed);
+            workflowDAO.update(workflow);
+
+
+        } catch (WorkflowsDBDAOException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
 }

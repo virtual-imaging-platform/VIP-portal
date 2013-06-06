@@ -71,6 +71,8 @@ public interface WorkflowServiceAsync {
     public void removeSimulationInputExample(String inputName, String applicationName, AsyncCallback<Void> asyncCallback);
 
     public void killSimulations(List<String> simulationIDs, AsyncCallback<Void> asyncCallback);
+    
+    public void markSimulationsCompleted(List<String> simulationIDs, AsyncCallback<Void> asyncCallback);
 
     public void cleanSimulations(List<String> simulationIDs, AsyncCallback<Void> asyncCallback);
 
@@ -81,6 +83,8 @@ public interface WorkflowServiceAsync {
     public void cleanWorkflow(String simulationID, AsyncCallback<Void> asyncCallback);
 
     public void purgeWorkflow(String simulationID, AsyncCallback<Void> asyncCallback);
+    
+    public void markWorkflowCompleted(String simulationID, AsyncCallback<Void> asyncCallback);
     
     public void relaunchSimulation(String simulationID, AsyncCallback<Map<String, String>> asyncCallback);
 

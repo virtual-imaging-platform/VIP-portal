@@ -779,4 +779,43 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             return s;
         }
     }
+
+    @Override
+    public void markSimulationsCompleted(List<String> simulationIDs) throws ApplicationException {
+try {
+            trace(logger, "Marking simulations completed: " + simulationIDs);
+            StringBuilder sb = new StringBuilder();
+            for (String simulationID : simulationIDs) {
+                try {
+                    workflowBusiness.markCompleted(simulationID);
+                } catch (BusinessException ex) {
+                    if (sb.length() > 0) {
+                        sb.append(", ");
+                    }
+                    sb.append(simulationID);
+                }
+            }
+
+            if (sb.length() > 0) {
+                logger.error("Unable to mark completed the following "
+                        + "simulations: " + sb.toString());
+                throw new ApplicationException("Unable to mark completed the following "
+                        + "simulations: " + sb.toString());
+            }
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        }    }
+
+    @Override
+    public void markWorkflowCompleted(String simulationID) throws ApplicationException {
+         try {
+            trace(logger, "Marking simulation '" + simulationID + "' completed.");
+            workflowBusiness.markCompleted(simulationID);
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
 }

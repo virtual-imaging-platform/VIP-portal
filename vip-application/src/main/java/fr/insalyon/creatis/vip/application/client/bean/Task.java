@@ -51,7 +51,7 @@ public class Task implements IsSerializable {
     private String parameters;
     private int minorStatus;
     private int jobID;
-
+    
     public Task() {
     }
 
@@ -148,4 +148,4 @@ public class Task implements IsSerializable {
     public void setJobID(int jobID) {
         this.jobID = jobID;
     }
-}
+    }

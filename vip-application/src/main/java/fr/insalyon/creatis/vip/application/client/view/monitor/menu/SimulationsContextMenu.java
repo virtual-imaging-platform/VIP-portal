@@ -140,6 +140,24 @@ public class SimulationsContextMenu extends Menu {
             }
         });
 
+         MenuItem markCompletedItem = new MenuItem("Mark Simulation Completed");
+        markCompletedItem.setIcon(ApplicationConstants.ICON_MARK_COMPLETED);
+        markCompletedItem.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(MenuItemClickEvent event) {
+                SC.ask("Do you really want to mark this simulation completed ("
+                        + title + ")?", new BooleanCallback() {
+                    @Override
+                    public void execute(Boolean value) {
+                        if (value) {
+                            markCompleted();
+                        }
+                    }
+
+                });
+            }
+        });
+        
         MenuItem relauchItem = new MenuItem("Relaunch Simulation");
         relauchItem.setIcon(ApplicationConstants.ICON_RELAUNCH);
         relauchItem.addClickHandler(new ClickHandler() {
@@ -153,11 +171,12 @@ public class SimulationsContextMenu extends Menu {
 
         if (status == SimulationStatus.Running) {
             this.setItems(viewItem, killItem, separator, relauchItem);
-        } else if (status == SimulationStatus.Completed || status == SimulationStatus.Killed) {
+        } else if (status == SimulationStatus.Completed) {
             this.setItems(viewItem, cleanItem, separator, relauchItem);
         } else if (status == SimulationStatus.Cleaned) {
             this.setItems(viewItem, purgeItem);
-        }
+        } else if (status == SimulationStatus.Killed)
+            this.setItems(viewItem, markCompletedItem, cleanItem, separator, relauchItem);
     }
 
     /**
@@ -224,6 +243,24 @@ public class SimulationsContextMenu extends Menu {
         };
         WorkflowService.Util.getInstance().purgeWorkflow(simulationID, callback);
         modal.show("Purging simulation " + simulationName + "...", true);
+    }
+    
+    private void markCompleted() {
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                Layout.getInstance().setWarningMessage("Unable to mark simulation completed:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                modal.hide();
+                getSimulationsTab().loadData();
+            }
+        };
+        WorkflowService.Util.getInstance().markWorkflowCompleted(simulationID, callback);
+        modal.show("Marking simulation " + simulationName + " cmopleted...", true);
     }
 
     /**
