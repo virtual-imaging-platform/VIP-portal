@@ -95,8 +95,8 @@ public class UserData implements UserDAO {
 
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Unique index or primary key violation")) {
-                logger.error("There is an existing account associated with the email: " + user.getEmail());
-                throw new DAOException("There is an existing account associated with this email.");
+                logger.error("There is an existing account associated with the email or with this {first name,last name}: " + user.getEmail());
+                throw new DAOException("There is an existing account associated with this email or with this {first name,last name}.");
             } else {
                 logger.error(ex);
                 throw new DAOException(ex);
