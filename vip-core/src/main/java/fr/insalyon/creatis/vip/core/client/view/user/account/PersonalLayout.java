@@ -65,8 +65,8 @@ public class PersonalLayout extends AbstractFormLayout {
 
     private Label levelLabel;
     private Label emailLabel;
-    private TextItem firstNameField;
-    private TextItem lastNameField;
+    private Label firstNameField;
+    private Label lastNameField;
     private TextItem institutionField;
     private TextItem phoneField;
     private SelectItem countryField;
@@ -86,8 +86,8 @@ public class PersonalLayout extends AbstractFormLayout {
 
         levelLabel = WidgetUtil.getLabel("", 15);
         emailLabel = WidgetUtil.getLabel("", 15);
-        firstNameField = FieldUtil.getTextItem(300, null);
-        lastNameField = FieldUtil.getTextItem(300, null);
+        firstNameField = WidgetUtil.getLabel("", 15);
+        lastNameField = WidgetUtil.getLabel("", 15);
         institutionField = FieldUtil.getTextItem(300, null);
         phoneField = FieldUtil.getTextItem(150, "[0-9\\(\\)\\-+. ]");
 
@@ -104,13 +104,12 @@ public class PersonalLayout extends AbstractFormLayout {
                     @Override
                     public void onClick(ClickEvent event) {
 
-                        if (firstNameField.validate() & lastNameField.validate()
-                                & institutionField.validate() & phoneField.validate()
+                        if (institutionField.validate() & phoneField.validate()
                                 & countryField.validate()) {
 
                             User user = new User(
-                                    firstNameField.getValueAsString().trim(),
-                                    lastNameField.getValueAsString().trim(),
+                                    firstNameField.getContents(),
+                                    lastNameField.getContents(),
                                     emailLabel.getContents(),
                                     institutionField.getValueAsString().trim(),
                                     phoneField.getValueAsString().trim(),
@@ -144,8 +143,10 @@ public class PersonalLayout extends AbstractFormLayout {
         this.addMember(levelLabel);
         this.addMember(WidgetUtil.getLabel("<b>Email</b>", 15));
         this.addMember(emailLabel);
-        addField("First Name", firstNameField);
-        addField("Last Name", lastNameField);
+        this.addMember(WidgetUtil.getLabel("<b>First Name</b>", 15));
+        this.addMember(firstNameField);
+        this.addMember(WidgetUtil.getLabel("<b>Last Name</b>", 15));
+        this.addMember(lastNameField);
         addField("Institution", institutionField);
         addField("Phone", phoneField);
         addField("Country", countryField);
@@ -176,8 +177,8 @@ public class PersonalLayout extends AbstractFormLayout {
                     levelLabel.setCursor(Cursor.HAND);
                 }
                 emailLabel.setContents(result.getEmail());
-                firstNameField.setValue(result.getFirstName());
-                lastNameField.setValue(result.getLastName());
+                firstNameField.setContents(result.getFirstName());
+                lastNameField.setContents(result.getLastName());
                 institutionField.setValue(result.getInstitution());
                 phoneField.setValue(result.getPhone());
                 countryField.setValue(result.getCountryCode().name());
