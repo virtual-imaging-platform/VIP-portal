@@ -97,7 +97,7 @@ public class UserData implements UserDAO {
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Duplicate entry")) {
                 logger.error("There is an existing account associated with the email: " + user.getEmail());
-                throw new DAOException("There is an existing account associated with this email.");
+                throw new DAOException("There is an existing account associated with this email or with this {first name,last name}..");
             } else {
                 logger.error(ex);
                 throw new DAOException(ex);
