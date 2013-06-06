@@ -30,6 +30,7 @@ class TaskInputsLayout  extends HLayout {
 //        this.addMember(nameLabel);
         
         Label valueLabel = WidgetUtil.getLabel(param, 16, Cursor.TEXT);
+        valueLabel.setCanSelectText(true);
         valueLabel.setWidth100();
         this.addMember(valueLabel);
     }

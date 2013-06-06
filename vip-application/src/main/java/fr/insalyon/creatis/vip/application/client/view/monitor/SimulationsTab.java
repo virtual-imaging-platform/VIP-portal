@@ -142,7 +142,8 @@ public class SimulationsTab extends Tab {
                         SimulationStatus.valueOf(event.getRecord().getAttribute("status")),
                         event.getRecord().getAttribute("application"),
                         event.getRecord().getAttribute("applicationVersion"),
-                        event.getRecord().getAttribute("applicationClass")).showContextMenu();
+                        event.getRecord().getAttribute("applicationClass"),
+                        event.getRecord().getAttribute("user")).showContextMenu();
             }
         });
         rowMouseDownHandler = grid.addRowMouseDownHandler(new RowMouseDownHandler() {

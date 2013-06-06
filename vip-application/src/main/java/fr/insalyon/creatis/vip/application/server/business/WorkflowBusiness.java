@@ -762,4 +762,16 @@ public class WorkflowBusiness {
             throw new BusinessException(ex);
         }
     }
+
+    public void changeSimulationUser(String simulationId, String user) throws BusinessException {
+try {
+            Workflow workflow = workflowDAO.get(simulationId);
+            workflow.setUsername(user);
+            workflowDAO.update(workflow);
+
+
+        } catch (WorkflowsDBDAOException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }    }
 }

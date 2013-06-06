@@ -130,4 +130,6 @@ public interface WorkflowService extends RemoteService {
     public void validateInputs(List<String> inputs) throws ApplicationException;
 
     public void updateUser(String currentUser, String newUser) throws ApplicationException;
+    
+    public void changeSimulationUser(String simulationId, String user) throws ApplicationException;
 }

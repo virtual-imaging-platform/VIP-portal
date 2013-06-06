@@ -35,6 +35,7 @@ package fr.insalyon.creatis.vip.application.client.view.monitor.menu;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.MenuItemSeparator;
@@ -46,6 +47,7 @@ import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationsTab;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -63,10 +65,11 @@ public class SimulationsContextMenu extends Menu {
     private String applicationName;
     private String applicationVersion;
     private String applicationClass;
+    private String simulationUser;
 
     public SimulationsContextMenu(ModalWindow modal, final String simulationID,
             final String title, final SimulationStatus status, String applicationName,
-            String applicationVersion, String applicationClass) {
+            String applicationVersion, String applicationClass, String simulationUser) {
 
         this.modal = modal;
         this.simulationID = simulationID;
@@ -74,6 +77,7 @@ public class SimulationsContextMenu extends Menu {
         this.applicationName = applicationName;
         this.applicationVersion = applicationVersion;
         this.applicationClass = applicationClass;
+        this.simulationUser = simulationUser;
 
         this.setShowShadow(true);
         this.setShadowDepth(10);
@@ -166,17 +170,49 @@ public class SimulationsContextMenu extends Menu {
                 relaunchSimulation();
             }
         });
+        
+        MenuItem changeUserItem = new MenuItem("Change Simulation User");
+        changeUserItem.setIcon(ApplicationConstants.ICON_USER);
+        changeUserItem.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(MenuItemClickEvent event) {
+                SC.askforValue("Enter new user name", new ValueCallback() {
+                    @Override
+                    public void execute(String value) {
+                        changeUser(value);
+                    }
+                });
+                
+            }
+        });
 
         MenuItemSeparator separator = new MenuItemSeparator();
 
         if (status == SimulationStatus.Running) {
-            this.setItems(viewItem, killItem, separator, relauchItem);
+            if (CoreModule.user.isSystemAdministrator()) {
+                this.setItems(viewItem, killItem, separator, relauchItem, separator, changeUserItem);
+            } else {
+                this.setItems(viewItem, killItem, separator, relauchItem);
+            }
         } else if (status == SimulationStatus.Completed) {
-            this.setItems(viewItem, cleanItem, separator, relauchItem);
+            if (CoreModule.user.isSystemAdministrator()) {
+                this.setItems(viewItem, cleanItem, separator, relauchItem, separator, changeUserItem);
+            } else {
+                this.setItems(viewItem, cleanItem, separator, relauchItem);
+            }
         } else if (status == SimulationStatus.Cleaned) {
-            this.setItems(viewItem, purgeItem);
-        } else if (status == SimulationStatus.Killed)
-            this.setItems(viewItem, markCompletedItem, cleanItem, separator, relauchItem);
+            if (CoreModule.user.isSystemAdministrator()) {
+                this.setItems(viewItem, purgeItem, separator, changeUserItem);
+            } else {
+                this.setItems(viewItem, purgeItem);
+            }
+        } else if (status == SimulationStatus.Killed) {
+            if (CoreModule.user.isSystemAdministrator()) {
+                this.setItems(viewItem, markCompletedItem, cleanItem, separator, relauchItem, separator, changeUserItem);
+            } else {
+                this.setItems(viewItem, cleanItem, separator, relauchItem);
+            }
+        }
     }
 
     /**
@@ -287,6 +323,26 @@ public class SimulationsContextMenu extends Menu {
         modal.show("Relaunching simulation " + simulationName + "...", true);
     }
 
+     private void changeUser(String user) {
+
+        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                Layout.getInstance().setWarningMessage("Unable to change simulation user:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                modal.hide();
+                 getSimulationsTab().loadData();
+            }
+        };
+        WorkflowService.Util.getInstance().changeSimulationUser(simulationID, user, callback);
+        modal.show("Changing user of simulation" + simulationName + " to '"+user+"'...", true);
+    }
+
+    
     private SimulationsTab getSimulationsTab() {
         return (SimulationsTab) Layout.getInstance().getTab(ApplicationConstants.TAB_MONITOR);
     }

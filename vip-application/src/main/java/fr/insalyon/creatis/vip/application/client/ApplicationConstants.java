@@ -67,6 +67,7 @@ public class ApplicationConstants {
     public static final String ICON_MONITOR_SIMULATION_CLEANED = IMG_FOLDER + "monitor/icon-simulation-cleaned.png";
     public static final String ICON_MONITOR_SIMULATION_COMPLETED = IMG_FOLDER + "monitor/icon-simulation-completed.png";
     public static final String ICON_MARK_COMPLETED  = IMG_FOLDER+"icon-mark-completed.png";
+    public static final String ICON_USER = IMG_FOLDER+"icon-user.png";;
     public static final String ICON_MONITOR_SIMULATION_FAILED = IMG_FOLDER + "monitor/icon-simulation-failed.png";
     public static final String ICON_MONITOR_SIMULATION_RUNNING = IMG_FOLDER + "monitor/icon-simulation-running.png";
     public static final String ICON_MONITOR_TIMELINE = IMG_FOLDER + "monitor/icon-timeline.png";
@@ -109,7 +110,7 @@ public class ApplicationConstants {
     public static final String SESSION_CLASSES = "vip-classes";
     public static final String SEPARATOR_INPUT = "##";
     public static final String SEPARATOR_LIST = "@@";
-
+   
     public static String getLaunchTabID(String applicationName) {
 
         return "launch-" + applicationName.replaceAll(" ", "-").toLowerCase()

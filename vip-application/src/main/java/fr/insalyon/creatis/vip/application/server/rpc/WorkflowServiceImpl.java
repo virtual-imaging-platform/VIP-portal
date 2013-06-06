@@ -818,4 +818,17 @@ try {
             throw new ApplicationException(ex);
         }
     }
+
+    @Override
+    public void changeSimulationUser(String simulationId, String user) throws ApplicationException {
+         try {
+            trace(logger, "Changing user of simulation '" + simulationId + "' to "+user+".");
+            workflowBusiness.changeSimulationUser(simulationId,user);
+
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
 }

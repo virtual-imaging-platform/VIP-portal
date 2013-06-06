@@ -135,7 +135,7 @@ public class SimulationsToolStrip extends ToolStrip {
             }));
 
             // Mark Simulation as Completed
-            this.addButton(WidgetUtil.getToolStripButton("Mark Completed",
+            this.addButton(WidgetUtil.getToolStripButton("Mark Simulations Completed",
                     ApplicationConstants.ICON_MARK_COMPLETED, null, new ClickHandler() {
                 @Override
                 public void onClick(ClickEvent event) {
