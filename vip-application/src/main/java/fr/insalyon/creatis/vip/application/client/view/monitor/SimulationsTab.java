@@ -73,6 +73,7 @@ public class SimulationsTab extends Tab {
     protected String user = null;
     protected String app = null;
     protected String status = null;
+    protected String appClass = null;
     protected Date startDate = null;
     protected Date endDate = null;
     protected HandlerRegistration rowMouseDownHandler;
@@ -200,7 +201,7 @@ public class SimulationsTab extends Tab {
             }
         };
         modal.show("Loading Simulations...", true);
-        WorkflowService.Util.getInstance().getSimulations(user, app, status, startDate, endDate, callback);
+        WorkflowService.Util.getInstance().getSimulations(user, app, status, appClass, startDate, endDate, callback);
         Layout.getInstance().setActiveCenterTab(ApplicationConstants.TAB_MONITOR);
     }
 
@@ -234,5 +235,9 @@ public class SimulationsTab extends Tab {
 
     public void setUser(String user) {
         this.user = user;
+    }
+    
+     public void setAppClass(String appClass) {
+        this.appClass = appClass;
     }
 }

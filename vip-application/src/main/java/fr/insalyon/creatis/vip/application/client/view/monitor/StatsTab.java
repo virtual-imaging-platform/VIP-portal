@@ -34,22 +34,38 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor;
 
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.ButtonItem;
+import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
+import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
+import com.smartgwt.client.widgets.grid.CellFormatter;
+import com.smartgwt.client.widgets.grid.ListGrid;
+import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+import fr.insalyon.creatis.vip.application.client.view.monitor.chart.WorkflowStatsChart;
+import fr.insalyon.creatis.vip.application.client.view.monitor.chart.JobStatsChart;
+import fr.insalyon.creatis.vip.application.client.view.monitor.chart.GeneralBarChart;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -59,15 +75,13 @@ import java.util.List;
  */
 public class StatsTab extends Tab {
 
-    private DynamicForm form;
-    private VLayout vLayout;
-    private SelectItem chartsItem;
-    private ModalWindow modal;
     private List<Simulation> simulationsList;
-    private VLayout chartLayout;
-    private VLayout innerChartLayout;
-    private int chartWidth = 780;
-    private int chartHeight = 500;
+    private VLayout leftVLayout;
+    private VLayout rightVLayout;
+    private SelectItem chartsItem;
+    private TextItem binItem;
+    private ListGrid grid;
+    private IButton generateButton;
 
     public StatsTab() {
 
@@ -76,137 +90,281 @@ public class StatsTab extends Tab {
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
 
-        vLayout = new VLayout(15);
-        vLayout.setWidth100();
-        vLayout.setHeight100();
-        vLayout.setOverflow(Overflow.AUTO);
-        vLayout.setPadding(5);
+        leftVLayout = new VLayout(15);
+        leftVLayout.setWidth(280);
+        leftVLayout.setHeight100();
+        leftVLayout.setOverflow(Overflow.AUTO);
+
+        rightVLayout = new VLayout(15);
+        rightVLayout.setWidth100();
+        rightVLayout.setHeight(600);
+        rightVLayout.setOverflow(Overflow.AUTO);
+        rightVLayout.setPadding(10);
 
         configureForm();
-        configureChart();
+        configureGrid();
 
-        vLayout.addMember(form);
-        vLayout.addMember(chartLayout);
+        HLayout hLayout = new HLayout(10);
+        hLayout.setWidth100();
+        hLayout.setHeight100();
+        hLayout.setOverflow(Overflow.AUTO);
+        hLayout.addMember(leftVLayout);
+        hLayout.addMember(rightVLayout);
 
-        modal = new ModalWindow(chartLayout);
-
-        this.setPane(vLayout);
+        this.setPane(hLayout);
     }
 
     private void configureForm() {
 
-        form = new DynamicForm();
-        form.setWidth(500);
-        form.setNumCols(5);
-
         LinkedHashMap<String, String> chartsMap = new LinkedHashMap<String, String>();
-        chartsMap.put("1", "Detailed Time Analysis for Completed Jobs");
-        chartsMap.put("2", "Job Statuses");
-        chartsItem = new SelectItem("charts", "Chart");
+        chartsMap.put("1", "Job Stats");
+        chartsMap.put("2", "Workflows per User");
+        chartsMap.put("3", "Workflows per Application");
+        chartsMap.put("4", "Application Classes");
+        chartsItem = new SelectItem();
+        chartsItem.setShowTitle(false);
+        chartsItem.setWidth(250);
         chartsItem.setValueMap(chartsMap);
         chartsItem.setEmptyDisplayValue("Select a chart...");
-        chartsItem.setWidth(300);
+        chartsItem.addChangedHandler(new ChangedHandler() {
 
-        ButtonItem generateButtonItem = new ButtonItem("generateChart", " Generate Chart ");
-        generateButtonItem.addClickHandler(new ClickHandler() {
+            @Override
+            public void onChanged(ChangedEvent event) {
+                int value = new Integer(chartsItem.getValueAsString());
+            }
+        });
+
+        generateButton = WidgetUtil.getIButton("Get Stats", null, new ClickHandler() {
+
             @Override
             public void onClick(ClickEvent event) {
                 generateChart();
             }
         });
-        generateButtonItem.setStartRow(false);
 
-        form.setItems(chartsItem, generateButtonItem);
+        VLayout formLayout = WidgetUtil.getVIPLayout(280, 185, false);
+        formLayout.addMember(WidgetUtil.getLabel("<b>Performance Statistics</b>", ApplicationConstants.ICON_CHART, 30));
+        WidgetUtil.addFieldToVIPLayout(formLayout, "Chart", chartsItem);
+        //WidgetUtil.addFieldToVIPLayout(formLayout, "Bin Size", binItem);
+        formLayout.addMember(generateButton);
+
+        leftVLayout.addMember(formLayout);
     }
 
-    private void configureChart() {
+    private void configureGrid() {
 
-        chartLayout = new VLayout();
-        chartLayout.setWidth(chartWidth);
-        chartLayout.setHeight(chartHeight);
+        grid = new ListGrid();
+        grid.setWidth(280);
+        grid.setHeight(145);
+        grid.setShowAllRecords(true);
+        grid.setShowEmptyMessage(true);
+        grid.setEmptyMessage("<br>No data available.");
 
-        innerChartLayout = new VLayout();
-        innerChartLayout.setWidth100();
-        innerChartLayout.setHeight100();
+        ListGridField propertyField = new ListGridField("property", "Properties");
+        ListGridField valueField = new ListGridField("value", "Value");
+        valueField.setAlign(Alignment.RIGHT);
+        valueField.setCellFormatter(new CellFormatter() {
 
-        chartLayout.addMember(innerChartLayout);
+            @Override
+            public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+
+                if (value == null) {
+                    return null;
+                }
+                try {
+                    NumberFormat nf = NumberFormat.getDecimalFormat();
+                    return nf.format(Double.parseDouble((String) value));
+                } catch (Exception e) {
+                    return value.toString();
+                }
+            }
+        });
+
+        grid.setFields(propertyField, valueField);
+        grid.setCanSelectCells(true);
+        grid.setCanEdit(true);
+        //grid.setAutoFetchData(true);
+        //grid.setCanDragSelect(true);
+        grid.setCanSelectText(true);
+        grid.setCursor(Cursor.TEXT);
+
+        leftVLayout.addMember(grid);
     }
 
     private void generateChart() {
 
-        int value = new Integer(chartsItem.getValueAsString());
+        int value = Integer.parseInt(chartsItem.getValueAsString());
         switch (value) {
             case 1:
-                plotOverallStats();
+                plotJobsStats();
                 break;
             case 2:
-                plotJobsSummary();
+                plotWorkflowsPerUser();
                 break;
+            case 3:
+                plotApplications();
+                break;
+            case 4:
+                plotApplicationClasses();
+
         }
     }
 
-    private void plotOverallStats() {
+    private void plotWorkflowsPerUser() {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        final AsyncCallback<String> callback = new AsyncCallback<String>() {
+        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
+                //modal.hide();
                 Layout.getInstance().setWarningMessage("Unable to load chart data:<br />" + caught.getMessage());
             }
 
             @Override
-            public void onSuccess(String result) {
-
-                String[] res = result.split("##");
-                Object[][] data = new Object[][]{
-                    {"Number Of Completed Jobs", new Integer(res[0])},
-                    {"Execution Time (s)", new Integer(res[1])},
-                    {"Upload Time (s)", new Integer(res[2])},
-                    {"Download Time (s)", new Integer(res[3])}
-                };
-                modal.hide();
+            public void onSuccess(List<String> result) {
+                if (result != null) {
+                    if (result.isEmpty()) {
+                        Layout.getInstance().setWarningMessage("Result set is empty!<br />");
+                    } else {
+                        new WorkflowStatsChart(result, rightVLayout, grid).build();
+                        resetGenerateButton();
+                        /*
+                        PropertyRecord[] p=new PropertyRecord[result.size()];
+                        for(int i=0; i< result.size(); i++){
+                            if(result.get(i) != null){
+                                String[] v = result.get(i).split("##");
+                                p[i]=new PropertyRecord(v[0], v[1]);
+                            }
+                            
+                        }
+                        grid.setData(p);
+                        grid.refreshFields();
+                         * 
+                         */
 //                VisualizationUtils.loadVisualizationApi(getPieChartRunnable(data), PieChart.PACKAGE);
+                    }
+                }
             }
         };
-        modal.show("Loading Time Analysis for Completed Jobs...", true);
+        //modal.show("Loading Time Analysis for Completed Jobs...", true);
+
+        service.getPerformanceStats(simulationsList, 2, callback);
+    }
+
+    private void plotJobsStats() {
+
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                //modal.hide();
+                Layout.getInstance().setWarningMessage("Unable to load chart data:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(List<String> result) {
+
+                if (result != null) {
+                    if (result.isEmpty()) {
+                        Layout.getInstance().setWarningMessage("Result set is empty!<br />");
+                    } else {
+                        new JobStatsChart(result, rightVLayout, grid).build();
+                        resetGenerateButton();
+//                VisualizationUtils.loadVisualizationApi(getPieChartRunnable(data), PieChart.PACKAGE);
+                    }
+                }
+            }
+        };
         service.getPerformanceStats(simulationsList, 1, callback);
     }
 
-    private void plotJobsSummary() {
+    private void plotApplications() {
 
         WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        final AsyncCallback<String> callback = new AsyncCallback<String>() {
+        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
+                //modal.hide();
                 Layout.getInstance().setWarningMessage("Unable to load chart data:<br />" + caught.getMessage());
             }
 
             @Override
-            public void onSuccess(String result) {
-
-                String[] res = result.split("##");
-                Object[][] data = new Object[][]{
-                    {"TotalNumberOfJobs", new Integer(res[0])},
-                    {"Completed", new Integer(res[1])},
-                    {"Failed", new Integer(res[3])},
-                    {"Cancelled", new Integer(res[2])}
-                };
-                modal.hide();
+            public void onSuccess(List<String> result) {
+                if (result != null) {
+                    if (result.isEmpty()) {
+                        Layout.getInstance().setWarningMessage("Result set is empty!<br />");
+                    } else {
+                        new WorkflowStatsChart(result, rightVLayout, grid).build();
+                        resetGenerateButton();
+                        /*
+                        PropertyRecord[] p=new PropertyRecord[result.size()];
+                        for(int i=0; i< result.size(); i++){
+                            if(result.get(i) != null){
+                                String[] v = result.get(i).split("##");
+                                p[i]=new PropertyRecord(v[0], v[1]);
+                            }
+                            
+                        } 
+                        grid.setData(p);
+                        grid.setCursor(Cursor.TEXT); 
+                         * 
+                         */
 //                VisualizationUtils.loadVisualizationApi(getPieChartRunnable(data), PieChart.PACKAGE);
+                    }
+                }
             }
         };
-        modal.show("Loading Job Statuses...", true);
-        service.getPerformanceStats(simulationsList, 2, callback);
+
+        service.getPerformanceStats(simulationsList, 3, callback);
+    }
+
+    private void plotApplicationClasses() {
+
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                //modal.hide();
+                Layout.getInstance().setWarningMessage("Unable to load chart data:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(List<String> result) {
+                if (result != null) {
+                    if (result.isEmpty()) {
+                        Layout.getInstance().setWarningMessage("Result set is empty!<br />");
+                    } else {
+
+                        //modal.show("Loaded Stats", true);
+                        PropertyRecord[] p=new PropertyRecord[result.size()];
+                        for(int i=0; i< result.size(); i++){
+                            if(result.get(i).compareToIgnoreCase("null")!=0){
+                                p[i]=new PropertyRecord("Application Class", result.get(i) + "");
+                            }
+                            
+                        }
+                        grid.setData(p);
+                        //grid.refreshFields();
+//                VisualizationUtils.loadVisualizationApi(getPieChartRunnable(data), PieChart.PACKAGE);
+                    }
+                }
+            }
+        };
+        //Layout.getInstance().setWarningMessage("plotJobsSummary success:<br />");
+        //modal.show("Loading Job Statuses...", true);
+        service.getPerformanceStats(simulationsList, 4, callback);
     }
 
     private Runnable getPieChartRunnable(final Object[][] data) {
 
         return new Runnable() {
+
             @Override
             public void run() {
-
 //                PieOptions options = PieOptions.create();
 //                options.setWidth(chartWidth);
 //                options.setHeight(chartHeight);
@@ -239,5 +397,9 @@ public class StatsTab extends Tab {
 
     public void setSimulationsList(List<Simulation> simulationsList) {
         this.simulationsList = simulationsList;
+    }
+    
+        private void resetGenerateButton() {
+        WidgetUtil.resetIButton(generateButton, "Get Stats", null);
     }
 }

@@ -88,7 +88,7 @@ public interface WorkflowServiceAsync {
     
     public void relaunchSimulation(String simulationID, AsyncCallback<Map<String, String>> asyncCallback);
 
-    public void getSimulations(String user, String application, String status, Date startDate, Date endDate, AsyncCallback<List<Simulation>> asyncCallback);
+    public void getSimulations(String user, String application, String status, String applicationClass, Date startDate, Date endDate, AsyncCallback<List<Simulation>> asyncCallback);
     
     public void getSimulation(String simulationID, AsyncCallback<Simulation> asyncCallback);
 
@@ -102,7 +102,7 @@ public interface WorkflowServiceAsync {
 
     public void getFileURL(String baseDir, String fileName, AsyncCallback<String> asyncCallback);
 
-    public void getPerformanceStats(List<Simulation> simulationList, int type, AsyncCallback<String> asyncCallback);
+    public void getPerformanceStats(List<Simulation> simulationList, int type, AsyncCallback<List<String>> asyncCallback);
 
     public void getOutputData(String simulationID, AsyncCallback<List<InOutData>> asyncCallback);
 

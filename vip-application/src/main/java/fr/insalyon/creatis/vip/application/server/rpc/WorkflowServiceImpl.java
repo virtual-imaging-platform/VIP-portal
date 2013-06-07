@@ -33,6 +33,7 @@
 package fr.insalyon.creatis.vip.application.server.rpc;
 
 import fr.insalyon.creatis.devtools.FileUtils;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
@@ -57,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -528,25 +530,25 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     @Override
     public List<Simulation> getSimulations(String userName, String application,
-            String status, Date startDate, Date endDate) throws ApplicationException {
+            String status, String appClass, Date startDate, Date endDate) throws ApplicationException {
 
         try {
             User user = getSessionUser();
             if (user.isSystemAdministrator()) {
                 return workflowBusiness.getSimulations(userName, application,
-                        status, startDate, endDate);
+                        status, appClass, startDate, endDate);
 
             } else {
 
                 if (userName != null) {
                     return workflowBusiness.getSimulations(userName,
-                            application, status, startDate, endDate);
+                            application, status, appClass, startDate, endDate);
 
                 } else {
                     List<String> users = configurationBusiness.getUserNames(user.getEmail(), true);
 
                     return workflowBusiness.getSimulations(users,
-                            application, status, startDate, endDate);
+                            application, status, appClass, startDate, endDate);
                 }
             }
 
@@ -656,11 +658,13 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @return
      * @throws ApplicationException
      */
-    public String getPerformanceStats(List<Simulation> simulationList, int type) throws ApplicationException {
+    public List<String> getPerformanceStats(List<Simulation> simulationList, int type) throws ApplicationException {
 
         try {
             return workflowBusiness.getPerformanceStats(simulationList, type);
-
+        } catch (WorkflowsDBDAOException ex) {
+            java.util.logging.Logger.getLogger(WorkflowServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            throw new ApplicationException(ex);
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }

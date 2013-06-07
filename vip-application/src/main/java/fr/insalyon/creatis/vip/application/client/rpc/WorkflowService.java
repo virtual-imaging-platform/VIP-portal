@@ -105,7 +105,7 @@ public interface WorkflowService extends RemoteService {
 
     public Map<String, String> relaunchSimulation(String simulationID) throws ApplicationException;
 
-    public List<Simulation> getSimulations(String user, String application, String status, Date startDate, Date endDate) throws ApplicationException;
+    public List<Simulation> getSimulations(String user, String application, String status, String appClass, Date startDate, Date endDate) throws ApplicationException;
 
     public Simulation getSimulation(String simulationID) throws ApplicationException;
 
@@ -119,7 +119,7 @@ public interface WorkflowService extends RemoteService {
 
     public List<SimulationInput> getWorkflowsInputByUserAndAppName(String user, String appName);
 
-    public String getPerformanceStats(List<Simulation> simulationList, int type) throws ApplicationException;
+    public List<String> getPerformanceStats(List<Simulation> simulationList, int type) throws ApplicationException;
 
     public List<InOutData> getOutputData(String simulationID) throws ApplicationException;
 

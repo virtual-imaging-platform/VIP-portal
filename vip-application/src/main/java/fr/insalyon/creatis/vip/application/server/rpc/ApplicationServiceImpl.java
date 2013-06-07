@@ -294,16 +294,17 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             User user = getSessionUser();
             if (isSystemAdministrator()) {
-
+                List<String> classes = classBusiness.getClassesName();
+                //trace(logger, "Admin classes are '" + classes.toString() + "'.");
                 return new List[]{configurationBusiness.getUserNames(user.getEmail(), false),
-                            applicationBusiness.getApplicationNames()};
+                            applicationBusiness.getApplicationNames(), classes};
 
             } else {
                 List<String> classes = classBusiness.getUserClassesName(user.getEmail(), !user.isSystemAdministrator());
                 classes.removeAll(reservedClasses);
-
+                //trace(logger, "User classes are '" + classes.toString() + "'.");
                 return new List[]{configurationBusiness.getUserNames(user.getEmail(), true),
-                            applicationBusiness.getApplicationNames(classes)};
+                            applicationBusiness.getApplicationNames(classes), classes};
             }
         } catch (CoreException ex) {
             throw new ApplicationException(ex);

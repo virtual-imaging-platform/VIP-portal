@@ -38,6 +38,7 @@ import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Input;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Output;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Processor;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Stats;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.InputDAO;
@@ -61,7 +62,9 @@ import fr.insalyon.creatis.vip.application.server.business.simulation.parser.Inp
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.ScuflParser;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
+import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAO;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAOFactory;
+import fr.insalyon.creatis.vip.application.server.dao.hibernate.SimulationStatsData;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
@@ -88,6 +91,7 @@ public class WorkflowBusiness {
 
     private static final Logger logger = Logger.getLogger(WorkflowBusiness.class);
     private static ApplicationDAO applicationDB;
+    private static SimulationStatsDAO simulationStatsDAO;
     private static WorkflowDAO workflowDAO;
     private static ProcessorDAO processorDAO;
     private static OutputDAO outputDAO;
@@ -98,6 +102,7 @@ public class WorkflowBusiness {
 
         try {
             applicationDB = ApplicationDAOFactory.getDAOFactory().getApplicationDAO();
+            simulationStatsDAO = SimulationStatsDAOFactory.getInstance().getSimulationStatsDAO();
             workflowDAO = WorkflowsDBDAOFactory.getInstance().getWorkflowDAO();
             processorDAO = WorkflowsDBDAOFactory.getInstance().getProcessorDAO();
             outputDAO = WorkflowsDBDAOFactory.getInstance().getOutputDAO();
@@ -234,7 +239,7 @@ public class WorkflowBusiness {
      * @throws BusinessException
      */
     public List<Simulation> getSimulations(String userName, String application,
-            String status, Date startDate, Date endDate) throws BusinessException {
+            String status, String appClass, Date startDate, Date endDate) throws BusinessException {
 
         try {
             if (endDate != null) {
@@ -250,7 +255,7 @@ public class WorkflowBusiness {
             }
 
             List<Simulation> simulations = parseWorkflows(workflowDAO.get(userName,
-                    application, wStatus, startDate, endDate));
+                    application, wStatus, appClass, startDate, endDate));
             checkRunningSimulations(simulations);
 
             return simulations;
@@ -273,7 +278,7 @@ public class WorkflowBusiness {
      * @throws BusinessException
      */
     public List<Simulation> getSimulations(List<String> users, String application,
-            String status, Date startDate, Date endDate) throws BusinessException {
+            String status, String appClass, Date startDate, Date endDate) throws BusinessException {
 
         try {
             if (endDate != null) {
@@ -287,9 +292,9 @@ public class WorkflowBusiness {
             if (status != null) {
                 wStatus = WorkflowStatus.valueOf(status);
             }
-            
+
             List<Simulation> simulations = parseWorkflows(workflowDAO.get(users,
-                    application, wStatus, startDate, endDate));
+                    application, wStatus, appClass, startDate, endDate));
             checkRunningSimulations(simulations);
 
             return simulations;
@@ -574,29 +579,46 @@ public class WorkflowBusiness {
      * @return
      * @throws BusinessException
      */
-    public String getPerformanceStats(List<Simulation> simulationIDList, int type)
-            throws BusinessException {
+    public List<String> getPerformanceStats(List<Simulation> simulationIDList, int type)
+            throws BusinessException, WorkflowsDBDAOException {
 
-        String stats = null;
-//        try {
-//            switch (type) {
-//                case 1:
-//
-//                    stats = workflowDB.getTimeAnalysis(simulationIDList);
-//                    break;
-//                case 2:
-//
-//                    stats = workflowDB.getJobStatuses(simulationIDList);
-//                    break;
-//                default:
-//
-//                    logger.error("Type '" + type + "' not supported.");
-//                    throw new fr.insalyon.creatis.vip.core.server.business.BusinessException("Type '" + type + "' not supported.");
-//            }
-//        } catch (fr.insalyon.creatis.vip.core.server.dao.DAOException ex) {
-//            WorkflowBusiness.logAndThrow(ex);
-//        }
+        List<String> workflowIDList = new ArrayList<String>();
+        List<String> stats = new ArrayList<String>();
+        if (simulationIDList != null) {
+            for (int i = 0; i < simulationIDList.size(); i++) {
+                //logger.error("Stat module, id is "+simulationIDList.get(i).getID());
+                workflowIDList.add(simulationIDList.get(i).getID());
+            }
+        } else {
+            throw new BusinessException("Simulation list is null!");
+        }
 
+        if (workflowIDList != null && !workflowIDList.isEmpty()) {
+            try {
+                switch (type) {
+                    case 1:
+                        stats = simulationStatsDAO.getBySimulationID(workflowIDList);
+                        break;
+                    case 2:
+                        stats = simulationStatsDAO.getWorkflowsPerUser(workflowIDList);
+                        break;
+                    case 3:
+                        stats = simulationStatsDAO.getApplications(workflowIDList);
+                        break;
+                    case 4:
+                        stats = simulationStatsDAO.getClasses(workflowIDList);
+
+                }
+
+
+            } catch (DAOException ex) {
+                logger.error(ex);
+                throw new BusinessException(ex);
+            }
+
+        } else {
+            throw new BusinessException("Empty workflow list!");
+        }
         return stats;
     }
 
@@ -764,7 +786,7 @@ public class WorkflowBusiness {
     }
 
     public void changeSimulationUser(String simulationId, String user) throws BusinessException {
-try {
+        try {
             Workflow workflow = workflowDAO.get(simulationId);
             workflow.setUsername(user);
             workflowDAO.update(workflow);
@@ -773,5 +795,6 @@ try {
         } catch (WorkflowsDBDAOException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
-        }    }
+        }
+    }
 }

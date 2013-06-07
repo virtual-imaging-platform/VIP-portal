@@ -64,6 +64,21 @@ public class ClassBusiness {
 
     /**
      * 
+     * @return
+     * @throws BusinessException 
+     */
+    public List<String> getClassesName() throws BusinessException {
+
+        List<String> classesName = new ArrayList<String>();
+        for (AppClass appClass : getClasses()) {
+            classesName.add(appClass.getName());
+        }
+
+        return classesName;
+    }
+    
+    /**
+     * 
      * @param c
      * @throws BusinessException 
      */
