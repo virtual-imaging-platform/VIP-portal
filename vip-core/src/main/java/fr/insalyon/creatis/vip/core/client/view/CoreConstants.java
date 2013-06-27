@@ -151,6 +151,8 @@ public class CoreConstants implements IsSerializable {
     // Roles and Groups
     public static final String GROUP_SUPPORT = "Support";
     public static final String GROUP_DROPBOX = "Dropbox";
+    // ssh
+    public static final String SSH_PUBLIC_KEY = "ssh.publickey";
  
     public static enum GROUP_ROLE implements IsSerializable {
 
