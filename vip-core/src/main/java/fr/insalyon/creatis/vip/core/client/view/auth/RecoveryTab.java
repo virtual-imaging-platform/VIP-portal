@@ -243,7 +243,7 @@ public class RecoveryTab extends Tab {
                     Layout.getInstance().setNoticeMessage("Your password was successfully reseted.", 15);
                 }
             };
-            WidgetUtil.setLoadingIButton(resetButton, "Reseting password...");
+           // WidgetUtil.setLoadingIButton(resetButton, "Reseting password...");
             service.resetPassword(email, codeField.getValueAsString().trim(),
                     passwordField.getValueAsString(), callback);
         }
