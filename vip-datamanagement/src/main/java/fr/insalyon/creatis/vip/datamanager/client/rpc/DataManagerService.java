@@ -42,6 +42,7 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Image;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
+import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import java.util.Date;
 import java.util.List;
@@ -112,4 +113,14 @@ public interface DataManagerService extends RemoteService {
     public void deleteZombieFiles(List<String> surls) throws DataManagerException;
     
     public Image getImageSlicesURL(String imageLFN) throws DataManagerException;
+    
+    public List<SSH> getSSHConnections() throws DataManagerException;
+    
+    public void addSSH(SSH ssh) throws DataManagerException;
+    
+    public void updateSSH(SSH ssh) throws DataManagerException;
+    
+    public void removeSSH(String email, String name) throws DataManagerException; 
+    
+    public String getSSHPublicKey();
 }
