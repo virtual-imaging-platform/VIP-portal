@@ -83,7 +83,7 @@ public class ValidatorUtil {
              Layout.getInstance().setWarningMessage("You cannot " + errorMessage + " a Dropbox folder.");
              return false;
          }
-         if(name.endsWith("_(ssh)")){
+         if(name.endsWith("_ssh")){
              Layout.getInstance().setWarningMessage("You cannot " + errorMessage + " a ssh folder.");
              return false;
          }
