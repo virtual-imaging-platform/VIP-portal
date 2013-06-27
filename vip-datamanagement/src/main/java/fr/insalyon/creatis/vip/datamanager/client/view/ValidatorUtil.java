@@ -80,7 +80,11 @@ public class ValidatorUtil {
     
      public static boolean validateDropboxDir(String name, String errorMessage){
          if(name.endsWith("Dropbox")){
-             Layout.getInstance().setWarningMessage("You cannot " + errorMessage + " in a Dropbox folder.");
+             Layout.getInstance().setWarningMessage("You cannot " + errorMessage + " a Dropbox folder.");
+             return false;
+         }
+         if(name.endsWith("_(ssh)")){
+             Layout.getInstance().setWarningMessage("You cannot " + errorMessage + " a ssh folder.");
              return false;
          }
          return true;

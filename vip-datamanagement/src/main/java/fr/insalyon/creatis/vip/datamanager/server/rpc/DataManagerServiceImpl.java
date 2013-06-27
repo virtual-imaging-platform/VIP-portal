@@ -44,6 +44,7 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Image;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
+import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
@@ -417,12 +418,69 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             trace(logger, "viewing image: " + imageLFN);
             User user = getSessionUser();
-            return  dataManagerBusiness.getImageSlicesURL(imageLFN,this.getServletContext().getRealPath("."),user);
+            return dataManagerBusiness.getImageSlicesURL(imageLFN, this.getServletContext().getRealPath("."), user);
         } catch (CoreException ex) {
             throw new DataManagerException(ex);
         } catch (BusinessException ex) {
             throw new DataManagerException(ex);
         }
 
+    }
+
+    @Override
+    public List<SSH> getSSHConnections() throws DataManagerException {
+        try {
+            trace(logger, "Getting ssh connections");
+
+            return dataManagerBusiness.getSSHConnections();
+
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
+        }
+
+
+    }
+
+    @Override
+    public void addSSH(SSH ssh) throws DataManagerException {
+        try {
+            trace(logger, "Adding ssh connection " + ssh.getEmail() + " ; " + ssh.getHost());
+            dataManagerBusiness.addSSH(ssh);
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
+        }
+    }
+
+    @Override
+    public void updateSSH(SSH ssh) throws DataManagerException {
+        try {
+            trace(logger, "Updating ssh connection " + ssh.getEmail() + " ; " + ssh.getHost());
+            dataManagerBusiness.updateSSH(ssh);
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
+        }
+    }
+
+    @Override
+    public void removeSSH(String email, String name) throws DataManagerException {
+        try {
+            trace(logger, "Removing ssh connection " + email + " ; " + name);
+            dataManagerBusiness.removeSSH(email, name);
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
+        }
+    }
+
+    @Override
+    public String getSSHPublicKey() {
+        return Server.getInstance().getSshPublicKey();
     }
 }

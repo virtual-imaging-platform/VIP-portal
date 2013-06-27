@@ -42,21 +42,25 @@ import fr.insalyon.creatis.grida.common.bean.ZombieFile;
 import java.util.ArrayList;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Image;
+import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import fr.insalyon.creatis.vip.datamanager.server.dao.SSHDAOFactory;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -139,9 +143,9 @@ public class DataManagerBusiness {
 
     /**
      * Gets the list of zombie files.
-     * 
+     *
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public List<DMZombieFile> getZombieFiles() throws BusinessException {
 
@@ -160,9 +164,9 @@ public class DataManagerBusiness {
 
     /**
      * Deletes a list of zombie files.
-     * 
+     *
      * @param surls List of zombie SURLs
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void deleteZombieFiles(List<String> surls) throws BusinessException {
 
@@ -180,17 +184,17 @@ public class DataManagerBusiness {
 
     public Image getImageSlicesURL(String imageLFN, String localDir, User user) throws BusinessException {
         String relativeDirString = "/images/viewer" + System.getProperty("file.separator") + (new File(imageLFN)).getParent().replaceAll(" ", "_").replaceAll("\\([^\\(]*\\)", "");
-        String imageDirString = localDir +relativeDirString;
+        String imageDirString = localDir + relativeDirString;
         File imageDir = new File(imageDirString);
         String imageFileName = imageDir.getAbsolutePath() + System.getProperty("file.separator") + imageLFN.substring(imageLFN.lastIndexOf('/') + 1);
 
-        if (!imageDir.exists()) { 
+        if (!imageDir.exists()) {
             imageDir.mkdirs();
             if (!imageDir.exists()) {
                 throw new BusinessException("Cannot create viewer dir: " + imageDir.getAbsolutePath());
             }
         }
-        if(!(new File(imageFileName)).exists()){
+        if (!(new File(imageFileName)).exists()) {
             try {
                 CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(user, imageLFN), imageDir.getAbsolutePath());
             } catch (GRIDAClientException ex) {
@@ -248,5 +252,70 @@ public class DataManagerBusiness {
         System.out.println(relativeDirString);
         return new Image(relativeDirString, Integer.parseInt(number.trim()));//tempDir.listFiles().length -1);
 
+    }
+
+    public List<SSH> getSSHConnections() throws BusinessException {
+        try {
+            return SSHDAOFactory.getDAOFactory().getSSHDAO().getSSHConnections();
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    public void addSSH(SSH ssh) throws BusinessException {
+        try {
+            //create LFC dir
+            ConfigurationBusiness conf = new ConfigurationBusiness();
+            User user = conf.getUser(ssh.getEmail());
+
+            String lfcDir = generateLFCDir(ssh.getName(), ssh.getEmail());
+            String name = lfcDir.substring(lfcDir.lastIndexOf("/") + 1);
+            String dir = Server.getInstance().getDataManagerUsersHome() + "/" + user.getFolder();
+            logger.info("Creating directory " + name + " in folder " + dir);
+
+            CoreUtil.getGRIDAClient().createFolder(dir, name);
+
+
+//            CoreUtil.getGRIDAClient().createFolder(dir, name);
+            SSHDAOFactory.getDAOFactory().getSSHDAO().addSSH(ssh);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        } catch (DataManagerException ex) {
+            throw new BusinessException(ex);
+        } catch (GRIDAClientException ex) {
+            throw new BusinessException(ex);
+        }
+
+    }
+
+    public void removeSSH(String email, String name) throws BusinessException {
+        try {
+            SSHDAOFactory.getDAOFactory().getSSHDAO().removeSSH(email, name);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    public void updateSSH(SSH ssh) throws BusinessException {
+        try {
+            SSHDAOFactory.getDAOFactory().getSSHDAO().updateSSH(ssh);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    public static String extractName(String lfcDir) {
+        String bruteName = lfcDir.substring(lfcDir.lastIndexOf("/") + 1);
+        String shortName = bruteName.replace(DataManagerConstants.SSH_APPEND, "");
+        return shortName;
+    }
+
+    public static String generateLFCDir(String name, String email) throws DataManagerException, BusinessException {
+
+        ConfigurationBusiness conf = new ConfigurationBusiness();
+        User user = conf.getUser(email);
+        String homeDir = Server.getInstance().getDataManagerUsersHome() + "/" + user.getFolder();
+
+        return (homeDir + "/" + name + DataManagerConstants.SSH_APPEND);
     }
 }

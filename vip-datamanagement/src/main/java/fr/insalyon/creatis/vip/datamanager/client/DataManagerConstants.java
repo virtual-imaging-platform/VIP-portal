@@ -44,6 +44,7 @@ public class DataManagerConstants {
     public final static String TAB_MANAGE_OPERATIONS = "manage-operations-tab";
     public final static String TAB_MANAGE_CACHED_FILES = "manage-cached-files-tab";
     public final static String TAB_MANAGE_ZOMBIE_FILES = "manage-zombie-files-tab";
+    public final static String TAB_MANAGE_SSH = "manage-ssh-tab";
     // Sections
     public final static String SECTION_FILE_TRANSFER = "file-transfer-section";
     // Layouts
@@ -66,17 +67,20 @@ public class DataManagerConstants {
     public static final String ICON_UPLOAD = IMG_FOLDER + "icon-upload.png";
     public static final String ICON_UPLOAD_MULTIPLE = IMG_FOLDER + "icon-upload-multiple.png";
     public static final String ICON_WARNING = IMG_FOLDER + "icon-warning.png";
-        public static final String ICON_VIEW = IMG_FOLDER+"icon-view.png";
+    public static final String ICON_VIEW = IMG_FOLDER+"icon-view.png";
+         public static final String ICON_SSH = IMG_FOLDER+"icon-ssh.png";
     // Application Names
     public final static String APP_CACHED_FILES = "Cached Files";
     public final static String APP_FILE_TRANSFER = "File Transfer";
     public final static String APP_OPERATIONS = "Operations";
     public final static String APP_ZOMBIE_FILES = "Zombie Files";
+    public final static String APP_SSH = "SSH Connections";
     // Application Images
     public static final String APP_IMG_CACHED_FILES = IMG_FOLDER + "app-cache.png";
     public static final String APP_IMG_FILE_TRANSFER = IMG_FOLDER + "app-file-transfer.png";
     public static final String APP_IMG_OPERATIONS = IMG_FOLDER + "app-operation.png";
     public static final String APP_IMG_ZOMBIE_FILES = IMG_FOLDER + "app-file-zombie.png";
+    public static String APP_IMG_SSH = IMG_FOLDER + "app-ssh.png";
     // Operation
     private static final String OP_FOLDER = IMG_FOLDER + "operation/";
     public static final String OP_DOWNLOAD = OP_FOLDER + "img-download.png";
@@ -91,5 +95,6 @@ public class DataManagerConstants {
     public static final String BIOMED_HOME = "Biomed";
     public static final String GROUP_APPEND = " (group)";
     public static final int MAX_OPERATIONS_LIMIT = 10;
-
+    public static final String SSH_APPEND = "_(ssh)"; //dont' change that otherwise existing connections will not work any more
+   
 }

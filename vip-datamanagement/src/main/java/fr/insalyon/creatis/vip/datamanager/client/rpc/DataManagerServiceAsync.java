@@ -40,6 +40,7 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Image;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
+import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
 import java.util.Date;
 import java.util.List;
 
@@ -95,5 +96,15 @@ public interface DataManagerServiceAsync {
     
     public void deleteZombieFiles(List<String> surls, AsyncCallback<Void> asyncCallback);
     
-     public void getImageSlicesURL(String imageLFN, AsyncCallback<Image> asyncCallback);
+   public void getImageSlicesURL(String imageLFN, AsyncCallback<Image> asyncCallback);
+     
+   public void getSSHConnections(AsyncCallback<List<SSH>> asyncCallback);
+     
+   public void addSSH(SSH ssh, AsyncCallback<Void> asyncCallback);
+   
+   public void updateSSH(SSH ssh, AsyncCallback<Void> asyncCallback);
+   
+   public void removeSSH(String email, String name, AsyncCallback<Void> asyncCallback);
+   
+   public void getSSHPublicKey(AsyncCallback<String> asycCallback);
 }
