@@ -108,7 +108,9 @@ public class Server {
     //cas
     private String casURL;
     private String casAccountType;
-
+    //ssh
+    private String sshPublicKey;
+    
     public static Server getInstance() {
         if (instance == null) {
             instance = new Server();
@@ -180,6 +182,8 @@ public class Server {
             casURL = config.getString(CoreConstants.LAB_CAS_URL, "https://ng-cas.maatg.fr/pandora-gateway-sl-cas");
             casAccountType = config.getString(CoreConstants.LAB_CAS_ACCOUNT_TYPE, "Neuroimaging");
 
+            sshPublicKey = config.getString(CoreConstants.SSH_PUBLIC_KEY, "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAuNjIXlgjuBR+WfjGtkieecZfe/ZL6EyNJTbL14bn3/Soof0kFSshDJvFgSH1hNwMMU1hynLbzcEbLTyVMoGQKfQkq7mJPajy9g8878WCKxCRbXv3W1/HT9iab/qqt2dcRYnDEruHwgyELBhQuMAe2W2/mgjd7Y5PxE01bwDcenYl3cU3iJk1sAOHao6P+3xU6Ov+TD8K9aC0LzZpM+rzAmS9HOZ9nvzERExd7k4TUpyffQV9Dpb5jEnEViF3VHqplB8AbWDdcJbiVkUBUe4hQb7nmWP0kHl1+v5SQJ1B4mWCZ+35Rc/9b1GsmPnXg3qqhjeKbrim/NbcUwKr9NPWjQ== vip-services@kingkong.grid.creatis.insa-lyon.fr");
+            
             config.setProperty(CoreConstants.LAB_DB_HOST, databaseServerHost);
             config.setProperty(CoreConstants.LAB_DB_PORT, databaseServerPort);
             config.setProperty(CoreConstants.LAB_ADMIN_FIRST_NAME, adminFirstName);
@@ -221,6 +225,7 @@ public class Server {
             config.setProperty(CoreConstants.LAB_SIMULATED_DATA_DB_URL, simulatedDataDBURL);
             config.setProperty(CoreConstants.LAB_CAS_URL, casURL);
             config.setProperty(CoreConstants.LAB_CAS_ACCOUNT_TYPE, casAccountType);
+            config.setProperty(CoreConstants.SSH_PUBLIC_KEY,sshPublicKey);
             
             config.save();
 
@@ -407,6 +412,10 @@ public class Server {
 
     public String getSimulatedDataDBUser() {
         return simulatedDataDBUser;
+    }
+
+    public String getSshPublicKey() {
+        return sshPublicKey;
     }
 
     

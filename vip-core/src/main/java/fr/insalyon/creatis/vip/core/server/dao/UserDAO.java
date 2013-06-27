@@ -89,5 +89,5 @@ public interface UserDAO {
     
     public DropboxAccountStatus.AccountStatus getDropboxAccountStatus(String email) throws DAOException;
     
-    public void unlinkDropboxAccount(String email) throws DAOException;
+    public void unlinkDropboxAccount(String email) throws DAOException;   
 }
