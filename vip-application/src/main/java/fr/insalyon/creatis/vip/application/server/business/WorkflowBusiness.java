@@ -440,6 +440,8 @@ public class WorkflowBusiness {
         Simulation simulation = null;
         try {
             Workflow workflow = workflowDAO.get(simulationID);
+            if(workflow == null )
+                throw new BusinessException("Cannot find simulation with id "+simulationID);
             simulation = new Simulation(
                     workflow.getApplication(),
                     workflow.getApplicationVersion(),

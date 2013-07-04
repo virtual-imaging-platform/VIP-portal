@@ -135,7 +135,8 @@ public class SimulatedDataServiceImpl extends AbstractRemoteServiceServlet imple
                 }
 
             } catch (ApplicationException ex) {
-                logger.warn("Cannot set simulation date or name");
+                logger.warn("Cannot set simulation date or name for "+ssd.getSimulation());
+                ssd.setName("unknown");
             }
 
 
