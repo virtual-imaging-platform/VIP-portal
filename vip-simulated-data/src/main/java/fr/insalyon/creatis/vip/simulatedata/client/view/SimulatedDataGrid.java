@@ -49,6 +49,7 @@ import com.smartgwt.client.widgets.grid.events.RowMouseDownHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.viewer.DetailViewer;
 import com.smartgwt.client.widgets.viewer.DetailViewerField;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.simulatedata.client.SimulatedDataRecord;
 import fr.insalyon.creatis.vip.simulatedata.client.bean.SimulatedData;
@@ -102,7 +103,11 @@ public class SimulatedDataGrid extends VLayout {
                 String model = event.getRecord().getAttribute("model-uri");
                 String simulation = event.getRecord().getAttribute("simulation");
                 String name = event.getRecord().getAttribute("short-model");
-                new SimulatedDataContextMenu(model, name, simulation).showContextMenu();
+                String simuName = event.getRecord().getAttribute("simulation-name");
+                if(!simuName.equals("unknown"))
+                    new SimulatedDataContextMenu(model, name, simulation).showContextMenu();
+                else
+                     Layout.getInstance().setWarningMessage("Cannot find the simulation related to this data");
 
             }
         });
@@ -114,7 +119,11 @@ public class SimulatedDataGrid extends VLayout {
                 String model = event.getRecord().getAttribute("model-uri");
                 String simulation = event.getRecord().getAttribute("simulation");
                 String name = event.getRecord().getAttribute("short-model");
-                new SimulatedDataContextMenu(model, name, simulation).showContextMenu();
+                String simuName = event.getRecord().getAttribute("simulation-name");
+                if(!simuName.equals("unknown"))
+                    new SimulatedDataContextMenu(model, name, simulation).showContextMenu();
+                else
+                     Layout.getInstance().setWarningMessage("Cannot find the simulation related to this data");
             }
         });
         grid.setCanHover(true);
