@@ -25,18 +25,48 @@ public class MySQLDAOFactory extends QueryDAOFactory {
 
     private MySQLDAOFactory() {
 
-        try {
+       /* try {
             logger.info("Configuring VIP Application database.");
 
             PlatformConnection.getInstance().createTable("Query",
-                    "name VARCHAR(255), "
-                    + "description VARCHAR(255)");
-
+                    "queryID BIGINT(20) AUTO_INCREMENT, "
+                    + "description TEXT NULL"
+                    + "queryMaker VARCHAR(255) "
+                    + "queryName VARCHAR(255) "
+                    + "PRIMARY KEY (queryID)"
+                    + "FOREIGN KEY (queryMaker) REFERENCES vipusers(email) "
+                    + "ON DELETE RESTRICT ON UPDATE RESTRICT");
             
+  
+            /*PlatformConnection.getInstance().createTable("QueryVersion",
+                    "queryVersionID BIGINT(20) AUTO_INCREMENT, "
+                    + "queryVersion VARCHAR(40) "
+                    + "queryID BIGINT(20) "
+                    + "body TEXT "
+                    + "dateCreation TIMESTAMP "
+                    + "PRIMARY KEY (queryVersionID ) "
+                    + "FOREIGN KEY (queryID) REFERENCES Query(queryID) "
+                    + "ON DELETE CASCADE ON UPDATE RESTRICT");
+            
+             PlatformConnection.getInstance().createTable("Parameter",
+                    "parameterID BIGINT(20) AUTO_INCREMENT, "
+                    + "name VARCHAR(255)"
+                    + "type VARCHAR(255)"
+                    + "description VARCHAR(255)"
+                    + "example VARCHAR(255)"
+                    + "queryVersionID BIGINT(20)"
+                    + "PRIMARY KEY (queryVersionID )"
+                    + "FOREIGN KEY (queryVersionID) REFERENCES QueryVersion(queryVersionID) "
+                    + "ON DELETE CASCADE ON UPDATE RESTRICT");
+            
+
+       
 
         } catch (DAOException ex) {
             logger.error(ex);
         }
+        * 
+        */
     }
 
     @Override

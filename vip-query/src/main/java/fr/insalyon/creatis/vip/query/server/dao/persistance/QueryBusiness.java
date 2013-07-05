@@ -6,7 +6,9 @@ package fr.insalyon.creatis.vip.query.server.dao.persistance;
 import fr.insalyon.creatis.vip.query.client.bean.Query;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.query.client.bean.Parameter;
 import fr.insalyon.creatis.vip.query.client.bean.QueryVersion;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -18,7 +20,7 @@ public class QueryBusiness {
     
   
   
-    public List<Query> getQueries() throws BusinessException {
+    public List<String[]> getQueries() throws BusinessException {
 
         try {
             return QueryDAOFactory.getDAOFactory().getQueryDAO().getQueries();
@@ -38,22 +40,72 @@ public class QueryBusiness {
         }
     }
   
-     public void add(Query query) throws BusinessException {
+     public Long add(Query query) throws BusinessException {
      try {
-            QueryDAOFactory.getDAOFactory().getQueryDAO().add(query);
+            return QueryDAOFactory.getDAOFactory().getQueryDAO().add(query);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
 }
-   public void addVersion(QueryVersion version,Query query) throws BusinessException {
+   public Long addVersion(QueryVersion version) throws BusinessException {
      try {
-            QueryDAOFactory.getDAOFactory().getQueryDAO().addVersion(version,query);
+            return QueryDAOFactory.getDAOFactory().getQueryDAO().addVersion(version);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
-}    
+}
+   
+   
+   
+   public void  removeVersion(Long versionid) throws BusinessException {
+     try {
+            QueryDAOFactory.getDAOFactory().getQueryDAO().removeVersion(versionid);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+   
+   }
      
-     
+   
+   
+  public List<Long> addParameter(Parameter param)throws  BusinessException {
+    try {
+            return QueryDAOFactory.getDAOFactory().getQueryDAO().addParameter(param);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        } 
+      
+      
+  }
+  
+  
+   public List<String[]> getQuerie(Long queryversionid)throws  BusinessException{
+  
+   try {
+            return QueryDAOFactory.getDAOFactory().getQueryDAO().getQuerie(queryversionid);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        } 
+  
+   }
+   
+   
+   public List<Parameter> getParameter(Long queryVersionID) throws  BusinessException{
+        try {
+            return QueryDAOFactory.getDAOFactory().getQueryDAO().getParameter(queryVersionID);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        } 
+  
+   }
+   
+   
+   
+  
 }
