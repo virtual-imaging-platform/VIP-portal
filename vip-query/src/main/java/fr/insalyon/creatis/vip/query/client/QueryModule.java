@@ -18,15 +18,14 @@ import fr.insalyon.creatis.vip.core.client.view.main.GeneralTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.main.HomeTab;
 import fr.insalyon.creatis.vip.core.client.view.main.SystemTileGrid;
 import fr.insalyon.creatis.vip.query.client.view.QueryHomeParser;
+import fr.insalyon.creatis.vip.query.client.view.QueryTitleGrid;
 public class QueryModule extends Module {
-
-
-   
-    
+ 
    @Override
     public void load() {
         
         CoreModule.addGeneralApplicationParser(new QueryHomeParser());
+        CoreModule.addApplicationsTileGrid(new QueryTitleGrid("My Queries"));
     }
 
     @Override

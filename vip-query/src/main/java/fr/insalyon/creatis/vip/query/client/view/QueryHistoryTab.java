@@ -79,11 +79,9 @@ public class QueryHistoryTab extends Tab {
                 new ListGridField("queryName", "Query Execution Name"),
                 new ListGridField("query", "Query"),
                 new ListGridField("queryVersion", "Version"),
-                new ListGridField("description", "Description"),
                 new ListGridField("executer", "Executer"),
                 new ListGridField("dateExecution", "Execution Start Time"),
                 new ListGridField("status", "Status"),
-                new ListGridField("dateEndExecution", "Execution End Time"),
                 new ListGridField("urlResult", "Result Data"));
       
                 

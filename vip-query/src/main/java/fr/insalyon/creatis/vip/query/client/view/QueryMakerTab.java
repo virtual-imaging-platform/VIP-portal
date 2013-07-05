@@ -30,13 +30,14 @@ public class QueryMakerTab extends Tab {
         this.setID(QueryConstants.TAB_QUERYMAKER);
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
-        HLayout qLayout = new HLayout();
-        qLayout.setHeight("50%");
+       
         
         vLayout = new VLayout();
-        vLayout.setWidth100();
-        vLayout.setHeight100();
-        vLayout.setOverflow(Overflow.AUTO);
+        vLayout.setMembersMargin(5);
+        //vLayout.setWidth100();
+       // vLayout.setHeight100();
+        
+        
         this.setPane(vLayout);
         
         
@@ -46,12 +47,18 @@ public class QueryMakerTab extends Tab {
         createQuery=new CreateQuery();
        
         
-        vLayout.addMember(queryLayout);
-        vLayout.addMember(createQuery);
+        vLayout.addMember(queryLayout,50);
+        vLayout.addMember(createQuery,50);
    
         
         
      }
+    
+     public void setQuery(boolean savebutton,String name, String description, String body) {
+        createQuery.setQuery(savebutton, name, description, body);     
+    }
+    
+    
     
 }
 

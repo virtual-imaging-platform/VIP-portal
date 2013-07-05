@@ -3,6 +3,7 @@
  * and open the template in the editor.
  */
 package fr.insalyon.creatis.vip.query.server.rpc;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -13,12 +14,15 @@ import org.hibernate.Session;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
+import fr.insalyon.creatis.vip.query.client.bean.Parameter;
 import fr.insalyon.creatis.vip.query.client.bean.Query;
 import fr.insalyon.creatis.vip.query.client.bean.QueryVersion;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.QueryException;
 import fr.insalyon.creatis.vip.query.server.dao.persistance.QueryBusiness;
+import java.sql.Timestamp;
 import org.apache.log4j.Logger;
 /**
  *
@@ -38,7 +42,7 @@ public class QueryServiceImpl  extends AbstractRemoteServiceServlet implements Q
     }
      
   @Override
-   public List<Query> getQureies() throws QueryException  {
+   public List<String[]> getQureies() throws QueryException  {
 
         try {
             return queryBusiness.getQueries();
@@ -48,6 +52,7 @@ public class QueryServiceImpl  extends AbstractRemoteServiceServlet implements Q
         }
   }
 
+  @Override
     public List<String[]> getVersion() throws QueryException {
        try {
             return queryBusiness.getVersion();
@@ -57,29 +62,79 @@ public class QueryServiceImpl  extends AbstractRemoteServiceServlet implements Q
         }
     }
 
-    public void add(Query query) throws QueryException {
+    
+  @Override
+   public Long add(Query query) throws QueryException {
         
     try {
-             queryBusiness.add(query);
+            return queryBusiness.add(query);
+             
         
         } catch (BusinessException ex) {
             throw new QueryException(ex);
         }
     }
- public void addVersion(QueryVersion version,Query query) throws QueryException {
+  
+  
+    @Override
+  public Long addVersion(QueryVersion version) throws QueryException {
         
     try {
-             queryBusiness.addVersion(version,query);
+             return queryBusiness.addVersion(version);
         
         } catch (BusinessException ex) {
             throw new QueryException(ex);
         }
     }
-    
-    
-         
-         
+ 
+ @Override
+  public void removeVersion(Long versionid)throws QueryException{
+     
+     
+     try {
+             queryBusiness.removeVersion(versionid);
+        
+        } catch (BusinessException ex) {
+            throw new QueryException(ex);
+        }
     }
+     
+ @Override
+ public List<Long> addParameter(Parameter param)throws QueryException{
+  try {
+            return queryBusiness.addParameter(param);
+        
+        } catch (BusinessException ex) {
+            throw new QueryException(ex);
+        }   
+ }
+     
+ 
+ 
+ 
+  @Override
+ public List<String[]> getQuerie(Long queryversionid)throws  QueryException{
+  try {
+            return queryBusiness.getQuerie(queryversionid);
+        
+        } catch (BusinessException ex) {
+            throw new QueryException(ex);
+        }   
+ }
+  
+       
+ @Override
+    public List<Parameter> getParameter(Long queryVersionID) throws  QueryException {
+     try {
+            return queryBusiness.getParameter(queryVersionID);
+        
+        } catch (BusinessException ex) {
+            throw new QueryException(ex);
+        }   
+ }
+ 
+         
+}
     
     
    

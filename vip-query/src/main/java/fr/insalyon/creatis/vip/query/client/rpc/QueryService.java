@@ -14,8 +14,10 @@ import fr.insalyon.creatis.vip.query.client.bean.Query;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import fr.insalyon.creatis.vip.query.client.bean.Parameter;
 import fr.insalyon.creatis.vip.query.client.bean.QueryVersion;
 import fr.insalyon.creatis.vip.query.client.view.QueryException;
+import java.sql.Timestamp;
 
 public interface QueryService extends RemoteService {
     
@@ -38,10 +40,13 @@ public static final String SERVICE_URI = "/queryService";
     
     
     
-     public List<Query> getQureies() throws QueryException;
+     public List<String[]> getQureies() throws QueryException;
      public List<String[]> getVersion() throws QueryException;
-     public void add(Query query)throws QueryException;
-     public void addVersion(QueryVersion version,Query query)throws QueryException;
-
-    
+     public Long add(Query query)throws QueryException;
+     public Long addVersion(QueryVersion version)throws QueryException;
+     public void removeVersion(Long versionid)throws QueryException;
+     public List<Long> addParameter(Parameter param)throws QueryException;
+     public List<String[]> getQuerie(Long queryversionid)throws  QueryException;
+     public List<Parameter> getParameter(Long queryVersionID) throws  QueryException;
+   
 }

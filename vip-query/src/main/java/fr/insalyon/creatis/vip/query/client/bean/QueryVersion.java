@@ -5,6 +5,7 @@
 package fr.insalyon.creatis.vip.query.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import java.sql.Timestamp;
 
 /**
  *
@@ -16,6 +17,15 @@ private Long  queryVersionID ;
 private String queryVersion;
 private Long queryID;
 private String body;
+private  Timestamp dateCreation;
+
+    public Timestamp getDateCreation() {
+        return dateCreation;
+    }
+
+    public void setDateCreation(Timestamp dateCreation) {
+        this.dateCreation = dateCreation;
+    }
 
     public QueryVersion() {
     }

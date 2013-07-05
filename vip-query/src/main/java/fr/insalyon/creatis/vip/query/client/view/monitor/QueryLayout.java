@@ -38,71 +38,63 @@ import fr.insalyon.creatis.vip.query.client.bean.QueryRecord;
 import fr.insalyon.creatis.vip.query.client.bean.QueryVersionRecord;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryServiceAsync;
+import fr.insalyon.creatis.vip.query.client.view.QueryConstants;
+import fr.insalyon.creatis.vip.query.client.view.QueryException;
+import fr.insalyon.creatis.vip.query.client.view.QueryMakerTab;
+import java.sql.Timestamp;
 /**
  *
  * @author Boujelben
  */
 public class QueryLayout extends VLayout {
-
+    private boolean sb;
     private ModalWindow modal;
     private ListGrid grid;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
 
     public QueryLayout() {
-
         this.setWidth100();
         this.setHeight100();
         this.setOverflow(Overflow.AUTO);
-
         configureActions();
         configureGrid();
         modal = new ModalWindow(grid);
-
         loadData();
     }
-
+    
+    
+    
     private void configureActions() {
-
         ToolstripLayout toolstrip = new ToolstripLayout();
-
         toolstrip.addMember(WidgetUtil.getSpaceLabel(15));
-
         LabelButton addButton = new LabelButton("Add Query", CoreConstants.ICON_ADD);
         addButton.setWidth(150);
-        /*addButton.addClickHandler(new ClickHandler() {
+        addButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
-                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                appsTab.setApplication(null, null, null);
+              setEdit(false,"","","");              
             }
-        });
-        * */
-       
-        toolstrip.addMember(addButton);
-
-        
-       LabelButton refreshButton = new LabelButton("Refresh", CoreConstants.ICON_REFRESH);
-        refreshButton.setWidth(150);
-        refreshButton.addClickHandler(new ClickHandler() {
+        });     
+      toolstrip.addMember(addButton);
+      LabelButton refreshButton = new LabelButton("Refresh", CoreConstants.ICON_REFRESH);  
+      refreshButton.setWidth(150);    
+      refreshButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
                 loadData();
             }
-        });
-        
-        
+        });      
         toolstrip.addMember(refreshButton);
-
         this.addMember(toolstrip);
     }
 
+    
+    
+    
+    
     private void configureGrid() {
-
-        grid = new ListGrid();
-        /*{;
-        
+        grid = new ListGrid(){
             @Override
             protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
                 rollOverRecord = this.getRecord(rowNum);
@@ -112,33 +104,35 @@ public class QueryLayout extends VLayout {
                     rollOverCanvas.setSnapTo("TR");
                     rollOverCanvas.setWidth(50);
                     rollOverCanvas.setHeight(22);
-
+           
                     ImgButton loadImg = getImgButton(CoreConstants.ICON_EDIT, "Edit");
                     loadImg.addClickHandler(new ClickHandler() {
                         @Override
                         public void onClick(ClickEvent event) {
-                            edit( rollOverRecord.getAttribute("name"),
-                                    rollOverRecord.getAttribute("dateCreation"),
-                                    rollOverRecord.getAttribute("version"));
+                             
+                            //  setQuery(false);
+                                   
                         }
-                    });
-                   
+                    }); 
                     ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
                     deleteImg.addClickHandler(new ClickHandler() {
                         @Override
                         public void onClick(ClickEvent event) {
-                            final String name = rollOverRecord.getAttribute("name");
-                            SC.ask("Do you really want to remove the application \""
-                                    + name + "\"?", new BooleanCallback() {
+                            final String version = rollOverRecord.getAttribute("queryversionID");
+                            final Long versionid=new Long(version);    
+                            SC.ask("Do you really want to remove this Version \""
+                                    + version + "\"?", new BooleanCallback() {
                                 @Override
                                 public void execute(Boolean value) {
                                     if (value) {
-                                        remove(name);
+                                        removeVersion(versionid);
                                     }
                                 }
                             });
                         }
                     });
+                    
+                    
                     rollOverCanvas.addMember(loadImg);
                     rollOverCanvas.addMember(deleteImg);
                 }
@@ -156,7 +150,7 @@ public class QueryLayout extends VLayout {
                 button.setWidth(16);
                 return button;
             }
-        };*/
+        };
         grid.setWidth100();
         grid.setHeight100();
         grid.setShowRollOverCanvas(true);
@@ -164,24 +158,30 @@ public class QueryLayout extends VLayout {
         grid.setShowEmptyMessage(true);
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
+        ListGridField idversion=new ListGridField("queryversionID", "queryversionID");
         grid.setFields(new ListGridField("name", "Name"),
                
                 new ListGridField("dateCreation", "Date Creation"),
                 
-                 new ListGridField("version", "Version"));
+                 new ListGridField("version", "Version"),
+                idversion);
        grid.setSortField("name");
-        grid.setSortDirection(SortDirection.ASCENDING);
-        /*grid.addCellClickHandler(new CellClickHandler() {
+       idversion.setHidden(true);
+       grid.setSortDirection(SortDirection.ASCENDING);  
+       
+       grid.addCellClickHandler(new CellClickHandler() {
             @Override
-            public void onCellClick(CellClickEvent event) {
-
-                edit(event.getRecord().getAttribute("name"),
-                        event.getRecord().getAttribute("classes"),
-                        event.getRecord().getAttribute("citation"));
-            }
-        });
+            public void onCellClick(CellClickEvent event) {      
+           setQuery(true);
+                   }
+    
+                   });
+              
+                
+            
         
-        */
+        
+        
         this.addMember(grid);
     }
     
@@ -191,7 +191,7 @@ public class QueryLayout extends VLayout {
          
            
            
-        final AsyncCallback<List<Query>> callback = new AsyncCallback<List<Query>>() {
+        final AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
@@ -199,25 +199,82 @@ public class QueryLayout extends VLayout {
             }
  
             @Override
-            public void onSuccess(List<Query> result) {
+            public void onSuccess(List<String[]>result) {
                 modal.hide();
                List<QueryRecord> dataList = new ArrayList<QueryRecord>();
 
-                for (Query q : result) {
+                for (String[] q : result) {
                     
-                    dataList.add(new QueryRecord(q.getName(),q.getDateCreation(),q.getQueryversions()));
+                    dataList.add(new QueryRecord(q[0],q[1],q[2],q[3]));
                 }
                 grid.setData(dataList.toArray(new QueryRecord[]{}));
         }
         };
             
-        modal.show("Loading Queries...", true);
+      
         QueryService.Util.getInstance().getQureies(callback);
           
     }
+    
+     
+    private void removeVersion(Long versionid){
+
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                Layout.getInstance().setWarningMessage("Unable to remove query Version:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                modal.hide();
+                Layout.getInstance().setNoticeMessage("The query version was successfully removed!");
+                loadData();
+            }
+        };
+        modal.show("Removing application '" + versionid + "'...", true);
+        
+        QueryService.Util.getInstance().removeVersion(versionid, callback);
+    }
+    
+     private void setEdit(boolean savebutton,String name, String desciption, String body) {
+
+        QueryMakerTab queryTab = (QueryMakerTab) Layout.getInstance().
+                getTab(QueryConstants.TAB_QUERYMAKER);
+        
+        queryTab.setQuery(savebutton,name, desciption, body);
+        
+       
+    }
+    
+     private void setQuery(boolean sbb){
+           String version = rollOverRecord.getAttribute("queryversionID");
+           Long versionid=new Long(version);
+            sb=sbb;
+            final AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                Layout.getInstance().setWarningMessage("Unable to get list of queries:<br />" + caught.getMessage());
+            }
+ 
+            @Override
+            public void onSuccess(List<String[]>result) {
+
+                for (String[] q : result) {
+                   
+                    setEdit(sb,q[0],q[1],q[2]);
+                }
+            }
+        };
+           QueryService.Util.getInstance().getQuerie(versionid, callback);
+        
+         
+    
                 }
 
-        
+}
         
          
 
