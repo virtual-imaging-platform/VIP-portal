@@ -35,7 +35,6 @@ package fr.insalyon.creatis.vip.application.client.view.monitor.menu;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.MenuItemSeparator;
@@ -44,6 +43,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
+import fr.insalyon.creatis.vip.application.client.view.monitor.ChangeSimulationUserLayout;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationsTab;
@@ -144,12 +144,12 @@ public class SimulationsContextMenu extends Menu {
             }
         });
 
-         MenuItem markCompletedItem = new MenuItem("Mark Simulation Completed");
+        MenuItem markCompletedItem = new MenuItem("Mark Simulation Completed");
         markCompletedItem.setIcon(ApplicationConstants.ICON_MARK_COMPLETED);
         markCompletedItem.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(MenuItemClickEvent event) {
-                SC.ask("Do you really want to mark this simulation completed ("
+                SC.ask("Do you really want to mark this simulation as completed ("
                         + title + ")?", new BooleanCallback() {
                     @Override
                     public void execute(Boolean value) {
@@ -157,11 +157,10 @@ public class SimulationsContextMenu extends Menu {
                             markCompleted();
                         }
                     }
-
                 });
             }
         });
-        
+
         MenuItem relauchItem = new MenuItem("Relaunch Simulation");
         relauchItem.setIcon(ApplicationConstants.ICON_RELAUNCH);
         relauchItem.addClickHandler(new ClickHandler() {
@@ -170,48 +169,49 @@ public class SimulationsContextMenu extends Menu {
                 relaunchSimulation();
             }
         });
-        
+
         MenuItem changeUserItem = new MenuItem("Change Simulation User");
         changeUserItem.setIcon(ApplicationConstants.ICON_USER);
         changeUserItem.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(MenuItemClickEvent event) {
-                SC.askforValue("Enter new user name", new ValueCallback() {
-                    @Override
-                    public void execute(String value) {
-                        changeUser(value);
-                    }
-                });
-                
+                changeUser();
             }
         });
 
         MenuItemSeparator separator = new MenuItemSeparator();
 
-        if (status == SimulationStatus.Running) {
-            if (CoreModule.user.isSystemAdministrator()) {
-                this.setItems(viewItem, killItem, separator, relauchItem, separator, changeUserItem);
-            } else {
-                this.setItems(viewItem, killItem, separator, relauchItem);
-            }
-        } else if (status == SimulationStatus.Completed) {
-            if (CoreModule.user.isSystemAdministrator()) {
-                this.setItems(viewItem, cleanItem, separator, relauchItem, separator, changeUserItem);
-            } else {
-                this.setItems(viewItem, cleanItem, separator, relauchItem);
-            }
-        } else if (status == SimulationStatus.Cleaned) {
-            if (CoreModule.user.isSystemAdministrator()) {
-                this.setItems(viewItem, purgeItem, separator, changeUserItem);
-            } else {
-                this.setItems(viewItem, purgeItem);
-            }
-        } else if (status == SimulationStatus.Killed) {
-            if (CoreModule.user.isSystemAdministrator()) {
-                this.setItems(viewItem, markCompletedItem, cleanItem, separator, relauchItem, separator, changeUserItem);
-            } else {
-                this.setItems(viewItem, cleanItem, separator, relauchItem);
-            }
+        switch (status) {
+            case Running:
+                if (CoreModule.user.isSystemAdministrator()) {
+                    this.setItems(viewItem, killItem, separator, relauchItem, separator, changeUserItem);
+                } else {
+                    this.setItems(viewItem, killItem, separator, relauchItem);
+                }
+                break;
+
+            case Completed:
+                if (CoreModule.user.isSystemAdministrator()) {
+                    this.setItems(viewItem, cleanItem, separator, relauchItem, separator, changeUserItem);
+                } else {
+                    this.setItems(viewItem, cleanItem, separator, relauchItem);
+                }
+                break;
+
+            case Cleaned:
+                if (CoreModule.user.isSystemAdministrator()) {
+                    this.setItems(viewItem, purgeItem, separator, changeUserItem);
+                } else {
+                    this.setItems(viewItem, purgeItem);
+                }
+                break;
+
+            case Killed:
+                if (CoreModule.user.isSystemAdministrator()) {
+                    this.setItems(viewItem, markCompletedItem, cleanItem, separator, relauchItem, separator, changeUserItem);
+                } else {
+                    this.setItems(viewItem, cleanItem, separator, relauchItem);
+                }
         }
     }
 
@@ -280,7 +280,7 @@ public class SimulationsContextMenu extends Menu {
         WorkflowService.Util.getInstance().purgeWorkflow(simulationID, callback);
         modal.show("Purging simulation " + simulationName + "...", true);
     }
-    
+
     private void markCompleted() {
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
@@ -314,7 +314,7 @@ public class SimulationsContextMenu extends Menu {
             @Override
             public void onSuccess(Map<String, String> result) {
                 modal.hide();
-                LaunchTab launchTab = new LaunchTab(applicationName, 
+                LaunchTab launchTab = new LaunchTab(applicationName,
                         applicationVersion, applicationClass, simulationName, result);
                 Layout.getInstance().addTab(launchTab);
             }
@@ -323,26 +323,11 @@ public class SimulationsContextMenu extends Menu {
         modal.show("Relaunching simulation " + simulationName + "...", true);
     }
 
-     private void changeUser(String user) {
-
-        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to change simulation user:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(Void result) {
-                modal.hide();
-                 getSimulationsTab().loadData();
-            }
-        };
-        WorkflowService.Util.getInstance().changeSimulationUser(simulationID, user, callback);
-        modal.show("Changing user of simulation" + simulationName + " to '"+user+"'...", true);
+    private void changeUser() {
+        new ChangeSimulationUserLayout(modal, simulationID, simulationName, 
+                simulationUser).show();
     }
 
-    
     private SimulationsTab getSimulationsTab() {
         return (SimulationsTab) Layout.getInstance().getTab(ApplicationConstants.TAB_MONITOR);
     }
