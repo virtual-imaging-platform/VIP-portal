@@ -159,7 +159,7 @@ public class SimulatedDataServiceImpl extends AbstractRemoteServiceServlet imple
             }
             f = File.createTempFile("dump-", ".rdf", dir);
 
-            RDFManagerFactory.createSDBResultsRepository("root", "creatis2011", "jdbc:mysql://kingkong.grid.creatis.insa-lyon.fr:3306/vip_simulated_data").dumpToFile(f);
+            RDFManagerFactory.createSDBResultsRepository(Server.getInstance().getSimulatedDataDBUser(),  Server.getInstance().getSimulatedDataDBPass(), Server.getInstance().getSimulatedDataDBURL()).dumpToFile(f);
 
         } catch (Exception ex) {
             ex.printStackTrace();
