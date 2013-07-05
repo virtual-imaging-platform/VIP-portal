@@ -314,6 +314,7 @@ public class SimulationsContextMenu extends Menu {
             @Override
             public void onSuccess(Map<String, String> result) {
                 modal.hide();
+                Layout.getInstance().removeTab(ApplicationConstants.getLaunchTabID(applicationName));
                 LaunchTab launchTab = new LaunchTab(applicationName,
                         applicationVersion, applicationClass, simulationName, result);
                 Layout.getInstance().addTab(launchTab);
