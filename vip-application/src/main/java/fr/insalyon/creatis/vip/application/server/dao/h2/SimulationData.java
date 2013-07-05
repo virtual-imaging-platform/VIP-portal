@@ -182,8 +182,8 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
         return new Task(rs.getString("id"), status,
                 rs.getString("command"), rs.getString("file_name"),
                 rs.getInt("exit_code"), rs.getString("node_site"),
-                rs.getString("node_name"), rs.getString("parameters"),
-                minorStatus);
+                rs.getString("node_name"), minorStatus,
+                rs.getString("parameters").split(" "));
     }
 
     @Override
@@ -232,8 +232,8 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
                 list.add(new Task(rs.getString("id"), status,
                         rs.getString("command"), rs.getString("file_name"),
                         rs.getInt("exit_code"), rs.getString("node_site"),
-                        rs.getString("node_name"), rs.getString("parameters"),
-                        minorStatus));
+                        rs.getString("node_name"), minorStatus,
+                        rs.getString("parameters").split(" ")));
             }
             stat.close();
 

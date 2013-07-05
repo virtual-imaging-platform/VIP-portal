@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -46,7 +44,7 @@ public class JobRecord extends ListGridRecord {
     }
 
     public JobRecord(String jobID, String status, String command, String fileName,
-            int exitCode, String siteName, String nodeName, String parameters,
+            int exitCode, String siteName, String nodeName, String[] parameters,
             int minorStatus) {
 
         setAttribute("jobID", jobID);
@@ -56,7 +54,14 @@ public class JobRecord extends ListGridRecord {
         setAttribute("exitCode", exitCode);
         setAttribute("siteName", siteName);
         setAttribute("nodeName", nodeName);
-        setAttribute("parameters", parameters.replaceAll(" ", "<br />"));
+        StringBuilder sb = new StringBuilder();
+        for (String p : parameters) {
+            if (!p.isEmpty()) {
+                sb.append("<br />");
+            }
+            sb.append(p);
+        }
+        setAttribute("parameters", sb.toString());
         setMinorStatus(status, exitCode, minorStatus);
     }
 

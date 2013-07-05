@@ -109,16 +109,16 @@ public class DebugLayout extends VLayout {
         }));
         this.addMember(titleLayout);
 
-         Label inputsLabel = WidgetUtil.getLabel("<font color=\"#666666\">Job Input and Output Parameters</font>",
+        Label inputsLabel = WidgetUtil.getLabel("<font color=\"#666666\">Job Input and Output Parameters</font>",
                 null, 16);
         inputsLabel.setBorder("1px solid #E2E2E2");
         inputsLabel.setBackgroundColor("#F2F2F2");
         inputsLabel.setPadding(3);
         inputsLabel.setAlign(Alignment.CENTER);
         this.addMember(inputsLabel);
-        
+
         configureInputsLayout();
-        
+
         Label tasksLabel = WidgetUtil.getLabel("<font color=\"#666666\">List of Tasks</font>",
                 ApplicationConstants.ICON_MONITOR_TASKS, 16);
         tasksLabel.setBorder("1px solid #E2E2E2");
@@ -148,7 +148,7 @@ public class DebugLayout extends VLayout {
 
         this.addMember(inputsLayout);
     }
-    
+
     private void configureTasksLayout() {
 
         tasksLayout = new VLayout(3);
@@ -310,18 +310,19 @@ public class DebugLayout extends VLayout {
                         t = task;
                     }
                     tasksLayout.addMember(new TaskLayout(instance, simulationID, task));
-                    if(inputsLayout.getMembers().length ==0){
-                        for(String param : task.getParameters().split(" "))
+                    if (inputsLayout.getMembers().length == 0) {
+                        for (String param : task.getParameters()) {
                             inputsLayout.addMember(new TaskInputsLayout(param));
+                        }
                     }
-                }            
+                }
                 refresh();
                 selectTask(t.getId(), t.getStatus());
             }
         };
         JobService.Util.getInstance().getTasks(simulationID, jobID, callback);
     }
-    
+
     /**
      * Loads a file and displays it in the panel.
      *
@@ -351,11 +352,11 @@ public class DebugLayout extends VLayout {
         infoLabel.setIcon(CoreConstants.ICON_LOADING);
         JobService.Util.getInstance().readSimulationFile(simulationID, selectedTaskID, fileType, callback);
     }
-    
+
     /**
-     * 
+     *
      * @param taskID
-     * @param status 
+     * @param status
      */
     public void selectTask(String taskID, TaskStatus status) {
 
