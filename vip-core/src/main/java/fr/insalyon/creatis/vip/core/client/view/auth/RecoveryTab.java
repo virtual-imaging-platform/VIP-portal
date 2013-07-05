@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -48,7 +46,6 @@ import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
-import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
@@ -135,7 +132,6 @@ public class RecoveryTab extends Tab {
         if (emailField.validate()) {
             final String email = emailField.getValueAsString().trim();
 
-            ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
             final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
                 @Override
                 public void onFailure(Throwable caught) {
@@ -151,7 +147,7 @@ public class RecoveryTab extends Tab {
                             + "Please use this code to reset the password.", 15);
                 }
             };
-            service.sendResetCode(email, callback);
+            ConfigurationService.Util.getInstance().sendResetCode(email, callback);
             WidgetUtil.setLoadingIButton(continueButton, "Sending code...");
         }
     }
@@ -227,9 +223,8 @@ public class RecoveryTab extends Tab {
                 return;
             }
 
-            final String email = emailField.getValueAsString().trim();
+            String email = emailField.getValueAsString().trim();
 
-            ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
             final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
                 @Override
                 public void onFailure(Throwable caught) {
@@ -239,13 +234,15 @@ public class RecoveryTab extends Tab {
 
                 @Override
                 public void onSuccess(Void result) {
+                    WidgetUtil.resetIButton(resetButton, "Reset Password", null);
                     Layout.getInstance().removeTab(CoreConstants.TAB_RECOVERY);
                     Layout.getInstance().setNoticeMessage("Your password was successfully reseted.", 15);
                 }
             };
-           // WidgetUtil.setLoadingIButton(resetButton, "Reseting password...");
-            service.resetPassword(email, codeField.getValueAsString().trim(),
+            ConfigurationService.Util.getInstance().resetPassword(email, 
+                    codeField.getValueAsString().trim(),
                     passwordField.getValueAsString(), callback);
+            WidgetUtil.setLoadingIButton(resetButton, "Reseting password...");
         }
     }
 }
