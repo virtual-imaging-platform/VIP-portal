@@ -48,10 +48,10 @@ public class Task implements IsSerializable {
     private String nodeName;
     private String command;
     private String fileName;
-    private String parameters;
+    private String[] parameters;
     private int minorStatus;
     private int jobID;
-    
+
     public Task() {
     }
 
@@ -63,8 +63,8 @@ public class Task implements IsSerializable {
     }
 
     public Task(String id, TaskStatus status, String command, String fileName,
-            int exitCode, String siteName, String nodeName, String parameters,
-            int minorStatus) {
+            int exitCode, String siteName, String nodeName, int minorStatus,
+            String... parameters) {
 
         this.id = id;
         this.status = status;
@@ -129,8 +129,12 @@ public class Task implements IsSerializable {
         this.siteName = siteName;
     }
 
-    public String getParameters() {
+    public String[] getParameters() {
         return parameters;
+    }
+
+    public void setParameters(String[] parameters) {
+        this.parameters = parameters;
     }
 
     public int getMinorStatus() {
@@ -148,4 +152,4 @@ public class Task implements IsSerializable {
     public void setJobID(int jobID) {
         this.jobID = jobID;
     }
-    }
+}

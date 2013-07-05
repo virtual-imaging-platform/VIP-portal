@@ -43,6 +43,8 @@ import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -138,13 +140,25 @@ public class SimulationBusiness {
      *
      * @param simulationID
      * @param jobID
+     * @param currentUserFolder
      * @return
      * @throws BusinessException
      */
-    public List<Task> getTasks(String simulationID, int jobID) throws BusinessException {
+    public List<Task> getTasks(String simulationID, int jobID, String currentUserFolder) throws BusinessException {
 
         try {
-            return ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getTasks(jobID);
+            List<Task> list = ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getTasks(jobID);
+            for (Task task : list) {
+                String[] params = task.getParameters();
+                for (int i = 0; i < params.length; i++) {
+                    params[i] = DataManagerUtil.parseRealDir(params[i], currentUserFolder);
+                }
+                task.setParameters(params);
+            }
+            return list;
+
+        } catch (DataManagerException ex) {
+            throw new BusinessException(ex);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);

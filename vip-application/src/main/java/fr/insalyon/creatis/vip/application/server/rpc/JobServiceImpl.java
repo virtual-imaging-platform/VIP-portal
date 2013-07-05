@@ -91,8 +91,10 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     public List<Task> getTasks(String simulationID, int jobID) throws ApplicationException {
 
         try {
-            return simulationBusiness.getTasks(simulationID, jobID);
+            return simulationBusiness.getTasks(simulationID, jobID, getSessionUser().getFolder());
 
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
@@ -121,17 +123,17 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
 
     /**
      * Sends a signal to a task.
-     * 
+     *
      * @param simulationID Simulation identification
      * @param taskID Task identification
      * @param status Simulation
      */
     @Override
     public void sendTaskSignal(String simulationID, String taskID, String status) throws ApplicationException {
-        
+
         try {
             simulationBusiness.sendTaskSignal(simulationID, taskID, TaskStatus.valueOf(status));
-            
+
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
