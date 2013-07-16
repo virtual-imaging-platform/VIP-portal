@@ -22,6 +22,7 @@ public class QueryConstants {
     public static final String ICON_CLEAN=IMG_FOLDER + "icon-clean.png";
     public static final String ICON_EXECUTE=IMG_FOLDER + "icon-execute.png";
     public static final String ICON_HELP=IMG_FOLDER + "icon-help.png";
+    public static final String ICON_LAUNCH=IMG_FOLDER + "icon-launch.png";
 
   
     public static final String ICON_EXECUTE_VERSION=IMG_FOLDER + "icon-query.png";

@@ -71,7 +71,7 @@ import java.lang.*;
     public CreateQuery() {
         
     
-        super(1410, 380);
+        super(1410, 280);
         addTitle("New Query", QueryConstants.ICON_QUERYMAKER);
 
         configure();
@@ -93,7 +93,7 @@ import java.lang.*;
                 "colorControls");
          body = new TextItem();
         
-         body.setHeight(150);
+         body.setHeight(125);
          body.setWidth(1410);
          //body.setDefaultValue("[name; type; description; Examples]");
 
@@ -105,6 +105,8 @@ import java.lang.*;
                 try {
                   Query q= new Query(description.getValue(), querynameField.getValueAsString(),"admin@vip.creatis.insa-lyon.fr"); 
                   save(q);
+                  new QueryLayout().loadData();
+                  
                 } catch (QueryException ex) {
                     Logger.getLogger(CreateQuery.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -173,7 +175,7 @@ import java.lang.*;
                 public void onClick(ClickEvent event) {
                 final Window winModal = new Window();  
                 winModal.setWidth(360);  
-                winModal.setHeight(200);  
+                winModal.setHeight(175);  
                 winModal.setTitle("Help");  
                 winModal.setShowMinimizeButton(false);  
                 winModal.setIsModal(true);  
@@ -200,7 +202,7 @@ import java.lang.*;
                 + "example of parameter name:[name; String; name of patient; Olivier]");  
        // textbox.setVisibility(Visibility.HIDDEN); 
         winModal.addItem(textbox);
-         winModal.show();
+        winModal.show();
                         }});
          helpButton.setLayoutAlign(Alignment.LEFT);
         
@@ -211,10 +213,10 @@ import java.lang.*;
       
        body.setTitleOrientation(TitleOrientation.TOP);
        body.setTextAlign(Alignment.LEFT);
-       
+       body.setShowTitle(false);
      
      
-       addField("", body);
+       addField("Body", body);
        this.addMember(helpButton);
        addButtons(saveButton,open);
        
