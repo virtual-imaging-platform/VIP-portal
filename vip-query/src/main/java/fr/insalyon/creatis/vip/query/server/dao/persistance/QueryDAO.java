@@ -9,7 +9,9 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.query.client.bean.Parameter;
 import java.util.List;
 import fr.insalyon.creatis.vip.query.client.bean.Query;
+import fr.insalyon.creatis.vip.query.client.bean.QueryExecution;
 import fr.insalyon.creatis.vip.query.client.bean.QueryVersion;
+import fr.insalyon.creatis.vip.query.client.bean.Value;
 import java.sql.Timestamp;
 /**
  *
@@ -25,7 +27,8 @@ public interface QueryDAO {
      public List<Long> addParameter(Parameter param) throws DAOException;
      public List<String[]> getQuerie(Long queryversionid)throws DAOException;
      public List<Parameter> getParameter(Long queryVersionID) throws DAOException;
-     
+     public Long addValue(Value value) throws DAOException ;
+     public Long addQueryExecution(QueryExecution queryExecution)throws DAOException ;
      
     
 }

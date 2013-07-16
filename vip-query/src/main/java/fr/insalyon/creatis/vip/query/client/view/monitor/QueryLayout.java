@@ -55,7 +55,7 @@ public class QueryLayout extends VLayout {
 
     public QueryLayout() {
         this.setWidth100();
-        this.setHeight100();
+        this.setHeight(200);
         this.setOverflow(Overflow.AUTO);
         configureActions();
         configureGrid();
@@ -152,7 +152,7 @@ public class QueryLayout extends VLayout {
             }
         };
         grid.setWidth100();
-        grid.setHeight100();
+        grid.setHeight(500);
         grid.setShowRollOverCanvas(true);
         grid.setShowAllRecords(false);
         grid.setShowEmptyMessage(true);

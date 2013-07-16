@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.Session;
+
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
@@ -18,7 +18,9 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.query.client.bean.Parameter;
 import fr.insalyon.creatis.vip.query.client.bean.Query;
+import fr.insalyon.creatis.vip.query.client.bean.QueryExecution;
 import fr.insalyon.creatis.vip.query.client.bean.QueryVersion;
+import fr.insalyon.creatis.vip.query.client.bean.Value;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.QueryException;
 import fr.insalyon.creatis.vip.query.server.dao.persistance.QueryBusiness;
@@ -133,12 +135,32 @@ public class QueryServiceImpl  extends AbstractRemoteServiceServlet implements Q
         }   
  }
  
+ 
+ 
+  @Override
+ public Long addValue(Value value) throws QueryException {
+ try {
+            return queryBusiness.addValue(value);
+        
+        } catch (BusinessException ex) {
+            throw new QueryException(ex);
+        }  
          
 }
+@Override
+    public Long addQueryExecution(QueryExecution queryExecution) throws QueryException {
+    
+    try {
+            return queryBusiness.addQueryExecution(queryExecution);
+        
+        } catch (BusinessException ex) {
+            throw new QueryException(ex);
+        }  
+    
+    }
     
     
    
-    
-
+}
 
    

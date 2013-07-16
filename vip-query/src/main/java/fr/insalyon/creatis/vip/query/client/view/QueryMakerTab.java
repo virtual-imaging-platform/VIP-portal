@@ -33,7 +33,7 @@ public class QueryMakerTab extends Tab {
        
         
         vLayout = new VLayout();
-        vLayout.setMembersMargin(5);
+        vLayout.setMargin(5);
         //vLayout.setWidth100();
        // vLayout.setHeight100();
         
@@ -47,8 +47,8 @@ public class QueryMakerTab extends Tab {
         createQuery=new CreateQuery();
        
         
-        vLayout.addMember(queryLayout,50);
-        vLayout.addMember(createQuery,50);
+        vLayout.addMember(queryLayout);
+        vLayout.addMember(createQuery);
    
         
         

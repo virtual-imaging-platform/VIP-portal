@@ -7,7 +7,9 @@ import fr.insalyon.creatis.vip.query.client.bean.Query;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.query.client.bean.Parameter;
+import fr.insalyon.creatis.vip.query.client.bean.QueryExecution;
 import fr.insalyon.creatis.vip.query.client.bean.QueryVersion;
+import fr.insalyon.creatis.vip.query.client.bean.Value;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -106,6 +108,24 @@ public class QueryBusiness {
    }
    
    
+   public Long addValue(Value value) throws BusinessException{
+   try {
+            return QueryDAOFactory.getDAOFactory().getQueryDAO().addValue(value);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        } 
+  
+   }
    
+     public Long addQueryExecution(QueryExecution queryExecution)throws BusinessException{
+   try {
+            return QueryDAOFactory.getDAOFactory().getQueryDAO().addQueryExecution(queryExecution);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        } 
+  
+   }
   
 }

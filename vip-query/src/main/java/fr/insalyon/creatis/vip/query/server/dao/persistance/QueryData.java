@@ -13,7 +13,10 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.UserData;
 import fr.insalyon.creatis.vip.query.client.bean.Parameter;
+import fr.insalyon.creatis.vip.query.client.bean.QueryExecution;
 import fr.insalyon.creatis.vip.query.client.bean.QueryVersion;
+import fr.insalyon.creatis.vip.query.client.bean.Value;
+import fr.insalyon.creatis.vip.query.client.view.QueryException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,7 +52,7 @@ public class QueryData implements QueryDAO {
             while (rs.next()) {
                 
                 int id=rs.getInt("queryID");
-                
+                //String idd=String.valueOf(id);
                  PreparedStatement ps2 = connection.prepareStatement("SELECT queryversionID, queryVersion, dateCreation FROM QueryVersion WHERE queryID=?");
                  
                 
@@ -188,7 +191,7 @@ public void  removeVersion(Long versionid) throws DAOException {
               String str[]=s.split("\\;");
               try
               {
-               PreparedStatement ps = null;
+               PreparedStatement ps ;
                 ps  = connection.prepareStatement(
                     "INSERT INTO Parameter(name, type, description, example, queryVersionID) "
                     + "VALUES (?, ?, ?, ?, ?)",PreparedStatement.RETURN_GENERATED_KEYS);
@@ -299,7 +302,7 @@ public void  removeVersion(Long versionid) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "parameterID, name, type, description, example"
+                    + "parameterID, name, type, description, example "
                     + "FROM Parameter "
                     + "WHERE queryVersionID = ?");
 
@@ -308,7 +311,7 @@ public void  removeVersion(Long versionid) throws DAOException {
             List<Parameter> parameters = new ArrayList<Parameter>();
 
             while (rs.next()) {
-               parameters .add(new Parameter(rs.getLong("parameterID"), rs.getString("name"),rs.getString("type"),rs.getString("description"),rs.getString("example")));
+               parameters .add(new Parameter(rs.getString("name"),rs.getString("type"),rs.getString("description"),rs.getString("example"),rs.getLong("parameterID")));
             }
 
             ps.close();
@@ -350,7 +353,67 @@ public void  removeVersion(Long versionid) throws DAOException {
         }
     }
 */
+ @Override
+ public Long addValue(Value value) throws DAOException {
+         try {
+           
+            PreparedStatement ps = connection.prepareStatement(
+                  "INSERT INTO Value(value, parameterID, queryExecutionID) VALUES (?, ?, ?)",PreparedStatement.RETURN_GENERATED_KEYS);
+            ps.setString(1,value.getValue());
+            ps.setLong(2, value.getParameterID());
+            ps.setLong(3,value.getQueryExecutionID());
+          
+            ps.execute();
+            ResultSet rs = ps.getGeneratedKeys();
+            Long idAuto_increment= new Long(0);
+            while (rs.next()){
+            idAuto_increment = rs.getLong(1);
+            }
+            
+            ps.close();
+           return idAuto_increment;
+        } catch (SQLException ex) {
+           
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
+         
+        }
     
+ 
+ 
+  @Override
+ public Long addQueryExecution(QueryExecution queryExecution) throws DAOException {
+      try {
+           
+            PreparedStatement ps = connection.prepareStatement(
+                  "INSERT INTO QueryExecution(queryVersionID, dateExecution, executer,status, name, description, urlResult) VALUES (?, ?, ?, ?, ?, ?, ?)",PreparedStatement.RETURN_GENERATED_KEYS);
+            ps.setLong(1,queryExecution.getQueryVersionID());
+            ps.setTimestamp(2,getCurrentTimeStamp());
+            ps.setString(3,queryExecution.getExecuter());
+            ps.setString(4,queryExecution.getStatus());
+            ps.setString(5,queryExecution.getName());
+            ps.setString(6,queryExecution.getDescription());
+         
+            ps.setString(7,queryExecution.getUrlResult());
+            
+          
+            ps.execute();
+            ResultSet rs = ps.getGeneratedKeys();
+            Long idAuto_increment= new Long(0);
+            while (rs.next()){
+            idAuto_increment = rs.getLong(1);
+            }
+            
+            ps.close();
+           return idAuto_increment;
+        } catch (SQLException ex) {
+           
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
+     
+ }
       private static java.sql.Timestamp getCurrentTimeStamp() {
  
 		java.util.Date today = new java.util.Date();
@@ -371,5 +434,3 @@ public void  removeVersion(Long versionid) throws DAOException {
     
     
     
-    
-
