@@ -127,5 +127,38 @@ public class QueryBusiness {
         } 
   
    }
+     
+     
+     public List<String[]> getQueryHistory() throws BusinessException{
+   try {
+            return QueryDAOFactory.getDAOFactory().getQueryDAO().getQueryHistory();
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        } 
   
-}
+   }
+     
+     
+     public String getBody(Long queryVersionID,Long queryExecutionID) throws BusinessException{
+          try {
+            return QueryDAOFactory.getDAOFactory().getQueryDAO().getBody(queryVersionID, queryExecutionID);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        } 
+  
+   }
+     
+     
+     public void updateQueryExecution(String urlResult, String status,Long executionID )  throws BusinessException{
+         try {
+            QueryDAOFactory.getDAOFactory().getQueryDAO().updateQueryExecution(urlResult, status, executionID);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+     }
+     
+     }
+  

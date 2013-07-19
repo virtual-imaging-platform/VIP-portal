@@ -34,6 +34,7 @@ import fr.insalyon.creatis.vip.query.client.bean.Parameter;
 import fr.insalyon.creatis.vip.query.client.bean.Query;
 import fr.insalyon.creatis.vip.query.client.bean.QueryRecord;
 import fr.insalyon.creatis.vip.query.client.bean.QueryVersion;
+import fr.insalyon.creatis.vip.query.client.rpc.EndPointSparqlService;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.QueryConstants;
 import fr.insalyon.creatis.vip.query.client.view.QueryException;
@@ -64,7 +65,7 @@ import java.lang.*;
     private IButton saveButton;
     private ImgButton helpButton;
     private TextItem body;
-   private IButton open;
+    private IButton open;
    
 
     
@@ -103,7 +104,7 @@ import java.lang.*;
                     public void onClick(ClickEvent event) {
                         
                 try {
-                  Query q= new Query(description.getValue(), querynameField.getValueAsString(),"admin@vip.creatis.insa-lyon.fr"); 
+                  Query q= new Query(description.getValue(), querynameField.getValueAsString()); 
                   save(q);
                   new QueryLayout().loadData();
                   
@@ -119,7 +120,13 @@ import java.lang.*;
                 new ClickHandler() {
                     @Override
                     public void onClick(ClickEvent event) {
-                          UrlBuilder builder = new UrlBuilder();
+                    }
+                    
+                        
+             /////////
+                       
+                        
+            /* UrlBuilder builder = new UrlBuilder();
             
            builder.setHost("ginseng.unice.fr");
            builder.setPort(9000);
@@ -130,44 +137,18 @@ import java.lang.*;
                  + " group by ?type"
                  + " order by desc(?c)"); 
          builder.setParameter("format","json" );
-       // return builder.buildString();
-          
-          
-           //String stringISO=null;
-               // try {
-                  //  stringISO = new String ( builder.buildString().getBytes(), "UTF-8" );
-               // } catch (UnsupportedEncodingException ex) {
-                //    Logger.getLogger(CreateQuery.class.getName()).log(Level.SEVERE, null, ex);
-                //}
-           com.google.gwt.user.client.Window.open(builder.buildString(),"_self","");      
-         // return "www.google.com";
+     com.google.gwt.user.client.Window.open(builder.buildString(),"_self","");   
+     
+        
                     }
                 });
+                * */
                         
-                /*        
-                        
-            final AsyncCallback<String> callback = new AsyncCallback<String>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                
-                Layout.getInstance().setWarningMessage("Unable to get result" + caught.getMessage());
-            }
- 
-            @Override
-            public void onSuccess(String result) {
-                
-               
-                com.google.gwt.user.client.Window.open(result,"_self","");      
-        }
-        };
-      
-         QueryService.Util.getInstance().getURL(callback);  
-                                
-                }
+                      
+        
                 }
                 );
-                * 
-                */
+                
    
        helpButton= FieldUtil.getImgButton(QueryConstants.ICON_HELP,"How to create a query",
                new ClickHandler() {

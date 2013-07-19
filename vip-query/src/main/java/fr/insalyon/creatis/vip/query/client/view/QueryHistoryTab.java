@@ -3,6 +3,8 @@
  * and open the template in the editor.
  */
 package fr.insalyon.creatis.vip.query.client.view;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.VisibilityMode;
@@ -15,7 +17,12 @@ import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.query.client.bean.QueryRecord;
+import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -40,6 +47,7 @@ public class QueryHistoryTab extends Tab {
         this.setAttribute("paneMargin", 0);
          configureGrid();
          modal = new ModalWindow(grid);
+         loadData();
 
         VLayout vLayout = new VLayout();
         vLayout.addMember(new HistoryToolStrip(modal));
@@ -74,18 +82,47 @@ public class QueryHistoryTab extends Tab {
         grid.setSelectionType(SelectionStyle.SIMPLE);
         grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
         grid.setEmptyMessage("<br>No data available.");
+       ListGridField linkField =new ListGridField("urlResult", "Result Data");
+       linkField.setType(ListGridFieldType.LINK);
+       
         grid.setFields(
                 FieldUtil.getIconGridField("statusIco"),
-                new ListGridField("queryName", "Query Execution Name"),
+                new ListGridField("name", "Query Execution Name"),
                 new ListGridField("query", "Query"),
-                new ListGridField("queryVersion", "Version"),
+                new ListGridField("version", "Version"),
                 new ListGridField("executer", "Executer"),
                 new ListGridField("dateExecution", "Execution Start Time"),
                 new ListGridField("status", "Status"),
-                new ListGridField("urlResult", "Result Data"));
-      
-                
-               
+                linkField);
+           
       }
+      
+      
+      
+          public void loadData() {
+
+        final AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                Layout.getInstance().setWarningMessage("Unable to get list of queries Execution:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(List<String[]> result) {
+                modal.hide();
+                List<QueryExecutionRecord> dataList = new ArrayList<QueryExecutionRecord>();
+
+                for (String[] q : result ) {
+                   
+                    
+                    dataList.add(new QueryExecutionRecord (q[0],q[1],q[2],q[3],q[4],q[5],q[6]));
+                }
+                grid.setData(dataList.toArray(new QueryExecutionRecord[]{}));
+            }
+        };
+        modal.show("Loading queries execution...", true);
+        QueryService.Util.getInstance().getQueryHistory(callback);
+    }
     
 }

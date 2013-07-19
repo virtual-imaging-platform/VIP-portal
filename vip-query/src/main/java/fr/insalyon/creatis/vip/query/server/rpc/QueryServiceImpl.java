@@ -25,6 +25,7 @@ import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.QueryException;
 import fr.insalyon.creatis.vip.query.server.dao.persistance.QueryBusiness;
 import java.sql.Timestamp;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 /**
  *
@@ -69,14 +70,20 @@ public class QueryServiceImpl  extends AbstractRemoteServiceServlet implements Q
    public Long add(Query query) throws QueryException {
         
     try {
-            return queryBusiness.add(query);
+            query.setQueryMaker(getSessionUser().getEmail());
+             } catch (CoreException ex) {
+             java.util.logging.Logger.getLogger(QueryServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+         }
+          
+    try{
+          return queryBusiness.add(query);
              
         
         } catch (BusinessException ex) {
             throw new QueryException(ex);
-        }
+       
     }
-  
+  }
   
     @Override
   public Long addVersion(QueryVersion version) throws QueryException {
@@ -158,7 +165,40 @@ public class QueryServiceImpl  extends AbstractRemoteServiceServlet implements Q
         }  
     
     }
+   @Override 
+    public List<String[]> getQueryHistory() throws QueryException{
+       try {
+            return queryBusiness.getQueryHistory();
+        
+        } catch (BusinessException ex) {
+            throw new QueryException(ex);
+        }  
     
+    }
+   
+   
+   @Override 
+    public String getBody(Long queryVersionID,Long queryExecutionID) throws QueryException{
+       try {
+            return queryBusiness.getBody(queryVersionID,queryExecutionID);
+        
+        } catch (BusinessException ex) {
+            throw new QueryException(ex);
+        }  
+    
+    }
+   
+   
+   @Override 
+  public void updateQueryExecution(String urlResult, String status,Long executionID)throws QueryException{
+       try {
+             queryBusiness.updateQueryExecution(urlResult, status, executionID);
+        
+        } catch (BusinessException ex) {
+            throw new QueryException(ex);
+        }  
+    
+    }
     
    
 }

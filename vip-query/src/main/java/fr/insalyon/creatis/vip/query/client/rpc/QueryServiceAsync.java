@@ -30,11 +30,8 @@ public interface QueryServiceAsync {
     public void getQuerie(Long queryversionid,AsyncCallback <List<String[]>> asyncCallback);
     public void getParameter(Long queryVersionID,AsyncCallback <List<Parameter>> asyncCallback);
     public void addValue(Value value,AsyncCallback <Long> asyncCallback);
-    /**
-     *
-     * @param queryExecution
-     * @param asyncCallback
-     */
     public void addQueryExecution(QueryExecution queryExecution,AsyncCallback <Long> asyncCallback);
-
+    public void  getQueryHistory(AsyncCallback <List<String[]>> asyncCallback);
+    public void  getBody(Long queryVersionID,Long queryExecutionID,AsyncCallback <String> asyncCallback);
+    public void updateQueryExecution(String urlResult, String status,Long executionID, AsyncCallback <Void> asyncCallback);
 }

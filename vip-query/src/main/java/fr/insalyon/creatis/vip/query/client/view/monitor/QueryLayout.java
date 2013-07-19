@@ -151,10 +151,11 @@ public class QueryLayout extends VLayout {
                 return button;
             }
         };
-        grid.setWidth100();
-        grid.setHeight(500);
-        grid.setShowRollOverCanvas(true);
+       grid.setWidth100();
+        grid.setHeight100();
         grid.setShowAllRecords(false);
+        grid.setShowRollOverCanvas(true);
+        
         grid.setShowEmptyMessage(true);
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
