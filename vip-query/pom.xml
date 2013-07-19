@@ -58,6 +58,13 @@
             <artifactId>org-netbeans-api-annotations-common</artifactId>
             <version>RELEASE73</version>
         </dependency>
+        
+        
+        <dependency>
+   <groupId>org.apache.httpcomponents</groupId>
+   <artifactId>httpclient-osgi</artifactId>
+   <version>4.2-alpha1</version>
+</dependency>
        
         <dependency>
             <groupId>org.eclipse.persistence</groupId>

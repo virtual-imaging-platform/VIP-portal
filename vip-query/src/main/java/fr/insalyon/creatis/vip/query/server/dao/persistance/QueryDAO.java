@@ -29,6 +29,8 @@ public interface QueryDAO {
      public List<Parameter> getParameter(Long queryVersionID) throws DAOException;
      public Long addValue(Value value) throws DAOException ;
      public Long addQueryExecution(QueryExecution queryExecution)throws DAOException ;
-     
+     public List<String[]> getQueryHistory() throws DAOException ;
+     public String getBody(Long queryVersionID,Long queryExecutionID) throws DAOException;
+     public void updateQueryExecution(String urlResult, String status,Long executionID ) throws DAOException;
     
 }

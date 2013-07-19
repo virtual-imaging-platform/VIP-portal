@@ -33,6 +33,13 @@ import java.util.List;
         this.description = description;
         this.queryMaker = queryMaker;
     }
+    
+    public Query(String description,String name) {
+        this.name = name;
+       ///this.dateCreation=dateCreation;
+        this.description = description;
+       
+    }
   
     
 public Query(String description,String name,String queryMaker, String dateCreation ) {

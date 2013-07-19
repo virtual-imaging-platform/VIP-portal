@@ -20,10 +20,12 @@ import fr.insalyon.creatis.vip.query.client.view.QueryException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 import java.lang.Character;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.log4j.Logger;
+
 
 /**
  *
@@ -117,6 +119,7 @@ public class QueryData implements QueryDAO {
             List<String[]> queries = new ArrayList<String[]>();
 
             while (rs.next()) {
+                
                 queries.add(new String[]{rs.getString("queryName"), rs.getString("dateCreation"),rs.getString("queryVersion")});
             }
             ps.close();
@@ -178,7 +181,7 @@ public void  removeVersion(Long versionid) throws DAOException {
                        last=body.charAt(j);
                        
                if(last==']'&& k==0){
-               listparam.add(body.substring(i+1, j-1));
+               listparam.add(body.substring(i+1,j));
                k=1;
                
                }
@@ -304,7 +307,7 @@ public void  removeVersion(Long versionid) throws DAOException {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "parameterID, name, type, description, example "
                     + "FROM Parameter "
-                    + "WHERE queryVersionID = ?");
+                    + "WHERE queryVersionID = ? ORDER BY parameterID DESC");
 
             ps.setLong(1, queryVersionID);
             ResultSet rs = ps.executeQuery();
@@ -324,35 +327,33 @@ public void  removeVersion(Long versionid) throws DAOException {
     }
 
 
-    /*
+    
       @Override
-    public void updateVersion(Long versionid, String description, String queryName ) throws DAOException {
+    public void updateQueryExecution(String urlResult, String status, Long executionID ) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
-                    + "query q, queryversion v "
-                    + "SET query.description=? "
-                    + "SET query.queryName=? "
-                    //+ "SET queryversion.body=? "
-                    //+ "SET queryversion.dateCreation=? "
-                    + "WHERE queryVersionID=?");
+                    + "QueryExecution "
+                    + "SET urlResult=?, status=? "
+                   
+                    + "WHERE queryExecutionID=?");
+            
+               
 
-            ps.setString(1, application.getCitation());
-            ps.setString(2, application.getName());
+            ps.setString(1, urlResult);
+            ps.setString(2, status);
+            ps.setLong(3, executionID);
             ps.executeUpdate();
             ps.close();
 
-            removeAllClassesFromApplication(application.getName());
-            for (String className : application.getApplicationClasses()) {
-                addClassToApplication(application.getName(), className);
-            }
+         
 
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
         }
     }
-*/
+
  @Override
  public Long addValue(Value value) throws DAOException {
          try {
@@ -412,8 +413,118 @@ public void  removeVersion(Long versionid) throws DAOException {
                 logger.error(ex);
                 throw new DAOException(ex);
             }
+  }
      
- }
+ @Override
+    public List<String[]> getQueryHistory() throws DAOException {
+       try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "name,queryName,queryVersion,executer,dateExecution,status,urlResult FROM "
+                    + "Query query,QueryVersion queryversion,QueryExecution queryexe WHERE "
+                    + "query.queryID=queryversion.queryID AND queryversion.queryVersionID=queryexe.queryVersionID "
+                    + "ORDER BY queryexe.name");
+
+            ResultSet rs = ps.executeQuery();
+            List<String[]> queries = new ArrayList<String[]>();
+
+            while (rs.next()) {
+           
+               Timestamp date=rs.getTimestamp("dateExecution");
+                queries.add(new String[]{rs.getString("name"),rs.getString("queryName"),rs.getString("queryVersion"),rs.getString("executer"),date.toString(), rs.getString("status"),rs.getString("urlResult")});
+            }
+            ps.close();
+            return queries;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+    
+  
+  @Override
+    public String getBody(Long queryVersionID, Long queryExecutionID) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "body, parameterID "
+                    + "FROM QueryVersion v, Parameter p "
+                    + "WHERE v.queryVersionID = p.queryVersionID AND v.queryVersionID=? ORDER BY p.parameterID DESC");
+
+            ps.setLong(1, queryVersionID);
+            ResultSet rs = ps.executeQuery();
+            //List<String> value=new ArrayList<String>(); 
+            int c=0;
+            int nn=0;
+            String body=null;
+            String s=null;
+            
+            while (rs.next()) {
+                
+             Long n=rs.getLong("parameterID");
+             if(nn==0){
+             body=rs.getString("body");
+             nn=1;
+             }
+              PreparedStatement ps2 = connection.prepareStatement("SELECT "
+                    + "value "
+                    + "FROM Value "
+                    + "WHERE parameterID=? AND queryExecutionID=?");
+              ps2.setLong(1, n);
+              ps2.setLong(2,queryExecutionID);
+              ResultSet rs2 = ps2.executeQuery();
+       
+              
+              while (rs2.next()) { 
+              for (int i=0; i<body.length();i++){
+              char b=body.charAt(i);
+               if(b=='['){
+                    for (int j=i+1;j<body.length();j++){
+                      char last=body.charAt(j);
+                      int kk=0;
+                      //substring j+1 non inclus
+                     
+                      if(last==']' && kk==0){
+                         kk=1; 
+                      c=j+1;
+                      s=body.substring(i+1,j);
+                     
+                      }
+               }
+                    
+               }
+                   
+               }
+               body=body.replaceAll("\\["+s+"\\]",rs2.getString("value") );
+              }
+             
+              ps2.close();
+              
+              
+             
+            }
+            
+
+            ps.close();
+            return body;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+  
+  
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
       private static java.sql.Timestamp getCurrentTimeStamp() {
  
 		java.util.Date today = new java.util.Date();

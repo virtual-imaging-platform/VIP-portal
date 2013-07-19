@@ -14,23 +14,17 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.grid.ListGrid;
-import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.viewer.DetailViewer;
 import com.smartgwt.client.widgets.viewer.DetailViewerField;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
-import fr.insalyon.creatis.vip.core.client.view.common.MessageWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
-
 import fr.insalyon.creatis.vip.query.client.bean.Parameter;
 import fr.insalyon.creatis.vip.query.client.bean.ParameterRecord;
 import fr.insalyon.creatis.vip.query.client.bean.QueryExecution;
-import fr.insalyon.creatis.vip.query.client.bean.QueryRecord;
 import fr.insalyon.creatis.vip.query.client.bean.Value;
+import fr.insalyon.creatis.vip.query.client.rpc.EndPointSparqlService;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.QueryConstants;
 import java.util.ArrayList;
@@ -49,9 +43,10 @@ public class parameterTab extends VLayout {
    private RichTextEditor executionDescription;
    DynamicForm execution;
    private List<TextItem> arrList;
+   private Long queryExecutionID;
   
-   int i=0;
-   private Long id;
+   
+  
 
    public parameterTab(Long queryVersionID) {
        
@@ -122,7 +117,7 @@ public class parameterTab extends VLayout {
            
            for (Parameter q : result) {
                TextItem value;  
-               i++;
+               
             dataList=  new ArrayList<ParameterRecord>();
             dynamicForm= new DynamicForm();
             printViewer = new DetailViewer();
@@ -180,14 +175,33 @@ public class parameterTab extends VLayout {
                 new ClickHandler() {
                     @Override
                     public void onClick(ClickEvent event) {
-                    saveQueryExecution(new QueryExecution(queryVersionID,"admin@vip.creatis.insa-lyon.fr","statusn",executionName.getValueAsString(),executionDescription.getValue(),"url"));
-                     
-                     
-                     for(TextItem t : arrList){
+                  
+                     final AsyncCallback <Long> callback = new AsyncCallback<Long>() {
+                     @Override
+                     public void onFailure(Throwable caught) {
+                
+                     Layout.getInstance().setWarningMessage("Unable to save Query Execution " + caught.getMessage());
+                     }
+ 
+                    @Override
+                    public void onSuccess(Long result) {
+                
+                 for(TextItem t : arrList){
                            
-                     saveValue(new Value(t.getValueAsString(),Long.parseLong(t.getName()),id)) ;
+                     saveValue(new Value(t.getValueAsString(),Long.parseLong(t.getName()),result)) ;
+                     
                      t.setValue("");
                         }
+               queryExecutionID=result;
+                 
+                
+                
+              
+        }
+        };
+        QueryService.Util.getInstance().addQueryExecution(new QueryExecution(queryVersionID,"admin@vip.creatis.insa-lyon.fr","Waiting",executionName.getValueAsString(),executionDescription.getValue()," "), callback);
+                     
+                    
                         
     }
 });
@@ -210,7 +224,7 @@ public class parameterTab extends VLayout {
  
             @Override
             public void onSuccess(Long result) {
-                
+             getBody(queryVersionID,queryExecutionID);
                 
                
                
@@ -220,28 +234,77 @@ public class parameterTab extends VLayout {
  
     }
      
-     public void saveQueryExecution(QueryExecution queryExecution)  {
-         
-          final AsyncCallback <Long> callback = new AsyncCallback<Long>() {
+    
+    
+ private  void getBody(Long queryVersionID,Long executonID )  {
+         final AsyncCallback <String> callback = new AsyncCallback<String>() {
             @Override
             public void onFailure(Throwable caught) {
                 
-                Layout.getInstance().setWarningMessage("Unable to save Query Execution " + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get Body" + caught.getMessage());
             }
  
             @Override
-            public void onSuccess(Long result) {
+            public void onSuccess(String result) {
                 
-                 id=new Long(result);
-                 
+              getUrlResult(result,"json");
               
+               
         }
         };
-        QueryService.Util.getInstance().addQueryExecution(queryExecution, callback);
-        
-        
-    }
-    
+       
+  QueryService.Util.getInstance().getBody(queryVersionID, executonID, callback);
+  
+ 
+ }
+ 
+ 
+ private  void update(String urlResult,String status,Long executonID )  {
+         final AsyncCallback <Void> callback = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                
+                Layout.getInstance().setWarningMessage("Unable to update" + caught.getMessage());
+            }
+ 
+            @Override
+            public void onSuccess(Void result) {     
+        }
+        };
+       
+  QueryService.Util.getInstance().updateQueryExecution(urlResult, status, executonID, callback); 
+  
+ 
+ }
+ 
+ 
+ 
+ 
+ private void getUrlResult(String query, String format)
+ {
+                 
+           final AsyncCallback<String> callback = new AsyncCallback<String>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                
+                Layout.getInstance().setWarningMessage("Unable to get result" + caught.getMessage());
+            }
+ 
+            @Override
+            public void onSuccess(String result) {
+                
+                 
+                update(result,"completed",queryExecutionID);
+               // com.google.gwt.user.client.Window.open(result,"_self","");    
+               
+        }
+        };
+      
+         EndPointSparqlService.Util.getInstance().getUrlResult(query, format, callback);
+                                
+                }
+
+ 
  
 }
      
