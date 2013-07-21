@@ -4,6 +4,7 @@
  */
 package fr.insalyon.creatis.vip.query.client.view;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
@@ -34,6 +35,7 @@ public class QueryHistoryTab extends Tab {
      private  SectionStackSection searchSection;
      protected ModalWindow modal;
      protected ListGrid grid;
+     ListGridField linkField;
     
     
     
@@ -82,17 +84,24 @@ public class QueryHistoryTab extends Tab {
         grid.setSelectionType(SelectionStyle.SIMPLE);
         grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
         grid.setEmptyMessage("<br>No data available.");
-       ListGridField linkField =new ListGridField("urlResult", "Result Data");
-       linkField.setType(ListGridFieldType.LINK);
-       
+        linkField =new ListGridField("urlResult", "Result Data");
+        linkField.setType(ListGridFieldType.LINK);
+        linkField.setWidth(60);  
+        linkField.setAlign(Alignment.CENTER);  
+        
+        ListGridField version = new ListGridField("version", "Version");
+        version.setWidth(60);
+        ListGridField status = new ListGridField("status", "Status");
+        status.setWidth(60);
+        
         grid.setFields(
                 FieldUtil.getIconGridField("statusIco"),
                 new ListGridField("name", "Query Execution Name"),
                 new ListGridField("query", "Query"),
-                new ListGridField("version", "Version"),
+                version,
                 new ListGridField("executer", "Executer"),
                 new ListGridField("dateExecution", "Execution Start Time"),
-                new ListGridField("status", "Status"),
+                status,
                 linkField);
            
       }
@@ -117,6 +126,15 @@ public class QueryHistoryTab extends Tab {
                    
                     
                     dataList.add(new QueryExecutionRecord (q[0],q[1],q[2],q[3],q[4],q[5],q[6]));
+                    if(q[5].equals("completed")){
+                        linkField.setLinkText(Canvas.imgHTML(QueryConstants.ICON_TICK, 16, 16, "info", "align=center", null)); 
+                    }
+                    else if(q[5].equals("failed")){
+                        linkField.setLinkText(Canvas.imgHTML(QueryConstants.ICON_WAIT, 16, 16, "info", "align=center", null));
+                    }
+                    else if(q[5].equals("waiting")){
+                         linkField.setLinkText(Canvas.imgHTML(QueryConstants.ICON_FAIL, 16, 16, "info", "align=center", null));
+                }
                 }
                 grid.setData(dataList.toArray(new QueryExecutionRecord[]{}));
             }

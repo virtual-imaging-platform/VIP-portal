@@ -158,11 +158,17 @@ public class QueryServiceImpl  extends AbstractRemoteServiceServlet implements Q
     public Long addQueryExecution(QueryExecution queryExecution) throws QueryException {
     
     try {
-            return queryBusiness.addQueryExecution(queryExecution);
-        
+            queryExecution.setExecuter(getSessionUser().getEmail());
+           
+        } catch (CoreException ex) {  
+             java.util.logging.Logger.getLogger(QueryServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+         }
+    try{
+      return queryBusiness.addQueryExecution(queryExecution);
         } catch (BusinessException ex) {
             throw new QueryException(ex);
-        }  
+            
+}
     
     }
    @Override 

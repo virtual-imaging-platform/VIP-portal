@@ -14,7 +14,7 @@ public class QueryConstants {
    public static final String TAB_QUERYMAKER = "queryMaker-tab";
    
     // Icons
-   private static final String IMG_FOLDER = "query/";
+    private static final String IMG_FOLDER = "query/";
     public static final String ICON_QUERYHISTORY = IMG_FOLDER + "icon-queryHistory.png";
     public static final String ICON_QUERYMAKER = IMG_FOLDER + "icon-queryMaker.png";
     public static final String ICON_SEARCH = IMG_FOLDER + "icon-search.png";
@@ -23,9 +23,10 @@ public class QueryConstants {
     public static final String ICON_EXECUTE=IMG_FOLDER + "icon-execute.png";
     public static final String ICON_HELP=IMG_FOLDER + "icon-help.png";
     public static final String ICON_LAUNCH=IMG_FOLDER + "icon-launch.png";
-
-  
+    public static final String ICON_TICK=IMG_FOLDER + "icon-tick.png";
+    public static final String ICON_FAIL=IMG_FOLDER + "icon-fail.png";
     public static final String ICON_EXECUTE_VERSION=IMG_FOLDER + "icon-query.png";
+    public static final String ICON_WAIT=IMG_FOLDER + "icon-wait.png";
     
     // Application Names
     public static final String APP_QUERYHISTORY= "Query History";
