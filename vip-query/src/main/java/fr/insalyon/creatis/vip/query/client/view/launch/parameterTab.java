@@ -182,24 +182,26 @@ public class parameterTab extends VLayout {
                 
                      Layout.getInstance().setWarningMessage("Unable to save Query Execution " + caught.getMessage());
                      }
+                    
  
                     @Override
                     public void onSuccess(Long result) {
-                
-                 for(TextItem t : arrList){
+                   update("","waiting",result);
+                  for(TextItem t : arrList){
                            
                      saveValue(new Value(t.getValueAsString(),Long.parseLong(t.getName()),result)) ;
                      
                      t.setValue("");
                         }
-               queryExecutionID=result;
+                   queryExecutionID=result;
+                  
                  
                 
                 
               
         }
         };
-        QueryService.Util.getInstance().addQueryExecution(new QueryExecution(queryVersionID,"admin@vip.creatis.insa-lyon.fr","Waiting",executionName.getValueAsString(),executionDescription.getValue()," "), callback);
+        QueryService.Util.getInstance().addQueryExecution(new QueryExecution(queryVersionID,"Waiting",executionName.getValueAsString(),executionDescription.getValue()," "), callback);
                      
                     
                         
@@ -224,7 +226,7 @@ public class parameterTab extends VLayout {
  
             @Override
             public void onSuccess(Long result) {
-             getBody(queryVersionID,queryExecutionID);
+            getBody(queryVersionID,queryExecutionID);
                 
                
                
@@ -288,6 +290,7 @@ public class parameterTab extends VLayout {
             public void onFailure(Throwable caught) {
                 
                 Layout.getInstance().setWarningMessage("Unable to get result" + caught.getMessage());
+                update("","failed",queryExecutionID);
             }
  
             @Override
