@@ -26,10 +26,8 @@ public class QueryExecution implements IsSerializable{
     }
     
 
-    public QueryExecution(Long queryVersionID, String executer, String status, String name, String description, String urlResult) {
+    public QueryExecution(Long queryVersionID, String status, String name, String description, String urlResult) {
         this.queryVersionID = queryVersionID;
-        //this.dateExecution = dateExecution;
-        this.executer = executer;
         this.status = status;
         this.name = name;
         this.description = description;
