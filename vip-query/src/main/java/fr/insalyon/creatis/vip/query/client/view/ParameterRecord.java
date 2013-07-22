@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.insalyon.creatis.vip.query.client.bean;
+package fr.insalyon.creatis.vip.query.client.view;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -14,10 +14,10 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 public class ParameterRecord extends ListGridRecord{
      public ParameterRecord(String name,String type,String description,String example ) {
 
-        setAttribute("name", name);
-        setAttribute("type", type);
-        setAttribute("description", description);
-        setAttribute("example", example);
+        setAttribute("name(type)", name+"("+type+")");
+       
+        setAttribute("description(example)", description+"(<strong>Example</strong>:"+example+")");
+       
        
         
     }

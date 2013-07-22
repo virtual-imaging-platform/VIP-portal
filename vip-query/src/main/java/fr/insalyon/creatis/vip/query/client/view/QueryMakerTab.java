@@ -9,8 +9,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.query.client.view.monitor.QueryLayout;
-import fr.insalyon.creatis.vip.query.client.view.monitor.VersionLayout;
-import fr.insalyon.creatis.vip.query.client.view.monitor.ParameterLayout;
+
+
  import fr.insalyon.creatis.vip.query.client.view.monitor.CreateQuery;
 
 /**
@@ -20,8 +20,6 @@ import fr.insalyon.creatis.vip.query.client.view.monitor.ParameterLayout;
 public class QueryMakerTab extends Tab {
     
     private final QueryLayout queryLayout;
-    
-    
     private final CreateQuery createQuery;
     protected VLayout vLayout;
     
