@@ -52,11 +52,16 @@ public class QueryMakerTab extends Tab {
         
      }
     
-     public void setQuery(boolean savebutton,String name, String description, String body) {
-        createQuery.setQuery(savebutton, name, description, body);     
+     public void setQuery(boolean test,String name, String description, String body) {
+        createQuery.setQuery(test, name, description, body);     
     }
+     public Long getVersionID(){
+         return queryLayout.getVersionID();
+     }
     
-    
+    public void loadData(){
+         queryLayout.loadData();
+     }
     
 }
 
