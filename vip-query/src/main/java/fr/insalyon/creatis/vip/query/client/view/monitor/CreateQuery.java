@@ -4,12 +4,10 @@
  */
 package fr.insalyon.creatis.vip.query.client.view.monitor;
 
-import com.google.gwt.http.client.UrlBuilder;
-import com.google.gwt.i18n.client.DateTimeFormat;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.TextArea;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.types.Overflow;
@@ -38,6 +36,7 @@ import fr.insalyon.creatis.vip.query.client.rpc.EndPointSparqlService;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.QueryConstants;
 import fr.insalyon.creatis.vip.query.client.view.QueryException;
+import fr.insalyon.creatis.vip.query.client.view.QueryMakerTab;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -59,13 +58,13 @@ import java.lang.*;
 
    
 
-   
+    private boolean newQuery;
     private TextItem querynameField;
     private RichTextEditor description;
     private IButton saveButton;
     private ImgButton helpButton;
     private TextItem body;
-    private IButton open;
+   
    
 
     
@@ -102,7 +101,7 @@ import java.lang.*;
                 new ClickHandler() {
                     @Override
                     public void onClick(ClickEvent event) {
-                        
+                    if (newQuery) {   
                 try {
                   Query q= new Query(description.getValue(), querynameField.getValueAsString()); 
                   save(q);
@@ -112,43 +111,17 @@ import java.lang.*;
                     Logger.getLogger(CreateQuery.class.getName()).log(Level.SEVERE, null, ex);
                 }
                         }
+                    else{
+                        //update
+                        
+                    };
                     
                 }
-                );
-
-       open= WidgetUtil.getIButton("open", CoreConstants.ICON_SAVED,
-                new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent event) {
-                    }
-                    
-                        
-             /////////
-                       
-                        
-            /* UrlBuilder builder = new UrlBuilder();
-            
-           builder.setHost("ginseng.unice.fr");
-           builder.setPort(9000);
-           builder.setPath("/sparql"); 
-       
-         builder.setParameter("query","select ?type (count(*) as ?c)" 
-                 + " where {?x a ?type}"
-                 + " group by ?type"
-                 + " order by desc(?c)"); 
-         builder.setParameter("format","json" );
-     com.google.gwt.user.client.Window.open(builder.buildString(),"_self","");   
-     
-        
-                    }
-                });
-                * */
-                        
-                      
-        
                 }
                 );
                 
+
+             
    
        helpButton= FieldUtil.getImgButton(QueryConstants.ICON_HELP,"How to create a query",
                new ClickHandler() {
@@ -175,7 +148,6 @@ import java.lang.*;
         textbox.setPadding(5);  
         textbox.setLeft(50);  
         textbox.setTop(50);  
-        //textbox.setParentElement(layout);  
         textbox.setWidth100();
         textbox.setHeight100();
         textbox.setContents("To create query you have to put parameters of query into «[]»"
@@ -195,13 +167,15 @@ import java.lang.*;
        body.setTitleOrientation(TitleOrientation.TOP);
        body.setTextAlign(Alignment.LEFT);
        body.setShowTitle(false);
-     
-     
+       
+    
        addField("Body", body);
        this.addMember(helpButton);
-       addButtons(saveButton,open);
+       addButtons(saveButton);
        
-       
+        if(body.getValueField()==null&& querynameField.getValueField()==null ){
+           newQuery=true;
+          }
         
     }
     
@@ -223,8 +197,10 @@ import java.lang.*;
               savev(new QueryVersion("v. "+result,result,body.getValueAsString()));
                     
              
-
-             WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
+               QueryMakerTab queryTab = (QueryMakerTab) Layout.getInstance().
+                getTab(QueryConstants.TAB_QUERYMAKER);
+                queryTab.loadData();
+                WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
              
              
               
@@ -297,10 +273,9 @@ import java.lang.*;
         };
     }
     
-           public void setQuery(boolean savebutton, String name, String description, String body) {  
+           public void setQuery(boolean test, String name, String description, String body) {  
                
-               
-              saveButton.setDisabled(savebutton);
+              newQuery=test;
               querynameField.setValue(name);
               this.description.setValue(description);
               this.body.setValue(body);  

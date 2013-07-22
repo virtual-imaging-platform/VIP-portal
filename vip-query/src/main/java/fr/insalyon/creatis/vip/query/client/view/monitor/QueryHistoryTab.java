@@ -25,6 +25,7 @@ import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.QueryConstants;
 import fr.insalyon.creatis.vip.query.client.view.QueryExecutionRecord;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -34,10 +35,15 @@ import java.util.List;
  */
 public class QueryHistoryTab extends Tab {
      
-     private  SectionStackSection searchSection;
+     private  SearchStackSection searchSection;
      protected ModalWindow modal;
      protected ListGrid grid;
      ListGridField linkField;
+     protected String user = null;
+     protected String status = null;
+     protected Date startDate = null;
+     protected Date endDate = null;
+
     
     
     
@@ -51,7 +57,7 @@ public class QueryHistoryTab extends Tab {
         this.setAttribute("paneMargin", 0);
          configureGrid();
          modal = new ModalWindow(grid);
-         loadData();
+        
 
         VLayout vLayout = new VLayout();
         vLayout.addMember(new HistoryToolStrip(modal));
@@ -65,12 +71,14 @@ public class QueryHistoryTab extends Tab {
         gridSection.setShowHeader(false);
         gridSection.addItem(grid);
 
-         searchSection =new SectionStackSection();
+         searchSection =new SearchStackSection();
 
         sectionStack.setSections(gridSection, searchSection);
+        searchSection.addItem(grid);
         vLayout.addMember(sectionStack);
 
         this.setPane(vLayout);
+        loadData();
         
         
         
@@ -151,6 +159,25 @@ public class QueryHistoryTab extends Tab {
        
         modal.show("Loading queries execution...", true);
         QueryService.Util.getInstance().getQueryHistory(callback);
+    }
+          
+         public void expandSearchSection() {
+        this.searchSection.setExpanded(true);
+    }
+         public void setUser(String user) {
+        this.user = user;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
     
 }
