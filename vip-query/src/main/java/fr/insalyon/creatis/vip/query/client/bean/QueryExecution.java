@@ -18,7 +18,7 @@ public class QueryExecution implements IsSerializable{
     private String executer;
     private String status ;
     private String name;
-    private String description;
+   
     private Timestamp dateEndExecution;
     private String urlResult;
 
@@ -26,11 +26,11 @@ public class QueryExecution implements IsSerializable{
     }
     
 
-    public QueryExecution(Long queryVersionID, String status, String name, String description, String urlResult) {
+    public QueryExecution(Long queryVersionID, String status, String name, String urlResult) {
         this.queryVersionID = queryVersionID;
         this.status = status;
         this.name = name;
-        this.description = description;
+      
     
         this.urlResult = urlResult;
     }
@@ -84,14 +84,7 @@ public class QueryExecution implements IsSerializable{
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
+   
     public Timestamp getDateEndExecution() {
         return dateEndExecution;
     }
