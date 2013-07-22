@@ -23,7 +23,7 @@ import fr.insalyon.creatis.vip.query.client.bean.QueryVersion;
 import fr.insalyon.creatis.vip.query.client.bean.Value;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.QueryException;
-import fr.insalyon.creatis.vip.query.server.dao.persistance.QueryBusiness;
+import fr.insalyon.creatis.vip.query.server.dao.business.QueryBusiness;
 import java.sql.Timestamp;
 import java.util.logging.Level;
 import org.apache.log4j.Logger;
