@@ -21,7 +21,7 @@ import com.smartgwt.client.widgets.viewer.DetailViewerField;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.query.client.bean.Parameter;
-import fr.insalyon.creatis.vip.query.client.bean.ParameterRecord;
+import fr.insalyon.creatis.vip.query.client.view.ParameterRecord;
 import fr.insalyon.creatis.vip.query.client.bean.QueryExecution;
 import fr.insalyon.creatis.vip.query.client.bean.Value;
 import fr.insalyon.creatis.vip.query.client.rpc.EndPointSparqlService;
@@ -40,7 +40,7 @@ public class parameterTab extends VLayout {
    private IButton launchButton;
    private DetailViewer printViewer ;
    private TextItem executionName;
-   private RichTextEditor executionDescription;
+ 
    DynamicForm execution;
    private List<TextItem> arrList;
    private Long queryExecutionID;
@@ -57,38 +57,28 @@ public class parameterTab extends VLayout {
       title.setHeight(20);
      
       executionName=new TextItem();
-      executionName.setWidth(800);
+      
       executionName.setShowTitle(false);
       executionName.setTitleOrientation(TitleOrientation.TOP);
       
       execution=new DynamicForm();
       execution.setFields(executionName);
       
-      executionDescription = new RichTextEditor();
-      executionDescription.setHeight(100);
-      executionDescription.setWidth100();
-      executionDescription.setOverflow(Overflow.HIDDEN);
-      executionDescription.setShowEdges(true);
-      executionDescription.setControlGroups("styleControls", "editControls",
-                "colorControls");
-      executionDescription.setTitle("Query Execution Description");
+   
         
         
-      Label executiondes = new Label("<strong>Execution Description</strong>");
-      executiondes.setHeight(20);
-      
+     
       
       
       mainLayout.setPadding(5);
       mainLayout.addMember(title,0);
       mainLayout.addMember(execution,1);
-      mainLayout.addMember(executiondes,2);
-      mainLayout.addMember(executionDescription,3);
+     
       
       Label parameterLab = new Label("<strong>Parameters</strong>");
       parameterLab.setHeight(20);
       
-      mainLayout.addMember(parameterLab,4);
+      mainLayout.addMember(parameterLab,2);
       loadParameter();
       configure();
       this.addMember(mainLayout);    
@@ -123,11 +113,11 @@ public class parameterTab extends VLayout {
             printViewer = new DetailViewer();
             printViewer.setWidth("600");  
             printViewer.setMargin(15);  
-            DetailViewerField name=new DetailViewerField("name", "Name");
-            DetailViewerField type=new DetailViewerField("type", "type");
-            DetailViewerField description=new DetailViewerField("description", "description");
-            DetailViewerField example=new DetailViewerField("example", "example");
-            printViewer.setFields(name,type,description,example);
+            DetailViewerField name=new DetailViewerField("name(type)", "Name");
+            //DetailViewerField type=new DetailViewerField("type", "type");
+            DetailViewerField description=new DetailViewerField("description(example)", "description");
+           // DetailViewerField example=new DetailViewerField("example", "example");
+            printViewer.setFields(name,description);
             dataList.add(new ParameterRecord(q.getName(),q.getType(),q.getDescription(),q.getExample()));
             
             printViewer.setData(dataList.toArray(new ParameterRecord[]{}));
@@ -151,7 +141,7 @@ public class parameterTab extends VLayout {
             hlayout.addMember(printViewer);
             hlayout.addMember(dynamicForm);
 
-            mainLayout.addMember(hlayout,5);
+            mainLayout.addMember(hlayout,3);
             mainLayout.setMembersMargin(10);
 
             }
@@ -201,7 +191,7 @@ public class parameterTab extends VLayout {
               
         }
         };
-        QueryService.Util.getInstance().addQueryExecution(new QueryExecution(queryVersionID,"Waiting",executionName.getValueAsString(),executionDescription.getValue()," "), callback);
+        QueryService.Util.getInstance().addQueryExecution(new QueryExecution(queryVersionID,"Waiting",executionName.getValueAsString()," "), callback);
                      
                     
                         
@@ -209,7 +199,7 @@ public class parameterTab extends VLayout {
 });
         
       
-        mainLayout.addMember(launchButton,6);
+        mainLayout.addMember(launchButton,4);
                 }
     
     
