@@ -36,7 +36,7 @@ import fr.insalyon.creatis.vip.query.client.view.QueryRecord;
  * @author Boujelben
  */
 public class QueryLayout extends VLayout {
-    private boolean newQuery;
+    
     private ModalWindow modal;
     private ListGrid grid;
     private HLayout rollOverCanvas;
@@ -62,7 +62,7 @@ public class QueryLayout extends VLayout {
         addButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-              setEdit(false,"","","");              
+              setEdit(true,null,null,null);              
             }
         });     
       toolstrip.addMember(addButton);
@@ -99,7 +99,7 @@ public class QueryLayout extends VLayout {
                         @Override
                         public void onClick(ClickEvent event) {
                              
-                            //  setQuery(false);
+                             setQuery();
                                    
                         }
                     }); 
@@ -160,7 +160,7 @@ public class QueryLayout extends VLayout {
        grid.addCellClickHandler(new CellClickHandler() {
             @Override
             public void onCellClick(CellClickEvent event) {      
-            setQuery(true);
+            setQuery();
                    }
     
                    });
@@ -226,20 +226,20 @@ public class QueryLayout extends VLayout {
         QueryService.Util.getInstance().removeVersion(versionid, callback);
     }
     
-     private void setEdit(boolean savebutton,String name, String desciption, String body) {
+     private void setEdit(boolean test,String name, String desciption, String body) {
 
         QueryMakerTab queryTab = (QueryMakerTab) Layout.getInstance().
                 getTab(QueryConstants.TAB_QUERYMAKER);
         
-        queryTab.setQuery(savebutton,name, desciption, body);
+        queryTab.setQuery(test,name, desciption, body);
         
        
     }
     
-     private void setQuery(boolean sbb){
+     private void setQuery(){
            String version = rollOverRecord.getAttribute("queryversionID");
            Long versionid=new Long(version);
-            newQuery=sbb;
+           
             final AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -252,7 +252,7 @@ public class QueryLayout extends VLayout {
 
                 for (String[] q : result) {
                    
-                    setEdit(newQuery,q[0],q[1],q[2]);
+                    setEdit(false,q[0],q[1],q[2]);
                 }
             }
         };
@@ -261,6 +261,11 @@ public class QueryLayout extends VLayout {
          
     
                 }
+     public Long getVersionID(){
+          String version = rollOverRecord.getAttribute("queryversionID");
+           Long versionid=new Long(version);
+           return versionid;
+     }
 
 }
         

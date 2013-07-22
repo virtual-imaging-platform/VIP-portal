@@ -40,7 +40,7 @@ public class HistoryToolStrip  extends ToolStrip {
 
             @Override
             public void onClick(ClickEvent event) {
-                // getQueryHistoryTab().loadData();
+                 getQueryHistoryTab().loadData();
             }
         }));
 
@@ -50,7 +50,7 @@ public class HistoryToolStrip  extends ToolStrip {
 
             @Override
             public void onClick(ClickEvent event) {
-               //: getQueryHistoryTab().expandSearchSection();
+                getQueryHistoryTab().expandSearchSection();
             }
         }));
 
