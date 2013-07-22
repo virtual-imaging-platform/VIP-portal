@@ -6,23 +6,15 @@ package fr.insalyon.creatis.vip.query.server.dao.business;
 
 
 import fr.insalyon.creatis.vip.query.client.bean.Query;
-import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
-import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.UserData;
 import fr.insalyon.creatis.vip.query.client.bean.Parameter;
 import fr.insalyon.creatis.vip.query.client.bean.QueryExecution;
 import fr.insalyon.creatis.vip.query.client.bean.QueryVersion;
 import fr.insalyon.creatis.vip.query.client.bean.Value;
-import fr.insalyon.creatis.vip.query.client.view.QueryException;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Calendar;
 import java.util.List;
-import java.lang.Character;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.log4j.Logger;
 
 
@@ -53,7 +45,7 @@ public class QueryData implements QueryDAO {
             while (rs.next()) {
                 
                 int id=rs.getInt("queryID");
-                //String idd=String.valueOf(id);
+           
                  PreparedStatement ps2 = connection.prepareStatement("SELECT queryversionID, queryVersion, dateCreation FROM QueryVersion WHERE queryID=?");
                  
                 
@@ -352,6 +344,34 @@ public void  removeVersion(Long versionid) throws DAOException {
             throw new DAOException(ex);
         }
     }
+      
+      
+      
+     /*    @Override
+    public void updateQueryVersion(Long queryVersionID,String name, String description) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "QueryVersion "
+                    + "SET urlResult=?, status=? "
+                   
+                    + "WHERE queryExecutionID=?");
+            
+               
+
+            ps.setString(1, urlResult);
+            ps.setString(2, status);
+            ps.setLong(3, executionID);
+            ps.executeUpdate();
+            ps.close();
+
+         
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }*/
 
  @Override
  public Long addValue(Value value) throws DAOException {
