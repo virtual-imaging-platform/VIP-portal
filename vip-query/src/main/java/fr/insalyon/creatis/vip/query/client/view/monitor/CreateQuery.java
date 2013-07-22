@@ -32,7 +32,7 @@ import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.query.client.bean.Parameter;
 import fr.insalyon.creatis.vip.query.client.bean.Query;
-import fr.insalyon.creatis.vip.query.client.bean.QueryRecord;
+import fr.insalyon.creatis.vip.query.client.view.QueryRecord;
 import fr.insalyon.creatis.vip.query.client.bean.QueryVersion;
 import fr.insalyon.creatis.vip.query.client.rpc.EndPointSparqlService;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;

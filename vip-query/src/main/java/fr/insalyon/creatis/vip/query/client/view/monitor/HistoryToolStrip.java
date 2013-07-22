@@ -17,7 +17,6 @@ import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.query.client.view.QueryConstants;
-import fr.insalyon.creatis.vip.query.client.view.QueryHistoryTab;
 import java.util.ArrayList;
 import java.util.List;
 

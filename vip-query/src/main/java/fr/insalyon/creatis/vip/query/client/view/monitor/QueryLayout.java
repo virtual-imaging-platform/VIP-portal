@@ -1,12 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package fr.insalyon.creatis.vip.query.client.view.monitor;
 
-import com.google.gwt.core.client.GWT;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SortDirection;
@@ -23,31 +19,24 @@ import com.smartgwt.client.widgets.grid.events.CellClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.common.LabelButton;
 import fr.insalyon.creatis.vip.core.client.view.common.ToolstripLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.system.user.UserRecord;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.ArrayList;
 import java.util.List;
-import fr.insalyon.creatis.vip.query.client.bean.Query;
-import fr.insalyon.creatis.vip.query.client.bean.QueryRecord;
-import fr.insalyon.creatis.vip.query.client.bean.QueryVersionRecord;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
-import fr.insalyon.creatis.vip.query.client.rpc.QueryServiceAsync;
 import fr.insalyon.creatis.vip.query.client.view.QueryConstants;
-import fr.insalyon.creatis.vip.query.client.view.QueryException;
 import fr.insalyon.creatis.vip.query.client.view.QueryMakerTab;
-import java.sql.Timestamp;
+import fr.insalyon.creatis.vip.query.client.view.QueryRecord;
 /**
  *
  * @author Boujelben
  */
 public class QueryLayout extends VLayout {
-    private boolean sb;
+    private boolean newQuery;
     private ModalWindow modal;
     private ListGrid grid;
     private HLayout rollOverCanvas;
@@ -151,7 +140,7 @@ public class QueryLayout extends VLayout {
                 return button;
             }
         };
-       grid.setWidth100();
+        grid.setWidth100();
         grid.setHeight100();
         grid.setShowAllRecords(false);
         grid.setShowRollOverCanvas(true);
@@ -161,11 +150,9 @@ public class QueryLayout extends VLayout {
         grid.setEmptyMessage("<br>No data available.");
         ListGridField idversion=new ListGridField("queryversionID", "queryversionID");
         grid.setFields(new ListGridField("name", "Name"),
-               
-                new ListGridField("dateCreation", "Date Creation"),
-                
-                 new ListGridField("version", "Version"),
-                idversion);
+                      new ListGridField("dateCreation", "Date Creation"),
+                      new ListGridField("version", "Version"),
+                      idversion);
        grid.setSortField("name");
        idversion.setHidden(true);
        grid.setSortDirection(SortDirection.ASCENDING);  
@@ -173,7 +160,7 @@ public class QueryLayout extends VLayout {
        grid.addCellClickHandler(new CellClickHandler() {
             @Override
             public void onCellClick(CellClickEvent event) {      
-           setQuery(true);
+            setQuery(true);
                    }
     
                    });
@@ -252,7 +239,7 @@ public class QueryLayout extends VLayout {
      private void setQuery(boolean sbb){
            String version = rollOverRecord.getAttribute("queryversionID");
            Long versionid=new Long(version);
-            sb=sbb;
+            newQuery=sbb;
             final AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -265,7 +252,7 @@ public class QueryLayout extends VLayout {
 
                 for (String[] q : result) {
                    
-                    setEdit(sb,q[0],q[1],q[2]);
+                    setEdit(newQuery,q[0],q[1],q[2]);
                 }
             }
         };
