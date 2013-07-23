@@ -55,6 +55,7 @@ public static final String SERVICE_URI = "/queryService";
      public Long addQueryExecution(QueryExecution queryExecution) throws QueryException;
      public List<String[]> getQueryHistory() throws QueryException;
      public String getBody(Long queryVersionID,Long queryExecutionID) throws QueryException;
-     
+     public void updateQueryVersion(Long queryID,String name, String description)throws QueryException;
      public void updateQueryExecution(String urlResult, String status,Long executionID)throws QueryException;
 }
+
