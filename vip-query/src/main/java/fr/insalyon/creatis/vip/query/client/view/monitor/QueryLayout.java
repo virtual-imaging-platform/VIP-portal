@@ -40,6 +40,8 @@ public class QueryLayout extends VLayout {
     private ListGrid grid;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
+    private String versionID;
+    private Integer rownum;
 
     public QueryLayout() {
         this.setWidth100();
@@ -86,7 +88,7 @@ public class QueryLayout extends VLayout {
             @Override
             protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
                 rollOverRecord = this.getRecord(rowNum);
-
+            rownum=rowNum;
                 if (rollOverCanvas == null) {
                     rollOverCanvas = new HLayout(3);
                     rollOverCanvas.setSnapTo("TR");
@@ -102,14 +104,16 @@ public class QueryLayout extends VLayout {
                                    
                         }
                     }); 
+                    
+                    
                     ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
                     deleteImg.addClickHandler(new ClickHandler() {
                         @Override
                         public void onClick(ClickEvent event) {
-                            final String version = rollOverRecord.getAttribute("queryversionID");
-                            final Long versionid=new Long(version);    
+                             versionID=rollOverRecord.getAttribute("queryversionID");
+                             final Long versionid=new Long(versionID);    
                             SC.ask("Do you really want to remove this Version \""
-                                    + version + "\"?", new BooleanCallback() {
+                                    + versionID + "\"?", new BooleanCallback() {
                                 @Override
                                 public void execute(Boolean value) {
                                     if (value) {
@@ -125,6 +129,7 @@ public class QueryLayout extends VLayout {
                     rollOverCanvas.addMember(deleteImg);
                 }
                 return rollOverCanvas;
+                
             }
 
             private ImgButton getImgButton(String imgSrc, String prompt) {
@@ -158,7 +163,8 @@ public class QueryLayout extends VLayout {
        
        grid.addCellClickHandler(new CellClickHandler() {
             @Override
-            public void onCellClick(CellClickEvent event) {      
+            public void onCellClick(CellClickEvent event) {  
+                versionID=rollOverRecord.getAttribute("queryversionID");
             setQuery();
                    }
     
@@ -260,10 +266,11 @@ public class QueryLayout extends VLayout {
          
     
                 }
-     public Long getVersionID(){
-          String version = rollOverRecord.getAttribute("queryversionID");
-           Long versionid=new Long(version);
-           return versionid;
+     public String getVersionID(){
+        
+           
+           return versionID;
+           
      }
 
 }

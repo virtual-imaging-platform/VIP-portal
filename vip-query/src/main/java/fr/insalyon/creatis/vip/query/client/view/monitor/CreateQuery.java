@@ -44,8 +44,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.StringTokenizer;
-import java.lang.*;
+
 
 
 /**
@@ -57,7 +56,7 @@ import java.lang.*;
 
    
 
-    private boolean newQuery;
+    private boolean newQuery=true;
     private TextItem querynameField;
     private RichTextEditor description;
     private IButton saveButton;
@@ -104,14 +103,29 @@ import java.lang.*;
                 try {
                   Query q= new Query(description.getValue(), querynameField.getValueAsString()); 
                   save(q);
-                  new QueryLayout().loadData();
+                 
                   
                 } catch (QueryException ex) {
                     Logger.getLogger(CreateQuery.class.getName()).log(Level.SEVERE, null, ex);
                 }
                         }
                     else{
-                        //update
+                       
+                        update(getVersionID(),querynameField.getValueAsString(),description.getValue());
+                         
+                      
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
                         
                     };
                     
@@ -172,9 +186,7 @@ import java.lang.*;
        this.addMember(helpButton);
        addButtons(saveButton);
        
-        if(body.getValueField()==null&& querynameField.getValueField()==null ){
-           newQuery=true;
-          }
+        
         
     }
     
@@ -279,6 +291,39 @@ import java.lang.*;
               this.description.setValue(description);
               this.body.setValue(body);  
            }    
+           
+         public Long getVersionID(){
+              QueryMakerTab queryTab = (QueryMakerTab) Layout.getInstance().
+                getTab(QueryConstants.TAB_QUERYMAKER);
+              String version=queryTab.getVersionID();
+              Long versionID=Long.parseLong(version);
+                return versionID;
+         }
+         
+         
+         public void update(Long queryVersionID,String name,String descriptionn){
+         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                
+                Layout.getInstance().setWarningMessage("Unable to update query " + caught.getMessage());
+            }
+ 
+            @Override
+            public void onSuccess(Void result) {
+                         QueryMakerTab queryTab = (QueryMakerTab) Layout.getInstance().
+                         getTab(QueryConstants.TAB_QUERYMAKER);
+                         queryTab.loadData();
+                       querynameField.setValue("");
+                      description.setValue("");
+                      body.setValue("");
+               
+        }
+        };
+        QueryService.Util.getInstance().updateQueryVersion(queryVersionID, name, descriptionn,callback);
+         
+         }
+         
   }
 
 
