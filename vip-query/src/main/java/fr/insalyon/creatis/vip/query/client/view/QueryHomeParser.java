@@ -3,6 +3,7 @@
  * and open the template in the editor.
  */
 package fr.insalyon.creatis.vip.query.client.view;
+import fr.insalyon.creatis.vip.query.client.view.monitor.QueryMakerTab;
 import fr.insalyon.creatis.vip.query.client.view.monitor.QueryHistoryTab;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
