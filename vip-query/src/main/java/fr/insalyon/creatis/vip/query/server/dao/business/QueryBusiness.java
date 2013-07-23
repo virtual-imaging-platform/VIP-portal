@@ -160,5 +160,15 @@ public class QueryBusiness {
         }
      }
      
+     
+     
+     public void updateQueryVersion(Long queryID,String name, String description)throws BusinessException{
+     try {
+            QueryDAOFactory.getDAOFactory().getQueryDAO().updateQueryVersion( queryID, name, description);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+     }
      }
   

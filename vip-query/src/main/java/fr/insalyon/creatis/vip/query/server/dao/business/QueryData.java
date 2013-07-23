@@ -40,7 +40,7 @@ public class QueryData implements QueryDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT queryID, queryName FROM Query");
             ResultSet rs = ps.executeQuery();
-             List<String[]> queries  = new ArrayList<String[]>();
+            List<String[]> queries  = new ArrayList<String[]>();
             
             while (rs.next()) {
                 
@@ -347,21 +347,31 @@ public void  removeVersion(Long versionid) throws DAOException {
       
       
       
-     /*    @Override
+        @Override
     public void updateQueryVersion(Long queryVersionID,String name, String description) throws DAOException {
-
-        try {
+  
+            try {
+            PreparedStatement ps1 = connection.prepareStatement(
+            "select queryID from QueryVersion where queryVersionID=?");
+                ps1.setLong(1, queryVersionID);
+                ResultSet rs = ps1.executeQuery();
+                Long queryID=0L;
+                while(rs.next()){
+                queryID=rs.getLong("queryID");
+                }
+                
+            ps1.close();
             PreparedStatement ps = connection.prepareStatement("UPDATE "
-                    + "QueryVersion "
-                    + "SET urlResult=?, status=? "
+                    + "Query "
+                    + "SET description=?, queryName=? "
                    
-                    + "WHERE queryExecutionID=?");
+                    + "WHERE queryID=?");
             
                
 
-            ps.setString(1, urlResult);
-            ps.setString(2, status);
-            ps.setLong(3, executionID);
+            ps.setString(1, description);
+            ps.setString(2, name);
+            ps.setLong(3, queryID);
             ps.executeUpdate();
             ps.close();
 
@@ -371,7 +381,7 @@ public void  removeVersion(Long versionid) throws DAOException {
             logger.error(ex);
             throw new DAOException(ex);
         }
-    }*/
+    }
 
  @Override
  public Long addValue(Value value) throws DAOException {
