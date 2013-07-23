@@ -32,5 +32,5 @@ public interface QueryDAO {
      public List<String[]> getQueryHistory() throws DAOException ;
      public String getBody(Long queryVersionID,Long queryExecutionID) throws DAOException;
      public void updateQueryExecution(String urlResult, String status,Long executionID ) throws DAOException;
-    
+     public void updateQueryVersion(Long queryID,String name, String description) throws DAOException;
 }
