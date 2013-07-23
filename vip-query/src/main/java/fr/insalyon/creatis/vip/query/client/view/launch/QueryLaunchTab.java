@@ -35,9 +35,6 @@ public class QueryLaunchTab extends Tab {
     public QueryLaunchTab(String queryName,String queryVersion) {
        this.queryName = queryName;
        this.queryVersion = queryVersion;
-       
-        
-        
        param=new parameterTab(Long.parseLong(queryVersion));
        this.setTitle(Canvas.imgHTML(QueryConstants.ICON_EXECUTE_VERSION) + " "
                 + queryName + " " + queryVersion);
