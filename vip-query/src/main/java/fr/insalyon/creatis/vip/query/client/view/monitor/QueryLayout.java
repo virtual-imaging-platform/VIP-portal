@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.QueryConstants;
-import fr.insalyon.creatis.vip.query.client.view.QueryMakerTab;
 import fr.insalyon.creatis.vip.query.client.view.QueryRecord;
 /**
  *

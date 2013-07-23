@@ -36,7 +36,6 @@ import fr.insalyon.creatis.vip.query.client.rpc.EndPointSparqlService;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.QueryConstants;
 import fr.insalyon.creatis.vip.query.client.view.QueryException;
-import fr.insalyon.creatis.vip.query.client.view.QueryMakerTab;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -95,7 +94,7 @@ import java.lang.*;
         
          body.setHeight(125);
          body.setWidth(1410);
-         //body.setDefaultValue("[name; type; description; Examples]");
+     
 
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
