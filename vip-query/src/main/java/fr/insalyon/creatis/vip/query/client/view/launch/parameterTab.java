@@ -64,12 +64,6 @@ public class parameterTab extends VLayout {
       execution=new DynamicForm();
       execution.setFields(executionName);
       
-   
-        
-        
-     
-      
-      
       mainLayout.setPadding(5);
       mainLayout.addMember(title,0);
       mainLayout.addMember(execution,1);
@@ -174,10 +168,10 @@ public class parameterTab extends VLayout {
                      }
                     
  
-                    @Override
+                     @Override
                     public void onSuccess(Long result) {
-                   update("","waiting",result);
-                  for(TextItem t : arrList){
+                    update("","waiting",result);
+                   for(TextItem t : arrList){
                            
                      saveValue(new Value(t.getValueAsString(),Long.parseLong(t.getName()),result)) ;
                      
