@@ -60,7 +60,7 @@ public class parameterTab extends VLayout {
       
       executionName.setShowTitle(false);
       executionName.setTitleOrientation(TitleOrientation.TOP);
-      
+      executionName.setWidth(200);
       execution=new DynamicForm();
       execution.setFields(executionName);
       
@@ -170,7 +170,7 @@ public class parameterTab extends VLayout {
  
                      @Override
                     public void onSuccess(Long result) {
-                    update("","waiting",result);
+                   
                    for(TextItem t : arrList){
                            
                      saveValue(new Value(t.getValueAsString(),Long.parseLong(t.getName()),result)) ;
