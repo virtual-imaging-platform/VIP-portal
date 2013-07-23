@@ -205,7 +205,17 @@ public class QueryServiceImpl  extends AbstractRemoteServiceServlet implements Q
         }  
     
     }
+   
+   @Override
+   public void updateQueryVersion(Long queryID,String name, String description)throws QueryException{
+     try {
+             queryBusiness.updateQueryVersion(queryID, name, description);
+        
+        } catch (BusinessException ex) {
+            throw new QueryException(ex);
+        }  
     
+    }
    
 }
 
