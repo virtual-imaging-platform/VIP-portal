@@ -30,9 +30,9 @@ public class SearchStackSection extends SectionStackSection {
 
     private DynamicForm form;
     private SelectItem userItem;
-    private SelectItem simulationItem;
+    
     private SelectItem statusItem;
-    private SelectItem appClassItem;
+   
     private DateItem startDateItem;
     private DateItem endDateItem;
     private IButton searchButton;
@@ -66,9 +66,9 @@ public class SearchStackSection extends SectionStackSection {
         form.setNumCols(4);
 
         userItem = new SelectItem("userFilter", "User");
-        simulationItem = new SelectItem("simualtionFilter", "Application");
+       
         statusItem = new SelectItem("statusFilter", "Status");
-        appClassItem = new SelectItem("classFilter", "Class");
+      
 
         startDateItem = new DateItem("startDateFilter", "Start Date");
         startDateItem.setUseTextField(true);
@@ -104,16 +104,16 @@ public class SearchStackSection extends SectionStackSection {
             @Override
             public void onClick(ClickEvent event) {
                 userItem.setValue("All");
-                simulationItem.setValue("All");
+                
                 statusItem.setValue("All");
-                appClassItem.setValue("All");
+          
                 startDateItem.setValue("");
                 endDateItem.setValue("");
             }
         });
 
-        form.setFields(userItem, startDateItem, simulationItem,
-                endDateItem, statusItem, appClassItem);
+        form.setFields(userItem, startDateItem,
+                endDateItem, statusItem);
     }
 /*
     private void loadData() {
