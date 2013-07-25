@@ -71,6 +71,44 @@ public class QueryData implements QueryDAO {
     }
         
            
+    
+    
+    @Override
+    public String getDescription(Long queryVersionID) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT queryID FROM QueryVersion where queryVersionID=?");
+            ps.setLong(1, queryVersionID);
+            ResultSet rs = ps.executeQuery();
+            
+            String result=null;
+            
+            while (rs.next()) {
+                
+                long id=rs.getLong("queryID");
+           
+                 PreparedStatement ps2 = connection.prepareStatement("SELECT description FROM Query WHERE queryID=?");
+                 
+                
+                 ps2.setLong(1,id);
+                 ResultSet rs2 = ps2.executeQuery();
+                
+                while (rs2.next()) {
+               result=rs2.getString("description");
+                }
+                ps2.close();
+
+            }
+            ps.close();
+            return result;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+        
+           
     @Override
     public List<String[]> getQuerie(Long queryversionid) throws DAOException {
 
@@ -121,7 +159,36 @@ public class QueryData implements QueryDAO {
             throw new DAOException(ex);
         }
     }
-    
+    @Override
+    public List<String[]> getParameterValue(Long queryExecutionID) throws DAOException {
+       try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "value,parameterID From Value WHERE queryExecutionID=?");
+            ps.setLong(1, queryExecutionID);
+
+            ResultSet rs = ps.executeQuery();
+            List<String[]> queries = new ArrayList<String[]>();
+
+            while (rs.next()) {
+                Long parameterID=rs.getLong("parameterID");
+                 PreparedStatement ps2 = connection.prepareStatement("SELECT "
+                    + "name From Parameter WHERE parameterID=?");
+                 ps2.setLong(1, parameterID);
+                   ResultSet rs2 = ps2.executeQuery();
+                    while (rs2.next()) {
+                    queries.add(new String[]{rs2.getString("name"), rs.getString("value")});
+                    }
+                ps2.close();
+                
+            }
+            ps.close();
+            return queries;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
     
    
 @Override
@@ -142,7 +209,49 @@ public void  removeVersion(Long versionid) throws DAOException {
             throw new DAOException(ex);
         }
     }
+             
+
+@Override
+public void  removeQueryExecution(Long executionID) throws DAOException {
+           
+        try {
+            PreparedStatement ps = connection.prepareStatement("DELETE "
+                    + "FROM QueryExecution WHERE queryExecutionID=?");
+
+           
+            ps.setLong(1,executionID);
+           
+            ps.execute();
+            ps.close();
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
                       
+       @Override
+     public int  count(Long queryID) throws DAOException {
+           
+        try {
+            PreparedStatement ps = connection.prepareStatement("select count(*) from QueryVersion WHERE queryID=?");
+                    
+
+           int numberOfRows = 0;
+            ps.setLong(1,queryID);
+           ResultSet rs = ps.executeQuery();
+           if (rs.next()) {
+           numberOfRows = rs.getInt(1);
+           }
+            ps.close();
+        return numberOfRows;
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+       
+    }
+               
                       
 
           
@@ -315,6 +424,7 @@ public void  removeVersion(Long versionid) throws DAOException {
             logger.error(ex);
             throw new DAOException(ex);
         }
+        
     }
 
 
@@ -417,7 +527,7 @@ public void  removeVersion(Long versionid) throws DAOException {
       try {
            
             PreparedStatement ps = connection.prepareStatement(
-                  "INSERT INTO QueryExecution(queryVersionID, dateExecution, executer,status, name, urlResult) VALUES (?, ?, ?, ?, ?, ?, ?)",PreparedStatement.RETURN_GENERATED_KEYS);
+                  "INSERT INTO QueryExecution(queryVersionID, dateExecution, executer,status, name, urlResult) VALUES (?, ?, ?, ?, ?, ?)",PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setLong(1,queryExecution.getQueryVersionID());
             ps.setTimestamp(2,getCurrentTimeStamp());
             ps.setString(3,queryExecution.getExecuter());
@@ -448,7 +558,7 @@ public void  removeVersion(Long versionid) throws DAOException {
     public List<String[]> getQueryHistory() throws DAOException {
        try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "name,queryName,queryVersion,executer,dateExecution,status,urlResult FROM "
+                    + "queryExecutionID,name,queryName,queryVersion,executer,dateExecution,status,urlResult FROM "
                     + "Query query,QueryVersion queryversion,QueryExecution queryexe WHERE "
                     + "query.queryID=queryversion.queryID AND queryversion.queryVersionID=queryexe.queryVersionID "
                     + "ORDER BY queryexe.name");
@@ -459,7 +569,8 @@ public void  removeVersion(Long versionid) throws DAOException {
             while (rs.next()) {
            
                Timestamp date=rs.getTimestamp("dateExecution");
-                queries.add(new String[]{rs.getString("name"),rs.getString("queryName"),rs.getString("queryVersion"),rs.getString("executer"),date.toString(), rs.getString("status"),rs.getString("urlResult")});
+               Long id=rs.getLong("queryExecutionID");
+                queries.add(new String[]{id.toString(),rs.getString("name"),rs.getString("queryName"),rs.getString("queryVersion"),rs.getString("executer"),date.toString(), rs.getString("status"),rs.getString("urlResult")});
             }
             ps.close();
             return queries;

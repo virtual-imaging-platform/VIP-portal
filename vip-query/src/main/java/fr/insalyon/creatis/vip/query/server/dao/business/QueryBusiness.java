@@ -170,5 +170,43 @@ public class QueryBusiness {
             throw new BusinessException(ex);
         }
      }
+     
+     
+     public String getDescription(Long queryVersionID) throws BusinessException{
+     try {
+            return QueryDAOFactory.getDAOFactory().getQueryDAO().getDescription(queryVersionID);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
      }
-  
+     
+     
+     
+      public List<String[]> getParameterValue(Long queryExecutionID) throws BusinessException{
+     try {
+            return QueryDAOFactory.getDAOFactory().getQueryDAO().getParameterValue(queryExecutionID);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+     }
+      
+      public void  removeQueryExecution(Long executionID) throws BusinessException{
+     try {
+             QueryDAOFactory.getDAOFactory().getQueryDAO().removeQueryExecution(executionID);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+     }
+      public int  count(Long queryID) throws BusinessException{
+     try {
+            return QueryDAOFactory.getDAOFactory().getQueryDAO().count(queryID);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+     }
+      
+}
