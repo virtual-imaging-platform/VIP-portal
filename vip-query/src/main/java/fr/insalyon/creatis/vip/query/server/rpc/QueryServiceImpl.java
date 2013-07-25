@@ -217,6 +217,52 @@ public class QueryServiceImpl  extends AbstractRemoteServiceServlet implements Q
     
     }
    
+    @Override
+   public String getDescription(Long queryVersionID)throws QueryException{
+     try {
+             return queryBusiness.getDescription(queryVersionID);
+        
+        } catch (BusinessException ex) {
+            throw new QueryException(ex);
+        }  
+    
+    }
+    
+    
+     @Override
+     public List<String[]> getParameterValue(Long queryExecutionID)throws QueryException{
+     try {
+             return queryBusiness.getParameterValue(queryExecutionID);
+        
+        } catch (BusinessException ex) {
+            throw new QueryException(ex);
+        }  
+    
+    }
+     
+       @Override
+      public void  removeQueryExecution(Long executionID) throws QueryException{
+     try {
+              queryBusiness.removeQueryExecution(executionID);
+        
+        } catch (BusinessException ex) {
+            throw new QueryException(ex);
+        }  
+    
+    }
+       
+       
+        @Override
+         public int  count(Long queryID) throws QueryException{
+       
+     try {
+             return queryBusiness.count(queryID);
+        
+        } catch (BusinessException ex) {
+            throw new QueryException(ex);
+        }  
+    
+    }
 }
 
    
