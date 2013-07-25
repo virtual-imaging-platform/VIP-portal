@@ -21,7 +21,7 @@ import com.smartgwt.client.widgets.viewer.DetailViewerField;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.query.client.bean.Parameter;
-import fr.insalyon.creatis.vip.query.client.view.ParameterRecord;
+
 import fr.insalyon.creatis.vip.query.client.bean.QueryExecution;
 import fr.insalyon.creatis.vip.query.client.bean.Value;
 import fr.insalyon.creatis.vip.query.client.rpc.EndPointSparqlService;
@@ -34,12 +34,19 @@ import java.util.List;
  *
  * @author Boujelben
  */
-public class parameterTab extends VLayout {
+public class ParameterTab extends VLayout {
    private Long queryVersionID;
    private VLayout mainLayout;
    private IButton launchButton;
    private DetailViewer printViewer ;
    private TextItem executionName;
+   private Boolean close=false;
+   private Label description;
+   
+
+    public Boolean getClose() {
+        return close;
+    }
  
    DynamicForm execution;
    private List<TextItem> arrList;
@@ -48,31 +55,40 @@ public class parameterTab extends VLayout {
    
   
 
-   public parameterTab(Long queryVersionID) {
+   public ParameterTab(Long queryVersionID) {
        
       this.queryVersionID=queryVersionID;
       
       mainLayout = new VLayout();
+      Label titleDes = new Label("<strong>Query description</strong>");
+      titleDes.setHeight(20);
       Label title = new Label("<strong>Execution Name</strong>");
       title.setHeight(20);
+      getDescription(queryVersionID);
+      
+      
      
       executionName=new TextItem();
       
       executionName.setShowTitle(false);
       executionName.setTitleOrientation(TitleOrientation.TOP);
-      executionName.setWidth(200);
+      executionName.setWidth(600);
+     
+      
       execution=new DynamicForm();
       execution.setFields(executionName);
       
       mainLayout.setPadding(5);
-      mainLayout.addMember(title,0);
-      mainLayout.addMember(execution,1);
+      mainLayout.addMember(titleDes,0);
+     
+      mainLayout.addMember(title,2);
+      mainLayout.addMember(execution,3);
      
       
       Label parameterLab = new Label("<strong>Parameters</strong>");
       parameterLab.setHeight(20);
       
-      mainLayout.addMember(parameterLab,2);
+      mainLayout.addMember(parameterLab,4);
       loadParameter();
       configure();
       this.addMember(mainLayout);    
@@ -94,27 +110,29 @@ public class parameterTab extends VLayout {
           public void onSuccess(List<Parameter>result) {
               
 
-           List<ParameterRecord> dataList ;
+          // List<ParameterRecord> dataList ;
           
           arrList = new ArrayList<TextItem>();
            DynamicForm dynamicForm ;
            
            for (Parameter q : result) {
-               TextItem value;  
+            TextItem value;  
                
-            dataList=  new ArrayList<ParameterRecord>();
+            //dataList=  new ArrayList<ParameterRecord>();
             dynamicForm= new DynamicForm();
-            printViewer = new DetailViewer();
+            /* printViewer = new DetailViewer();
             printViewer.setWidth("600");  
             printViewer.setMargin(15);  
             DetailViewerField name=new DetailViewerField("name(type)", "Name");
-            //DetailViewerField type=new DetailViewerField("type", "type");
+            DetailViewerField type=new DetailViewerField("type", "type");
             DetailViewerField description=new DetailViewerField("description(example)", "description");
-           // DetailViewerField example=new DetailViewerField("example", "example");
+            DetailViewerField example=new DetailViewerField("example", "example");
             printViewer.setFields(name,description);
             dataList.add(new ParameterRecord(q.getName(),q.getType(),q.getDescription(),q.getExample()));
             
-            printViewer.setData(dataList.toArray(new ParameterRecord[]{}));
+            printViewer.setData(dataList.toArray(new ParameterRecord[]{}));*/
+            
+         
             HLayout hlayout=new  HLayout(15);
  
             hlayout.setBorder("1px solid #C0C0C0");
@@ -129,13 +147,14 @@ public class parameterTab extends VLayout {
            
             value.setTitleOrientation(TitleOrientation.TOP);
             value.setName(String.valueOf(q.getParameterID()));
+            value.setPrompt("<b> Description: </b>"+q.getDescription()+"<br><b> Type: </b>"+q.getType()+"<br><b> Example: </b>"+q.getExample());
             arrList.add(value);
             dynamicForm.setFields(value);
 
-            hlayout.addMember(printViewer);
+           // hlayout.addMember(printViewer);
             hlayout.addMember(dynamicForm);
 
-            mainLayout.addMember(hlayout,3);
+            mainLayout.addMember(hlayout,5);
             mainLayout.setMembersMargin(10);
 
             }
@@ -179,6 +198,7 @@ public class parameterTab extends VLayout {
                         }
                    queryExecutionID=result;
                   
+                  
                  
                 
                 
@@ -193,7 +213,7 @@ public class parameterTab extends VLayout {
 });
         
       
-        mainLayout.addMember(launchButton,4);
+        mainLayout.addMember(launchButton,6);
                 }
     
     
@@ -282,7 +302,9 @@ public class parameterTab extends VLayout {
                 
                  
                 update(result,"completed",queryExecutionID);
-               // com.google.gwt.user.client.Window.open(result,"_self","");    
+                 Layout.getInstance().setNoticeMessage("The query was successfully executed");
+               // com.google.gwt.user.client.Window.open(result,"_self","");  
+                 close=true;
                
         }
         };
@@ -290,6 +312,31 @@ public class parameterTab extends VLayout {
          EndPointSparqlService.Util.getInstance().getUrlResult(query, format, callback);
                                 
                 }
+ 
+ private  void getDescription(Long queryVersionID )  {
+         final AsyncCallback <String> callback = new AsyncCallback<String>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                
+                Layout.getInstance().setWarningMessage("Unable to get description of query" + caught.getMessage());
+            }
+ 
+            @Override
+            public void onSuccess(String result) {
+                
+              
+              description=new Label(result);
+              description.setHeight(20);
+              mainLayout.addMember(description,1);
+               
+        }
+        };
+       
+  QueryService.Util.getInstance().getDescription(queryVersionID, callback);
+  
+ 
+ }
+ 
 
  
  
