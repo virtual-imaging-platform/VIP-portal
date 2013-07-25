@@ -11,12 +11,12 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  *
  * @author Boujelben
  */
-public class ParameterRecord extends ListGridRecord{
-     public ParameterRecord(String name,String type,String description,String example ) {
+public class ParameterValue extends ListGridRecord{
+     public ParameterValue(String name,String value ) {
 
-        setAttribute("name(type)", name+"("+type+")");
+        setAttribute("name", name);
        
-        setAttribute("description(example)", description+"(<strong>Example</strong>:"+example+")");
+        setAttribute("value",value );
        
        
         
