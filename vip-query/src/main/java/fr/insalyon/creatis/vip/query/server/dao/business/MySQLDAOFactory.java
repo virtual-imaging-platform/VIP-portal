@@ -61,16 +61,17 @@ public class MySQLDAOFactory extends QueryDAOFactory {
              
               PlatformConnection.getInstance().createTable("QueryExecution",
                     "queryExecutionID BIGINT(20) AUTO_INCREMENT, "
+                    + "queryVersionID BIGINT(20), "
                     + "name VARCHAR(255), "
                     + "dateExecution TIMESTAMP, "
                     + "dateEndExecution TIMESTAMP, "
-                    + "urlResult VARCHAR(255), "
+                    + "urlResult VARCHAR(1000), "
                     + "executer VARCHAR(255), "   
-                    + "queryVersionID BIGINT(20), "
+                    
                     + "status VARCHAR(255), "  
                     + "PRIMARY KEY (queryExecutionID), "
                     + "FOREIGN KEY (queryVersionID) REFERENCES QueryVersion(queryVersionID) "
-                    + "ON DELETE CASCADE ON UPDATE RESTRICT");
+                    + "ON DELETE RESTRICT ON UPDATE RESTRICT");
             
              PlatformConnection.getInstance().createTable("Value",
                     "ValueID BIGINT(20) AUTO_INCREMENT, "
