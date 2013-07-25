@@ -36,7 +36,7 @@ public class QueryTitleGrid extends ApplicationsTileGrid
     public void parse(String queryName, String queryVersion) {
        String queryVersionID;
        queryVersionID=map.get(new Key(queryName,queryVersion));
-       Layout.getInstance().addTab(new QueryLaunchTab(queryName,queryVersionID));
+       Layout.getInstance().addTab(new QueryLaunchTab(queryName,queryVersionID,queryVersion));
     
   }
     
