@@ -35,5 +35,9 @@ public interface QueryServiceAsync {
     public void  getBody(Long queryVersionID,Long queryExecutionID,AsyncCallback <String> asyncCallback);
     public void updateQueryExecution(String urlResult, String status,Long executionID, AsyncCallback <Void> asyncCallback);
     public void updateQueryVersion(Long queryID,String name, String description, AsyncCallback <Void> asyncCallback);
-
+    public void   getDescription(Long queryVersionID,AsyncCallback <String> asyncCallback) ;
+    public void getParameterValue(Long queryExecutionID,AsyncCallback < List<String[]>> asyncCallback);
+    public void  removeQueryExecution(Long executionID,AsyncCallback < Void> asyncCallback);
+    
+    public void count(Long queryID,AsyncCallback<Integer> asyncCallback);
 }
