@@ -62,6 +62,8 @@ import java.util.logging.Logger;
     private IButton saveButton;
     private ImgButton helpButton;
     private TextItem body;
+   private Integer rownumber=0;
+    
    
    
 
@@ -93,6 +95,7 @@ import java.util.logging.Logger;
         
          body.setHeight(125);
          body.setWidth(1410);
+         body.setDisabled(false);
      
 
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
@@ -103,6 +106,7 @@ import java.util.logging.Logger;
                 try {
                   Query q= new Query(description.getValue(), querynameField.getValueAsString()); 
                   save(q);
+                 
                  
                   
                 } catch (QueryException ex) {
@@ -203,15 +207,16 @@ import java.util.logging.Logger;
  
             @Override
             public void onSuccess(Long result) {
+                int n=count(result)+1;
                 
-                   
-              savev(new QueryVersion("v. "+result,result,body.getValueAsString()));
+              savev(new QueryVersion("v."+n,result,body.getValueAsString()));
                     
              
                QueryMakerTab queryTab = (QueryMakerTab) Layout.getInstance().
                 getTab(QueryConstants.TAB_QUERYMAKER);
                 queryTab.loadData();
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
+                 Layout.getInstance().setNoticeMessage("The query was successfully added");
              
              
               
@@ -284,13 +289,16 @@ import java.util.logging.Logger;
         };
     }
     
-           public void setQuery(boolean test, String name, String description, String body) {  
+           public void setQuery(boolean bodyState,boolean test, String name, String description, String body) {  
                
               newQuery=test;
               querynameField.setValue(name);
               this.description.setValue(description);
-              this.body.setValue(body);  
+              this.body.setValue(body); 
+             this.body.setDisabled(bodyState);
            }    
+           
+           
            
          public Long getVersionID(){
               QueryMakerTab queryTab = (QueryMakerTab) Layout.getInstance().
@@ -317,6 +325,7 @@ import java.util.logging.Logger;
                        querynameField.setValue("");
                       description.setValue("");
                       body.setValue("");
+                       Layout.getInstance().setNoticeMessage("The queryVersion was successfully updated");
                
         }
         };
@@ -324,6 +333,29 @@ import java.util.logging.Logger;
          
          }
          
+         
+         
+         public int count(long queryID){
+              
+         
+             final AsyncCallback <Integer> callback = new AsyncCallback<Integer>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                
+                Layout.getInstance().setWarningMessage("Unable to update query " + caught.getMessage());
+            }
+             @Override
+            public void onSuccess(Integer result) {
+                 rownumber=result;
+             }
+ 
+         
+              };
+         
+         QueryService.Util.getInstance().count(queryID, callback);
+         return rownumber;
+         
+  }
   }
 
 

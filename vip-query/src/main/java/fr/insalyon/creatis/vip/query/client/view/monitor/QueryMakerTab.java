@@ -53,8 +53,8 @@ public class QueryMakerTab extends Tab {
         
      }
     
-     public void setQuery(boolean test,String name, String description, String body) {
-        createQuery.setQuery(test, name, description, body);     
+     public void setQuery(boolean bodyState,boolean test,String name, String description, String body) {
+        createQuery.setQuery(bodyState,test, name, description, body);     
     }
      public String getVersionID(){
          return queryLayout.getVersionID();

@@ -42,6 +42,7 @@ public class QueryLayout extends VLayout {
     private ListGridRecord rollOverRecord;
     private String versionID;
     private Integer rownum;
+    private String bodyTest;
 
     public QueryLayout() {
         this.setWidth100();
@@ -63,7 +64,8 @@ public class QueryLayout extends VLayout {
         addButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-              setEdit(true,null,null,null);              
+              setEdit(false,true,null,null,null); 
+              
             }
         });     
       toolstrip.addMember(addButton);
@@ -81,7 +83,7 @@ public class QueryLayout extends VLayout {
 
     
     
-    
+      
     
     private void configureGrid() {
         grid = new ListGrid(){
@@ -106,14 +108,14 @@ public class QueryLayout extends VLayout {
                     }); 
                     
                     
-                    ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
+                    ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delte");
                     deleteImg.addClickHandler(new ClickHandler() {
                         @Override
                         public void onClick(ClickEvent event) {
                              versionID=rollOverRecord.getAttribute("queryversionID");
                              final Long versionid=new Long(versionID);    
                             SC.ask("Do you really want to remove this Version \""
-                                    + versionID + "\"?", new BooleanCallback() {
+                                     + "\"?", new BooleanCallback() {
                                 @Override
                                 public void execute(Boolean value) {
                                     if (value) {
@@ -165,7 +167,8 @@ public class QueryLayout extends VLayout {
             @Override
             public void onCellClick(CellClickEvent event) {  
                 versionID=rollOverRecord.getAttribute("queryversionID");
-            setQuery();
+                setQuery();
+                
                    }
     
                    });
@@ -204,7 +207,8 @@ public class QueryLayout extends VLayout {
         }
         };
             
-      
+       modal.show("Loading queries...", true);
+
         QueryService.Util.getInstance().getQureies(callback);
           
     }
@@ -231,12 +235,12 @@ public class QueryLayout extends VLayout {
         QueryService.Util.getInstance().removeVersion(versionid, callback);
     }
     
-     private void setEdit(boolean test,String name, String desciption, String body) {
+     private void setEdit(boolean bodyState,boolean test,String name, String desciption, String body) {
 
         QueryMakerTab queryTab = (QueryMakerTab) Layout.getInstance().
                 getTab(QueryConstants.TAB_QUERYMAKER);
         
-        queryTab.setQuery(test,name, desciption, body);
+        queryTab.setQuery(bodyState,test,name, desciption, body);
         
        
     }
@@ -257,7 +261,7 @@ public class QueryLayout extends VLayout {
 
                 for (String[] q : result) {
                    
-                    setEdit(false,q[0],q[1],q[2]);
+                    setEdit(true,false,q[0],q[1],q[2]);
                 }
             }
         };
@@ -266,13 +270,15 @@ public class QueryLayout extends VLayout {
          
     
                 }
+     
+     
      public String getVersionID(){
         
            
            return versionID;
            
      }
-
+    
 }
         
          
