@@ -184,9 +184,9 @@ public class QueryServiceImpl  extends AbstractRemoteServiceServlet implements Q
    
    
    @Override 
-    public String getBody(Long queryVersionID,Long queryExecutionID) throws QueryException{
+    public String getBody(Long queryVersionID,Long queryExecutionID,boolean parameter) throws QueryException{
        try {
-            return queryBusiness.getBody(queryVersionID,queryExecutionID);
+            return queryBusiness.getBody(queryVersionID,queryExecutionID,parameter);
         
         } catch (BusinessException ex) {
             throw new QueryException(ex);
@@ -253,10 +253,22 @@ public class QueryServiceImpl  extends AbstractRemoteServiceServlet implements Q
        
        
         @Override
-         public int  count(Long queryID) throws QueryException{
+         public Integer  count(Long queryID) throws QueryException{
        
      try {
              return queryBusiness.count(queryID);
+        
+        } catch (BusinessException ex) {
+            throw new QueryException(ex);
+        }  
+    
+    }
+        
+        @Override
+        public Long  getQueryID(Long queryVersionID) throws QueryException{
+       
+     try {
+             return queryBusiness.getQueryID(queryVersionID);
         
         } catch (BusinessException ex) {
             throw new QueryException(ex);
