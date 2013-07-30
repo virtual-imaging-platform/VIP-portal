@@ -61,7 +61,7 @@ public static final String SERVICE_URI = "/queryService";
      public String getDescription(Long queryVersionID)throws QueryException;
      public List<String[]> getParameterValue(Long queryExecutionID)throws QueryException;
      public void  removeQueryExecution(Long executionID) throws QueryException;
-     public Integer  count(Long queryID) throws QueryException;
+     public String  maxVersion(Long queryID) throws QueryException;
      public Long  getQueryID(Long queryVersionID) throws QueryException;
 }
 
