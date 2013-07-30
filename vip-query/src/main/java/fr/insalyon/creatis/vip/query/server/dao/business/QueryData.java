@@ -231,17 +231,17 @@ public void  removeQueryExecution(Long executionID) throws DAOException {
     }
                       
        @Override
-     public int  count(Long queryID) throws DAOException {
+     public Integer  count(Long queryID) throws DAOException {
            
         try {
             PreparedStatement ps = connection.prepareStatement("select count(*) from QueryVersion WHERE queryID=?");
                     
 
-           int numberOfRows = 0;
+           Integer numberOfRows = new Integer(0);
             ps.setLong(1,queryID);
            ResultSet rs = ps.executeQuery();
-           if (rs.next()) {
-           numberOfRows = rs.getInt(1);
+           while (rs.next()) {
+           numberOfRows = new Integer(rs.getInt(1));
            }
             ps.close();
         return numberOfRows;
@@ -251,7 +251,30 @@ public void  removeQueryExecution(Long executionID) throws DAOException {
         }
        
     }
-               
+         
+       @Override
+     public Long  getQueryID(Long queryVersionID) throws DAOException {
+           
+        try {
+            PreparedStatement ps = connection.prepareStatement("select queryID from QueryVersion WHERE queryVersionID=?");
+                    
+
+           
+            ps.setLong(1,queryVersionID);
+           ResultSet rs = ps.executeQuery();
+           Long queryID=0L;
+           if (rs.next()) {
+           queryID = rs.getLong(1);
+           }
+            ps.close();
+        return queryID;
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+       
+    }
+           
                       
 
           
@@ -583,9 +606,24 @@ public void  removeQueryExecution(Long executionID) throws DAOException {
     
   
   @Override
-    public String getBody(Long queryVersionID, Long queryExecutionID) throws DAOException {
-
-        try {
+    public String getBody(Long queryVersionID, Long queryExecutionID,boolean parameter) throws DAOException {
+      try {
+      if (parameter==false)
+      {
+           PreparedStatement ps = connection.prepareStatement("SELECT "
+                   + "body FROM QueryVersion where queryVersionID=?");
+             ps.setLong(1, queryVersionID);
+             ResultSet rs = ps.executeQuery();
+              String body=null;
+              while (rs.next()) {
+           body=rs.getString("body");
+              }
+               ps.close();
+              return body;
+                   
+      }
+      else {
+        
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "body, parameterID "
                     + "FROM QueryVersion v, Parameter p "
@@ -647,11 +685,14 @@ public void  removeQueryExecution(Long executionID) throws DAOException {
 
             ps.close();
             return body;
+      }
+            
 
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
         }
+        
     }
 
   
