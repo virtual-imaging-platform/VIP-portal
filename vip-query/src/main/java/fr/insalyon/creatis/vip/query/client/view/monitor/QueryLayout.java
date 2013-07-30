@@ -3,6 +3,7 @@ package fr.insalyon.creatis.vip.query.client.view.monitor;
 
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SortDirection;
@@ -30,6 +31,11 @@ import java.util.List;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.QueryConstants;
 import fr.insalyon.creatis.vip.query.client.view.QueryRecord;
+
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.query.client.view.QueryException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  *
  * @author Boujelben
@@ -42,7 +48,7 @@ public class QueryLayout extends VLayout {
     private ListGridRecord rollOverRecord;
     private String versionID;
     private Integer rownum;
-    private String bodyTest;
+    private String bodyValue;
 
     public QueryLayout() {
         this.setWidth100();
@@ -119,7 +125,12 @@ public class QueryLayout extends VLayout {
                                 @Override
                                 public void execute(Boolean value) {
                                     if (value) {
-                                        removeVersion(versionid);
+                                      
+                                            removeVersion(versionid);
+                                        
+                                        
+                                 
+                                        
                                     }
                                 }
                             });
@@ -159,6 +170,9 @@ public class QueryLayout extends VLayout {
                       new ListGridField("dateCreation", "Date Creation"),
                       new ListGridField("version", "Version"),
                       idversion);
+                      
+       DataSource ds=new Data();
+       grid.setDataSource(ds);
        grid.setSortField("name");
        idversion.setHidden(true);
        grid.setSortDirection(SortDirection.ASCENDING);  
@@ -219,6 +233,7 @@ public class QueryLayout extends VLayout {
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
+                
                 modal.hide();
                 Layout.getInstance().setWarningMessage("Unable to remove query Version:<br />" + caught.getMessage());
             }
@@ -232,8 +247,17 @@ public class QueryLayout extends VLayout {
         };
         modal.show("Removing application '" + versionid + "'...", true);
         
-        QueryService.Util.getInstance().removeVersion(versionid, callback);
+            QueryService.Util.getInstance().removeVersion(versionid, callback);
+      
+            
+        
+                
+            
     }
+
+        
+
+    
     
      private void setEdit(boolean bodyState,boolean test,String name, String desciption, String body) {
 
@@ -262,6 +286,7 @@ public class QueryLayout extends VLayout {
                 for (String[] q : result) {
                    
                     setEdit(true,false,q[0],q[1],q[2]);
+                     bodyValue=q[2];
                 }
             }
         };
@@ -276,6 +301,13 @@ public class QueryLayout extends VLayout {
         
            
            return versionID;
+           
+     }
+     
+     public String getBody(){
+        
+           
+           return bodyValue;
            
      }
     

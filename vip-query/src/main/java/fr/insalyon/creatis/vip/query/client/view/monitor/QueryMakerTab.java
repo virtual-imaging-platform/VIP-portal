@@ -60,6 +60,9 @@ public class QueryMakerTab extends Tab {
          return queryLayout.getVersionID();
      }
     
+     public String getBody(){
+         return queryLayout.getBody();
+     }
     public void loadData(){
          queryLayout.loadData();
      }

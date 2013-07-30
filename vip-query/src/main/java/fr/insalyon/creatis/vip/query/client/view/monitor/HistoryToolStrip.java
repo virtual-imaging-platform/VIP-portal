@@ -53,7 +53,7 @@ public class HistoryToolStrip  extends ToolStrip {
 
             @Override
             public void onClick(ClickEvent event) {
-                getQueryHistoryTab().expandSearchSection();
+                getQueryHistoryTab().setFilter();
             }
         }));
         

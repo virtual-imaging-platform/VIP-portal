@@ -4,8 +4,13 @@
  */
 package fr.insalyon.creatis.vip.query.client.view.monitor;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
+import com.smartgwt.client.data.fields.DataSourceDateField;
+import com.smartgwt.client.data.fields.DataSourceIntegerField;
+import com.smartgwt.client.data.fields.DataSourceTextField;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.FetchMode;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
@@ -17,14 +22,17 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.viewer.DetailViewer;
+import com.smartgwt.client.widgets.viewer.DetailViewerField;
 
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.ParameterValue;
@@ -41,7 +49,7 @@ import java.util.List;
  */
 public class QueryHistoryTab extends Tab {
      
-     public  SearchStackSection searchSection;
+    
      protected ModalWindow modal;
      protected ListGrid grid;
      ListGridField linkField;
@@ -51,21 +59,22 @@ public class QueryHistoryTab extends Tab {
      protected Date endDate = null;
      private ListGridRecord rollOverRecord;
      private DetailViewer detailViewer ;
-     private Label l;
+     DataSource ds;
+     boolean state=false;
+    
 
     
     
     
     public QueryHistoryTab() {
          
-         
-         
+        
         this.setTitle(Canvas.imgHTML(QueryConstants.ICON_QUERYHISTORY) + "Query History");
         this.setID(QueryConstants.TAB_QUERYHISTORY);
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
-         configureGrid();
-         modal = new ModalWindow(grid);
+        configureGrid(); 
+        modal = new ModalWindow(grid);
         
 
         VLayout vLayout = new VLayout();
@@ -80,16 +89,17 @@ public class QueryHistoryTab extends Tab {
         gridSection.setShowHeader(false);
         gridSection.addItem(grid);
 
-         searchSection =new SearchStackSection();
+        
 
-        sectionStack.setSections(gridSection, searchSection);
+        sectionStack.setSections(gridSection);
        
         vLayout.addMember(sectionStack);
 
         this.setPane(vLayout);
-        loadData();
-        
-        
+       
+           
+         loadData();
+       
         
      }
       private void configureGrid() {
@@ -97,17 +107,15 @@ public class QueryHistoryTab extends Tab {
         grid = new ListGrid(){
              @Override  
             protected Canvas getCellHoverComponent(Record record, Integer rowNum, Integer colNum) {  
-               
-                 
-                detailViewer = new DetailViewer();
                 
-                detailViewer.setWidth(200); 
-              /*DetailViewerField name=new DetailViewerField("name", "name");
+              detailViewer = new DetailViewer();
+                
+              detailViewer.setWidth(200); 
+              DetailViewerField name=new DetailViewerField("name", "name");
               DetailViewerField type=new DetailViewerField("value", "value");
-               detailViewer.setFields(name,type);*/
+              detailViewer.setFields(name,type);
                
-                Long executionID=record.getAttributeAsLong("queryExecutionID");
-                
+              Long executionID=record.getAttributeAsLong("queryExecutionID");
                 //appel rpc
                 final AsyncCallback <List<String[]>> callback = new AsyncCallback<List<String[]>>() {
                      @Override
@@ -124,37 +132,47 @@ public class QueryHistoryTab extends Tab {
                        
                       // DetailViewerField name=new DetailViewerField(s[0], s[1]);
                        dataList.add(new ParameterValue(s[0],s[1]));
-                       String n=s[0];
-                       l=new Label(n);
+                       
                 
                          }
                    detailViewer.setData(dataList.toArray(new ParameterValue[]{}));
-                     Layout.getInstance().setWarningMessage("Unable to");
+                   detailViewer.setEmptyMessage("No parameters to display");
+                   detailViewer.setEmptyMessageStyle("1px solid black center");
+                   
+                   detailViewer.setBorder("1px solid gray");
+                    
+                   
                           }
                     };
                    QueryService.Util.getInstance().getParameterValue(executionID, callback);
-                     
-                    
-                        
-               
-               
-
+          
+                 return  detailViewer;
                 
-                
-                
-                 return  l;
-                
-            }
+            }  
+             
         };
-            
+        ds=new Data();
+        
+        grid.setCanHover(true);
+        grid.setShowHover(true);
+        grid.setShowHoverComponents(true); 
         grid.setWidth100();
         grid.setHeight100();
+        //
+        grid.setFilterOnKeypress(true);
+       // loadData();
+        grid.setDataSource(ds);
+        grid.setAutoFetchData(Boolean.TRUE);
+       
+        grid.setDataFetchMode(FetchMode.LOCAL);
+        
         grid.setShowAllRecords(false);
         grid.setShowRowNumbers(true);
         grid.setShowEmptyMessage(true);
         grid.setSelectionType(SelectionStyle.SIMPLE);
         grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
-        grid.setEmptyMessage("<br>No data available.");
+        
+        grid.setEmptyMessage("<br>No data available");
         linkField =new ListGridField("urlResult", "Result Data");
         linkField.setType(ListGridFieldType.LINK);
         linkField.setWidth(150);  
@@ -167,7 +185,9 @@ public class QueryHistoryTab extends Tab {
         ListGridField status = new ListGridField("status", "Status");
         status.setWidth(60);
         
+        
         grid.setFields(
+                FieldUtil.getIconGridField("statusIcon"),
                 executionID,
                 new ListGridField("name", "Query Execution Name"),
                 new ListGridField("query", "Query"),
@@ -204,21 +224,12 @@ public class QueryHistoryTab extends Tab {
                     
                     dataList.add(new QueryExecutionRecord (q[0],q[1],q[2],q[3],q[4],q[5],q[6],q[7]));
                     
-                   /* if(q[5].equals("completed")){
-                        linkField.setLinkText(Canvas.imgHTML(QueryConstants.ICON_TICK, 16, 16, "info", "align=center", null)); 
-                    }
-                    else if(q[5].equals("failed")){
-                        linkField.setLinkText(Canvas.imgHTML(QueryConstants.ICON_WAIT, 16, 16, "info", "align=center", null));
-                    }
-                    else if(q[5].equals("waiting")){
-                         linkField.setLinkText(Canvas.imgHTML(QueryConstants.ICON_FAIL, 16, 16, "info", "align=center", null));
-                }
-                * */
+                
                 }
                 grid.setData(dataList.toArray(new QueryExecutionRecord[]{}));
+                
                
-               
-              
+               ds.setTestData(dataList.toArray(new QueryExecutionRecord[]{}));
                
                 }
                     
@@ -231,29 +242,29 @@ public class QueryHistoryTab extends Tab {
         QueryService.Util.getInstance().getQueryHistory(callback);
     }
           
-         public void expandSearchSection() {
-        this.searchSection.setExpanded(true);
-    }
-         public void setUser(String user) {
-        this.user = user;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
+         public void setFilter()
+         {
+           
+             if (state==false){
+             grid.setShowFilterEditor(false);
+             state=true;
+             }
+             else {
+             grid.setShowFilterEditor(true);
+             state=false;
+}
+             
+         }
+        
     public ListGridRecord[] getGridSelection() {
          return grid.getSelectedRecords();
          
         
          
           }
+    
+    
+  
+   
     
 }
