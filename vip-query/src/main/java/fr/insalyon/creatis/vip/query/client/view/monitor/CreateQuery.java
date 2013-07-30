@@ -354,22 +354,24 @@ import java.util.logging.Logger;
          
          
          
-         public int count(final long queryID){
+         public void maxVersion(final long queryID){
               
          
-            final AsyncCallback <Integer> callback = new AsyncCallback<Integer>() {
+            final AsyncCallback <String> callback = new AsyncCallback<String>() {
             @Override
             public void onFailure(Throwable caught) {
                 
                 Layout.getInstance().setWarningMessage("Unable to update query " + caught.getMessage());
             }
              @Override
-            public void onSuccess(Integer result) {
+            public void onSuccess(String result) {
                  
-                 rownumber=result.intValue();
-                 int n=0;
-                 n=rownumber+1;
-                 savev(new QueryVersion("v."+n,queryID,body.getValueAsString()));
+                 
+                 String n=result.substring(2);
+                 int nn=new Integer(n);
+                 
+                 nn=nn+1;
+                 savev(new QueryVersion("v."+nn,queryID,body.getValueAsString()));
                  reset();
                 
              }
@@ -377,8 +379,8 @@ import java.util.logging.Logger;
          
               };
          
-         QueryService.Util.getInstance().count(queryID, callback);
-         return rownumber;
+         QueryService.Util.getInstance().maxVersion(queryID, callback);
+         //return rownumber;
          
   }
          
@@ -405,7 +407,8 @@ import java.util.logging.Logger;
              @Override
             public void onSuccess(Long result) {
                 
-                 count(result);
+                 
+                 maxVersion(result);
                  
                     
              }
