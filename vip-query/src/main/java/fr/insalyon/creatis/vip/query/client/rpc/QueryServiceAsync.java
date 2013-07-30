@@ -6,6 +6,7 @@ package fr.insalyon.creatis.vip.query.client.rpc;
 
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.query.client.bean.Parameter;
 import fr.insalyon.creatis.vip.query.client.bean.Query;
 import fr.insalyon.creatis.vip.query.client.bean.QueryExecution;
@@ -32,7 +33,7 @@ public interface QueryServiceAsync {
     public void addValue(Value value,AsyncCallback <Long> asyncCallback);
     public void addQueryExecution(QueryExecution queryExecution,AsyncCallback <Long> asyncCallback);
     public void  getQueryHistory(AsyncCallback <List<String[]>> asyncCallback);
-    public void  getBody(Long queryVersionID,Long queryExecutionID,AsyncCallback <String> asyncCallback);
+    public void  getBody(Long queryVersionID,Long queryExecutionID,boolean parameter,AsyncCallback <String> asyncCallback);
     public void updateQueryExecution(String urlResult, String status,Long executionID, AsyncCallback <Void> asyncCallback);
     public void updateQueryVersion(Long queryID,String name, String description, AsyncCallback <Void> asyncCallback);
     public void   getDescription(Long queryVersionID,AsyncCallback <String> asyncCallback) ;
@@ -40,4 +41,5 @@ public interface QueryServiceAsync {
     public void  removeQueryExecution(Long executionID,AsyncCallback < Void> asyncCallback);
     
     public void count(Long queryID,AsyncCallback<Integer> asyncCallback);
+    public void  getQueryID(Long queryVersionID,AsyncCallback<Long> asyncCallback);
 }

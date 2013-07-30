@@ -54,14 +54,15 @@ public static final String SERVICE_URI = "/queryService";
      public Long addValue(Value value) throws QueryException;
      public Long addQueryExecution(QueryExecution queryExecution) throws QueryException;
      public List<String[]> getQueryHistory() throws QueryException;
-     public String getBody(Long queryVersionID,Long queryExecutionID) throws QueryException;
+     public String getBody(Long queryVersionID,Long queryExecutionID,boolean parameter) throws QueryException;
      public void updateQueryVersion(Long queryID,String name, String description)throws QueryException;
      
      public void updateQueryExecution(String urlResult, String status,Long executionID)throws QueryException;
-      public String getDescription(Long queryVersionID)throws QueryException;
-      public List<String[]> getParameterValue(Long queryExecutionID)throws QueryException;
-      public void  removeQueryExecution(Long executionID) throws QueryException;
-       public int  count(Long queryID) throws QueryException;
+     public String getDescription(Long queryVersionID)throws QueryException;
+     public List<String[]> getParameterValue(Long queryExecutionID)throws QueryException;
+     public void  removeQueryExecution(Long executionID) throws QueryException;
+     public Integer  count(Long queryID) throws QueryException;
+     public Long  getQueryID(Long queryVersionID) throws QueryException;
 }
 
 
