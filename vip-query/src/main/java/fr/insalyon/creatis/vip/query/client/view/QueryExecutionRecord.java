@@ -13,6 +13,7 @@ import java.sql.Date;
  */
 public class QueryExecutionRecord extends ListGridRecord {
      public QueryExecutionRecord(String ExecutionID, String name,String queryName,String version,String executer,String dateExecution, String status, String urlResult){
+     setAttribute("statusIcon", status);
      setAttribute("queryExecutionID",ExecutionID );
      setAttribute("name",name);
      setAttribute("query", queryName);
