@@ -42,12 +42,6 @@ public class ParameterTab extends VLayout {
    private TextItem executionName;
    private Boolean close=false;
    private Label description;
-   
-
-    public Boolean getClose() {
-        return close;
-    }
- 
    DynamicForm execution;
    private List<TextItem> arrList;
    private Long queryExecutionID;
@@ -65,11 +59,8 @@ public class ParameterTab extends VLayout {
       Label title = new Label("<strong>Execution Name</strong>");
       title.setHeight(20);
       getDescription(queryVersionID);
-      
-      
-     
-      executionName=new TextItem();
-      
+   
+      executionName=new TextItem(); 
       executionName.setShowTitle(false);
       executionName.setTitleOrientation(TitleOrientation.TOP);
       executionName.setWidth(600);
@@ -79,8 +70,7 @@ public class ParameterTab extends VLayout {
       execution.setFields(executionName);
       
       mainLayout.setPadding(5);
-      mainLayout.addMember(titleDes,0);
-     
+      mainLayout.addMember(titleDes,0);    
       mainLayout.addMember(title,2);
       mainLayout.addMember(execution,3);
      
@@ -108,72 +98,47 @@ public class ParameterTab extends VLayout {
 
          @Override
           public void onSuccess(List<Parameter>result) {
-              
-
-          // List<ParameterRecord> dataList ;
           
           arrList = new ArrayList<TextItem>();
            DynamicForm dynamicForm ;
            
            for (Parameter q : result) {
-            TextItem value;  
-               
-            //dataList=  new ArrayList<ParameterRecord>();
+            TextItem value;   
             dynamicForm= new DynamicForm();
-            /* printViewer = new DetailViewer();
-            printViewer.setWidth("600");  
-            printViewer.setMargin(15);  
-            DetailViewerField name=new DetailViewerField("name(type)", "Name");
-            DetailViewerField type=new DetailViewerField("type", "type");
-            DetailViewerField description=new DetailViewerField("description(example)", "description");
-            DetailViewerField example=new DetailViewerField("example", "example");
-            printViewer.setFields(name,description);
-            dataList.add(new ParameterRecord(q.getName(),q.getType(),q.getDescription(),q.getExample()));
-            
-            printViewer.setData(dataList.toArray(new ParameterRecord[]{}));*/
-            
-         
-            HLayout hlayout=new  HLayout(15);
  
+            HLayout hlayout=new  HLayout(15);
             hlayout.setBorder("1px solid #C0C0C0");
             hlayout.setBackgroundColor("#F5F5F5");
             hlayout.setPadding(10);
             hlayout.setMembersMargin(10);
-            
-
+       
             value=new TextItem();
             value.setWidth(600);
             value.setTitle(q.getName());
-           
             value.setTitleOrientation(TitleOrientation.TOP);
             value.setName(String.valueOf(q.getParameterID()));
             value.setPrompt("<b> Description: </b>"+q.getDescription()+"<br><b> Type: </b>"+q.getType()+"<br><b> Example: </b>"+q.getExample());
+            
             arrList.add(value);
             dynamicForm.setFields(value);
 
-           // hlayout.addMember(printViewer);
+    
             hlayout.addMember(dynamicForm);
 
             mainLayout.addMember(hlayout,5);
             mainLayout.setMembersMargin(10);
 
             }
-
-
          }
-
-
     };
-    
-      QueryService.Util.getInstance().getParameter(queryVersionID,callback);
-    
-
+           QueryService.Util.getInstance().getParameter(queryVersionID,callback);
                 }
+    
+    
 
     private void configure() {
        
        launchButton=new IButton();
-    
        launchButton= WidgetUtil.getIButton("Execute", QueryConstants.ICON_LAUNCH,
                 new ClickHandler() {
                     @Override
@@ -189,7 +154,12 @@ public class ParameterTab extends VLayout {
  
                      @Override
                     public void onSuccess(Long result) {
-                   
+                   if (arrList.isEmpty()){
+                        getBody(queryVersionID,result,false);
+                         queryExecutionID=result;
+                   }
+                       
+                   else{
                    for(TextItem t : arrList){
                            
                      saveValue(new Value(t.getValueAsString(),Long.parseLong(t.getName()),result)) ;
@@ -198,7 +168,7 @@ public class ParameterTab extends VLayout {
                         }
                    queryExecutionID=result;
                   
-                  
+                   }
                  
                 
                 
@@ -230,7 +200,7 @@ public class ParameterTab extends VLayout {
  
             @Override
             public void onSuccess(Long result) {
-            getBody(queryVersionID,queryExecutionID);
+            getBody(queryVersionID,queryExecutionID,true);
                 
                
                
@@ -242,7 +212,7 @@ public class ParameterTab extends VLayout {
      
     
     
- private  void getBody(Long queryVersionID,Long executonID )  {
+ private  void getBody(Long queryVersionID,Long executonID,boolean parameter )  {
          final AsyncCallback <String> callback = new AsyncCallback<String>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -253,13 +223,13 @@ public class ParameterTab extends VLayout {
             @Override
             public void onSuccess(String result) {
                 
-              getUrlResult(result,"json");
+              getUrlResult(result,"csv");
               
                
         }
         };
        
-  QueryService.Util.getInstance().getBody(queryVersionID, executonID, callback);
+  QueryService.Util.getInstance().getBody(queryVersionID, executonID,parameter, callback);
   
  
  }
