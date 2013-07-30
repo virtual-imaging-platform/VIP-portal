@@ -272,6 +272,7 @@ public class QueryServiceImpl  extends AbstractRemoteServiceServlet implements Q
         
         } catch (BusinessException ex) {
             throw new QueryException(ex);
+            
         }  
     
     }
