@@ -140,9 +140,9 @@ public class QueryBusiness {
    }
      
      
-     public String getBody(Long queryVersionID,Long queryExecutionID) throws BusinessException{
+     public String getBody(Long queryVersionID,Long queryExecutionID,boolean parameter) throws BusinessException{
           try {
-            return QueryDAOFactory.getDAOFactory().getQueryDAO().getBody(queryVersionID, queryExecutionID);
+            return QueryDAOFactory.getDAOFactory().getQueryDAO().getBody(queryVersionID, queryExecutionID,parameter);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -209,4 +209,12 @@ public class QueryBusiness {
         }
      }
       
+      public Long  getQueryID(Long queryVersionID) throws BusinessException{
+     try {
+            return QueryDAOFactory.getDAOFactory().getQueryDAO().getQueryID(queryVersionID);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+     }
 }
