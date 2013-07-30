@@ -231,20 +231,20 @@ public void  removeQueryExecution(Long executionID) throws DAOException {
     }
                       
        @Override
-     public Integer  count(Long queryID) throws DAOException {
+     public String  maxVersion(Long queryID) throws DAOException {
            
         try {
-            PreparedStatement ps = connection.prepareStatement("select count(*) from QueryVersion WHERE queryID=?");
+            PreparedStatement ps = connection.prepareStatement("select max(queryVersion) from QueryVersion WHERE queryID=?");
                     
 
-           Integer numberOfRows = new Integer(0);
+           String max =null;
             ps.setLong(1,queryID);
            ResultSet rs = ps.executeQuery();
            while (rs.next()) {
-           numberOfRows = new Integer(rs.getInt(1));
+           max =rs.getString(1);
            }
             ps.close();
-        return numberOfRows;
+        return max;
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
