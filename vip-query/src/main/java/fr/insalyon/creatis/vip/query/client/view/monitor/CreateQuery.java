@@ -5,23 +5,19 @@
 package fr.insalyon.creatis.vip.query.client.view.monitor;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Hyperlink;
-import com.google.gwt.user.client.ui.TextArea;
+
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.MultipleAppearance;
+
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.BooleanCallback;
-import com.smartgwt.client.util.DateDisplayFormatter;
-import com.smartgwt.client.util.DateUtil;
-import com.smartgwt.client.util.SC;
+
 import com.smartgwt.client.widgets.*;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
@@ -60,10 +56,17 @@ import java.util.logging.Logger;
     private TextItem querynameField;
     private RichTextEditor description;
     private IButton saveButton;
+    private IButton testButton;
     private ImgButton helpButton;
-    private TextItem body;
-   private Integer rownumber=0;
+    private TextAreaItem body;
+    private int rownumber=0;
+    private Long queryID=0l;
     
+     // messageItem.setShowTitle(false);
+     // messageItem.setLength(5000);
+    //  messageItem.setColSpan(2);
+      //messageItem.setWidth("*");
+    //  messageItem.setHeight("*");
    
    
 
@@ -91,7 +94,7 @@ import java.util.logging.Logger;
         description.setShowEdges(true);
         description.setControlGroups("styleControls", "editControls",
                 "colorControls");
-         body = new TextItem();
+         body =  new TextAreaItem();
         
          body.setHeight(125);
          body.setWidth(1410);
@@ -104,38 +107,65 @@ import java.util.logging.Logger;
                     public void onClick(ClickEvent event) {
                     if (newQuery) {   
                 try {
+                    
                   Query q= new Query(description.getValue(), querynameField.getValueAsString()); 
                   save(q);
-                 
+                
                  
                   
                 } catch (QueryException ex) {
                     Logger.getLogger(CreateQuery.class.getName()).log(Level.SEVERE, null, ex);
                 }
                         }
-                    else{
+                    else {
+                       String bodyOnSelect= getQueryMakerTb().getBody();
+                       if (bodyOnSelect==body.getValueAsString())
+                       {
                        
-                        update(getVersionID(),querynameField.getValueAsString(),description.getValue());
-                         
-                      
                         
+                           update(getVersionID(),querynameField.getValueAsString(),description.getValue());
                         
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                    };
+                       }
+                       else 
+                           
+                       {
+                       
+                       Long queryVersionID=getVersionID();
+                       getQueryID(queryVersionID);
+                       update(queryVersionID,querynameField.getValueAsString(),description.getValue());
+                       
+                       }
+                    
+                    
+                    }
                     
                 }
                 }
                 );
+        
+        
+          testButton = WidgetUtil.getIButton("Test", CoreConstants.ICON_USER_INFO,
+                new ClickHandler() {
+                    @Override
+                    public void onClick(ClickEvent event) {
+                  final Window winModal = new Window();  
+                   winModal.setWidth100();
+                   winModal.setHeight100();
+                   winModal.setTitle("Test");  
+                   winModal.setShowMinimizeButton(false);  
+                   winModal.setIsModal(true);  
+                   winModal.setShowModalMask(true);  
+                   winModal.centerInPage();
+                   winModal.show();
+               
+                   winModal.addCloseClickHandler(new CloseClickHandler() {  
+                    public void onCloseClick(CloseClickEvent event) {  
+                        winModal.destroy();  
+                    }  
+                });
+                        
+                    }
+                });
                 
 
              
@@ -167,9 +197,9 @@ import java.util.logging.Logger;
         textbox.setTop(50);  
         textbox.setWidth100();
         textbox.setHeight100();
-        textbox.setContents("To create query you have to put parameters of query into «[]»"
+        textbox.setContents("<b>To create query you have to put parameters of query into «[]»"
                 + "and name;type;description;examples separed by «;»"
-                + "example of parameter name:[name; String; name of patient; Olivier]");  
+                + "example of parameter name:[name; String; name of patient; Olivier]</b>");  
        // textbox.setVisibility(Visibility.HIDDEN); 
         winModal.addItem(textbox);
         winModal.show();
@@ -184,11 +214,11 @@ import java.util.logging.Logger;
        body.setTitleOrientation(TitleOrientation.TOP);
        body.setTextAlign(Alignment.LEFT);
        body.setShowTitle(false);
-       
+     
     
        addField("Body", body);
        this.addMember(helpButton);
-       addButtons(saveButton);
+       addButtons(saveButton,testButton);
        
         
         
@@ -207,16 +237,15 @@ import java.util.logging.Logger;
  
             @Override
             public void onSuccess(Long result) {
-                int n=count(result)+1;
                 
-              savev(new QueryVersion("v."+n,result,body.getValueAsString()));
+              savev(new QueryVersion("v.1",result,body.getValueAsString()));
+              reset();
+              
+              
                     
-             
-               QueryMakerTab queryTab = (QueryMakerTab) Layout.getInstance().
-                getTab(QueryConstants.TAB_QUERYMAKER);
-                queryTab.loadData();
-                WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
-                 Layout.getInstance().setNoticeMessage("The query was successfully added");
+               
+               
+              
              
              
               
@@ -234,9 +263,34 @@ import java.util.logging.Logger;
   
   
     private void savev(QueryVersion version) {
-        QueryService.Util.getInstance().addVersion(version,getCallback("version"));
- 
+        final AsyncCallback<Long> callback = new AsyncCallback<Long>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
+               // WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
+                Layout.getInstance().setWarningMessage("Unable to save query:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Long result) {
+                WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
+               
+       
+                Parameter p=new Parameter(result);
+                saveParameter(p);
+               
+                //body.setDefaultValue("[name: ][type: ][descripition ][examples]");
+                }
+               
+             
+        };
+        QueryService.Util.getInstance().addVersion(version,callback);
+         
     }
+    
+        
+ 
+    
     
      private void saveParameter(Parameter param)  {
          final AsyncCallback<List<Long>> callback = new AsyncCallback<List<Long>>() {
@@ -256,54 +310,22 @@ import java.util.logging.Logger;
  
     }
 
-     private AsyncCallback<Long> getCallback(final String text) {
-
-        return new AsyncCallback<Long>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
-               // WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                Layout.getInstance().setWarningMessage("Unable to save " + text + ":<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(Long result) {
-                WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
-                if(text.equals("version")){
-       
-                Parameter p=new Parameter(result);
-                saveParameter(p);
-                querynameField.setValue("");
-                description.setValue("");
-                body.setValue("");
-                //body.setDefaultValue("[name: ][type: ][descripition ][examples]");
-                }
-               
-                
-               // WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-               // setApplication(null, null, null);
-               // ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().
-                       // getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                //tab.loadApplications();
-            }
-        };
-    }
     
-           public void setQuery(boolean bodyState,boolean test, String name, String description, String body) {  
+           public void setQuery(boolean nameState,boolean test, String name, String description, String body) {  
                
               newQuery=test;
               querynameField.setValue(name);
               this.description.setValue(description);
               this.body.setValue(body); 
-             this.body.setDisabled(bodyState);
+             // this.querynameField.setDisabled(nameState);
            }    
            
            
            
          public Long getVersionID(){
-              QueryMakerTab queryTab = (QueryMakerTab) Layout.getInstance().
-                getTab(QueryConstants.TAB_QUERYMAKER);
-              String version=queryTab.getVersionID();
+             
+              
+              String version=getQueryMakerTb().getVersionID();
               Long versionID=Long.parseLong(version);
                 return versionID;
          }
@@ -319,12 +341,9 @@ import java.util.logging.Logger;
  
             @Override
             public void onSuccess(Void result) {
-                         QueryMakerTab queryTab = (QueryMakerTab) Layout.getInstance().
-                         getTab(QueryConstants.TAB_QUERYMAKER);
-                         queryTab.loadData();
-                       querynameField.setValue("");
-                      description.setValue("");
-                      body.setValue("");
+                         
+                       getQueryMakerTb().loadData();
+                      
                        Layout.getInstance().setNoticeMessage("The queryVersion was successfully updated");
                
         }
@@ -335,10 +354,10 @@ import java.util.logging.Logger;
          
          
          
-         public int count(long queryID){
+         public int count(final long queryID){
               
          
-             final AsyncCallback <Integer> callback = new AsyncCallback<Integer>() {
+            final AsyncCallback <Integer> callback = new AsyncCallback<Integer>() {
             @Override
             public void onFailure(Throwable caught) {
                 
@@ -346,7 +365,13 @@ import java.util.logging.Logger;
             }
              @Override
             public void onSuccess(Integer result) {
-                 rownumber=result;
+                 
+                 rownumber=result.intValue();
+                 int n=0;
+                 n=rownumber+1;
+                 savev(new QueryVersion("v."+n,queryID,body.getValueAsString()));
+                 reset();
+                
              }
  
          
@@ -356,6 +381,52 @@ import java.util.logging.Logger;
          return rownumber;
          
   }
+         
+         
+        public QueryMakerTab getQueryMakerTb()
+        {
+            
+            QueryMakerTab queryTab = (QueryMakerTab) Layout.getInstance().
+            getTab(QueryConstants.TAB_QUERYMAKER);
+            return queryTab;
+        }
+        
+        
+        
+        public void getQueryID(Long queryVersionID){
+              
+         
+            final AsyncCallback <Long> callback = new AsyncCallback<Long>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                
+                Layout.getInstance().setWarningMessage("Unable to get queryID " + caught.getMessage());
+            }
+             @Override
+            public void onSuccess(Long result) {
+                
+                 count(result);
+                 
+                    
+             }
+ 
+         
+              };
+         
+         QueryService.Util.getInstance().getQueryID(queryVersionID, callback);
+         
+         
+  }
+        public void reset(){
+             querynameField.setValue("");
+             description.setValue("");
+             body.setValue("");
+             getQueryMakerTb().loadData();
+             WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
+             Layout.getInstance().setNoticeMessage("The query was successfully added");
+        }
+                
+         
   }
 
 
