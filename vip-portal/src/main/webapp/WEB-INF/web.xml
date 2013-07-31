@@ -184,6 +184,26 @@
     
     <!-- End Cardiac Module -->
     
+    <!-- Query Module -->
+        <servlet>
+        <servlet-name>QueryService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.query.server.rpc.QueryServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>QueryService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/queryService</url-pattern>
+    </servlet-mapping>
+
+     <servlet>
+        <servlet-name>EndPointService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.query.server.rpc.EndPointSparqlServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EndPointService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/endPointService</url-pattern>
+    </servlet-mapping>
+    <!-- End Query Module -->
+    
     <session-config>
         <session-timeout>-1</session-timeout>
     </session-config>

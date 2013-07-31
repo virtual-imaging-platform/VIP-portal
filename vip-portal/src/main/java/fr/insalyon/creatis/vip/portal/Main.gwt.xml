@@ -19,6 +19,7 @@
     <inherits name="fr.insalyon.creatis.vip.cardiac.Cardiac" />
     <!-- Specify the app entry point class.-->
     <entry-point class="fr.insalyon.creatis.vip.portal.client.Main"/>
+    <inherits name="fr.insalyon.creatis.vip.query.Query" />
     <!--     <set-property name="user.agent" value="gecko1_8" />
     -->
         
