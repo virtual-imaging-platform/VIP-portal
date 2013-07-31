@@ -6,6 +6,7 @@ package fr.insalyon.creatis.vip.query.client.view.monitor;
 
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceDateField;
+import com.smartgwt.client.data.fields.DataSourceDateTimeField;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
@@ -34,7 +35,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 		
                 DataSourceTextField executer = new DataSourceTextField("executer", "Executer");
 		
-                DataSourceDateField date = new DataSourceDateField("dateExecution", "Execution Start Time");
+               DataSourceDateTimeField date = new DataSourceDateTimeField("dateExecution", "Execution Start Time");
 		 DataSourceTextField urlResult = new DataSourceTextField("urlResult", "Result Data");
                 setFields(id,version,status,name,query,executer,date,urlResult);
 		setClientOnly(true);
