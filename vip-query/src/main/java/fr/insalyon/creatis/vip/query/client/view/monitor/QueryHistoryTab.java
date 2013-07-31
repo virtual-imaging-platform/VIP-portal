@@ -232,7 +232,7 @@ public class QueryHistoryTab extends Tab {
                 grid.setData(dataList.toArray(new QueryExecutionRecord[]{}));
                 
                
-               ds.setTestData(dataList.toArray(new QueryExecutionRecord[]{}));
+                ds.setTestData(dataList.toArray(new QueryExecutionRecord[]{}));
                
                 }
                     

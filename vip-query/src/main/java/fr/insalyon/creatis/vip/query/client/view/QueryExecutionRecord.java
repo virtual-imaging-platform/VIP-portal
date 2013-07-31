@@ -18,7 +18,7 @@ public class QueryExecutionRecord extends ListGridRecord {
      setAttribute("queryExecutionID",ExecutionID );
      setAttribute("name",name);
      setAttribute("query", queryName);
-     setAttribute("version", version);
+     setAttribute("version", "v."+version);
      setAttribute("executer", executer);
      setAttribute("dateExecution", dateExecution);
      setAttribute("status", status);
