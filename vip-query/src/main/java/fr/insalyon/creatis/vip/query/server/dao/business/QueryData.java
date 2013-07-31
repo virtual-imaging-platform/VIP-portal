@@ -593,7 +593,8 @@ public void  removeQueryExecution(Long executionID) throws DAOException {
            
                Timestamp date=rs.getTimestamp("dateExecution");
                Long id=rs.getLong("queryExecutionID");
-                queries.add(new String[]{id.toString(),rs.getString("name"),rs.getString("queryName"),rs.getString("queryVersion"),rs.getString("executer"),date.toString(), rs.getString("status"),rs.getString("urlResult")});
+               Long version=rs.getLong("queryVersion");
+                queries.add(new String[]{id.toString(),rs.getString("name"),rs.getString("queryName"),version.toString(),rs.getString("executer"),date.toString(), rs.getString("status"),rs.getString("urlResult")});
             }
             ps.close();
             return queries;
