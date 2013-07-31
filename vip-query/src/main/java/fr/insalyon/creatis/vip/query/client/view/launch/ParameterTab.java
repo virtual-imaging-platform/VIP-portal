@@ -5,11 +5,11 @@
 package fr.insalyon.creatis.vip.query.client.view.launch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.Overflow;
+
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.RichTextEditor;
+
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -17,7 +17,7 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.viewer.DetailViewer;
-import com.smartgwt.client.widgets.viewer.DetailViewerField;
+
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.query.client.bean.Parameter;
@@ -45,9 +45,6 @@ public class ParameterTab extends VLayout {
    DynamicForm execution;
    private List<TextItem> arrList;
    private Long queryExecutionID;
-  
-   
-  
 
    public ParameterTab(Long queryVersionID) {
        
@@ -156,7 +153,7 @@ public class ParameterTab extends VLayout {
                     public void onSuccess(Long result) {
                    if (arrList.isEmpty()){
                         getBody(queryVersionID,result,false);
-                         queryExecutionID=result;
+                        queryExecutionID=result;
                    }
                        
                    else{

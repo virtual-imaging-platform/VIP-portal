@@ -43,6 +43,7 @@ import java.util.logging.Logger;
 
 
 
+
 /**
  *
  * @author Boujelben
@@ -110,6 +111,9 @@ import java.util.logging.Logger;
                     
                   Query q= new Query(description.getValue(), querynameField.getValueAsString()); 
                   save(q);
+                 
+
+              
                 
                  
                   
@@ -124,7 +128,7 @@ import java.util.logging.Logger;
                        
                         
                            update(getVersionID(),querynameField.getValueAsString(),description.getValue());
-                        
+                   
                        }
                        else 
                            
@@ -133,7 +137,7 @@ import java.util.logging.Logger;
                        Long queryVersionID=getVersionID();
                        getQueryID(queryVersionID);
                        update(queryVersionID,querynameField.getValueAsString(),description.getValue());
-                       
+                      
                        }
                     
                     
@@ -148,7 +152,7 @@ import java.util.logging.Logger;
                 new ClickHandler() {
                     @Override
                     public void onClick(ClickEvent event) {
-                  final Window winModal = new Window();  
+                 final Window winModal = new Window();  
                    winModal.setWidth100();
                    winModal.setHeight100();
                    winModal.setTitle("Test");  
