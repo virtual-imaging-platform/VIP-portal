@@ -23,11 +23,7 @@ public class QueryLaunchTab extends Tab {
     protected String queryName;
     protected String queryVersionID;
     protected String titleName ;
-   
     protected ModalWindow modal;
-   // protected LaunchFormLayout launchFormLayout;
-    //protected InputsLayout inputsLayout;
-   
     protected IButton saveInputsButton;
     protected IButton saveAsExampleButton;
     private ParameterTab param;
@@ -38,37 +34,23 @@ public class QueryLaunchTab extends Tab {
        this.queryVersionID = queryVersionID;
        param=new ParameterTab(Long.parseLong(queryVersionID));
        this.setTitle(Canvas.imgHTML(QueryConstants.ICON_EXECUTE_VERSION) + " "
-                + queryName + " "+queryVersion);
- 
+                + queryName + " v."+queryVersion);
        this.setCanClose(true);
        this.setAttribute("paneMargin", 0);
-       
+  
        layout = new HLayout();
        layout.setWidth100();
        layout.setHeight100();
        layout.setMargin(5);
-   
        layout.addMember(param);
-       
-        
-     
-       this.setPane(layout);
-      
-    
-           
-        
-        
+       this.setPane(layout);     
     
     }
 
     @Override
     public void setCanClose(boolean canClose) {
-        super.setCanClose(canClose); //To change body of generated methods, choose Tools | Templates.
+        super.setCanClose(canClose); 
     }
     
-
-    
-       
-
         
 }

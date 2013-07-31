@@ -54,9 +54,9 @@ public class QueryData implements QueryDAO {
                 
                 while (rs2.next()) {
                Timestamp date=rs2.getTimestamp("dateCreation");
+               Long version=rs2.getLong("queryVersion");
                
-               
-                    queries.add(new String[]{rs.getString("queryName"),date.toString(),rs2.getString("queryVersion"),rs2.getString("queryversionID")});
+                    queries.add(new String[]{rs.getString("queryName"),date.toString(),version.toString(),rs2.getString("queryversionID")});
                 }
                 ps2.close();
 
@@ -148,8 +148,8 @@ public class QueryData implements QueryDAO {
             List<String[]> queries = new ArrayList<String[]>();
 
             while (rs.next()) {
-                
-                queries.add(new String[]{rs.getString("queryName"), rs.getString("dateCreation"),rs.getString("queryVersion")});
+                Long version=rs.getLong("queryVersion");
+                queries.add(new String[]{rs.getString("queryName"), rs.getString("dateCreation"),version.toString()});
             }
             ps.close();
             return queries;
@@ -712,12 +712,7 @@ public void  removeQueryExecution(Long executionID) throws DAOException {
 		java.util.Date today = new java.util.Date();
 		return new java.sql.Timestamp(today.getTime());
  
-	}
-      
-      
-      
-      
-      
+	} 
       
     }
         
