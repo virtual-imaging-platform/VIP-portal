@@ -35,5 +35,8 @@ public class QueryConstants {
     // Application Images
     public static final String APP_IMG_QUERYHISTORY = IMG_FOLDER + "hist.png";
     public static final String APP_IMG_QUERYMAKER  = IMG_FOLDER + "creation.png";
-      public static final String APP_IMG_QUERY=IMG_FOLDER + "execute-query.png";
+    public static final String APP_IMG_QUERY=IMG_FOLDER + "execute-query.png";
+    
+    //group
+    public static final String QUERY_GROUP = "Ginseng";
 }
