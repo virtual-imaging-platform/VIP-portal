@@ -18,7 +18,7 @@ public class QueryRecord extends ListGridRecord {
 
         setAttribute("name", name);
         setAttribute("dateCreation", dateCreation);
-        setAttribute("version", version);
+        setAttribute("version", "v."+version);
         setAttribute("queryversionID", queryversionID);
        
         

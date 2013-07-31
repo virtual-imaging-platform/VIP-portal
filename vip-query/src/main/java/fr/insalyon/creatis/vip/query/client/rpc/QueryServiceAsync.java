@@ -40,6 +40,6 @@ public interface QueryServiceAsync {
     public void getParameterValue(Long queryExecutionID,AsyncCallback < List<String[]>> asyncCallback);
     public void  removeQueryExecution(Long executionID,AsyncCallback < Void> asyncCallback);
     
-    public void maxVersion(Long queryID,AsyncCallback<String> asyncCallback);
+    public void maxVersion(Long queryID,AsyncCallback<Long> asyncCallback);
     public void  getQueryID(Long queryVersionID,AsyncCallback<Long> asyncCallback);
 }

@@ -36,6 +36,6 @@ public interface QueryDAO {
      public String getDescription(Long queryVersionID) throws DAOException ;
      public List<String[]> getParameterValue(Long queryExecutionID) throws DAOException;
      public void  removeQueryExecution(Long executionID) throws DAOException ;
-     public String maxVersion(Long queryID) throws DAOException;
+     public Long  maxVersion(Long queryID) throws DAOException;
      public Long  getQueryID(Long queryVersionID) throws DAOException ;
 }

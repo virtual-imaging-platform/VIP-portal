@@ -238,7 +238,7 @@ import java.util.logging.Logger;
             @Override
             public void onSuccess(Long result) {
                 
-              savev(new QueryVersion("v.1",result,body.getValueAsString()));
+              savev(new QueryVersion(1L,result,body.getValueAsString()));
               reset();
               
               
@@ -357,21 +357,21 @@ import java.util.logging.Logger;
          public void maxVersion(final long queryID){
               
          
-            final AsyncCallback <String> callback = new AsyncCallback<String>() {
+            final AsyncCallback <Long > callback = new AsyncCallback<Long >() {
             @Override
             public void onFailure(Throwable caught) {
                 
                 Layout.getInstance().setWarningMessage("Unable to update query " + caught.getMessage());
             }
              @Override
-            public void onSuccess(String result) {
+            public void onSuccess(Long result) {
                  
-                 
-                 String n=result.substring(2);
-                 int nn=new Integer(n);
+               
+                 Long nn=result;
                  
                  nn=nn+1;
-                 savev(new QueryVersion("v."+nn,queryID,body.getValueAsString()));
+                 
+                 savev(new QueryVersion(nn,queryID,body.getValueAsString()));
                  reset();
                 
              }
