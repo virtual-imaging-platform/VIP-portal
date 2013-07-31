@@ -40,7 +40,7 @@ public class MySQLDAOFactory extends QueryDAOFactory {
   
             PlatformConnection.getInstance().createTable("QueryVersion",
                     "queryVersionID BIGINT(20) AUTO_INCREMENT, "
-                    + "queryVersion VARCHAR(40), "
+                    + "queryVersion BIGINT(20), "
                     + "queryID BIGINT(20), "
                     + "body TEXT, "
                     + "dateCreation TIMESTAMP, "

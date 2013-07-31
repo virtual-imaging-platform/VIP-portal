@@ -38,6 +38,7 @@ import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.ParameterValue;
 import fr.insalyon.creatis.vip.query.client.view.QueryConstants;
 import fr.insalyon.creatis.vip.query.client.view.QueryExecutionRecord;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -60,7 +61,7 @@ public class QueryHistoryTab extends Tab {
      private ListGridRecord rollOverRecord;
      private DetailViewer detailViewer ;
      DataSource ds;
-     boolean state=false;
+     boolean state=true;
     
 
     
@@ -223,8 +224,8 @@ public class QueryHistoryTab extends Tab {
 
                 for (String[] q : result ) {
                    
-                    
-                    dataList.add(new QueryExecutionRecord (q[0],q[1],q[2],q[3],q[4],q[5],q[6],q[7]));
+                    Timestamp ts = Timestamp.valueOf(q[5]);
+                    dataList.add(new QueryExecutionRecord (q[0],q[1],q[2],q[3],q[4],ts,q[6],q[7]));
                     
                 
                 }
