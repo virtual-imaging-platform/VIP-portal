@@ -18,7 +18,6 @@ public class QueryModule extends Module {
     public void load() {
         
         CoreModule.addGeneralApplicationParser(new QueryHomeParser());
-        CoreModule.addApplicationsTileGrid(new QueryTitleGrid("My Queries"));
     }
 
     @Override
