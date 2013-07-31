@@ -23,6 +23,7 @@ public class QueryHomeParser extends ApplicationParser {
                 || CoreModule.user.hasGroupAccess(QueryConstants.QUERY_GROUP)) {
             addApplication(QueryConstants.APP_QUERYMAKER, QueryConstants.APP_IMG_QUERYMAKER);
             addApplication(QueryConstants.APP_QUERYHISTORY, QueryConstants.APP_IMG_QUERYHISTORY);
+            CoreModule.addApplicationsTileGrid(new QueryTitleGrid("My Queries"));
         }
     }
 
