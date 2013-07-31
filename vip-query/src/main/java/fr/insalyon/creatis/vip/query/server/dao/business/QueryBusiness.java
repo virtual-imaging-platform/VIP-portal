@@ -200,7 +200,7 @@ public class QueryBusiness {
             throw new BusinessException(ex);
         }
      }
-      public String  maxVersion(Long queryID) throws BusinessException{
+      public Long maxVersion(Long queryID) throws BusinessException{
      try {
             return QueryDAOFactory.getDAOFactory().getQueryDAO().maxVersion(queryID);
 

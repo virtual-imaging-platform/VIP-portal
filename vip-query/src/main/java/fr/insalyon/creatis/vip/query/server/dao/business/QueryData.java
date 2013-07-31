@@ -231,17 +231,17 @@ public void  removeQueryExecution(Long executionID) throws DAOException {
     }
                       
        @Override
-     public String  maxVersion(Long queryID) throws DAOException {
+     public Long  maxVersion(Long queryID) throws DAOException {
            
         try {
             PreparedStatement ps = connection.prepareStatement("select max(queryVersion) from QueryVersion WHERE queryID=?");
                     
 
-           String max =null;
-            ps.setLong(1,queryID);
+           Long max=0L;
+           ps.setLong(1,queryID);
            ResultSet rs = ps.executeQuery();
            while (rs.next()) {
-           max =rs.getString(1);
+           max =rs.getLong(1);
            }
             ps.close();
         return max;
@@ -398,7 +398,7 @@ public void  removeQueryExecution(Long executionID) throws DAOException {
            
             PreparedStatement ps2 = connection.prepareStatement(
                   "INSERT INTO QueryVersion(queryVersion, queryID, body, dateCreation) VALUES (?, ?, ?, ?)",PreparedStatement.RETURN_GENERATED_KEYS);
-            ps2.setString(1,version.getQueryVersion());
+            ps2.setLong(1,version.getQueryVersion());
             ps2.setObject(2, version.getQueryID());
             ps2.setString(3,version.getBody());
             ps2.setTimestamp(4,getCurrentTimeStamp());

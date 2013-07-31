@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 public class QueryVersion implements IsSerializable{
     
 private Long  queryVersionID ;
-private String queryVersion;
+private Long queryVersion;
 private Long queryID;
 private String body;
 private  Timestamp dateCreation;
@@ -29,13 +29,13 @@ private  Timestamp dateCreation;
 
     public QueryVersion() {
     }
-    public QueryVersion(String queryVersion, Long queryID, String body) {
+    public QueryVersion(Long queryVersion, Long queryID, String body) {
         this.queryVersion = queryVersion;
         this.queryID = queryID;
         this.body = body;
     }
 
-    public QueryVersion(String queryVersion, String body) {
+    public QueryVersion(Long queryVersion, String body) {
         this.queryVersion = queryVersion;
         this.body = body;
     }
@@ -43,7 +43,7 @@ private  Timestamp dateCreation;
 
     
 
-    public QueryVersion(Long queryVersionID, String queryVersion, Long queryID, String body) {
+    public QueryVersion(Long queryVersionID, Long queryVersion, Long queryID, String body) {
         this.queryVersionID = queryVersionID;
         this.queryVersion = queryVersion;
         this.queryID = queryID;
@@ -66,11 +66,11 @@ private  Timestamp dateCreation;
         this.queryID = queryID;
     }
 
-    public String getQueryVersion() {
+    public Long getQueryVersion() {
         return queryVersion;
     }
 
-    public void setQueryVersion(String queryVersion) {
+    public void setQueryVersion(Long queryVersion) {
         this.queryVersion = queryVersion;
     }
 

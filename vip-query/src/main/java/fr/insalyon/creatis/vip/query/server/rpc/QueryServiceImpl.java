@@ -253,7 +253,7 @@ public class QueryServiceImpl  extends AbstractRemoteServiceServlet implements Q
        
        
         @Override
-         public String  maxVersion(Long queryID) throws QueryException{
+         public Long maxVersion(Long queryID) throws QueryException{
        
      try {
              return queryBusiness.maxVersion(queryID);
