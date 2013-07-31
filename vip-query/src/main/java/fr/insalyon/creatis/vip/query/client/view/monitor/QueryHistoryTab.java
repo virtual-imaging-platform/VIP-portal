@@ -183,7 +183,7 @@ public class QueryHistoryTab extends Tab {
         ListGridField version = new ListGridField("version", "Version");
         version.setWidth(60);
         ListGridField status = new ListGridField("status", "Status");
-        status.setWidth(60);
+        
         
         
         grid.setFields(
