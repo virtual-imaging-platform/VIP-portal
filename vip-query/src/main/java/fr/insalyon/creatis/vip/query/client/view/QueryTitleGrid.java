@@ -6,6 +6,8 @@ import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.launch.QueryLaunchTab;
+import fr.insalyon.creatis.vip.query.server.dao.business.MySQLDAOFactory;
+import fr.insalyon.creatis.vip.query.server.dao.business.QueryDAOFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,13 +20,27 @@ public class QueryTitleGrid extends ApplicationsTileGrid
     {
     private List<String> applicationNames;
     private HashMap<Key,String> map ;
-     
+   // private static QueryTitleGrid  instance;
+   
+     // Singleton
+   
+    
     public QueryTitleGrid(String tileName) {
        super(tileName);
        applicationNames = new ArrayList<String>();
        loadApplications();            
     }
-    
+   
+    /*
+     * public static QueryTitleGrid  getInstance() {
+        if (instance == null) {
+            String tileName="My QUERIES";
+            instance = new QueryTitleGrid(tileName);
+        }
+        return instance;
+        *
+   }
+   */
     
     /**
      *
@@ -40,7 +56,7 @@ public class QueryTitleGrid extends ApplicationsTileGrid
     
   }
     
-     private void loadApplications() {
+     public void loadApplications() {
 
         final AsyncCallback<List<String[]>> callback;
         callback = new AsyncCallback<List<String[]>>() {
@@ -91,7 +107,7 @@ public class QueryTitleGrid extends ApplicationsTileGrid
 
       @Override
        public int hashCode() {
-       return (name +"v."+version).hashCode();
+       return (name+"v."+version).hashCode();
     }
 }
      
