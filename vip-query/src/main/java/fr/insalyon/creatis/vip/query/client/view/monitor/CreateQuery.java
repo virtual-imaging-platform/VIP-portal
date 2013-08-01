@@ -223,7 +223,7 @@ import java.util.logging.Logger;
     
        addField("Body", body);
        this.addMember(helpButton);
-       addButtons(saveButton,testButton);
+       addButtons(saveButton);
        
         
         
