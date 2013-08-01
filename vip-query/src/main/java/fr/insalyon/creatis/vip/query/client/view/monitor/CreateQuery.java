@@ -32,6 +32,7 @@ import fr.insalyon.creatis.vip.query.client.rpc.EndPointSparqlService;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.QueryConstants;
 import fr.insalyon.creatis.vip.query.client.view.QueryException;
+import fr.insalyon.creatis.vip.query.client.view.QueryTitleGrid;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -111,7 +112,7 @@ import java.util.logging.Logger;
                     
                   Query q= new Query(description.getValue(), querynameField.getValueAsString()); 
                   save(q);
-                 
+             
 
               
                 
