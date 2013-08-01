@@ -34,7 +34,7 @@ public class QueryLaunchTab extends Tab {
        this.queryVersionID = queryVersionID;
        param=new ParameterTab(Long.parseLong(queryVersionID));
        this.setTitle(Canvas.imgHTML(QueryConstants.ICON_EXECUTE_VERSION) + " "
-                + queryName + " v."+queryVersion);
+                + queryName +" "+queryVersion);
        this.setCanClose(true);
        this.setAttribute("paneMargin", 0);
   
