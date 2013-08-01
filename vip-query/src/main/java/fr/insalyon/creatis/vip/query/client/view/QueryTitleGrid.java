@@ -71,8 +71,8 @@ public class QueryTitleGrid extends ApplicationsTileGrid
            for (String[] q : result) {
            //name,version,image
            addApplication(q[0],"v."+q[2],QueryConstants.APP_IMG_QUERY);
-           map.put(new Key(q[0],q[2]),q[3]);
-           applicationNames.add(q[0] + " v."+ q[2]);
+           map.put(new Key(q[0],"v."+q[2]),q[3]);
+           applicationNames.add(q[0] +" "+ q[2]);
 
 
              }
@@ -107,7 +107,7 @@ public class QueryTitleGrid extends ApplicationsTileGrid
 
       @Override
        public int hashCode() {
-       return (name+"v."+version).hashCode();
+       return (name+version).hashCode();
     }
 }
      

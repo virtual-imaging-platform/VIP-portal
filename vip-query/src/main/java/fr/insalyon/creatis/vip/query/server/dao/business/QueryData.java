@@ -54,7 +54,7 @@ public class QueryData implements QueryDAO {
                 
                 while (rs2.next()) {
                Timestamp date=rs2.getTimestamp("dateCreation");
-               Long version=rs2.getLong("queryVersion");
+               Integer version=rs2.getInt("queryVersion");
                
                     queries.add(new String[]{rs.getString("queryName"),date.toString(),version.toString(),rs2.getString("queryversionID")});
                 }
