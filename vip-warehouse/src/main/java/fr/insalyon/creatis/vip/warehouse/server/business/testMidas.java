@@ -8,10 +8,17 @@ package fr.insalyon.creatis.vip.warehouse.server.business;
 
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -21,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -200,7 +209,71 @@ public class testMidas {
 //      System.out.println(responseStrBuilder.toString());
 //      JSONObject jso =   new JSONObject(responseStrBuilder.toString());
    
+  method = "midas.folder.download";
+      String id="165";
+      HttpURLConnection con8 = (HttpURLConnection) new URL(site+method+"&token="+token+"&id="+id).openConnection();
+      con8.setRequestMethod("GET");
+      con8.setDoOutput(true);
+      con8.connect();
+        BufferedReader streamReader = new BufferedReader(new InputStreamReader(con8.getInputStream(), "UTF-8")); 
+    StringBuilder responseStrBuilder = new StringBuilder();
+
+    String inputStr;
+    while ((inputStr = streamReader.readLine()) != null)
+        responseStrBuilder.append(inputStr);
       
+  File file = new File("D:\\" + id + ".zip");
+BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+writer.write(responseStrBuilder.toString());
+  writer.close();    
+      
+      
+      
+      
+      method = "midas.folder.download";
+      id="165";
+      HttpURLConnection con7 = (HttpURLConnection) new URL(site+method+"&token="+token+"&id="+id).openConnection();
+      con7.setRequestMethod("GET");
+      con7.setDoOutput(true);
+      con7.connect();
+         streamReader = new BufferedReader(new InputStreamReader(con7.getInputStream())); 
+         
+         ByteArrayOutputStream bos = new ByteArrayOutputStream();
+int next = streamReader.read();
+while (next > -1) {
+    bos.write(next);
+    next = streamReader.read();
+}
+bos.flush();
+byte[] result = bos.toByteArray();
+         
+//     responseStrBuilder = new StringBuilder();
+//    while ((inputStr = streamReader.readLine()) != null)
+//     responseStrBuilder.append(inputStr);
+//    
+
+FileOutputStream fos = new FileOutputStream("D:\\"+id+".zip");
+fos.write(result);
+fos.close();
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
            method = "midas.user.folders";
         ArrayList<String> folders = getFolders(site+method+"&token="+token,"f");
         for(String fols : folders)
