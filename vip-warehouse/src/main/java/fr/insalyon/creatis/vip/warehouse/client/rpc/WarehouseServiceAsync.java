@@ -56,10 +56,12 @@ public interface WarehouseServiceAsync {
     
     public void getConnection(String nickname, String pwd, String site, String type, AsyncCallback<Void> asyncCallback);
 
-    public void getProjects(String nick, String site, String type, AsyncCallback< HashMap<String, String> > asyncCallback);
+    public void getProjects(String nick, String site, String type, AsyncCallback< ArrayList<String> > asyncCallback);
     
-    public void getProject(String nick, String site, String projectid, AsyncCallback< String > asyncCallback);
+    public void getProject(String nick, String site, String type, String projectid,  String itemtype, AsyncCallback< ArrayList<String> > asyncCallback);
 
+    public void getData(String nick, String site, String waretype, String name, 
+                    String id,  String itemtype, String path, AsyncCallback< Void > asyncCallback);
    
     /**
      *

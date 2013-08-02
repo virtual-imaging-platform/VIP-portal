@@ -71,12 +71,15 @@ public interface WarehouseService extends RemoteService {
     
     public void getConnection(String nickname,  String pwd, String url, String type) throws WareHouseException;
     
-    public HashMap<String, String> getProjects(String nick, String site, String type) throws WareHouseException;
+    public ArrayList<String> getProjects(String nick, String site, String type) throws WareHouseException;
 
     ///public JSONObject getData(String nick, String site, String project) throws WarehouseException;
     
-      public String getProject(String nick, String site, String projectid) throws WareHouseException;
+      public ArrayList<String> getProject(String nick, String site, String type, String projectid, String itemtype) throws WareHouseException;
       public String test();
+      
+      void getData(String nick, String site, String waretype, String name, String id,
+              String itemtype, String path) throws WareHouseException;
       
 
 

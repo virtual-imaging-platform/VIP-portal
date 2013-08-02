@@ -34,7 +34,6 @@
  */
 package fr.insalyon.creatis.vip.warehouse.client.view;
 
-
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
@@ -43,6 +42,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.TreeModelType;
+import com.smartgwt.client.util.SC;
 
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -61,6 +61,9 @@ import com.smartgwt.client.widgets.tree.Tree;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeGridField;
 import com.smartgwt.client.widgets.tree.TreeNode;
+import com.smartgwt.client.widgets.tree.events.NodeClickEvent;
+import com.smartgwt.client.widgets.tree.events.NodeClickHandler;
+
 
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.application.client.view.launch.ListHLayout;
@@ -91,87 +94,75 @@ public class WarehouseListTab extends Tab {
     private String murl;
     private String mwarehouse;
     private String mtype;
-       private Logger logger = null;
+    private Logger logger = null;
 
-    private String addProject(String jslist)
-    {
+    private String addProject(String jslist) {
         String result;
-      logger = Logger.getLogger("warehouse");
+        logger = Logger.getLogger("warehouse");
         logger.log(Level.SEVERE, "warehouse access");
         JSONValue value = JSONParser.parseStrict(jslist);
         JSONObject jobj = value.isObject();
         //HashMap<String, String> maps = new HashMap<String, String>();
         result = "<b>" + jobj.get("name") + "</b> <br>";
-        if (jobj.get("ID") != null)
-        {
+        if (jobj.get("ID") != null) {
             result += "<b> projet ID: " + jobj.get("ID") + "</b>";
         }
-        if (jobj.get("pi_firstname") != null)
-        {
-            result += "<b> PI: " + jobj.get("pi_firstname") + " " + jobj.get("pi_lastname")+ "</b> <br>";
+        if (jobj.get("pi_firstname") != null) {
+            result += "<b> PI: " + jobj.get("pi_firstname") + " " + jobj.get("pi_lastname") + "</b> <br>";
         }
-        if (jobj.get("description") != null)
-        {
-            result +=  jobj.get("description") +"<br>";
+        if (jobj.get("description") != null) {
+            result += jobj.get("description") + "<br>";
         }
         return result;
     }
-    
-    private String addSubjects(String jslist)
-    {
+
+    private String addSubjects(String jslist) {
         String result;
-    
+
         JSONValue value = JSONParser.parseStrict(jslist);
         JSONObject jobj = value.isObject();
         //HashMap<String, String> maps = new HashMap<String, String>();
         result = "<b>" + jobj.get("name") + "</b> <br>";
-        if (jobj.get("label") != null)
-        {
+        if (jobj.get("label") != null) {
             result += "<b> projet ID: " + jobj.get("ID") + "</b>";
         }
-        if (jobj.get("pi_firstname") != null)
-        {
-            result += "<b> PI: " + jobj.get("pi_firstname") + " " + jobj.get("pi_lastname")+ "</b> <br>";
+        if (jobj.get("pi_firstname") != null) {
+            result += "<b> PI: " + jobj.get("pi_firstname") + " " + jobj.get("pi_lastname") + "</b> <br>";
         }
-        if (jobj.get("description") != null)
-        {
-            result +=  jobj.get("description") +"<br>";
+        if (jobj.get("description") != null) {
+            result += jobj.get("description") + "<br>";
         }
         return result;
     }
-    
-    
-    private String getProjectID(String jslist)
-    {
+
+    private String getProjectID(String jslist) {
         String res = "";
         JSONValue value = JSONParser.parseStrict(jslist);
         JSONObject jobj = value.isObject();
-         if (jobj.get("ID") != null)
-        {
+        if (jobj.get("ID") != null) {
             res = jobj.get("ID").isObject().toString();
         }
-         return res;
+        return res;
     }
-    
-    private void readJSonProjects(String jslist)
-    {
+
+    private void readJSonProjects(String jslist) {
         JSONValue value = JSONParser.parseStrict(jslist);
         JSONObject jobj = value.isObject();
         JSONValue jsonValue = jobj.get("ResultSet").isObject().get("Result");
         int id = 0;
-         for (String key: jsonValue.isObject().keySet()) { 
-             Record rc = new Record();
-             rc.setAttribute("subject", id);
-             JSONValue subjs = jsonValue.isObject().get(key).isObject();
-             rc.setAttribute("label",subjs.isObject().get("label").toString());
-             rc.setAttribute("date",subjs.isObject().get("insert_date").toString());
-             rc.setAttribute("user",subjs.isObject().get("insert_user").toString());
-             rc.setAttribute("subjectid", subjs.isObject().get("ID").toString());
-             dbGrid.addData(rc); 
-             id++;
-         }
+        for (String key : jsonValue.isObject().keySet()) {
+            Record rc = new Record();
+            rc.setAttribute("subject", id);
+            JSONValue subjs = jsonValue.isObject().get(key).isObject();
+            rc.setAttribute("label", subjs.isObject().get("label").toString());
+            rc.setAttribute("date", subjs.isObject().get("insert_date").toString());
+            rc.setAttribute("user", subjs.isObject().get("insert_user").toString());
+            rc.setAttribute("subjectid", subjs.isObject().get("ID").toString());
+            dbGrid.addData(rc);
+            id++;
+        }
     }
-    
+
     private void readJSON(String jslist, TreeItem parent) {
         JSONValue value = JSONParser.parseStrict(jslist);
         JSONObject jobj = value.isObject();
@@ -197,110 +188,103 @@ public class WarehouseListTab extends Tab {
         }
 
     }
-    
-    
-    private void extractSubjects(String project)
-    {
+
+    private void extractSubjects(String project) {
         JSONValue value = JSONParser.parseStrict(project);
         JSONObject jobj = value.isObject();
         JSONArray subArray = jobj.get("ResultSet").isObject().get("Result").isArray();
-        for(int i = 0; i < subArray.size(); i++)
-        {
-             Record rc = new Record();
-             rc.setAttribute("ID", i);
-             rc.setAttribute("Projects",addSubjects(subArray.get(i).isObject().toString()) );
-             //rc.setAttribute("projectid",getProjectID(jsonValue.isObject().get(key).isObject().toString()));
-             dbGrid.addData(rc); 
+        for (int i = 0; i < subArray.size(); i++) {
+            Record rc = new Record();
+            rc.setAttribute("ID", i);
+            rc.setAttribute("Projects", addSubjects(subArray.get(i).isObject().toString()));
+            //rc.setAttribute("projectid",getProjectID(jsonValue.isObject().get(key).isObject().toString()));
+            dbGrid.addData(rc);
         }
     }
-    
-    private void configureDBGrid()
-    {
+
+    private void configureDBGrid() {
         dbGrid = new ListGrid();
-          ListGridField idField = new ListGridField("id", "ID", 120);  
-        ListGridField nameField = new ListGridField("project", "Project");  
-        ListGridField projectidField = new ListGridField("projectid", "projectid", 50); 
+        ListGridField idField = new ListGridField("id", "ID", 120);
+        ListGridField nameField = new ListGridField("project", "Project");
+        ListGridField projectidField = new ListGridField("projectid", "projectid", 50);
         projectidField.setHidden(true);
         dbGrid.setFields(idField, nameField, projectidField);
-        
-        dbGrid.addRowContextClickHandler(new RowContextClickHandler() {
 
+        dbGrid.addRowContextClickHandler(new RowContextClickHandler() {
             @Override
             public void onRowContextClick(RowContextClickEvent event) {
                 event.cancel();
-                String projectid = event.getRecord().getAttribute("projectid");
+                String projectid = event.getRecord().getAttribute("id");
                 showProject(projectid);
             }
         });
     }
-    
-   private void configureTree()
-    {
+
+    private void configureTree() {
         /* It's working
          warehouseTree = new TreeGrid();
-        warehouseTree.setWidth100();
-        warehouseTree.setHeight100();
-        warehouseTree.setShowOpenIcons(false);
-        warehouseTree.setShowDropIcons(false);
+         warehouseTree.setWidth100();
+         warehouseTree.setHeight(500);
+         warehouseTree.setShowOpenIcons(false);
+         warehouseTree.setShowDropIcons(false);
        
        
-        warehouseTree.setCanHover(true);
-        warehouseTree.setClosedIconSuffix("");
-        warehouseTree.setLoadDataOnDemand(true);
-        warehouseTree.setFields(new TreeGridField("name", "test"));
+         warehouseTree.setCanHover(true);
+         warehouseTree.setClosedIconSuffix("");
+         warehouseTree.setLoadDataOnDemand(true);
+         warehouseTree.setFields(new TreeGridField("name", "test"));
 
-      Tree tree = new Tree();
-        tree.setModelType(TreeModelType.CHILDREN);
-        tree.setNameProperty("name");
+         Tree tree = new Tree();
+         tree.setModelType(TreeModelType.CHILDREN);
+         tree.setNameProperty("name");
 
-        TreeNode root = new TreeNode("Root");
-        tree.setRoot(root);
+         TreeNode root = new TreeNode("Root");
+         tree.setRoot(root);
 
-        TreeNode treeNode = new TreeNode( "Simulation");
-        tree.add(treeNode, root);
+         TreeNode treeNode = new TreeNode( "Simulation");
+         tree.add(treeNode, root);
         
-        warehouseTree.setData(tree);
-        */
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+         warehouseTree.setData(tree);
+         */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         warehouseTree = new TreeGrid();
-      //  TreeGridField idField = new TreeGridField("id", "ID");  
-        TreeGridField nameField = new TreeGridField("name");  
+        //  TreeGridField idField = new TreeGridField("id", "ID");  
+        TreeGridField nameField = new TreeGridField("name");
         //TreeGridField descriptionField = new TreeGridField("description", "description"); 
         //idField.setHidden(true);
         //descriptionField.setHidden(true);
-       // warehouseTree.setFields(idField, nameField, descriptionField);
+        // warehouseTree.setFields(idField, nameField, descriptionField);
         warehouseTree.setWidth100();
-        warehouseTree.setHeight100();
+        warehouseTree.setHeight(200);
         warehouseTree.setShowOpenIcons(false);
         warehouseTree.setShowDropIcons(false);
-       
-       
+
+
         warehouseTree.setCanHover(true);
         warehouseTree.setClosedIconSuffix("");
         warehouseTree.setLoadDataOnDemand(true);
-          warehouseTree.setFields( nameField);
-           // MedImgWarehouseTreeNode[] child = new MedImgWarehouseTreeNode[3];
-           
-           
-        warehouseTree.addRowContextClickHandler(new RowContextClickHandler() {
+        warehouseTree.setFields(nameField);
+        // MedImgWarehouseTreeNode[] child = new MedImgWarehouseTreeNode[3];
 
+
+        warehouseTree.addRowContextClickHandler(new RowContextClickHandler() {
             @Override
             public void onRowContextClick(RowContextClickEvent event) {
                 event.cancel();
@@ -309,14 +293,9 @@ public class WarehouseListTab extends Tab {
             }
         });
     }
-    
-    
-    
-    
-    
-    private void showProject(String id)
-    {
-         WarehouseServiceAsync ms = WarehouseService.Util.getInstance();
+
+    private void showProject(String id) {
+        WarehouseServiceAsync ms = WarehouseService.Util.getInstance();
         final AsyncCallback<String> callback = new AsyncCallback<String>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -325,26 +304,23 @@ public class WarehouseListTab extends Tab {
 
             @Override
             public void onSuccess(String result) {
-               configureSubjectsGrid(result); 
+                configureSubjectsGrid(result);
             }
         };
-         //  ms.getProject(id, callback);
+        //  ms.getProject(id, callback);
     }
-    
 
-        private void configureSubjectsGrid(String project)
-    {
+    private void configureSubjectsGrid(String project) {
         dbGrid = new ListGrid();
-          ListGridField subField = new ListGridField("subject", "Subject", 20); 
-          ListGridField labelField = new ListGridField("label", "Label", 120);  
-          ListGridField dateField = new ListGridField("date", "Date of insertion", 120);  
-          ListGridField userField = new ListGridField("user", "Owner", 120); 
-          ListGridField subjectidField = new ListGridField("subjectid", "subjectid", 50); 
-          subjectidField.setHidden(true);
+        ListGridField subField = new ListGridField("subject", "Subject", 20);
+        ListGridField labelField = new ListGridField("label", "Label", 120);
+        ListGridField dateField = new ListGridField("date", "Date of insertion", 120);
+        ListGridField userField = new ListGridField("user", "Owner", 120);
+        ListGridField subjectidField = new ListGridField("subjectid", "subjectid", 50);
+        subjectidField.setHidden(true);
         dbGrid.setFields(subField, labelField, dateField, userField, subjectidField);
-        
-        dbGrid.addRowContextClickHandler(new RowContextClickHandler() {
 
+        dbGrid.addRowContextClickHandler(new RowContextClickHandler() {
             @Override
             public void onRowContextClick(RowContextClickEvent event) {
                 event.cancel();
@@ -354,93 +330,103 @@ public class WarehouseListTab extends Tab {
         });
     }
 
-   public void connect(String pwd)
-   {
-       WarehouseServiceAsync ms = WarehouseService.Util.getInstance();
-       final AsyncCallback< Void > callback = new AsyncCallback< Void >() {
-       @Override
-       public void onFailure(Throwable caught) {
+    private WareTreeNode[] createNode(ArrayList<String> results) {
+
+        WareTreeNode[] child = new WareTreeNode[results.size()];
+        int i = 0;
+        for (String key : results) {
+            String[] split = key.split("#");
+            child[i] = new WareTreeNode(split[0], split[1], split[2], split[3]);
+            //child[i] = new MedImgWarehouseTreeNode("1","test","test");
+
+
+            i++;
+
+        }
+        return child;
+    }
+
+    public void connect(String pwd) {
+        WarehouseServiceAsync ms = WarehouseService.Util.getInstance();
+        final AsyncCallback< Void> callback = new AsyncCallback< Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Cannot reach the selected warehouse.");
             }
 
-       @Override
+            @Override
             public void onSuccess(Void result) {
-                 WarehouseServiceAsync ms2 = WarehouseService.Util.getInstance();
-                final AsyncCallback< HashMap<String, String> > callback = new AsyncCallback< HashMap<String, String> >() {
-
+                WarehouseServiceAsync ms2 = WarehouseService.Util.getInstance();
+                final AsyncCallback< ArrayList<String>> callback = new AsyncCallback< ArrayList<String>>() {
                     @Override
                     public void onFailure(Throwable caught) {
                         Layout.getInstance().setWarningMessage("Cannot find the database");
                     }
 
-
                     @Override
                     // id, name
-                    public void onSuccess(HashMap<String, String> results) {
+                    public void onSuccess(ArrayList<String> results) {
                         Layout.getInstance().setNoticeMessage("successful connection to the warehouse.");
+                      
+
+                        WareTreeNode root = new WareTreeNode("1", "root", "root","folder", createNode(results));
                         //create tree with model timepoints
-                      
-                  //  wareTree.setModelType(TreeModelType.CHILDREN);
-                    //wareTree.setChildrenProperty("Children");
-                 
-                    
-                                           TreeNode root = new TreeNode("root");
-                                   //("1","root","root");
-       Tree wareTree = new Tree();
-       
-                            wareTree.setRoot(root);
-            TreeNode[] child = new TreeNode[results.size()];
-            int i=0;
-                         for(String key : results.keySet())
-                        {
-                            child[i] = new TreeNode(results.get(key));
-                              //child[i] = new MedImgWarehouseTreeNode("1","test","test");
-                              
-                              wareTree.add(child[i], root);
-                              i++;
-                      
-                        }
-             
-       
-              
-                            warehouseTree.setData(wareTree);
+                        Tree wareTree = new Tree();
+                        wareTree.setModelType(TreeModelType.CHILDREN);
+                        wareTree.setNameProperty("warehouse");
                         
-                        
-                        
- logger.log(Level.SEVERE, " tree creation");
-//                    MedImgWarehouseTreeNode[] child = new MedImgWarehouseTreeNode[results.size()];
-//                    int i =0;
-// logger.log(Level.SEVERE, " treechild creation");
-//                        for(String key : results.keySet())
-//                        {
-//                              child[i] = new MedImgWarehouseTreeNode(key,results.get(key),results.get(key));
-//                              i++;
-//                        }
-//                           logger.log(Level.SEVERE, " tp size :" + child.length);
-//                           MedImgWarehouseTreeNode root = new MedImgWarehouseTreeNode("1","root","root",child);
-//                           
-//                            wareTree.setRoot(root);
-//                            warehouseTree.setData(wareTree);
-//                            warehouseTree.redraw();
-                              logger.log(Level.SEVERE, " root creation  " + root.toString());
-                     }
+                        wareTree.setRoot(root);
+                       warehouseTree.setAutoFetchData(true);
+    warehouseTree.setShowConnectors(true);  
 
+//                   warehouseTree.setShowOpenIcons(false);
+//        warehouseTree.setShowDropIcons(false);
+//        warehouseTree.setShowHeader(false);
+//        warehouseTree.setFolderIcon("icon-tree-service.png");
+//        warehouseTree.setClosedIconSuffix("");
+//        warehouseTree.setLoadDataOnDemand(true);
+                     //   warehouseTree.setFolderIcon("icon-tree-service.png");
+                        warehouseTree.setData(wareTree);
+                        warehouseTree.addNodeClickHandler(new NodeClickHandler() {
+                            public void onNodeClick(NodeClickEvent event) {
+                                final NodeClickEvent ev = event;
+                                String id = ev.getNode().getAttribute("id");
+
+                                
+                                WarehouseServiceAsync ms = WarehouseService.Util.getInstance();
+                                final AsyncCallback< ArrayList<String>> callback = new AsyncCallback< ArrayList<String>>() {
+                                    @Override
+                                    public void onFailure(Throwable caught) {
+                                        Layout.getInstance().setWarningMessage("Cannot find the database");
+                                    }
+
+                                    @Override
+                                    // id, name
+                                    public void onSuccess(ArrayList<String> results) {
+                                        ev.getNode().setChildren(createNode(results));
+                                        warehouseTree.getData().openAll();
+                                        warehouseTree.redraw();
+                                    }
+                                };
+                                if(ev.getNode().getAttribute("type").equals("folder"))
+                                ms.getProject(mnickname, murl, mtype, id, ev.getNode().getAttribute("type"),callback);
+                            }
+                        });
+
+
+                    }
                 };
-                ms2.getProjects(mnickname,murl, mtype,callback);
+                ms2.getProjects(mnickname, murl, mtype, callback);
             }
-            
         };
-         
-        ms.getConnection(mnickname, pwd, murl, mtype, callback);
-   }
-        
-        
-   private void getDB()
-   {
-      
-        WarehouseServiceAsync ms = WarehouseService.Util.getInstance();
-        final AsyncCallback< List<String> > callback = new AsyncCallback< List<String>>() {
 
+        ms.getConnection(mnickname, pwd, murl, mtype, callback);
+    }
+
+    private void getDB() {
+
+        WarehouseServiceAsync ms = WarehouseService.Util.getInstance();
+        final AsyncCallback< List<String>> callback = new AsyncCallback< List<String>>() {
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Cannot find the database");
@@ -449,25 +435,23 @@ public class WarehouseListTab extends Tab {
             // a result is composed of nickanme#url#site
             @Override
             public void onSuccess(List<String> result) {
-               sites = (ArrayList)result;
-                             LinkedHashMap<String, String> lutMap = new LinkedHashMap<String, String>();
-        for(String key : result) {
-            String splits[] = key.split("#");
-            //Map : nickanme#url#type, name
-            lutMap.put(splits[0]+"#"+splits[1]+"#"+splits[3], splits[2]);
-        }
-                    DBCombo.setValueMap(lutMap);
+                sites = (ArrayList) result;
+                LinkedHashMap<String, String> lutMap = new LinkedHashMap<String, String>();
+                for (String key : result) {
+                    String splits[] = key.split("#");
+                    //Map : nickanme#url#type, name
+                    lutMap.put(splits[0] + "#" + splits[1] + "#" + splits[3], splits[2]);
                 }
-            
+                DBCombo.setValueMap(lutMap);
+            }
         };
         ms.getSites(callback);
-   }
-    
-   private void getDB2()
-   {
-      
-           WarehouseServiceAsync ms = WarehouseService.Util.getInstance();
-        final AsyncCallback< String > callback = new AsyncCallback< String >() {
+    }
+
+    private void getDB2() {
+
+        WarehouseServiceAsync ms = WarehouseService.Util.getInstance();
+        final AsyncCallback< String> callback = new AsyncCallback< String>() {
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Cannot find the project");
@@ -475,43 +459,37 @@ public class WarehouseListTab extends Tab {
 
             @Override
             public void onSuccess(String result) {
-              
             }
         };
-       
-       ms.test(callback);
-   } 
-   
-   
+
+        ms.test(callback);
+    }
+
     public WarehouseListTab() {
-       logger = Logger.getLogger("warehouse");
-        logger.log(Level.SEVERE, "warehouse access");
         this.setTitle("Medical Images Database");
-       this.setCanClose(true);
+        this.setCanClose(true);
 
         // Layout for  selection to database
-        final DynamicForm manageForm = new DynamicForm();  
-        manageForm.setIsGroup(true);  
-        manageForm.setGroupTitle("Manage connections");  
-        manageForm.setAutoFocus(false);  
-        manageForm.setID("manageconnections");  
-        manageForm.setNumCols(2);  
+        final DynamicForm manageForm = new DynamicForm();
+        manageForm.setIsGroup(true);
+        manageForm.setGroupTitle("Manage connections");
+        manageForm.setAutoFocus(false);
+        manageForm.setID("manageconnections");
+        manageForm.setNumCols(2);
         manageForm.setHeight100();
         //manageForm.setWidth100();
         ButtonItem submitButton = new ButtonItem("OK");
         final pwdDialog pDial = new pwdDialog(this);
         submitButton.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-
             @Override
-            public void onClick( com.smartgwt.client.widgets.form.fields.events.ClickEvent event) 
-            {
-              
+            public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
+
                 String[] values = DBCombo.getValue().toString().split("#");
                 mnickname = values[0];
                 murl = values[1];
                 mwarehouse = DBCombo.getDisplayValue();
                 mtype = values[2];
-                pDial.configure(mnickname,murl, mwarehouse, mtype);
+                pDial.configure(mnickname, murl, mwarehouse, mtype);
                 pDial.show();
             }
         });
@@ -519,25 +497,25 @@ public class WarehouseListTab extends Tab {
         DBCombo.setTitle("Database");
         DBCombo.setMultiple(false);
         DBCombo.setPrompt("select the database where to download the data.");
-        DBCombo.enable(); 
+        DBCombo.enable();
         getDB();
-        manageForm.setFields(DBCombo,submitButton);
-        
+        manageForm.setFields(DBCombo, submitButton);
+
         HLayout hconlay = new HLayout();
         //hconlay.setWidth100();
         hconlay.setHeight(100);
         hconlay.setMembersMargin(10);
         hconlay.addMember(manageForm);
-        
+
         //Layout for browse database
         VLayout dblayout = new VLayout();
-        
+
         final DynamicForm exploreForm = new DynamicForm();
-        exploreForm.setIsGroup(true);  
-        exploreForm.setGroupTitle("Explore DB");  
-        exploreForm.setAutoFocus(false);  
-        exploreForm.setID("exploredb");  
-        exploreForm.setNumCols(2); 
+        exploreForm.setIsGroup(true);
+        exploreForm.setGroupTitle("Explore DB");
+        exploreForm.setAutoFocus(false);
+        exploreForm.setID("exploredb");
+        exploreForm.setNumCols(2);
         //database grid
         //configureDBGrid();
         configureTree();
@@ -547,28 +525,43 @@ public class WarehouseListTab extends Tab {
         item.setCanvas(warehouseTree);
         exploreForm.setFields(item);
         // result path
-        
-        ListHLayout lhlayout = new ListHLayout(dblayout,false);
+
+        final ListHLayout lhlayout = new ListHLayout(dblayout, false);
         //download button
         final ButtonItem downBut = new ButtonItem("download");
         downBut.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-
             @Override
-            public void onClick( com.smartgwt.client.widgets.form.fields.events.ClickEvent event) 
-            {}
+            public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
+                WarehouseServiceAsync ms = WarehouseService.Util.getInstance();
+                final AsyncCallback< Void> callback = new AsyncCallback< Void>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        Layout.getInstance().setWarningMessage("Cannot Download data");
+                    }
+
+                    @Override
+                    public void onSuccess(Void result) {
+                        Layout.getInstance().setNoticeMessage("Downloaded data");
+                    }
+                };
+                 ms.getData(mnickname, murl,mtype,    warehouseTree.getSelectedRecord().getAttribute("name"),
+                         warehouseTree.getSelectedRecord().getAttribute("id"),
+                     warehouseTree.getSelectedRecord().getAttribute("type")   ,
+                      lhlayout.getValue(), callback);
+            }
         });
         final DynamicForm downForm = new DynamicForm();
         downForm.setFields(downBut);
-        exploreForm.setIsGroup(true); 
+        //  exploreForm.setIsGroup(true); 
         dblayout.addMember(warehouseTree);
-//        dblayout.addMember(exploreForm);
-//        dblayout.addMember(lhlayout);
+        //  dblayout.addMember(exploreForm);
+        dblayout.addMember(lhlayout);
         dblayout.addMember(downForm);
         hconlay.addMember(dblayout);
 
         VLayout vlay = new VLayout();
-       vlay.addMember(hconlay);
-        
+        vlay.addMember(hconlay);
+
         this.setPane(vlay);
     }
 }

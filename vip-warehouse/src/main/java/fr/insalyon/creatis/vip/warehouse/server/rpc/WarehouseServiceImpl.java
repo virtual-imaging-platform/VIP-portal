@@ -35,12 +35,14 @@
 package fr.insalyon.creatis.vip.warehouse.server.rpc;
 
 
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.warehouse.client.rpc.WarehouseService;
 import fr.insalyon.creatis.vip.warehouse.server.business.XnatBusiness;
 import fr.insalyon.creatis.vip.warehouse.client.view.WareHouseException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.warehouse.server.business.ItemDB;
 import fr.insalyon.creatis.vip.warehouse.server.business.MedImgWarehouseBusiness;
 import fr.insalyon.creatis.vip.warehouse.server.business.MidasBusiness;
@@ -79,8 +81,7 @@ public class WarehouseServiceImpl extends AbstractRemoteServiceServlet implement
    public List<String> getSites()
    {
        try {
-              System.out.println("I was here");
-             Logger.getLogger("gettheSites");
+              
                 return midbness.getSites(getSessionUser().getEmail());
         } catch (DAOException ex) {
             Logger.getLogger(WarehouseServiceImpl.class.getName());
@@ -136,9 +137,9 @@ public class WarehouseServiceImpl extends AbstractRemoteServiceServlet implement
    }
     
     @Override
-   public HashMap<String,String> getProjects(String nickname, String url, String type) throws WareHouseException
+   public ArrayList<String> getProjects(String nickname, String url, String type) throws WareHouseException
    { 
-       HashMap<String, String> result = new HashMap<String, String>();
+       ArrayList<String> result= new ArrayList<String>();
         try {
              if (type.contains("midas"))
                  return mness.getTopFolder(nickname, url);
@@ -165,11 +166,19 @@ public class WarehouseServiceImpl extends AbstractRemoteServiceServlet implement
    
    
     @Override
-    public String getProject(String nick, String site, String projectid) throws WareHouseException
+    public ArrayList<String> getProject(String nick, String url, String type, String projectid, String itemtype) throws WareHouseException
    {
+       ArrayList<String> res = new ArrayList<String>();
+   
         try {
-            return xness.getProject(nick, site, projectid);
-        } catch (MalformedURLException ex) {
+             if (type.contains("midas"))
+                 return mness.getChildren(nick, url, projectid, itemtype);
+            else if (type.equalsIgnoreCase("xnat"))
+                 return res;//xness.getProject(nick, url, projectid);
+            else
+            return res;
+          }
+         catch (MalformedURLException ex) {
             Logger.getLogger(ex.toString());//Logger.getLogger(XnatServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         } catch (IOException ex) {
@@ -186,9 +195,38 @@ public class WarehouseServiceImpl extends AbstractRemoteServiceServlet implement
         
    }
  
-//   public JSONObject getData(String nick, String site,String project) throws XnatException
-//   {
-//         return xness.getData( project);
-//   }
+    @Override
+   public void getData(String nick, String site, String waretype, String name, String id, String itemtype, String path) throws WareHouseException
+   {
+         try {
+             if (waretype.contains("midas"))
+             {
+                  mness.getData(getSessionUser(), site,name, id,itemtype, path);
+             }
+            else if (waretype.equalsIgnoreCase("xnat")){}               //xness.getProjects(nickname, url);
+            else{
+            }
+          
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(ex.toString());//Logger.getLogger(XnatServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+           
+        } catch (IOException ex) {
+            Logger.getLogger(ex.toString());//Logger.getLogger(XnatServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+          
+        } 
+         catch (DAOException ex) {
+            Logger.getLogger(ex.toString());//Logger.getLogger(XnatServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+          
+        } catch (JSONException ex) {
+            java.util.logging.Logger.getLogger(WarehouseServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            
+        } catch (CoreException ex) {
+            java.util.logging.Logger.getLogger(WarehouseServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (DataManagerException ex) {
+            java.util.logging.Logger.getLogger(WarehouseServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (GRIDAClientException ex) {
+            java.util.logging.Logger.getLogger(WarehouseServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+   }
 
 }
