@@ -249,8 +249,8 @@ public class CreateQuery extends AbstractFormLayout {
                         + "and name;type;description;examples separed by «;»"
                         + "example of parameter name:[name; String; name of patient; Olivier]</b>");
                  
-               // winModal.addItem(textbox);
-               // winModal.show();
+                winModal.addItem(textbox);
+                winModal.show();
             }
         });
         helpButton.setLayoutAlign(Alignment.LEFT);
