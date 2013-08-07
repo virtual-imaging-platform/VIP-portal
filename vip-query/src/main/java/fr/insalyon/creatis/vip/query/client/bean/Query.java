@@ -13,59 +13,52 @@ import java.util.List;
  *
  * @author Boujelben
  */
+public class Query implements IsSerializable {
 
-
- public class Query implements IsSerializable {
-    public Query() {}
-
-            
+    public Query() {
+    }
     private String name;
     private Long queryID;
     //date creation of version
-    private  String dateCreation;
+    private String dateCreation;
     private String description;
-    private String queryMaker ;
+    private String queryMaker;
     private String queryversions;
 
-    public Query(String description,String name,String queryMaker ) {
+    public Query(String description, String name, String queryMaker) {
         this.name = name;
-       ///this.dateCreation=dateCreation;
-        this.description = description;
-        this.queryMaker = queryMaker;
-    }
-    
-    public Query(String description,String name) {
-        this.name = name;
-       ///this.dateCreation=dateCreation;
-        this.description = description;
-       
-    }
-  
-    
-public Query(String description,String name,String queryMaker, String dateCreation ) {
-        this.name = name;
-       this.dateCreation=dateCreation;
+        ///this.dateCreation=dateCreation;
         this.description = description;
         this.queryMaker = queryMaker;
     }
 
-   
+    public Query(String description, String name) {
+        this.name = name;
+        ///this.dateCreation=dateCreation;
+        this.description = description;
 
-  
-/*
-    public Query( String name, String dateCreation,String queryversions ) {
+    }
+
+    public Query(String description, String name, String queryMaker, String dateCreation) {
         this.name = name;
         this.dateCreation = dateCreation;
-        this.queryversions=queryversions;
-        
+        this.description = description;
+        this.queryMaker = queryMaker;
     }
-    */
 
-    public String  getDateCreation() {
+    /*
+     public Query( String name, String dateCreation,String queryversions ) {
+     this.name = name;
+     this.dateCreation = dateCreation;
+     this.queryversions=queryversions;
+        
+     }
+     */
+    public String getDateCreation() {
         return dateCreation;
     }
 
-    public void setDateCreation(String  dateCreation) {
+    public void setDateCreation(String dateCreation) {
         this.dateCreation = dateCreation;
     }
 
@@ -100,27 +93,12 @@ public Query(String description,String name,String queryMaker, String dateCreati
     public void setQueryMaker(String queryMaker) {
         this.queryMaker = queryMaker;
     }
-     
-        public String getQueryversions() {
+
+    public String getQueryversions() {
         return queryversions;
     }
 
     public void setQueryversions(String queryversions) {
         this.queryversions = queryversions;
     }
-    
-    
-
-  
-
-  
-    
-
-    
-   
-   
-   
-    }
-     
-
-    
+}

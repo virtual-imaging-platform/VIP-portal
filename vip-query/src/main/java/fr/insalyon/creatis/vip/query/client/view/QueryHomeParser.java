@@ -36,6 +36,7 @@ public class QueryHomeParser extends ApplicationParser {
 
         } else if (applicationName.equals(QueryConstants.APP_QUERYHISTORY)) {
             Layout.getInstance().addTab(new QueryHistoryTab());
+           
             return true;
         }
         return false;

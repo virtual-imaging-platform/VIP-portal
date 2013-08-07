@@ -11,7 +11,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * @author Boujelben
  */
 public class QueryException extends Exception implements IsSerializable {
-   
+
     public QueryException() {
     }
 
@@ -23,4 +23,3 @@ public class QueryException extends Exception implements IsSerializable {
         super(message);
     }
 }
-

@@ -10,21 +10,13 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  *
  * @author nouha
  */
-public class ValueRecord extends ListGridRecord{
-    
-    
-   
-     public ValueRecord(String value,Long parameterID) {
+public class ValueRecord extends ListGridRecord {
+
+    public ValueRecord(String value, Long parameterID) {
 
         setAttribute("value", value);
-        setAttribute("parameterID",parameterID );
-      
-        
-    }
-    
-}
-    
-    
-    
-    
+        setAttribute("parameterID", parameterID);
 
+
+    }
+}

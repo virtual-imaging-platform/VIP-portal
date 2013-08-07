@@ -12,17 +12,18 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 import java.sql.Date;
 import java.sql.Timestamp;
+
 public class QueryRecord extends ListGridRecord {
 
-    public QueryRecord(String name,String dateCreation,String version,String queryversionID ) {
+    public QueryRecord(String name, String dateCreation, String version, String queryversionID,String queryID) {
 
         setAttribute("name", name);
         setAttribute("dateCreation", dateCreation);
-        setAttribute("version", "v."+version);
+        setAttribute("version", "v." + version);
         setAttribute("queryversionID", queryversionID);
-       
         
+        setAttribute("queryID", queryID);
+
+
     }
 }
-    
-

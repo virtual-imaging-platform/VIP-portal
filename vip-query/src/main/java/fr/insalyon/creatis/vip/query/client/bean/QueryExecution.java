@@ -11,30 +11,28 @@ import java.sql.Timestamp;
  *
  * @author nouha
  */
-public class QueryExecution implements IsSerializable{
+public class QueryExecution implements IsSerializable {
+
     private Long queryExecutionID;
     private Long queryVersionID;
     private Timestamp dateExecution;
     private String executer;
-    private String status ;
+    private String status;
     private String name;
-   
     private Timestamp dateEndExecution;
     private String urlResult;
 
     public QueryExecution() {
     }
-    
 
     public QueryExecution(Long queryVersionID, String status, String name, String urlResult) {
         this.queryVersionID = queryVersionID;
         this.status = status;
         this.name = name;
-      
-    
+
+
         this.urlResult = urlResult;
     }
-    
 
     public Long getQueryExecutionID() {
         return queryExecutionID;
@@ -84,7 +82,6 @@ public class QueryExecution implements IsSerializable{
         this.name = name;
     }
 
-   
     public Timestamp getDateEndExecution() {
         return dateEndExecution;
     }
@@ -100,7 +97,4 @@ public class QueryExecution implements IsSerializable{
     public void setUrlResult(String urlResult) {
         this.urlResult = urlResult;
     }
-   
-    
-    
 }

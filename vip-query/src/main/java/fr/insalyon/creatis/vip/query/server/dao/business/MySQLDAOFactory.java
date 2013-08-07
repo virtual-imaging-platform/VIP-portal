@@ -1,6 +1,4 @@
-
 package fr.insalyon.creatis.vip.query.server.dao.business;
-
 
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
@@ -25,7 +23,7 @@ public class MySQLDAOFactory extends QueryDAOFactory {
 
     private MySQLDAOFactory() {
 
-       try {
+        try {
             logger.info("Configuring VIP Query database.");
 
             PlatformConnection.getInstance().createTable("Query",
@@ -36,8 +34,8 @@ public class MySQLDAOFactory extends QueryDAOFactory {
                     + "PRIMARY KEY (queryID), "
                     + "FOREIGN KEY (queryMaker) REFERENCES vipusers(email) "
                     + "ON DELETE RESTRICT ON UPDATE RESTRICT");
-            
-  
+
+
             PlatformConnection.getInstance().createTable("QueryVersion",
                     "queryVersionID BIGINT(20) AUTO_INCREMENT, "
                     + "queryVersion BIGINT(20), "
@@ -47,8 +45,8 @@ public class MySQLDAOFactory extends QueryDAOFactory {
                     + "PRIMARY KEY (queryVersionID ), "
                     + "FOREIGN KEY (queryID) REFERENCES Query(queryID) "
                     + "ON DELETE CASCADE ON UPDATE RESTRICT");
-            
-             PlatformConnection.getInstance().createTable("Parameter",
+
+            PlatformConnection.getInstance().createTable("Parameter",
                     "parameterID BIGINT(20) AUTO_INCREMENT, "
                     + "name VARCHAR(255), "
                     + "type VARCHAR(255), "
@@ -58,22 +56,21 @@ public class MySQLDAOFactory extends QueryDAOFactory {
                     + "PRIMARY KEY (parameterID), "
                     + "FOREIGN KEY (queryVersionID) REFERENCES QueryVersion(queryVersionID) "
                     + "ON DELETE CASCADE ON UPDATE RESTRICT");
-             
-              PlatformConnection.getInstance().createTable("QueryExecution",
+
+            PlatformConnection.getInstance().createTable("QueryExecution",
                     "queryExecutionID BIGINT(20) AUTO_INCREMENT, "
                     + "queryVersionID BIGINT(20), "
                     + "name VARCHAR(255), "
                     + "dateExecution TIMESTAMP, "
                     + "dateEndExecution TIMESTAMP, "
                     + "urlResult VARCHAR(1000), "
-                    + "executer VARCHAR(255), "   
-                    
-                    + "status VARCHAR(255), "  
+                    + "executer VARCHAR(255), "
+                    + "status VARCHAR(255), "
                     + "PRIMARY KEY (queryExecutionID), "
                     + "FOREIGN KEY (queryVersionID) REFERENCES QueryVersion(queryVersionID) "
                     + "ON DELETE RESTRICT ON UPDATE RESTRICT");
-            
-             PlatformConnection.getInstance().createTable("Value",
+
+            PlatformConnection.getInstance().createTable("Value",
                     "ValueID BIGINT(20) AUTO_INCREMENT, "
                     + "value VARCHAR(255), "
                     + "parameterID BIGINT(20), "
@@ -81,21 +78,19 @@ public class MySQLDAOFactory extends QueryDAOFactory {
                     + "PRIMARY KEY (ValueID ), "
                     + "FOREIGN KEY (parameterID) REFERENCES Parameter(parameterID) "
                     + "ON DELETE CASCADE ON UPDATE RESTRICT, "
-                    + "FOREIGN KEY (queryExecutionID) REFERENCES QueryExecution(queryExecutionID)"  
+                    + "FOREIGN KEY (queryExecutionID) REFERENCES QueryExecution(queryExecutionID)"
                     + "ON DELETE CASCADE ON UPDATE RESTRICT");
-             
 
-             
-             
+
+
+
         } catch (DAOException ex) {
             logger.error(ex);
         }
     }
 
     @Override
-    public QueryDAO getQueryDAO() throws DAOException
-    {
-         return new QueryData();
+    public QueryDAO getQueryDAO() throws DAOException {
+        return new QueryData();
     }
-    
 }
