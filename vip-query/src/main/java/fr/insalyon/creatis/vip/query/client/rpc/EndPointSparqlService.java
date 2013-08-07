@@ -15,8 +15,7 @@ import static fr.insalyon.creatis.vip.query.client.rpc.QueryService.SERVICE_URI;
  * @author nouha
  */
 public interface EndPointSparqlService extends RemoteService {
-    
-    
+
     public static final String SERVICE_URI = "/endPointService";
 
     public static class Util {
@@ -29,10 +28,6 @@ public interface EndPointSparqlService extends RemoteService {
             return instance;
         }
     }
-    
-    
-    
-    
-    
-    String getUrlResult(String param1,String param2);                        
+
+    String getUrlResult(String param1, String param2);
 }

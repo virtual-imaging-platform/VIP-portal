@@ -13,18 +13,18 @@ import java.sql.Timestamp;
  * @author nouha
  */
 public class QueryExecutionRecord extends ListGridRecord {
-     public QueryExecutionRecord(String ExecutionID, String name,String queryName,String version,String executer,Timestamp dateExecution, String status, String urlResult){
-     setAttribute("statusIcon", status);
-     setAttribute("queryExecutionID",ExecutionID );
-     setAttribute("name",name);
-     setAttribute("query", queryName);
-     setAttribute("version", "v."+version);
-     setAttribute("executer", executer);
-     setAttribute("dateExecution", dateExecution);
-     setAttribute("status", status);
-     setAttribute("urlResult", urlResult);
-    
-       
+
+    public QueryExecutionRecord(String ExecutionID, String name, String queryName, String version, String executer, Timestamp dateExecution, String status, String urlResult) {
+        setAttribute("statusIcon", status);
+        setAttribute("queryExecutionID", ExecutionID);
+        setAttribute("name", name);
+        setAttribute("query", queryName);
+        setAttribute("version", "v." + version);
+        setAttribute("executer", executer);
+        setAttribute("dateExecution", dateExecution);
+        setAttribute("status", status);
+        setAttribute("urlResult", urlResult);
+
+
     }
-    
 }

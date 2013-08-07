@@ -11,13 +11,13 @@ import java.sql.Timestamp;
  *
  * @author Boujelben
  */
-public class QueryVersion implements IsSerializable{
-    
-private Long  queryVersionID ;
-private Long queryVersion;
-private Long queryID;
-private String body;
-private  Timestamp dateCreation;
+public class QueryVersion implements IsSerializable {
+
+    private Long queryVersionID;
+    private Long queryVersion;
+    private Long queryID;
+    private String body;
+    private Timestamp dateCreation;
 
     public Timestamp getDateCreation() {
         return dateCreation;
@@ -29,6 +29,7 @@ private  Timestamp dateCreation;
 
     public QueryVersion() {
     }
+
     public QueryVersion(Long queryVersion, Long queryID, String body) {
         this.queryVersion = queryVersion;
         this.queryID = queryID;
@@ -39,9 +40,6 @@ private  Timestamp dateCreation;
         this.queryVersion = queryVersion;
         this.body = body;
     }
-   
-
-    
 
     public QueryVersion(Long queryVersionID, Long queryVersion, Long queryID, String body) {
         this.queryVersionID = queryVersionID;
@@ -81,9 +79,4 @@ private  Timestamp dateCreation;
     public void setQueryVersionID(Long queryVersionID) {
         this.queryVersionID = queryVersionID;
     }
-
-
-
-    
-    
 }

@@ -11,6 +11,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * @author nouha
  */
 public interface EndPointSparqlServiceAsync {
-      public void getUrlResult(String param1,String param2,AsyncCallback <String> asyncCallback);
-    
+
+    public void getUrlResult(String param1, String param2, AsyncCallback<String> asyncCallback);
 }

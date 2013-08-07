@@ -11,19 +11,20 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * @author nouha
  */
 public class Value implements IsSerializable {
-    
+
     private Long valueID;
     private String value;
-    public Value() {}
+    private Long parameterID;
+    private Long queryExecutionID;
+
+    public Value() {
+    }
+
     public Value(String value, Long parameterID, Long queryExecutionID) {
         this.value = value;
         this.parameterID = parameterID;
         this.queryExecutionID = queryExecutionID;
     }
-    private Long parameterID ;
-    private Long queryExecutionID;
-    
-    
 
     public Long getValueID() {
         return valueID;
@@ -56,7 +57,4 @@ public class Value implements IsSerializable {
     public void setQueryExecutionID(Long queryExecutionID) {
         this.queryExecutionID = queryExecutionID;
     }
-    
-    
-    
 }

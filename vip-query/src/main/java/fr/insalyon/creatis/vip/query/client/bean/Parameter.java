@@ -10,13 +10,14 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  *
  * @author Boujelben
  */
-public class Parameter implements IsSerializable{
-  Long  parameterID;
-  String name;
-  String type;
-  String description ;
-  String example;
-  Long queryVersionID;
+public class Parameter implements IsSerializable {
+
+    Long parameterID;
+    String name;
+    String type;
+    String description;
+    String example;
+    Long queryVersionID;
 
     public Parameter(Long queryVersionID) {
         this.queryVersionID = queryVersionID;
@@ -25,22 +26,23 @@ public class Parameter implements IsSerializable{
     public Parameter() {
     }
 
-    public Parameter( String name, String type, String description, String example) {
-      
+    public Parameter(String name, String type, String description, String example) {
+
         this.name = name;
         this.type = type;
         this.description = description;
         this.example = example;
-       
+
     }
-     public Parameter( String name, String type, String description, String example,Long parameterID) {
-      
+
+    public Parameter(String name, String type, String description, String example, Long parameterID) {
+
         this.name = name;
         this.type = type;
         this.description = description;
         this.example = example;
-        this.parameterID=parameterID;
-       
+        this.parameterID = parameterID;
+
     }
 
     public Parameter(String name, String type, Long queryVersionID) {
@@ -48,7 +50,6 @@ public class Parameter implements IsSerializable{
         this.type = type;
         this.queryVersionID = queryVersionID;
     }
-  
 
     public String getDescription() {
         return description;
@@ -97,6 +98,4 @@ public class Parameter implements IsSerializable{
     public void setType(String type) {
         this.type = type;
     }
-  
-    
 }
