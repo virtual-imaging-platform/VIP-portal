@@ -562,7 +562,7 @@ public class QueryData implements QueryDAO {
                     + "queryExecutionID,name,queryName,queryVersion,executer,dateExecution,status,urlResult FROM "
                     + "Query query,QueryVersion queryversion,QueryExecution queryexe WHERE "
                     + "query.queryID=queryversion.queryID AND queryversion.queryVersionID=queryexe.queryVersionID "
-                    + "ORDER BY queryexe.name");
+                    + "ORDER BY queryexe.dateExecution DESC");
 
             ResultSet rs = ps.executeQuery();
             List<String[]> queries = new ArrayList<String[]>();
