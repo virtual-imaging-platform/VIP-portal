@@ -132,8 +132,13 @@ public class QueryHistoryTab extends Tab {
 
                         }
                         detailViewer.setData(dataList.toArray(new ParameterValue[]{}));
+                        
+     
                         detailViewer.setEmptyMessage("No parameters to display");
-                        detailViewer.setEmptyMessageStyle("1px solid black center");
+                        
+       
+                        detailViewer.setBackgroundColor("white");
+                        detailViewer.setEmptyMessageStyle("2px solid black center");
 
                         detailViewer.setBorder("1px solid gray");
 
