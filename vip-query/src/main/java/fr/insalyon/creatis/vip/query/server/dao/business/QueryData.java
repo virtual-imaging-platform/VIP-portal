@@ -41,7 +41,7 @@ public class QueryData implements QueryDAO {
 
                 int id = rs.getInt("queryID");
 
-                PreparedStatement ps2 = connection.prepareStatement("SELECT queryversionID, queryVersion, dateCreation,queryID FROM QueryVersion WHERE queryID=?");
+                PreparedStatement ps2 = connection.prepareStatement("SELECT queryversionID, queryVersion, dateCreation,queryID FROM QueryVersion WHERE queryID=? ORDER BY dateCreation DESC");
 
 
                 ps2.setInt(1, id);
