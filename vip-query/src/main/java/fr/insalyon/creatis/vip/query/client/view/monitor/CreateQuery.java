@@ -179,6 +179,9 @@ public class CreateQuery extends AbstractFormLayout {
               
              //_self empeche popup mais ouvre in the cuurent window
              //Autoriser les fenetre pop-up pour ce site(vip.creatis...)
+                if(body.getValue()==null)
+                     Layout.getInstance().setWarningMessage("there is no query to test" );
+                    else
             
             com.google.gwt.user.client.Window.open(result, "_blank","");
                
