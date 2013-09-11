@@ -18,6 +18,15 @@ public class QueryVersion implements IsSerializable {
     private Long queryID;
     private String body;
     private Timestamp dateCreation;
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public Timestamp getDateCreation() {
         return dateCreation;
@@ -30,10 +39,11 @@ public class QueryVersion implements IsSerializable {
     public QueryVersion() {
     }
 
-    public QueryVersion(Long queryVersion, Long queryID, String body) {
+    public QueryVersion(Long queryVersion, Long queryID,String description, String body) {
         this.queryVersion = queryVersion;
         this.queryID = queryID;
         this.body = body;
+        this.description=description;
     }
 
     public QueryVersion(Long queryVersion, String body) {

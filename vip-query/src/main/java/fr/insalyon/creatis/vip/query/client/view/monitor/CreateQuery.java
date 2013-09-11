@@ -103,7 +103,7 @@ public class CreateQuery extends AbstractFormLayout {
                 if (newQuery) {
                     try {
 
-                        Query q = new Query(description.getValue(), querynameField.getValueAsString());
+                        Query q = new Query(querynameField.getValueAsString());
                         save(q);
 
 
@@ -290,8 +290,9 @@ public class CreateQuery extends AbstractFormLayout {
                 String bodyRemplace = body.getValueAsString();
                  bodyRemplace = bodyRemplace.trim();
                 //bodyd=bodyd.replaceAll("\\s{2,}", " ");
-                bodyRemplace=bodyRemplace.replaceAll("[\r\n]{2,}", "\r\n");;
-                savev(new QueryVersion(1L, result,  bodyRemplace));
+                bodyRemplace=bodyRemplace.replaceAll("[\r\n]{2,}", "\r\n");
+                //queryversiob,queryid
+                savev(new QueryVersion(1L, result,description.getValue(), bodyRemplace));
                 reset();
 
 
@@ -407,7 +408,7 @@ public class CreateQuery extends AbstractFormLayout {
                 String bodyd = bodyRemplace.replaceAll("[\r\n]{2,}", "\r\n");
                
 
-                savev(new QueryVersion(nn, queryID, bodyd));
+                savev(new QueryVersion(nn, queryID,description.getValue(), bodyd));
                 reset();
 
             }

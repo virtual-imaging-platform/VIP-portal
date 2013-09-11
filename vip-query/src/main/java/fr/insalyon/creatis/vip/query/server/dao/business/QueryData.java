@@ -71,29 +71,21 @@ public class QueryData implements QueryDAO {
     public String getDescription(Long queryVersionID) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT queryID FROM QueryVersion where queryVersionID=?");
-            ps.setLong(1, queryVersionID);
-            ResultSet rs = ps.executeQuery();
-
+           
             String result = null;
-
-            while (rs.next()) {
-
-                long id = rs.getLong("queryID");
-
-                PreparedStatement ps2 = connection.prepareStatement("SELECT description FROM Query WHERE queryID=?");
+            PreparedStatement ps2 = connection.prepareStatement("SELECT description FROM QueryVersion WHERE queryVersionID=?");
 
 
-                ps2.setLong(1, id);
-                ResultSet rs2 = ps2.executeQuery();
+            ps2.setLong(1, queryVersionID);
+            ResultSet rs2 = ps2.executeQuery();
 
-                while (rs2.next()) {
+            while (rs2.next()) {
                     result = rs2.getString("description");
                 }
-                ps2.close();
+            ps2.close();
 
-            }
-            ps.close();
+            
+            
             return result;
 
         } catch (SQLException ex) {
@@ -106,7 +98,7 @@ public class QueryData implements QueryDAO {
     public List<String[]> getQuerie(Long queryversionid, Long queryID) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT queryName, description, queryID FROM Query  WHERE queryID=? ");
+            PreparedStatement ps = connection.prepareStatement("SELECT queryName, queryID FROM Query  WHERE queryID=? ");
             //
             ps.setLong(1, queryID);
             ResultSet rs = ps.executeQuery();
@@ -114,12 +106,12 @@ public class QueryData implements QueryDAO {
             List<String[]> queries = new ArrayList<String[]>();
 
             while (rs.next()) {
-                PreparedStatement ps2 = connection.prepareStatement("SELECT body FROM QueryVersion  WHERE queryVersionID=? ");
+                PreparedStatement ps2 = connection.prepareStatement("SELECT body,description FROM QueryVersion  WHERE queryVersionID=? ");
                 ps2.setLong(1, queryversionid);
                 ResultSet rs2 = ps2.executeQuery();
                 while (rs2.next()) {
                     Long qID = rs.getLong("queryID");
-                    queries.add(new String[]{rs.getString("queryName"), rs.getString("description"), rs2.getString("body"), qID.toString()});
+                    queries.add(new String[]{rs.getString("queryName"), rs2.getString("description"), rs2.getString("body"), qID.toString()});
                 }
                 ps2.close();
             }
@@ -353,12 +345,12 @@ public class QueryData implements QueryDAO {
         PreparedStatement ps = null;
         try {
             ps = connection.prepareStatement(
-                    "INSERT INTO Query(description, queryName, queryMaker) "
-                    + "VALUES (?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
+                    "INSERT INTO Query(queryName, queryMaker) "
+                    + "VALUES (?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
 
-            ps.setString(1, query.getDescription());
-            ps.setString(2, query.getName());
-            ps.setString(3, query.getQueryMaker());
+           
+            ps.setString(1, query.getName());
+            ps.setString(2, query.getQueryMaker());
 
             ps.execute();
             ResultSet rs = ps.getGeneratedKeys();
@@ -387,11 +379,12 @@ public class QueryData implements QueryDAO {
         try {
 
             PreparedStatement ps2 = connection.prepareStatement(
-                    "INSERT INTO QueryVersion(queryVersion, queryID, body, dateCreation) VALUES (?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
+                    "INSERT INTO QueryVersion(queryVersion, queryID, body, dateCreation,description) VALUES (?, ?, ?, ?, ? )", PreparedStatement.RETURN_GENERATED_KEYS);
             ps2.setLong(1, version.getQueryVersion());
             ps2.setObject(2, version.getQueryID());
             ps2.setString(3, version.getBody());
             ps2.setTimestamp(4, getCurrentTimeStamp());
+            ps2.setString(5,version.getDescription());
             ps2.execute();
             ResultSet rs = ps2.getGeneratedKeys();
             Long idAuto_increment = new Long(0);
@@ -476,15 +469,16 @@ public class QueryData implements QueryDAO {
 
             ps1.close();
             PreparedStatement ps = connection.prepareStatement("UPDATE "
-                    + "Query "
+                    + "Query, QueryVersion "
                     + "SET description=?, queryName=? "
-                    + "WHERE queryID=?");
+                    + "WHERE Query.queryID=? AND QueryVersion.queryVersionID=?");
 
 
 
             ps.setString(1, description);
             ps.setString(2, name);
             ps.setLong(3, queryID);
+            ps.setLong(4, queryVersionID);
             ps.executeUpdate();
             ps.close();
 
@@ -584,6 +578,7 @@ public class QueryData implements QueryDAO {
     }
 
     @Override
+    //Get body with or no parameter
     public String getBody(Long queryVersionID, Long queryExecutionID, boolean parameter) throws DAOException {
         try {
             if (parameter == false) {
