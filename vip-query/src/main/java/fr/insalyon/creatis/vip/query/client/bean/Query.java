@@ -25,24 +25,24 @@ public class Query implements IsSerializable {
     private String queryMaker;
     private String queryversions;
 
-    public Query(String description, String name, String queryMaker) {
+    public Query( String name, String queryMaker) {
         this.name = name;
         ///this.dateCreation=dateCreation;
-        this.description = description;
+      
         this.queryMaker = queryMaker;
     }
 
-    public Query(String description, String name) {
+    public Query(String name) {
         this.name = name;
         ///this.dateCreation=dateCreation;
-        this.description = description;
+        
 
     }
 
-    public Query(String description, String name, String queryMaker, String dateCreation) {
+    public Query(String name, String queryMaker, String dateCreation) {
         this.name = name;
         this.dateCreation = dateCreation;
-        this.description = description;
+       
         this.queryMaker = queryMaker;
     }
 
@@ -62,13 +62,9 @@ public class Query implements IsSerializable {
         this.dateCreation = dateCreation;
     }
 
-    public String getDescription() {
-        return description;
-    }
+   
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+   
 
     public String getName() {
         return name;
