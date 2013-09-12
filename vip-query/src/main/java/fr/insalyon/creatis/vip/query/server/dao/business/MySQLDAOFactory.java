@@ -28,7 +28,7 @@ public class MySQLDAOFactory extends QueryDAOFactory {
 
             PlatformConnection.getInstance().createTable("Query",
                     "queryID BIGINT(20) AUTO_INCREMENT, "
-                    + "description TEXT NULL, "
+                    
                     + "queryMaker VARCHAR(255), "
                     + "queryName VARCHAR(255), "
                     + "PRIMARY KEY (queryID), "
@@ -42,6 +42,7 @@ public class MySQLDAOFactory extends QueryDAOFactory {
                     + "queryID BIGINT(20), "
                     + "body TEXT, "
                     + "dateCreation TIMESTAMP, "
+                    + "description TEXT NULL, "
                     + "PRIMARY KEY (queryVersionID ), "
                     + "FOREIGN KEY (queryID) REFERENCES Query(queryID) "
                     + "ON DELETE CASCADE ON UPDATE RESTRICT");
