@@ -33,6 +33,7 @@ public class QueryData implements QueryDAO {
     public List<String[]> getQueries() throws DAOException {
 
         try {
+            
             PreparedStatement ps = connection.prepareStatement("SELECT queryID, queryName FROM Query");
             ResultSet rs = ps.executeQuery();
             List<String[]> queries = new ArrayList<String[]>();
@@ -53,14 +54,38 @@ public class QueryData implements QueryDAO {
                     Long qID = rs2.getLong("queryID");
 
 
-                    queries.add(new String[]{rs.getString("queryName"), date.toString(), version.toString(), rs2.getString("queryversionID"), qID.toString()});
+                    queries.add(new String[]{rs.getString("queryName"), date.toString(), version.toString(), rs2.getString("queryVersionID"), qID.toString()});
                 }
                 ps2.close();
 
             }
             ps.close();
             return queries;
+           
+            
 
+        
+        /*
+            try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                    + "QueryVersion.queryID, queryName, dateCreation, queryVersion, queryVersionID FROM "
+                    + "Query, QueryVersion "
+                    + "WHERE Query.queryID=QueryVersion.queryID "
+                    + "ORDER BY dateCreation DESC");
+
+            ResultSet rs = ps.executeQuery();
+            List<String[]> queries = new ArrayList<String[]>();
+
+            while (rs.next()) {
+                Integer version = rs.getInt("queryVersion");
+                Timestamp date = rs.getTimestamp("dateCreation");
+                Long qID = rs.getLong("QueryVersion.queryID");
+                
+                queries.add(new String[]{rs.getString("queryName"), date.toString(), version.toString(), rs.getString("queryVersionID"),qID.toString()});
+            }
+            ps.close();
+            return queries;
+            * */
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
@@ -132,8 +157,8 @@ public class QueryData implements QueryDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "queryName,dateCreation,queryVersion FROM"
                     + " Query query,QueryVersion queryversion "
-                    + "query.queryID=queryVersion.queryID"
-                    + "ORDER BY query.queryName");
+                    + "WHERE query.queryID=queryVersion.queryID"
+                    + "ORDER BY queryVersion.dateCreation");
 
             ResultSet rs = ps.executeQuery();
             List<String[]> queries = new ArrayList<String[]>();
