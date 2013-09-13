@@ -46,7 +46,7 @@ public class EndPointSparqlServiceImpl extends RemoteServiceServlet
             Logger.getLogger(EndPointSparqlServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            k = URLDecoder.decode(url, "UTF-8");
+            k = URLDecoder.decode(url,"UTF-8");
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(EndPointSparqlServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
        }
