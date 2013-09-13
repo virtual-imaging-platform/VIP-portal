@@ -9,6 +9,7 @@ import fr.insalyon.creatis.vip.query.client.rpc.EndPointSparqlService;
 import java.io.UnsupportedEncodingException;
 import org.apache.http.client.utils.URIBuilder;
 import java.lang.Object.*;
+import java.net.URI;
 
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -39,6 +40,7 @@ public class EndPointSparqlServiceImpl extends RemoteServiceServlet
         builder.setParameter("format", param2);
         try {
             url = builder.build().toString();
+            
 
         } catch (URISyntaxException ex) {
             Logger.getLogger(EndPointSparqlServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
@@ -47,9 +49,10 @@ public class EndPointSparqlServiceImpl extends RemoteServiceServlet
             k = URLDecoder.decode(url, "UTF-8");
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(EndPointSparqlServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-        }
+       }
 
         return k;
+        
     }
-    //;  
+    
 }
