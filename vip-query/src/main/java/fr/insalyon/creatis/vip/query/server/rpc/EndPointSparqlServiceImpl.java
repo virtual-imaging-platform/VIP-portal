@@ -51,7 +51,7 @@ public class EndPointSparqlServiceImpl extends RemoteServiceServlet
             Logger.getLogger(EndPointSparqlServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
        }
 
-        return k;
+        return url;
         
     }
     
