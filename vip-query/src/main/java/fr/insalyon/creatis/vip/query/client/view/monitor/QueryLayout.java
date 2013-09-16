@@ -168,8 +168,8 @@ public class QueryLayout extends VLayout {
         DataSource ds = new Data();
         grid.setDataSource(ds);
         grid.setSortField("name");
-        //idversion.setHidden(true);
-       // idQuery.setHidden(true);
+       idversion.setHidden(true);
+       idQuery.setHidden(true);
        // grid.setSortDirection(SortDirection.ASCENDING);
 
         grid.addCellClickHandler(new CellClickHandler() {
