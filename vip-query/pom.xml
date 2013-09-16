@@ -4,7 +4,7 @@
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>1.4.1</version>
+        <version>1.4</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -61,10 +61,12 @@
         
         
         <dependency>
-   <groupId>org.apache.httpcomponents</groupId>
-   <artifactId>httpclient-osgi</artifactId>
-   <version>4.2-alpha1</version>
-</dependency>
+	<groupId>org.apache.httpcomponents</groupId>
+	<artifactId>httpclient</artifactId>
+	<version>4.2.3</version>
+        </dependency>
+            
+            
        
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
