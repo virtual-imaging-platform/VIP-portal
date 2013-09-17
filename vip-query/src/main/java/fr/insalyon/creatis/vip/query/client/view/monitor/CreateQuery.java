@@ -59,6 +59,7 @@ public class CreateQuery extends AbstractFormLayout {
     private int rownumber = 0;
     private Long queryID = 0l;
     private boolean testt;  
+    
 
     // messageItem.setShowTitle(false);
     // messageItem.setLength(5000);
@@ -159,68 +160,7 @@ public class CreateQuery extends AbstractFormLayout {
         });
 
 
-        testButton = WidgetUtil.getIButton("Test", CoreConstants.ICON_USER_INFO,
-                new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-         
-
-        final AsyncCallback<String> callback = new AsyncCallback<String>() {
-            @Override
-            public void onFailure(Throwable caught) {
-
-                Layout.getInstance().setWarningMessage("Unable to get result" + caught.getMessage());
-                
-            }
-
-            @Override
-            public void onSuccess(String result) {
-
-              
-             //_self empeche popup mais ouvre in the cuurent window
-             //Autoriser les fenetre pop-up pour ce site(vip.creatis...)
-                if(body.getValue()==null)
-                     Layout.getInstance().setWarningMessage("there is no query to test" );
-                    else
-            
-            com.google.gwt.user.client.Window.open(result, "_blank","");
-               
-
-
-                
-
-
-            }
-        };
-
-        EndPointSparqlService.Util.getInstance().getUrlResult(body.getValueAsString(),"csv", callback);
-
-
-
-    
-                /*final Window winModal = new Window();
-                winModal.setWidth100();
-                winModal.setHeight100();
-                winModal.setTitle("Test");
-                winModal.setShowMinimizeButton(false);
-                winModal.setIsModal(true);
-                winModal.setShowModalMask(true);
-                winModal.centerInPage();
-                winModal.show();
-
-                winModal.addCloseClickHandler(new CloseClickHandler() {
-                    public void onCloseClick(CloseClickEvent event) {
-                        winModal.destroy();
-                    }
-                });
-                */
-
-            }
-        });
-
-
-
-
+        
         helpButton = FieldUtil.getImgButton(QueryConstants.ICON_HELP, "How to create a query",
                 new ClickHandler() {
             @Override
@@ -270,7 +210,7 @@ public class CreateQuery extends AbstractFormLayout {
 
         addField("Body", body);
         this.addMember(helpButton);
-        addButtons(saveButton,testButton);
+        addButtons(saveButton);
 
 
 
