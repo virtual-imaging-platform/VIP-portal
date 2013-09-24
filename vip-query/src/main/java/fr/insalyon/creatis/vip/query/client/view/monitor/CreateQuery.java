@@ -160,7 +160,88 @@ public class CreateQuery extends AbstractFormLayout {
         });
 
 
+        testButton = WidgetUtil.getIButton("Test", CoreConstants.ICON_USER_INFO,
+                new ClickHandler() {
+           String body_val=null;
+           
+            @Override
+            public void onClick(ClickEvent event) {
+        body_val=body.getValue().toString(); 
         
+if(body_val==null){
+ Layout.getInstance().setWarningMessage("there is no query to test" );}
+else {
+     
+    if(body_val.indexOf("[")!=-1)
+{
+    //body_val=body.getValue().toString();
+                int c = 0;
+                int nn = 0;
+              
+                String s = null;
+                
+                String sequence=null;
+           
+for (int i = 0; i < body_val.length(); i++) {
+        char b = body_val.charAt(i);
+        if (b == '[') {
+            for (int j = i + 1; j <body_val.length(); j++) {
+                char last = body_val.charAt(j);
+                int kk = 0;
+                //substring j+1 non inclus
+
+                if (last == ']' && kk == 0) {
+                    kk = 1;
+                    c = j + 1;
+                    sequence=body_val.substring(i + 1, j);
+                     String str[] =sequence.split("\\;");
+                     String example=str[3];
+                     body_val=body_val.replaceAll("\\["+sequence+"\\]", example);
+                  
+                     
+                    
+                }
+            }
+ 
+        }
+        }//end for
+
+}
+ 
+    
+   
+        final AsyncCallback<String> callback;
+         callback = new AsyncCallback<String>() {
+         @Override
+         public void onFailure(Throwable caught) {
+
+       Layout.getInstance().setWarningMessage("Unable to get result" + caught.getMessage());
+                
+      }
+
+     @Override
+    public void onSuccess(String result) {
+//_self empeche popup mais ouvre in the cuurent window
+//Autoriser les fenetre pop-up pour ce site(vip.creatis...)
+         com.google.gwt.user.client.Window.open(result, "_blank","");
+
+     }
+         };
+                  EndPointSparqlService.Util.getInstance().getUrlResult(body_val,"csv", callback);
+                 }
+
+ 
+           
+
+
+       
+           
+        }
+                });
+
+
+
+
         helpButton = FieldUtil.getImgButton(QueryConstants.ICON_HELP, "How to create a query",
                 new ClickHandler() {
             @Override
@@ -210,7 +291,7 @@ public class CreateQuery extends AbstractFormLayout {
 
         addField("Body", body);
         this.addMember(helpButton);
-        addButtons(saveButton);
+        addButtons(saveButton,testButton);
 
 
 
