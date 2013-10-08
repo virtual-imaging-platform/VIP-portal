@@ -28,6 +28,8 @@ public class QueryConstants {
     public static final String ICON_EXECUTE_VERSION = IMG_FOLDER + "icon-query.png";
     public static final String ICON_WAIT = IMG_FOLDER + "icon-wait.png";
     public static final String ICON_LINK = IMG_FOLDER + "icon-links.png";
+    public static final String ICON_DOWNLOAD = IMG_FOLDER + "file_download.png";
+    public static final String ICON_ERROR =IMG_FOLDER + "Error.png";
     // Application Names
     public static final String APP_QUERYHISTORY = "Query History";
     public static final String APP_QUERYMAKER = "Query Maker";
