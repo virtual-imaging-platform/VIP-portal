@@ -25,8 +25,7 @@ public class QueryLaunchTab extends Tab {
     protected String queryVersionID;
     protected String titleName;
     protected ModalWindow modal;
-    protected IButton saveInputsButton;
-    protected IButton saveAsExampleButton;
+  
     private ParameterTab param;
 
     public QueryLaunchTab(String queryName, String queryVersionID, String queryVersion) {
