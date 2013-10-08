@@ -43,7 +43,7 @@ public interface QueryDAO {
 
     public String getBody(Long queryVersionID, Long queryExecutionID, boolean parameter) throws DAOException;
 
-    public void updateQueryExecution(String urlResult, String status, Long executionID) throws DAOException;
+    public void updateQueryExecution(String bodyResult, String status, Long executionID) throws DAOException;
 
     public void updateQueryVersion(Long queryID, String name, String description) throws DAOException;
 

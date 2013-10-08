@@ -455,17 +455,17 @@ public class QueryData implements QueryDAO {
     }
 
     @Override
-    public void updateQueryExecution(String urlResult, String status, Long executionID) throws DAOException {
+    public void updateQueryExecution(String bodyResult, String status, Long executionID) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
                     + "QueryExecution "
-                    + "SET urlResult=?, status=? "
+                    + "SET bodyResult=?, status=? "
                     + "WHERE queryExecutionID=?");
 
 
 
-            ps.setString(1, urlResult);
+            ps.setString(1,bodyResult );
             ps.setString(2, status);
             ps.setLong(3, executionID);
             ps.executeUpdate();
@@ -547,17 +547,13 @@ public class QueryData implements QueryDAO {
         try {
 
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO QueryExecution(queryVersionID, dateExecution, executer,status, name, urlResult) VALUES (?, ?, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
+                    "INSERT INTO QueryExecution(queryVersionID, dateExecution, executer,status, name, bodyResult) VALUES (?, ?, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setLong(1, queryExecution.getQueryVersionID());
             ps.setTimestamp(2, getCurrentTimeStamp());
             ps.setString(3, queryExecution.getExecuter());
             ps.setString(4, queryExecution.getStatus());
             ps.setString(5, queryExecution.getName());
-
-
-            ps.setString(6, queryExecution.getUrlResult());
-
-
+            ps.setString(6, queryExecution.getBodyResult());
             ps.execute();
             ResultSet rs = ps.getGeneratedKeys();
             Long idAuto_increment = new Long(0);
@@ -578,7 +574,7 @@ public class QueryData implements QueryDAO {
     public List<String[]> getQueryHistory() throws DAOException {
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "queryExecutionID,name,queryName,queryVersion,executer,dateExecution,status,urlResult FROM "
+                    + "queryExecutionID,name,queryName,queryVersion,executer,dateExecution,status,bodyResult,pathFileResult FROM "
                     + "Query query,QueryVersion queryversion,QueryExecution queryexe WHERE "
                     + "query.queryID=queryversion.queryID AND queryversion.queryVersionID=queryexe.queryVersionID "
                     + "ORDER BY queryexe.dateExecution DESC");
@@ -591,7 +587,7 @@ public class QueryData implements QueryDAO {
                 Timestamp date = rs.getTimestamp("dateExecution");
                 Long id = rs.getLong("queryExecutionID");
                 Long version = rs.getLong("queryVersion");
-                queries.add(new String[]{id.toString(), rs.getString("name"), rs.getString("queryName"), version.toString(), rs.getString("executer"), date.toString(), rs.getString("status"), rs.getString("urlResult")});
+                queries.add(new String[]{id.toString(), rs.getString("name"), rs.getString("queryName"), version.toString(), rs.getString("executer"), date.toString(), rs.getString("status"), rs.getString("bodyResult"),rs.getString("pathFileResult")});
             }
             ps.close();
             return queries;
