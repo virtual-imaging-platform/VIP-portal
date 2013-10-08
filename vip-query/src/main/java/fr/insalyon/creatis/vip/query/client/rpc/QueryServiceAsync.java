@@ -46,7 +46,7 @@ public interface QueryServiceAsync {
 
     public void getBody(Long queryVersionID, Long queryExecutionID, boolean parameter, AsyncCallback<String> asyncCallback);
 
-    public void updateQueryExecution(String urlResult, String status, Long executionID, AsyncCallback<Void> asyncCallback);
+    public void updateQueryExecution(String bodyResult, String status, Long executionID, AsyncCallback<Void> asyncCallback);
 
     public void updateQueryVersion(Long queryID, String name, String description, AsyncCallback<Void> asyncCallback);
 
