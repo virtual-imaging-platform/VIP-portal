@@ -4,6 +4,7 @@
  */
 package fr.insalyon.creatis.vip.query.client.view.monitor;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import com.smartgwt.client.types.Alignment;
@@ -42,7 +43,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 /**
  *
  * @author Boujelben
@@ -58,8 +58,7 @@ public class CreateQuery extends AbstractFormLayout {
     private TextAreaItem body;
     private int rownumber = 0;
     private Long queryID = 0l;
-    private boolean testt;  
-    
+    private boolean testt;
 
     // messageItem.setShowTitle(false);
     // messageItem.setLength(5000);
@@ -90,7 +89,7 @@ public class CreateQuery extends AbstractFormLayout {
         description.setControlGroups("styleControls", "editControls",
                 "colorControls");
         body = new TextAreaItem();
-        
+
 
         body.setHeight(125);
         body.setWidth(1410);
@@ -112,46 +111,46 @@ public class CreateQuery extends AbstractFormLayout {
                         Logger.getLogger(CreateQuery.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 } else {
-                   //String bodyOnSelect = getQueryMakerTb().getBody();
+                    //String bodyOnSelect = getQueryMakerTb().getBody();
                     //bodyOnSelect=bodyOnSelect.replaceAll("\\s","");
-                   // bodyOnSelect=bodyOnSelect.toLowerCase();
+                    // bodyOnSelect=bodyOnSelect.toLowerCase();
                     String getbody = body.getValueAsString();
                     //
                     getbody = getbody.replaceAll("[\r\n]{2,}", "\r\n");
-                    getbody=getbody.replaceAll("\\s","");
-                    getbody=getbody.toLowerCase();
-                    String bodyy=new String(getbody);
-                    String queryID=getQueryMakerTb().getQueryID();
-                    Long qID=Long.parseLong(queryID);
+                    getbody = getbody.replaceAll("\\s", "");
+                    getbody = getbody.toLowerCase();
+                    String bodyy = new String(getbody);
+                    String queryID = getQueryMakerTb().getQueryID();
+                    Long qID = Long.parseLong(queryID);
                     final AsyncCallback<Boolean> callbackk = new AsyncCallback<Boolean>() {
-                     @Override
-                     public void onFailure(Throwable caught) {
+                        @Override
+                        public void onFailure(Throwable caught) {
 
-                     Layout.getInstance().setWarningMessage("Unable to get bodies " + caught.getMessage());
-                     }
+                            Layout.getInstance().setWarningMessage("Unable to get bodies " + caught.getMessage());
+                        }
 
-                       @Override
-                   public void onSuccess(Boolean result) {
-                       testt=result.booleanValue();
-                       
-                       if (testt==true) {
-                        update(getVersionID(), querynameField.getValueAsString(), description.getValue());
+                        @Override
+                        public void onSuccess(Boolean result) {
+                            testt = result.booleanValue();
 
-                    } else {
+                            if (testt == true) {
+                                update(getVersionID(), querynameField.getValueAsString(), description.getValue());
 
-                        Long queryVersionID = getVersionID();
-                        getQueryID(queryVersionID);
-                        update(queryVersionID, querynameField.getValueAsString(), description.getValue());
+                            } else {
 
-                    }
-                 
-                   
-            }
-            };
-                    
-                      QueryService.Util.getInstance().getBodies(qID, bodyy, callbackk);
-                   
-                    
+                                Long queryVersionID = getVersionID();
+                                getQueryID(queryVersionID);
+                                update(queryVersionID, querynameField.getValueAsString(), description.getValue());
+
+                            }
+
+
+                        }
+                    };
+
+                    QueryService.Util.getInstance().getBodies(qID, bodyy, callbackk);
+
+
 
 
                 }
@@ -162,82 +161,84 @@ public class CreateQuery extends AbstractFormLayout {
 
         testButton = WidgetUtil.getIButton("Test", CoreConstants.ICON_USER_INFO,
                 new ClickHandler() {
-           String body_val=null;
-           
+            ///nouha// String body_val=null;
             @Override
             public void onClick(ClickEvent event) {
-        body_val=body.getValue().toString(); 
-        
-if(body_val==null){
- Layout.getInstance().setWarningMessage("there is no query to test" );}
-else {
-     
-    if(body_val.indexOf("[")!=-1)
-{
-    //body_val=body.getValue().toString();
-                int c = 0;
-                int nn = 0;
-              
-                String s = null;
-                
-                String sequence=null;
-           
-for (int i = 0; i < body_val.length(); i++) {
-        char b = body_val.charAt(i);
-        if (b == '[') {
-            for (int j = i + 1; j <body_val.length(); j++) {
-                char last = body_val.charAt(j);
-                int kk = 0;
-                //substring j+1 non inclus
+                //FileProgressTab tab = new FileProgressTab();
+                //Layout.getInstance().addTab(tab);  
+                //com.google.gwt.user.client.Window.open(GWT.getHostPageBaseURL() + "base/result101.txt", "name", "enabled");
 
-                if (last == ']' && kk == 0) {
-                    kk = 1;
-                    c = j + 1;
-                    sequence=body_val.substring(i + 1, j);
-                     String str[] =sequence.split("\\;");
-                     String example=str[3];
-                     body_val=body_val.replaceAll("\\["+sequence+"\\]", example);
+                /*nouha body_val=body.getValue().toString(); 
+        
+                 if(body_val==null){
+                 Layout.getInstance().setWarningMessage("there is no query to test" );}
+                 else {
+     
+                 if(body_val.indexOf("[")!=-1)
+                 {
+                 //body_val=body.getValue().toString();
+                 int c = 0;
+                 int nn = 0;
+              
+                 String s = null;
+                
+                 String sequence=null;
+           
+                 for (int i = 0; i < body_val.length(); i++) {
+                 char b = body_val.charAt(i);
+                 if (b == '[') {
+                 for (int j = i + 1; j <body_val.length(); j++) {
+                 char last = body_val.charAt(j);
+                 int kk = 0;
+                 //substring j+1 non inclus
+
+                 if (last == ']' && kk == 0) {
+                 kk = 1;
+                 c = j + 1;
+                 sequence=body_val.substring(i + 1, j);
+                 String str[] =sequence.split("\\;");
+                 String example=str[3];
+                 body_val=body_val.replaceAll("\\["+sequence+"\\]", example);
                   
                      
                     
-                }
-            }
+                 }
+                 }
  
-        }
-        }//end for
+                 }
+                 }//end for
 
-}
+                 }
  
     
    
-        final AsyncCallback<String> callback;
-         callback = new AsyncCallback<String>() {
-         @Override
-         public void onFailure(Throwable caught) {
+                 final AsyncCallback<String> callback;
+                 callback = new AsyncCallback<String>() {
+                 @Override
+                 public void onFailure(Throwable caught) {
 
-       Layout.getInstance().setWarningMessage("Unable to get result" + caught.getMessage());
+                 Layout.getInstance().setWarningMessage("Unable to get result" + caught.getMessage());
                 
-      }
+                 }
 
-     @Override
-    public void onSuccess(String result) {
-//_self empeche popup mais ouvre in the cuurent window
-//Autoriser les fenetre pop-up pour ce site(vip.creatis...)
-         com.google.gwt.user.client.Window.open(result, "_blank","");
+                 @Override
+                 public void onSuccess(String result) {
+                 //_self empeche popup mais ouvre in the cuurent window
+                 //Autoriser les fenetre pop-up pour ce site(vip.creatis...)
+                 com.google.gwt.user.client.Window.open(result, "_blank","");
 
-     }
-         };
-                  EndPointSparqlService.Util.getInstance().getUrlResult(body_val,"csv", callback);
+                 }
+                 };
+                 EndPointSparqlService.Util.getInstance().getUrlResult(body_val,"csv", callback);
                  }
 
  
            
 
 
-       
-           
-        }
-                });
+                 nouha*/
+            }
+        });
 
 
 
@@ -246,7 +247,7 @@ for (int i = 0; i < body_val.length(); i++) {
                 new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-               final Window winModal = new Window();
+                final Window winModal = new Window();
                 winModal.setWidth(360);
                 winModal.setHeight(175);
                 winModal.setTitle("Help");
@@ -259,7 +260,7 @@ for (int i = 0; i < body_val.length(); i++) {
                         winModal.destroy();
                     }
                 });
-                
+
                 final Label textbox = new Label();
                 textbox.setID("textbox");
                 textbox.setAlign(Alignment.CENTER);
@@ -272,7 +273,7 @@ for (int i = 0; i < body_val.length(); i++) {
                 textbox.setContents("<b>To create query you have to put parameters of query into «[]»"
                         + "and name;type;description;examples separed by «;»"
                         + "example of parameter name:[name; String; name of patient; Olivier]</b>");
-                 
+
                 winModal.addItem(textbox);
                 winModal.show();
             }
@@ -291,7 +292,7 @@ for (int i = 0; i < body_val.length(); i++) {
 
         addField("Body", body);
         this.addMember(helpButton);
-        addButtons(saveButton,testButton);
+        addButtons(saveButton, testButton);
 
 
 
@@ -309,11 +310,11 @@ for (int i = 0; i < body_val.length(); i++) {
             @Override
             public void onSuccess(Long result) {
                 String bodyRemplace = body.getValueAsString();
-                 bodyRemplace = bodyRemplace.trim();
+                bodyRemplace = bodyRemplace.trim();
                 //bodyd=bodyd.replaceAll("\\s{2,}", " ");
-                bodyRemplace=bodyRemplace.replaceAll("[\r\n]{2,}", "\r\n");
+                bodyRemplace = bodyRemplace.replaceAll("[\r\n]{2,}", "\r\n");
                 //queryversiob,queryid
-                savev(new QueryVersion(1L, result,description.getValue(), bodyRemplace));
+                savev(new QueryVersion(1L, result, description.getValue(), bodyRemplace));
                 reset();
 
 
@@ -361,14 +362,6 @@ for (int i = 0; i < body_val.length(); i++) {
         QueryService.Util.getInstance().addParameter(param, callback);
 
     }
-      
-          
-       
-        
-      
-        
-        
-       
 
     public void setQuery(boolean nameState, boolean test, String name, String description, String body) {
 
@@ -427,9 +420,9 @@ for (int i = 0; i < body_val.length(); i++) {
                 nn = nn + 1;
                 String bodyRemplace = body.getValueAsString();
                 String bodyd = bodyRemplace.replaceAll("[\r\n]{2,}", "\r\n");
-               
 
-                savev(new QueryVersion(nn, queryID,description.getValue(), bodyd));
+
+                savev(new QueryVersion(nn, queryID, description.getValue(), bodyd));
                 reset();
 
             }
@@ -449,7 +442,7 @@ for (int i = 0; i < body_val.length(); i++) {
 
     public void getQueryID(Long queryVersionID) {
 
-       
+
         final AsyncCallback<Long> callback = new AsyncCallback<Long>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -466,7 +459,7 @@ for (int i = 0; i < body_val.length(); i++) {
         };
 
         QueryService.Util.getInstance().getQueryID(queryVersionID, callback);
-        
+
 
     }
 

@@ -4,25 +4,31 @@
  */
 package fr.insalyon.creatis.vip.query.client.view.monitor;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.data.fields.DataSourceDateField;
-import com.smartgwt.client.data.fields.DataSourceIntegerField;
-import com.smartgwt.client.data.fields.DataSourceTextField;
+
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.FetchMode;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.VisibilityMode;
+import com.smartgwt.client.util.SC;
 
 import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
 
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.widgets.grid.events.CellClickEvent;
+import com.smartgwt.client.widgets.grid.events.CellClickHandler;
 
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
@@ -85,25 +91,66 @@ public class QueryHistoryTab extends Tab {
         gridSection.setShowHeader(false);
         gridSection.addItem(grid);
 
-
-
         sectionStack.setSections(gridSection);
-
         vLayout.addMember(sectionStack);
-
         this.setPane(vLayout);
-
-
         loadData();
-
-
     }
 
     private void configureGrid() {
 
         grid = new ListGrid() {
             @Override
+            protected Canvas createRecordComponent(final ListGridRecord record, Integer colNum) {
+
+                String fieldName = this.getFieldName(colNum);
+                IButton button = null;
+
+                if (fieldName.equals("buttonField")) {
+                    button = new IButton();
+                    button.setHeight(18);
+                    button.setWidth(75);
+
+
+                    if (record.getAttribute("status") == "completed") {
+                        button.setIcon(QueryConstants.ICON_LINK);
+                        button.setTitle("download");
+                        button.addClickHandler(new ClickHandler() {
+                            public void onClick(ClickEvent event) {
+                                
+                                Window.open(GWT.getModuleBaseURL() + "/filedownload?queryid="
+                                        + record.getAttribute("queryExecutionID").toString()+"&path="+record.getAttribute("pathFileResult"), "", "");
+                            }
+                        });
+                    } else if (record.getAttribute("status") == "failed") {
+                        button.setIcon(QueryConstants.ICON_ERROR);
+                        button.setTitle("Error");
+                        button.addClickHandler(new ClickHandler() {
+                            public void onClick(ClickEvent event) {
+                                SC.say("<html><font color=\"red\">ERROR!</font></html>", record.getAttribute("pathFileResult"));
+                            }
+                        });
+
+
+                    }
+
+
+                }
+                if (record.getAttribute("status") == "completed" || record.getAttribute("status") == "failed") {
+                    return button;
+                } else {
+                    return null;
+                }
+            }
+
+            ;
+
+
+
+
+            @Override
             protected Canvas getCellHoverComponent(Record record, Integer rowNum, Integer colNum) {
+                rollOverRecord = this.getRecord(rowNum);
 
                 detailViewer = new DetailViewer();
 
@@ -132,11 +179,11 @@ public class QueryHistoryTab extends Tab {
 
                         }
                         detailViewer.setData(dataList.toArray(new ParameterValue[]{}));
-                        
-     
+
+
                         detailViewer.setEmptyMessage("No parameters to display");
-                        
-       
+
+
                         detailViewer.setBackgroundColor("white");
                         detailViewer.setEmptyMessageStyle("2px solid black center");
 
@@ -151,6 +198,11 @@ public class QueryHistoryTab extends Tab {
 
             }
         };
+
+
+
+
+
         ds = new Data();
 
         grid.setCanHover(true);
@@ -158,9 +210,12 @@ public class QueryHistoryTab extends Tab {
         grid.setShowHoverComponents(true);
         grid.setWidth100();
         grid.setHeight100();
+        grid.setShowRollOverCanvas(true);
+        grid.setShowRecordComponents(true);
+        grid.setShowRecordComponentsByCell(true);
         //
         grid.setFilterOnKeypress(true);
-        // loadData();
+
         grid.setDataSource(ds);
         grid.setAutoFetchData(Boolean.TRUE);
 
@@ -173,12 +228,12 @@ public class QueryHistoryTab extends Tab {
         grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
 
         grid.setEmptyMessage("<br>No data available");
-        linkField = new ListGridField("urlResult", "Result Data");
-        linkField.setType(ListGridFieldType.LINK);
-        linkField.setWidth(150);
-        linkField.setAlign(Alignment.CENTER);
-        linkField.setLinkText(Canvas.imgHTML(QueryConstants.ICON_LINK, 16, 16, "info", "align=center", null));
+
+
+
+
         ListGridField executionID = new ListGridField("queryExecutionID", "queryExecutionID");
+        ListGridField pathFileResult = new ListGridField("pathFileResult", "pathFileResult");
 
         ListGridField version = new ListGridField("version", "Version");
         version.setWidth(60);
@@ -186,7 +241,8 @@ public class QueryHistoryTab extends Tab {
         statuss.setWidth(60);
         ListGridField date = new ListGridField("dateExecution", "Execution Start Time");
         date.setWidth(120);
-
+        ListGridField buttonField = new ListGridField("buttonField", "Result");
+        buttonField.setAlign(Alignment.CENTER);
 
         grid.setFields(
                 FieldUtil.getIconGridField("statusIcon"),
@@ -197,13 +253,15 @@ public class QueryHistoryTab extends Tab {
                 new ListGridField("executer", "Executer"),
                 date,
                 statuss,
-                linkField);
+                buttonField,
+                pathFileResult);
+
 
         executionID.setHidden(true);
+        pathFileResult.setHidden(true);
     }
 
     public void loadData() {
-
         final AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -219,13 +277,11 @@ public class QueryHistoryTab extends Tab {
                 for (String[] q : result) {
 
                     Timestamp ts = Timestamp.valueOf(q[5]);
-                    dataList.add(new QueryExecutionRecord(q[0], q[1], q[2], q[3], q[4], ts, q[6], q[7]));
+                    dataList.add(new QueryExecutionRecord(q[0], q[1], q[2], q[3], q[4], ts, q[6], q[7], q[8]));
 
 
                 }
                 grid.setData(dataList.toArray(new QueryExecutionRecord[]{}));
-
-
                 ds.setTestData(dataList.toArray(new QueryExecutionRecord[]{}));
 
             }
