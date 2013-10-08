@@ -14,7 +14,7 @@ import java.sql.Timestamp;
  */
 public class QueryExecutionRecord extends ListGridRecord {
 
-    public QueryExecutionRecord(String ExecutionID, String name, String queryName, String version, String executer, Timestamp dateExecution, String status, String urlResult) {
+    public QueryExecutionRecord(String ExecutionID, String name, String queryName, String version, String executer, Timestamp dateExecution, String status, String bodyResult,String pathFileResult) {
         setAttribute("statusIcon", status);
         setAttribute("queryExecutionID", ExecutionID);
         setAttribute("name", name);
@@ -23,7 +23,8 @@ public class QueryExecutionRecord extends ListGridRecord {
         setAttribute("executer", executer);
         setAttribute("dateExecution", dateExecution);
         setAttribute("status", status);
-        setAttribute("urlResult", urlResult);
+        setAttribute("bodyResult", bodyResult);
+        setAttribute("pathFileResult", pathFileResult);
 
 
     }
