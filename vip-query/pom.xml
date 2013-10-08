@@ -38,16 +38,16 @@
             <id>eclipselink</id>
             <layout>default</layout>
             <name>Repository for library Library[eclipselink]</name>
-             </repository>
-      <!-- jboss repository for hibernate       
-    <repository>
-      <id>JBoss repository</id>
-      <url>http://repository.jboss.com/maven2/</url>
-    </repository>--> 
-  </repositories>
+        </repository>
+        <!-- jboss repository for hibernate       
+        <repository>
+          <id>JBoss repository</id>
+          <url>http://repository.jboss.com/maven2/</url>
+        </repository>--> 
+    </repositories>
        
     <dependencies>
-         <dependency>
+        <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-core</artifactId>
             <version>${vip.core.version}</version>
@@ -61,9 +61,9 @@
         
         
         <dependency>
-	<groupId>org.apache.httpcomponents</groupId>
-	<artifactId>httpclient</artifactId>
-	<version>4.2.3</version>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.2.3</version>
         </dependency>
             
             
@@ -93,55 +93,55 @@
         </dependency>
    
     
-    <dependency>
+        <dependency>
             <artifactId>hibernate-jpa-2.0-api</artifactId>
             <groupId>org.hibernate.javax.persistence</groupId>
             <type>jar</type>
             <version>1.0.1.Final</version>
-    </dependency>
+        </dependency>
  
-     <dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.6.1</version>
-		</dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.6.1</version>
+        </dependency>
      
             
 	
    
-     <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-        <version>5.1.23</version>
-        <scope>compile</scope>
-    </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.23</version>
+            <scope>compile</scope>
+        </dependency>
   
     
     
-    <!-- Hibernate library dependecy start -->
-	<dependency>
-		<groupId>dom4j</groupId>
-		<artifactId>dom4j</artifactId>
-		<version>1.6.1</version>
-	</dependency>
+        <!-- Hibernate library dependecy start -->
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.6.1</version>
+        </dependency>
  
-	<dependency>
-		<groupId>commons-logging</groupId>
-		<artifactId>commons-logging</artifactId>
-		<version>1.1.1</version>
-	</dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+        </dependency>
  
-	<dependency>
-		<groupId>commons-collections</groupId>
-		<artifactId>commons-collections</artifactId>
-		<version>3.2.1</version>
-	</dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2.1</version>
+        </dependency>
  
-	<dependency>
-		<groupId>cglib</groupId>
-		<artifactId>cglib</artifactId>
-		<version>2.2</version>
-	</dependency>
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>2.2</version>
+        </dependency>
     
     
         <dependency>
@@ -154,7 +154,7 @@
     <build>
        
         
-           <plugins>
+        <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -201,14 +201,14 @@
             </plugin>
             
 
-          </plugins>
+        </plugins>
         
         
         
         
  
     
-    <finalName>vip-query</finalName>
+        <finalName>vip-query</finalName>
         <resources>
             <resource>
                 <directory>src/main/java</directory>
