@@ -140,9 +140,9 @@ public class QueryBusiness {
 
     }
 
-    public void updateQueryExecution(String urlResult, String status, Long executionID) throws BusinessException {
+    public void updateQueryExecution(String bodyResult, String status, Long executionID) throws BusinessException {
         try {
-            QueryDAOFactory.getDAOFactory().getQueryDAO().updateQueryExecution(urlResult, status, executionID);
+            QueryDAOFactory.getDAOFactory().getQueryDAO().updateQueryExecution(bodyResult, status, executionID);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
