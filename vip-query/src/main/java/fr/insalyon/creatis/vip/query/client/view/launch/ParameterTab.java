@@ -115,13 +115,9 @@ public class ParameterTab extends VLayout {
                     value.setTitleOrientation(TitleOrientation.TOP);
                     value.setName(String.valueOf(q.getParameterID()));
                     value.setPrompt("<b> Description: </b>" + q.getDescription() + "<br><b> Type: </b>" + q.getType() + "<br><b> Example: </b>" + q.getExample());
-
                     arrList.add(value);
                     dynamicForm.setFields(value);
-
-
                     hlayout.addMember(dynamicForm);
-
                     mainLayout.addMember(hlayout, 5);
                     mainLayout.setMembersMargin(10);
 
@@ -159,7 +155,6 @@ public class ParameterTab extends VLayout {
 
                                 saveValue(new Value(t.getValueAsString(), Long.parseLong(t.getName()), result));
                                 t.setValue("");
-
 
                             }
                             queryExecutionID = result;
@@ -213,13 +208,14 @@ public class ParameterTab extends VLayout {
             public void onFailure(Throwable caught) {
 
                 Layout.getInstance().setWarningMessage("Unable to get Body" + caught.getMessage());
+                update("", "failed", queryExecutionID);
             }
 
             @Override
             public void onSuccess(String result) {
 
-                getUrlResult(result, "csv");
-
+                //getUrlResult(result, "csv");
+                update(result,"waiting", queryExecutionID);
 
             }
         };
@@ -229,7 +225,7 @@ public class ParameterTab extends VLayout {
 
     }
 
-    private void update(String urlResult, String status, Long executonID) {
+    private void update(String bodyResult, String status, Long executonID) {
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -242,11 +238,13 @@ public class ParameterTab extends VLayout {
             }
         };
 
-        QueryService.Util.getInstance().updateQueryExecution(urlResult, status, executonID, callback);
+        QueryService.Util.getInstance().updateQueryExecution(bodyResult, status, executonID, callback);
 
 
     }
 
+    
+    /*
     private void getUrlResult(String query, String format) {
 
         final AsyncCallback<String> callback = new AsyncCallback<String>() {
@@ -277,6 +275,7 @@ public class ParameterTab extends VLayout {
 
 
     }
+    * */
 
     private void getDescription(Long queryVersionID) {
         final AsyncCallback<String> callback = new AsyncCallback<String>() {
