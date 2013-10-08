@@ -20,7 +20,7 @@ public class QueryExecution implements IsSerializable {
     private String status;
     private String name;
     private Timestamp dateEndExecution;
-    private String urlResult;
+    private String bodyResult;
 
     public QueryExecution() {
     }
@@ -31,7 +31,7 @@ public class QueryExecution implements IsSerializable {
         this.name = name;
 
 
-        this.urlResult = urlResult;
+        this.bodyResult = bodyResult;
     }
 
     public Long getQueryExecutionID() {
@@ -90,11 +90,11 @@ public class QueryExecution implements IsSerializable {
         this.dateEndExecution = dateEndExecution;
     }
 
-    public String getUrlResult() {
-        return urlResult;
+    public String getBodyResult() {
+        return bodyResult;
     }
 
-    public void setUrlResult(String urlResult) {
-        this.urlResult = urlResult;
+    public void setBodyResult(String urlResult) {
+        this.bodyResult = bodyResult;
     }
 }
