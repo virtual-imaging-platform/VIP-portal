@@ -34,7 +34,10 @@ public class Data extends DataSource {
 
         DataSourceDateTimeField date = new DataSourceDateTimeField("dateExecution", "Execution Start Time");
         DataSourceTextField urlResult = new DataSourceTextField("urlResult", "Result Data");
-        setFields(id, version, status, name, query, executer, date, urlResult);
+        urlResult.setHidden(Boolean.TRUE);
+        DataSourceTextField pathFileResult = new DataSourceTextField("pathFileResult", "pathFileResult");
+        pathFileResult.setHidden(Boolean.TRUE);
+        setFields(id, version, status, name, query, executer, date, urlResult, pathFileResult);
         setClientOnly(true);
 
 
