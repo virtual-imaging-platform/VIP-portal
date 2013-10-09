@@ -63,10 +63,11 @@ public class MySQLDAOFactory extends QueryDAOFactory {
                     + "queryVersionID BIGINT(20), "
                     + "name VARCHAR(255), "
                     + "dateExecution TIMESTAMP, "
-                    + "dateEndExecution TIMESTAMP, "
-                    + "urlResult VARCHAR(1000), "
+                    + "dateEndExecution TIMESTAMP, "   
                     + "executer VARCHAR(255), "
                     + "status VARCHAR(255), "
+                    + "bodyResult VARCHAR(1000), "
+                    + "pathFileResult VARCHAR(500),"
                     + "PRIMARY KEY (queryExecutionID), "
                     + "FOREIGN KEY (queryVersionID) REFERENCES QueryVersion(queryVersionID) "
                     + "ON DELETE RESTRICT ON UPDATE RESTRICT");
