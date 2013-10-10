@@ -465,7 +465,7 @@ public class QueryData implements QueryDAO {
 
 
 
-            ps.setString(1,bodyResult );
+            ps.setString(1,bodyResult);
             ps.setString(2, status);
             ps.setLong(3, executionID);
             ps.executeUpdate();
@@ -479,6 +479,38 @@ public class QueryData implements QueryDAO {
         }
     }
 
+    
+     @Override
+    public void updateQueryExecutionStatus(String status, Long executionID) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "QueryExecution "
+                    + "SET dateExecution=?, status=? "
+                    + "WHERE queryExecutionID=?");
+
+
+
+            ps.setTimestamp(1, getCurrentTimeStamp());
+            ps.setString(2, status);
+            ps.setLong(3, executionID);
+            ps.executeUpdate();
+            ps.close();
+
+
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
     @Override
     public void updateQueryVersion(Long queryVersionID, String name, String description) throws DAOException {
 

@@ -7,9 +7,10 @@ package fr.insalyon.creatis.vip.query.client.view.monitor;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
-
+import com.smartgwt.client.widgets.menu.*;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.FetchMode;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -29,10 +30,14 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellClickHandler;
+import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
+import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
 
 import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.menu.Menu;
+import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.viewer.DetailViewer;
 import com.smartgwt.client.widgets.viewer.DetailViewerField;
@@ -117,9 +122,9 @@ public class QueryHistoryTab extends Tab {
                         button.setTitle("download");
                         button.addClickHandler(new ClickHandler() {
                             public void onClick(ClickEvent event) {
-                                
+
                                 Window.open(GWT.getModuleBaseURL() + "/filedownload?queryid="
-                                        + record.getAttribute("queryExecutionID").toString()+"&path="+record.getAttribute("pathFileResult"), "", "");
+                                        + record.getAttribute("queryExecutionID").toString() + "&path=" + record.getAttribute("pathFileResult"), "", "");
                             }
                         });
                     } else if (record.getAttribute("status") == "failed") {
@@ -141,6 +146,10 @@ public class QueryHistoryTab extends Tab {
                 } else {
                     return null;
                 }
+
+
+
+
             }
 
             ;
@@ -172,24 +181,13 @@ public class QueryHistoryTab extends Tab {
                     public void onSuccess(List<String[]> result) {
                         List<ParameterValue> dataList = new ArrayList<ParameterValue>();;
                         for (String[] s : result) {
-
-                            // DetailViewerField name=new DetailViewerField(s[0], s[1]);
                             dataList.add(new ParameterValue(s[0], s[1]));
-
-
                         }
                         detailViewer.setData(dataList.toArray(new ParameterValue[]{}));
-
-
                         detailViewer.setEmptyMessage("No parameters to display");
-
-
                         detailViewer.setBackgroundColor("white");
                         detailViewer.setEmptyMessageStyle("2px solid black center");
-
                         detailViewer.setBorder("1px solid gray");
-
-
                     }
                 };
                 QueryService.Util.getInstance().getParameterValue(executionID, callback);
@@ -200,7 +198,48 @@ public class QueryHistoryTab extends Tab {
         };
 
 
+        grid.addRowContextClickHandler(new RowContextClickHandler() {
+            public void onRowContextClick(RowContextClickEvent event) {
+                ListGridRecord record = event.getRecord();
+                if (record.getAttribute("status") == "failed") {
+                    Menu menu = new Menu();
+                    final String queryExecutionID=record.getAttribute("queryExecutionID");
 
+                    MenuItem relaunch = new MenuItem("Relauch", QueryConstants.ICON_EXECUTE);
+                    relaunch.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+                        public void onClick(MenuItemClickEvent event) {
+
+                            final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+                                @Override
+                                public void onFailure(Throwable caught) {
+
+                                    Layout.getInstance().setWarningMessage("Unable to relaunch this query" + caught.getMessage());
+                                }
+
+                                @Override
+                                public void onSuccess(Void result) {
+                                }
+                            };
+                            QueryService.Util.getInstance().updateQueryExecutionStatus("waiting",Long.parseLong(queryExecutionID), callback);
+
+                        }
+                    });
+                    menu.addItem(relaunch);
+
+                    grid.setContextMenu(menu);
+                } else {
+
+                    Menu menu = new Menu();
+                    menu = null;
+                    grid.setContextMenu(menu);
+                }
+
+
+
+
+
+            }
+        });
 
 
         ds = new Data();
