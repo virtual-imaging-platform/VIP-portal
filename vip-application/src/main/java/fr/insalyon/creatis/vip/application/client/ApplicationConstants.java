@@ -48,6 +48,7 @@ public class ApplicationConstants {
     // Icons
     private static final String IMG_FOLDER = "application/";
     public static final String ICON_APPLICATION = IMG_FOLDER + "icon-application.png";
+    public static final String ICON_APPLICATION_MONITOR = IMG_FOLDER + "icon-application-monitor.png";
     public static final String ICON_CHART = IMG_FOLDER + "icon-chart.png";
     public static final String ICON_CLASSES = IMG_FOLDER + "icon-classes.png";
     public static final String ICON_CLEAN = IMG_FOLDER + "icon-clean.png";
@@ -88,6 +89,7 @@ public class ApplicationConstants {
     public static final String ICON_TASK_KILL = IMG_FOLDER + "icon-task-kill.png";
     public static final String ICON_TASK_REPLICATE = IMG_FOLDER + "icon-task-replicate.png";
     public static final String ICON_TASK_RESCHEDULE = IMG_FOLDER + "icon-task-reschedule.png";
+    public static final String ICON_TASK_UNHOLD = IMG_FOLDER + "icon-task-unhold.png";
     public static final String ICON_TREE_INPUT = IMG_FOLDER + "tree/icon-tree-input.png";
     public static final String ICON_TREE_OUTPUT = IMG_FOLDER + "tree/icon-tree-output.png";
     public static final String ICON_TREE_SERVICE = IMG_FOLDER + "tree/icon-tree-service.png";

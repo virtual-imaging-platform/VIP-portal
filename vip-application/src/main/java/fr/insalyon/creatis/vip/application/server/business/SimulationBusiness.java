@@ -126,6 +126,14 @@ public class SimulationBusiness {
                             jobsMap.put(task.getJobID(), new Job(task.getJobID(), task.getCommand(), JobStatus.Queued));
                         }
                         break;
+                    case ERROR_HELD:
+                    case STALLED_HELD:
+                        if (jobsMap.containsKey(task.getJobID())) {
+                            Job job = jobsMap.get(task.getJobID());
+                            job.setStatus(JobStatus.Held);
+                        } else {
+                            jobsMap.put(task.getJobID(), new Job(task.getJobID(), task.getCommand(), JobStatus.Held));
+                        }
                 }
             }
 

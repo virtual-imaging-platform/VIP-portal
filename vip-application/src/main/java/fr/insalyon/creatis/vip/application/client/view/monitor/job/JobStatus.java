@@ -46,7 +46,8 @@ public enum JobStatus {
     Queued_with_errors("#D3864C", "Queued with errors"),
     Running("#8CC653", "Running"),
     Queued("#DBA400", "Queued"),
-    Completed("#287fd6", "Completed");
+    Completed("#287fd6", "Completed"),
+    Held("#9CAB4C", "Held");
     //
     private String color;
     private String description;

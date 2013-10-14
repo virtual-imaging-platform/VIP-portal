@@ -109,6 +109,11 @@ public class JobInfoButton extends HLayout {
                         + "<font color=\"#666666\"><em>Click to debug.</em></font>");
                 img.setSrc(ApplicationConstants.ICON_MONITOR_TASK_CRITICAL);
                 break;
+            case 3:
+                messageLabel.setContents("<strong>Held jobs detected.</strong><br />"
+                        + "<font color=\"#666666\"><em>Click to debug.</em></font>");
+                img.setSrc(ApplicationConstants.ICON_MONITOR_TASK_NONCRITICAL);
+                break;
             default:
                 messageLabel.setContents("<strong>No errors detected.</strong>");
                 img.setSrc(ApplicationConstants.ICON_MONITOR_TASK_OK);

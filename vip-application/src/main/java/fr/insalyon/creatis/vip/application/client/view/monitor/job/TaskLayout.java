@@ -209,6 +209,22 @@ public class TaskLayout extends HLayout {
                 }
             });
             actionsLayout.addMember(killLabel);
+
+        } else if (status == TaskStatus.ERROR_HELD || status == TaskStatus.STALLED_HELD) {
+            Label releaseLabel = WidgetUtil.getLabel(null, ApplicationConstants.ICON_TASK_UNHOLD, 16, Cursor.HAND);
+            releaseLabel.setPrompt("Release Task");
+            releaseLabel.setWidth(16);
+            releaseLabel.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    if (status == TaskStatus.ERROR_HELD) {
+                        sendSignal(TaskStatus.UNHOLD_ERROR);
+                    } else if (status == TaskStatus.STALLED_HELD) {
+                        sendSignal(TaskStatus.UNHOLD_STALLED);
+                    }
+                }
+            });
+            actionsLayout.addMember(releaseLabel);
         }
     }
 
@@ -222,7 +238,7 @@ public class TaskLayout extends HLayout {
                     AsyncCallback<Void> callback = new AsyncCallback<Void>() {
                         @Override
                         public void onFailure(Throwable caught) {
-                            statusLabel.setContents(status.name());
+                            statusLabel.setContents("<font color=\"" + status.getColor() + "\">" + status.getDescription() + "</font>");
                             minorStatusLabel.setContents("");
                             minorStatusLabel.setIcon(null);
                             Layout.getInstance().setWarningMessage("Unable to send signal:<br />" + caught.getMessage());
@@ -235,7 +251,7 @@ public class TaskLayout extends HLayout {
                             Layout.getInstance().setNoticeMessage("Signal Successfully sent.");
                         }
                     };
-                    statusLabel.setContents(taskStatus.name());
+                    statusLabel.setContents("<font color=\"" + taskStatus.getColor() + "\">" + taskStatus.getDescription() + "</font>");
                     minorStatusLabel.setContents("<font color=\"#666666\">Sending signal...</font>");
                     minorStatusLabel.setIcon(CoreConstants.ICON_LOADING);
                     JobService.Util.getInstance().sendTaskSignal(simulationID, taskID, taskStatus.name(), callback);
