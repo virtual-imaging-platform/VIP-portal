@@ -49,7 +49,11 @@ public enum TaskStatus {
     REPLICATE("#8CC653", "Replicate"),
     KILL("#8CC653", "Kill"),
     KILL_REPLICA("#8CC653", "Kill"),
-    RESCHEDULE("#8CC653", "Reschedule");
+    RESCHEDULE("#8CC653", "Reschedule"),
+    ERROR_HELD("#9CAB4C", "Held"),
+    STALLED_HELD("#9CAB4C", "Held"),
+    UNHOLD_ERROR("#9CAB4C", "Unhold"),
+    UNHOLD_STALLED("#9CAB4C", "Unhold");
     //
     private String color;
     private String description;

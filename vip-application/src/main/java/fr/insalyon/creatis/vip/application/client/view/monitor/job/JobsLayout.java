@@ -72,6 +72,7 @@ public class JobsLayout extends VLayout {
     private SeriesHandler runningSeries;
     private SeriesHandler completedSeries;
     private SeriesHandler failedSeries;
+    private SeriesHandler heldSeries;
     private Map<String, Command> commandsMap;
 
     public JobsLayout(String simulationID) {
@@ -144,6 +145,7 @@ public class JobsLayout extends VLayout {
         runningSeries = model.addSeries(Series.of("<font size=\"1\">" + JobStatus.Running.name() + "</font>", JobStatus.Running.getColor()));
         completedSeries = model.addSeries(Series.of("<font size=\"1\">" + JobStatus.Completed.name() + "</font>", JobStatus.Completed.getColor()));
         failedSeries = model.addSeries(Series.of("<font size=\"1\">" + JobStatus.Failed.name() + "</font>", JobStatus.Failed.getColor()));
+        heldSeries = model.addSeries(Series.of("<font size=\"1\">" + JobStatus.Held.name() + "</font>", JobStatus.Held.getColor()));
 
         plot = new SimplePlot(model, plotOptions);
         plot.setWidth(400);
@@ -168,6 +170,7 @@ public class JobsLayout extends VLayout {
                 int runningWE = 0;
                 int completed = 0;
                 int failed = 0;
+                int held = 0;
 
                 for (Job job : result) {
 
@@ -201,6 +204,8 @@ public class JobsLayout extends VLayout {
                         case Failed:
                             failed++;
                             break;
+                        case Held:
+                            held++;
                     }
                 }
 
@@ -209,16 +214,20 @@ public class JobsLayout extends VLayout {
                     runningSeries.add(DataPoint.of(1, running + runningWE));
                     completedSeries.add(DataPoint.of(1, completed));
                     failedSeries.add(DataPoint.of(1, failed));
+                    heldSeries.add(DataPoint.of(1, held));
                 } else {
                     queuedSeries.getData().get(0).setY(queued + queuedWE);
                     runningSeries.getData().get(0).setY(running + runningWE);
                     completedSeries.getData().get(0).setY(completed);
                     failedSeries.getData().get(0).setY(failed);
+                    heldSeries.getData().get(0).setY(held);
                 }
                 plot.redraw();
 
                 if (failed > 0) {
                     infoLayout.setStatus(2);
+                } else if (held > 0) {
+                    infoLayout.setStatus(3);
                 } else if (queuedWE > 0 || runningWE > 0) {
                     infoLayout.setStatus(1);
                 } else {
