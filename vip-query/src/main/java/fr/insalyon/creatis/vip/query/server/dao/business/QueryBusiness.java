@@ -151,9 +151,17 @@ public class QueryBusiness {
     
     
     
-     public void updateQueryExecutionStatus(String status, Long executionID) throws BusinessException {
+     public void updateQueryExecutionStatusWaiting(String status, Long executionID) throws BusinessException {
              try {
-            QueryDAOFactory.getDAOFactory().getQueryDAO().updateQueryExecutionStatus(status, executionID);
+            QueryDAOFactory.getDAOFactory().getQueryDAO().updateQueryExecutionStatusWaiting(status, executionID);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+     public void updateQueryExecutionStatusFailed(String status, Long executionID) throws BusinessException {
+             try {
+            QueryDAOFactory.getDAOFactory().getQueryDAO().updateQueryExecutionStatusFailed(status, executionID);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
