@@ -57,5 +57,6 @@ public interface QueryDAO {
 
     public Long getQueryID(Long queryVersionID) throws DAOException;
     public  boolean getBodies(Long queryID,String body) throws DAOException ;
-     public void updateQueryExecutionStatus(String status, Long executionID) throws DAOException ;
+    public void updateQueryExecutionStatusWaiting(String status, Long executionID) throws DAOException ;
+     public void updateQueryExecutionStatusFailed(String status, Long executionID) throws DAOException ;
 }

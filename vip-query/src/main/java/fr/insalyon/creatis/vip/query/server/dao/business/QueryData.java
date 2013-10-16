@@ -481,7 +481,7 @@ public class QueryData implements QueryDAO {
 
     
      @Override
-    public void updateQueryExecutionStatus(String status, Long executionID) throws DAOException {
+    public void updateQueryExecutionStatusWaiting(String status, Long executionID) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
@@ -505,6 +505,31 @@ public class QueryData implements QueryDAO {
         }
     }
     
+    @Override
+    public void updateQueryExecutionStatusFailed(String status, Long executionID) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "QueryExecution "
+                    + "SET dateEndExecution=?, status=?, pathFileResult=? "
+                    + "WHERE queryExecutionID=?");
+
+
+
+            ps.setTimestamp(1, getCurrentTimeStamp());
+            ps.setString(2, status);
+            ps.setString(3,"Query Execution was interrupted by the user");
+            ps.setLong(4, executionID);
+            ps.executeUpdate();
+            ps.close();
+
+
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
     
     
     
