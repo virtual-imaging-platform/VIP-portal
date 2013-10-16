@@ -30,6 +30,8 @@ public class QueryConstants {
     public static final String ICON_LINK = IMG_FOLDER + "icon-links.png";
     public static final String ICON_DOWNLOAD = IMG_FOLDER + "file_download.png";
     public static final String ICON_ERROR =IMG_FOLDER + "Error.png";
+     public static final String ICON_BASE =IMG_FOLDER + "icon-base.png";
+      public static final String ICON_PROPERTIES =IMG_FOLDER + "icon-properties.png";
     // Application Names
     public static final String APP_QUERYHISTORY = "Query History";
     public static final String APP_QUERYMAKER = "Query Maker";

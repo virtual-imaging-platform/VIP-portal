@@ -21,6 +21,7 @@ import com.smartgwt.client.util.SC;
 
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -109,17 +110,22 @@ public class QueryHistoryTab extends Tab {
             protected Canvas createRecordComponent(final ListGridRecord record, Integer colNum) {
 
                 String fieldName = this.getFieldName(colNum);
-                IButton button = null;
+               ImgButton button = null;
 
                 if (fieldName.equals("buttonField")) {
-                    button = new IButton();
-                    button.setHeight(18);
-                    button.setWidth(75);
+                    button = new ImgButton();
+                   button.setShowDown(false);  
+                   button.setShowRollOver(false);  
+                    button.setAlign(Alignment.CENTER);  
+                   
+                    button.setHeight(16);  
+                    button.setWidth(16);
 
 
                     if (record.getAttribute("status") == "completed") {
-                        button.setIcon(QueryConstants.ICON_LINK);
-                        button.setTitle("download");
+                        
+                       button.setSrc(QueryConstants.ICON_LINK);  
+                   
                         button.addClickHandler(new ClickHandler() {
                             public void onClick(ClickEvent event) {
 
@@ -128,8 +134,8 @@ public class QueryHistoryTab extends Tab {
                             }
                         });
                     } else if (record.getAttribute("status") == "failed") {
-                        button.setIcon(QueryConstants.ICON_ERROR);
-                        button.setTitle("Error");
+                        button.setSrc(QueryConstants.ICON_ERROR);
+                        
                         button.addClickHandler(new ClickHandler() {
                             public void onClick(ClickEvent event) {
                                 SC.say("<html><font color=\"red\">ERROR!</font></html>", record.getAttribute("pathFileResult"));
@@ -206,6 +212,7 @@ public class QueryHistoryTab extends Tab {
                     final String queryExecutionID=record.getAttribute("queryExecutionID");
 
                     MenuItem relaunch = new MenuItem("Relauch", QueryConstants.ICON_EXECUTE);
+                     
                     relaunch.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
                         public void onClick(MenuItemClickEvent event) {
 
@@ -220,17 +227,52 @@ public class QueryHistoryTab extends Tab {
                                 public void onSuccess(Void result) {
                                 }
                             };
-                            QueryService.Util.getInstance().updateQueryExecutionStatus("waiting",Long.parseLong(queryExecutionID), callback);
+                            QueryService.Util.getInstance().updateQueryExecutionStatusWaiting("waiting",Long.parseLong(queryExecutionID), callback);
 
                         }
                     });
                     menu.addItem(relaunch);
+                    
 
                     grid.setContextMenu(menu);
-                } else {
+                } else if(record.getAttribute("status") == "waiting" ||record.getAttribute("status") == "running" ){
 
                     Menu menu = new Menu();
-                    menu = null;
+                     final String queryExecutionID=record.getAttribute("queryExecutionID");
+                    MenuItem kill = new MenuItem("kill", QueryConstants.ICON_KILL);
+                    
+                      kill.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+                        public void onClick(MenuItemClickEvent event) {
+
+                            final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+                                @Override
+                                public void onFailure(Throwable caught) {
+
+                                    Layout.getInstance().setWarningMessage("Unable to relaunch this query" + caught.getMessage());
+                                }
+
+                                @Override
+                                public void onSuccess(Void result) {
+                                }
+                            };
+                            QueryService.Util.getInstance().updateQueryExecutionStatusFailed("failed",Long.parseLong(queryExecutionID), callback);
+
+                        }
+                    });
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    menu.addItem(kill);
+                    grid.setContextMenu(menu);
+                }
+                else{
+                    Menu menu = new Menu();
+                    menu=null;
                     grid.setContextMenu(menu);
                 }
 
@@ -282,6 +324,7 @@ public class QueryHistoryTab extends Tab {
         date.setWidth(120);
         ListGridField buttonField = new ListGridField("buttonField", "Result");
         buttonField.setAlign(Alignment.CENTER);
+        buttonField.setWidth(60);
 
         grid.setFields(
                 FieldUtil.getIconGridField("statusIcon"),
