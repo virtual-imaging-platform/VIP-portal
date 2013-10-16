@@ -201,9 +201,19 @@ public class QueryServiceImpl extends AbstractRemoteServiceServlet implements Qu
     
     
     @Override
-   public void updateQueryExecutionStatus(String status, Long executionID) throws QueryException {
-try {
-            queryBusiness.updateQueryExecutionStatus( status, executionID);
+    public void updateQueryExecutionStatusWaiting(String status, Long executionID) throws QueryException {
+        try {
+            queryBusiness.updateQueryExecutionStatusWaiting(status, executionID);
+
+        } catch (BusinessException ex) {
+            throw new QueryException(ex);
+        }
+
+    }
+    @Override
+    public void updateQueryExecutionStatusFailed(String status, Long executionID) throws QueryException {
+        try {
+            queryBusiness.updateQueryExecutionStatusFailed(status, executionID);
 
         } catch (BusinessException ex) {
             throw new QueryException(ex);
