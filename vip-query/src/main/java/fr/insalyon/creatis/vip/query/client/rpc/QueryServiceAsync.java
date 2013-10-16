@@ -47,7 +47,8 @@ public interface QueryServiceAsync {
     public void getBody(Long queryVersionID, Long queryExecutionID, boolean parameter, AsyncCallback<String> asyncCallback);
 
     public void updateQueryExecution(String bodyResult, String status, Long executionID, AsyncCallback<Void> asyncCallback);
-    public void updateQueryExecutionStatus(String status, Long executionID,AsyncCallback<Void> asyncCallback);
+    public void updateQueryExecutionStatusWaiting(String status, Long executionID,AsyncCallback<Void> asyncCallback);
+    public void updateQueryExecutionStatusFailed(String status, Long executionID,AsyncCallback<Void> asyncCallback);
     public void updateQueryVersion(Long queryID, String name, String description, AsyncCallback<Void> asyncCallback);
 
     public void getDescription(Long queryVersionID, AsyncCallback<String> asyncCallback);

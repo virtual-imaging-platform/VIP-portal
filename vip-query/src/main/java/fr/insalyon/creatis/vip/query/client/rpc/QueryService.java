@@ -62,7 +62,8 @@ public interface QueryService extends RemoteService {
     public String getBody(Long queryVersionID, Long queryExecutionID, boolean parameter) throws QueryException;
 
     public void updateQueryVersion(Long queryID, String name, String description) throws QueryException;
-    public void updateQueryExecutionStatus(String status, Long executionID) throws QueryException ;
+    public void updateQueryExecutionStatusWaiting(String status, Long executionID) throws QueryException ;
+    public void updateQueryExecutionStatusFailed(String status, Long executionID) throws QueryException ;
 
 
     public void updateQueryExecution(String urlResult, String status, Long executionID) throws QueryException;
