@@ -25,7 +25,7 @@
         <vip.cowork-applet.version>0.1</vip.cowork-applet.version>
         <vip.cardiac.version>0.9.4</vip.cardiac.version>
         <vip.physical-properties.version>0.1</vip.physical-properties.version>
-        <vip.query.version>1.4.2</vip.query.version>
+        <vip.query.version>1.5</vip.query.version>
     </properties>
     
     <description>VIP</description>
