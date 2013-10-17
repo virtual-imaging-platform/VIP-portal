@@ -129,6 +129,9 @@ public class QueryHistoryTab extends Tab {
                         button.addClickHandler(new ClickHandler() {
                             public void onClick(ClickEvent event) {
                                 String n=record.getAttribute("pathFileResult");
+                                if (n.length()<80)
+                                    SC.say("<html><font color=\"red\">ERROR!</font></html>",n);
+                                else{
                                int i=0;
                                String message=new String();
                                while(i<n.length()){
@@ -136,12 +139,14 @@ public class QueryHistoryTab extends Tab {
                                        int k=n.length()-i;
                                        message+=n.substring(i, k);
                                    }
-                                 message+=n.substring(i,i+80)+"<br>";
+                                   else{
+                                 message+=n.substring(i,i+80)+"<br>";}
                                i+=80;
                                }
                                     
                                 SC.say("<html><font color=\"red\">ERROR!</font></html>",message);
                                
+                            }
                             }
                         });
                     }

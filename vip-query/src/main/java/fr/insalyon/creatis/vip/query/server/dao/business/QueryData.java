@@ -518,6 +518,7 @@ public class QueryData implements QueryDAO {
 
             ps.setTimestamp(1, getCurrentTimeStamp());
             ps.setString(2, status);
+       
             ps.setString(3,"Query Execution was interrupted by the user");
             ps.setLong(4, executionID);
             ps.executeUpdate();
