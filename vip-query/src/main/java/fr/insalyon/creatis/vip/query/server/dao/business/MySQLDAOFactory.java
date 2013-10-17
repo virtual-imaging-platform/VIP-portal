@@ -67,7 +67,7 @@ public class MySQLDAOFactory extends QueryDAOFactory {
                     + "executer VARCHAR(255), "
                     + "status VARCHAR(255), "
                     + "bodyResult VARCHAR(1000), "
-                    + "pathFileResult VARCHAR(500),"
+                    + "pathFileResult VARCHAR(500), "
                     + "PRIMARY KEY (queryExecutionID), "
                     + "FOREIGN KEY (queryVersionID) REFERENCES QueryVersion(queryVersionID) "
                     + "ON DELETE RESTRICT ON UPDATE RESTRICT");
