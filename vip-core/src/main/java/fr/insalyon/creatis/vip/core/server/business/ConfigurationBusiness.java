@@ -148,10 +148,11 @@ public class ConfigurationBusiness {
 
             // Adding user to groups
             for (Group group : CoreDAOFactory.getDAOFactory().getAccountDAO().getGroups(accountType)) {
-                if(mapPrivateGroups || createdFromCAS || group.isPublicGroup())
+                if (mapPrivateGroups || createdFromCAS || group.isPublicGroup()) {
                     CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().add(user.getEmail(), group.getName(), GROUP_ROLE.User);
-                else
-                    logger.info("Don't map user "+user.getEmail()+" to private group "+group.getName());
+                } else {
+                    logger.info("Don't map user " + user.getEmail() + " to private group " + group.getName());
+                }
             }
 
             if (!createdFromCAS) {
@@ -180,7 +181,7 @@ public class ConfigurationBusiness {
                     }
                     accounts.append(account);
                 }
-                
+
                 String adminsEmailContents = "<html>"
                         + "<head></head>"
                         + "<body>"
@@ -250,7 +251,7 @@ public class ConfigurationBusiness {
      * @param accountType
      * @throws BusinessException
      */
-    public void signup(User user, String comments, String...accountType) throws BusinessException {
+    public void signup(User user, String comments, String... accountType) throws BusinessException {
         signup(user, comments, false, false, accountType);
 
     }
@@ -903,12 +904,15 @@ public class ConfigurationBusiness {
      * @param email
      * @param level
      * @param countryCode
+     * @param maxRunningSimulations 
      * @throws BusinessException
      */
-    public void updateUser(String email, UserLevel level, CountryCode countryCode) throws BusinessException {
+    public void updateUser(String email, UserLevel level, CountryCode countryCode,
+            int maxRunningSimulations) throws BusinessException {
 
         try {
-            CoreDAOFactory.getDAOFactory().getUserDAO().update(email, level, countryCode);
+            CoreDAOFactory.getDAOFactory().getUserDAO().update(email, level,
+                    countryCode, maxRunningSimulations);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);

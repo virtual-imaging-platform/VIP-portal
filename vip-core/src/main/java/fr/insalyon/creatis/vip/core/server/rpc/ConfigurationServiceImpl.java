@@ -60,7 +60,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 
@@ -422,12 +421,12 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      */
     @Override
     public void updateUser(String email, UserLevel level, CountryCode countryCode,
-            Map<String, GROUP_ROLE> groups) throws CoreException {
+            int maxRunningSimulations, Map<String, GROUP_ROLE> groups) throws CoreException {
 
         try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Updating user '" + email + "'.");
-            configurationBusiness.updateUser(email, level, countryCode);
+            configurationBusiness.updateUser(email, level, countryCode, maxRunningSimulations);
             configurationBusiness.setUserGroups(email, groups);
 
         } catch (BusinessException ex) {

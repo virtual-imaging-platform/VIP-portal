@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -44,12 +42,11 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
 /**
  *
- * @author Rafael Ferreira da Silva
+ * @author Rafael Ferreira da Silva, Tristan Glatard
  */
 public class UserData implements UserDAO {
 
@@ -75,8 +72,8 @@ public class UserData implements UserDAO {
                     "INSERT INTO VIPUsers("
                     + "email, pass, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, registration, last_login, level, "
-                    + "country_code) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    + "country_code, max_simulations) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getPassword());
@@ -91,6 +88,7 @@ public class UserData implements UserDAO {
             ps.setTimestamp(11, new Timestamp(user.getLastLogin().getTime()));
             ps.setString(12, user.getLevel().name());
             ps.setString(13, user.getCountryCode().name());
+            ps.setInt(14, user.getMaxRunningSimulations());
             ps.execute();
             ps.close();
 
@@ -190,7 +188,7 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, session, registration, "
-                    + "last_login, level, country_code "
+                    + "last_login, level, country_code, max_simulations "
                     + "FROM VIPUsers "
                     + "WHERE email=?");
 
@@ -207,7 +205,8 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("registration").getTime()),
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
-                        CountryCode.valueOf(rs.getString("country_code")));
+                        CountryCode.valueOf(rs.getString("country_code")),
+                        rs.getInt("max_simulations"));
 
                 ps.close();
                 return user;
@@ -233,7 +232,7 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, registration, last_login, "
-                    + "level, country_code "
+                    + "level, country_code, max_simulations "
                     + "FROM VIPUsers "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
 
@@ -249,7 +248,8 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("registration").getTime()),
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
-                        CountryCode.valueOf(rs.getString("country_code"))));
+                        CountryCode.valueOf(rs.getString("country_code")),
+                        rs.getInt("max_simulations")));
             }
             ps.close();
             return users;
@@ -439,7 +439,7 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, session, registration, "
-                    + "last_login, level, country_code "
+                    + "last_login, level, country_code, max_simulations "
                     + "FROM VIPUsers "
                     + "WHERE session = ?");
 
@@ -456,7 +456,8 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("registration").getTime()),
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
-                        CountryCode.valueOf(rs.getString("country_code")));
+                        CountryCode.valueOf(rs.getString("country_code")),
+                        rs.getInt("max_simulations"));
                 ps.close();
                 return user;
             }
@@ -481,7 +482,7 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, registration, last_login, "
-                    + "level, country_code "
+                    + "level, country_code, max_simulations "
                     + "FROM VIPUsers WHERE level = ? "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
             ps.setString(1, UserLevel.Administrator.name());
@@ -498,7 +499,8 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("registration").getTime()),
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
-                        CountryCode.valueOf(rs.getString("country_code"))));
+                        CountryCode.valueOf(rs.getString("country_code")),
+                        rs.getInt("max_simulations")));
             }
             ps.close();
             return users;
@@ -517,15 +519,17 @@ public class UserData implements UserDAO {
      * @throws DAOException
      */
     @Override
-    public void update(String email, UserLevel level, CountryCode countryCode)
-            throws DAOException {
+    public void update(String email, UserLevel level, CountryCode countryCode,
+            int maxRunningSimulations) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
-                    + "VIPUsers SET level = ?, country_code = ? WHERE email = ?");
+                    + "VIPUsers SET level = ?, country_code = ?, "
+                    + "max_simulations = ? WHERE email = ?");
             ps.setString(1, level.name());
             ps.setString(2, countryCode.name());
-            ps.setString(3, email);
+            ps.setInt(3, maxRunningSimulations);
+            ps.setString(4, email);
 
             ps.executeUpdate();
             ps.close();
@@ -589,7 +593,7 @@ public class UserData implements UserDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("select COUNT(*) as count from VIPUsers");
             ResultSet rs = ps.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 return rs.getInt("count");
             }
             ps.close();
@@ -605,7 +609,7 @@ public class UserData implements UserDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("select COUNT(distinct country_code) as count from VIPUsers");
             ResultSet rs = ps.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 return rs.getInt("count");
             }
             ps.close();
@@ -672,14 +676,15 @@ public class UserData implements UserDAO {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                boolean validated  = rs.getBoolean("validated");
+                boolean validated = rs.getBoolean("validated");
                 if (!validated) {
 
-                   return DropboxAccountStatus.AccountStatus.UNCONFIRMED;
+                    return DropboxAccountStatus.AccountStatus.UNCONFIRMED;
                 }
                 boolean failed = rs.getBoolean("auth_failed");
-                if(failed)
+                if (failed) {
                     return DropboxAccountStatus.AccountStatus.AUTHENTICATION_FAILED;
+                }
                 return DropboxAccountStatus.AccountStatus.OK;
             }
             return DropboxAccountStatus.AccountStatus.UNLINKED;
@@ -690,7 +695,7 @@ public class UserData implements UserDAO {
 
     @Override
     public void unlinkDropboxAccount(String email) throws DAOException {
-         try {
+        try {
             PreparedStatement ps = connection.prepareStatement("DELETE "
                     + "FROM VIPDropboxAccounts WHERE email=?");
 

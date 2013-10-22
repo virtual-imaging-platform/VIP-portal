@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -131,7 +129,7 @@ public class PlatformConnection {
                             server.getAdminPhone(), true,
                             UUID.randomUUID().toString(), folder, "",
                             new Date(), new Date(), UserLevel.Administrator,
-                            CountryCode.fr));
+                            CountryCode.fr, 100));
 
                 } catch (DAOException ex) {
                     logger.error(ex);

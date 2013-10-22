@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -60,6 +58,7 @@ public class User implements IsSerializable {
     private Date registration;
     private Date lastLogin;
     private UserLevel level;
+    private int maxRunningSimulations;
     private CountryCode countryCode;
     private Map<Group, GROUP_ROLE> groups;
 
@@ -70,20 +69,21 @@ public class User implements IsSerializable {
             String phone, UserLevel level, CountryCode countryCode) {
 
         this(firstName, lastName, email, institution, "", phone, false, "", "",
-                "", null, null, level, countryCode);
+                "", null, null, level, countryCode, 1);
     }
 
     public User(String firstName, String lastName, String email, String institution,
             String password, String phone, CountryCode countryCode) {
 
         this(firstName, lastName, email, institution, password, phone, false,
-                "", "", "", new Date(), new Date(), null, countryCode);
+                "", "", "", new Date(), new Date(), null, countryCode, 1);
     }
 
     public User(String firstName, String lastName, String email,
             String institution, String password, String phone, boolean confirmed,
             String code, String folder, String session, Date registration,
-            Date lastLogin, UserLevel level, CountryCode countryCode) {
+            Date lastLogin, UserLevel level, CountryCode countryCode, 
+            int maxRunningSimulations) {
 
         this.firstName = firstName;
         this.lastName = lastName;
@@ -98,6 +98,7 @@ public class User implements IsSerializable {
         this.registration = registration;
         this.lastLogin = lastLogin;
         this.level = level;
+        this.maxRunningSimulations = maxRunningSimulations;
         this.countryCode = countryCode;
     }
 
@@ -175,6 +176,14 @@ public class User implements IsSerializable {
 
     public void setLevel(UserLevel level) {
         this.level = level;
+    }
+
+    public int getMaxRunningSimulations() {
+        return maxRunningSimulations;
+    }
+
+    public void setMaxRunningSimulations(int maxRunningSimulations) {
+        this.maxRunningSimulations = maxRunningSimulations;
     }
 
     public CountryCode getCountryCode() {

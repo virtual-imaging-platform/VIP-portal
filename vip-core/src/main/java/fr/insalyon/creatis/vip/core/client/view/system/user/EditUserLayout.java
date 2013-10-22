@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -42,6 +40,7 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
@@ -69,6 +68,7 @@ public class EditUserLayout extends AbstractFormLayout {
     private SelectItem levelPickList;
     private SelectItem groupsPickList;
     private SelectItem countryPickList;
+    private SpinnerItem maxRunningSimulationsItem;
     private CheckboxItem confirmedField;
     private IButton saveButton;
 
@@ -109,6 +109,13 @@ public class EditUserLayout extends AbstractFormLayout {
         countryPickList.setRequired(true);
         countryPickList.setWidth(350);
 
+        maxRunningSimulationsItem = new SpinnerItem();
+        maxRunningSimulationsItem.setShowTitle(false);
+        maxRunningSimulationsItem.setDefaultValue(1);
+        maxRunningSimulationsItem.setMin(1);
+        maxRunningSimulationsItem.setMax(100);
+        maxRunningSimulationsItem.setStep(1);
+
         confirmedField = new CheckboxItem();
         confirmedField.setTitle("Confirmed");
         confirmedField.setDisabled(true);
@@ -116,36 +123,37 @@ public class EditUserLayout extends AbstractFormLayout {
 
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent event) {
-                        if (levelPickList.validate() & countryPickList.validate()) {
+            @Override
+            public void onClick(ClickEvent event) {
+                if (levelPickList.validate() & countryPickList.validate()) {
 
-                            String[] values = groupsPickList.getValues();
-                            Map<String, CoreConstants.GROUP_ROLE> map = new HashMap<String, CoreConstants.GROUP_ROLE>();
+                    String[] values = groupsPickList.getValues();
+                    Map<String, CoreConstants.GROUP_ROLE> map = new HashMap<String, CoreConstants.GROUP_ROLE>();
 
-                            for (String v : values) {
-                                if (v.equals(CoreConstants.GROUP_SUPPORT)) {
-                                    map.put(v, CoreConstants.GROUP_ROLE.User);
+                    for (String v : values) {
+                        if (v.equals(CoreConstants.GROUP_SUPPORT)) {
+                            map.put(v, CoreConstants.GROUP_ROLE.User);
 
-                                } else {
-                                    String name = v.substring(0, v.indexOf(" ("));
-                                    CoreConstants.GROUP_ROLE role = v.contains("("
-                                            + CoreConstants.GROUP_ROLE.Admin.name() + ")")
-                                            ? CoreConstants.GROUP_ROLE.Admin
-                                            : CoreConstants.GROUP_ROLE.User;
+                        } else {
+                            String name = v.substring(0, v.indexOf(" ("));
+                            CoreConstants.GROUP_ROLE role = v.contains("("
+                                    + CoreConstants.GROUP_ROLE.Admin.name() + ")")
+                                    ? CoreConstants.GROUP_ROLE.Admin
+                                    : CoreConstants.GROUP_ROLE.User;
 
-                                    if (map.get(name) == null || role == CoreConstants.GROUP_ROLE.Admin) {
-                                        map.put(name, role);
-                                    }
-                                }
+                            if (map.get(name) == null || role == CoreConstants.GROUP_ROLE.Admin) {
+                                map.put(name, role);
                             }
-                            save(emailLabel.getContents(),
-                                    UserLevel.valueOf(levelPickList.getValueAsString()),
-                                    CountryCode.valueOf(countryPickList.getValueAsString()),
-                                    map);
                         }
                     }
-                });
+                    save(emailLabel.getContents(),
+                            UserLevel.valueOf(levelPickList.getValueAsString()),
+                            CountryCode.valueOf(countryPickList.getValueAsString()),
+                            Integer.parseInt(maxRunningSimulationsItem.getValueAsString()),
+                            map);
+                }
+            }
+        });
         saveButton.setDisabled(true);
 
         this.addMember(nameLabel);
@@ -153,6 +161,7 @@ public class EditUserLayout extends AbstractFormLayout {
         addField("Level", levelPickList);
         addField("Groups", groupsPickList);
         addField("Country", countryPickList);
+        addField("Max Running Simulations", maxRunningSimulationsItem);
         this.addMember(FieldUtil.getForm(confirmedField));
         this.addMember(saveButton);
     }
@@ -165,15 +174,17 @@ public class EditUserLayout extends AbstractFormLayout {
      * @param confirmed If the user confirmed his account
      * @param level User's level
      * @param countryCode User's country code
+     * @param maxRunningSimulations User's max running simulations
      */
     public void setUser(String name, String email, boolean confirmed,
-            String level, String countryCode) {
+            String level, String countryCode, int maxRunningSimulations) {
 
         this.nameLabel.setContents(name);
         this.emailLabel.setContents(email);
         this.confirmedField.setValue(confirmed);
         this.levelPickList.setValue(level);
         this.countryPickList.setValue(countryCode);
+        this.maxRunningSimulationsItem.setValue(maxRunningSimulations);
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<Map<Group, GROUP_ROLE>> callback = new AsyncCallback<Map<Group, GROUP_ROLE>>() {
@@ -209,7 +220,7 @@ public class EditUserLayout extends AbstractFormLayout {
      * @param groups List of groups
      */
     private void save(String email, UserLevel level, CountryCode countryCode,
-            Map<String, CoreConstants.GROUP_ROLE> groups) {
+            int maxRunningSimulations, Map<String, CoreConstants.GROUP_ROLE> groups) {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
@@ -234,7 +245,7 @@ public class EditUserLayout extends AbstractFormLayout {
             }
         };
         WidgetUtil.setLoadingIButton(saveButton, "Updating user...");
-        service.updateUser(email, level, countryCode, groups, callback);
+        service.updateUser(email, level, countryCode, maxRunningSimulations, groups, callback);
     }
 
     /**

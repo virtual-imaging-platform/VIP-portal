@@ -1,10 +1,8 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
- *
- * This software is a grid-enabled data-driven workflow manager and editor.
  *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -39,23 +37,13 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public enum UserLevel {
 
-    Beginner(1),
-    Advanced(Integer.MAX_VALUE),
-    Administrator(Integer.MAX_VALUE);
-    //
-    private int maxRunningSimulations;
-
-    private UserLevel(int maxRunningSimulations) {
-        this.maxRunningSimulations = maxRunningSimulations;
-    }
-
-    public int getMaxRunningSimulations() {
-        return maxRunningSimulations;
-    }
+    Beginner,
+    Advanced,
+    Administrator;
 
     public static String[] toStringArray() {
 

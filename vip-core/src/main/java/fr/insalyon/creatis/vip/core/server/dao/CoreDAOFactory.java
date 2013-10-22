@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -40,27 +38,16 @@ package fr.insalyon.creatis.vip.core.server.dao;
  */
 public abstract class CoreDAOFactory {
 
-    public static final int H2 = 1;
-    public static final int MYSQL = 2;
-    public static int factory = MYSQL;
-
     public static CoreDAOFactory getDAOFactory() {
 
-        switch (factory) {
-            case H2:
-                return H2DAOFactory.getInstance();
-            case MYSQL:
-                return MySQLDAOFactory.getInstance();
-            default:
-                return null;
-        }
+        return MySQLDAOFactory.getInstance();
     }
 
     public abstract UserDAO getUserDAO() throws DAOException;
-    
+
     public abstract GroupDAO getGroupDAO() throws DAOException;
-    
+
     public abstract UsersGroupsDAO getUsersGroupsDAO() throws DAOException;
-    
+
     public abstract AccountDAO getAccountDAO() throws DAOException;
 }

@@ -133,7 +133,7 @@ public class WorkflowBusiness {
 
         try {
             long runningWorkflows = workflowDAO.getNumberOfRunning(user.getFullName());
-            if (runningWorkflows >= user.getLevel().getMaxRunningSimulations()) {
+            if (runningWorkflows >= user.getMaxRunningSimulations()) {
 
                 logger.warn("Unable to launch simulation '" + simulationName + "': max "
                         + "number of running workflows reached for user '" + user + "'.");

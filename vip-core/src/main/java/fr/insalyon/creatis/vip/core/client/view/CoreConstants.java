@@ -72,14 +72,16 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_SMA_PORT = "sma.port";
     public static final String LAB_TRUSTSTORE_FILE = "truststore.file";
     public static final String LAB_TRUSTSTORE_PASS = "truststore.password";
-    public static final String LAB_WORKFLOWS_DB_HOST = "workflows.db.host";
-    public static final String LAB_WORKFLOWS_DB_NAME = "workflows.db.name";
-    public static final String LAB_WORKFLOWS_DB_PORT = "workflows.db.port";
-    public static final String LAB_WORKFLOWS_FOLDER = "workflows.directory";
-    public static final String LAB_WORKFLOWS_EXEC_MODE = "workflows.exec.mode";
-    public static final String LAB_SIMULATED_DATA_DB_USER ="simulated-data.db.user";
-    public static final String LAB_SIMULATED_DATA_DB_PASSWORD ="simulated-data.db.pass";
-    public static final String LAB_SIMULATED_DATA_DB_URL ="simulated-data.db.url";
+    public static final String LAB_SIMULATED_DATA_DB_USER = "simulated-data.db.user";
+    public static final String LAB_SIMULATED_DATA_DB_PASSWORD = "simulated-data.db.pass";
+    public static final String LAB_SIMULATED_DATA_DB_URL = "simulated-data.db.url";
+    public static final String LAB_SIMULATION_ADVANCED_MAX = "simulation.max.advanced";
+    public static final String LAB_SIMULATION_BEGINNER_MAX = "simulation.max.beginner";
+    public static final String LAB_SIMULATION_DB_HOST = "workflows.db.host";
+    public static final String LAB_SIMULATION_DB_NAME = "workflows.db.name";
+    public static final String LAB_SIMULATION_DB_PORT = "workflows.db.port";
+    public static final String LAB_SIMULATION_FOLDER = "workflows.directory";
+    public static final String LAB_SIMULATION_EXEC_MODE = "workflows.exec.mode";
     // Tabs
     public static final String TAB_ACCOUNT = "account-tab";
     public static final String TAB_ACTIVATION = "activation-tab";
@@ -124,7 +126,7 @@ public class CoreConstants implements IsSerializable {
     public static final String ICON_USER_INFO = IMG_FOLDER + "system/icon-user-info.png";
     public static final String ICON_WARNING = IMG_FOLDER + "icon-warning.png";
     public static final String ICON_WORLD = IMG_FOLDER + "flags/_world.png";
-    public static final String ICON_DROPBOX = IMG_FOLDER+"icon-dropbox.png";
+    public static final String ICON_DROPBOX = IMG_FOLDER + "icon-dropbox.png";
     // Folders
     public static final String FOLDER_TRASH = "Trash";
     public static final String FOLDER_FLAGS = IMG_FOLDER + "flags/";
@@ -153,7 +155,7 @@ public class CoreConstants implements IsSerializable {
     public static final String GROUP_DROPBOX = "Dropbox";
     // ssh
     public static final String SSH_PUBLIC_KEY = "ssh.publickey";
- 
+
     public static enum GROUP_ROLE implements IsSerializable {
 
         Admin, User, None
