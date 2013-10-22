@@ -38,7 +38,6 @@ import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Input;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Output;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Processor;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Stats;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.InputDAO;
@@ -64,7 +63,6 @@ import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAO;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAOFactory;
-import fr.insalyon.creatis.vip.application.server.dao.hibernate.SimulationStatsData;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
@@ -440,8 +438,9 @@ public class WorkflowBusiness {
         Simulation simulation = null;
         try {
             Workflow workflow = workflowDAO.get(simulationID);
-            if(workflow == null )
-                throw new BusinessException("Cannot find simulation with id "+simulationID);
+            if (workflow == null) {
+                throw new BusinessException("Cannot find simulation with id " + simulationID);
+            }
             simulation = new Simulation(
                     workflow.getApplication(),
                     workflow.getApplicationVersion(),
@@ -760,11 +759,13 @@ public class WorkflowBusiness {
 
         for (Simulation simulation : simulations) {
 
-            if (simulation.getStatus() == SimulationStatus.Running) {
+            if (simulation.getStatus() == SimulationStatus.Running
+                    || simulation.getStatus() == SimulationStatus.Unknown) {
                 WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(simulation.getApplicationClass());
                 SimulationStatus simulationStatus = executionBusiness.getStatus(simulation.getID());
 
-                if (simulationStatus != SimulationStatus.Running) {
+                if (simulationStatus != SimulationStatus.Running 
+                        && simulationStatus != SimulationStatus.Unknown) {
                     simulation.setStatus(simulationStatus);
                     Workflow workflow = workflowDAO.get(simulation.getID());
                     workflow.setStatus(WorkflowStatus.valueOf(simulationStatus.name()));
