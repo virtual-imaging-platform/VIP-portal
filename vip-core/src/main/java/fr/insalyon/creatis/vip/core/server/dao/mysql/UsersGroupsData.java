@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -230,7 +228,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "us.email AS uemail, first_name, last_name, institution, "
                     + "phone, code, confirmed, folder, registration, last_login, "
-                    + "level, country_code "
+                    + "level, country_code, max_simulations "
                     + "FROM VIPUsers us, VIPUsersGroups ug "
                     + "WHERE us.email = ug.email AND ug.groupname = ? "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
@@ -249,7 +247,8 @@ public class UsersGroupsData implements UsersGroupsDAO {
                         new Date(rs.getTimestamp("registration").getTime()),
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
-                        CountryCode.valueOf(rs.getString("country_code"))));
+                        CountryCode.valueOf(rs.getString("country_code")),
+                        rs.getInt("max_simulations")));
             }
             ps.close();
             return users;

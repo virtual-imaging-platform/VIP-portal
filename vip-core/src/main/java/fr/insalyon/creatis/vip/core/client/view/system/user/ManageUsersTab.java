@@ -1,10 +1,8 @@
 /* Copyright CNRS-CREATIS
  *
- * Rafael Silva
+ * Rafael Ferreira da Silva
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
- *
- * This software is a grid-enabled data-driven workflow manager and editor.
  *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
@@ -40,7 +38,7 @@ import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
 
 /**
  *
- * @author Rafael Silva
+ * @author Rafael Ferreira da Silva
  */
 public class ManageUsersTab extends AbstractManageTab {
 
@@ -76,10 +74,11 @@ public class ManageUsersTab extends AbstractManageTab {
      * @param confirmed
      * @param level
      * @param countryCode 
+     * @param maxRunningSimulations
      */
     public void setUser(String name, String email, boolean confirmed,
-            String level, String countryCode) {
+            String level, String countryCode, int maxRunningSimulations) {
 
-        editLayout.setUser(name, email, confirmed, level, countryCode);
+        editLayout.setUser(name, email, confirmed, level, countryCode, maxRunningSimulations);
     }
 }

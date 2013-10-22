@@ -139,7 +139,8 @@ public class UsersLayout extends VLayout {
                                     rollOverRecord.getAttribute("email"),
                                     rollOverRecord.getAttributeAsBoolean("confirmed"),
                                     rollOverRecord.getAttribute("level"),
-                                    rollOverRecord.getAttribute("countryCode"));
+                                    rollOverRecord.getAttribute("countryCode"),
+                                    rollOverRecord.getAttributeAsInt("maxRunningSimulations"));
                         }
                     }));
 
@@ -221,7 +222,8 @@ public class UsersLayout extends VLayout {
                         record.getAttribute("email"),
                         record.getAttributeAsBoolean("confirmed"),
                         record.getAttribute("level"),
-                        record.getAttribute("countryCode"));
+                        record.getAttribute("countryCode"),
+                        record.getAttributeAsInt("maxRunningSimulations"));
             }
         });
 
@@ -294,10 +296,10 @@ public class UsersLayout extends VLayout {
      * @param countryCode
      */
     private void edit(String userName, String email, boolean confirmed,
-            String level, String countryCode) {
+            String level, String countryCode, int maxRunningSimulations) {
 
         ManageUsersTab usersTab = (ManageUsersTab) Layout.getInstance().
                 getTab(CoreConstants.TAB_MANAGE_USERS);
-        usersTab.setUser(userName, email, confirmed, level, countryCode);
+        usersTab.setUser(userName, email, confirmed, level, countryCode, maxRunningSimulations);
     }
 }

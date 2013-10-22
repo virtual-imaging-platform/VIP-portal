@@ -4,8 +4,6 @@
  * rafael.silva@creatis.insa-lyon.fr
  * http://www.rafaelsilva.com
  *
- * This software is a grid-enabled data-driven workflow manager and editor.
- *
  * This software is governed by the CeCILL  license under French law and
  * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL
@@ -88,7 +86,9 @@ public class Server {
     private String moteurServer;
     private String truststoreFile;
     private String truststorePass;
-    // Workflows
+    // Simulations
+    private int beginnerMaxRunningSimulations;
+    private int advancedMaxRunningSimulations;
     private String workflowsPath;
     private String workflowsDB;
     private String workflowsHost;
@@ -110,7 +110,7 @@ public class Server {
     private String casAccountType;
     //ssh
     private String sshPublicKey;
-    
+
     public static Server getInstance() {
         if (instance == null) {
             instance = new Server();
@@ -162,11 +162,13 @@ public class Server {
             truststoreFile = config.getString(CoreConstants.LAB_TRUSTSTORE_FILE, "/usr/local/apache-tomcat-6.0.29/conf/truststore.jks");
             truststorePass = config.getString(CoreConstants.LAB_TRUSTSTORE_PASS, "");
 
-            workflowsPath = config.getString(CoreConstants.LAB_WORKFLOWS_FOLDER, "/var/www/html/workflows");
-            workflowsDB = config.getString(CoreConstants.LAB_WORKFLOWS_DB_NAME, "/var/www/workflows.db");
-            workflowsHost = config.getString(CoreConstants.LAB_WORKFLOWS_DB_HOST, "localhost");
-            workflowsPort = config.getInt(CoreConstants.LAB_WORKFLOWS_DB_PORT, 1527);
-            workflowsExecuctionMode = config.getString(CoreConstants.LAB_WORKFLOWS_EXEC_MODE, "ws");
+            beginnerMaxRunningSimulations = config.getInt(CoreConstants.LAB_SIMULATION_BEGINNER_MAX, 1);
+            advancedMaxRunningSimulations = config.getInt(CoreConstants.LAB_SIMULATION_ADVANCED_MAX, Integer.MAX_VALUE);
+            workflowsPath = config.getString(CoreConstants.LAB_SIMULATION_FOLDER, "/var/www/html/workflows");
+            workflowsDB = config.getString(CoreConstants.LAB_SIMULATION_DB_NAME, "/var/www/workflows.db");
+            workflowsHost = config.getString(CoreConstants.LAB_SIMULATION_DB_HOST, "localhost");
+            workflowsPort = config.getInt(CoreConstants.LAB_SIMULATION_DB_PORT, 1527);
+            workflowsExecuctionMode = config.getString(CoreConstants.LAB_SIMULATION_EXEC_MODE, "ws");
 
             apacheHost = config.getString("apache.host", apacheHost);
             apacheSSLPort = config.getInt("apache.ssl.port", apacheSSLPort);
@@ -174,16 +176,16 @@ public class Server {
             provenanceDBUser = config.getString("provenance.db.user", provenanceDBUser);
             provenanceDBPass = config.getString("provenance.db.pass", provenanceDBPass);
             provenanceDBURL = config.getString("provenance.db.url", provenanceDBURL);
-            
+
             simulatedDataDBUser = config.getString(CoreConstants.LAB_SIMULATED_DATA_DB_USER, simulatedDataDBUser);
             simulatedDataDBPass = config.getString(CoreConstants.LAB_SIMULATED_DATA_DB_PASSWORD, simulatedDataDBPass);
             simulatedDataDBURL = config.getString(CoreConstants.LAB_SIMULATED_DATA_DB_URL, simulatedDataDBURL);
-            
+
             casURL = config.getString(CoreConstants.LAB_CAS_URL, "https://ng-cas.maatg.fr/pandora-gateway-sl-cas");
             casAccountType = config.getString(CoreConstants.LAB_CAS_ACCOUNT_TYPE, "Neuroimaging");
 
             sshPublicKey = config.getString(CoreConstants.SSH_PUBLIC_KEY, "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAuNjIXlgjuBR+WfjGtkieecZfe/ZL6EyNJTbL14bn3/Soof0kFSshDJvFgSH1hNwMMU1hynLbzcEbLTyVMoGQKfQkq7mJPajy9g8878WCKxCRbXv3W1/HT9iab/qqt2dcRYnDEruHwgyELBhQuMAe2W2/mgjd7Y5PxE01bwDcenYl3cU3iJk1sAOHao6P+3xU6Ov+TD8K9aC0LzZpM+rzAmS9HOZ9nvzERExd7k4TUpyffQV9Dpb5jEnEViF3VHqplB8AbWDdcJbiVkUBUe4hQb7nmWP0kHl1+v5SQJ1B4mWCZ+35Rc/9b1GsmPnXg3qqhjeKbrim/NbcUwKr9NPWjQ== vip-services@kingkong.grid.creatis.insa-lyon.fr");
-            
+
             config.setProperty(CoreConstants.LAB_DB_HOST, databaseServerHost);
             config.setProperty(CoreConstants.LAB_DB_PORT, databaseServerPort);
             config.setProperty(CoreConstants.LAB_ADMIN_FIRST_NAME, adminFirstName);
@@ -210,11 +212,13 @@ public class Server {
             config.setProperty(CoreConstants.LAB_MOTEUR_HOST, moteurServer);
             config.setProperty(CoreConstants.LAB_TRUSTSTORE_FILE, truststoreFile);
             config.setProperty(CoreConstants.LAB_TRUSTSTORE_PASS, truststorePass);
-            config.setProperty(CoreConstants.LAB_WORKFLOWS_FOLDER, workflowsPath);
-            config.setProperty(CoreConstants.LAB_WORKFLOWS_DB_NAME, workflowsDB);
-            config.setProperty(CoreConstants.LAB_WORKFLOWS_DB_HOST, workflowsHost);
-            config.setProperty(CoreConstants.LAB_WORKFLOWS_DB_PORT, workflowsPort);
-            config.setProperty(CoreConstants.LAB_WORKFLOWS_EXEC_MODE, workflowsExecuctionMode);
+            config.setProperty(CoreConstants.LAB_SIMULATION_BEGINNER_MAX, beginnerMaxRunningSimulations);
+            config.setProperty(CoreConstants.LAB_SIMULATION_ADVANCED_MAX, advancedMaxRunningSimulations);
+            config.setProperty(CoreConstants.LAB_SIMULATION_FOLDER, workflowsPath);
+            config.setProperty(CoreConstants.LAB_SIMULATION_DB_NAME, workflowsDB);
+            config.setProperty(CoreConstants.LAB_SIMULATION_DB_HOST, workflowsHost);
+            config.setProperty(CoreConstants.LAB_SIMULATION_DB_PORT, workflowsPort);
+            config.setProperty(CoreConstants.LAB_SIMULATION_EXEC_MODE, workflowsExecuctionMode);
             config.setProperty("apache.host", apacheHost);
             config.setProperty("apache.ssl.port", apacheSSLPort);
             config.setProperty("provenance.db.user", provenanceDBUser);
@@ -225,8 +229,8 @@ public class Server {
             config.setProperty(CoreConstants.LAB_SIMULATED_DATA_DB_URL, simulatedDataDBURL);
             config.setProperty(CoreConstants.LAB_CAS_URL, casURL);
             config.setProperty(CoreConstants.LAB_CAS_ACCOUNT_TYPE, casAccountType);
-            config.setProperty(CoreConstants.SSH_PUBLIC_KEY,sshPublicKey);
-            
+            config.setProperty(CoreConstants.SSH_PUBLIC_KEY, sshPublicKey);
+
             config.save();
 
         } catch (ConfigurationException ex) {
@@ -417,6 +421,4 @@ public class Server {
     public String getSshPublicKey() {
         return sshPublicKey;
     }
-
-    
 }

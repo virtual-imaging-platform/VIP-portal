@@ -19,7 +19,7 @@
         <vip.simulation-gui.version>0.4.1</vip.simulation-gui.version>
         <vip.models.version>0.9.1</vip.models.version>
         <vip.simulated-data.version>1.3.1</vip.simulated-data.version>
-        <vip.social.version>0.3.6</vip.social.version>
+        <vip.social.version>1.5</vip.social.version>
         <vip.provenance.version>0.1.2</vip.provenance.version>
         <vip.cowork.version>0.1</vip.cowork.version>
         <vip.cowork-applet.version>0.1</vip.cowork-applet.version>
