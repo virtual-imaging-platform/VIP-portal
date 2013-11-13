@@ -68,9 +68,11 @@ public class GroupData implements GroupDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO VIPGroups(groupname, public) VALUES(?, ?)");
+                    "INSERT INTO VIPGroups(groupname, public, gridfile, gridjobs) VALUES(?, ?, ?, ?)");
             ps.setString(1, group.getName());
             ps.setBoolean(2, group.isPublicGroup());
+            ps.setBoolean(3, group.isGridFile());
+            ps.setBoolean(4, group.isGridJobs());
             ps.execute();
             ps.close();
 
@@ -106,12 +108,14 @@ public class GroupData implements GroupDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
                     + "VIPGroups "
-                    + "SET groupname=?, public=? "
+                    + "SET groupname=?, public=?, gridfile=?, gridjobs=? "
                     + "WHERE groupname=?");
 
             ps.setString(1, group.getName());
             ps.setBoolean(2, group.isPublicGroup());
-            ps.setString(3, name);
+            ps.setBoolean(3, group.isGridFile());
+            ps.setBoolean(4, group.isGridJobs());
+            ps.setString(5, name);
             ps.executeUpdate();
             ps.close();
 
@@ -127,13 +131,13 @@ public class GroupData implements GroupDAO {
 
             List<Group> groups = new ArrayList<Group>();
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "groupname, public FROM "
+                    + "groupname, public, gridfile, gridjobs FROM "
                     + "VIPGroups ORDER BY LOWER(groupname)");
 
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 groups.add(new Group(rs.getString("groupname"),
-                        rs.getBoolean("public")));
+                        rs.getBoolean("public"),rs.getBoolean("gridfile"),rs.getBoolean("gridjobs")));
             }
             ps.close();
             return groups;
