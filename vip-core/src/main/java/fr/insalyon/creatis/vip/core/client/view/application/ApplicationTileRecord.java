@@ -46,6 +46,9 @@ public class ApplicationTileRecord extends TileRecord {
     public ApplicationTileRecord(String name, String icon) {
         
         this(name, null, icon);
+        
+        
+        
     }
 
     public ApplicationTileRecord(String name, String version, String icon) {
@@ -58,6 +61,9 @@ public class ApplicationTileRecord extends TileRecord {
         setAttribute("picture", icon);
         setAttribute("applicationName", name);
         setAttribute("applicationVersion", version);
+       
+       
+        
     }
 
     public String getName() {

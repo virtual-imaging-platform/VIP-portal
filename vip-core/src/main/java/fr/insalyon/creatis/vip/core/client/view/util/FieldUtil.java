@@ -72,6 +72,7 @@ public class FieldUtil {
         iconField.setImageWidth(12);
         iconField.setImageHeight(12);
         return iconField;
+       
     }
 
     /**
@@ -108,6 +109,17 @@ public class FieldUtil {
     public static DynamicForm getForm(FormItem... items) {
 
         DynamicForm form = new DynamicForm();
+        form.setWidth100();
+       
+        form.setFields(items);
+        return form;
+    }
+    
+     public static DynamicForm getFormOneColumn(FormItem... items) {
+
+        DynamicForm form = new DynamicForm();
+        form.setWidth100();
+        form.setNumCols(1);
         form.setFields(items);
         return form;
     }
@@ -123,7 +135,12 @@ public class FieldUtil {
 
         return getTextItem(size, false, "", keyPressFilter, false);
     }
+    
+    
+    public static TextItem getTextItem(String size, String keyPressFilter) {
 
+        return getTextItem(size, false, "", keyPressFilter, false);
+    }
     /**
      * Gets a TextItem configured according to the provided parameters.
      *
@@ -164,6 +181,28 @@ public class FieldUtil {
      * @return
      */
     public static TextItem getTextItem(int size, boolean showTitle, String title,
+            String keyPressFilter, boolean disabled) {
+
+        TextItem textItem = new TextItem();
+        textItem.setTitle(title);
+        textItem.setShowTitle(showTitle);
+        textItem.setWidth(size);
+        textItem.setKeyPressFilter(keyPressFilter);
+        textItem.setAlign(Alignment.LEFT);
+        textItem.setRequired(true);
+        textItem.setDisabled(disabled);
+        textItem.addChangedHandler(new ChangedHandler() {
+
+            @Override
+            public void onChanged(ChangedEvent event) {
+                event.getItem().validate();
+            }
+        });
+
+        return textItem;
+    }
+   
+    public static TextItem getTextItem(String size, boolean showTitle, String title,
             String keyPressFilter, boolean disabled) {
 
         TextItem textItem = new TextItem();
