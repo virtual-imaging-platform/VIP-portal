@@ -4,41 +4,33 @@
  */
 package fr.insalyon.creatis.vip.query.client.view.monitor;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-
 import com.smartgwt.client.types.Alignment;
-
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.TitleOrientation;
-
 import com.smartgwt.client.widgets.*;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.events.CloseClickHandler;
-import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.ValidatorUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.query.client.bean.Parameter;
 import fr.insalyon.creatis.vip.query.client.bean.Query;
-import fr.insalyon.creatis.vip.query.client.view.QueryRecord;
 import fr.insalyon.creatis.vip.query.client.bean.QueryVersion;
 import fr.insalyon.creatis.vip.query.client.rpc.EndPointSparqlService;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.QueryConstants;
 import fr.insalyon.creatis.vip.query.client.view.QueryException;
 import fr.insalyon.creatis.vip.query.client.view.QueryTitleGrid;
-import java.io.UnsupportedEncodingException;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,30 +47,18 @@ public class CreateQuery extends AbstractFormLayout {
     private IButton saveButton;
     private IButton testButton;
     private ImgButton helpButton;
-    private TextAreaItem body;
+    public TextAreaItem body;
     private int rownumber = 0;
     private Long queryID = 0l;
     private boolean testt;
 
-    // messageItem.setShowTitle(false);
-    // messageItem.setLength(5000);
-    //  messageItem.setColSpan(2);
-    //messageItem.setWidth("*");
-    //  messageItem.setHeight("*");
     public CreateQuery() {
-
-
-        super(1410, 280);
+        super("100%","100%");
         addTitle("New Query", QueryConstants.ICON_QUERYMAKER);
-
         configure();
-
-
     }
 
     private void configure() {
-
-        querynameField = FieldUtil.getTextItem(1400, null);
 
 
         description = new RichTextEditor();
@@ -88,13 +68,15 @@ public class CreateQuery extends AbstractFormLayout {
         description.setShowEdges(true);
         description.setControlGroups("styleControls", "editControls",
                 "colorControls");
+        
+        querynameField = FieldUtil.getTextItem(900, false, "", "[0-9.,A-Za-z-+/_() ]"); 
+        querynameField.setWidth("*");
+        querynameField.setValidators(ValidatorUtil.getStringValidator());
+
         body = new TextAreaItem();
-
-
-        body.setHeight(125);
-        body.setWidth(1410);
+        body.setHeight(130);
+        body.setWidth(900);
         body.setDisabled(false);
-
 
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
@@ -103,19 +85,15 @@ public class CreateQuery extends AbstractFormLayout {
                 if (newQuery) {
                     try {
 
-                        Query q = new Query(querynameField.getValueAsString());
+                        Query q = new Query(querynameField.getValueAsString().trim());
                         save(q);
-
 
                     } catch (QueryException ex) {
                         Logger.getLogger(CreateQuery.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 } else {
-                    //String bodyOnSelect = getQueryMakerTb().getBody();
-                    //bodyOnSelect=bodyOnSelect.replaceAll("\\s","");
-                    // bodyOnSelect=bodyOnSelect.toLowerCase();
-                    String getbody = body.getValueAsString();
-                    //
+                   
+                    String getbody = body.getValueAsString();                 
                     getbody = getbody.replaceAll("[\r\n]{2,}", "\r\n");
                     getbody = getbody.replaceAll("\\s", "");
                     getbody = getbody.toLowerCase();
@@ -134,14 +112,13 @@ public class CreateQuery extends AbstractFormLayout {
                             testt = result.booleanValue();
 
                             if (testt == true) {
-                                update(getVersionID(), querynameField.getValueAsString(), description.getValue());
+                                update(getVersionID(), querynameField.getValueAsString().trim(), description.getValue());
 
                             } else {
 
                                 Long queryVersionID = getVersionID();
                                 getQueryID(queryVersionID);
-                                update(queryVersionID, querynameField.getValueAsString(), description.getValue());
-
+                                update(queryVersionID, querynameField.getValueAsString().trim(), description.getValue());
                             }
 
 
@@ -149,10 +126,6 @@ public class CreateQuery extends AbstractFormLayout {
                     };
 
                     QueryService.Util.getInstance().getBodies(qID, bodyy, callbackk);
-
-
-
-
                 }
 
             }
@@ -164,79 +137,68 @@ public class CreateQuery extends AbstractFormLayout {
             ///nouha// String body_val=null;
             @Override
             public void onClick(ClickEvent event) {
-                //FileProgressTab tab = new FileProgressTab();
-                //Layout.getInstance().addTab(tab);  
-                //com.google.gwt.user.client.Window.open(GWT.getHostPageBaseURL() + "base/result101.txt", "name", "enabled");
+                String body_val = body.getValueAsString();
+                if (body_val.isEmpty() || body_val == null || body_val.length() == 0 || body_val.equals("null")) {
+                    Layout.getInstance().setWarningMessage("there is no Query to test");
+                } else {
 
-                /*nouha body_val=body.getValue().toString(); 
-        
-                 if(body_val==null){
-                 Layout.getInstance().setWarningMessage("there is no query to test" );}
-                 else {
-     
-                 if(body_val.indexOf("[")!=-1)
-                 {
-                 //body_val=body.getValue().toString();
-                 int c = 0;
-                 int nn = 0;
-              
-                 String s = null;
-                
-                 String sequence=null;
-           
-                 for (int i = 0; i < body_val.length(); i++) {
-                 char b = body_val.charAt(i);
-                 if (b == '[') {
-                 for (int j = i + 1; j <body_val.length(); j++) {
-                 char last = body_val.charAt(j);
-                 int kk = 0;
-                 //substring j+1 non inclus
+                    if (body_val.indexOf("[") != -1) {
 
-                 if (last == ']' && kk == 0) {
-                 kk = 1;
-                 c = j + 1;
-                 sequence=body_val.substring(i + 1, j);
-                 String str[] =sequence.split("\\;");
-                 String example=str[3];
-                 body_val=body_val.replaceAll("\\["+sequence+"\\]", example);
-                  
-                     
-                    
-                 }
-                 }
- 
-                 }
-                 }//end for
+                        int c = 0;
+                        int nn = 0;
+                        String s = null;
+                        String sequence = null;
+                        for (int i = 0; i < body_val.length(); i++) {
+                            char b = body_val.charAt(i);
+                            if (b == '[') {
+                                int kk = 0;
+                                for (int j = i + 1; j < body_val.length(); j++) {
+                                    char last = body_val.charAt(j);
 
-                 }
- 
-    
-   
-                 final AsyncCallback<String> callback;
-                 callback = new AsyncCallback<String>() {
-                 @Override
-                 public void onFailure(Throwable caught) {
+                                    //substring j+1 non inclus
+                                    if (last == ']' && kk == 0) {
+                                        kk = 1;
+                                        c = j + 1;
+                                        sequence = body_val.substring(i + 1, j);
 
-                 Layout.getInstance().setWarningMessage("Unable to get result" + caught.getMessage());
-                
-                 }
+                                        String str[] = sequence.split("\\;");
+                                        String example = str[3];
+                                        body_val = body_val.replaceFirst("\\[" + sequence + "\\]", example);
+                                    }
+                                }
 
-                 @Override
-                 public void onSuccess(String result) {
-                 //_self empeche popup mais ouvre in the cuurent window
-                 //Autoriser les fenetre pop-up pour ce site(vip.creatis...)
-                 com.google.gwt.user.client.Window.open(result, "_blank","");
+                            }
+                        }//end for
 
-                 }
-                 };
-                 EndPointSparqlService.Util.getInstance().getUrlResult(body_val,"csv", callback);
-                 }
-
- 
-           
+                    }
 
 
-                 nouha*/
+
+                    final AsyncCallback<String> callback;
+                    callback = new AsyncCallback<String>() {
+                        @Override
+                        public void onFailure(Throwable caught) {
+
+                            Layout.getInstance().setWarningMessage("Unable to get result" + caught.getMessage());
+
+                        }
+
+                        @Override
+                        public void onSuccess(String result) {
+                            //_self empeche popup mais ouvre in the cuurent window
+                            //Autoriser les fenetre pop-up pour ce site(vip.creatis...)
+                            com.google.gwt.user.client.Window.open(result, "_blank", "");
+
+                        }
+                    };
+                    EndPointSparqlService.Util.getInstance().getUrlResult(body_val, "csv", callback);
+                }
+
+
+
+
+
+
             }
         });
 
@@ -281,17 +243,23 @@ public class CreateQuery extends AbstractFormLayout {
         helpButton.setLayoutAlign(Alignment.LEFT);
 
 
-        addField("Name", querynameField);
-        this.addMember(WidgetUtil.getLabel("<b>Description</b>", 15));
-        this.addMember(description);
+        addField100("Name", querynameField);
+        
+        
+       
+  
+        
+        addMember(WidgetUtil.getLabel("<b>Description</b>", 15));
+        addMember(description);
 
         body.setTitleOrientation(TitleOrientation.TOP);
         body.setTextAlign(Alignment.LEFT);
         body.setShowTitle(false);
+        body.setWidth("*");
 
 
-        addField("Body", body);
-        this.addMember(helpButton);
+        addField100("Body", body);
+        addMember(helpButton);
         addButtons(saveButton, testButton);
 
 
@@ -313,8 +281,20 @@ public class CreateQuery extends AbstractFormLayout {
                 bodyRemplace = bodyRemplace.trim();
                 //bodyd=bodyd.replaceAll("\\s{2,}", " ");
                 bodyRemplace = bodyRemplace.replaceAll("[\r\n]{2,}", "\r\n");
+                // String des=description.getValue().replaceFirst("<br>","");
+
+
+
+
                 //queryversiob,queryid
-                savev(new QueryVersion(1L, result, description.getValue(), bodyRemplace));
+                String desc = description.getValue().trim();
+                desc = desc.replaceAll("<br><br>", "<br>");
+                while (desc.indexOf("<br>") == 0) {
+
+                    desc = desc.replaceFirst("<br>", "");
+                }
+
+                savev(new QueryVersion(1L, result, desc, bodyRemplace));
                 reset();
 
 
@@ -366,6 +346,7 @@ public class CreateQuery extends AbstractFormLayout {
     public void setQuery(boolean nameState, boolean test, String name, String description, String body) {
 
         newQuery = test;
+
         querynameField.setValue(name);
         this.description.setValue(description);
         this.body.setValue(body);
@@ -422,7 +403,22 @@ public class CreateQuery extends AbstractFormLayout {
                 String bodyd = bodyRemplace.replaceAll("[\r\n]{2,}", "\r\n");
 
 
-                savev(new QueryVersion(nn, queryID, description.getValue(), bodyd));
+
+                //queryversiob,queryid
+                String desc = description.getValue().trim();
+                desc = desc.replaceAll("<br><br>", "<br>");
+                while (desc.indexOf("<br>") == 0) {
+
+                    desc = desc.replaceFirst("<br>", "");
+                }
+
+
+
+
+
+
+
+                savev(new QueryVersion(nn, queryID, desc, bodyd));
                 reset();
 
             }
@@ -470,5 +466,7 @@ public class CreateQuery extends AbstractFormLayout {
         getQueryMakerTb().loadData();
         WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
         Layout.getInstance().setNoticeMessage("The query was successfully added");
+
+
     }
 }

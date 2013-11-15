@@ -9,6 +9,7 @@ import fr.insalyon.creatis.vip.query.client.view.monitor.QueryMakerTab;
 import fr.insalyon.creatis.vip.query.client.view.monitor.QueryHistoryTab;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.query.client.view.monitor.QueryExplorerTab;
 
 /**
  *
@@ -23,7 +24,9 @@ public class QueryHomeParser extends ApplicationParser {
                 || CoreModule.user.hasGroupAccess(QueryConstants.QUERY_GROUP)) {
             addApplication(QueryConstants.APP_QUERYMAKER, QueryConstants.APP_IMG_QUERYMAKER);
             addApplication(QueryConstants.APP_QUERYHISTORY, QueryConstants.APP_IMG_QUERYHISTORY);
-            CoreModule.addApplicationsTileGrid(new QueryTitleGrid("My Queries"));
+            addApplication(QueryConstants.APP_QUERYEXPLORER, QueryConstants.APP_IMG_QUERYEXPLORER);
+            CoreModule.addApplicationsTileGrid(new QueryTitleGrid());
+            
         }
     }
 
@@ -36,6 +39,11 @@ public class QueryHomeParser extends ApplicationParser {
 
         } else if (applicationName.equals(QueryConstants.APP_QUERYHISTORY)) {
             Layout.getInstance().addTab(new QueryHistoryTab());
+           
+            return true;
+        }
+         else if (applicationName.equals(QueryConstants.APP_QUERYEXPLORER)) {
+            Layout.getInstance().addTab(new QueryExplorerTab());
            
             return true;
         }

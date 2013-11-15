@@ -30,7 +30,7 @@ public class QueryMakerTab extends Tab {
         this.setPane(vLayout);  
         queryLayout = new QueryLayout();
         createQuery = new CreateQuery();
-      
+        vLayout.setMembersMargin(5);  
         vLayout.addMember(queryLayout);
         vLayout.addMember(createQuery);
     }

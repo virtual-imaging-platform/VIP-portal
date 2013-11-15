@@ -25,12 +25,10 @@ public class QueryExecution implements IsSerializable {
     public QueryExecution() {
     }
 
-    public QueryExecution(Long queryVersionID, String status, String name, String urlResult) {
+    public QueryExecution(Long queryVersionID, String status, String name, String bodyResult) {
         this.queryVersionID = queryVersionID;
         this.status = status;
         this.name = name;
-
-
         this.bodyResult = bodyResult;
     }
 
@@ -94,7 +92,7 @@ public class QueryExecution implements IsSerializable {
         return bodyResult;
     }
 
-    public void setBodyResult(String urlResult) {
+    public void setBodyResult(String bodyResult) {
         this.bodyResult = bodyResult;
     }
 }

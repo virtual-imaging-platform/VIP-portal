@@ -4,18 +4,9 @@
  */
 package fr.insalyon.creatis.vip.query.server.rpc;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-
-
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.query.client.bean.Parameter;
 import fr.insalyon.creatis.vip.query.client.bean.Query;
@@ -25,7 +16,6 @@ import fr.insalyon.creatis.vip.query.client.bean.Value;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.QueryException;
 import fr.insalyon.creatis.vip.query.server.dao.business.QueryBusiness;
-import java.sql.Timestamp;
 import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
@@ -152,7 +142,7 @@ public class QueryServiceImpl extends AbstractRemoteServiceServlet implements Qu
     public Long addQueryExecution(QueryExecution queryExecution) throws QueryException {
 
         try {
-            queryExecution.setExecuter(getSessionUser().getEmail());
+            queryExecution.setExecuter(getSessionUser().getFullName());
 
         } catch (CoreException ex) {
             java.util.logging.Logger.getLogger(QueryServiceImpl.class.getName()).log(Level.SEVERE, null, ex);

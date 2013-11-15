@@ -8,10 +8,9 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
  *
- * @author Boujelben
+ * @author Nouha Boujelben
  */
-import java.sql.Date;
-import java.sql.Timestamp;
+
 
 public class QueryRecord extends ListGridRecord {
 
