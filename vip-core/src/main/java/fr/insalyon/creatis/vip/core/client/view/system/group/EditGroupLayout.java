@@ -72,6 +72,8 @@ public class EditGroupLayout extends AbstractFormLayout {
     private boolean newGroup = true;
     private TextItem nameItem;
     private CheckboxItem isPublicField;
+    private CheckboxItem isGridFileField;
+    private CheckboxItem isGridJobsField;
     private IButton saveButton;
     private IButton removeButton;
     private ListGrid grid;
@@ -95,6 +97,16 @@ public class EditGroupLayout extends AbstractFormLayout {
         isPublicField = new CheckboxItem();
         isPublicField.setTitle("Public");
         isPublicField.setWidth(350);
+        
+        isGridFileField = new CheckboxItem();
+        isGridFileField.setTitle("Grid File");
+        isGridFileField.setWidth(350);
+        
+        isGridJobsField= new CheckboxItem();
+        isGridJobsField.setTitle("Grid Jobs");
+        isGridJobsField.setWidth(350);
+        
+        
 
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
@@ -102,7 +114,9 @@ public class EditGroupLayout extends AbstractFormLayout {
                     public void onClick(ClickEvent event) {
                         if (nameItem.validate()) {
                             save(nameItem.getValueAsString().trim(),
-                                    isPublicField.getValueAsBoolean());
+                                    isPublicField.getValueAsBoolean(),
+                                    isGridFileField.getValueAsBoolean(),
+                                    isGridJobsField.getValueAsBoolean());
                         }
                     }
                 });
@@ -170,6 +184,8 @@ public class EditGroupLayout extends AbstractFormLayout {
 
         addField("Name", nameItem);
         this.addMember(FieldUtil.getForm(isPublicField));
+        this.addMember(FieldUtil.getForm(isGridFileField));
+        this.addMember(FieldUtil.getForm(isGridJobsField));
         this.addMember(WidgetUtil.getLabel("<b>Users</b>", 15));
         this.addMember(grid);
         addButtons(saveButton, removeButton);
@@ -180,12 +196,14 @@ public class EditGroupLayout extends AbstractFormLayout {
      *
      * @param name Group name
      */
-    public void setGroup(String name, boolean isPublic) {
+    public void setGroup(String name, boolean isPublic,boolean isGridFile,boolean isGridJobs ) {
 
         if (name != null) {
             this.oldName = name;
             this.nameItem.setValue(name);
             this.isPublicField.setValue(isPublic);
+            this.isGridFileField.setValue(isGridFile);
+            this.isGridJobsField.setValue(isGridJobs);
             this.newGroup = false;
             this.removeButton.setDisabled(false);
             loadUsers();
@@ -194,21 +212,23 @@ public class EditGroupLayout extends AbstractFormLayout {
             this.oldName = null;
             this.nameItem.setValue("");
             this.isPublicField.setValue(true);
+            this.isGridFileField.setValue(true);
+            this.isGridJobsField.setValue(true);
             this.newGroup = true;
             this.removeButton.setDisabled(true);
             this.grid.setData(new ListGridRecord[]{});
         }
     }
 
-    private void save(String name, boolean isPublic) {
+    private void save(String name, boolean isPublic,boolean isgridfile,boolean isgridjobs) {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         WidgetUtil.setLoadingIButton(saveButton, "Saving...");
 
         if (newGroup) {
-            service.addGroup(new Group(name, isPublic), getCallback("add"));
+            service.addGroup(new Group(name, isPublic,isgridfile,isgridjobs), getCallback("add"));
         } else {
-            service.updateGroup(oldName, new Group(name, isPublic), getCallback("update"));
+            service.updateGroup(oldName, new Group(name, isPublic,isgridfile,isgridjobs), getCallback("update"));
         }
     }
 
@@ -244,7 +264,7 @@ public class EditGroupLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setGroup(null, false);
+                setGroup(null, false,false,false);
                 ((ManageGroupsTab) Layout.getInstance().getTab(
                         CoreConstants.TAB_MANAGE_GROUPS)).loadGroups();
             }

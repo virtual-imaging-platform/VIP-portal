@@ -52,11 +52,22 @@ public abstract class AbstractFormLayout extends VLayout {
     public AbstractFormLayout(int width, int height) {
 
         this(Integer.toString(width), Integer.toString(height));
+        
+        
     }
 
     public AbstractFormLayout(int width, String height) {
 
         this(Integer.toString(width), height);
+    }
+    
+ public AbstractFormLayout() {
+
+       
+        this.setBorder("1px solid #C0C0C0");
+        this.setBackgroundColor("#F5F5F5");
+        this.setPadding(10);
+        this.setMembersMargin(5);
     }
 
     public AbstractFormLayout(String width, String height) {
@@ -90,12 +101,17 @@ public abstract class AbstractFormLayout extends VLayout {
      * @param title
      * @param item 
      */
-    protected void addField(String title, FormItem item) {
+    public void addField(String title, FormItem item) {
 
         this.addMember(WidgetUtil.getLabel("<b>" + title + "</b>", 15));
         this.addMember(FieldUtil.getForm(item));
     }
     
+     public void addField100(String title, FormItem item) {
+
+        this.addMember(WidgetUtil.getLabel("<b>" + title + "</b>", 15));
+        this.addMember(FieldUtil.getFormOneColumn(item));
+    }
     /**
      * Adds a set of buttons displayed in line.
      * 
@@ -111,4 +127,10 @@ public abstract class AbstractFormLayout extends VLayout {
         }
         this.addMember(hLayout);
     }
+    
+    protected int getwiddh(){
+        return this.getwiddh();
+    }
+    
+    
 }

@@ -32,9 +32,11 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.application;
 
+import com.smartgwt.client.data.Record;
 import com.smartgwt.client.widgets.tile.TileGrid;
 import com.smartgwt.client.widgets.tile.events.RecordClickEvent;
 import com.smartgwt.client.widgets.tile.events.RecordClickHandler;
+import com.smartgwt.client.widgets.viewer.DetailFormatter;
 import com.smartgwt.client.widgets.viewer.DetailViewerField;
 
 /**
@@ -50,27 +52,60 @@ public abstract class ApplicationsTileGrid extends TileGrid {
         this.tileName = tileName;
 
         this.setWidth100();
-        this.setHeight(110);
+        //this.setHeight(110);
         this.setTileWidth(110);
         this.setTileHeight(100);
-
+        this.setAutoFetchData(true);
         this.setBorder("0px");
         this.setCanReorderTiles(true);
         this.setShowAllRecords(true);
         this.setAnimateTileChange(true);
         this.setShowEdges(false);
 
+
+
+
         DetailViewerField imageField = new DetailViewerField("picture");
         imageField.setType("image");
+
+
+
         DetailViewerField commonNameField = new DetailViewerField("commonName");
+
+        commonNameField.setDetailFormatter(new DetailFormatter() {
+            public String format(Object value, Record record, DetailViewerField field) {
+
+                String[] words = value.toString().split(" ");
+                int length = words.length;
+                int max = 18;
+                String tile = new String();
+                for (String s : words) {
+                    int l = tile.length() + s.length() + 1;
+                    if (l > max) {
+                        tile += "<br>";
+                        max += 18;
+                        tile += s + " ";
+                    } else {
+                        tile += s + " ";
+                    }
+
+                }
+                return tile;
+
+            }
+        });
 
         this.setFields(imageField, commonNameField);
         this.setData(new ApplicationTileRecord[]{});
+
+
+
 
         this.addRecordClickHandler(new RecordClickHandler() {
             @Override
             public void onRecordClick(RecordClickEvent event) {
                 ApplicationTileRecord record = (ApplicationTileRecord) event.getRecord();
+
                 parse(record.getApplicationName(), record.getApplicationVersion());
             }
         });
@@ -84,11 +119,15 @@ public abstract class ApplicationsTileGrid extends TileGrid {
     protected void addApplication(String applicationName, String version, String applicationImage) {
 
         addApplication(new ApplicationTileRecord(applicationName, version, applicationImage));
+
+
+
     }
 
     protected void addApplication(ApplicationTileRecord record) {
 
         this.addData(record);
+
     }
 
     public abstract void parse(String applicationName, String version);

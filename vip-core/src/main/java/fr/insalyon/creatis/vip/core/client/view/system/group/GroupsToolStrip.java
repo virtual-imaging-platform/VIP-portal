@@ -59,7 +59,7 @@ public class GroupsToolStrip extends ToolStrip {
             public void onClick(ClickEvent event) {
                 ManageGroupsTab groupTab = (ManageGroupsTab) Layout.getInstance().
                         getTab(CoreConstants.TAB_MANAGE_GROUPS);
-                groupTab.setGroup(null, false);
+                groupTab.setGroup(null, false,false,false);
             }
         });
         this.addButton(addButton);
