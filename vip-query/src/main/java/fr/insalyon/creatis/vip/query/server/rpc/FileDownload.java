@@ -68,6 +68,7 @@ public class FileDownload extends HttpServlet {
         User user = (User) req.getSession().getAttribute(CoreConstants.SESSION_USER);
         String queryId = req.getParameter("queryid");
         String path=req.getParameter("path");
+        String queryName=req.getParameter("name");
         String tab[]=path.split("/");
         
         if (user != null && queryId != null && !queryId.isEmpty()) {
@@ -87,7 +88,7 @@ public class FileDownload extends HttpServlet {
                     //file = new File(operation.getDest() + "/" 
                             //+ FilenameUtils.getName(operation.getSource()));
                     file = new File(k+"/"+tab[l-1]);
-                    
+                   
                 }
                 int length = 0;
                 ServletOutputStream op = resp.getOutputStream();
@@ -98,8 +99,9 @@ public class FileDownload extends HttpServlet {
 
                 resp.setContentType((mimetype != null) ? mimetype : "application/octet-stream");
                 resp.setContentLength((int) file.length());
+                //name of the file in servlet download
                 resp.setHeader("Content-Disposition", "attachment; filename=\""
-                        + file.getName() + "\"");
+                        + queryName+"_"+getCurrentTimeStamp() + "\"");
 
                 byte[] bbuf = new byte[4096];
                 DataInputStream in = new DataInputStream(new FileInputStream(file));
@@ -114,6 +116,22 @@ public class FileDownload extends HttpServlet {
             } catch (Exception ex) {
                 logger.error(ex);
             }
+            
+            
+            
+            
+            
+            
         }
+    }
+    
+    
+    
+    
+     private static java.sql.Timestamp getCurrentTimeStamp() {
+
+        java.util.Date today = new java.util.Date();
+        return new java.sql.Timestamp(today.getTime());
+
     }
 }

@@ -14,9 +14,12 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.viewer.DetailViewer;
+import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
@@ -24,10 +27,10 @@ import fr.insalyon.creatis.vip.query.client.bean.Parameter;
 
 import fr.insalyon.creatis.vip.query.client.bean.QueryExecution;
 import fr.insalyon.creatis.vip.query.client.bean.Value;
-import fr.insalyon.creatis.vip.query.client.rpc.EndPointSparqlService;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.QueryConstants;
 import fr.insalyon.creatis.vip.query.client.view.monitor.QueryHistoryTab;
+//import fr.insalyon.creatis.vip.query.client.view.monitor.Status;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,49 +38,71 @@ import java.util.List;
  *
  * @author Boujelben
  */
-public class ParameterTab extends VLayout {
+public class ParameterTab extends AbstractFormLayout {
 
     private Long queryVersionID;
     private VLayout mainLayout;
     private IButton launchButton;
-    private DetailViewer printViewer;
     private TextItem executionName;
     private Label description;
+    private Label titleDes;
+    private Label parameterLab;
     DynamicForm execution;
     private List<TextItem> arrList;
     private Long queryExecutionID;
     QueryHistoryTab tab;
-
+    private boolean descriptionE;
+    private boolean parametersE=false;
     public ParameterTab(Long queryVersionID) {
-
+        super();
+        this.addTitle("Query Execution", QueryConstants.ICON_EXECUTE_VERSION);
         this.queryVersionID = queryVersionID;
 
+
         mainLayout = new VLayout();
-        Label titleDes = new Label("<strong>Query description</strong>");
+        mainLayout.setMembersMargin(10);
+        titleDes = new Label("<strong>Query description</strong>");
         titleDes.setHeight(20);
         Label title = new Label("<strong>Execution Name</strong>");
         title.setHeight(20);
         getDescription(queryVersionID);
 
-        executionName = new TextItem();
+        executionName = new TextItem(); 
         executionName.setShowTitle(false);
         executionName.setTitleOrientation(TitleOrientation.TOP);
-        executionName.setWidth(600);
+        executionName.setWidth("*");
+        executionName.setKeyPressFilter("[0-9.,A-Za-z-+/_() ]");
+        executionName.addChangedHandler(new ChangedHandler() {
 
+            @Override
+            public void onChanged(ChangedEvent event) {
+                event.getItem().validate();
+            }
+        });
 
+        
+        
+        
+        
+        
+        
+        
         execution = new DynamicForm();
+        execution.setNumCols(1);
         execution.setFields(executionName);
 
         mainLayout.setPadding(5);
-        mainLayout.addMember(titleDes, 0);
+        if  (descriptionE==true){
         mainLayout.addMember(title, 2);
-        mainLayout.addMember(execution, 3);
+        mainLayout.addMember(execution, 3);}
+        else {
+        mainLayout.addMember(title, 0);
+        mainLayout.addMember(execution, 1);
+}
 
 
-        Label parameterLab = new Label("<strong>Parameters</strong>");
+        parameterLab = new Label("<strong>Parameter</strong>");
         parameterLab.setHeight(20);
-
-        mainLayout.addMember(parameterLab, 4);
         loadParameter();
         configure();
         this.addMember(mainLayout);
@@ -95,31 +120,54 @@ public class ParameterTab extends VLayout {
 
             @Override
             public void onSuccess(List<Parameter> result) {
+                if (!result.isEmpty()) {
+                    if (descriptionE == true) {
+                        mainLayout.addMember(parameterLab, 4);
+                    } else {
+                        mainLayout.addMember(parameterLab, 2);
+                    }
+                   
+                    arrList = new ArrayList<TextItem>();
+                    DynamicForm dynamicForm;
 
-                arrList = new ArrayList<TextItem>();
-                DynamicForm dynamicForm;
+                    for (Parameter q : result) {
+                        TextItem value;
+                        dynamicForm = new DynamicForm();
+                        dynamicForm.setWidth100();
+                        dynamicForm.setNumCols(1);
+                        dynamicForm.setPadding(5);
+                        dynamicForm.setMargin(5);
 
-                for (Parameter q : result) {
-                    TextItem value;
-                    dynamicForm = new DynamicForm();
-
-                    HLayout hlayout = new HLayout(15);
-                    hlayout.setBorder("1px solid #C0C0C0");
-                    hlayout.setBackgroundColor("#F5F5F5");
-                    hlayout.setPadding(10);
-                    hlayout.setMembersMargin(10);
-
-                    value = new TextItem();
-                    value.setWidth(600);
-                    value.setTitle(q.getName());
-                    value.setTitleOrientation(TitleOrientation.TOP);
-                    value.setName(String.valueOf(q.getParameterID()));
-                    value.setPrompt("<b> Description: </b>" + q.getDescription() + "<br><b> Type: </b>" + q.getType() + "<br><b> Example: </b>" + q.getExample());
-                    arrList.add(value);
-                    dynamicForm.setFields(value);
-                    hlayout.addMember(dynamicForm);
-                    mainLayout.addMember(hlayout, 5);
-                    mainLayout.setMembersMargin(10);
+                        HLayout hlayout = new HLayout();
+                        hlayout.setBorder("1px solid #C0C0C0");
+                        hlayout.setBackgroundColor("#F5F5F5");
+                        hlayout.setPadding(5);
+                        hlayout.setMembersMargin(5);
+                        value = new TextItem();
+                        value.setWidth("100%");
+                        value.setTitle(q.getName());
+                        value.setKeyPressFilter("[0-9.,A-Za-z-+/_() ]");
+                        value.addChangedHandler(new ChangedHandler() {
+                            @Override
+                            public void onChanged(ChangedEvent event) {
+                                event.getItem().validate();
+                            }
+                        });
+                        value.setTitleOrientation(TitleOrientation.TOP);
+                        value.setName(String.valueOf(q.getParameterID()));
+                        
+                        value.setPrompt("<b> Description: </b>" + q.getDescription() + "<br><b> Type: </b>" + q.getType() + "<br><b> Example: </b>" + q.getExample());
+                        arrList.add(value);
+                        dynamicForm.setFields(value);
+                        hlayout.addMember(dynamicForm);
+                        if (descriptionE == true) {
+                            mainLayout.addMember(hlayout, 5);
+                            parametersE = true; 
+                        } else {
+                            mainLayout.addMember(hlayout, 3);
+                            parametersE = true;
+                        }                      
+                    }
 
                 }
             }
@@ -144,13 +192,10 @@ public class ParameterTab extends VLayout {
 
                     @Override
                     public void onSuccess(Long result) {
-
-
-
-                        if (arrList.isEmpty()) {
-                            getBody(queryVersionID, result, false);
+                        if (parametersE==false) {
+                            getBody(queryVersionID, result,false);
                             queryExecutionID = result;
-                        } else {
+                       } else {
                             for (TextItem t : arrList) {
 
                                 saveValue(new Value(t.getValueAsString(), Long.parseLong(t.getName()), result));
@@ -158,10 +203,6 @@ public class ParameterTab extends VLayout {
 
                             }
                             queryExecutionID = result;
-
-
-
-
 
                         }
                         executionName.setValue("");
@@ -171,10 +212,7 @@ public class ParameterTab extends VLayout {
                     }
                 };
 
-                QueryService.Util.getInstance().addQueryExecution(new QueryExecution(queryVersionID, "Waiting", executionName.getValueAsString(), " "), callback);
-
-
-
+                QueryService.Util.getInstance().addQueryExecution(new QueryExecution(queryVersionID, "waiting", executionName.getValueAsString(), " "), callback);
             }
         });
 
@@ -193,9 +231,6 @@ public class ParameterTab extends VLayout {
             @Override
             public void onSuccess(Long result) {
                 getBody(queryVersionID, queryExecutionID, true);
-
-
-
             }
         };
         QueryService.Util.getInstance().addValue(value, callback);
@@ -215,7 +250,7 @@ public class ParameterTab extends VLayout {
             public void onSuccess(String result) {
 
                 //getUrlResult(result, "csv");
-                update(result,"waiting", queryExecutionID);
+                update(result, "waiting", queryExecutionID);
 
             }
         };
@@ -243,40 +278,38 @@ public class ParameterTab extends VLayout {
 
     }
 
-    
     /*
-    private void getUrlResult(String query, String format) {
+     private void getUrlResult(String query, String format) {
 
-        final AsyncCallback<String> callback = new AsyncCallback<String>() {
-            @Override
-            public void onFailure(Throwable caught) {
+     final AsyncCallback<String> callback = new AsyncCallback<String>() {
+     @Override
+     public void onFailure(Throwable caught) {
 
-                Layout.getInstance().setWarningMessage("Unable to get result" + caught.getMessage());
-                update("", "failed", queryExecutionID);
-                tab.loadData();
-            }
+     Layout.getInstance().setWarningMessage("Unable to get result" + caught.getMessage());
+     update("", "failed", queryExecutionID);
+     tab.loadData();
+     }
 
-            @Override
-            public void onSuccess(String result) {
-
-
-                update(result, "completed", queryExecutionID);
-                Layout.getInstance().setNoticeMessage("The query was successfully executed");
+     @Override
+     public void onSuccess(String result) {
 
 
-                tab.loadData();
+     update(result, "completed", queryExecutionID);
+     Layout.getInstance().setNoticeMessage("The query was successfully executed");
 
 
-            }
-        };
-
-        EndPointSparqlService.Util.getInstance().getUrlResult(query, format, callback);
+     tab.loadData();
 
 
+     }
+     };
 
-    }
-    * */
+     EndPointSparqlService.Util.getInstance().getUrlResult(query, format, callback);
 
+
+
+     }
+     * */
     private void getDescription(Long queryVersionID) {
         final AsyncCallback<String> callback = new AsyncCallback<String>() {
             @Override
@@ -287,11 +320,21 @@ public class ParameterTab extends VLayout {
 
             @Override
             public void onSuccess(String result) {
-
-
-                description = new Label(result);
-                description.setHeight(20);
-                mainLayout.addMember(description, 1);
+             
+            
+             
+                if (result.length()==0) {
+                    descriptionE=false;
+                }
+                else 
+                {
+                    descriptionE=true;
+                    mainLayout.addMember(titleDes, 0);
+                    description = new Label(result);
+                    description.setHeight(20);
+                    mainLayout.addMember(description, 1);
+                }
+               
 
             }
         };

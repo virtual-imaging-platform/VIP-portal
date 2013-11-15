@@ -1,6 +1,11 @@
 package fr.insalyon.creatis.vip.query.client.view;
 
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.data.Record;
+import com.smartgwt.client.types.Cursor;
+import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.events.MouseOverHandler;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
@@ -17,32 +22,36 @@ import java.util.List;
  */
 public class QueryTitleGrid extends ApplicationsTileGrid {
 
-    private List<String> applicationNames;
-    private HashMap<Key, String> map;
-    // private static QueryTitleGrid  instance;
+   // private List<String> applicationNames;
+     private HashMap<Key, String> map;
+    
+     private static QueryTitleGrid  instance;
 
     // Singleton
-    public QueryTitleGrid(String tileName) {
-        super(tileName);
-        applicationNames = new ArrayList<String>();
+    
+     public static QueryTitleGrid getInstance() {
+        if (instance == null) {
+            instance = new QueryTitleGrid();
+        }
+        
+        return instance;
+    }
+     
+    public QueryTitleGrid() {
+        super("My Queries");
+        this.setID(id);
+        //applicationNames = new ArrayList<String>();
         loadApplications();
     }
 
-    /*
-     * public static QueryTitleGrid  getInstance() {
-     if (instance == null) {
-     String tileName="My QUERIES";
-     instance = new QueryTitleGrid(tileName);
-     }
-     return instance;
-     *
-     }
-     */
+   
     /**
      *
      * @param queryName
      * @param queryVersion
      */
+    
+    
     @Override
     public void parse(String queryName, String queryVersion) {
         String queryVersionID;
@@ -65,9 +74,10 @@ public class QueryTitleGrid extends ApplicationsTileGrid {
                 map = new HashMap<Key, String>();
                 for (String[] q : result) {
                     //name,version,image
-                    addApplication(q[0], "v." + q[2], QueryConstants.APP_IMG_QUERY);
+                   
+                    addApplication(q[0], "v." + q[2], QueryConstants.APP_IMG_QUERY);   
                     map.put(new Key(q[0], "v." + q[2]), q[3]);
-                    applicationNames.add(q[0] + " " + q[2]);
+                   // applicationNames.add(q[0] + " " + q[2]);
 
 
                 }
@@ -104,5 +114,18 @@ public class QueryTitleGrid extends ApplicationsTileGrid {
         public int hashCode() {
             return (name + version).hashCode();
         }
+    }
+    
+   
+
+    
+    
+    public void addQuery(){
+          // addApplication(queryName, "v." + version, QueryConstants.APP_IMG_QUERY);   
+          // map.put(new Key(queryName, "v." + version), versionID);
+           loadApplications();
+          
+          
+           
     }
 }

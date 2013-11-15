@@ -48,7 +48,7 @@ import java.util.List;
 
 /**
  *
- * @author Boujelben
+ * @author Nouha Boujelben
  */
 public class QueryHistoryTab extends Tab {
 
@@ -63,6 +63,8 @@ public class QueryHistoryTab extends Tab {
     private DetailViewer detailViewer;
     DataSource ds;
     boolean state = true;
+    boolean empty;
+    private List<ParameterValue> dataList;
 
     public QueryHistoryTab() {
 
@@ -73,7 +75,6 @@ public class QueryHistoryTab extends Tab {
         this.setAttribute("paneMargin", 0);
         configureGrid();
         modal = new ModalWindow(grid);
-
 
         VLayout vLayout = new VLayout();
         vLayout.addMember(new HistoryToolStrip(modal));
@@ -91,8 +92,6 @@ public class QueryHistoryTab extends Tab {
         vLayout.addMember(sectionStack);
         this.setPane(vLayout);
         loadData();
-        
-        
     }
 
     private void configureGrid() {
@@ -120,7 +119,7 @@ public class QueryHistoryTab extends Tab {
                             public void onClick(ClickEvent event) {
 
                                 Window.open(GWT.getModuleBaseURL() + "/filedownload?queryid="
-                                        + record.getAttribute("queryExecutionID").toString() + "&path=" + record.getAttribute("pathFileResult"), "", "");
+                                        + record.getAttribute("queryExecutionID").toString() + "&path=" + record.getAttribute("pathFileResult") + "&name=" + record.getAttribute("name").toString(), "", "");
                             }
                         });
                     } else if (record.getAttribute("status") == Status.failed.toString()) {
@@ -128,25 +127,44 @@ public class QueryHistoryTab extends Tab {
 
                         button.addClickHandler(new ClickHandler() {
                             public void onClick(ClickEvent event) {
-                                String n=record.getAttribute("pathFileResult");
-                                if (n.length()<80)
-                                    SC.say("<html><font color=\"red\">ERROR!</font></html>",n);
-                                else{
-                               int i=0;
-                               String message=new String();
-                               while(i<n.length()){
-                                   if((i+80)>n.length()){
-                                       int k=n.length()-i;
-                                       message+=n.substring(i, k);
-                                   }
-                                   else{
-                                 message+=n.substring(i,i+80)+"<br>";}
-                               i+=80;
-                               }
+                                String error = record.getAttribute("pathFileResult");
+                                if (error.length() < 70) {
+                                    SC.say("Error", error);
+                                } else {
+                                    String[] words = error.toString().split(" ");
+                                    int length = words.length;
+                                    int max = 70;
+                                    String msg = new String();
+                                    for (String s : words) {
+                                        int l = msg.length() + s.length() + 1;
+                                        if (l > max) {
+                                            msg += "<br>";
+                                            max += 70;
+                                            msg += s + " ";
+                                        } else {
+                                            msg += s + " ";
+                                        }
+
+                                    }
                                     
-                                SC.say("<html><font color=\"red\">ERROR!</font></html>",message);
-                               
-                            }
+                                    /*
+                                    int i = 0;
+                                    String message = new String();
+                                    while (i < n.length()) {
+                                        if ((i + 65) > n.length()) {
+                                            int k = n.length() - i;
+                                            message += n.substring(i, k);
+                                        } else {
+                                            message += n.substring(i, i + 65) + "<br>";
+                                        }
+                                        i += 65;
+                                        
+                                    }
+                                    * */
+
+                                    SC.say("Error", msg);
+
+                                }
                             }
                         });
                     }
@@ -155,18 +173,23 @@ public class QueryHistoryTab extends Tab {
                     return button;
                 } else {
                     return null;
-                    }
-            };
+                }
+            }
 
-
+            ;
+ 
+//canvas de type detailViewer 
             @Override
             protected Canvas getCellHoverComponent(Record record, Integer rowNum, Integer colNum) {
+
                 rollOverRecord = this.getRecord(rowNum);
                 detailViewer = new DetailViewer();
                 detailViewer.setWidth(200);
                 DetailViewerField name = new DetailViewerField("name", "name");
                 DetailViewerField type = new DetailViewerField("value", "value");
                 detailViewer.setFields(name, type);
+                
+                dataList = new ArrayList<ParameterValue>();
                 Long executionID = record.getAttributeAsLong("queryExecutionID");
                 //appel rpc
                 final AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
@@ -175,27 +198,27 @@ public class QueryHistoryTab extends Tab {
                         Layout.getInstance().setWarningMessage("Unable to save Query Execution " + caught.getMessage());
                     }
 
-                    
                     @Override
                     public void onSuccess(List<String[]> result) {
-                        List<ParameterValue> dataList = new ArrayList<ParameterValue>();;
                         for (String[] s : result) {
                             dataList.add(new ParameterValue(s[0], s[1]));
                         }
+                        if (dataList.isEmpty()){
+                        detailViewer.setVisible(false);}
+                        else{
                         detailViewer.setData(dataList.toArray(new ParameterValue[]{}));
-                        detailViewer.setEmptyMessage("No parameters to display");
                         detailViewer.setBackgroundColor("white");
-                        detailViewer.setEmptyMessageStyle("2px solid black center");
                         detailViewer.setBorder("1px solid gray");
+                        detailViewer.setAutoFetchData(true);
+                        }
+                      
                     }
                 };
                 QueryService.Util.getInstance().getParameterValue(executionID, callback);
-
                 return detailViewer;
-
             }
+        ;
         };
-
 
         grid.addRowContextClickHandler(new RowContextClickHandler() {
             public void onRowContextClick(RowContextClickEvent event) {
@@ -269,7 +292,6 @@ public class QueryHistoryTab extends Tab {
         grid.setShowHoverComponents(true);
         grid.setWidth100();
         grid.setHeight100();
-        grid.setShowRollOverCanvas(true);
         grid.setShowRecordComponents(true);
         grid.setShowRecordComponentsByCell(true);
         grid.setFilterOnKeypress(true);
@@ -290,8 +312,16 @@ public class QueryHistoryTab extends Tab {
         version.setWidth(60);
         ListGridField statuss = new ListGridField("status", "Status");
         statuss.setWidth(60);
+
+        ListGridField statusFormatter = new ListGridField("statusFormatter", "Status");
+        statusFormatter.setWidth(60);
+
         ListGridField date = new ListGridField("dateExecution", "Execution Start Time");
-        date.setWidth(120);
+        date.setWidth(150);
+
+        ListGridField dateEndExecution = new ListGridField("dateEndExecution", "Execution End Time");
+        dateEndExecution.setWidth(150);
+
         ListGridField buttonField = new ListGridField("buttonField", "Result");
         buttonField.setAlign(Alignment.CENTER);
         buttonField.setWidth(60);
@@ -299,18 +329,20 @@ public class QueryHistoryTab extends Tab {
                 FieldUtil.getIconGridField("statusIcon"),
                 executionID,
                 new ListGridField("name", "Query Execution Name"),
+                statusFormatter,
                 new ListGridField("query", "Query"),
-                version,
-                new ListGridField("executer", "Executer"),
                 date,
+                version,
+                new ListGridField("executer", "User"),
+                dateEndExecution,
                 statuss,
                 buttonField,
                 pathFileResult);
         executionID.setHidden(true);
         pathFileResult.setHidden(true);
+        statuss.setHidden(true);
     }
 
-    
     public void loadData() {
         final AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
             @Override
@@ -323,11 +355,20 @@ public class QueryHistoryTab extends Tab {
             public void onSuccess(List<String[]> result) {
                 modal.hide();
                 List<QueryExecutionRecord> dataList = new ArrayList<QueryExecutionRecord>();
-
+                String formatter = new String();
                 for (String[] q : result) {
 
-                    Timestamp ts = Timestamp.valueOf(q[5]);
-                    dataList.add(new QueryExecutionRecord(q[0], q[1], q[2], q[3], q[4], ts, q[6], q[7], q[8]));
+                   
+                    if (q[6] == Status.completed.toString()) {
+                        formatter = "Completed";
+                    } else if (q[6] == Status.failed.toString()) {
+                        formatter = "Failed";
+                    } else if (q[6] == Status.running.toString()) {
+                        formatter = "Running";
+                    } else if (q[6] == Status.waiting.toString()) {
+                        formatter = "Waiting";
+                    }
+                    dataList.add(new QueryExecutionRecord(q[0], q[1], q[2], q[3], q[4],q[5] , q[6], formatter, q[7], q[8],q[9]));
 
 
                 }
@@ -356,8 +397,5 @@ public class QueryHistoryTab extends Tab {
 
     public ListGridRecord[] getGridSelection() {
         return grid.getSelectedRecords();
-
-
-
     }
 }

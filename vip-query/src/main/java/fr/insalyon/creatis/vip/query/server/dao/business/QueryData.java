@@ -488,17 +488,11 @@ public class QueryData implements QueryDAO {
                     + "QueryExecution "
                     + "SET dateExecution=?, status=? "
                     + "WHERE queryExecutionID=?");
-
-
-
             ps.setTimestamp(1, getCurrentTimeStamp());
             ps.setString(2, status);
             ps.setLong(3, executionID);
             ps.executeUpdate();
             ps.close();
-
-
-
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
@@ -632,7 +626,7 @@ public class QueryData implements QueryDAO {
     public List<String[]> getQueryHistory() throws DAOException {
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "queryExecutionID,name,queryName,queryVersion,executer,dateExecution,status,bodyResult,pathFileResult FROM "
+                    + "queryExecutionID,name,queryName,queryVersion,executer,dateExecution,status,bodyResult,pathFileResult,dateEndExecution FROM "
                     + "Query query,QueryVersion queryversion,QueryExecution queryexe WHERE "
                     + "query.queryID=queryversion.queryID AND queryversion.queryVersionID=queryexe.queryVersionID "
                     + "ORDER BY queryexe.dateExecution DESC");
@@ -643,9 +637,10 @@ public class QueryData implements QueryDAO {
             while (rs.next()) {
 
                 Timestamp date = rs.getTimestamp("dateExecution");
+                String  dateEnd = rs.getString("dateEndExecution");
                 Long id = rs.getLong("queryExecutionID");
                 Long version = rs.getLong("queryVersion");
-                queries.add(new String[]{id.toString(), rs.getString("name"), rs.getString("queryName"), version.toString(), rs.getString("executer"), date.toString(), rs.getString("status"), rs.getString("bodyResult"),rs.getString("pathFileResult")});
+                queries.add(new String[]{id.toString(), rs.getString("name"), rs.getString("queryName"), version.toString(), rs.getString("executer"), date.toString(), rs.getString("status"), rs.getString("bodyResult"),rs.getString("pathFileResult"),dateEnd});
             }
             ps.close();
             return queries;
@@ -661,13 +656,16 @@ public class QueryData implements QueryDAO {
     public String getBody(Long queryVersionID, Long queryExecutionID, boolean parameter) throws DAOException {
         try {
             if (parameter == false) {
+                 logger.error("parameter false for"+ parameter );
+                 logger.error("versionID"+queryVersionID+"exeID"+queryExecutionID);
                 PreparedStatement ps = connection.prepareStatement("SELECT "
-                        + "body FROM QueryVersion where queryVersionID=?");
+                        + "body FROM QueryVersion WHERE queryVersionID=? ");
                 ps.setLong(1, queryVersionID);
                 ResultSet rs = ps.executeQuery();
-                String body = null;
+                String body =new String();
                 while (rs.next()) {
-                    body = rs.getString("body");
+                   body = rs.getString("body");
+                    logger.error("body"+body);
                 }
                 ps.close();
                 return body;
@@ -766,9 +764,7 @@ public class QueryData implements QueryDAO {
                 if (body.equals(bd)) {
                   exist = true;  
                     i=1;
-                }
-                
-                
+                } 
             }
             
 
