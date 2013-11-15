@@ -44,13 +44,18 @@ public class Group implements IsSerializable {
 
     private String name;
     private boolean publicGroup;
+    private boolean gridFile; 
+    private boolean gridJobs;
 
     public Group() {
     }
 
-    public Group(String name, boolean publicGroup) {
+    public Group(String name, boolean publicGroup,boolean gridFile,boolean gridJobs) {
         this.name = name;
         this.publicGroup = publicGroup;
+        this.gridFile=gridFile;
+        this.gridJobs=gridJobs;
+        
     }
 
     public String getName() {
@@ -67,5 +72,20 @@ public class Group implements IsSerializable {
 
     public void setPublicGroup(boolean publicGroup) {
         this.publicGroup = publicGroup;
+    }
+    public void setGridFile(boolean gridFile) {
+        this.gridFile = gridFile;
+    }
+
+    public void setGridJobs(boolean gridJobs) {
+        this.gridJobs = gridJobs;
+    }
+
+    public boolean isGridFile() {
+        return gridFile;
+    }
+
+    public boolean isGridJobs() {
+        return gridJobs;
     }
 }
