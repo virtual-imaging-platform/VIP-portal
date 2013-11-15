@@ -44,6 +44,9 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.util.List;
 import java.util.Map;
 
@@ -96,7 +99,10 @@ public interface ConfigurationService extends RemoteService {
     
     public Map<Group, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws CoreException;
     
+    public List<Boolean[]> getUserGroup() throws CoreException;     
+    
     public List<String> getUserGroups() throws CoreException;
+    
 
     public void updateUser(String email, UserLevel level, CountryCode countryCode, int maxRunningSimulations, Map<String, CoreConstants.GROUP_ROLE> groups) throws CoreException;
     
