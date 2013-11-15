@@ -39,6 +39,7 @@ import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import java.util.List;
@@ -77,6 +78,8 @@ public interface ConfigurationServiceAsync {
     public void removeUser(String email, AsyncCallback<User> asyncCallback);
 
     public void getUserGroups(String email, AsyncCallback<Map<Group, CoreConstants.GROUP_ROLE>> asyncCallback);
+    public void getUserGroup(AsyncCallback<List<Boolean[]>> asyncCallback);    
+
 
     public void getUserGroups(AsyncCallback<List<String>> asyncCallback);
 
