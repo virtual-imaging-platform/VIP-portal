@@ -77,6 +77,8 @@ public class CoreModule extends Module {
         if (user.isSystemAdministrator() || user.isGroupAdmin()) {
             systemTileGrid.addParser(new SystemParser());
             homeTab.addTileGrid(systemTileGrid);
+            
+            
         }
 
         // Configure User's toolstrip        
@@ -136,8 +138,15 @@ public class CoreModule extends Module {
      * @param tileGrid 
      */
     public static void addApplicationsTileGrid(ApplicationsTileGrid tileGrid) {
-
+        
         homeTab.addTileGrid(tileGrid);
+        tileGrid.setCanAcceptDrop(true);
+        tileGrid.setAutoFetchData(true);
+         
+       // tileGrid.redraw();
+        
+        
+       
     }
     
     /**
