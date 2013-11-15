@@ -36,15 +36,19 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+
+
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
 public class User implements IsSerializable {
-
+ 
     private String firstName;
     private String lastName;
     private String email;
@@ -61,6 +65,30 @@ public class User implements IsSerializable {
     private int maxRunningSimulations;
     private CountryCode countryCode;
     private Map<Group, GROUP_ROLE> groups;
+    private Boolean isgridfile;
+
+    public Boolean getIsgridfile() {
+        return isgridfile;
+    }
+
+    public void setIsgridfile(Boolean isgridfile) {
+        this.isgridfile = isgridfile;
+    }
+
+    public Boolean getIsgridjobs() {
+        return isgridjobs;
+    }
+
+    public void setIsgridjobs(Boolean isgridjobs) {
+        this.isgridjobs = isgridjobs;
+    }
+    private Boolean isgridjobs;
+    
+   
+
+    
+
+   
 
     public User() {
     }
@@ -204,6 +232,7 @@ public class User implements IsSerializable {
 
     public void setGroups(Map<Group, GROUP_ROLE> groups) {
         this.groups = groups;
+        
     }
 
     public boolean hasGroupAccess(String groupName) {
@@ -235,6 +264,23 @@ public class User implements IsSerializable {
             }
         }
         return false;
+    }
+    
+    
+    
+    
+    public void getGroups() {
+       
+        for (Group group : groups.keySet()) {
+           
+            if (group.isGridFile())
+              setIsgridfile(true);
+          
+            if(group.isGridJobs())
+                setIsgridjobs(true);
+        }
+       
+
     }
 
     @Override
