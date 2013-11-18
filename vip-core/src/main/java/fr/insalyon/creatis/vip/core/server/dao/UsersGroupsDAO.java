@@ -59,4 +59,5 @@ public interface UsersGroupsDAO {
     public List<User> getUsersFromGroup(String groupName) throws DAOException;
     
     public void removeUserFromGroup(String email, String groupName) throws DAOException;
+     public  List<Boolean[]> getUserGroup(String email)throws DAOException;
 }
