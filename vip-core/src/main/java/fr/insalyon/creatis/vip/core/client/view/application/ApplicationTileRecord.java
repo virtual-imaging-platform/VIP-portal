@@ -54,7 +54,7 @@ public class ApplicationTileRecord extends TileRecord {
     public ApplicationTileRecord(String name, String version, String icon) {
 
         if (version != null && !version.isEmpty()) {
-            setAttribute("commonName", name + " " + version);
+            setAttribute("commonName", name);
         } else {
             setAttribute("commonName", name);
         }
