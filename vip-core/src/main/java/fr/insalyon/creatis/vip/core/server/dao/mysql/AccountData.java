@@ -179,7 +179,7 @@ public class AccountData implements AccountDAO {
             }
 
             PreparedStatement ps = connection.prepareStatement("SELECT DISTINCT "
-                    + "ag.groupname AS name, g.public AS pub "
+                    + "ag.groupname AS name, g.public AS pub, g.gridfile AS gfile, g.gridjobs AS gjobs "
                     + "FROM VIPAccountsGroups AS ag "
                     + "LEFT JOIN VIPGroups AS g ON ag.groupname = g.groupname "
                     + "WHERE " + query.toString());
@@ -188,7 +188,7 @@ public class AccountData implements AccountDAO {
             List<Group> groups = new ArrayList<Group>();
             while (rs.next()) {
                 groups.add(new Group(rs.getString("name"),
-                        rs.getBoolean("pub")));
+                        rs.getBoolean("pub"),rs.getBoolean("gfile"),rs.getBoolean("gjobs")));
             }
             ps.close();
             return groups;
