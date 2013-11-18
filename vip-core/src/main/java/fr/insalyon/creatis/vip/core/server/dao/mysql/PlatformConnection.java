@@ -143,7 +143,7 @@ public class PlatformConnection {
 
                 try {
                     CoreDAOFactory.getDAOFactory().getGroupDAO().add(
-                            new Group(CoreConstants.GROUP_SUPPORT, false));
+                            new Group(CoreConstants.GROUP_SUPPORT, false,true,true));
                 } catch (DAOException ex) {
                     logger.error(ex);
                 }
