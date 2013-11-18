@@ -37,6 +37,7 @@ import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session.AccessType;
 import com.dropbox.client2.session.WebAuthSession;
 import com.dropbox.client2.session.WebAuthSession.WebAuthInfo;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
@@ -382,6 +383,20 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             throw new CoreException(ex);
         }
     }
+  
+    
+   @Override
+    public List<Boolean[]> getUserGroup() throws CoreException {
+        try {
+            String email=getSessionUser().getEmail();
+            return configurationBusiness.getUserGroup(email);
+            
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
 
     /**
      *
