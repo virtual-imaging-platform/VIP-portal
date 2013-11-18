@@ -33,6 +33,7 @@
 package fr.insalyon.creatis.vip.core.client.view.application;
 
 import com.smartgwt.client.data.Record;
+import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.tile.TileGrid;
 import com.smartgwt.client.widgets.tile.events.RecordClickEvent;
 import com.smartgwt.client.widgets.tile.events.RecordClickHandler;
@@ -51,16 +52,20 @@ public abstract class ApplicationsTileGrid extends TileGrid {
 
         this.tileName = tileName;
 
-        this.setWidth100();
+        
         //this.setHeight(110);
         this.setTileWidth(110);
         this.setTileHeight(100);
+       
         this.setAutoFetchData(true);
         this.setBorder("0px");
         this.setCanReorderTiles(true);
         this.setShowAllRecords(true);
         this.setAnimateTileChange(true);
         this.setShowEdges(false);
+        this.setAutoHeight();
+        this.setOverflow(Overflow.VISIBLE);
+        
 
 
 
@@ -71,19 +76,20 @@ public abstract class ApplicationsTileGrid extends TileGrid {
 
 
         DetailViewerField commonNameField = new DetailViewerField("commonName");
+        DetailViewerField applicationVersion = new DetailViewerField("applicationVersion");
 
         commonNameField.setDetailFormatter(new DetailFormatter() {
             public String format(Object value, Record record, DetailViewerField field) {
 
                 String[] words = value.toString().split(" ");
                 int length = words.length;
-                int max = 18;
+                int max = 16;
                 String tile = new String();
                 for (String s : words) {
                     int l = tile.length() + s.length() + 1;
                     if (l > max) {
                         tile += "<br>";
-                        max += 18;
+                        max += 16;
                         tile += s + " ";
                     } else {
                         tile += s + " ";
@@ -95,7 +101,7 @@ public abstract class ApplicationsTileGrid extends TileGrid {
             }
         });
 
-        this.setFields(imageField, commonNameField);
+        this.setFields(imageField,commonNameField,applicationVersion);
         this.setData(new ApplicationTileRecord[]{});
 
 
