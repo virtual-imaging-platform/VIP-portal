@@ -92,7 +92,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "SELECT g.groupname, g.public, role "
+                    "SELECT g.groupname, g.public, g.gridfile, g.gridjobs, role "
                     + "FROM VIPGroups g LEFT JOIN VIPUsersGroups ug "
                     + "ON g.groupname = ug.groupname AND email = ?");
             ps.setString(1, email);
@@ -105,7 +105,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
                 if (role == null || role.isEmpty() || role.equals("null")) {
                     role = "None";
                 }
-                groups.put(new Group(rs.getString("groupname"), rs.getBoolean("public")),
+                groups.put(new Group(rs.getString("groupname"), rs.getBoolean("public"),rs.getBoolean("gridfile"),rs.getBoolean("gridjobs")),
                         GROUP_ROLE.valueOf(role));
             }
             ps.close();
@@ -211,6 +211,50 @@ public class UsersGroupsData implements UsersGroupsDAO {
             ps.close();
             return users;
 
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+    
+    
+    @Override
+    public  List<Boolean[]> getUserGroup(String email)
+            throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(
+                   "SELECT public, gridfile, gridjobs "
+                    + "FROM VIPGroups g, VIPUsersGroups ug "
+                    + "WHERE g.groupname = ug.groupname AND ug.email= ?");
+            ps.setString(1, email);
+             logger.info("email"+email);
+            ResultSet rs = ps.executeQuery();
+          logger.info("execute query with success");
+             List<Boolean[]> proprties = new ArrayList<Boolean[]>();
+             boolean ispublic=false;
+             boolean isgridfile=false;
+             boolean isgridJobs=false;
+
+            while (rs.next()) { 
+               if(rs.getInt("gridfile")==1);
+               logger.info("test 1 bon");
+               isgridfile=true;
+               if(rs.getInt("gridjobs")==1);
+               isgridJobs=true;
+                if(rs.getInt("public")==1);
+               ispublic=true;
+            }
+            proprties.add(new Boolean[]{ispublic,isgridfile,isgridJobs});
+             logger.info("add von");
+            ps.close();
+            
+            for (Boolean[] q :proprties){
+                 logger.info(q[0]+"" +q[1]+""+q[2]);
+            }
+           
+            return proprties;
+            
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
