@@ -54,7 +54,7 @@ public abstract class ApplicationsTileGrid extends TileGrid {
 
         
         //this.setHeight(110);
-        this.setTileWidth(110);
+        this.setTileWidth(115);
         this.setTileHeight(100);
        
         this.setAutoFetchData(true);
