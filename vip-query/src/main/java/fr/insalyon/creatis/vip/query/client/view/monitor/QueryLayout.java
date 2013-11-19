@@ -114,8 +114,8 @@ public class QueryLayout extends VLayout {
                         public void onClick(ClickEvent event) {
                             versionID = rollOverRecord.getAttribute("queryversionID");
                             final Long versionid = new Long(versionID);
-                            SC.ask("Do you really want to remove this Version"
-                                    + "\"?", new BooleanCallback() {
+                            SC.ask("Do you really want to remove this Version?"
+                                 , new BooleanCallback() {
                                 @Override
                                 public void execute(Boolean value) {
                                     if (value) {
