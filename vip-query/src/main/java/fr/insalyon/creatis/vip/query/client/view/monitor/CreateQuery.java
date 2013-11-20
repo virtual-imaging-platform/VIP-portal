@@ -289,7 +289,7 @@ public class CreateQuery extends AbstractFormLayout {
                 //queryversiob,queryid
                 String desc = description.getValue().trim();
                 desc = desc.replaceAll("<br><br>", "<br>");
-                desc = desc.replaceAll("<div><br><div>", "");
+                desc = desc.replaceAll("<div><br></div>", "");
                 while (desc.indexOf("<br>") == 0) {
 
                     desc = desc.replaceFirst("<br>", "");
@@ -412,7 +412,7 @@ public class CreateQuery extends AbstractFormLayout {
                 //queryversiob,queryid
                 String desc = description.getValue().trim();
                 desc = desc.replaceAll("<br><br>", "<br>");
-                desc = desc.replaceAll("<div><br><div>", "");
+                desc = desc.replaceAll("<div><br></div>", "");
                 while (desc.indexOf("<br>") == 0) {
 
                     desc = desc.replaceFirst("<br>", "");
