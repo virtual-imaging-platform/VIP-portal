@@ -41,25 +41,21 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
-import fr.insalyon.creatis.vip.application.client.ApplicationModule;
-import fr.insalyon.creatis.vip.cardiac.client.CardiacModule;
+
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Modules;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.cowork.client.CoworkModule;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
 import fr.insalyon.creatis.vip.docs.client.DocsModule;
-import fr.insalyon.creatis.vip.gatelab.client.GateLabModule;
-import fr.insalyon.creatis.vip.models.client.ModelModule;
 import fr.insalyon.creatis.vip.query.client.QueryModule;
-import fr.insalyon.creatis.vip.simulatedata.client.SimulatedDataModule;
-import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIModule;
-import fr.insalyon.creatis.vip.social.client.SocialModule;
+import fr.insalyon.creatis.vip.query.client.view.QueryRecord;
+import java.util.List;
 
 /**
  *
@@ -67,40 +63,59 @@ import fr.insalyon.creatis.vip.social.client.SocialModule;
  */
 public class Main implements EntryPoint {
 
+    private boolean isgridfile;
+    private boolean isgridjobs;
+    Modules modulesInit;
+
     @Override
     public void onModuleLoad() {
-        
+
+
         final String ticket = Window.Location.getParameter("ticket");
         String login = Window.Location.getParameter("login");
-        
-        if(login.equals("stats")){
-                configureStats();
-                return;
+
+        if (login.equals("stats")) {
+            configureStats();
+            return;
         }
-        
+
         Layout.getInstance().getModal().show("Loading VIP " + CoreConstants.VERSION, true);
+
+
+
         // Modules
-        Modules modulesInit = Modules.getInstance();
+        modulesInit = Modules.getInstance();
         modulesInit.add(new CoreModule());
-        modulesInit.add(new DocsModule());
+        getGroups();
+
+
+
+
+
+
+        modulesInit.add(new QueryModule());
+
+        modulesInit.add(new SocialModule());
         modulesInit.add(new ModelModule());
         modulesInit.add(new SimulationGUIModule());
         modulesInit.add(new SimulatedDataModule());
-        modulesInit.add(new ApplicationModule());
         modulesInit.add(new GateLabModule());
-        modulesInit.add(new SocialModule());
         modulesInit.add(new DataManagerModule());
         modulesInit.add(new CoworkModule());
         modulesInit.add(new CardiacModule());
-        modulesInit.add(new QueryModule());
-        // End-Modules
+        
+
+        
 
         if (ticket == null && (login == null || !login.equals("CASN4U"))) {
-                //regular VIP authentication
-                configureVIP();
+            //regular VIP authentication
+            configureVIP();
         } else {
             configureN4U(ticket);
         }
+
+
+
     }
 
     //redirect to N4U CAS authentication
@@ -143,22 +158,22 @@ public class Main implements EntryPoint {
             public void onSuccess(User user) {
                 Layout.getInstance().getModal().hide();
                 Layout.getInstance().authenticate(user);
-                
+
                 //Dropbox account confirmation
                 String oauth_token = Window.Location.getParameter("oauth_token");
-                if(oauth_token != null && !oauth_token.equals(""))
-                    service.activateDropboxAccount(oauth_token,new AsyncCallback<Void>(){
+                if (oauth_token != null && !oauth_token.equals("")) {
+                    service.activateDropboxAccount(oauth_token, new AsyncCallback<Void>() {
+                        @Override
+                        public void onFailure(Throwable caught) {
+                            Layout.getInstance().setWarningMessage("Cannot activate Dropbox account");
+                        }
 
-                    @Override
-                    public void onFailure(Throwable caught) {
-                        Layout.getInstance().setWarningMessage("Cannot activate Dropbox account");
-                    }
-
-                    @Override
-                    public void onSuccess(Void result) {
-                     Layout.getInstance().setNoticeMessage("Successfully activated Dropbox account");
-                    }
-                });
+                        @Override
+                        public void onSuccess(Void result) {
+                            Layout.getInstance().setNoticeMessage("Successfully activated Dropbox account");
+                        }
+                    });
+                }
             }
         };
         service.configure(email, session, callback);
@@ -206,7 +221,6 @@ public class Main implements EntryPoint {
     private void configureStats() {
         final ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         AsyncCallback<UsageStats> acb = new AsyncCallback<UsageStats>() {
-
             @Override
             public void onFailure(Throwable caught) {
                 SC.say("Cannot get usage stats");
@@ -222,5 +236,75 @@ public class Main implements EntryPoint {
             }
         };
         service.getUsageStats(acb);
+
     }
+
+    private void getGroups() {
+        final AsyncCallback<List<Boolean[]>> callback = new AsyncCallback<List<Boolean[]>>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to get groups properties:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(List<Boolean[]> result) {
+                for (Boolean[] b : result) {
+
+                    isgridfile = b[1];
+                    isgridjobs = b[2];
+                }
+                if (isgridfile) {
+                    modulesInit.add(new DataManagerModule());
+                }
+                if (isgridjobs) {
+                   modulesInit.add(new ApplicationModule());
+                }
+                if (isgridfile && isgridjobs) {
+                    modulesInit.add(new DocsModule());
+                }
+            }
+        };
+
+        ConfigurationService.Util.getInstance().getUserGroup(callback);
+
+    }
+    /*
+     private void getGroups() {
+     final ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+     AsyncCallback <List<String>> l  = new AsyncCallback<List<String>> () {
+
+     @Override
+     public void onFailure(Throwable caught) {
+     SC.say("Cannot get usage stats");
+     }
+
+     @Override
+     public void onSuccess(List<String> result) {
+     for (String l:result)
+     {
+     Group g=new Group();
+     if (g.getName().equals(l) && g.isGridFile()){
+     isgridfile=true;}
+     if (g.getName().equals(l) && g.isGridJobs()){
+     isgridjobs=true;    
+                        
+     }
+     }
+                        
+     }
+               
+            
+     };
+     service.getUserGroups(l);
+        
+     }
+     * 
+     * 
+     * 
+     *  if(isgridfile){
+     modulesInit.add(new DataManagerModule());}
+                    
+     if(isgridfile && isgridjobs){
+     modulesInit.add(new DocsModule());}
+     **/
 }
