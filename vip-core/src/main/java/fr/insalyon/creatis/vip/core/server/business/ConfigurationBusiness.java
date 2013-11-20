@@ -76,8 +76,8 @@ public class ConfigurationBusiness {
 
         try {
             logger.info("Configuring VIP server proxy.");
-            ProxyClient myproxy = new ProxyClient();
-            myproxy.getProxy();
+            //ProxyClient myproxy = new ProxyClient();
+           // myproxy.getProxy();
 
         } catch (Exception ex) {
             logger.error(ex);
@@ -708,6 +708,10 @@ public class ConfigurationBusiness {
             throw new BusinessException(ex);
         }
     }
+    
+   
+    
+    
 
     /**
      *
@@ -724,7 +728,17 @@ public class ConfigurationBusiness {
             throw new BusinessException(ex);
         }
     }
+    
+    
+public List<Boolean[]> getUserGroup(String email) throws BusinessException {
 
+        try {
+            return CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUserGroup(email);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
     /**
      *
      * @param groups
