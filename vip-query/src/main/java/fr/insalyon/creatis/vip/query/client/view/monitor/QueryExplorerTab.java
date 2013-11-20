@@ -27,13 +27,13 @@ import fr.insalyon.creatis.vip.query.client.view.QueryConstants;
 public class QueryExplorerTab extends Tab {
 
     private final CheckboxTree checkboxTree;
-    private final CheckboxTreeRestriction checkboxTreeRestriction;
+    //private final CheckboxTreeRestriction checkboxTreeRestriction;
     
 
     public QueryExplorerTab() {
 
         checkboxTree = new CheckboxTree();
-        checkboxTreeRestriction=new CheckboxTreeRestriction();
+       // checkboxTreeRestriction=new CheckboxTreeRestriction();
         HLayout layout=new HLayout();
         this.setTitle(Canvas.imgHTML(QueryConstants.ICON_EXPLORE) + "Query Explorer");
         this.setID(QueryConstants.TAB_QUERYEXPLORER);
@@ -41,7 +41,7 @@ public class QueryExplorerTab extends Tab {
         this.setAttribute("paneMargin", 0);
         layout.setMembersMargin(5);
         layout.addMember(checkboxTree);
-        layout.addMember(checkboxTreeRestriction);
+        //layout.addMember(checkboxTreeRestriction);
         this.setPane(layout);
 
     }
@@ -61,7 +61,7 @@ public class QueryExplorerTab extends Tab {
        
     }
      public void setForm(){
-         checkboxTreeRestriction.setForm();
+        // checkboxTreeRestriction.setForm();
      }
      
       public String getName(){
