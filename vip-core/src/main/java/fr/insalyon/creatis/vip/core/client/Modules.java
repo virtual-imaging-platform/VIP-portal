@@ -34,7 +34,10 @@
  */
 package fr.insalyon.creatis.vip.core.client;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,15 +68,38 @@ public class Modules {
     }
     
     public void initializeModules(User user) {
-
         CoreModule.user = user;      
-        
-        for (Module module : modules) {
-            module.load();            
-        }
-        for (Module module : modules) {
-            module.postLoading();
-        }        
+        final AsyncCallback<List<Boolean[]>> callback = new AsyncCallback<List<Boolean[]>>() {
+            boolean isGridFile;
+            boolean isGridJobs;
+
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().getModal().hide();
+                Layout.getInstance().setWarningMessage("Unable to get group properties:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(List<Boolean[]> result) {
+                Layout.getInstance().getModal().hide();
+                for (Boolean[] b : result) {
+                    isGridFile = b[1];
+                    isGridJobs = b[2];
+                }
+                for (Module module : modules) {
+                    if ((!module.requiresGridFile() || isGridFile) && (!module.requiresGridJob() || isGridJobs)) {
+                        module.load();
+                    }
+                }
+                for (Module module : modules) {
+                    if ((!module.requiresGridFile() || isGridFile) && (!module.requiresGridJob() || isGridJobs)) {
+                        module.postLoading();
+                    }
+                }
+            }
+        };
+        Layout.getInstance().getModal().show("Getting user groups", true);
+        ConfigurationService.Util.getInstance().getUserGroup(callback);        
     }
     
     public void finalizeModules() {

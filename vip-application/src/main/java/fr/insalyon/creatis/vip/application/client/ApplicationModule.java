@@ -161,4 +161,7 @@ public class ApplicationModule extends Module {
             WorkflowService.Util.getInstance().updateUser(oldUser.getFullName(), updatedUser.getFullName(), callback);
         }
     }
+    
+    @Override
+    public boolean requiresGridJob() { return true; }
 }

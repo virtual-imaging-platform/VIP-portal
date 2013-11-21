@@ -71,4 +71,7 @@ public class DataManagerModule extends Module {
     @Override
     public void postLoading() {
     }
+    
+    @Override
+    public boolean requiresGridFile() { return true; }
 }
