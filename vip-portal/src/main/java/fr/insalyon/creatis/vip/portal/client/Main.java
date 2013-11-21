@@ -90,20 +90,20 @@ public class Main implements EntryPoint {
         modulesInit.add(new CoreModule());
         modulesInit.add(new QueryModule());
         modulesInit.add(new SocialModule());
-       //modulesInit.add(new ModelModule());
-       // modulesInit.add(new SimulationGUIModule());
-       // modulesInit.add(new SimulatedDataModule());
-       // modulesInit.add(new GateLabModule());
-        modulesInit.add(new CoworkModule());
-        //modulesInit.add(new CardiacModule());
-        
-         
+        modulesInit.add(new ModelModule());
+       modulesInit.add(new SimulationGUIModule());
+       modulesInit.add(new SimulatedDataModule());
+       modulesInit.add(new GateLabModule());
+       modulesInit.add(new CoworkModule());
+        modulesInit.add(new CardiacModule());
+
+
 
 
         if (ticket == null && (login == null || !login.equals("CASN4U"))) {
             //regular VIP authentication
             configureVIP();
-            
+
 
         } else {
             configureN4U(ticket);
@@ -154,7 +154,7 @@ public class Main implements EntryPoint {
             public void onSuccess(User user) {
                 Layout.getInstance().getModal().hide();
                 Layout.getInstance().authenticate(user);
-                getGroups();
+               
 
                 //Dropbox account confirmation
                 String oauth_token = Window.Location.getParameter("oauth_token");
@@ -168,10 +168,12 @@ public class Main implements EntryPoint {
                         @Override
                         public void onSuccess(Void result) {
                             Layout.getInstance().setNoticeMessage("Successfully activated Dropbox account");
-                           
+
                         }
                     });
                 }
+              getGroups();  
+                 
             }
         };
         service.configure(email, session, callback);
@@ -210,7 +212,7 @@ public class Main implements EntryPoint {
 
                     Layout.getInstance().authenticate(result);
                     getGroups();
-                   
+
                 }
             };
             Layout.getInstance().getModal().show("Signing in with CAS...", true);
@@ -261,7 +263,7 @@ public class Main implements EntryPoint {
                     modulesInit.add(new DataManagerModule());
                 }
                 if (isGridJobs) {
-                     modulesInit.add(new ApplicationModule());
+                    modulesInit.add(new ApplicationModule());
                 }
                 if (isGridFile && isGridJobs) {
                     modulesInit.add(new DocsModule());
