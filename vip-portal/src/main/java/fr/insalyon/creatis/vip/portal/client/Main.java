@@ -82,6 +82,22 @@ public class Main implements EntryPoint {
         }
 
         Layout.getInstance().getModal().show("Loading VIP " + CoreConstants.VERSION, true);
+        
+        Modules modulesInit = Modules.getInstance();
+        modulesInit.add(new CoreModule());
+        modulesInit.add(new DataManagerModule());
+        modulesInit.add(new ApplicationModule());
+        modulesInit.add(new DocsModule());
+        modulesInit.add(new QueryModule());
+        modulesInit.add(new SocialModule());
+        modulesInit.add(new ModelModule());
+        modulesInit.add(new SimulationGUIModule());
+        modulesInit.add(new SimulatedDataModule());
+        modulesInit.add(new GateLabModule());
+        modulesInit.add(new CoworkModule());
+        modulesInit.add(new CardiacModule());
+
+        
         if (ticket == null && (login == null || !login.equals("CASN4U"))) {
             //regular VIP authentication
             configureVIP();
@@ -148,7 +164,6 @@ public class Main implements EntryPoint {
                         }
                     });
                 }
-                addModules(user);
             }
         };
         service.configure(email, session, callback);
@@ -186,8 +201,6 @@ public class Main implements EntryPoint {
                             null, "/", false);
 
                     Layout.getInstance().authenticate(user);
-                    addModules(user);
-
                 }
             };
             Layout.getInstance().getModal().show("Signing in with CAS...", true);
@@ -213,65 +226,6 @@ public class Main implements EntryPoint {
             }
         };
         service.getUsageStats(acb);
-
-    }
-
-    private void addModules(final User user) {
-
-        final Modules modulesInit = Modules.getInstance();
-        
-        final AsyncCallback<List<Boolean[]>> callback = new AsyncCallback<List<Boolean[]>>() {
-            boolean isGridFile;
-            boolean isGridJobs;
-
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().getModal().hide();
-                Layout.getInstance().setWarningMessage("Unable to get group properties:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(List<Boolean[]> result) {
-                modulesInit.add(new CoreModule());
-                Layout.getInstance().getModal().show("Loading modules Data Manager, Application and Docs", true);
-                for (Boolean[] b : result) {
-                    isGridFile = b[1];
-                    isGridJobs = b[2];
-                }
-                if (isGridFile) {
-                    modulesInit.add(new DataManagerModule());
-                }
-                if (isGridJobs) {
-                    modulesInit.add(new ApplicationModule());
-                }
-                if (isGridFile && isGridJobs) {
-                    modulesInit.add(new DocsModule());
-                }
-                // now that datamanager and application modules are loaded, load other modules.
-                Layout.getInstance().getModal().show("Loading module Query", true);
-                modulesInit.add(new QueryModule());
-                Layout.getInstance().getModal().show("Loading module Social", true);
-                modulesInit.add(new SocialModule());
-                Layout.getInstance().getModal().show("Loading module Model", true);
-                modulesInit.add(new ModelModule());
-                Layout.getInstance().getModal().show("Loading module Simulation GUI", true);
-                modulesInit.add(new SimulationGUIModule());
-                Layout.getInstance().getModal().show("Loading module Simulated Data", true);
-                modulesInit.add(new SimulatedDataModule());
-                Layout.getInstance().getModal().show("Loading module GateLab", true);
-                modulesInit.add(new GateLabModule());
-                Layout.getInstance().getModal().show("Loading module Cowork", true);
-                modulesInit.add(new CoworkModule());
-                Layout.getInstance().getModal().show("Loading module Cardiac", true);
-                modulesInit.add(new CardiacModule());
-                Layout.getInstance().getModal().show("Re-initializing modules", true);  
-                modulesInit.initializeModules(user);
-                Layout.getInstance().getModal().hide();
-
-            }
-        };
-        Layout.getInstance().getModal().show("Getting user groups", true);
-        ConfigurationService.Util.getInstance().getUserGroup(callback);
 
     }
 }

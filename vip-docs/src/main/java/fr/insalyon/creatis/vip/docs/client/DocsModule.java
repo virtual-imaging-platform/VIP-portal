@@ -57,4 +57,10 @@ public class DocsModule extends Module {
     @Override
     public void terminate() {
     }
+    
+    @Override
+    public boolean requiresGridFile() { return true; }
+    
+    @Override
+    public boolean requiresGridJob() { return true; }
 }

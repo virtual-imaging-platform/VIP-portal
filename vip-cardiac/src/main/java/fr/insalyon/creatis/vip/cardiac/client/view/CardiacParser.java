@@ -6,6 +6,7 @@ package fr.insalyon.creatis.vip.cardiac.client.view;
 
 import fr.insalyon.creatis.vip.cardiac.client.CardiacConstants;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
@@ -19,7 +20,7 @@ public class CardiacParser extends ApplicationParser {
     public void loadApplications() {
         if (CoreModule.user.isSystemAdministrator()
                 || CoreModule.user.hasGroupAccess(CardiacConstants.CARDIAC_GROUP)) {
-
+            
             addApplication(CardiacConstants.APP_SD, CardiacConstants.APP_IMG_SD);
         }
     }
