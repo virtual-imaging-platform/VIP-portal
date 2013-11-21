@@ -42,6 +42,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
 import fr.insalyon.creatis.vip.application.client.ApplicationModule;
+import fr.insalyon.creatis.vip.cardiac.client.CardiacModule;
 
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Modules;
@@ -55,8 +56,11 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.cowork.client.CoworkModule;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
 import fr.insalyon.creatis.vip.docs.client.DocsModule;
+import fr.insalyon.creatis.vip.gatelab.client.GateLabModule;
+import fr.insalyon.creatis.vip.models.client.ModelModule;
 import fr.insalyon.creatis.vip.query.client.QueryModule;
-import fr.insalyon.creatis.vip.query.client.view.QueryRecord;
+import fr.insalyon.creatis.vip.simulatedata.client.SimulatedDataModule;
+import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIModule;
 import fr.insalyon.creatis.vip.social.client.SocialModule;
 import java.util.List;
 
@@ -66,11 +70,8 @@ import java.util.List;
  */
 public class Main implements EntryPoint {
 
-    Modules modulesInit;
-
     @Override
     public void onModuleLoad() {
-
 
         final String ticket = Window.Location.getParameter("ticket");
         String login = Window.Location.getParameter("login");
@@ -81,37 +82,12 @@ public class Main implements EntryPoint {
         }
 
         Layout.getInstance().getModal().show("Loading VIP " + CoreConstants.VERSION, true);
-
-
-
-        // Modules
-        //DataManagerModule,ApplicationModules,Docs added with condition
-        modulesInit = Modules.getInstance();
-        modulesInit.add(new CoreModule());
-        modulesInit.add(new QueryModule());
-        modulesInit.add(new SocialModule());
-        modulesInit.add(new ModelModule());
-       modulesInit.add(new SimulationGUIModule());
-       modulesInit.add(new SimulatedDataModule());
-       modulesInit.add(new GateLabModule());
-       modulesInit.add(new CoworkModule());
-        modulesInit.add(new CardiacModule());
-
-
-
-
         if (ticket == null && (login == null || !login.equals("CASN4U"))) {
             //regular VIP authentication
             configureVIP();
-
-
         } else {
             configureN4U(ticket);
-
         }
-
-
-
     }
 
     //redirect to N4U CAS authentication
@@ -154,7 +130,7 @@ public class Main implements EntryPoint {
             public void onSuccess(User user) {
                 Layout.getInstance().getModal().hide();
                 Layout.getInstance().authenticate(user);
-               
+
 
                 //Dropbox account confirmation
                 String oauth_token = Window.Location.getParameter("oauth_token");
@@ -172,8 +148,7 @@ public class Main implements EntryPoint {
                         }
                     });
                 }
-              getGroups();  
-                 
+                addModules(user);
             }
         };
         service.configure(email, session, callback);
@@ -200,18 +175,18 @@ public class Main implements EntryPoint {
                 }
 
                 @Override
-                public void onSuccess(User result) {
+                public void onSuccess(User user) {
                     Layout.getInstance().getModal().hide();
 
                     Cookies.setCookie(CoreConstants.COOKIES_USER,
-                            result.getEmail(), CoreConstants.COOKIES_EXPIRATION_DATE,
+                            user.getEmail(), CoreConstants.COOKIES_EXPIRATION_DATE,
                             null, "/", false);
                     Cookies.setCookie(CoreConstants.COOKIES_SESSION,
-                            result.getSession(), CoreConstants.COOKIES_EXPIRATION_DATE,
+                            user.getSession(), CoreConstants.COOKIES_EXPIRATION_DATE,
                             null, "/", false);
 
-                    Layout.getInstance().authenticate(result);
-                    getGroups();
+                    Layout.getInstance().authenticate(user);
+                    addModules(user);
 
                 }
             };
@@ -241,21 +216,25 @@ public class Main implements EntryPoint {
 
     }
 
-    private void getGroups() {
+    private void addModules(final User user) {
 
+        final Modules modulesInit = Modules.getInstance();
+        
         final AsyncCallback<List<Boolean[]>> callback = new AsyncCallback<List<Boolean[]>>() {
             boolean isGridFile;
             boolean isGridJobs;
 
             @Override
             public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to get groups properties:<br />" + caught.getMessage());
+                Layout.getInstance().getModal().hide();
+                Layout.getInstance().setWarningMessage("Unable to get group properties:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(List<Boolean[]> result) {
+                modulesInit.add(new CoreModule());
+                Layout.getInstance().getModal().show("Loading modules Data Manager, Application and Docs", true);
                 for (Boolean[] b : result) {
-
                     isGridFile = b[1];
                     isGridJobs = b[2];
                 }
@@ -268,9 +247,30 @@ public class Main implements EntryPoint {
                 if (isGridFile && isGridJobs) {
                     modulesInit.add(new DocsModule());
                 }
+                // now that datamanager and application modules are loaded, load other modules.
+                Layout.getInstance().getModal().show("Loading module Query", true);
+                modulesInit.add(new QueryModule());
+                Layout.getInstance().getModal().show("Loading module Social", true);
+                modulesInit.add(new SocialModule());
+                Layout.getInstance().getModal().show("Loading module Model", true);
+                modulesInit.add(new ModelModule());
+                Layout.getInstance().getModal().show("Loading module Simulation GUI", true);
+                modulesInit.add(new SimulationGUIModule());
+                Layout.getInstance().getModal().show("Loading module Simulated Data", true);
+                modulesInit.add(new SimulatedDataModule());
+                Layout.getInstance().getModal().show("Loading module GateLab", true);
+                modulesInit.add(new GateLabModule());
+                Layout.getInstance().getModal().show("Loading module Cowork", true);
+                modulesInit.add(new CoworkModule());
+                Layout.getInstance().getModal().show("Loading module Cardiac", true);
+                modulesInit.add(new CardiacModule());
+                Layout.getInstance().getModal().show("Re-initializing modules", true);  
+                modulesInit.initializeModules(user);
+                Layout.getInstance().getModal().hide();
+
             }
         };
-
+        Layout.getInstance().getModal().show("Getting user groups", true);
         ConfigurationService.Util.getInstance().getUserGroup(callback);
 
     }
