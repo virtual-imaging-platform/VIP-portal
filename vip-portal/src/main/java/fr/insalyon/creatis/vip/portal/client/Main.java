@@ -41,6 +41,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
+import fr.insalyon.creatis.vip.application.client.ApplicationModule;
 
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Modules;
@@ -51,10 +52,12 @@ import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.cowork.client.CoworkModule;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
 import fr.insalyon.creatis.vip.docs.client.DocsModule;
 import fr.insalyon.creatis.vip.query.client.QueryModule;
 import fr.insalyon.creatis.vip.query.client.view.QueryRecord;
+import fr.insalyon.creatis.vip.social.client.SocialModule;
 import java.util.List;
 
 /**
@@ -63,8 +66,6 @@ import java.util.List;
  */
 public class Main implements EntryPoint {
 
-    private boolean isgridfile;
-    private boolean isgridjobs;
     Modules modulesInit;
 
     @Override
@@ -84,34 +85,29 @@ public class Main implements EntryPoint {
 
 
         // Modules
+        //DataManagerModule,ApplicationModules,Docs added with condition
         modulesInit = Modules.getInstance();
         modulesInit.add(new CoreModule());
-        getGroups();
-
-
-
-
-
-
         modulesInit.add(new QueryModule());
-
         modulesInit.add(new SocialModule());
-        modulesInit.add(new ModelModule());
-        modulesInit.add(new SimulationGUIModule());
-        modulesInit.add(new SimulatedDataModule());
-        modulesInit.add(new GateLabModule());
-        modulesInit.add(new DataManagerModule());
+       //modulesInit.add(new ModelModule());
+       // modulesInit.add(new SimulationGUIModule());
+       // modulesInit.add(new SimulatedDataModule());
+       // modulesInit.add(new GateLabModule());
         modulesInit.add(new CoworkModule());
-        modulesInit.add(new CardiacModule());
+        //modulesInit.add(new CardiacModule());
         
+         
 
-        
 
         if (ticket == null && (login == null || !login.equals("CASN4U"))) {
             //regular VIP authentication
             configureVIP();
+            
+
         } else {
             configureN4U(ticket);
+
         }
 
 
@@ -158,6 +154,7 @@ public class Main implements EntryPoint {
             public void onSuccess(User user) {
                 Layout.getInstance().getModal().hide();
                 Layout.getInstance().authenticate(user);
+                getGroups();
 
                 //Dropbox account confirmation
                 String oauth_token = Window.Location.getParameter("oauth_token");
@@ -171,6 +168,7 @@ public class Main implements EntryPoint {
                         @Override
                         public void onSuccess(Void result) {
                             Layout.getInstance().setNoticeMessage("Successfully activated Dropbox account");
+                           
                         }
                     });
                 }
@@ -211,6 +209,8 @@ public class Main implements EntryPoint {
                             null, "/", false);
 
                     Layout.getInstance().authenticate(result);
+                    getGroups();
+                   
                 }
             };
             Layout.getInstance().getModal().show("Signing in with CAS...", true);
@@ -240,7 +240,11 @@ public class Main implements EntryPoint {
     }
 
     private void getGroups() {
+
         final AsyncCallback<List<Boolean[]>> callback = new AsyncCallback<List<Boolean[]>>() {
+            boolean isGridFile;
+            boolean isGridJobs;
+
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to get groups properties:<br />" + caught.getMessage());
@@ -250,16 +254,16 @@ public class Main implements EntryPoint {
             public void onSuccess(List<Boolean[]> result) {
                 for (Boolean[] b : result) {
 
-                    isgridfile = b[1];
-                    isgridjobs = b[2];
+                    isGridFile = b[1];
+                    isGridJobs = b[2];
                 }
-                if (isgridfile) {
+                if (isGridFile) {
                     modulesInit.add(new DataManagerModule());
                 }
-                if (isgridjobs) {
-                   modulesInit.add(new ApplicationModule());
+                if (isGridJobs) {
+                     modulesInit.add(new ApplicationModule());
                 }
-                if (isgridfile && isgridjobs) {
+                if (isGridFile && isGridJobs) {
                     modulesInit.add(new DocsModule());
                 }
             }
@@ -268,43 +272,4 @@ public class Main implements EntryPoint {
         ConfigurationService.Util.getInstance().getUserGroup(callback);
 
     }
-    /*
-     private void getGroups() {
-     final ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-     AsyncCallback <List<String>> l  = new AsyncCallback<List<String>> () {
-
-     @Override
-     public void onFailure(Throwable caught) {
-     SC.say("Cannot get usage stats");
-     }
-
-     @Override
-     public void onSuccess(List<String> result) {
-     for (String l:result)
-     {
-     Group g=new Group();
-     if (g.getName().equals(l) && g.isGridFile()){
-     isgridfile=true;}
-     if (g.getName().equals(l) && g.isGridJobs()){
-     isgridjobs=true;    
-                        
-     }
-     }
-                        
-     }
-               
-            
-     };
-     service.getUserGroups(l);
-        
-     }
-     * 
-     * 
-     * 
-     *  if(isgridfile){
-     modulesInit.add(new DataManagerModule());}
-                    
-     if(isgridfile && isgridjobs){
-     modulesInit.add(new DocsModule());}
-     **/
 }
