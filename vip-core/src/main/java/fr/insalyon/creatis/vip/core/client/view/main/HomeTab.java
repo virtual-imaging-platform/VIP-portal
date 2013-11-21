@@ -59,6 +59,7 @@ public class HomeTab extends Tab {
         this.setTitle("Home");
         this.setID(CoreConstants.TAB_HOME);
         this.setIcon(CoreConstants.ICON_HOME);
+        
 
         hLayout = new HLayout(10);
         hLayout.setWidth100();
@@ -74,7 +75,7 @@ public class HomeTab extends Tab {
         rightLayout = new VLayout();
         rightLayout.setWidth(380);
         rightLayout.setHeight100();
-        rightLayout.setOverflow(Overflow.AUTO);
+        rightLayout.setOverflow(Overflow.VISIBLE);
        
 
         this.setPane(hLayout);
