@@ -99,7 +99,7 @@ public interface ConfigurationService extends RemoteService {
     
     public Map<Group, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws CoreException;
     
-    public List<Boolean[]> getUserGroup() throws CoreException;     
+    public List<Boolean> getUserPropertiesGroups() throws CoreException;     
     
     public List<String> getUserGroups() throws CoreException;
     
