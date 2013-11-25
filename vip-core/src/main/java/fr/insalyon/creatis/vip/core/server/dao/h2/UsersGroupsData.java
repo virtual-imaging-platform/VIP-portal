@@ -120,8 +120,8 @@ public class UsersGroupsData implements UsersGroupsDAO {
     }
 
     
-      @Override
-    public  List<Boolean[]> getUserGroup(String email)
+     @Override
+    public  List<Boolean> getUserPropertiesGroups(String email)
             throws DAOException {
 
         try {
@@ -133,36 +133,36 @@ public class UsersGroupsData implements UsersGroupsDAO {
              logger.info("email"+email);
             ResultSet rs = ps.executeQuery();
           logger.info("execute query with success");
-             List<Boolean[]> proprties = new ArrayList<Boolean[]>();
-             boolean ispublic=false;
-             boolean isgridfile=false;
-             boolean isgridJobs=false;
+             List<Boolean> proprties = new ArrayList<Boolean>();
+             boolean isPublic=false;
+             boolean isGridFile=false;
+             boolean isGridJobs=false;
 
             while (rs.next()) { 
-               if(rs.getInt("gridfile")==1);
+               if(rs.getInt("gridfile")==1)
                logger.info("test 1 bon");
-               isgridfile=true;
-               if(rs.getInt("gridjobs")==1);
-               isgridJobs=true;
-                if(rs.getInt("public")==1);
-               ispublic=true;
+               isGridFile=true;
+               if(rs.getInt("gridjobs")==1)
+               isGridJobs=true;
+                if(rs.getInt("public")==1)
+               isPublic=true;
             }
-            proprties.add(new Boolean[]{ispublic,isgridfile,isgridJobs});
-             logger.info("add von");
+            proprties.add(0, isPublic);
+            proprties.add(1, isGridFile);
+            proprties.add(2, isGridJobs);
+            
+            
             ps.close();
-            for (Boolean[] q :proprties){
-                 logger.info(q[0]+"" +q[1]+""+q[2]);
-            }
+            
+            
+           
             return proprties;
             
-              
-
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
         }
     }
-
 
     
     
