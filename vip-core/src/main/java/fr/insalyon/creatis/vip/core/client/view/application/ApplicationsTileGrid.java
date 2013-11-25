@@ -54,7 +54,6 @@ public abstract class ApplicationsTileGrid extends TileGrid {
         this.tileName = tileName;
         this.setTileWidth(120);
         this.setTileHeight(120);
-        
         this.setAutoFetchData(true);
         this.setBorder("0px");
         this.setCanReorderTiles(true);
@@ -62,54 +61,53 @@ public abstract class ApplicationsTileGrid extends TileGrid {
         this.setAnimateTileChange(true);
         this.setShowEdges(false);
         this.setOverflow(Overflow.VISIBLE);
-        
+
 
 
 
 
         DetailViewerField imageField = new DetailViewerField("picture");
         imageField.setType("image");
-        
-        
+
+
 
 
 
         DetailViewerField commonNameField = new DetailViewerField("applicationName");
-        commonNameField.setHeight(10);
-        
+       
+
         DetailViewerField applicationVersion = new DetailViewerField("applicationVersion");
         commonNameField.setCanHilite(false);
-       
+
         commonNameField.setDetailFormatter(new DetailFormatter() {
             public String format(Object value, Record record, DetailViewerField field) {
 
                 String[] words = value.toString().split(" ");
                 int length = words.length;
-                int max = 18;
-                int nbr=0;
+                int max = 18;          
                 String tile = new String();
                 for (String s : words) {
                     int l = tile.length() + s.length() + 1;
                     if (l > max) {
-                        tile += "<br>";
-                        nbr++;
+                        tile += "<br>";    
                         max += 18;
                         tile += s + " ";
                     } else {
                         tile += s + " ";
                     }
-
                 }
-                 String[] wordss = tile.toString().split("<br>");
-                 if(wordss.length>3)
-                return wordss[0]+"<br>"+wordss[1]+"<br>"+ wordss[2]+"<br>"+wordss[3];
-                 else return tile;
+                String[] wordss = tile.toString().split("<br>");
+                if (wordss.length > 3) {
+                    return wordss[0] + "<br>" + wordss[1] + "<br>" + wordss[2] + "<br>" + wordss[3];
+                } else {
+                    return tile;
+                }
 
             }
         });
-        
 
-        this.setFields(imageField,commonNameField,applicationVersion);
+
+        this.setFields(imageField, commonNameField, applicationVersion);
         this.setData(new ApplicationTileRecord[]{});
 
 
