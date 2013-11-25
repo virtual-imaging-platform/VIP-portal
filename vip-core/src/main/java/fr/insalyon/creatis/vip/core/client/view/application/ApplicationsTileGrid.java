@@ -33,6 +33,7 @@
 package fr.insalyon.creatis.vip.core.client.view.application;
 
 import com.smartgwt.client.data.Record;
+import com.smartgwt.client.types.DateDisplayFormat;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.tile.TileGrid;
 import com.smartgwt.client.widgets.tile.events.RecordClickEvent;
@@ -51,12 +52,9 @@ public abstract class ApplicationsTileGrid extends TileGrid {
     public ApplicationsTileGrid(String tileName) {
 
         this.tileName = tileName;
-
+        this.setTileWidth(120);
+        this.setTileHeight(120);
         
-        //this.setHeight(110);
-        this.setTileWidth(115);
-        this.setTileHeight(100);
-       
         this.setAutoFetchData(true);
         this.setBorder("0px");
         this.setCanReorderTiles(true);
@@ -71,34 +69,45 @@ public abstract class ApplicationsTileGrid extends TileGrid {
 
         DetailViewerField imageField = new DetailViewerField("picture");
         imageField.setType("image");
+        
+        
 
 
 
-        DetailViewerField commonNameField = new DetailViewerField("commonName");
+        DetailViewerField commonNameField = new DetailViewerField("applicationName");
+        commonNameField.setHeight(10);
+        
         DetailViewerField applicationVersion = new DetailViewerField("applicationVersion");
-
+        commonNameField.setCanHilite(false);
+       
         commonNameField.setDetailFormatter(new DetailFormatter() {
             public String format(Object value, Record record, DetailViewerField field) {
 
                 String[] words = value.toString().split(" ");
                 int length = words.length;
-                int max = 16;
+                int max = 18;
+                int nbr=0;
                 String tile = new String();
                 for (String s : words) {
                     int l = tile.length() + s.length() + 1;
                     if (l > max) {
                         tile += "<br>";
-                        max += 16;
+                        nbr++;
+                        max += 18;
                         tile += s + " ";
                     } else {
                         tile += s + " ";
                     }
 
                 }
-                return tile;
+                 String[] wordss = tile.toString().split("<br>");
+                 if(wordss.length>3)
+                return wordss[0]+"<br>"+wordss[1]+"<br>"+ wordss[2]+"<br>"+wordss[3];
+                 else return tile;
 
             }
         });
+        
 
         this.setFields(imageField,commonNameField,applicationVersion);
         this.setData(new ApplicationTileRecord[]{});
