@@ -63,7 +63,6 @@ public abstract class ApplicationsTileGrid extends TileGrid {
         this.setShowAllRecords(true);
         this.setAnimateTileChange(true);
         this.setShowEdges(false);
-        this.setAutoHeight();
         this.setOverflow(Overflow.VISIBLE);
         
 
