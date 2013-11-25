@@ -238,13 +238,10 @@ public class UsersGroupsData implements UsersGroupsDAO {
 
              while (rs.next()) { 
                if(rs.getInt("gridfile")==1){
-               logger.info("im a gridfile");
                isGridFile=true;}
                if(rs.getInt("gridjobs")==1){
-               logger.info("im a gridjobs");
                isGridJobs=true;}
                if(rs.getInt("public")==1){
-               logger.info("im a public group ");
                isPublic=true;}
             }
             proprties.add(0, isPublic);
