@@ -384,12 +384,12 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         }
     }
   
-    
+   
    @Override
-    public List<Boolean[]> getUserGroup() throws CoreException {
+    public List<Boolean> getUserPropertiesGroups() throws CoreException {
         try {
             String email=getSessionUser().getEmail();
-            return configurationBusiness.getUserGroup(email);
+            return configurationBusiness. getUserPropertiesGroups(email);
             
 
         } catch (BusinessException ex) {
