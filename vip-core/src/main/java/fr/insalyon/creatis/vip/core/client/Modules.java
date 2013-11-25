@@ -69,7 +69,7 @@ public class Modules {
     
     public void initializeModules(User user) {
         CoreModule.user = user;      
-        final AsyncCallback<List<Boolean[]>> callback = new AsyncCallback<List<Boolean[]>>() {
+        final AsyncCallback<List<Boolean>> callback = new AsyncCallback<List<Boolean>>() {
             boolean isGridFile;
             boolean isGridJobs;
 
@@ -80,12 +80,12 @@ public class Modules {
             }
 
             @Override
-            public void onSuccess(List<Boolean[]> result) {
+            public void onSuccess(List<Boolean> result) {
                 Layout.getInstance().getModal().hide();
-                for (Boolean[] b : result) {
-                    isGridFile = b[1];
-                    isGridJobs = b[2];
-                }
+               
+                    isGridFile =result.get(1);
+                    isGridJobs = result.get(2);
+                
                 for (Module module : modules) {
                     if ((!module.requiresGridFile() || isGridFile) && (!module.requiresGridJob() || isGridJobs)) {
                         module.load();
@@ -99,7 +99,7 @@ public class Modules {
             }
         };
         Layout.getInstance().getModal().show("Getting user groups", true);
-        ConfigurationService.Util.getInstance().getUserGroup(callback);        
+        ConfigurationService.Util.getInstance().getUserPropertiesGroups(callback);        
     }
     
     public void finalizeModules() {
