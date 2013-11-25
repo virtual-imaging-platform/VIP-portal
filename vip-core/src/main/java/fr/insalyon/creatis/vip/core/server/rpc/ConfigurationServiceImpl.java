@@ -389,7 +389,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public List<Boolean> getUserPropertiesGroups() throws CoreException {
         try {
             String email=getSessionUser().getEmail();
-            return configurationBusiness. getUserPropertiesGroups(email);
+            return configurationBusiness.getUserPropertiesGroups(email);
             
 
         } catch (BusinessException ex) {
