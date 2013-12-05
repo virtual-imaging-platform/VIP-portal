@@ -33,8 +33,10 @@
 package fr.insalyon.creatis.vip.core.client.view.application;
 
 import com.smartgwt.client.data.Record;
+import com.smartgwt.client.types.BackgroundRepeat;
 import com.smartgwt.client.types.DateDisplayFormat;
 import com.smartgwt.client.types.Overflow;
+
 import com.smartgwt.client.widgets.tile.TileGrid;
 import com.smartgwt.client.widgets.tile.events.RecordClickEvent;
 import com.smartgwt.client.widgets.tile.events.RecordClickHandler;
@@ -54,24 +56,20 @@ public abstract class ApplicationsTileGrid extends TileGrid {
         this.tileName = tileName;
         this.setTileWidth(120);
         this.setTileHeight(120);
-        this.setAutoFetchData(true);
+        this.setOverflow(Overflow.VISIBLE);
         this.setBorder("0px");
         this.setCanReorderTiles(true);
         this.setShowAllRecords(true);
         this.setAnimateTileChange(true);
         this.setShowEdges(false);
-        this.setOverflow(Overflow.VISIBLE);
-
-
-
-
+        this.setAutoHeight();
+        this.setHeight100();
+        this.setWidth100();
+        
+        
 
         DetailViewerField imageField = new DetailViewerField("picture");
         imageField.setType("image");
-
-
-
-
 
         DetailViewerField commonNameField = new DetailViewerField("applicationName");
        
@@ -123,13 +121,14 @@ public abstract class ApplicationsTileGrid extends TileGrid {
         });
     }
 
-    protected void addApplication(String applicationName, String applicationImage) {
-
+    protected void addApplication(String applicationName, String applicationImage)  {
+        
         addApplication(new ApplicationTileRecord(applicationName, applicationImage));
+        
     }
 
     protected void addApplication(String applicationName, String version, String applicationImage) {
-
+   
         addApplication(new ApplicationTileRecord(applicationName, version, applicationImage));
 
 
@@ -139,8 +138,11 @@ public abstract class ApplicationsTileGrid extends TileGrid {
     protected void addApplication(ApplicationTileRecord record) {
 
         this.addData(record);
+        
 
     }
+    
+    
 
     public abstract void parse(String applicationName, String version);
 
