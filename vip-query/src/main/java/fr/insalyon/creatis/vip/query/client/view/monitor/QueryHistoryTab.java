@@ -34,6 +34,8 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.viewer.DetailViewer;
 import com.smartgwt.client.widgets.viewer.DetailViewerField;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
@@ -344,6 +346,12 @@ public class QueryHistoryTab extends Tab {
     }
 
     public void loadData() {
+        
+         String state=new String();
+         
+        if(CoreModule.user.isGroupAdmin(QueryConstants.QUERY_GROUP)||CoreModule.user.isSystemAdministrator()){
+           state="admin";
+        }
         final AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -380,7 +388,7 @@ public class QueryHistoryTab extends Tab {
 
 
         modal.show("Loading queries execution...", true);
-        QueryService.Util.getInstance().getQueryHistory(callback);
+        QueryService.Util.getInstance().getQueryHistory(state,callback);
     }
 
     public void setFilter() {

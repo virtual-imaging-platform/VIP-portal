@@ -47,19 +47,24 @@ public class CreateQuery extends AbstractFormLayout {
     private IButton saveButton;
     private IButton testButton;
     private ImgButton helpButton;
+    private Label label = new Label();
     public TextAreaItem body;
     private int rownumber = 0;
     private Long queryID = 0l;
     private boolean testt;
 
     public CreateQuery() {
-        super("100%","100%");
-        addTitle("New Query", QueryConstants.ICON_QUERYMAKER);
+        super("100%", "100%");
+        //addTitle("New Query","");
+        label.setContents("<b>New Query</b>");
         configure();
     }
 
     private void configure() {
-
+        label.setHeight(15);
+        label.setWidth100();
+        label.setAlign(Alignment.LEFT);
+         
 
         description = new RichTextEditor();
         description.setHeight(100);
@@ -68,8 +73,8 @@ public class CreateQuery extends AbstractFormLayout {
         description.setShowEdges(true);
         description.setControlGroups("styleControls", "editControls",
                 "colorControls");
-        
-        querynameField = FieldUtil.getTextItem(900, false, "", "[0-9.,A-Za-z-+/_() ]"); 
+
+        querynameField = FieldUtil.getTextItem(900, false, "", "[0-9.,A-Za-z-+/_() ]");
         querynameField.setWidth("*");
         querynameField.setValidators(ValidatorUtil.getStringValidator());
 
@@ -92,8 +97,8 @@ public class CreateQuery extends AbstractFormLayout {
                         Logger.getLogger(CreateQuery.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 } else {
-                   
-                    String getbody = body.getValueAsString();                 
+                    
+                    String getbody = body.getValueAsString();
                     getbody = getbody.replaceAll("[\r\n]{2,}", "\r\n");
                     getbody = getbody.replaceAll("\\s", "");
                     getbody = getbody.toLowerCase();
@@ -242,13 +247,9 @@ public class CreateQuery extends AbstractFormLayout {
         });
         helpButton.setLayoutAlign(Alignment.LEFT);
 
-
+        addMember(label);
         addField100("Name", querynameField);
-        
-        
-       
-  
-        
+
         addMember(WidgetUtil.getLabel("<b>Description</b>", 15));
         addMember(description);
 
@@ -291,13 +292,12 @@ public class CreateQuery extends AbstractFormLayout {
                 desc = desc.replaceAll("<br><br>", "<br>");
                 desc = desc.replaceAll("<div><br></div>", "");
                 while (desc.indexOf("<br>") == 0) {
-
                     desc = desc.replaceFirst("<br>", "");
                 }
-                 
-                while(desc.lastIndexOf("<br>")==desc.length()-4){ 
-               desc = desc.substring(0,desc.length()-4);
-                       }
+
+                while (desc.lastIndexOf("<br>") == desc.length() - 4) {
+                    desc = desc.substring(0, desc.length() - 4);
+                }
 
                 savev(new QueryVersion(1L, result, desc, bodyRemplace));
                 reset();
@@ -351,6 +351,13 @@ public class CreateQuery extends AbstractFormLayout {
     public void setQuery(boolean nameState, boolean test, String name, String description, String body) {
 
         newQuery = test;
+        if (newQuery == false) {
+            label.setContents("<b>Edit Query</b>");
+        } else {
+            label.setContents("<b>New Query</b>");
+        }
+
+
 
         querynameField.setValue(name);
         this.description.setValue(description);
@@ -417,9 +424,9 @@ public class CreateQuery extends AbstractFormLayout {
 
                     desc = desc.replaceFirst("<br>", "");
                 }
-                while(desc.lastIndexOf("<br>")==desc.length()-4){ 
-               desc = desc.substring(0,desc.length()-4);
-                       }
+                while (desc.lastIndexOf("<br>") == desc.length() - 4) {
+                    desc = desc.substring(0, desc.length() - 4);
+                }
 
 
 
