@@ -52,19 +52,25 @@ public abstract class ApplicationsTileGrid extends TileGrid {
     protected String tileName;
 
     public ApplicationsTileGrid(String tileName) {
-
+        
         this.tileName = tileName;
         this.setTileWidth(120);
-        this.setTileHeight(120);
-        this.setOverflow(Overflow.VISIBLE);
+        this.setTileHeight(130);
+       
+       this.setWidth100();
+       this.setHeight100();
+       this.setOverflow(Overflow.VISIBLE);
+        //this.setShowAllRecords(true);  
+        //this.setAutoHeight();    
         this.setBorder("0px");
         this.setCanReorderTiles(true);
-        this.setShowAllRecords(true);
         this.setAnimateTileChange(true);
         this.setShowEdges(false);
-        this.setAutoHeight();
-        this.setHeight100();
-        this.setWidth100();
+        
+       
+        
+       
+       
         
         
 

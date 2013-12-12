@@ -61,7 +61,7 @@ public class ApplicationTileRecord extends TileRecord {
         setAttribute("picture", icon);
         setAttribute("applicationName", name);
         setAttribute("applicationVersion", version);
-       
+        
        
         
     }
