@@ -101,7 +101,7 @@ public class FileDownload extends HttpServlet {
                 resp.setContentLength((int) file.length());
                 //name of the file in servlet download
                 resp.setHeader("Content-Disposition", "attachment; filename=\""
-                        + queryName+"_"+getCurrentTimeStamp() + "\"");
+                        + queryName+"_"+getCurrentTimeStamp().toString().replaceAll(" ","_")+".txt"+ "\"");
 
                 byte[] bbuf = new byte[4096];
                 DataInputStream in = new DataInputStream(new FileInputStream(file));

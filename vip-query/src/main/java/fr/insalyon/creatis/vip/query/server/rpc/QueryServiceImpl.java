@@ -35,7 +35,7 @@ public class QueryServiceImpl extends AbstractRemoteServiceServlet implements Qu
     }
 
     @Override
-    public List<String[]> getQureies() throws QueryException {
+    public List<String[]> getQueries() throws QueryException {
 
         try {
             return queryBusiness.getQueries();
@@ -142,7 +142,7 @@ public class QueryServiceImpl extends AbstractRemoteServiceServlet implements Qu
     public Long addQueryExecution(QueryExecution queryExecution) throws QueryException {
 
         try {
-            queryExecution.setExecuter(getSessionUser().getFullName());
+            queryExecution.setExecuter(getSessionUser().getEmail());
 
         } catch (CoreException ex) {
             java.util.logging.Logger.getLogger(QueryServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
@@ -157,9 +157,16 @@ public class QueryServiceImpl extends AbstractRemoteServiceServlet implements Qu
     }
 
     @Override
-    public List<String[]> getQueryHistory() throws QueryException {
+    public List<String[]> getQueryHistory(String state) throws QueryException {
+        String executer=null;
         try {
-            return queryBusiness.getQueryHistory();
+            
+            try {
+                executer = getSessionUser().getEmail();
+            } catch (CoreException ex) {
+                java.util.logging.Logger.getLogger(QueryServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return queryBusiness.getQueryHistory(executer,state);
 
         } catch (BusinessException ex) {
             throw new QueryException(ex);

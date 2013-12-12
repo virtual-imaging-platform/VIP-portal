@@ -120,9 +120,9 @@ public class QueryBusiness {
 
     }
 
-    public List<String[]> getQueryHistory() throws BusinessException {
+    public List<String[]> getQueryHistory(String executer,String state) throws BusinessException {
         try {
-            return QueryDAOFactory.getDAOFactory().getQueryDAO().getQueryHistory();
+            return QueryDAOFactory.getDAOFactory().getQueryDAO().getQueryHistory(executer,state);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
