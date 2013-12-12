@@ -37,7 +37,7 @@ public interface QueryService extends RemoteService {
         }
     }
 
-    public List<String[]> getQureies() throws QueryException;
+    public List<String[]> getQueries() throws QueryException;
 
     public List<String[]> getVersion() throws QueryException;
 
@@ -57,7 +57,7 @@ public interface QueryService extends RemoteService {
 
     public Long addQueryExecution(QueryExecution queryExecution) throws QueryException;
 
-    public List<String[]> getQueryHistory() throws QueryException;
+    public List<String[]> getQueryHistory(String state) throws QueryException;
 
     public String getBody(Long queryVersionID, Long queryExecutionID, boolean parameter) throws QueryException;
 

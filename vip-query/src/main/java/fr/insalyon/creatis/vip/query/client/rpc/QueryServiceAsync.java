@@ -22,7 +22,7 @@ import java.util.List;
  */
 public interface QueryServiceAsync {
 
-    public void getQureies(AsyncCallback<List<String[]>> asyncCallback);
+    public void getQueries(AsyncCallback<List<String[]>> asyncCallback);
 
     public void getVersion(AsyncCallback<List<String[]>> asyncCallback);
 
@@ -42,7 +42,7 @@ public interface QueryServiceAsync {
 
     public void addQueryExecution(QueryExecution queryExecution, AsyncCallback<Long> asyncCallback);
 
-    public void getQueryHistory(AsyncCallback<List<String[]>> asyncCallback);
+    public void getQueryHistory(String state,AsyncCallback<List<String[]>> asyncCallback);
 
     public void getBody(Long queryVersionID, Long queryExecutionID, boolean parameter, AsyncCallback<String> asyncCallback);
 
