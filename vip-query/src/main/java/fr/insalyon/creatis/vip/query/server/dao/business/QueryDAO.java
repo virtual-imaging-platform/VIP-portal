@@ -39,7 +39,7 @@ public interface QueryDAO {
 
     public Long addQueryExecution(QueryExecution queryExecution) throws DAOException;
 
-    public List<String[]> getQueryHistory() throws DAOException;
+    public List<String[]> getQueryHistory(String executer,String state) throws DAOException;
 
     public String getBody(Long queryVersionID, Long queryExecutionID, boolean parameter) throws DAOException;
 

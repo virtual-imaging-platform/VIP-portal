@@ -33,7 +33,7 @@ public class QueryData implements QueryDAO {
     public List<String[]> getQueries() throws DAOException {
 
         try {
-            
+
             PreparedStatement ps = connection.prepareStatement("SELECT queryID, queryName FROM Query");
             ResultSet rs = ps.executeQuery();
             List<String[]> queries = new ArrayList<String[]>();
@@ -61,31 +61,31 @@ public class QueryData implements QueryDAO {
             }
             ps.close();
             return queries;
-           
-            
 
-        
-        /*
-            try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "QueryVersion.queryID, queryName, dateCreation, queryVersion, queryVersionID FROM "
-                    + "Query, QueryVersion "
-                    + "WHERE Query.queryID=QueryVersion.queryID "
-                    + "ORDER BY dateCreation DESC");
 
-            ResultSet rs = ps.executeQuery();
-            List<String[]> queries = new ArrayList<String[]>();
 
-            while (rs.next()) {
-                Integer version = rs.getInt("queryVersion");
-                Timestamp date = rs.getTimestamp("dateCreation");
-                Long qID = rs.getLong("QueryVersion.queryID");
+
+            /*
+             try {
+             PreparedStatement ps = connection.prepareStatement("SELECT "
+             + "QueryVersion.queryID, queryName, dateCreation, queryVersion, queryVersionID FROM "
+             + "Query, QueryVersion "
+             + "WHERE Query.queryID=QueryVersion.queryID "
+             + "ORDER BY dateCreation DESC");
+
+             ResultSet rs = ps.executeQuery();
+             List<String[]> queries = new ArrayList<String[]>();
+
+             while (rs.next()) {
+             Integer version = rs.getInt("queryVersion");
+             Timestamp date = rs.getTimestamp("dateCreation");
+             Long qID = rs.getLong("QueryVersion.queryID");
                 
-                queries.add(new String[]{rs.getString("queryName"), date.toString(), version.toString(), rs.getString("queryVersionID"),qID.toString()});
-            }
-            ps.close();
-            return queries;
-            * */
+             queries.add(new String[]{rs.getString("queryName"), date.toString(), version.toString(), rs.getString("queryVersionID"),qID.toString()});
+             }
+             ps.close();
+             return queries;
+             * */
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
@@ -96,7 +96,7 @@ public class QueryData implements QueryDAO {
     public String getDescription(Long queryVersionID) throws DAOException {
 
         try {
-           
+
             String result = null;
             PreparedStatement ps2 = connection.prepareStatement("SELECT description FROM QueryVersion WHERE queryVersionID=?");
 
@@ -105,12 +105,12 @@ public class QueryData implements QueryDAO {
             ResultSet rs2 = ps2.executeQuery();
 
             while (rs2.next()) {
-                    result = rs2.getString("description");
-                }
+                result = rs2.getString("description");
+            }
             ps2.close();
 
-            
-            
+
+
             return result;
 
         } catch (SQLException ex) {
@@ -373,7 +373,7 @@ public class QueryData implements QueryDAO {
                     "INSERT INTO Query(queryName, queryMaker) "
                     + "VALUES (?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
 
-           
+
             ps.setString(1, query.getName());
             ps.setString(2, query.getQueryMaker());
 
@@ -409,7 +409,7 @@ public class QueryData implements QueryDAO {
             ps2.setObject(2, version.getQueryID());
             ps2.setString(3, version.getBody());
             ps2.setTimestamp(4, getCurrentTimeStamp());
-            ps2.setString(5,version.getDescription());
+            ps2.setString(5, version.getDescription());
             ps2.execute();
             ResultSet rs = ps2.getGeneratedKeys();
             Long idAuto_increment = new Long(0);
@@ -465,7 +465,7 @@ public class QueryData implements QueryDAO {
 
 
 
-            ps.setString(1,bodyResult);
+            ps.setString(1, bodyResult);
             ps.setString(2, status);
             ps.setLong(3, executionID);
             ps.executeUpdate();
@@ -479,8 +479,7 @@ public class QueryData implements QueryDAO {
         }
     }
 
-    
-     @Override
+    @Override
     public void updateQueryExecutionStatusWaiting(String status, Long executionID) throws DAOException {
 
         try {
@@ -498,7 +497,7 @@ public class QueryData implements QueryDAO {
             throw new DAOException(ex);
         }
     }
-    
+
     @Override
     public void updateQueryExecutionStatusFailed(String status, Long executionID) throws DAOException {
 
@@ -512,8 +511,8 @@ public class QueryData implements QueryDAO {
 
             ps.setTimestamp(1, getCurrentTimeStamp());
             ps.setString(2, status);
-       
-            ps.setString(3,"Query Execution was interrupted by the user");
+
+            ps.setString(3, "Query Execution was interrupted by the user");
             ps.setLong(4, executionID);
             ps.executeUpdate();
             ps.close();
@@ -525,12 +524,7 @@ public class QueryData implements QueryDAO {
             throw new DAOException(ex);
         }
     }
-    
-    
-    
-    
-    
-    
+
     @Override
     public void updateQueryVersion(Long queryVersionID, String name, String description) throws DAOException {
 
@@ -623,31 +617,81 @@ public class QueryData implements QueryDAO {
     }
 
     @Override
-    public List<String[]> getQueryHistory() throws DAOException {
-        try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "queryExecutionID,name,queryName,queryVersion,executer,dateExecution,status,bodyResult,pathFileResult,dateEndExecution FROM "
-                    + "Query query,QueryVersion queryversion,QueryExecution queryexe WHERE "
-                    + "query.queryID=queryversion.queryID AND queryversion.queryVersionID=queryexe.queryVersionID "
-                    + "ORDER BY queryexe.dateExecution DESC");
+    public List<String[]> getQueryHistory(String executer, String state) throws DAOException {
+        if (state.equals("admin")) {
 
-            ResultSet rs = ps.executeQuery();
-            List<String[]> queries = new ArrayList<String[]>();
+            try {
+                PreparedStatement ps = connection.prepareStatement("SELECT "
+                        + "queryExecutionID,name,queryName,queryVersion,executer,dateExecution,status,bodyResult,pathFileResult,dateEndExecution FROM "
+                        + "Query query,QueryVersion queryversion,QueryExecution queryexe WHERE "
+                        + "query.queryID=queryversion.queryID AND queryversion.queryVersionID=queryexe.queryVersionID "
+                        + "ORDER BY queryexe.dateExecution DESC");
 
-            while (rs.next()) {
+                ResultSet rs = ps.executeQuery();
+                List<String[]> queries = new ArrayList<String[]>();
 
-                Timestamp date = rs.getTimestamp("dateExecution");
-                String  dateEnd = rs.getString("dateEndExecution");
-                Long id = rs.getLong("queryExecutionID");
-                Long version = rs.getLong("queryVersion");
-                queries.add(new String[]{id.toString(), rs.getString("name"), rs.getString("queryName"), version.toString(), rs.getString("executer"), date.toString(), rs.getString("status"), rs.getString("bodyResult"),rs.getString("pathFileResult"),dateEnd});
+                while (rs.next()) {
+                    PreparedStatement ps2 = connection.prepareStatement("SELECT "
+                            + "first_name, last_name FROM VIPUsers WHERE email=?");
+                    ps2.setString(1, rs.getString("executer"));
+                    ResultSet rs2 = ps2.executeQuery();
+                    String fullNameExecuter = new String();
+                    while (rs2.next()) {
+
+                        fullNameExecuter = rs2.getString("first_name") + " " + rs2.getString("last_name");
+                    }
+
+
+                    Timestamp date = rs.getTimestamp("dateExecution");
+                    String dateEnd = rs.getString("dateEndExecution");
+                    Long id = rs.getLong("queryExecutionID");
+                    Long version = rs.getLong("queryVersion");
+                    queries.add(new String[]{id.toString(), rs.getString("name"), rs.getString("queryName"), version.toString(), fullNameExecuter, date.toString(), rs.getString("status"), rs.getString("bodyResult"), rs.getString("pathFileResult"), dateEnd});
+                }
+                ps.close();
+                return queries;
+
+            } catch (SQLException ex) {
+                logger.error(ex);
+                throw new DAOException(ex);
             }
-            ps.close();
-            return queries;
+        } else {
 
-        } catch (SQLException ex) {
-            logger.error(ex);
-            throw new DAOException(ex);
+            try {
+                PreparedStatement ps = connection.prepareStatement("SELECT "
+                        + "queryExecutionID,name,queryName,queryVersion,executer,dateExecution,status,bodyResult,pathFileResult,dateEndExecution FROM "
+                        + "Query query,QueryVersion queryversion,QueryExecution queryexe WHERE "
+                        + "query.queryID=queryversion.queryID AND queryversion.queryVersionID=queryexe.queryVersionID AND queryexe.executer=?"
+                        + "ORDER BY queryexe.dateExecution DESC");
+                ps.setString(1, executer);
+                ResultSet rs = ps.executeQuery();
+
+                List<String[]> queries = new ArrayList<String[]>();
+
+                while (rs.next()) {
+                    PreparedStatement ps2 = connection.prepareStatement("SELECT "
+                            + "first_name, last_name FROM VIPUsers WHERE email=?");
+                    ps2.setString(1, rs.getString("executer"));
+                    ResultSet rs2 = ps2.executeQuery();
+                    String fullNameExecuter = new String();
+                    while (rs2.next()) {
+
+                        fullNameExecuter = rs2.getString("first_name") + " " + rs2.getString("last_name");
+                    }
+
+                    Timestamp date = rs.getTimestamp("dateExecution");
+                    String dateEnd = rs.getString("dateEndExecution");
+                    Long id = rs.getLong("queryExecutionID");
+                    Long version = rs.getLong("queryVersion");
+                    queries.add(new String[]{id.toString(), rs.getString("name"), rs.getString("queryName"), version.toString(), fullNameExecuter, date.toString(), rs.getString("status"), rs.getString("bodyResult"), rs.getString("pathFileResult"), dateEnd});
+                }
+                ps.close();
+                return queries;
+
+            } catch (SQLException ex) {
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
         }
     }
 
@@ -656,16 +700,14 @@ public class QueryData implements QueryDAO {
     public String getBody(Long queryVersionID, Long queryExecutionID, boolean parameter) throws DAOException {
         try {
             if (parameter == false) {
-                 logger.error("parameter false for"+ parameter );
-                 logger.error("versionID"+queryVersionID+"exeID"+queryExecutionID);
                 PreparedStatement ps = connection.prepareStatement("SELECT "
                         + "body FROM QueryVersion WHERE queryVersionID=? ");
                 ps.setLong(1, queryVersionID);
                 ResultSet rs = ps.executeQuery();
-                String body =new String();
+                String body = new String();
                 while (rs.next()) {
-                   body = rs.getString("body");
-                    logger.error("body"+body);
+                    body = rs.getString("body");
+                    logger.error("body" + body);
                 }
                 ps.close();
                 return body;
@@ -753,24 +795,24 @@ public class QueryData implements QueryDAO {
 
             ps.setLong(1, queryID);
             ResultSet rs = ps.executeQuery();
-            
-            int i=0;
-            boolean exist=false; 
-            while (rs.next() && i==0 ) {
+
+            int i = 0;
+            boolean exist = false;
+            while (rs.next() && i == 0) {
                 String bd = rs.getString("body");
-                bd = bd.replaceAll("\\s","");
+                bd = bd.replaceAll("\\s", "");
                 bd = bd.toLowerCase();
-               
+
                 if (body.equals(bd)) {
-                  exist = true;  
-                    i=1;
-                } 
+                    exist = true;
+                    i = 1;
+                }
             }
-            
+
 
             ps.close();
             return exist;
-            
+
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
