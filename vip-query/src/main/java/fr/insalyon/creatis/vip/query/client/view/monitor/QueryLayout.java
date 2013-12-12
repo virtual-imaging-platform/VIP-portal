@@ -211,7 +211,7 @@ public class QueryLayout extends VLayout {
 
         modal.show("Loading queries...", true);
 
-        QueryService.Util.getInstance().getQureies(callback);
+        QueryService.Util.getInstance().getQueries(callback);
 
     }
 
