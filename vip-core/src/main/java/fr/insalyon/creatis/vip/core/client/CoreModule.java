@@ -138,15 +138,10 @@ public class CoreModule extends Module {
      * @param tileGrid 
      */
     public static void addApplicationsTileGrid(ApplicationsTileGrid tileGrid) {
-        
-        homeTab.addTileGrid(tileGrid);
-        tileGrid.setCanAcceptDrop(true);
-        tileGrid.setAutoFetchData(true);
-         
-       // tileGrid.redraw();
-        
-        
        
+        homeTab.addTileGrid(tileGrid);
+       
+         
     }
     
     /**
