@@ -75,13 +75,11 @@ public class Modules {
 
             @Override
             public void onFailure(Throwable caught) {
-                Layout.getInstance().getModal().hide();
                 Layout.getInstance().setWarningMessage("Unable to get group properties:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(List<Boolean> result) {
-                Layout.getInstance().getModal().hide();
                
                     isGridFile =result.get(1);
                     isGridJobs = result.get(2);
@@ -98,7 +96,6 @@ public class Modules {
                 }
             }
         };
-        Layout.getInstance().getModal().show("Getting user groups", true);
         ConfigurationService.Util.getInstance().getUserPropertiesGroups(callback);        
     }
     

@@ -62,6 +62,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 
 /**
@@ -821,5 +822,17 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             throw new CoreException(ex);
         }
     }
-}
 
+//    @Override
+//    public void getPostParameters() throws CoreException {
+//        trace(logger,"Getting post parameters");
+//       HttpSession session = this.getSession();
+//       String name = (String) session.getAttributeNames().nextElement();
+//       while(name !=null){
+//           trace(logger,"Found attribute "+session.getAttribute(name)+" for name "+name);
+//           
+//       }
+//    }
+        
+    }
+   
