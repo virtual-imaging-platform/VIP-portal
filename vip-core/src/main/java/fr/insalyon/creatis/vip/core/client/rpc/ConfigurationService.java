@@ -144,4 +144,6 @@ public interface ConfigurationService extends RemoteService {
     public DropboxAccountStatus.AccountStatus getDropboxAccountStatus() throws CoreException;
     
     public void unlinkDropboxAccount() throws CoreException;
+//    
+//    public void getPostParameters() throws CoreException;
 }
