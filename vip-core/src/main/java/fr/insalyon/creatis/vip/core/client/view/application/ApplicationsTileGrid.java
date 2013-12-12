@@ -52,33 +52,25 @@ public abstract class ApplicationsTileGrid extends TileGrid {
     protected String tileName;
 
     public ApplicationsTileGrid(String tileName) {
-        
+
         this.tileName = tileName;
         this.setTileWidth(120);
         this.setTileHeight(130);
-       
-       this.setWidth100();
-       this.setHeight100();
-       this.setOverflow(Overflow.VISIBLE);
-        //this.setShowAllRecords(true);  
-        //this.setAutoHeight();    
+        this.setWidth100();
+        this.setHeight100();
+        this.setOverflow(Overflow.VISIBLE);
         this.setBorder("0px");
         this.setCanReorderTiles(true);
         this.setAnimateTileChange(true);
         this.setShowEdges(false);
-        
-       
-        
-       
-       
-        
-        
+
+
 
         DetailViewerField imageField = new DetailViewerField("picture");
         imageField.setType("image");
 
         DetailViewerField commonNameField = new DetailViewerField("applicationName");
-       
+
 
         DetailViewerField applicationVersion = new DetailViewerField("applicationVersion");
         commonNameField.setCanHilite(false);
@@ -88,12 +80,12 @@ public abstract class ApplicationsTileGrid extends TileGrid {
 
                 String[] words = value.toString().split(" ");
                 int length = words.length;
-                int max = 18;          
+                int max = 18;
                 String tile = new String();
                 for (String s : words) {
                     int l = tile.length() + s.length() + 1;
                     if (l > max) {
-                        tile += "<br>";    
+                        tile += "<br>";
                         max += 18;
                         tile += s + " ";
                     } else {
@@ -127,14 +119,14 @@ public abstract class ApplicationsTileGrid extends TileGrid {
         });
     }
 
-    protected void addApplication(String applicationName, String applicationImage)  {
-        
+    protected void addApplication(String applicationName, String applicationImage) {
+
         addApplication(new ApplicationTileRecord(applicationName, applicationImage));
-        
+
     }
 
     protected void addApplication(String applicationName, String version, String applicationImage) {
-   
+
         addApplication(new ApplicationTileRecord(applicationName, version, applicationImage));
 
 
@@ -144,11 +136,9 @@ public abstract class ApplicationsTileGrid extends TileGrid {
     protected void addApplication(ApplicationTileRecord record) {
 
         this.addData(record);
-        
+
 
     }
-    
-    
 
     public abstract void parse(String applicationName, String version);
 
