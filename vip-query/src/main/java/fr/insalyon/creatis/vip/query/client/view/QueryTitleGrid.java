@@ -4,8 +4,11 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Cursor;
+import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.util.FileLoader;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.MouseOverHandler;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
@@ -75,15 +78,16 @@ public class QueryTitleGrid extends ApplicationsTileGrid {
                 for (String[] q : result) {
                     //name,version,image
                    
-                    addApplication(q[0], "v." + q[2], QueryConstants.APP_IMG_QUERY);   
+                    addApplication(q[0], "v." + q[2], QueryConstants.APP_IMG_QUERY); 
                     map.put(new Key(q[0], "v." + q[2]), q[3]);
                    // applicationNames.add(q[0] + " " + q[2]);
-
-
+                   
+                    
                 }
             }
         };
-        QueryService.Util.getInstance().getQureies(callback);
+        QueryService.Util.getInstance().getQueries(callback);
+        
     }
 
     public class Key {
