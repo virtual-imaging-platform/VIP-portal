@@ -55,7 +55,6 @@ public class CreateQuery extends AbstractFormLayout {
 
     public CreateQuery() {
         super("100%", "100%");
-        //addTitle("New Query","");
         label.setContents("<b>New Query</b>");
         configure();
     }
@@ -79,8 +78,7 @@ public class CreateQuery extends AbstractFormLayout {
         querynameField.setValidators(ValidatorUtil.getStringValidator());
 
         body = new TextAreaItem();
-        body.setHeight(130);
-        body.setWidth(900);
+        body.setHeight("*");
         body.setDisabled(false);
 
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
@@ -257,9 +255,10 @@ public class CreateQuery extends AbstractFormLayout {
         body.setTextAlign(Alignment.LEFT);
         body.setShowTitle(false);
         body.setWidth("*");
+       
 
 
-        addField100("Body", body);
+        addFieldResponsiveHeight("Body", body);
         addMember(helpButton);
         addButtons(saveButton, testButton);
 
@@ -283,9 +282,6 @@ public class CreateQuery extends AbstractFormLayout {
                 //bodyd=bodyd.replaceAll("\\s{2,}", " ");
                 bodyRemplace = bodyRemplace.replaceAll("[\r\n]{2,}", "\r\n");
                 // String des=description.getValue().replaceFirst("<br>","");
-
-
-
 
                 //queryversiob,queryid
                 String desc = description.getValue().trim();
