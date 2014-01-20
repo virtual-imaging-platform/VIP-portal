@@ -9,6 +9,7 @@ import com.google.gwt.http.client.UrlBuilder;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import static fr.insalyon.creatis.vip.query.client.rpc.QueryService.SERVICE_URI;
+import java.util.List;
 
 /**
  *
@@ -30,4 +31,5 @@ public interface EndPointSparqlService extends RemoteService {
     }
 
     String getUrlResult(String param1, String param2);
+    List<String[]> getUrlResultFormatTable(String param1);
 }

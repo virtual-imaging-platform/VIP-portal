@@ -5,6 +5,7 @@
 package fr.insalyon.creatis.vip.query.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import java.util.List;
 
 /**
  *
@@ -13,4 +14,5 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public interface EndPointSparqlServiceAsync {
 
     public void getUrlResult(String param1, String param2, AsyncCallback<String> asyncCallback);
+    public void getUrlResultFormatTable(String param1, AsyncCallback <List<String[]>> asyncCallback);
 }
