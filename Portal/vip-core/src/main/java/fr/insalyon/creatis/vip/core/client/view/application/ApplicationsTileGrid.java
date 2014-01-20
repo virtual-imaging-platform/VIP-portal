@@ -56,8 +56,8 @@ public abstract class ApplicationsTileGrid extends TileGrid {
         this.tileName = tileName;
         this.setTileWidth(120);
         this.setTileHeight(130);
-        this.setWidth100();
-        this.setHeight100();
+        this.setWidth("100%");
+        this.setHeight(400);
         this.setOverflow(Overflow.VISIBLE);
         this.setBorder("0px");
         this.setCanReorderTiles(true);
@@ -105,6 +105,10 @@ public abstract class ApplicationsTileGrid extends TileGrid {
 
         this.setFields(imageField, commonNameField, applicationVersion);
         this.setData(new ApplicationTileRecord[]{});
+       if( this.isElementSet==false){
+           this.setHeight("100%");
+       }
+        this.redraw();
 
 
 
@@ -122,13 +126,14 @@ public abstract class ApplicationsTileGrid extends TileGrid {
     protected void addApplication(String applicationName, String applicationImage) {
 
         addApplication(new ApplicationTileRecord(applicationName, applicationImage));
-
+         this.setHeight("100%");
+        
     }
 
     protected void addApplication(String applicationName, String version, String applicationImage) {
 
         addApplication(new ApplicationTileRecord(applicationName, version, applicationImage));
-
+       this.setHeight("100%");
 
 
     }
@@ -136,7 +141,7 @@ public abstract class ApplicationsTileGrid extends TileGrid {
     protected void addApplication(ApplicationTileRecord record) {
 
         this.addData(record);
-
+         this.setHeight("100%");
 
     }
 
