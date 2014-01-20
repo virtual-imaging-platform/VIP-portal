@@ -719,13 +719,15 @@ public class WorkflowBusiness {
                 path = path.substring(0, path.indexOf("/"));
             }
 
-            if (!groups.contains(path)) {
+            if (!DataManagerUtil.getPaths(groups).contains(path)) {
                 logger.error("User '" + user + "' tried to access data from a non-autorized group: " + path + "");
                 throw new BusinessException("Access denied to group '" + path + "'.");
             }
         }
     }
 
+   
+    
     /**
      *
      * @param list

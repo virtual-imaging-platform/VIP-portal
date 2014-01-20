@@ -43,6 +43,8 @@ import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import java.io.File;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -93,6 +95,18 @@ public class DataManagerUtil {
         return baseDir;
     }
 
+    /**
+     *
+     * @param groups
+     * @return
+     */
+     public static List<String> getPaths(List<String> groups){
+        ArrayList<String> paths = new ArrayList();
+        for(String s : groups)
+            paths.add(s.replaceAll(" ", "_"));
+        return paths;
+    }
+    
     /**
      *
      * @param baseDir

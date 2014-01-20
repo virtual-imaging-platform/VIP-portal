@@ -1068,7 +1068,7 @@ public class ConfigurationBusiness {
         }
     }
 
-    private User getUserWithSession(String email) throws DAOException {
+    public User getUserWithSession(String email) throws DAOException {
         UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
 
         String session = UUID.randomUUID().toString();
