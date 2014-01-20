@@ -114,6 +114,16 @@ public class FieldUtil {
         form.setFields(items);
         return form;
     }
+     public static DynamicForm getFormOneColumnResponsiveHeight(FormItem... items) {
+
+        DynamicForm form = new DynamicForm();
+        form.setWidth100();
+        form.setHeight("*"); 
+        form.setNumCols(1);
+        form.setFields(items);
+        return form;
+    }
+    
     
      public static DynamicForm getFormOneColumn(FormItem... items) {
 
