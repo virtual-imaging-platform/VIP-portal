@@ -3,8 +3,12 @@
  * and open the template in the editor.
  */
 package fr.insalyon.creatis.vip.query.client.view.monitor;
+
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.smartgwt.client.data.Record;
 import com.smartgwt.client.widgets.calendar.*;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.DateDisplayFormat;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.Canvas;
@@ -13,7 +17,9 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.FormItemValueFormatter;
 import com.smartgwt.client.widgets.form.fields.DateItem;
+import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangeHandler;
@@ -25,6 +31,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.query.client.view.QueryConstants;
+import java.util.Date;
 
 /**
  *
@@ -34,10 +41,9 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
 
     VLayout layout;
     TextAreaItem body;
-   
 
     public CheckboxTreeRestriction() {
-         super("30%","100%");
+        super("30%","100%");
         layout = new VLayout();
         layout.setMembersMargin(5);
         this.addMember(layout);
@@ -116,7 +122,7 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
 
                 }
             });
-            
+
             IButton b2 = new IButton();
             b2.setWidth(50);
             b2.setHeight(50);
@@ -152,20 +158,40 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
                 }
             });
 
+
+            IButton b4 = new IButton();
+            b4.setWidth(50);
+            b4.setHeight(50);
+            b4.setTitle("!=");
+            final String tile4 = b4.getTitle();
+            b4.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    if (body.getValueAsString() == null) {
+                        body.setValue("" + tile4);
+                    } else {
+                        body.setValue(body.getValueAsString() + " " + tile4);
+                    }
+
+
+                }
+            });
+
+
             IButton saveButton = WidgetUtil.getIButton("Add Restriction", CoreConstants.ICON_SAVE,
                     new ClickHandler() {
                 ///nouha// String body_val=null;
                 @Override
                 public void onClick(ClickEvent event) {
                     //save condition
-                  
+
                     getQueryExplorerTb().addRestriction(body.getValueAsString());
                     getQueryExplorerTb().refrechGrid();
-                    
+
 
                 }
             });
-             
+
             IButton resetButton = WidgetUtil.getIButton("Reset", QueryConstants.ICON_LAUNCH,
                     new ClickHandler() {
                 @Override
@@ -183,6 +209,7 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
             l.addMember(b1);
             l.addMember(b2);
             l.addMember(b3);
+            l.addMember(b4);
 
             l.setMembersMargin(5);
             layout.addMember(label);
@@ -260,20 +287,58 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
                 }
             });
 
+            IButton b4 = new IButton();
+            b4.setWidth(50);
+            b4.setHeight(50);
+            b4.setTitle("!=");
+            final String tile4 = b4.getTitle();
+            b4.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    if (body.getValueAsString() == null) {
+                        body.setValue("" + tile4);
+                    } else {
+                        body.setValue(body.getValueAsString() + " " + tile4);
+                    }
+
+
+                }
+            });
+
+
+
+            IButton b5 = new IButton();
+            b5.setWidth(50);
+            b5.setHeight(50);
+            b5.setTitle("regex");
+
+            b5.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    if (body.getValueAsString() == null) {
+                        body.setValue("" + "regex:value");
+                    } else {
+                        body.setValue(body.getValueAsString() + " " + "regex:value");
+                    }
+
+
+                }
+            });
+
             IButton saveButton = WidgetUtil.getIButton("Add Restriction", CoreConstants.ICON_SAVE,
                     new ClickHandler() {
                 ///nouha// String body_val=null;
                 @Override
                 public void onClick(ClickEvent event) {
                     //save condition
-                 
+
                     getQueryExplorerTb().addRestriction(body.getValueAsString());
                     getQueryExplorerTb().refrechGrid();
-                    
+
 
                 }
             });
-            
+
 
 
             IButton resetButton = WidgetUtil.getIButton("Reset", QueryConstants.ICON_LAUNCH,
@@ -291,6 +356,8 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
             l.addMember(b0);
             l.addMember(b);
             l.addMember(b3);
+            l.addMember(b4);
+            l.addMember(b5);
 
             l.setMembersMargin(5);
             layout.addMember(label);
@@ -407,20 +474,39 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
                 }
             });
 
+
+            IButton b4 = new IButton();
+            b4.setWidth(50);
+            b4.setHeight(50);
+            b4.setTitle("!=");
+            final String tile4 = b4.getTitle();
+            b4.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    if (body.getValueAsString() == null) {
+                        body.setValue("" + tile4);
+                    } else {
+                        body.setValue(body.getValueAsString() + " " + tile4);
+                    }
+
+
+                }
+            });
+
             IButton saveButton = WidgetUtil.getIButton("Add Restriction", CoreConstants.ICON_SAVE,
                     new ClickHandler() {
                 ///nouha// String body_val=null;
                 @Override
                 public void onClick(ClickEvent event) {
                     //save condition
-                  
+
                     getQueryExplorerTb().addRestriction(body.getValueAsString());
                     getQueryExplorerTb().refrechGrid();
-                    
+
 
                 }
             });
-             
+
 
 
 
@@ -433,56 +519,62 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
             });
 
             hlayoutbuttons.addMembers(saveButton, resetButton);
-            
-            DynamicForm df=new DynamicForm();
-            //df.setNumCols(1);
+
+            DynamicForm df = new DynamicForm();
             df.setWidth100();
-            DateItem date = new DateItem();  
-            date.setName("Date");  
+            DateItem date = new DateItem();
+            date.setName("Date");
             date.setShowTitle(false);
-            date.setUseTextField(false);
-            date.addChangeHandler(new ChangeHandler() {
-			public void onChange(ChangeEvent event) {
-                             if (body.getValueAsString() == null) {
-                        body.setValue("" + event.getValue().toString());
+            date.setUseTextField(true);
+
+            date.setEditorValueFormatter(new FormItemValueFormatter() {
+                public String formatValue(Object value, Record record, DynamicForm form, FormItem item) {
+
+                    if (value != null && value instanceof Date) {
+                        return "\"" + DateTimeFormat.getFormat("yyyy-MM-dd").format((Date) value) + "\"" + "^^xsd:date";
                     } else {
-                        body.setValue(body.getValueAsString() + " " + event.getValue().toString());
+                        return null;
                     }
-			
-                      
-			}
-		});
+
+                }
+            });
+
+
+            date.addChangeHandler(new ChangeHandler() {
+                public void onChange(ChangeEvent event) {
+                    if (body.getValueAsString() == null) {
+                        body.setValue("" + event.getValue());
+
+                    } else {
+                        body.setValue(body.getValueAsString() + " " + event.getValue());
+                    }
+                }
+            });
 
             df.setFields(date);
 
             Canvas[] children = layout.getChildren();
             layout.removeMembers(children);
-            
+
             l.addMember(b0);
             l.addMember(b);
             l.addMember(b1);
             l.addMember(b2);
             l.addMember(b3);
-
+            l.addMember(b4);
             l.setMembersMargin(5);
-
-
-
             layout.addMember(label);
-
             layout.addMember(l);
             layout.addMember(df);
-
             layout.addMember(FieldUtil.getForm(body));
             layout.addMember(hlayoutbuttons);
- 
-        }
-        else{
-            
+
+        } else {
+
             Canvas[] children = layout.getChildren();
             layout.removeMembers(children);
         }
-        
+
 
 
     }

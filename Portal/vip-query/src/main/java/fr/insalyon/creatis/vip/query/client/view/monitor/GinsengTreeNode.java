@@ -12,7 +12,7 @@ import com.smartgwt.client.widgets.tree.TreeNode;
  */
 public class GinsengTreeNode extends TreeNode {
 
-    public GinsengTreeNode(String Id, String reportsTo, String name, String type, boolean isOpen, String restriction,boolean select) {
+    public GinsengTreeNode(String Id, String reportsTo, String name, String type, boolean isOpen, String restriction,boolean select,String value ) {
         setAttribute("Id", Id);
         setAttribute("ReportsTo", reportsTo);
         setAttribute("Name", name);
@@ -20,6 +20,8 @@ public class GinsengTreeNode extends TreeNode {
         setAttribute("isOpen", isOpen);
         setAttribute("Restriction", restriction);
         setAttribute("Select", select);
+         setAttribute("Value", value);
+        setAttribute("isSelected", select);
 
     }
 }
