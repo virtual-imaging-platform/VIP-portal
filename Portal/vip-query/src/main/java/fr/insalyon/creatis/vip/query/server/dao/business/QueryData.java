@@ -11,10 +11,12 @@ import fr.insalyon.creatis.vip.query.client.bean.Parameter;
 import fr.insalyon.creatis.vip.query.client.bean.QueryExecution;
 import fr.insalyon.creatis.vip.query.client.bean.QueryVersion;
 import fr.insalyon.creatis.vip.query.client.bean.Value;
+import static fr.insalyon.creatis.vip.query.server.dao.business.QueryData.html2text;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
+import org.jsoup.Jsoup;
 
 /**
  *
@@ -389,10 +391,6 @@ public class QueryData implements QueryDAO {
 
 
         } catch (SQLException ex) {
-            //if (ex.getMessage().contains("Duplicate entry")) {
-            // logger.error("An application named \"" + application.getName() + "\" already exists.");
-            //throw new DAOException("An application named \"" + application.getName() + "\" already exists.");
-            // } else {
             logger.error(ex);
             throw new DAOException(ex);
         }
@@ -407,7 +405,7 @@ public class QueryData implements QueryDAO {
                     "INSERT INTO QueryVersion(queryVersion, queryID, body, dateCreation,description) VALUES (?, ?, ?, ?, ? )", PreparedStatement.RETURN_GENERATED_KEYS);
             ps2.setLong(1, version.getQueryVersion());
             ps2.setObject(2, version.getQueryID());
-            ps2.setString(3, version.getBody());
+            ps2.setString(3, html2text(version.getBody()));
             ps2.setTimestamp(4, getCurrentTimeStamp());
             ps2.setString(5, version.getDescription());
             ps2.execute();
@@ -590,16 +588,17 @@ public class QueryData implements QueryDAO {
 
     @Override
     public Long addQueryExecution(QueryExecution queryExecution) throws DAOException {
+         if(queryExecution.getQueryVersionID()!=null){
         try {
-
+           
             PreparedStatement ps = connection.prepareStatement(
                     "INSERT INTO QueryExecution(queryVersionID, dateExecution, executer,status, name, bodyResult) VALUES (?, ?, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
-            ps.setLong(1, queryExecution.getQueryVersionID());
+            ps.setLong(1,queryExecution.getQueryVersionID()); 
             ps.setTimestamp(2, getCurrentTimeStamp());
             ps.setString(3, queryExecution.getExecuter());
             ps.setString(4, queryExecution.getStatus());
             ps.setString(5, queryExecution.getName());
-            ps.setString(6, queryExecution.getBodyResult());
+            ps.setString(6, html2text(queryExecution.getBodyResult()));
             ps.execute();
             ResultSet rs = ps.getGeneratedKeys();
             Long idAuto_increment = new Long(0);
@@ -614,6 +613,39 @@ public class QueryData implements QueryDAO {
             logger.error(ex);
             throw new DAOException(ex);
         }
+          }
+          else{
+          
+               logger.error("else");
+                try {
+           
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO QueryExecution(dateExecution, executer,status, name, bodyResult) VALUES (?, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
+           
+            ps.setTimestamp(1, getCurrentTimeStamp());
+            ps.setString(2, queryExecution.getExecuter());
+            ps.setString(3, queryExecution.getStatus());
+            ps.setString(4, queryExecution.getName());
+            ps.setString(5, html2text(queryExecution.getBodyResult()));
+            ps.execute();
+            ResultSet rs = ps.getGeneratedKeys();
+            Long idAuto_increment = new Long(0);
+            while (rs.next()) {
+                idAuto_increment = rs.getLong(1);
+            }
+
+            ps.close();
+            return idAuto_increment;
+        } catch (SQLException ex) {
+
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+          
+          
+          
+         }
+          
     }
 
     @Override
@@ -625,9 +657,19 @@ public class QueryData implements QueryDAO {
                         + "queryExecutionID,name,queryName,queryVersion,executer,dateExecution,status,bodyResult,pathFileResult,dateEndExecution FROM "
                         + "Query query,QueryVersion queryversion,QueryExecution queryexe WHERE "
                         + "query.queryID=queryversion.queryID AND queryversion.queryVersionID=queryexe.queryVersionID "
-                        + "ORDER BY queryexe.dateExecution DESC");
+                        + "UNION "
+                        + "SELECT "
+                        + "queryExecutionID,name,name as queryName,queryVersionID,executer,dateExecution,status,bodyResult,pathFileResult,dateEndExecution FROM "
+                        + "QueryExecution queryexe WHERE "
+                        + "queryexe.queryVersionID IS NULL "  
+                        + "ORDER BY dateExecution DESC");
+                
+               
+          
 
                 ResultSet rs = ps.executeQuery();
+             
+               
                 List<String[]> queries = new ArrayList<String[]>();
 
                 while (rs.next()) {
@@ -646,7 +688,8 @@ public class QueryData implements QueryDAO {
                     String dateEnd = rs.getString("dateEndExecution");
                     Long id = rs.getLong("queryExecutionID");
                     Long version = rs.getLong("queryVersion");
-                    queries.add(new String[]{id.toString(), rs.getString("name"), rs.getString("queryName"), version.toString(), fullNameExecuter, date.toString(), rs.getString("status"), rs.getString("bodyResult"), rs.getString("pathFileResult"), dateEnd});
+                    logger.error(version);
+                    queries.add(new String[]{id.toString(), rs.getString("name"), rs.getString("queryName"),version.toString(), fullNameExecuter, date.toString(), rs.getString("status"), rs.getString("bodyResult"), rs.getString("pathFileResult"), dateEnd});
                 }
                 ps.close();
                 return queries;
@@ -655,15 +698,23 @@ public class QueryData implements QueryDAO {
                 logger.error(ex);
                 throw new DAOException(ex);
             }
-        } else {
+        } else  {
 
             try {
                 PreparedStatement ps = connection.prepareStatement("SELECT "
                         + "queryExecutionID,name,queryName,queryVersion,executer,dateExecution,status,bodyResult,pathFileResult,dateEndExecution FROM "
                         + "Query query,QueryVersion queryversion,QueryExecution queryexe WHERE "
-                        + "query.queryID=queryversion.queryID AND queryversion.queryVersionID=queryexe.queryVersionID AND queryexe.executer=?"
-                        + "ORDER BY queryexe.dateExecution DESC");
+                        + "query.queryID=queryversion.queryID AND queryversion.queryVersionID=queryexe.queryVersionID AND queryexe.executer=? "
+                        + "UNION "
+                        + "SELECT "
+                        + "queryExecutionID,name,name as queryName,queryVersionID,executer,dateExecution,status,bodyResult,pathFileResult,dateEndExecution FROM "
+                        + "QueryExecution queryexe WHERE "
+                        + "queryexe.queryVersionID IS NULL AND executer=? "  
+                        + "ORDER BY dateExecution DESC");
+                
+               
                 ps.setString(1, executer);
+                ps.setString(2, executer);
                 ResultSet rs = ps.executeQuery();
 
                 List<String[]> queries = new ArrayList<String[]>();
@@ -693,6 +744,7 @@ public class QueryData implements QueryDAO {
                 throw new DAOException(ex);
             }
         }
+       
     }
 
     @Override
@@ -707,7 +759,7 @@ public class QueryData implements QueryDAO {
                 String body = new String();
                 while (rs.next()) {
                     body = rs.getString("body");
-                    logger.error("body" + body);
+              
                 }
                 ps.close();
                 return body;
@@ -825,4 +877,8 @@ public class QueryData implements QueryDAO {
         return new java.sql.Timestamp(today.getTime());
 
     }
+    public static String html2text(String html) {
+    return Jsoup.parse(html).text();
+    
+}
 }

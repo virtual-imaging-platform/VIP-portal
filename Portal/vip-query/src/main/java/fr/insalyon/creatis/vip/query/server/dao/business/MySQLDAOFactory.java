@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author Rafael Ferreira da Silva
+ * @author Nouha Boujelben
  */
 public class MySQLDAOFactory extends QueryDAOFactory {
 
@@ -27,8 +27,7 @@ public class MySQLDAOFactory extends QueryDAOFactory {
             logger.info("Configuring VIP Query database.");
 
             PlatformConnection.getInstance().createTable("Query",
-                    "queryID BIGINT(20) AUTO_INCREMENT, "
-                    
+                    "queryID BIGINT(20) AUTO_INCREMENT, "   
                     + "queryMaker VARCHAR(255), "
                     + "queryName VARCHAR(255), "
                     + "PRIMARY KEY (queryID), "
@@ -69,7 +68,7 @@ public class MySQLDAOFactory extends QueryDAOFactory {
                     + "bodyResult VARCHAR(1000), "
                     + "pathFileResult VARCHAR(1000), "
                     + "PRIMARY KEY (queryExecutionID), "
-                    + "FOREIGN KEY (queryVersionID) REFERENCES QueryVersion(queryVersionID) "
+                    + "FOREIGN KEY (queryVersionID) REFERENCES QueryVersion(queryVersionID) NULL "
                     + "ON DELETE RESTRICT ON UPDATE RESTRICT");
 
             PlatformConnection.getInstance().createTable("Value",
@@ -82,9 +81,6 @@ public class MySQLDAOFactory extends QueryDAOFactory {
                     + "ON DELETE CASCADE ON UPDATE RESTRICT, "
                     + "FOREIGN KEY (queryExecutionID) REFERENCES QueryExecution(queryExecutionID)"
                     + "ON DELETE CASCADE ON UPDATE RESTRICT");
-
-
-
 
         } catch (DAOException ex) {
             logger.error(ex);
