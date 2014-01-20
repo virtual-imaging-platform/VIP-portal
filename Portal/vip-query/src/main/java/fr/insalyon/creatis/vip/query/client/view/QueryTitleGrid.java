@@ -25,40 +25,33 @@ import java.util.List;
  */
 public class QueryTitleGrid extends ApplicationsTileGrid {
 
-   // private List<String> applicationNames;
-     private HashMap<Key, String> map;
-    
-     private static QueryTitleGrid  instance;
-
-    // Singleton
-    
-     public static QueryTitleGrid getInstance() {
+    // private List<String> applicationNames;
+    private HashMap<QueryTitleGrid.Key, String> map;
+    private static QueryTitleGrid instance;
+ 
+    public static QueryTitleGrid getInstance() {
         if (instance == null) {
             instance = new QueryTitleGrid();
         }
-        
+
         return instance;
     }
-     
+
     public QueryTitleGrid() {
         super("My Queries");
         this.setID(id);
-        //applicationNames = new ArrayList<String>();
         loadApplications();
     }
 
-   
     /**
      *
      * @param queryName
      * @param queryVersion
      */
-    
-    
     @Override
     public void parse(String queryName, String queryVersion) {
         String queryVersionID;
-        queryVersionID = map.get(new Key(queryName, queryVersion));
+        queryVersionID = map.get(new QueryTitleGrid.Key(queryName, queryVersion));
         Layout.getInstance().addTab(new QueryLaunchTab(queryName, queryVersionID, queryVersion));
 
     }
@@ -74,20 +67,19 @@ public class QueryTitleGrid extends ApplicationsTileGrid {
 
             @Override
             public void onSuccess(List<String[]> result) {
-                map = new HashMap<Key, String>();
+                map = new HashMap<QueryTitleGrid.Key, String>();
                 for (String[] q : result) {
                     //name,version,image
-                   
-                    addApplication(q[0], "v." + q[2], QueryConstants.APP_IMG_QUERY); 
-                    map.put(new Key(q[0], "v." + q[2]), q[3]);
-                   // applicationNames.add(q[0] + " " + q[2]);
-                   
-                    
+
+                    addApplication(q[0], "v." + q[2], QueryConstants.APP_IMG_QUERY);
+                    map.put(new QueryTitleGrid.Key(q[0], "v." + q[2]), q[3]);
+
+
                 }
             }
         };
         QueryService.Util.getInstance().getQueries(callback);
-        
+
     }
 
     public class Key {
@@ -107,8 +99,8 @@ public class QueryTitleGrid extends ApplicationsTileGrid {
 
         @Override
         public boolean equals(Object obj) {
-            if (obj != null && obj instanceof Key) {
-                Key s = (Key) obj;
+            if (obj != null && obj instanceof QueryTitleGrid.Key) {
+                QueryTitleGrid.Key s = (QueryTitleGrid.Key) obj;
                 return name.equals(s.name) && version.equals(s.version);
             }
             return false;
@@ -119,17 +111,12 @@ public class QueryTitleGrid extends ApplicationsTileGrid {
             return (name + version).hashCode();
         }
     }
-    
-   
 
-    
-    
-    public void addQuery(){
-          // addApplication(queryName, "v." + version, QueryConstants.APP_IMG_QUERY);   
-          // map.put(new Key(queryName, "v." + version), versionID);
-           loadApplications();
-          
-          
-           
+    public void addQuery() {
+
+        loadApplications();
+
+
+
     }
 }
