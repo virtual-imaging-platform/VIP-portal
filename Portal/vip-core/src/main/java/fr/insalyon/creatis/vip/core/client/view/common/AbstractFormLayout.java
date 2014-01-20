@@ -112,6 +112,12 @@ public abstract class AbstractFormLayout extends VLayout {
         this.addMember(WidgetUtil.getLabel("<b>" + title + "</b>", 15));
         this.addMember(FieldUtil.getFormOneColumn(item));
     }
+     
+      public void addFieldResponsiveHeight(String title, FormItem item) {
+
+        this.addMember(WidgetUtil.getLabel("<b>" + title + "</b>", 15));
+        this.addMember(FieldUtil.getFormOneColumnResponsiveHeight(item));
+    }
     /**
      * Adds a set of buttons displayed in line.
      * 
