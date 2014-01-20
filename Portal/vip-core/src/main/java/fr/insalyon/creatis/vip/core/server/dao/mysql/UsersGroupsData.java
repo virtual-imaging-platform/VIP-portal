@@ -93,7 +93,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
         try {
             PreparedStatement ps = connection.prepareStatement(
                     "SELECT g.groupname, g.public, g.gridfile, g.gridjobs, role "
-                    + "FROM VIPGroups g LEFT JOIN VIPUsersGroups ug "
+                    + "FROM VIPGroups g JOIN VIPUsersGroups ug "
                     + "ON g.groupname = ug.groupname AND email = ?");
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();

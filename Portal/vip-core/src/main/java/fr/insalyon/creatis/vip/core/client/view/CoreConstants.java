@@ -147,7 +147,7 @@ public class CoreConstants implements IsSerializable {
     public static final String COOKIES_SESSION = "vip-cookie-session";
     public static final String SESSION_USER = "vip-user";
     public static final String SESSION_GROUPS = "vip-groups";
-    public static final Date COOKIES_EXPIRATION_DATE = new Date(new Date().getTime() + (1000l * 60 * 60 * 24 * 7));
+    public static final Date COOKIES_EXPIRATION_DATE = new Date(new Date().getTime() + (1000l * 60 * 60 * 24 * 7)); //cookies are valid for a week
     // Account Type
     public static final String ACCOUNT_OTHER = "Other";
     // Roles and Groups
