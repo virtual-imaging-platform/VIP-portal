@@ -30,8 +30,12 @@ public class QueryExecution implements IsSerializable {
         this.status = status;
         this.name = name;
         this.bodyResult = bodyResult;
+    } 
+    public QueryExecution(String status, String name, String bodyResult) { 
+        this.status = status;
+        this.name = name;
+        this.bodyResult = bodyResult;
     }
-
     public Long getQueryExecutionID() {
         return queryExecutionID;
     }
