@@ -10,9 +10,13 @@ import java.io.UnsupportedEncodingException;
 import org.apache.http.client.utils.URIBuilder;
 import java.lang.Object.*;
 import java.net.URI;
-
+import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.query.*;
+import fr.insalyon.creatis.vip.query.server.dao.business.QueryData;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,7 +27,7 @@ import java.util.logging.Logger;
  */
 public class EndPointSparqlServiceImpl extends RemoteServiceServlet
         implements EndPointSparqlService {
-
+ private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(EndPointSparqlServiceImpl.class);
     public String getUrlResult(String param1, String param2) {
         String url = null;
         String k = null;
@@ -48,6 +52,34 @@ public class EndPointSparqlServiceImpl extends RemoteServiceServlet
         
 
         return url;
+        
+    }
+    
+    
+   
+    
+     public List<String[]> getUrlResultFormatTable(String param1) {
+       
+   
+         Query query = QueryFactory.create(param1);
+         QueryExecution qexec = QueryExecutionFactory.sparqlService("http://ginseng.i3s.unice.fr:9000/sparql", param1);
+         ResultSet results = qexec.execSelect();
+         List<String[]> rslt = new ArrayList<String[]>();
+        
+
+         while (results.hasNext()) {
+             QuerySolution row = results.next();
+             //RDFNode thing = row.get("Concept");
+             //Literal label = row.getLiteral("label");
+           
+              rslt.add(new String[]{row.get("x").toString(),row.get("type").toString()});
+           
+             logger.info(row.get("x").toString() );
+         }
+       
+        
+
+        return rslt;
         
     }
     
