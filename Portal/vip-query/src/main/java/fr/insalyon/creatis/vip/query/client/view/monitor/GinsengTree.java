@@ -33,26 +33,53 @@ public class GinsengTree {
        
     public GinsengTree() {
         GinsengBaseData = new TreeNode[]{
-            
+
             
             //(String Id, String reportsTo, String name, String type, boolean isOpen, String restriction,boolean select,String value)
             new GinsengTreeNode("2", "1", "http://e-ginseng.org/graph/I3S", "nothing", false, "",true,""),
-            new GinsengTreeNode("3", "1", "http://e-ginseng.org/graph/IN2P3", "nothing", false, "",true,""),};
+            //new GinsengTreeNode("3", "1", "http://e-ginseng.org/graph/IN2P3", "nothing", false, "",true,""),
+        };
         
         GinsengData = new TreeNode[]{
-            new GinsengTreeNode("265", "1", "Person", "nothing", false, "",false,"?person rdf:type &lt;http://www.mnemotix.com/ontology/semEHR#Person&gt;"),
-            new GinsengTreeNode("264", "1", "MedicalBag", "nothing", false, "",false,"?medicalbag rdf:type &lt;http://www.mnemotix.com/ontology/semEHR#MedicalBag&gt;"),
-            new GinsengTreeNode("263", "1", "MedicalEvent", "nothing", false, "",false,"?medicalevent rdf:type &lt;http://www.mnemotix.com/ontology/semEHR#MedicalEvent&gt;"),
-
-//
-            new GinsengTreeNode("262", "1", "Clinical Variable", "nothing", false, "",false,"?clinicalvariable rdf:type &lt;http://www.mnemotix.com/ontology/semEHR#ClinicalVariable&gt;"),
+            /*
+            new GinsengTreeNode("4", "1", "MedicaEvent", "nothing", false, "",false,"?medicalevent rdf:type &lt;http://www.mnemotix.com/ontology/semEHR#MedicaEvent&gt;"),
+            new GinsengTreeNode("5", "1", "MedicalBag", "nothing", false, "",false,"?medicalbag rdf:type &lt;http://www.mnemotix.com/ontology/semEHR#MedicalBag&gt;"),
+            new GinsengTreeNode("6", "1", "Address", "nothing", false, "",false,"?adresse rdf:type &lt;http://www.mnemotix.com/ontology/semEHR#Address&gt;"),
+            new GinsengTreeNode("7", "1", "ClinicalVariable", "nothing", false, "",false,"?clinicalvariable rdf:type &lt;http://www.mnemotix.com/ontology/semEHR#ClinicalVariable&gt;"),   
+            new GinsengTreeNode("8", "1", "Patient", "string", false, "",false,"?patient rdf:type &lt;http://www.mnemotix.com/ontology/semEHR#Patient&gt;"),
+            new GinsengTreeNode("9", "1", "Physician", "string", false, "",false,"?patient rdf:type &lt;http://www.mnemotix.com/ontology/semEHR#Physician&gt;"),
             
+            new GinsengTreeNode("10", "8", "MedicalBag", "string", false, "",false,"?patient &lt;http://www.mnemotix.com/ontology/semEHR#hasMedicalBag&gt; ?medicalbag"),
+            new GinsengTreeNode("11", "8", "birthDate", "date", false, "",false,"?patient &lt;http://www.mnemotix.com/ontology/semEHR#birthDate&gt; ?birthdate"),
+            new GinsengTreeNode("12", "8", "Adresse", "string", false, "",false,"?patient &lt;http://www.mnemotix.com/ontology/semEHR#address&gt; ?adresse"),
+            
+            */
+            
+
+           
+            new GinsengTreeNode("265", "1", "Patient", "string", false, "",false,"?patient rdf:type semehr:Patient"),
+
+           // new GinsengTreeNode("265", "1", "Person", "nothing", false, "",false,"?person rdf:type foaf:Person"),
+            new GinsengTreeNode("264", "1", "MedicalBag", "nothing", false, "",false,"?medicalbag rdf:type semehr:MedicalBag"),
+            new GinsengTreeNode("263", "1", "MedicalEvent", "nothing", false, "",false,"?medicalevent rdf:type semehr:MedicalEvent"),
+
+
+            new GinsengTreeNode("262", "1", "Clinical Variable", "nothing", false, "",false,"?clinicalvariable rdf:type semehr:ClinicalVariable"),
+            
+            
+            new GinsengTreeNode("277", "265", "MedicalBag", "string", false, "",false,"?patient semehr:hasMedicalBag ?medicalbag"),
+            new GinsengTreeNode("278", "265", "birthDate", "date", false, "",false,"?patient semehr:birthDate ?birthdate"),
+            new GinsengTreeNode("279", "265", "Adresse", "string", false, "",false,"?patient semehr:address ?adresse"),
+            
+            new GinsengTreeNode("280", "265", "FirstName", "string", false, "",false,"?patient  &lt;http://xmlns.com/foaf/0.1/firstName&gt; ?firstname"),
+            new GinsengTreeNode("281", "265", "LastName", "string", false, "",false,"?patient &lt;http://xmlns.com/foaf/0.1/lastName&gt; ?lastname"),
+            /*
             new GinsengTreeNode("105", "265", "FirstName", "string", false, "",false,"?person  &lt;http://xmlns.com/foaf/0.1/firstName&gt; ?firstname"),
-            new GinsengTreeNode("106", "265", "LastName", "string", false, "",false,"?person &lt;http://xmlns.com/foaf/0.1/lastName&gt; ?lastname "),
-            new GinsengTreeNode("4", "265", "Patient", "nothing", false, "",false,"?patient rdf:type &lt;http://www.mnemotix.com/ontology/semEHR#Patient&gt;"),
-            new GinsengTreeNode("5", "265", "Physician", "nothing", false, "",false,""),
-            new GinsengTreeNode("100", "265", "Adresse", "nothing", false, "",false,""),
-         
+            new GinsengTreeNode("106", "265", "LastName", "string", false, "",false,"?person &lt;http://xmlns.com/foaf/0.1/lastName&gt; ?lastname"),
+            new GinsengTreeNode("4", "265", "Patient", "nothing", false, "",false,"?person rdf:type semehr:Patient"),
+            new GinsengTreeNode("5", "265", "Physician", "nothing", false, "",false,"?person semehr:Physician ?pysician"),
+            new GinsengTreeNode("100", "265", "Adresse", "nothing", false, "",false,"?person semehr:address ?adresse"),
+         */
             new GinsengTreeNode("276", "263", "label", "nothing", false, "",false,"?Medical rdfs:label ?label"),
             new GinsengTreeNode("107", "263", "externalRefID", "int", false, "",false,""),
             new GinsengTreeNode("108", "263", "date", "date", false, "",false,""),
@@ -72,7 +99,7 @@ public class GinsengTree {
             new GinsengTreeNode("12", "262", "DernierFCV", "nothing", false, "",false,""),
             new GinsengTreeNode("13", "262", "DateDebutGrossesse", "nothing", false, "",false,""),
             
-            //new GinsengTreeNode("14", "4", "ID", "int", false, "",false,""),
+       /* 4,5
             new GinsengTreeNode("15", "4", "birthdate", "date", false, "",false,"?patient &lt;http://www.mnemotix.com/ontology/semEHR#birthDate&gt; ?birthdate "),
             new GinsengTreeNode("16", "4", "First Name", "string", false, "",false,"?patient &lt;http://xmlns.com/foaf/0.1/firstName&gt; ?firstname"),
             new GinsengTreeNode("17", "4", "Last Name", "string", false, "",false,"?patient &lt;http://xmlns.com/foaf/0.1/lastName&gt; ?lastname "),
@@ -92,7 +119,7 @@ public class GinsengTree {
             new GinsengTreeNode("26", "21", "Street", "string", false, "",false,""),
             new GinsengTreeNode("27", "21", "Zip", "string", false, "",false,""),
             new GinsengTreeNode("28", "21", "City", "city", false, "",false,""),
-            
+            **/
             new GinsengTreeNode("29", "6", "externalRefID", "int", false, "",false,""),
             new GinsengTreeNode("30", "6", "date", "date", false, "",false,""),
             new GinsengTreeNode("31", "6", "hasPysician", "nothing", false, "",false,""),
@@ -131,9 +158,12 @@ public class GinsengTree {
             new GinsengTreeNode("60", "13", "value", "string", false, "",false,""),
             new GinsengTreeNode("61", "13", "unit", "string", false, "",false,""),
             //Medical Bag
+            
+            /*
             new GinsengTreeNode("62", "45", "description", "string", false, "",false,""),
             new GinsengTreeNode("63", "45", "date", "date", false, "",false,""),
             new GinsengTreeNode("64", "45", "hasMedicalEvent", "nothing", false, "",false,""),
+            * **/
             //Medical Event
             new GinsengTreeNode("65", "43", "Baby", "nothing", false, "",false,""),
             new GinsengTreeNode("66", "43", "FCV", "nothing", false, "",false,""),
@@ -331,11 +361,13 @@ public class GinsengTree {
             new GinsengTreeNode("164", "99", "unit", "string", false, "",false,""),
             
             //ADRESSE
+            
+            /*
             new GinsengTreeNode("101", "100", "Number", "int", false, "",false,""),
             new GinsengTreeNode("102", "100", "Street", "nothing", false, "",false,""),
             new GinsengTreeNode("103", "100", "Zip", "string", false, "",false,""),
             new GinsengTreeNode("104", "100", "City", "city", false, "",false,""),
-            
+            **/
             new GinsengTreeNode("114", "109", "First Name", "string", false, "",false,""),
             new GinsengTreeNode("115", "109", "Last Name", "string", false, "",false,""),
             new GinsengTreeNode("116", "109", "Adresse", "nothing", false, "",false,""),
