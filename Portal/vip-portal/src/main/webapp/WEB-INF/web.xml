@@ -19,6 +19,14 @@
         <servlet-name>GetFileService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/getfileservice</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>SamlAuthenticationService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.core.server.rpc.SamlAuthenticationServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SamlAuthenticationService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/samlauthenticationservice</url-pattern>
+    </servlet-mapping>
     <!-- End Core Module -->
     
     <!-- Provenance Module -->

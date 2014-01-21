@@ -34,6 +34,7 @@ package fr.insalyon.creatis.vip.core.client.view;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -41,7 +42,7 @@ import java.util.Date;
  */
 public class CoreConstants implements IsSerializable {
 
-    public static final String VERSION = "v1.5.2";
+    public static final String VERSION = "v1.6";
     // Configuration Labels
     public static final String LAB_DB_HOST = "database.server.host";
     public static final String LAB_DB_PORT = "database.server.port";
@@ -155,6 +156,8 @@ public class CoreConstants implements IsSerializable {
     public static final String GROUP_DROPBOX = "Dropbox";
     // ssh
     public static final String SSH_PUBLIC_KEY = "ssh.publickey";
+    
+    public static final String SAML_TRUSTED_CERTIFICATE="saml.trusted.certificates";
 
     public static enum GROUP_ROLE implements IsSerializable {
 
