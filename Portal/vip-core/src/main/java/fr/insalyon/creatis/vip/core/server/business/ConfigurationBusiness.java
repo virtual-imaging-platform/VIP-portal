@@ -76,7 +76,7 @@ public class ConfigurationBusiness {
 
         try {
             logger.info("Configuring VIP server proxy.");
-           ProxyClient myproxy = new ProxyClient();
+            ProxyClient myproxy = new ProxyClient();
             myproxy.getProxy();
 
         } catch (Exception ex) {
@@ -128,7 +128,7 @@ public class ConfigurationBusiness {
         }
     }
 
-    public void signup(User user, String comments, boolean createdFromCAS, boolean mapPrivateGroups, String... accountType) throws BusinessException {
+    public void signup(User user, String comments, boolean automaticCreation, boolean mapPrivateGroups, String... accountType) throws BusinessException {
         try {
             user.setCode(UUID.randomUUID().toString());
             user.setPassword(MD5.get(user.getPassword()));
@@ -147,15 +147,16 @@ public class ConfigurationBusiness {
             CoreDAOFactory.getDAOFactory().getUserDAO().add(user);
 
             // Adding user to groups
-            for (Group group : CoreDAOFactory.getDAOFactory().getAccountDAO().getGroups(accountType)) {
-                if (mapPrivateGroups || createdFromCAS || group.isPublicGroup()) {
+            List<Group> groups = CoreDAOFactory.getDAOFactory().getAccountDAO().getGroups(accountType);
+            for (Group group : groups) {
+                if (mapPrivateGroups || automaticCreation || group.isPublicGroup()) {
                     CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().add(user.getEmail(), group.getName(), GROUP_ROLE.User);
                 } else {
                     logger.info("Don't map user " + user.getEmail() + " to private group " + group.getName());
                 }
             }
 
-            if (!createdFromCAS) {
+            if (!automaticCreation) {
                 String emailContent = "<html>"
                         + "<head></head>"
                         + "<body>"
@@ -206,18 +207,25 @@ public class ConfigurationBusiness {
                             new String[]{email}, true, user.getEmail());
                 }
             } else {
+                StringBuilder groupNames = new StringBuilder();
+                for (Group group : groups) {
+                    if (groupNames.length() > 0) {
+                        groupNames.append(", ");
+                    }
+                    groupNames.append(group.getName());
+                }
                 String adminsEmailContents = "<html>"
                         + "<head></head>"
                         + "<body>"
                         + "<p>Dear Administrators,</p>"
-                        + "<p>The following account was automatically created for a CAS user:</p>"
+                        + "<p>The following account was automatically created:</p>"
                         + "<p><b>First Name:</b> " + user.getFirstName() + "</p>"
                         + "<p><b>Last Name:</b> " + user.getLastName() + "</p>"
                         + "<p><b>Email:</b> " + user.getEmail() + "</p>"
                         + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
                         + "<p><b>Phone:</b> " + user.getPhone() + "</p>"
                         + "<p><b>Country:</b> " + user.getCountryCode().getCountryName() + "</p>"
-                        + "<p><b>Account Type:</b> " + accountType + "</p>"
+                        + "<p><b>Accounts:</b> " + groups.toString() + "</p>"
                         + "<p><b>Comments:</b><br />" + comments + "</p>"
                         + "<p>&nbsp;</p>"
                         + "<p>Best Regards,</p>"
@@ -333,6 +341,36 @@ public class ConfigurationBusiness {
 
     }
 
+    public User getNewUser(String email, String firstName, String lastName) {
+        CountryCode cc = CountryCode.aq;
+
+        String country = "";
+
+        try {
+            country = email.substring(email.lastIndexOf('.') + 1);
+        } catch (NullPointerException e) {
+        }
+
+        try {
+            if (CountryCode.valueOf(country) != null) {
+                cc = CountryCode.valueOf(country);
+            }
+        } catch (IllegalArgumentException e) {
+            logger.info("Cannot determine country from email extension " + country + ": user will be mapped to Antartica");
+        }
+
+        User u = new User(
+                firstName.trim(),
+                lastName.trim(),
+                email.trim(),
+                "Unknown",
+                UUID.randomUUID().toString(),
+                "0000",
+                cc);
+
+        return u;
+    }
+
     private User getCASUser(String ticket, URL serviceURL) {
         //  String userId = null;
         if (ticket != null) {
@@ -361,33 +399,7 @@ public class ConfigurationBusiness {
                 last = n[0];
             }
 
-            CountryCode cc = CountryCode.aq;
-
-            String country = "";
-
-            try {
-                country = email.substring(email.lastIndexOf('.') + 1);
-            } catch (NullPointerException e) {
-            }
-
-            try {
-                if (CountryCode.valueOf(country) != null) {
-                    cc = CountryCode.valueOf(country);
-                }
-            } catch (IllegalArgumentException e) {
-                logger.info("Cannot determine country from email extension " + country + ": user will be mapped to Antartica");
-            }
-
-            User u = new User(
-                    first.trim(),
-                    last.trim(),
-                    email.trim(),
-                    "Unknown",
-                    UUID.randomUUID().toString(),
-                    "0000",
-                    cc);
-
-            return u;
+            return getNewUser(email, first, last);
         }
         return null;
     }
@@ -708,10 +720,6 @@ public class ConfigurationBusiness {
             throw new BusinessException(ex);
         }
     }
-    
-   
-    
-    
 
     /**
      *
@@ -728,10 +736,8 @@ public class ConfigurationBusiness {
             throw new BusinessException(ex);
         }
     }
-    
-       
-    
-  public List<Boolean> getUserPropertiesGroups(String email) throws BusinessException {
+
+    public List<Boolean> getUserPropertiesGroups(String email) throws BusinessException {
 
         try {
             return CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUserPropertiesGroups(email);
@@ -740,6 +746,7 @@ public class ConfigurationBusiness {
             throw new BusinessException(ex);
         }
     }
+
     /**
      *
      * @param groups
@@ -919,7 +926,7 @@ public class ConfigurationBusiness {
      * @param email
      * @param level
      * @param countryCode
-     * @param maxRunningSimulations 
+     * @param maxRunningSimulations
      * @throws BusinessException
      */
     public void updateUser(String email, UserLevel level, CountryCode countryCode,
@@ -1079,5 +1086,36 @@ public class ConfigurationBusiness {
 
     public String getLoginUrlCas(URL serviceURL) {
         return Server.getInstance().getCasURL() + "/login?service=" + serviceURL;
+    }
+
+    public User getOrCreateUser(String email) throws BusinessException {
+        User user;
+        try {
+            user = getUserWithSession(email);
+        } catch (DAOException ex) {
+            //User doesn't exist: let's create an account 
+            String name = email.substring(0, email.indexOf('@'));
+            String firstName = name, lastName = name;
+
+            String[] delimiters = {"\\.", "-", "_"};
+            for (String delimiter : delimiters) {
+                if (name.contains(".") && name.split(delimiter).length >= 2) {
+                    firstName = name.split(delimiter)[0];
+                    lastName = name.split(delimiter)[1];
+                    break;
+                }
+            }
+
+            user = getNewUser(email, firstName, lastName);
+            signup(user, "Generated from SAML ticket", true, true, Server.getInstance().getCasAccountType());
+            activateUser(user.getEmail());
+            try {
+                user = getUserWithSession(email);
+            } catch (DAOException ex1) {
+                throw new BusinessException(ex1);
+            }
+
+        }
+        return user;
     }
 }

@@ -526,13 +526,18 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @return
      * @throws BusinessException
      */
-    private User setUserSession(User user) throws BusinessException {
+    public User setUserSession(User user) throws BusinessException {
 
+        return setUserSession(user,getSession());
+        
+    }
+    
+    public User setUserSession(User user, HttpSession session) throws BusinessException {
         Map<Group, GROUP_ROLE> groups = configurationBusiness.getUserGroups(user.getEmail());
         user.setGroups(groups);
 
-        getSession().setAttribute(CoreConstants.SESSION_USER, user);
-        getSession().setAttribute(CoreConstants.SESSION_GROUPS, groups);
+        session.setAttribute(CoreConstants.SESSION_USER, user);
+        session.setAttribute(CoreConstants.SESSION_GROUPS, groups);
 
         return user;
     }
@@ -691,38 +696,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         }
     }
 
-//    /**
-//     *
-//     * @return @throws CoreException
-//     */
-//    @Override
-//    public String getCASLoginPageUrl() throws CoreException {
-//
-//        try {
-//            return configurationBusiness.getLoginUrlCas(getBaseURL());
-//
-//        } catch (MalformedURLException e) {
-//            throw new CoreException(e);
-//        }
-//    }
-//
-//    /**
-//     *
-//     * @return @throws MalformedURLException
-//     */
-//    private URL getBaseURL() throws MalformedURLException {
-//
-//        HttpServletRequest request = this.getThreadLocalRequest();
-//        return (request.getServerPort() == 80)
-//                || (request.getServerPort() == 443)
-//                ? new URL(request.getScheme() + "://"
-//                + request.getServerName()
-//                + request.getContextPath())
-//                : new URL(request.getScheme() + "://"
-//                + request.getServerName() + ":"
-//                + request.getServerPort()
-//                + request.getContextPath());
-//    }
     @Override
     public String getCASLoginPageUrl() throws CoreException {
         URL url = null;
@@ -823,16 +796,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         }
     }
 
-//    @Override
-//    public void getPostParameters() throws CoreException {
-//        trace(logger,"Getting post parameters");
-//       HttpSession session = this.getSession();
-//       String name = (String) session.getAttributeNames().nextElement();
-//       while(name !=null){
-//           trace(logger,"Found attribute "+session.getAttribute(name)+" for name "+name);
-//           
-//       }
-//    }
-        
+       
     }
    

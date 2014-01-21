@@ -110,6 +110,7 @@ public class Server {
     private String casAccountType;
     //ssh
     private String sshPublicKey;
+    private String samlTrustedCertificate;
 
     public static Server getInstance() {
         if (instance == null) {
@@ -128,6 +129,7 @@ public class Server {
             // Configuration File
             String confFilePath = configurationFolder + CONF_FILE;
             PropertiesConfiguration config = new PropertiesConfiguration(confFilePath);
+            logger.info("Loading config file: "+confFilePath);
 
             databaseServerHost = config.getString(CoreConstants.LAB_DB_HOST, "localhost");
             databaseServerPort = config.getInt(CoreConstants.LAB_DB_PORT, 9092);
@@ -185,7 +187,8 @@ public class Server {
             casAccountType = config.getString(CoreConstants.LAB_CAS_ACCOUNT_TYPE, "Neuroimaging");
 
             sshPublicKey = config.getString(CoreConstants.SSH_PUBLIC_KEY, "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAuNjIXlgjuBR+WfjGtkieecZfe/ZL6EyNJTbL14bn3/Soof0kFSshDJvFgSH1hNwMMU1hynLbzcEbLTyVMoGQKfQkq7mJPajy9g8878WCKxCRbXv3W1/HT9iab/qqt2dcRYnDEruHwgyELBhQuMAe2W2/mgjd7Y5PxE01bwDcenYl3cU3iJk1sAOHao6P+3xU6Ov+TD8K9aC0LzZpM+rzAmS9HOZ9nvzERExd7k4TUpyffQV9Dpb5jEnEViF3VHqplB8AbWDdcJbiVkUBUe4hQb7nmWP0kHl1+v5SQJ1B4mWCZ+35Rc/9b1GsmPnXg3qqhjeKbrim/NbcUwKr9NPWjQ== vip-services@kingkong.grid.creatis.insa-lyon.fr");
-
+            samlTrustedCertificate = config.getString(CoreConstants.SAML_TRUSTED_CERTIFICATE, System.getProperty( "user.home" )+File.separator+".vip"+File.separator+"trusted_saml_cert.pem");
+            
             config.setProperty(CoreConstants.LAB_DB_HOST, databaseServerHost);
             config.setProperty(CoreConstants.LAB_DB_PORT, databaseServerPort);
             config.setProperty(CoreConstants.LAB_ADMIN_FIRST_NAME, adminFirstName);
@@ -230,6 +233,7 @@ public class Server {
             config.setProperty(CoreConstants.LAB_CAS_URL, casURL);
             config.setProperty(CoreConstants.LAB_CAS_ACCOUNT_TYPE, casAccountType);
             config.setProperty(CoreConstants.SSH_PUBLIC_KEY, sshPublicKey);
+            config.setProperty(CoreConstants.SAML_TRUSTED_CERTIFICATE, samlTrustedCertificate);
 
             config.save();
 
@@ -421,4 +425,9 @@ public class Server {
     public String getSshPublicKey() {
         return sshPublicKey;
     }
+
+    public String getSamlTrustedCertificate() {
+        return samlTrustedCertificate;
+    }
+  
 }
