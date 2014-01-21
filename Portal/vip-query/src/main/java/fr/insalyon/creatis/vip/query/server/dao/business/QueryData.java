@@ -597,6 +597,11 @@ public class QueryData implements QueryDAO {
             ps.setTimestamp(2, getCurrentTimeStamp());
             ps.setString(3, queryExecution.getExecuter());
             ps.setString(4, queryExecution.getStatus());
+            
+            if (queryExecution.getName()==null || queryExecution.getName() == ""||queryExecution.getName().isEmpty()) {
+                queryExecution.setName("empty name");
+            }
+            
             ps.setString(5, queryExecution.getName());
             ps.setString(6, html2text(queryExecution.getBodyResult()));
             ps.execute();
@@ -615,8 +620,6 @@ public class QueryData implements QueryDAO {
         }
           }
           else{
-          
-               logger.error("else");
                 try {
            
             PreparedStatement ps = connection.prepareStatement(
@@ -625,6 +628,9 @@ public class QueryData implements QueryDAO {
             ps.setTimestamp(1, getCurrentTimeStamp());
             ps.setString(2, queryExecution.getExecuter());
             ps.setString(3, queryExecution.getStatus());
+             if (queryExecution.getName()==null || queryExecution.getName() == ""||queryExecution.getName().isEmpty()) {
+                queryExecution.setName("empty name");
+            }
             ps.setString(4, queryExecution.getName());
             ps.setString(5, html2text(queryExecution.getBodyResult()));
             ps.execute();
@@ -688,7 +694,6 @@ public class QueryData implements QueryDAO {
                     String dateEnd = rs.getString("dateEndExecution");
                     Long id = rs.getLong("queryExecutionID");
                     Long version = rs.getLong("queryVersion");
-                    logger.error(version);
                     queries.add(new String[]{id.toString(), rs.getString("name"), rs.getString("queryName"),version.toString(), fullNameExecuter, date.toString(), rs.getString("status"), rs.getString("bodyResult"), rs.getString("pathFileResult"), dateEnd});
                 }
                 ps.close();
