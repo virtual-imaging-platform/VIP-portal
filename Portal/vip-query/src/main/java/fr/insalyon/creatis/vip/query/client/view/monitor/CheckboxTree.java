@@ -199,6 +199,15 @@ public class CheckboxTree extends AbstractFormLayout {
                 }
             }
         }));
+        
+        
+     
+       
+      
+       
+       
+   
+        
         treeGrid.setLoadDataOnDemand(false);
         treeGrid.setNodeIcon(QueryConstants.ICON_BASE);
         treeGrid.setFolderIcon(QueryConstants.ICON_PROPERTIES);
@@ -212,6 +221,7 @@ public class CheckboxTree extends AbstractFormLayout {
         treeGrid.setShowSelectedStyle(true);
         treeGrid.setShowPartialSelection(true);
         treeGrid.setData(GTree);
+        treeGrid.setCascadeSelection(true);  
         queryNameField = FieldUtil.getTextItem("100%", null);
 
         description = new RichTextEditor();
@@ -237,7 +247,7 @@ public class CheckboxTree extends AbstractFormLayout {
         HLayout layout = new HLayout();
         layout.setHeight(30);
 
-        body = new Label();
+        body = new Label("");
         body.setHeight(100);
         body.setWidth100();
         body.setBackgroundColor("White");
@@ -264,9 +274,9 @@ public class CheckboxTree extends AbstractFormLayout {
                 new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-
-                // String body_val="select * from <http://e-ginseng.org/graph/ontology/semEHR> where {?x a rdfs:Class .?x rdfs:label ?label}";
-                String body_val = "select * where {?x a ?type} limit 10";
+            String body_val="PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> select * where {?x a rdfs:Class . ?x rdfs:label ?label}";
+             //"select * from <http://e-ginseng.org/graph/ontology/semEHR> where {?x a rdfs:Class .?x rdfs:label ?label}";
+                //String body_val = "select * where {?x a ?type} limit 10";
                 final AsyncCallback<List<String[]>> callback;
                 callback = new AsyncCallback<List<String[]>>() {
                     @Override
@@ -296,6 +306,11 @@ public class CheckboxTree extends AbstractFormLayout {
                 new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
+                if(body.getContents().isEmpty()||body.getContents()==""){
+                    generateBody();
+                }
+                 
+               
 
                 final AsyncCallback<Long> callback = new AsyncCallback<Long>() {
                     @Override
@@ -307,15 +322,16 @@ public class CheckboxTree extends AbstractFormLayout {
                     @Override
                     public void onSuccess(Long result) {
 
-                        Layout.getInstance().setNoticeMessage("The query was successfully executed");
+                        Layout.getInstance().setNoticeMessage("The query was successfully launched");
                         reset();
                         tab = new QueryHistoryTab();
                         Layout.getInstance().addTab(tab);
+                       
                     }
                 };
-
+                
                 QueryService.Util.getInstance().addQueryExecution(new QueryExecution("waiting", queryNameField.getValueAsString(), body.getContents()), callback);
-
+                 tab.loadData();
             }
         });
 
@@ -345,68 +361,8 @@ public class CheckboxTree extends AbstractFormLayout {
             //bu.setDisabled(!((Boolean) event.getValue()));              }
             public void onChange(ChangeEvent event) {
                 if ((Boolean) event.getValue()) {
-                    body.setContents("");
-
-                    ListGridRecord[] list = treeGrid.getSelectedRecords();
-                    int n = list.length;
-                    //Bloc select 
-
-                    for (int i = 0; i < n; i++) {
-                        rollOverRecord2 = (GinsengTreeNode) list[i];
-                        if (i == 0) {
-                            body.setContents("Select" + " " + "?" + rollOverRecord2.getAttribute("Name").toLowerCase());
-                        } else {
-
-                            body.setContents(body.getContents() + " " + "?" + rollOverRecord2.getAttribute("Name").toLowerCase());
-
-                        }
-                    }
-                    //Bloc from
-                    ListGridRecord[] list2 = BTreeGrid.getSelectedRecords();
-                    int n1 = list2.length;
-
-
-                    for (int i = 0; i < n1; i++) {
-                        rollOverRecord3 = (GinsengTreeNode) list2[i];
-
-                        body.setContents(body.getContents() + "<br/>" + "From " + "&lt;" + rollOverRecord3.getAttribute("Name") + "&gt;");
-                    }
-
-                    //bloc where
-
-                    for (int i = 0; i < n; i++) {
-                        rollOverRecord2 = (GinsengTreeNode) list[i];
-                        if (i == 0) {
-                            body.setContents(body.getContents() + "<br/>" + "WHERE{" + "<br/>" + rollOverRecord2.getAttribute("Value") + "." + "<br/>");
-                        } else if (i == n - 1) {
-                            body.setContents(body.getContents() + rollOverRecord2.getAttribute("Value") + "<br/>");
-                        } else {
-                            body.setContents(body.getContents() + rollOverRecord2.getAttribute("Value") + "." + "<br/>");
-                        }
-                    }
-
-                    //Bloc filter
-
-                    for (int i = 0; i < n; i++) {
-
-                        rollOverRecord2 = (GinsengTreeNode) list[i];
-
-                        if (rollOverRecord2.getAttribute("Restriction") != "") {
-
-                            if (rollOverRecord2.getAttribute("Restriction").indexOf("regex") != -1) {
-
-                                // body.setContents(body.getContents() + "filter regex(" + "?" + rollOverRecord2.getAttribute("Name").toLowerCase() + "," + rollOverRecord2.getAttribute("Restriction").replaceAll("regex(", "") + "<br/>");
-                                body.setContents(body.getContents() + "FILTER regex(" + "?" + rollOverRecord2.getAttribute("Name").toLowerCase() + "," + "&quot;" + rollOverRecord2.getAttribute("Restriction").replaceAll("regex:", "") + "&quot;" + ")" + "<br/>");
-
-                            } else {
-
-                                body.setContents(body.getContents() + "FILTER (" + "?" + rollOverRecord2.getAttribute("Name").toLowerCase() + " " + rollOverRecord2.getAttribute("Restriction") + ")" + "<br/>");
-
-                            }
-                        }
-                    }
-
-                    body.setContents(body.getContents() + "}");
+                    
+                    generateBody();
                     body.animateShow(AnimationEffect.SLIDE);
 
 
@@ -432,7 +388,9 @@ public class CheckboxTree extends AbstractFormLayout {
 
             @Override
             public void onSuccess(Long result) {
-
+                 if(body.getContents().isEmpty()||body.getContents()==""){
+                    generateBody();
+                }
 
                 String desc = description.getValue().trim();
                 desc = desc.replaceAll("<br><br>", "<br>");
@@ -500,6 +458,75 @@ public class CheckboxTree extends AbstractFormLayout {
     public String getName() {
         return name;
 
+    }
+    
+    public void generateBody(){
+         body.setContents("");
+                 
+                    body.setContents(body.getContents()+" PREFIX semehr: &lt;http://www.mnemotix.com/ontology/semEHR#&gt;");
+                   
+
+                    ListGridRecord[] list = treeGrid.getSelectedRecords();
+                    int n = list.length;
+                    //Bloc select 
+
+                    for (int i = 0; i < n; i++) {
+                        rollOverRecord2 = (GinsengTreeNode) list[i];
+                        if (i == 0) {
+                            body.setContents(body.getContents()+"<br/>" +"Select" + " " + "?" + rollOverRecord2.getAttribute("Name").toLowerCase());
+                        } else {
+
+                            body.setContents(body.getContents() + " " + "?" + rollOverRecord2.getAttribute("Name").toLowerCase());
+
+                        }
+                    }
+                    //Bloc from
+                    ListGridRecord[] list2 = BTreeGrid.getSelectedRecords();
+                    int n1 = list2.length;
+
+
+                    for (int i = 0; i < n1; i++) {
+                        rollOverRecord3 = (GinsengTreeNode) list2[i];
+
+                        body.setContents(body.getContents() + "<br/>" + "From " + "&lt;" + rollOverRecord3.getAttribute("Name") + "&gt;");
+                    }
+
+                    //bloc where
+
+                    for (int i = 0; i < n; i++) {
+                        rollOverRecord2 = (GinsengTreeNode) list[i];
+                        if (i == 0) {
+                            body.setContents(body.getContents() + "<br/>" + "WHERE{" + "<br/>" + rollOverRecord2.getAttribute("Value") + "." + "<br/>");
+                        } else if (i == n - 1) {
+                            body.setContents(body.getContents() + rollOverRecord2.getAttribute("Value") + "<br/>");
+                        } else {
+                            body.setContents(body.getContents() + rollOverRecord2.getAttribute("Value") + "." + "<br/>");
+                        }
+                    }
+
+                    //Bloc filter
+
+                    for (int i = 0; i < n; i++) {
+
+                        rollOverRecord2 = (GinsengTreeNode) list[i];
+
+                        if (rollOverRecord2.getAttribute("Restriction") != "") {
+
+                            if (rollOverRecord2.getAttribute("Restriction").indexOf("regex") != -1) {
+
+                                // body.setContents(body.getContents() + "filter regex(" + "?" + rollOverRecord2.getAttribute("Name").toLowerCase() + "," + rollOverRecord2.getAttribute("Restriction").replaceAll("regex(", "") + "<br/>");
+                                body.setContents(body.getContents() + "FILTER regex(" + "?" + rollOverRecord2.getAttribute("Name").toLowerCase() + "," + "&quot;" + rollOverRecord2.getAttribute("Restriction").replaceAll("regex:", "") + "&quot;" + ")" + "<br/>");
+
+                            } else {
+
+                                body.setContents(body.getContents() + "FILTER (" + "?" + rollOverRecord2.getAttribute("Name").toLowerCase() + " " + rollOverRecord2.getAttribute("Restriction") + ")" + "<br/>");
+
+                            }
+                        }
+                    }
+
+                    body.setContents(body.getContents() + "}");
+        
     }
 
     public QueryExplorerTab getQueryExplorerTb() {
