@@ -69,12 +69,9 @@ public class EndPointSparqlServiceImpl extends RemoteServiceServlet
 
          while (results.hasNext()) {
              QuerySolution row = results.next();
-             //RDFNode thing = row.get("Concept");
-             //Literal label = row.getLiteral("label");
            
-              rslt.add(new String[]{row.get("x").toString(),row.get("type").toString()});
+              rslt.add(new String[]{row.get("x").toString(),row.get("label").toString()});
            
-             logger.info(row.get("x").toString() );
          }
        
         
