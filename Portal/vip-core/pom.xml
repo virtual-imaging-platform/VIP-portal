@@ -4,7 +4,7 @@
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>1.5.2</version>
+        <version>1.6</version>
         <relativePath>..</relativePath>
     </parent>
     <groupId>fr.insalyon.creatis</groupId>
@@ -115,18 +115,6 @@
         </dependency>
         
         <dependency>
-            <groupId>org.opensaml</groupId>
-            <artifactId>opensaml1</artifactId>
-            <version>1.1</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>xml-security</groupId>
-            <artifactId>xmlsec</artifactId>
-            <version>1.0.5D2</version>
-        </dependency>
-        
-        <dependency>
             <groupId>org.jasig.cas.client</groupId>
             <artifactId>cas-client-core</artifactId>
             <version>3.2.1</version>
@@ -141,6 +129,12 @@
             <groupId>org.syncloud</groupId>
             <artifactId>dropbox-client</artifactId>
             <version>1.5.3</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml</artifactId>
+            <version>2.6.0</version>
             <type>jar</type>
         </dependency>
     </dependencies>
