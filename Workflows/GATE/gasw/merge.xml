@@ -1,0 +1,34 @@
+<description>
+        <executable name="merge.sh">
+                <retrycount value="10"/>
+                <access type="LFN">
+                </access>
+                <value value="[BIN_DIR]/merge.sh"/>
+                <!--avoids SL3 CEs because shared libs don't work there-->
+                <requirement value="(!RegExp(&quot;.*ce.grid.rug.nl.*&quot;,other.GlueCEUniqueID))"/>
+                <input name="fgate_input_lfn" option="no1">
+                        <access type="LFN"/>
+                </input>
+                <input name="fgate_output_lfn" option="no2">
+                </input>
+                <input name="timestamp" option="no5">
+                </input>
+                <output name="outputdirectory" option="no3">
+                        <template value="$dir2/$na2/output-merged.tar.gz"/>
+                        <access type="LFN"/>
+                </output>
+                <output name="numberOfMergedParticles" option="no4">
+                        <template value="$dir2/$na2/NPartMerged.txt"/>
+                        <access type="LFN"/>
+                </output>
+		<sandbox name="merge_rel">
+			<access type="LFN" cached="true">
+                        </access>
+                        <value value="[BIN_DIR]/merge_release.tar.gz"/>
+                </sandbox>
+		<sandbox name="unzip">
+                        <access type="LFN"/>
+                        <value value="[BIN_DIR]/unzip"/>
+                </sandbox>
+        </executable> 
+</description>
