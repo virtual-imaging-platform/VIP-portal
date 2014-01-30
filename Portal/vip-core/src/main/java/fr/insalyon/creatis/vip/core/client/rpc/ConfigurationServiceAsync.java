@@ -72,6 +72,8 @@ public interface ConfigurationServiceAsync {
     public void removeGroup(String groupName, AsyncCallback<Void> asyncCallback);
 
     public void getGroups(AsyncCallback<List<Group>> asyncCallback);
+    
+    public void getPublicGroups(AsyncCallback<List<Group>> asyncCallback);
 
     public void updateGroup(String name, Group group, AsyncCallback<Void> asyncCallback);
 

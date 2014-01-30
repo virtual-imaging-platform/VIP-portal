@@ -42,6 +42,7 @@ import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.auth.RecoveryTab;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
@@ -57,6 +58,7 @@ public class PasswordLayout extends AbstractFormLayout {
     private PasswordItem newPasswordField;
     private PasswordItem confirmPasswordField;
     private IButton saveButton;
+    private IButton recoverButton;
 
     public PasswordLayout() {
 
@@ -71,6 +73,7 @@ public class PasswordLayout extends AbstractFormLayout {
         currentPasswordField = FieldUtil.getPasswordItem(150, 32);
         newPasswordField = FieldUtil.getPasswordItem(150, 32);
         confirmPasswordField = FieldUtil.getPasswordItem(150, 32);
+        
 
         saveButton = WidgetUtil.getIButton("Save Changes", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
@@ -110,10 +113,21 @@ public class PasswordLayout extends AbstractFormLayout {
                         }
                     }
                 });
-
+        saveButton.setWidth("50%");
+                
+        recoverButton = WidgetUtil.getIButton("Forgot Password?", CoreConstants.ICON_HELP,  new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                 Layout.getInstance().addTab(new RecoveryTab());
+            }
+        });
+        recoverButton.setWidth("50%");
+        
+        currentPasswordField.setTooltip("Note: you may not know your VIP password in case your account was automatically generated. If you need it, you can still recover it using the button below.");
         addField("Current", currentPasswordField);
         addField("New", newPasswordField);
         addField("Re-type new", confirmPasswordField);
         this.addMember(saveButton);
+        this.addMember(recoverButton);
     }
 }

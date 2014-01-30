@@ -46,7 +46,6 @@ import fr.insalyon.creatis.vip.cardiac.client.CardiacModule;
 
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Modules;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
@@ -62,7 +61,6 @@ import fr.insalyon.creatis.vip.query.client.QueryModule;
 import fr.insalyon.creatis.vip.simulatedata.client.SimulatedDataModule;
 import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIModule;
 import fr.insalyon.creatis.vip.social.client.SocialModule;
-import java.util.List;
 
 /**
  *
@@ -82,7 +80,7 @@ public class Main implements EntryPoint {
         }
 
         Layout.getInstance().getModal().show("Loading VIP " + CoreConstants.VERSION, true);
-        
+
         Modules modulesInit = Modules.getInstance();
         modulesInit.add(new CoreModule());
         modulesInit.add(new DataManagerModule());
@@ -97,7 +95,6 @@ public class Main implements EntryPoint {
         modulesInit.add(new CoworkModule());
         modulesInit.add(new CardiacModule());
 
-        
         if (ticket == null && (login == null || !login.equals("CASN4U"))) {
             //regular VIP authentication
             configureVIP();
@@ -146,7 +143,6 @@ public class Main implements EntryPoint {
             public void onSuccess(User user) {
                 Layout.getInstance().getModal().hide();
                 Layout.getInstance().authenticate(user);
-
 
                 //Dropbox account confirmation
                 String oauth_token = Window.Location.getParameter("oauth_token");
