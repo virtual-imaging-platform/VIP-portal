@@ -4,7 +4,7 @@
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>1.6</version>
+        <version>1.6.1</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -58,16 +58,6 @@
             <artifactId>org-netbeans-api-annotations-common</artifactId>
             <version>RELEASE73</version>
         </dependency>
-        
-        
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.2.3</version>
-        </dependency>
-            
-            
-       
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>javax.persistence</artifactId>
