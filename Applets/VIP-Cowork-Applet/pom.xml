@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.insalyon.creatis.vip</groupId>
   <artifactId>VIP-Cowork-Applet</artifactId>
-  <version>0.1</version>
+  <version>0.1.1</version>
   <name>VIP-Cowork-Applet</name>
   <url>http://maven.apache.org</url>
   <properties>
@@ -20,7 +20,7 @@
       <dependency>
       <groupId>net.sourceforge.htmlunit</groupId>
       <artifactId>htmlunit</artifactId>
-      <version>2.11</version>
+      <version>2.13</version>
       <type>jar</type>
     </dependency>
      <dependency>
