@@ -72,11 +72,12 @@ public class PersonalLayout extends AbstractFormLayout {
     private SelectItem countryField;
     private String folder;
     private IButton saveButton;
+    private Label messageLabel;
 
     public PersonalLayout() {
 
         super(330, 430);
-        addTitle("Account Settings", CoreConstants.ICON_PERSONAL);
+        addTitle("Account Information", CoreConstants.ICON_PERSONAL);
 
         configure();
         loadData();
@@ -84,6 +85,9 @@ public class PersonalLayout extends AbstractFormLayout {
 
     private void configure() {
 
+        messageLabel = WidgetUtil.getLabel("", 15);
+        messageLabel.setBackgroundColor("#F79191");
+        
         levelLabel = WidgetUtil.getLabel("", 15);
         emailLabel = WidgetUtil.getLabel("", 15);
         firstNameField = WidgetUtil.getLabel("", 15);
@@ -139,6 +143,7 @@ public class PersonalLayout extends AbstractFormLayout {
                     }
                 });
 
+        this.addMember(messageLabel);
         this.addMember(WidgetUtil.getLabel("<b>Level</b>", 15));
         this.addMember(levelLabel);
         this.addMember(WidgetUtil.getLabel("<b>Email</b>", 15));
@@ -183,6 +188,12 @@ public class PersonalLayout extends AbstractFormLayout {
                 phoneField.setValue(result.getPhone());
                 countryField.setValue(result.getCountryCode().name());
                 folder = result.getFolder();
+                
+                if(institutionField.getDisplayValue().equals("Unknown") || phoneField.getDisplayValue().equals("0000")){
+                    messageLabel.setVisible(true);
+                    messageLabel.setContents("Please review your account information");
+                } else
+                    messageLabel.setVisible(false);
             }
         };
         service.getUserData(callback);

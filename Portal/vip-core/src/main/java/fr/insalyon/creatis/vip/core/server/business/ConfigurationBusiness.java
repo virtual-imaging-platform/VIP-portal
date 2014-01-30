@@ -147,13 +147,18 @@ public class ConfigurationBusiness {
             CoreDAOFactory.getDAOFactory().getUserDAO().add(user);
 
             // Adding user to groups
-            List<Group> groups = CoreDAOFactory.getDAOFactory().getAccountDAO().getGroups(accountType);
-            for (Group group : groups) {
-                if (mapPrivateGroups || automaticCreation || group.isPublicGroup()) {
-                    CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().add(user.getEmail(), group.getName(), GROUP_ROLE.User);
-                } else {
-                    logger.info("Don't map user " + user.getEmail() + " to private group " + group.getName());
+            List<Group> groups = null;
+            if (accountType != null) {
+                groups = CoreDAOFactory.getDAOFactory().getAccountDAO().getGroups(accountType);
+                for (Group group : groups) {
+                    if (mapPrivateGroups || automaticCreation || group.isPublicGroup()) {
+                        CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().add(user.getEmail(), group.getName(), GROUP_ROLE.User);
+                    } else {
+                        logger.info("Don't map user " + user.getEmail() + " to private group " + group.getName());
+                    }
                 }
+            } else {
+                groups = new ArrayList<Group>();
             }
 
             if (!automaticCreation) {
@@ -225,7 +230,7 @@ public class ConfigurationBusiness {
                         + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
                         + "<p><b>Phone:</b> " + user.getPhone() + "</p>"
                         + "<p><b>Country:</b> " + user.getCountryCode().getCountryName() + "</p>"
-                        + "<p><b>Accounts:</b> " + groups.toString() + "</p>"
+                        + "<p><b>Groups:</b> " + groupNames + "</p>"
                         + "<p><b>Comments:</b><br />" + comments + "</p>"
                         + "<p>&nbsp;</p>"
                         + "<p>Best Regards,</p>"
@@ -320,7 +325,7 @@ public class ConfigurationBusiness {
                 user = userDAO.getUser(user.getEmail());
             } catch (DAOException ex) {
                 try {
-                    signup(user, "Generated from CAS login", true, true, Server.getInstance().getCasAccountType());
+                    signup(user, "Generated from CAS login", true, true, Server.getInstance().getSAMLDefaultAccountType());
                     this.activateUser(user.getEmail());
                     user = userDAO.getUser(user.getEmail());
 
@@ -721,6 +726,20 @@ public class ConfigurationBusiness {
         }
     }
 
+    public List<Group> getPublicGroups() throws BusinessException {
+        try {
+            List<Group> publicGroups = new ArrayList<Group>();
+            for(Group g : CoreDAOFactory.getDAOFactory().getGroupDAO().getGroups())
+                if(g.isPublicGroup())
+                    publicGroups.add(g);
+            return publicGroups;
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+
+    }
+
     /**
      *
      * @param email
@@ -1088,7 +1107,7 @@ public class ConfigurationBusiness {
         return Server.getInstance().getCasURL() + "/login?service=" + serviceURL;
     }
 
-    public User getOrCreateUser(String email) throws BusinessException {
+    public User getOrCreateUser(String email, String defaultAccountType) throws BusinessException {
         User user;
         try {
             user = getUserWithSession(email);
@@ -1107,7 +1126,16 @@ public class ConfigurationBusiness {
             }
 
             user = getNewUser(email, firstName, lastName);
-            signup(user, "Generated from SAML ticket", true, true, Server.getInstance().getCasAccountType());
+            try {
+                signup(user, "Generated automatically", true, true, defaultAccountType);
+            } catch (BusinessException ex2) {
+                if (ex2.getMessage().contains("existing")) {
+                    //try with a different last name
+                    lastName += "_" + System.currentTimeMillis();
+                    user = getNewUser(email, firstName, lastName);
+                    signup(user, "Generated automatically", true, true, defaultAccountType);
+                }
+            }
             activateUser(user.getEmail());
             try {
                 user = getUserWithSession(email);

@@ -42,6 +42,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.layout.InjectCallback;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
@@ -83,15 +84,22 @@ public class UserMenuButton extends ToolStripMenuButton {
         });
 
         // Sign out
-        MenuItem signoutItem = new MenuItem("Sign Out");
+        final MenuItem signoutItem = new MenuItem("Sign Out");
         signoutItem.setIcon(CoreConstants.ICON_SIGNOUT);
-        signoutItem.addClickHandler(new ClickHandler() {
-
+        Layout.getInstance().injectMozillaPersonaScripts(new InjectCallback() {
             @Override
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().signout();
+            public void afterInject() {
+                
+                signoutItem.addClickHandler(new ClickHandler() {
+                    @Override
+                    public void onClick(MenuItemClickEvent event) {
+                        Layout.getInstance().signout();
+                    }
+                });
+                
             }
-        });
+        }); //logout will attempt to log out from Persona, even if the user didn't log in with it (shouldn't be an issue).
+
 
         if (user.getLevel() == UserLevel.Beginner) {
             menu.setItems(upgradeItem, accountItem, signoutItem);

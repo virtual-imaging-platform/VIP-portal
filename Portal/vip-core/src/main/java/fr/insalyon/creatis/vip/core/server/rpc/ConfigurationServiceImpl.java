@@ -338,6 +338,21 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             throw new CoreException(ex);
         }
     }
+    
+     /**
+     *
+     * @return @throws CoreException
+     */
+    @Override
+    public List<Group> getPublicGroups() throws CoreException {
+
+        try {
+             return configurationBusiness.getPublicGroups();
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
 
     /**
      *

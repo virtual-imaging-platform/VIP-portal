@@ -53,7 +53,7 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
- * @author Rafael Ferreira da Silva
+ * @author glatard
  */
 public class DropboxLayout extends AbstractFormLayout {
 

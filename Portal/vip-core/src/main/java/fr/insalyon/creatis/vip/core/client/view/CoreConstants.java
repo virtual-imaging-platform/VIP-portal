@@ -42,7 +42,7 @@ import java.util.List;
  */
 public class CoreConstants implements IsSerializable {
 
-    public static final String VERSION = "v1.6";
+    public static final String VERSION = "v1.6.1";
     // Configuration Labels
     public static final String LAB_DB_HOST = "database.server.host";
     public static final String LAB_DB_PORT = "database.server.port";
@@ -52,9 +52,8 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_ADMIN_INSTITUTION = "admin.institution";
     public static final String LAB_ADMIN_PHONE = "admin.phone";
     public static final String LAB_ADMIN_PASS = "admin.pass";
-    public static final String LAB_CAS_ACCOUNT_TYPE = "cas.accounttype";
+    public static final String LAB_SAML_ACCOUNT_TYPE = "saml.accounttype";
     public static final String LAB_CAS_URL = "cas.url";
-    public static final String LAB_CAS_GROUPS = "cas.groups";
     public static final String LAB_MYPROXY_HOST = "myproxy.host";
     public static final String LAB_MYPROXY_PORT = "myproxy.port";
     public static final String LAB_MYPROXY_USER = "myproxy.user";
@@ -128,6 +127,7 @@ public class CoreConstants implements IsSerializable {
     public static final String ICON_WARNING = IMG_FOLDER + "icon-warning.png";
     public static final String ICON_WORLD = IMG_FOLDER + "flags/_world.png";
     public static final String ICON_DROPBOX = IMG_FOLDER + "icon-dropbox.png";
+        public static String ICON_MOZILLA_PERSONA= IMG_FOLDER + "icon-persona.png";;
     // Folders
     public static final String FOLDER_TRASH = "Trash";
     public static final String FOLDER_FLAGS = IMG_FOLDER + "flags/";
@@ -158,6 +158,8 @@ public class CoreConstants implements IsSerializable {
     public static final String SSH_PUBLIC_KEY = "ssh.publickey";
     
     public static final String SAML_TRUSTED_CERTIFICATE="saml.trusted.certificates";
+    public static String MOZILLA_PERSONA_VALIDATION_URL="mozilla.persona.validation.url";
+
 
     public static enum GROUP_ROLE implements IsSerializable {
 

@@ -35,10 +35,12 @@
 package fr.insalyon.creatis.vip.core.client.view.auth;
 
 import com.google.gwt.user.client.Cookies;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -57,19 +59,22 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+import fr.insalyon.creatis.vip.core.client.view.layout.InjectCallback;
 
 /**
  *
- * @author Rafael Ferreira da Silva
+ * @author Rafael Ferreira da Silva, glatard
  */
 public class SignInTab extends Tab {
 
     private VLayout signinLayout;
+    private VLayout orLayout;
     private DynamicForm newForm;
     private TextItem emailField;
     private PasswordItem passwordField;
     private CheckboxItem remembermeField;
     private IButton signinButton;
+    private IButton personaLoginButton;
 
     public SignInTab() {
 
@@ -84,12 +89,25 @@ public class SignInTab extends Tab {
         vLayout.setAlign(Alignment.CENTER);
         vLayout.setDefaultLayoutAlign(Alignment.CENTER);
 
-        configureSigninLayout();
         configureNewForm();
+        configureSigninLayout();
 
+        vLayout.addMember(personaLoginButton);
+        vLayout.addMember(orLayout);
         vLayout.addMember(signinLayout);
         vLayout.addMember(newForm);
 
+        Layout.getInstance().injectMozillaPersonaScripts(new InjectCallback() {
+            @Override
+            public void afterInject() {
+                personaLoginButton.addClickHandler(new ClickHandler() {
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        Layout.getInstance().personaLogin();
+                    }
+                });
+            }
+        });
         this.setPane(vLayout);
     }
 
@@ -132,6 +150,14 @@ public class SignInTab extends Tab {
             }
         });
 
+        personaLoginButton = new IButton("Email");
+        personaLoginButton.setIcon(CoreConstants.ICON_MOZILLA_PERSONA);
+
+        orLayout = new VLayout();
+        orLayout.setWidth(250);
+        orLayout.setHeight(70);
+        orLayout.addMember(new Label("<center><b>or</b></center>"));
+
         signinLayout = WidgetUtil.getVIPLayout(250, 150);
         WidgetUtil.addFieldToVIPLayout(signinLayout, "Email", emailField);
         WidgetUtil.addFieldToVIPLayout(signinLayout, "Password", passwordField);
@@ -149,7 +175,7 @@ public class SignInTab extends Tab {
                     }
                 });
 
-        LinkItem recoverAccount = FieldUtil.getLinkItem("link_reset", "Can't access your account?",
+        LinkItem recoverAccount = FieldUtil.getLinkItem("link_reset", "Forgot your password?",
                 new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
                     @Override
                     public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {

@@ -283,6 +283,10 @@ public class User implements IsSerializable {
 
     }
 
+    public boolean hasGroups(){
+        return groups.size() != 0;
+    }
+    
     @Override
     public String toString() {
         return email;
