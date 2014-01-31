@@ -68,11 +68,15 @@ function verifyAssertion(assertion) {
     xhr.onreadystatechange = function() {
     if (xhr.readyState == 4) {
 	if(xhr.status != 200){
-		window.alert("Couldn't login ("+xhr.status+")");
+		var message = "Couldn't login ("+xhr.status+")";
+		if(xhr.responseXML != "" && xhr.responseXML != null)
+			message+=": "+xhr.responseXML;
+		window.alert(message);
 		navigator.id.logout();
 	}
 	else{
-         window.parent.location.reload(true);
+	//window.alert("Successful login");
+          window.parent.location.reload(true);
 	}
       }
    }
