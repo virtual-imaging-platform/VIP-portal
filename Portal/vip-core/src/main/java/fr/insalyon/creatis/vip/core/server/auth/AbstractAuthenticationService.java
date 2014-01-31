@@ -105,9 +105,6 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
         logger.info("User " + email + " connected.");
         response.setStatus(HttpServletResponse.SC_OK);
         setResponseText(email, response);
-//        } catch (IOException ex) {
-//            throw new BusinessException(ex);
-//        }
     }
 
     private void setResponseText(String message, HttpServletResponse response) throws BusinessException {
@@ -149,16 +146,9 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
 
     private void authFailedResponse(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
         logger.info("Third-party authentication failed.");
-//        try {
-//            response.sendRedirect(getBaseURL(request));
-//        } catch (IOException ex) {
-//            throw new BusinessException(ex);
-//        }
-        //String message = ("<html><body><p>If you see this page it means that you failed to authenticate on VIP. Please contact vip-support@creatis.insa-lyon.fr for support.</p></body></html>");
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        //setResponseText(message, response);
+       response.setStatus(HttpServletResponse.SC_FORBIDDEN);
     }
-
+    
     private boolean isValidEmailAddress(String email) {
         boolean result = true;
         try {
