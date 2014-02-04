@@ -14,8 +14,10 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
@@ -30,14 +32,13 @@ import fr.insalyon.creatis.vip.query.client.rpc.EndPointSparqlService;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.QueryConstants;
 import fr.insalyon.creatis.vip.query.client.view.QueryException;
-import fr.insalyon.creatis.vip.query.client.view.QueryTitleGrid;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  *
- * @author Boujelben
+ * @author Nouha Boujelben
  */
 public class CreateQuery extends AbstractFormLayout {
 
@@ -48,10 +49,12 @@ public class CreateQuery extends AbstractFormLayout {
     private IButton testButton;
     private ImgButton helpButton;
     private Label label = new Label();
-    public TextAreaItem body;
+    private TextAreaItem body;
     private int rownumber = 0;
     private Long queryID = 0l;
     private boolean testt;
+    private CheckboxItem isPublic;
+    private boolean isPublicValue;
 
     public CreateQuery() {
         super("100%", "100%");
@@ -63,7 +66,7 @@ public class CreateQuery extends AbstractFormLayout {
         label.setHeight(15);
         label.setWidth100();
         label.setAlign(Alignment.LEFT);
-         
+
 
         description = new RichTextEditor();
         description.setHeight(100);
@@ -81,6 +84,16 @@ public class CreateQuery extends AbstractFormLayout {
         body.setHeight("*");
         body.setDisabled(false);
 
+
+        isPublic = new CheckboxItem();
+        isPublic.setName("Public");
+        isPublic.setTitle("Public");
+        isPublic.setRedrawOnChange(true);
+        isPublic.setValue(false);
+        DynamicForm form = new DynamicForm();
+        form.setFields(isPublic);
+
+
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
             @Override
@@ -91,16 +104,17 @@ public class CreateQuery extends AbstractFormLayout {
                         Query q = new Query(querynameField.getValueAsString().trim());
                         save(q);
 
+
                     } catch (QueryException ex) {
                         Logger.getLogger(CreateQuery.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 } else {
-                    
+
                     String getbody = body.getValueAsString();
                     getbody = getbody.replaceAll("[\r\n]{2,}", "\r\n");
                     getbody = getbody.replaceAll("\\s", "");
                     getbody = getbody.toLowerCase();
-                    String bodyy = new String(getbody);
+                    // String bodyy = new String(getbody);
                     String queryID = getQueryMakerTb().getQueryID();
                     Long qID = Long.parseLong(queryID);
                     final AsyncCallback<Boolean> callbackk = new AsyncCallback<Boolean>() {
@@ -115,20 +129,21 @@ public class CreateQuery extends AbstractFormLayout {
                             testt = result.booleanValue();
 
                             if (testt == true) {
-                                update(getVersionID(), querynameField.getValueAsString().trim(), description.getValue());
+                                update(getVersionID(), querynameField.getValueAsString().trim(), description.getValue(), isPublicValue, true);
 
                             } else {
 
                                 Long queryVersionID = getVersionID();
                                 getQueryID(queryVersionID);
-                                update(queryVersionID, querynameField.getValueAsString().trim(), description.getValue());
+                                // update(queryVersionID, querynameField.getValueAsString().trim(), description.getValue(), isPublicValue);
+
                             }
 
 
                         }
                     };
 
-                    QueryService.Util.getInstance().getBodies(qID, bodyy, callbackk);
+                    QueryService.Util.getInstance().getBodies(qID, getbody, callbackk);
                 }
 
             }
@@ -255,12 +270,18 @@ public class CreateQuery extends AbstractFormLayout {
         body.setTextAlign(Alignment.LEFT);
         body.setShowTitle(false);
         body.setWidth("*");
-       
+
 
 
         addFieldResponsiveHeight("Body", body);
+        this.addMember(form);
         addMember(helpButton);
         addButtons(saveButton, testButton);
+        isPublic.addChangeHandler(new com.smartgwt.client.widgets.form.fields.events.ChangeHandler() {
+            public void onChange(ChangeEvent event) {
+                isPublicValue = (Boolean) event.getValue();
+            }
+        });
 
 
 
@@ -279,33 +300,15 @@ public class CreateQuery extends AbstractFormLayout {
             public void onSuccess(Long result) {
                 String bodyRemplace = body.getValueAsString();
                 bodyRemplace = bodyRemplace.trim();
-                //bodyd=bodyd.replaceAll("\\s{2,}", " ");
                 bodyRemplace = bodyRemplace.replaceAll("[\r\n]{2,}", "\r\n");
-                // String des=description.getValue().replaceFirst("<br>","");
-
-                //queryversiob,queryid
-                String desc = description.getValue().trim();
-                desc = desc.replaceAll("<br><br>", "<br>");
-                desc = desc.replaceAll("<div><br></div>", "");
-                while (desc.indexOf("<br>") == 0) {
-                    desc = desc.replaceFirst("<br>", "");
-                }
-
-                while (desc.lastIndexOf("<br>") == desc.length() - 4) {
-                    desc = desc.substring(0, desc.length() - 4);
-                }
-
-                savev(new QueryVersion(1L, result, desc, bodyRemplace));
-                reset();
-
-
+                savev(new QueryVersion(1L, result, descriptionTraitement(description.getValue().trim()), bodyRemplace, isPublicValue), false);
             }
         };
 
         QueryService.Util.getInstance().add(query, callback);
     }
 
-    private void savev(QueryVersion version) {
+    private void savev(QueryVersion version, final boolean update) {
         final AsyncCallback<Long> callback = new AsyncCallback<Long>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -321,10 +324,16 @@ public class CreateQuery extends AbstractFormLayout {
 
                 Parameter p = new Parameter(result);
                 saveParameter(p);
+                if (update == true) {
+                    update(result, querynameField.getValueAsString().trim(), description.getValue(), isPublicValue, false);
+                }
+                if (p.equals(null)) {
+                    reset("the Query was successfully added");
+                }
 
             }
         };
-        QueryService.Util.getInstance().addVersion(version, callback);
+        QueryService.Util.getInstance().addVersion(version, false, callback);
 
     }
 
@@ -338,13 +347,14 @@ public class CreateQuery extends AbstractFormLayout {
 
             @Override
             public void onSuccess(List<Long> result) {
+                reset("the Query was successfully added");
             }
         };
         QueryService.Util.getInstance().addParameter(param, callback);
 
     }
 
-    public void setQuery(boolean nameState, boolean test, String name, String description, String body) {
+    public void setQuery(boolean nameState, boolean test, String name, String description, String body, boolean isPublicValue) {
 
         newQuery = test;
         if (newQuery == false) {
@@ -358,6 +368,7 @@ public class CreateQuery extends AbstractFormLayout {
         querynameField.setValue(name);
         this.description.setValue(description);
         this.body.setValue(body);
+        isPublic.setValue(isPublicValue);
         // this.querynameField.setDisabled(nameState);
     }
 
@@ -369,7 +380,7 @@ public class CreateQuery extends AbstractFormLayout {
         return versionID;
     }
 
-    public void update(Long queryVersionID, String name, String descriptionn) {
+    public void update(Long queryVersionID, String name, String description, boolean isPublicValue, final boolean reset) {
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -379,14 +390,12 @@ public class CreateQuery extends AbstractFormLayout {
 
             @Override
             public void onSuccess(Void result) {
-
-                getQueryMakerTb().loadData();
-
-                Layout.getInstance().setNoticeMessage("The queryVersion was successfully updated");
-
+                if (reset == true) {
+                    reset("the query was successfully updated");
+                }
             }
         };
-        QueryService.Util.getInstance().updateQueryVersion(queryVersionID, name, descriptionn, callback);
+        QueryService.Util.getInstance().updateQueryVersion(queryVersionID, name, descriptionTraitement(description), isPublicValue, callback);
 
     }
 
@@ -402,39 +411,17 @@ public class CreateQuery extends AbstractFormLayout {
 
             @Override
             public void onSuccess(Long result) {
-
-
                 Long nn = result;
-
                 nn = nn + 1;
                 String bodyRemplace = body.getValueAsString();
-                String bodyd = bodyRemplace.replaceAll("[\r\n]{2,}", "\r\n");
-
-
-
-                //queryversiob,queryid
-                String desc = description.getValue().trim();
-                desc = desc.replaceAll("<br><br>", "<br>");
-                desc = desc.replaceAll("<div><br></div>", "");
-                while (desc.indexOf("<br>") == 0) {
-
-                    desc = desc.replaceFirst("<br>", "");
-                }
-                while (desc.lastIndexOf("<br>") == desc.length() - 4) {
-                    desc = desc.substring(0, desc.length() - 4);
-                }
-
-
-
-
-                savev(new QueryVersion(nn, queryID, desc, bodyd));
-                reset();
+                bodyRemplace = bodyRemplace.replaceAll("[\r\n]{2,}", "\r\n");
+                savev(new QueryVersion(nn, queryID, descriptionTraitement(description.getValue().trim()), bodyRemplace, isPublicValue), true);
 
             }
         };
 
         QueryService.Util.getInstance().maxVersion(queryID, callback);
-        //return rownumber;
+
 
     }
 
@@ -468,14 +455,50 @@ public class CreateQuery extends AbstractFormLayout {
 
     }
 
-    public void reset() {
+    public void reset(String message) {
+
         querynameField.setValue("");
         description.setValue("");
+        isPublic.setValue(false);
         body.setValue("");
         getQueryMakerTb().loadData();
-        WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
-        Layout.getInstance().setNoticeMessage("The query was successfully added");
+        Layout.getInstance().setNoticeMessage(message);
 
+
+    }
+
+    public void resetUpdate(String message) {
+
+
+        querynameField.setValue("");
+        description.setValue("");
+        isPublic.setValue(false);
+        getQueryMakerTb().loadData();
+        Layout.getInstance().setNoticeMessage(message);
+
+
+    }
+
+    public String descriptionTraitement(String desc) {
+        desc=desc.trim();
+        desc = desc.replaceAll("<br><br>", "<br>");
+        desc=desc.trim();
+        desc = desc.replaceAll("<div><br></div>", "");
+        desc=desc.trim();
+        while (desc.indexOf("<br>") == 0) {
+            desc = desc.replaceFirst("<br>", "");
+            desc=desc.trim();
+        }
+        while (desc.lastIndexOf("<br>") == desc.length() - 4) {
+            desc = desc.substring(0, desc.length() - 4);
+        }
+       
+        while (desc.indexOf("&nbsp;") == 0) {
+            desc = desc.replaceFirst("&nbsp;", "");
+            desc=desc.trim();
+        }
+
+        return desc;
 
     }
 }
