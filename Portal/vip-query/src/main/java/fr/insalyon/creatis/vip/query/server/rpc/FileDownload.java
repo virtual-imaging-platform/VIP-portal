@@ -55,53 +55,51 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author nouha
+ * @author Nouha Boujelben
  */
 public class FileDownload extends HttpServlet {
 
     private static Logger logger = Logger.getLogger(FileDownload.class);
-    
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
         User user = (User) req.getSession().getAttribute(CoreConstants.SESSION_USER);
         String queryId = req.getParameter("queryid");
-        String path=req.getParameter("path");
-        String queryName=req.getParameter("name");
-        String tab[]=path.split("/");
-        
+        String path = req.getParameter("path");
+        String queryName = req.getParameter("name");
+        String tab[] = path.split("/");
+
         if (user != null && queryId != null && !queryId.isEmpty()) {
 
             try {
-                //GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
-               // Operation operation = client.getOperationById(operationId);
-           String k=new String();
-               // File file = new File(operation.getDest());
-           int l=tab.length;
-                for (int i=0;i<l-1;i++){
-                     k+="//"+tab[i];
+
+                String k = new String();
+
+                int l = tab.length;
+                for (int i = 0; i < l - 1; i++) {
+                    k += "//" + tab[i];
                 }
                 File file = new File(k);
-                logger.info("that"+k);
+                logger.info("that" + k);
                 if (file.isDirectory()) {
-                    //file = new File(operation.getDest() + "/" 
-                            //+ FilenameUtils.getName(operation.getSource()));
-                    file = new File(k+"/"+tab[l-1]);
-                   
+
+                    file = new File(k + "/" + tab[l - 1]);
+
                 }
                 int length = 0;
                 ServletOutputStream op = resp.getOutputStream();
                 ServletContext context = getServletConfig().getServletContext();
                 String mimetype = context.getMimeType(file.getName());
-                
+
                 logger.info("(" + user.getEmail() + ") Downloading '" + file.getAbsolutePath() + "'.");
 
                 resp.setContentType((mimetype != null) ? mimetype : "application/octet-stream");
                 resp.setContentLength((int) file.length());
                 //name of the file in servlet download
                 resp.setHeader("Content-Disposition", "attachment; filename=\""
-                        + queryName+"_"+getCurrentTimeStamp().toString().replaceAll(" ","_")+".txt"+ "\"");
+                        + queryName + "_" + getCurrentTimeStamp().toString().replaceAll(" ", "_") + ".txt" + "\"");
 
                 byte[] bbuf = new byte[4096];
                 DataInputStream in = new DataInputStream(new FileInputStream(file));
@@ -116,19 +114,11 @@ public class FileDownload extends HttpServlet {
             } catch (Exception ex) {
                 logger.error(ex);
             }
-            
-            
-            
-            
-            
-            
+
         }
     }
-    
-    
-    
-    
-     private static java.sql.Timestamp getCurrentTimeStamp() {
+
+    private static java.sql.Timestamp getCurrentTimeStamp() {
 
         java.util.Date today = new java.util.Date();
         return new java.sql.Timestamp(today.getTime());
