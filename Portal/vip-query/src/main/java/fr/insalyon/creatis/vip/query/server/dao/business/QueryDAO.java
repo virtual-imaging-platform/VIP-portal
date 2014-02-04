@@ -15,17 +15,17 @@ import java.sql.Timestamp;
 
 /**
  *
- * @author Boujelben
+ * @author Nouha Boujelben
  */
 public interface QueryDAO {
 
-    public List<String[]> getQueries() throws DAOException;
+    public List<String[]> getQueries(String creator) throws DAOException;
 
     public List<String[]> getVersion() throws DAOException;
 
     public Long add(Query query) throws DAOException;
 
-    public Long addVersion(QueryVersion version) throws DAOException;
+    public Long addVersion(QueryVersion version,boolean bodyTypeHtml) throws DAOException;
 
     public void removeVersion(Long versionid) throws DAOException;
 
@@ -45,9 +45,9 @@ public interface QueryDAO {
 
     public void updateQueryExecution(String bodyResult, String status, Long executionID) throws DAOException;
 
-    public void updateQueryVersion(Long queryID, String name, String description) throws DAOException;
+    public void updateQueryVersion(Long queryID, String name, String description,boolean isPublic) throws DAOException;
 
-    public String getDescription(Long queryVersionID) throws DAOException;
+    public List<String>getDescriptionQueryMaker(Long queryVersionID) throws DAOException;
 
     public List<String[]> getParameterValue(Long queryExecutionID) throws DAOException;
 

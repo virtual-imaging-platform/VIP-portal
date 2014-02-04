@@ -27,11 +27,11 @@ public class MySQLDAOFactory extends QueryDAOFactory {
             logger.info("Configuring VIP Query database.");
 
             PlatformConnection.getInstance().createTable("Query",
-                    "queryID BIGINT(20) AUTO_INCREMENT, "   
-                    + "queryMaker VARCHAR(255), "
+                    "queryID BIGINT(20) AUTO_INCREMENT NOT NULL, "   
+                    + "queryMaker VARCHAR(255) NOT NULL, "
                     + "queryName VARCHAR(255), "
                     + "PRIMARY KEY (queryID), "
-                    + "FOREIGN KEY (queryMaker) REFERENCES vipusers(email) "
+                    + "FOREIGN KEY (queryMaker) REFERENCES VIPUsers(email) "
                     + "ON DELETE RESTRICT ON UPDATE RESTRICT");
 
 
@@ -68,7 +68,7 @@ public class MySQLDAOFactory extends QueryDAOFactory {
                     + "bodyResult VARCHAR(1000), "
                     + "pathFileResult VARCHAR(1000), "
                     + "PRIMARY KEY (queryExecutionID), "
-                    + "FOREIGN KEY (queryVersionID) REFERENCES QueryVersion(queryVersionID) NULL "
+                    + "FOREIGN KEY (queryVersionID) REFERENCES QueryVersion(queryVersionID) "
                     + "ON DELETE RESTRICT ON UPDATE RESTRICT");
 
             PlatformConnection.getInstance().createTable("Value",
