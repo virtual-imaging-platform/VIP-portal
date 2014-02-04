@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  *
- * @author nouha
+ * @author Nouha Boujelben
  */
 public interface EndPointSparqlService extends RemoteService {
 
@@ -31,5 +31,6 @@ public interface EndPointSparqlService extends RemoteService {
     }
 
     String getUrlResult(String param1, String param2);
-    List<String[]> getUrlResultFormatTable(String param1);
+    List<String[]> getUrlResultFormatTable(String param1,String val1, String val2);
+    List<String[]> getUrlResultFormatTable(String param1,String val1, String val2, String val3,String val4);
 }
