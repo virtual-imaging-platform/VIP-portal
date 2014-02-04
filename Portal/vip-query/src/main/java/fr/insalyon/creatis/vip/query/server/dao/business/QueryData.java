@@ -32,33 +32,26 @@ public class QueryData implements QueryDAO {
     }
 
     @Override
-    public List<String[]> getQueries() throws DAOException {
+    public List<String[]> getQueries(String creator) throws DAOException {
 
         try {
 
-            PreparedStatement ps = connection.prepareStatement("SELECT queryID, queryName FROM Query");
+            PreparedStatement ps = connection.prepareStatement("SELECT q.queryName, v.queryVersionID, v.queryVersion, v.dateCreation, v.queryID FROM Query q, QueryVersion v where q.queryID=v.queryID AND (q.queryMaker=? OR v.isPublic=?)");
+            ps.setString(1, creator);
+            ps.setInt(2, 1);
             ResultSet rs = ps.executeQuery();
             List<String[]> queries = new ArrayList<String[]>();
 
             while (rs.next()) {
 
-                int id = rs.getInt("queryID");
-
-                PreparedStatement ps2 = connection.prepareStatement("SELECT queryversionID, queryVersion, dateCreation,queryID FROM QueryVersion WHERE queryID=? ORDER BY dateCreation DESC");
-
-
-                ps2.setInt(1, id);
-                ResultSet rs2 = ps2.executeQuery();
-
-                while (rs2.next()) {
-                    Timestamp date = rs2.getTimestamp("dateCreation");
-                    Integer version = rs2.getInt("queryVersion");
-                    Long qID = rs2.getLong("queryID");
+              
+                    Timestamp date = rs.getTimestamp("dateCreation");
+                    Integer version = rs.getInt("queryVersion");
+                    Long qID = rs.getLong("queryID");
 
 
-                    queries.add(new String[]{rs.getString("queryName"), date.toString(), version.toString(), rs2.getString("queryVersionID"), qID.toString()});
-                }
-                ps2.close();
+                    queries.add(new String[]{rs.getString("queryName"), date.toString(), version.toString(), rs.getString("queryVersionID"), qID.toString()});
+               
 
             }
             ps.close();
@@ -95,25 +88,35 @@ public class QueryData implements QueryDAO {
     }
 
     @Override
-    public String getDescription(Long queryVersionID) throws DAOException {
+   public List<String> getDescriptionQueryMaker(Long queryVersionID) throws DAOException {
 
         try {
 
-            String result = null;
-            PreparedStatement ps2 = connection.prepareStatement("SELECT description FROM QueryVersion WHERE queryVersionID=?");
+             List<String> values = new ArrayList<String>();
+            PreparedStatement ps2 = connection.prepareStatement("SELECT queryMaker,description FROM QueryVersion qv,Query q WHERE q.queryID=qv.queryID AND queryVersionID=?");
 
 
             ps2.setLong(1, queryVersionID);
             ResultSet rs2 = ps2.executeQuery();
 
             while (rs2.next()) {
-                result = rs2.getString("description");
+              // values.add(0,rs2.getString("queryMaker") );
+              
+               PreparedStatement prep = connection.prepareStatement("SELECT first_name,last_name FROM VIPUsers WHERE email=?");
+              prep.setString(1, rs2.getString("queryMaker"));
+              ResultSet rsPrep = prep.executeQuery();
+               while (rsPrep.next()) {
+              values.add(0,rsPrep.getString("first_name")+" "+rsPrep.getString("last_name")+"("+rs2.getString("queryMaker")+")" );
+               }
+              values.add(1,rs2.getString("description") );
+
+               
             }
             ps2.close();
 
 
 
-            return result;
+            return values;
 
         } catch (SQLException ex) {
             logger.error(ex);
@@ -133,12 +136,14 @@ public class QueryData implements QueryDAO {
             List<String[]> queries = new ArrayList<String[]>();
 
             while (rs.next()) {
-                PreparedStatement ps2 = connection.prepareStatement("SELECT body,description FROM QueryVersion  WHERE queryVersionID=? ");
+                PreparedStatement ps2 = connection.prepareStatement("SELECT body,description,isPublic FROM QueryVersion  WHERE queryVersionID=? ");
                 ps2.setLong(1, queryversionid);
                 ResultSet rs2 = ps2.executeQuery();
                 while (rs2.next()) {
                     Long qID = rs.getLong("queryID");
-                    queries.add(new String[]{rs.getString("queryName"), rs2.getString("description"), rs2.getString("body"), qID.toString()});
+                    String isPublic= String.valueOf(rs2.getInt("isPublic"));
+                    
+                    queries.add(new String[]{rs.getString("queryName"), rs2.getString("description"), rs2.getString("body"), qID.toString(),isPublic });
                 }
                 ps2.close();
             }
@@ -398,16 +403,28 @@ public class QueryData implements QueryDAO {
     }
 
     @Override
-    public Long addVersion(QueryVersion version) throws DAOException {
+    public Long addVersion(QueryVersion version,boolean bodyTypeHtml) throws DAOException {
         try {
 
             PreparedStatement ps2 = connection.prepareStatement(
-                    "INSERT INTO QueryVersion(queryVersion, queryID, body, dateCreation,description) VALUES (?, ?, ?, ?, ? )", PreparedStatement.RETURN_GENERATED_KEYS);
+                    "INSERT INTO QueryVersion(queryVersion, queryID, body, dateCreation,description,isPublic) VALUES (?, ?, ?, ?, ?, ? )", PreparedStatement.RETURN_GENERATED_KEYS);
             ps2.setLong(1, version.getQueryVersion());
             ps2.setObject(2, version.getQueryID());
-            ps2.setString(3, html2text(version.getBody()));
+            if (bodyTypeHtml==true) {
+                ps2.setString(3, html2text(version.getBody()));
+                
+            } else {
+                ps2.setString(3, version.getBody());        
+            }
             ps2.setTimestamp(4, getCurrentTimeStamp());
             ps2.setString(5, version.getDescription());
+            int  isPublicVersion;
+            if(version.isIsPublic()){
+            isPublicVersion=1;}
+            else{
+            isPublicVersion=0;
+            }
+            ps2.setInt(6, isPublicVersion);
             ps2.execute();
             ResultSet rs = ps2.getGeneratedKeys();
             Long idAuto_increment = new Long(0);
@@ -522,9 +539,9 @@ public class QueryData implements QueryDAO {
             throw new DAOException(ex);
         }
     }
-
+//update without body
     @Override
-    public void updateQueryVersion(Long queryVersionID, String name, String description) throws DAOException {
+    public void updateQueryVersion(Long queryVersionID, String name, String description, boolean isPublic) throws DAOException {
 
         try {
             PreparedStatement ps1 = connection.prepareStatement(
@@ -539,15 +556,22 @@ public class QueryData implements QueryDAO {
             ps1.close();
             PreparedStatement ps = connection.prepareStatement("UPDATE "
                     + "Query, QueryVersion "
-                    + "SET description=?, queryName=? "
+                    + "SET description=?, queryName=?, isPublic=? "
                     + "WHERE Query.queryID=? AND QueryVersion.queryVersionID=?");
 
 
 
             ps.setString(1, description);
             ps.setString(2, name);
-            ps.setLong(3, queryID);
-            ps.setLong(4, queryVersionID);
+           
+          
+            if (isPublic) {
+                ps.setInt(3, 1);
+            } else {
+                 ps.setInt(3, 0);
+            }
+            ps.setLong(4, queryID);
+            ps.setLong(5, queryVersionID);
             ps.executeUpdate();
             ps.close();
 
@@ -603,7 +627,9 @@ public class QueryData implements QueryDAO {
             }
             
             ps.setString(5, queryExecution.getName());
-            ps.setString(6, html2text(queryExecution.getBodyResult()));
+            ps.setString(6, queryExecution.getBodyResult());   
+            
+          
             ps.execute();
             ResultSet rs = ps.getGeneratedKeys();
             Long idAuto_increment = new Long(0);
@@ -619,6 +645,7 @@ public class QueryData implements QueryDAO {
             throw new DAOException(ex);
         }
           }
+         //by query explorer
           else{
                 try {
            
@@ -631,8 +658,8 @@ public class QueryData implements QueryDAO {
              if (queryExecution.getName()==null || queryExecution.getName() == ""||queryExecution.getName().isEmpty()) {
                 queryExecution.setName("empty name");
             }
-            ps.setString(4, queryExecution.getName());
-            ps.setString(5, html2text(queryExecution.getBodyResult()));
+            ps.setString(4, queryExecution.getName());     
+            ps.setString(5, html2text(queryExecution.getBodyResult()));    
             ps.execute();
             ResultSet rs = ps.getGeneratedKeys();
             Long idAuto_increment = new Long(0);

@@ -20,10 +20,10 @@ import java.util.List;
  */
 public class QueryBusiness {
 
-    public List<String[]> getQueries() throws BusinessException {
+    public List<String[]> getQueries(String creator) throws BusinessException {
 
         try {
-            return QueryDAOFactory.getDAOFactory().getQueryDAO().getQueries();
+            return QueryDAOFactory.getDAOFactory().getQueryDAO().getQueries( creator);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -49,9 +49,9 @@ public class QueryBusiness {
         }
     }
 
-    public Long addVersion(QueryVersion version) throws BusinessException {
+    public Long addVersion(QueryVersion version,boolean bodyTypeHtml) throws BusinessException {
         try {
-            return QueryDAOFactory.getDAOFactory().getQueryDAO().addVersion(version);
+            return QueryDAOFactory.getDAOFactory().getQueryDAO().addVersion(version,bodyTypeHtml);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -168,18 +168,18 @@ public class QueryBusiness {
         }
     }
 
-    public void updateQueryVersion(Long queryID, String name, String description) throws BusinessException {
+    public void updateQueryVersion(Long queryID, String name, String description,boolean isPublic) throws BusinessException {
         try {
-            QueryDAOFactory.getDAOFactory().getQueryDAO().updateQueryVersion(queryID, name, description);
+            QueryDAOFactory.getDAOFactory().getQueryDAO().updateQueryVersion(queryID, name, description,isPublic);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    public String getDescription(Long queryVersionID) throws BusinessException {
+    public List<String> getDescriptionQueryMaker(Long queryVersionID) throws BusinessException {
         try {
-            return QueryDAOFactory.getDAOFactory().getQueryDAO().getDescription(queryVersionID);
+            return QueryDAOFactory.getDAOFactory().getQueryDAO().getDescriptionQueryMaker(queryVersionID);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
