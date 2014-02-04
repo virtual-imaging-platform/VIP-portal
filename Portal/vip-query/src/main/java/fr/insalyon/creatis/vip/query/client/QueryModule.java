@@ -6,7 +6,7 @@ package fr.insalyon.creatis.vip.query.client;
 
 /**
  *
- * @author Boujelben
+ * @author Nouha Boujelben
  */
 import fr.insalyon.creatis.vip.core.client.Module;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
