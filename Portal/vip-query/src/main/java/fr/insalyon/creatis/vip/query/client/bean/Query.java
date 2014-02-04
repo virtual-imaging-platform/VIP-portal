@@ -11,49 +11,38 @@ import java.util.List;
 
 /**
  *
- * @author Boujelben
+ * @author Nouha Boujelben
  */
 public class Query implements IsSerializable {
 
-    public Query() {
-    }
+    
     private String name;
     private Long queryID;
-    //date creation of version
     private String dateCreation;
     private String description;
     private String queryMaker;
     private String queryversions;
-
-    public Query( String name, String queryMaker) {
+    
+    
+    
+    public Query() {}
+    
+    
+    public Query(String name, String queryMaker) {
         this.name = name;
-        ///this.dateCreation=dateCreation;
-      
         this.queryMaker = queryMaker;
     }
 
     public Query(String name) {
         this.name = name;
-        ///this.dateCreation=dateCreation;
-        
-
     }
 
     public Query(String name, String queryMaker, String dateCreation) {
         this.name = name;
         this.dateCreation = dateCreation;
-       
         this.queryMaker = queryMaker;
     }
 
-    /*
-     public Query( String name, String dateCreation,String queryversions ) {
-     this.name = name;
-     this.dateCreation = dateCreation;
-     this.queryversions=queryversions;
-        
-     }
-     */
     public String getDateCreation() {
         return dateCreation;
     }
@@ -61,10 +50,6 @@ public class Query implements IsSerializable {
     public void setDateCreation(String dateCreation) {
         this.dateCreation = dateCreation;
     }
-
-   
-
-   
 
     public String getName() {
         return name;
@@ -96,5 +81,13 @@ public class Query implements IsSerializable {
 
     public void setQueryversions(String queryversions) {
         this.queryversions = queryversions;
+    }
+    
+      public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

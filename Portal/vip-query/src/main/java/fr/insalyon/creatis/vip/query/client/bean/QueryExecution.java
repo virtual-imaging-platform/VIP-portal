@@ -9,7 +9,7 @@ import java.sql.Timestamp;
 
 /**
  *
- * @author nouha
+ * @author Nouha boujelben
  */
 public class QueryExecution implements IsSerializable {
 
