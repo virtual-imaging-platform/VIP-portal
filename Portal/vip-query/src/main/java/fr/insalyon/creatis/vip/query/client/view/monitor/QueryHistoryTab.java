@@ -299,7 +299,6 @@ public class QueryHistoryTab extends Tab {
         grid.setFilterOnKeypress(true);
         grid.setDataSource(ds);
         grid.setAutoFetchData(Boolean.TRUE);
-        grid.setDataFetchMode(FetchMode.LOCAL);
         grid.setShowAllRecords(false);
         grid.setShowRowNumbers(true);
         grid.setShowEmptyMessage(true);
