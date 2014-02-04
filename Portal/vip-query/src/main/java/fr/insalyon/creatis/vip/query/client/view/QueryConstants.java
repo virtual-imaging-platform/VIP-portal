@@ -6,16 +6,14 @@ package fr.insalyon.creatis.vip.query.client.view;
 
 /**
  *
- * @author Boujelben
+ * @author Nouha Boujelben
  */
 public class QueryConstants {
-    // Tabs ID 
-
+    // Tabs ID
     public static final String TAB_QUERYHISTORY = "queryHistory-tab";
     public static final String TAB_QUERYMAKER = "queryMaker-tab";
     public static final String TAB_QUERYEXPLORER = "queryExplorer-tab";
     // Icons
-    
     private static final String IMG_FOLDER = "query/";
     public static final String ICON_EXPLORE = IMG_FOLDER + "icon_explorer.png";
     public static final String ICON_QUERYHISTORY = IMG_FOLDER + "icon-queryHistory.png";
@@ -32,9 +30,10 @@ public class QueryConstants {
     public static final String ICON_WAIT = IMG_FOLDER + "icon-wait.png";
     public static final String ICON_LINK = IMG_FOLDER + "icon-links.png";
     public static final String ICON_DOWNLOAD = IMG_FOLDER + "file_download.png";
-    public static final String ICON_ERROR =IMG_FOLDER + "Error.png";
-    public static final String ICON_BASE =IMG_FOLDER + "icon-base.png";
-    public static final String ICON_PROPERTIES =IMG_FOLDER + "icon-properties.png";
+    public static final String ICON_ERROR = IMG_FOLDER + "Error.png";
+    public static final String ICON_BASE = IMG_FOLDER + "icon-base.png";
+    public static final String ICON_ATTRIBUT = IMG_FOLDER + "icon_attribut.png";
+    public static final String ICON_PROPERTIES = IMG_FOLDER + "icon-properties.png";
     // Application Names
     public static final String APP_QUERYHISTORY = "Query History";
     public static final String APP_QUERYMAKER = "Query Maker";
