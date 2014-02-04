@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author nouha
+ * @author Nouha Boujelben
  */
 public class EndPointSparqlServiceImpl extends RemoteServiceServlet
         implements EndPointSparqlService {
@@ -31,9 +31,6 @@ public class EndPointSparqlServiceImpl extends RemoteServiceServlet
     public String getUrlResult(String param1, String param2) {
         String url = null;
         String k = null;
-
-
-
         URIBuilder builder = new URIBuilder();
         builder.setHost("ginseng.unice.fr");
         builder.setPort(9000);
@@ -58,7 +55,7 @@ public class EndPointSparqlServiceImpl extends RemoteServiceServlet
     
    
     
-     public List<String[]> getUrlResultFormatTable(String param1) {
+     public List<String[]> getUrlResultFormatTable(String param1,String val1, String val2) {
        
    
          Query query = QueryFactory.create(param1);
@@ -69,13 +66,39 @@ public class EndPointSparqlServiceImpl extends RemoteServiceServlet
 
          while (results.hasNext()) {
              QuerySolution row = results.next();
+             rslt.add(new String[]{row.get(val1).toString(),row.get(val2).toString()});    
+             }
            
-              rslt.add(new String[]{row.get("x").toString(),row.get("label").toString()});
-           
-         }
+        return rslt;
+        
+    }
+     
+     
+     
+      public List<String[]> getUrlResultFormatTable(String param1,String val1, String val2,String val3,String val4) {
        
+   
+         Query query = QueryFactory.create(param1);
+         QueryExecution qexec = QueryExecutionFactory.sparqlService("http://ginseng.i3s.unice.fr:9000/sparql", param1);
+         ResultSet results = qexec.execSelect();
+         List<String[]> rslt = new ArrayList<String[]>();
         
 
+         while (results.hasNext()) {
+             QuerySolution row = results.next();
+          /*
+             String range;
+             try {
+                 range = row.get(val3).toString();
+             } catch (Exception ex) {
+                 range = "empty";
+             }  
+             * */
+             rslt.add(new String[]{row.get(val1).toString(),row.get(val2).toString(),row.get(val3).toString(),row.get(val4).toString()});
+             logger.info(row.get(val3).toString());
+          
+             }
+           
         return rslt;
         
     }
