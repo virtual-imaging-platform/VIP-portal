@@ -8,7 +8,7 @@ import com.smartgwt.client.widgets.tree.TreeNode;
 
 /**
  *
- * @author nouha
+ * @author Nouha Boujelben 
  */
 public class GinsengTree {
 
