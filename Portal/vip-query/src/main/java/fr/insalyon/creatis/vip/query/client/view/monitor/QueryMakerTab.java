@@ -35,8 +35,8 @@ public class QueryMakerTab extends Tab {
         vLayout.addMember(createQuery);
     }
 
-    public void setQuery(boolean bodyState, boolean test, String name, String description, String body) {
-        createQuery.setQuery(bodyState, test, name, description, body);
+    public void setQuery(boolean bodyState, boolean test, String name, String description, String body, boolean isPublic) {
+        createQuery.setQuery(bodyState, test, name, description, body, isPublic);
     }
 
     public String getVersionID() {
