@@ -5,16 +5,14 @@
 package fr.insalyon.creatis.vip.query.client.view;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import java.sql.Date;
-import java.sql.Timestamp;
 
 /**
  *
- * @author nouha
+ * @author Nouha Boujelben
  */
 public class QueryExecutionRecord extends ListGridRecord {
 
-    public QueryExecutionRecord(String ExecutionID, String name, String queryName, String version, String executer, String dateExecution, String status,String statuss, String bodyResult,String pathFileResult,String dateEndExecution) {
+    public QueryExecutionRecord(String ExecutionID, String name, String queryName, String version, String executer, String dateExecution, String status, String statuss, String bodyResult, String pathFileResult, String dateEndExecution) {
         setAttribute("statusIcon", status);
         setAttribute("queryExecutionID", ExecutionID);
         setAttribute("name", name);

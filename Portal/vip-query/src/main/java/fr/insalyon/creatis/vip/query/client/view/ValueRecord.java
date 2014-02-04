@@ -8,7 +8,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
  *
- * @author nouha
+ * @author Nouha Boujelben
  */
 public class ValueRecord extends ListGridRecord {
 
@@ -16,7 +16,6 @@ public class ValueRecord extends ListGridRecord {
 
         setAttribute("value", value);
         setAttribute("parameterID", parameterID);
-
 
     }
 }

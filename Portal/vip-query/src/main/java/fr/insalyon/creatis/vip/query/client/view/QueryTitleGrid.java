@@ -1,34 +1,22 @@
 package fr.insalyon.creatis.vip.query.client.view;
 
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.data.Record;
-import com.smartgwt.client.types.Cursor;
-import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.util.FileLoader;
-import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.events.MouseOverHandler;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.launch.QueryLaunchTab;
-import fr.insalyon.creatis.vip.query.server.dao.business.MySQLDAOFactory;
-import fr.insalyon.creatis.vip.query.server.dao.business.QueryDAOFactory;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 /**
  *
- * @author Boujelben
+ * @author Nouha Boujelben
  */
 public class QueryTitleGrid extends ApplicationsTileGrid {
 
-    // private List<String> applicationNames;
     private HashMap<QueryTitleGrid.Key, String> map;
     private static QueryTitleGrid instance;
- 
+
     public static QueryTitleGrid getInstance() {
         if (instance == null) {
             instance = new QueryTitleGrid();
@@ -70,11 +58,8 @@ public class QueryTitleGrid extends ApplicationsTileGrid {
                 map = new HashMap<QueryTitleGrid.Key, String>();
                 for (String[] q : result) {
                     //name,version,image
-
                     addApplication(q[0], "v." + q[2], QueryConstants.APP_IMG_QUERY);
                     map.put(new QueryTitleGrid.Key(q[0], "v." + q[2]), q[3]);
-
-
                 }
             }
         };
@@ -113,10 +98,6 @@ public class QueryTitleGrid extends ApplicationsTileGrid {
     }
 
     public void addQuery() {
-
         loadApplications();
-
-
-
     }
 }

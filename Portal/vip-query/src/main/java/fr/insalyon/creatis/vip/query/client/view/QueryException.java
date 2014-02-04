@@ -8,7 +8,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  *
- * @author Boujelben
+ * @author Nouha Boujelben
  */
 public class QueryException extends Exception implements IsSerializable {
 
