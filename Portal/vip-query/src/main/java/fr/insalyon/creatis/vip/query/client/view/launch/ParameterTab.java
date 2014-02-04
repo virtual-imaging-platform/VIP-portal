@@ -18,7 +18,6 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.viewer.DetailViewer;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -30,13 +29,12 @@ import fr.insalyon.creatis.vip.query.client.bean.Value;
 import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.QueryConstants;
 import fr.insalyon.creatis.vip.query.client.view.monitor.QueryHistoryTab;
-//import fr.insalyon.creatis.vip.query.client.view.monitor.Status;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
- * @author Boujelben
+ * @author Nouha Boujelben
  */
 public class ParameterTab extends AbstractFormLayout {
 
@@ -46,13 +44,16 @@ public class ParameterTab extends AbstractFormLayout {
     private TextItem executionName;
     private Label description;
     private Label titleDes;
+    private Label queryCreateur;
+    private Label queryCreateurValue;
     private Label parameterLab;
     DynamicForm execution;
     private List<TextItem> arrList;
     private Long queryExecutionID;
     QueryHistoryTab tab;
     private boolean descriptionE;
-    private boolean parametersE=false;
+    private boolean parametersE = false;
+
     public ParameterTab(Long queryVersionID) {
         super();
         this.addTitle("Query Execution", QueryConstants.ICON_EXECUTE_VERSION);
@@ -65,40 +66,39 @@ public class ParameterTab extends AbstractFormLayout {
         titleDes.setHeight(20);
         Label title = new Label("<strong>Execution Name</strong>");
         title.setHeight(20);
-        getDescription(queryVersionID);
+        getDescriptionQueryMaker(queryVersionID);
 
-        executionName = new TextItem(); 
+        executionName = new TextItem();
         executionName.setShowTitle(false);
         executionName.setTitleOrientation(TitleOrientation.TOP);
         executionName.setWidth("*");
         executionName.setKeyPressFilter("[0-9.,A-Za-z-+/_() ]");
         executionName.addChangedHandler(new ChangedHandler() {
-
             @Override
             public void onChanged(ChangedEvent event) {
                 event.getItem().validate();
             }
         });
 
-        
-        
-        
-        
-        
-        
-        
+
+
+
+
+
+
+
         execution = new DynamicForm();
         execution.setNumCols(1);
         execution.setFields(executionName);
 
         mainLayout.setPadding(5);
-        if  (descriptionE==true){
-        mainLayout.addMember(title, 2);
-        mainLayout.addMember(execution, 3);}
-        else {
-        mainLayout.addMember(title, 0);
-        mainLayout.addMember(execution, 1);
-}
+        if (descriptionE == true) {
+            mainLayout.addMember(title, 2);
+            mainLayout.addMember(execution, 3);
+        } else {
+            mainLayout.addMember(title, 0);
+            mainLayout.addMember(execution, 1);
+        }
 
 
         parameterLab = new Label("<strong>Parameter</strong>");
@@ -126,7 +126,7 @@ public class ParameterTab extends AbstractFormLayout {
                     } else {
                         mainLayout.addMember(parameterLab, 2);
                     }
-                   
+
                     arrList = new ArrayList<TextItem>();
                     DynamicForm dynamicForm;
 
@@ -155,18 +155,18 @@ public class ParameterTab extends AbstractFormLayout {
                         });
                         value.setTitleOrientation(TitleOrientation.TOP);
                         value.setName(String.valueOf(q.getParameterID()));
-                        
+
                         value.setPrompt("<b> Description: </b>" + q.getDescription() + "<br><b> Type: </b>" + q.getType() + "<br><b> Example: </b>" + q.getExample());
                         arrList.add(value);
                         dynamicForm.setFields(value);
                         hlayout.addMember(dynamicForm);
                         if (descriptionE == true) {
                             mainLayout.addMember(hlayout, 5);
-                            parametersE = true; 
+                            parametersE = true;
                         } else {
                             mainLayout.addMember(hlayout, 3);
                             parametersE = true;
-                        }                      
+                        }
                     }
 
                 }
@@ -192,10 +192,10 @@ public class ParameterTab extends AbstractFormLayout {
 
                     @Override
                     public void onSuccess(Long result) {
-                        if (parametersE==false) {
-                            getBody(queryVersionID, result,false);
+                        if (parametersE == false) {
+                            getBody(queryVersionID, result, false);
                             queryExecutionID = result;
-                       } else {
+                        } else {
                             for (TextItem t : arrList) {
 
                                 saveValue(new Value(t.getValueAsString(), Long.parseLong(t.getName()), result));
@@ -207,7 +207,6 @@ public class ParameterTab extends AbstractFormLayout {
                         }
                         executionName.setValue("");
                         tab = new QueryHistoryTab();
-
                         Layout.getInstance().addTab(tab);
                     }
                 };
@@ -218,6 +217,13 @@ public class ParameterTab extends AbstractFormLayout {
 
 
         mainLayout.addMember(launchButton, 7);
+        queryCreateur = new Label("<strong>Query Author</strong>");
+        queryCreateur.setHeight(20);
+        queryCreateurValue = new Label("");
+        queryCreateurValue.setHeight(20);
+        mainLayout.addMember(queryCreateur);
+        mainLayout.addMember(queryCreateurValue);
+
     }
 
     private void saveValue(Value value) {
@@ -310,8 +316,8 @@ public class ParameterTab extends AbstractFormLayout {
 
      }
      * */
-    private void getDescription(Long queryVersionID) {
-        final AsyncCallback<String> callback = new AsyncCallback<String>() {
+    private void getDescriptionQueryMaker(Long queryVersionID) {
+        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
             @Override
             public void onFailure(Throwable caught) {
 
@@ -319,27 +325,27 @@ public class ParameterTab extends AbstractFormLayout {
             }
 
             @Override
-            public void onSuccess(String result) {
-             
-            
-             
-                if (result.length()==0) {
-                    descriptionE=false;
-                }
-                else 
-                {
-                    descriptionE=true;
+            public void onSuccess(List<String> result) {
+
+
+
+                if (result.get(1).length() == 0 || result.get(1).isEmpty() || result.get(1) == "" || result.get(1).equals(null) ||result.get(1)=="<br>"||result.get(1)==" ") {
+                    descriptionE = false;
+                } else {
+                    descriptionE = true;
                     mainLayout.addMember(titleDes, 0);
-                    description = new Label(result);
+                    description = new Label(result.get(1));
                     description.setHeight(20);
                     mainLayout.addMember(description, 1);
                 }
-               
+
+                queryCreateurValue.setContents(result.get(0));
+
 
             }
         };
 
-        QueryService.Util.getInstance().getDescription(queryVersionID, callback);
+        QueryService.Util.getInstance().getDescriptionQueryMaker(queryVersionID, callback);
 
 
     }
