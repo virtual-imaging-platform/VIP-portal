@@ -29,10 +29,7 @@ import fr.insalyon.creatis.vip.query.client.rpc.QueryService;
 import fr.insalyon.creatis.vip.query.client.view.QueryConstants;
 import fr.insalyon.creatis.vip.query.client.view.QueryRecord;
 
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.query.client.view.QueryException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 /**
  *
@@ -47,7 +44,7 @@ public class QueryLayout extends VLayout {
     private String versionID;
     private Integer rownum;
     private String bodyValue;
-     private String qID;
+    private String qID;
 
     public QueryLayout() {
         this.setWidth100();
@@ -67,7 +64,7 @@ public class QueryLayout extends VLayout {
         addButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                setEdit(false, true, null, null, null);
+                setEdit(false, true, null, null, null,false);
 
             }
         });
@@ -242,12 +239,12 @@ public class QueryLayout extends VLayout {
 
     }
 
-    private void setEdit(boolean bodyState, boolean test, String name, String desciption, String body) {
+    private void setEdit(boolean bodyState, boolean test, String name, String desciption, String body, boolean isPublic) {
 
         QueryMakerTab queryTab = (QueryMakerTab) Layout.getInstance().
                 getTab(QueryConstants.TAB_QUERYMAKER);
 
-        queryTab.setQuery(bodyState, test, name, desciption, body);
+        queryTab.setQuery(bodyState, test, name, desciption, body, isPublic);
 
 
     }
@@ -269,8 +266,13 @@ public class QueryLayout extends VLayout {
             public void onSuccess(List<String[]> result) {
 
                 for (String[] q : result) {
+                    boolean val;
+                    if(q[4]=="1"){
+                        val=true;}
+                    else {
+                        val=false;}
 
-                    setEdit(true, false, q[0], q[1], q[2]);
+                    setEdit(true, false, q[0], q[1], q[2],val);
                     bodyValue = q[2];
                 }
             }
