@@ -5,18 +5,14 @@
 package fr.insalyon.creatis.vip.query.client.view.launch;
 
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tab.events.CloseClickHandler;
-import com.smartgwt.client.widgets.viewer.DetailViewer;
-import com.smartgwt.client.widgets.viewer.DetailViewerField;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.query.client.view.QueryConstants;
 
 /**
  *
- * @author Boujelben
+ * @author Nouha Boujelben
  */
 public class QueryLaunchTab extends Tab {
 
@@ -36,7 +32,6 @@ public class QueryLaunchTab extends Tab {
                 + queryName + " " + queryVersion);
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
-
         layout = new HLayout();
         layout.setWidth100();
         layout.setHeight100();
@@ -45,7 +40,7 @@ public class QueryLaunchTab extends Tab {
         this.setPane(layout);
 
     }
-
+    
     @Override
     public void setCanClose(boolean canClose) {
         super.setCanClose(canClose);
