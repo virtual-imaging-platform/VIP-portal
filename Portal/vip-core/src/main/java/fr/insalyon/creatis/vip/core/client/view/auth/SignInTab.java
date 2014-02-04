@@ -34,12 +34,16 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.auth;
 
+import com.google.gwt.core.client.Callback;
+import com.google.gwt.core.client.ScriptInjector;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.ImageStyle;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -59,7 +63,6 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
-import fr.insalyon.creatis.vip.core.client.view.layout.InjectCallback;
 
 /**
  *
@@ -74,7 +77,7 @@ public class SignInTab extends Tab {
     private PasswordItem passwordField;
     private CheckboxItem remembermeField;
     private IButton signinButton;
-    private IButton personaLoginButton;
+    private Img personaImage;
 
     public SignInTab() {
 
@@ -92,22 +95,13 @@ public class SignInTab extends Tab {
         configureNewForm();
         configureSigninLayout();
 
-        vLayout.addMember(personaLoginButton);
+        injectMozillaPersonaScripts();
+        
+        vLayout.addMember(personaImage);
         vLayout.addMember(orLayout);
         vLayout.addMember(signinLayout);
         vLayout.addMember(newForm);
 
-        Layout.getInstance().injectMozillaPersonaScripts(new InjectCallback() {
-            @Override
-            public void afterInject() {
-                personaLoginButton.addClickHandler(new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent event) {
-                        Layout.getInstance().personaLogin();
-                    }
-                });
-            }
-        });
         this.setPane(vLayout);
     }
 
@@ -150,8 +144,17 @@ public class SignInTab extends Tab {
             }
         });
 
-        personaLoginButton = new IButton("Email");
-        personaLoginButton.setIcon(CoreConstants.ICON_MOZILLA_PERSONA);
+        personaImage = new Img(CoreConstants.ICON_MOZILLA_PERSONA, 205, 30);
+        personaImage.setImageWidth(205);
+        personaImage.setImageHeight(30);
+        personaImage.setImageType(ImageStyle.CENTER);
+        personaImage.setBorder("0px solid gray");
+        personaImage.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                personaLogin();
+            }
+        });
 
         orLayout = new VLayout();
         orLayout.setWidth(250);
@@ -235,5 +238,29 @@ public class SignInTab extends Tab {
                     passwordField.getValueAsString(), callback);
             WidgetUtil.setLoadingIButton(signinButton, "Signing in...");
         }
+    }
+
+    private static native void personaLogin() /*-{
+     loginPersona();
+     }-*/;
+
+    private void injectMozillaPersonaScripts() {
+        //put that in CoreConstants
+        final String personaUrl = "https://login.persona.org/include.js";
+        final String localUrl = "/js/login-persona.js";
+        injectScript(personaUrl);
+        injectScript(localUrl);
+    }
+
+    private void injectScript(final String url) {
+        ScriptInjector.fromUrl(url).setCallback(
+                new Callback() {
+                    public void onFailure(Object reason) {
+                        Window.alert("Script load failed: " + url);
+                    }
+
+                    public void onSuccess(Object result) {
+                    }
+                }).inject();
     }
 }
