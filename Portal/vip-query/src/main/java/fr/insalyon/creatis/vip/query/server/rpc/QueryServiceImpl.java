@@ -21,7 +21,7 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author Boujelben
+ * @author Nouha Boujelben
  */
 public class QueryServiceImpl extends AbstractRemoteServiceServlet implements QueryService {
 
@@ -38,7 +38,13 @@ public class QueryServiceImpl extends AbstractRemoteServiceServlet implements Qu
     public List<String[]> getQueries() throws QueryException {
 
         try {
-            return queryBusiness.getQueries();
+            String creator = null;
+            try {
+                creator = getSessionUser().getEmail();
+            } catch (CoreException ex) {
+                java.util.logging.Logger.getLogger(QueryServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return queryBusiness.getQueries(creator);
 
         } catch (BusinessException ex) {
             throw new QueryException(ex);
@@ -75,10 +81,10 @@ public class QueryServiceImpl extends AbstractRemoteServiceServlet implements Qu
     }
 
     @Override
-    public Long addVersion(QueryVersion version) throws QueryException {
+    public Long addVersion(QueryVersion version, boolean bodyTypeHtml) throws QueryException {
 
         try {
-            return queryBusiness.addVersion(version);
+            return queryBusiness.addVersion(version, bodyTypeHtml);
 
         } catch (BusinessException ex) {
             throw new QueryException(ex);
@@ -108,9 +114,9 @@ public class QueryServiceImpl extends AbstractRemoteServiceServlet implements Qu
     }
 
     @Override
-    public List<String[]> getQuerie(Long queryversionid,Long queryID) throws QueryException {
+    public List<String[]> getQuerie(Long queryversionid, Long queryID) throws QueryException {
         try {
-            return queryBusiness.getQuerie(queryversionid,queryID);
+            return queryBusiness.getQuerie(queryversionid, queryID);
 
         } catch (BusinessException ex) {
             throw new QueryException(ex);
@@ -158,15 +164,15 @@ public class QueryServiceImpl extends AbstractRemoteServiceServlet implements Qu
 
     @Override
     public List<String[]> getQueryHistory(String state) throws QueryException {
-        String executer=null;
+        String executer = null;
         try {
-            
+
             try {
                 executer = getSessionUser().getEmail();
             } catch (CoreException ex) {
                 java.util.logging.Logger.getLogger(QueryServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
-            return queryBusiness.getQueryHistory(executer,state);
+            return queryBusiness.getQueryHistory(executer, state);
 
         } catch (BusinessException ex) {
             throw new QueryException(ex);
@@ -195,8 +201,7 @@ public class QueryServiceImpl extends AbstractRemoteServiceServlet implements Qu
         }
 
     }
-    
-    
+
     @Override
     public void updateQueryExecutionStatusWaiting(String status, Long executionID) throws QueryException {
         try {
@@ -207,6 +212,7 @@ public class QueryServiceImpl extends AbstractRemoteServiceServlet implements Qu
         }
 
     }
+
     @Override
     public void updateQueryExecutionStatusFailed(String status, Long executionID) throws QueryException {
         try {
@@ -219,9 +225,9 @@ public class QueryServiceImpl extends AbstractRemoteServiceServlet implements Qu
     }
 
     @Override
-    public void updateQueryVersion(Long queryID, String name, String description) throws QueryException {
+    public void updateQueryVersion(Long queryID, String name, String description, boolean isPublic) throws QueryException {
         try {
-            queryBusiness.updateQueryVersion(queryID, name, description);
+            queryBusiness.updateQueryVersion(queryID, name, description, isPublic);
 
         } catch (BusinessException ex) {
             throw new QueryException(ex);
@@ -230,9 +236,9 @@ public class QueryServiceImpl extends AbstractRemoteServiceServlet implements Qu
     }
 
     @Override
-    public String getDescription(Long queryVersionID) throws QueryException {
+    public List<String> getDescriptionQueryMaker(Long queryVersionID) throws QueryException {
         try {
-            return queryBusiness.getDescription(queryVersionID);
+            return queryBusiness.getDescriptionQueryMaker(queryVersionID);
 
         } catch (BusinessException ex) {
             throw new QueryException(ex);
@@ -286,9 +292,9 @@ public class QueryServiceImpl extends AbstractRemoteServiceServlet implements Qu
         }
 
     }
-    
+
     @Override
-     public  boolean getBodies(Long queryID,String body) throws QueryException {
+    public boolean getBodies(Long queryID, String body) throws QueryException {
 
         try {
             return queryBusiness.getBodies(queryID, body);
