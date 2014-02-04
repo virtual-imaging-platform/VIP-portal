@@ -228,7 +228,6 @@ public class UsersGroupsData implements UsersGroupsDAO {
                     + "FROM VIPGroups g, VIPUsersGroups ug "
                     + "WHERE g.groupname = ug.groupname AND ug.email= ?");
             ps.setString(1, email);
-             logger.info("email"+email);
             ResultSet rs = ps.executeQuery();
            
              List<Boolean> proprties = new ArrayList<Boolean>();
