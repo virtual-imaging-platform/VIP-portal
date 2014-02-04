@@ -162,8 +162,6 @@ public class Layout {
                 Cookies.setCookie(CoreConstants.COOKIES_USER, null, new Date(0), null, "/", false);
                 Cookies.setCookie(CoreConstants.COOKIES_SESSION, null, new Date(0), null, "/", false);
 
-                personaLogout();
-                
                 for (Tab tab : centerTabSet.getTabs()) {
                     centerTabSet.removeTab(tab);
                 }
@@ -263,40 +261,4 @@ public class Layout {
     public void setWarningMessage(String message, int delay) {
         messageWindow.setMessage(message, "#F79191", CoreConstants.ICON_WARNING, delay);
     }
-
-    public void injectMozillaPersonaScripts(final InjectCallback cb) {
-        //put that in CoreConstants
-        final String personaUrl = "https://login.persona.org/include.js";
-        final String localUrl = "/js/login-persona.js";
-
-        ScriptInjector.fromUrl(personaUrl).setCallback(
-                new Callback() {
-                    public void onFailure(Object reason) {
-                        Window.alert("Script load failed: " + personaUrl);
-                    }
-
-                    public void onSuccess(Object result) {
-                       // Window.alert("Script load success: " + personaUrl);
-                        ScriptInjector.fromUrl(localUrl).setCallback(
-                                new Callback() {
-                                    public void onFailure(Object reason) {
-                                        Window.alert("Script load failed: " + localUrl);
-                                    }
-
-                                    public void onSuccess(Object result) {
-                                       // Window.alert("Script load success: " + localUrl);
-                                        if(cb!=null) cb.afterInject();
-                                    }
-                                }).inject();
-                    }
-                }).inject();
-    }
-
-    public static native void personaLogin() /*-{
-     navigator.id.request();
-     }-*/;
-
-    public static native void personaLogout() /*-{
-     navigator.id.logout();
-     }-*/;
 }

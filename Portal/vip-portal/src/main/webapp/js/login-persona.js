@@ -32,64 +32,28 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-var currentUser=getCookie("vip-cookie-user");
-
-if (!currentUser)
-    currentUser = null; //currentUser has to contain either a valid email or null. Otherwise, Persona will go in an infinite loop
-else
-    currentUser=decodeURIComponent(currentUser);
-
-function getCookie(cname)
-{
-    var name = cname + "=";
-    var ca = document.cookie.split(';');
-    for(var i=0; i<ca.length; i++)
-    {
-        var c = ca[i].trim();
-        if (c.indexOf(name)==0) return c.substring(name.length,c.length);
-    }
-    return "";
-}
-
-
 function verifyAssertion(assertion) {
-    // Your backend must return HTTP status code 200 to indicate successful
-    // verification of user's email address and it must arrange for the binding
-    // of currentUser to said address when the page is reloaded
     var xhr = new XMLHttpRequest();
-    xhr.open("POST",  "/fr.insalyon.creatis.vip.portal.Main/personaauthenticationservice", true);
+    xhr.open("POST", "/fr.insalyon.creatis.vip.portal.Main/personaauthenticationservice", true);
     // see http://www.openjs.com/articles/ajax_xmlhttp_using_post.php
-    var param = "assertion="+assertion;
+    var param = "assertion=" + assertion;
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-   // xhr.setRequestHeader("Content-length", param.length);
-   // xhr.setRequestHeader("Connection", "close");
-    xhr.send(param); // for verification by your backend
+    xhr.send(param); 
 
     xhr.onreadystatechange = function() {
-    if (xhr.readyState == 4) {
-	if(xhr.status != 200){
-		var message = "Couldn't login ("+xhr.status+")";
-		if(xhr.responseXML != "" && xhr.responseXML != null)
-			message+=": "+xhr.responseXML;
-		window.alert(message);
-		navigator.id.logout();
-	}
-	else{
-	//window.alert("Successful login");
-          window.parent.location.reload(true);
-	}
-      }
-   }
+        if (xhr.readyState === 4) {
+            if (xhr.status !== 200) {
+                window.alert("Couldn't login (" + xhr.status + ")");
+            }
+            else {
+                window.parent.location.reload(true);
+            }
+        }
+    }
 }
 
-function signoutUser() {
-    currentUser = null;
-    }
-
-// Go!
-navigator.id.watch( {
-    loggedInUser: currentUser,
-    onlogin: verifyAssertion,
-    onlogout: signoutUser } );
+function loginPersona() {
+    navigator.id.get(verifyAssertion, {backgroundColor: "#F5F5F5", siteName: "VIP"});
+}
 
 
