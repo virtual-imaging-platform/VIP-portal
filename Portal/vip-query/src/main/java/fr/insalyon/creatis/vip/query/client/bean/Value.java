@@ -8,7 +8,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  *
- * @author nouha
+ * @author Nouha boujelben
  */
 public class Value implements IsSerializable {
 
