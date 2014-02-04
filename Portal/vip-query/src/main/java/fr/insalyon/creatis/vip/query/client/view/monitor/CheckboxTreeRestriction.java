@@ -49,14 +49,16 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
         this.addMember(layout);
     }
 
-    public void setForm() {
+    public void setForm(String restriction) {
         String type = getQueryExplorerTb().getType();
         String name = getQueryExplorerTb().getName();
         Label label = WidgetUtil.getLabel("<b>" + name + "</b>",
                 QueryConstants.ICON_EXPLORE, 15);
         label.setWidth100();
         label.setAlign(Alignment.LEFT);
-        if (type == "int") {
+      
+
+       if (type == "http://www.w3.org/2001/XMLSchema#string") {
             HLayout l = new HLayout();
             l.setWidth100();
             l.setHeight(60);
@@ -69,168 +71,7 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
             body.setTitleOrientation(TitleOrientation.TOP);
             body.setTextAlign(Alignment.LEFT);
             body.setShowTitle(false);
-
-
-            IButton b0 = new IButton();
-            b0.setWidth(50);
-            b0.setHeight(50);
-            b0.setTitle("OR");
-            final String tile0 = b0.getTitle();
-            b0.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent event) {
-                    if (body.getValueAsString() == null) {
-                        body.setValue("" + tile0);
-                    } else {
-                        body.setValue(body.getValueAsString() + " " + tile0);
-                    }
-                }
-            });
-
-            IButton b = new IButton();
-            b.setWidth(50);
-            b.setHeight(50);
-            b.setTitle("AND");
-            final String tile = b.getTitle();
-            b.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent event) {
-                    if (body.getValueAsString() == null) {
-                        body.setValue("" + tile);
-                    } else {
-                        body.setValue(body.getValueAsString() + " " + tile);
-                    }
-
-
-                }
-            });
-
-            IButton b1 = new IButton();
-            b1.setWidth(50);
-            b1.setHeight(50);
-            b1.setTitle("<");
-            final String tile1 = b1.getTitle();
-            b1.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent event) {
-                    if (body.getValueAsString() == null) {
-                        body.setValue("" + tile1);
-                    } else {
-                        body.setValue(body.getValueAsString() + " " + tile1);
-                    }
-
-
-                }
-            });
-
-            IButton b2 = new IButton();
-            b2.setWidth(50);
-            b2.setHeight(50);
-            b2.setTitle(">");
-            final String tile2 = b2.getTitle();
-            b2.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent event) {
-                    if (body.getValueAsString() == null) {
-                        body.setValue("" + tile2);
-                    } else {
-                        body.setValue(body.getValueAsString() + " " + tile2);
-                    }
-                }
-            });
-
-
-            IButton b3 = new IButton();
-            b3.setWidth(50);
-            b3.setHeight(50);
-            b3.setTitle("=");
-            final String tile3 = b3.getTitle();
-            b3.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent event) {
-                    if (body.getValueAsString() == null) {
-                        body.setValue("" + tile3);
-                    } else {
-                        body.setValue(body.getValueAsString() + " " + tile3);
-                    }
-
-
-                }
-            });
-
-
-            IButton b4 = new IButton();
-            b4.setWidth(50);
-            b4.setHeight(50);
-            b4.setTitle("!=");
-            final String tile4 = b4.getTitle();
-            b4.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent event) {
-                    if (body.getValueAsString() == null) {
-                        body.setValue("" + tile4);
-                    } else {
-                        body.setValue(body.getValueAsString() + " " + tile4);
-                    }
-
-
-                }
-            });
-
-
-            IButton saveButton = WidgetUtil.getIButton("Add Restriction", CoreConstants.ICON_SAVE,
-                    new ClickHandler() {
-                ///nouha// String body_val=null;
-                @Override
-                public void onClick(ClickEvent event) {
-                    //save condition
-
-                    getQueryExplorerTb().addRestriction(body.getValueAsString());
-                    getQueryExplorerTb().refrechGrid();
-
-
-                }
-            });
-
-            IButton resetButton = WidgetUtil.getIButton("Reset", QueryConstants.ICON_LAUNCH,
-                    new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent event) {
-                    body.setValue("");
-                }
-            });
-
-            hlayoutbuttons.addMembers(saveButton, resetButton);
-
-            Canvas[] children = layout.getChildren();
-            layout.removeMembers(children);
-            l.addMember(b0);
-            l.addMember(b);
-            l.addMember(b1);
-            l.addMember(b2);
-            l.addMember(b3);
-            l.addMember(b4);
-
-            l.setMembersMargin(5);
-            layout.addMember(label);
-            layout.addMember(l);
-            layout.addMember(FieldUtil.getForm(body));
-            layout.addMember(hlayoutbuttons);
-
-
-        } else if (type == "string") {
-            HLayout l = new HLayout();
-            l.setWidth100();
-            l.setHeight(60);
-            HLayout hlayoutbuttons = new HLayout();
-            hlayoutbuttons.setMembersMargin(5);
-
-            body = new TextAreaItem();
-            body.setWidth(300);
-            body.setHeight(150);
-            body.setTitleOrientation(TitleOrientation.TOP);
-            body.setTextAlign(Alignment.LEFT);
-            body.setShowTitle(false);
+            body.setValue(restriction);
 
 
             IButton b0 = new IButton();
@@ -365,11 +206,11 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
 
             layout.addMember(FieldUtil.getForm(body));
             layout.addMember(hlayoutbuttons);
-        } else if (type == "nothing") {
+       /** } else if (type == "nothing") {
 
             Canvas[] children = layout.getChildren();
-            layout.removeMembers(children);
-        } else if (type == "date") {
+            layout.removeMembers(children);**/
+        } else if (type == "http://www.w3.org/2001/XMLSchema#dateTime") {
             HLayout l = new HLayout();
             l.setWidth100();
             l.setHeight(60);
@@ -382,6 +223,7 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
             body.setTitleOrientation(TitleOrientation.TOP);
             body.setTextAlign(Alignment.LEFT);
             body.setShowTitle(false);
+            body.setValue(restriction);
 
             IButton b0 = new IButton();
             b0.setWidth(50);
@@ -569,12 +411,171 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
             layout.addMember(FieldUtil.getForm(body));
             layout.addMember(hlayoutbuttons);
 
-        } else {
+      
+       /* }else  if (type == "int") {**/
+        }else{
+            HLayout l = new HLayout();
+            l.setWidth100();
+            l.setHeight(60);
+            HLayout hlayoutbuttons = new HLayout();
+            hlayoutbuttons.setMembersMargin(5);
+
+            body = new TextAreaItem();
+            body.setWidth(300);
+            body.setHeight(150);
+            body.setTitleOrientation(TitleOrientation.TOP);
+            body.setTextAlign(Alignment.LEFT);
+            body.setShowTitle(false);
+            body.setValue(restriction);
+
+
+            IButton b0 = new IButton();
+            b0.setWidth(50);
+            b0.setHeight(50);
+            b0.setTitle("OR");
+            final String tile0 = b0.getTitle();
+            b0.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    if (body.getValueAsString() == null) {
+                        body.setValue("" + tile0);
+                    } else {
+                        body.setValue(body.getValueAsString() + " " + tile0);
+                    }
+                }
+            });
+
+            IButton b = new IButton();
+            b.setWidth(50);
+            b.setHeight(50);
+            b.setTitle("AND");
+            final String tile = b.getTitle();
+            b.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    if (body.getValueAsString() == null) {
+                        body.setValue("" + tile);
+                    } else {
+                        body.setValue(body.getValueAsString() + " " + tile);
+                    }
+
+
+                }
+            });
+
+            IButton b1 = new IButton();
+            b1.setWidth(50);
+            b1.setHeight(50);
+            b1.setTitle("<");
+            final String tile1 = b1.getTitle();
+            b1.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    if (body.getValueAsString() == null) {
+                        body.setValue("" + tile1);
+                    } else {
+                        body.setValue(body.getValueAsString() + " " + tile1);
+                    }
+
+
+                }
+            });
+
+            IButton b2 = new IButton();
+            b2.setWidth(50);
+            b2.setHeight(50);
+            b2.setTitle(">");
+            final String tile2 = b2.getTitle();
+            b2.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    if (body.getValueAsString() == null) {
+                        body.setValue("" + tile2);
+                    } else {
+                        body.setValue(body.getValueAsString() + " " + tile2);
+                    }
+                }
+            });
+
+
+            IButton b3 = new IButton();
+            b3.setWidth(50);
+            b3.setHeight(50);
+            b3.setTitle("=");
+            final String tile3 = b3.getTitle();
+            b3.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    if (body.getValueAsString() == null) {
+                        body.setValue("" + tile3);
+                    } else {
+                        body.setValue(body.getValueAsString() + " " + tile3);
+                    }
+
+
+                }
+            });
+
+
+            IButton b4 = new IButton();
+            b4.setWidth(50);
+            b4.setHeight(50);
+            b4.setTitle("!=");
+            final String tile4 = b4.getTitle();
+            b4.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    if (body.getValueAsString() == null) {
+                        body.setValue("" + tile4);
+                    } else {
+                        body.setValue(body.getValueAsString() + " " + tile4);
+                    }
+
+
+                }
+            });
+
+
+            IButton saveButton = WidgetUtil.getIButton("Add Restriction", CoreConstants.ICON_SAVE,
+                    new ClickHandler() {
+                ///nouha// String body_val=null;
+                @Override
+                public void onClick(ClickEvent event) {
+                    //save condition
+
+                    getQueryExplorerTb().addRestriction(body.getValueAsString());
+                    getQueryExplorerTb().refrechGrid();
+
+
+                }
+            });
+
+            IButton resetButton = WidgetUtil.getIButton("Reset", QueryConstants.ICON_LAUNCH,
+                    new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    body.setValue("");
+                }
+            });
+
+            hlayoutbuttons.addMembers(saveButton, resetButton);
 
             Canvas[] children = layout.getChildren();
             layout.removeMembers(children);
-        }
+            l.addMember(b0);
+            l.addMember(b);
+            l.addMember(b1);
+            l.addMember(b2);
+            l.addMember(b3);
+            l.addMember(b4);
 
+            l.setMembersMargin(5);
+            layout.addMember(label);
+            layout.addMember(l);
+            layout.addMember(FieldUtil.getForm(body));
+            layout.addMember(hlayoutbuttons);
+
+        }
 
 
     }
