@@ -9,7 +9,7 @@ import java.sql.Timestamp;
 
 /**
  *
- * @author Boujelben
+ * @author Nouha Boujelben
  */
 public class QueryVersion implements IsSerializable {
 
@@ -19,14 +19,10 @@ public class QueryVersion implements IsSerializable {
     private String body;
     private Timestamp dateCreation;
     private String description;
+    private boolean isPublic;
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
+ 
+   
 
     public Timestamp getDateCreation() {
         return dateCreation;
@@ -39,11 +35,12 @@ public class QueryVersion implements IsSerializable {
     public QueryVersion() {
     }
 
-    public QueryVersion(Long queryVersion, Long queryID,String description, String body) {
+    public QueryVersion(Long queryVersion, Long queryID,String description, String body,boolean isPublic) {
         this.queryVersion = queryVersion;
         this.queryID = queryID;
-        this.body = body;
         this.description=description;
+        this.body = body;
+        this.isPublic=isPublic;
     }
 
     public QueryVersion(Long queryVersion, String body) {
@@ -51,12 +48,7 @@ public class QueryVersion implements IsSerializable {
         this.body = body;
     }
 
-    public QueryVersion(Long queryVersionID, Long queryVersion, Long queryID, String body) {
-        this.queryVersionID = queryVersionID;
-        this.queryVersion = queryVersion;
-        this.queryID = queryID;
-        this.body = body;
-    }
+    
 
     public String getBody() {
         return body;
@@ -88,5 +80,21 @@ public class QueryVersion implements IsSerializable {
 
     public void setQueryVersionID(Long queryVersionID) {
         this.queryVersionID = queryVersionID;
+    }
+    
+     public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
+    public boolean isIsPublic() {
+        return isPublic;
+    }
+
+    public void setIsPublic(boolean isPublic) {
+        this.isPublic = isPublic;
     }
 }
