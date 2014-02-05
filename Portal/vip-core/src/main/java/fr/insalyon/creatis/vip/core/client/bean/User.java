@@ -266,7 +266,11 @@ public class User implements IsSerializable {
         return false;
     }
     
-    
+
+
+    public boolean hasGroups(){
+        return groups.size() != 0;
+    }
     
     
     public void getGroups() {
