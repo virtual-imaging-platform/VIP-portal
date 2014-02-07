@@ -199,13 +199,13 @@ public class ParameterTab extends AbstractFormLayout {
                             for (TextItem t : arrList) {
 
                                 saveValue(new Value(t.getValueAsString(), Long.parseLong(t.getName()), result));
-                                t.setValue("");
+                                
 
                             }
                             queryExecutionID = result;
 
                         }
-                        executionName.setValue("");
+                        
                         tab = new QueryHistoryTab();
                         Layout.getInstance().addTab(tab);
                     }
