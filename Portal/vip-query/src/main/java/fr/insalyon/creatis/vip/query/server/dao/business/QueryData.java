@@ -106,7 +106,7 @@ public class QueryData implements QueryDAO {
               prep.setString(1, rs2.getString("queryMaker"));
               ResultSet rsPrep = prep.executeQuery();
                while (rsPrep.next()) {
-              values.add(0,rsPrep.getString("first_name")+" "+rsPrep.getString("last_name")+"("+rs2.getString("queryMaker")+")" );
+              values.add(0,rsPrep.getString("first_name")+" "+rsPrep.getString("last_name")+" ("+rs2.getString("queryMaker")+")" );
                }
               values.add(1,rs2.getString("description") );
 
