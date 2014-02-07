@@ -55,11 +55,14 @@ import com.smartgwt.client.widgets.tree.TreeGridField;
 import com.smartgwt.client.widgets.tree.TreeNode;
 import com.smartgwt.client.widgets.tree.events.FolderOpenedEvent;
 import com.smartgwt.client.widgets.tree.events.FolderOpenedHandler;
+import com.smartgwt.client.widgets.tree.events.NodeClickEvent;
+import com.smartgwt.client.widgets.tree.events.NodeClickHandler;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.query.client.bean.Parameter;
 import fr.insalyon.creatis.vip.query.client.bean.Query;
 import fr.insalyon.creatis.vip.query.client.bean.QueryExecution;
@@ -123,6 +126,7 @@ public class CheckboxTree extends AbstractFormLayout {
         GTree.setParentIdField("ReportsTo");
         GTree.setOpenProperty("isOpen");
         GTree.setIsFolderProperty("isFolder");
+       
 
         BTree = new Tree();
         BTree.setModelType(TreeModelType.PARENT);
@@ -132,6 +136,7 @@ public class CheckboxTree extends AbstractFormLayout {
         BTree.setParentIdField("ReportsTo");
         BTree.setOpenProperty("isOpen");
         BTree.setData(new GinsengTree().getGinsengBaseData());
+        
 
         BTreeGrid.setHeight(70);
         BTreeGrid.setLoadDataOnDemand(false);
@@ -153,11 +158,10 @@ public class CheckboxTree extends AbstractFormLayout {
         BTreeGrid.addSelectionUpdatedHandler(new SelectionUpdatedHandler() {
             public void onSelectionUpdated(SelectionUpdatedEvent event) {
                 generateBody();
-
             }
         });
 
-
+       treeGrid.setSelectionProperty("isSelected");
 
         treeGrid.addFolderOpenedHandler((new FolderOpenedHandler() {
             public void onFolderOpened(FolderOpenedEvent event) {
@@ -172,6 +176,7 @@ public class CheckboxTree extends AbstractFormLayout {
 
         treeGrid.setShowSelectionCanvas(true);
         treeGrid.setAnimateSelectionUnder(true);
+        
         treeGrid.addCellClickHandler((new CellClickHandler() {
             public void onCellClick(CellClickEvent event) {
                 if (event.getColNum() == 1) {
@@ -181,17 +186,47 @@ public class CheckboxTree extends AbstractFormLayout {
                     getQueryExplorerTb().setForm(event.getRecord().getAttribute("Restriction"));
 
                 }
-
+                
+               
             }
         }));
-
+      
+              
+                
         treeGrid.addSelectionUpdatedHandler(new SelectionUpdatedHandler() {
             public void onSelectionUpdated(SelectionUpdatedEvent event) {
+               
                 generateBody();
+                //selectionner les attribus classes
+                ListGridRecord[] list = treeGrid.getSelectedRecords();  
+                int n = list.length;
+                TreeNode[] children = GTree.getChildren((GinsengTreeNode) list[n-1]);
+
+                for (TreeNode child : children) {
+                    if (child.getAttribute("isFolder") != "true") {
+                        treeGrid.selectRecord(child);
+                    }
+                }
+                
+                
+                ListGridRecord[] AllRecords=treeGrid.getRecords();
+                for (ListGridRecord record :AllRecords ) {
+                    
+                    if(((GinsengTreeNode)record).getAttribute("isSelected")=="false"){
+                        TreeNode[] childrenn = GTree.getChildren(((GinsengTreeNode)record));
+                        if(childrenn!=null){
+                        treeGrid.deselectRecords(childrenn);
+                        }
+                }
+                
+                }
+                
+                
+               
 
             }
         });
-
+       
         treeGrid.setLoadDataOnDemand(false);
         treeGrid.setNodeIcon(QueryConstants.ICON_BASE);
         treeGrid.setFolderIcon(QueryConstants.ICON_PROPERTIES);
@@ -205,7 +240,7 @@ public class CheckboxTree extends AbstractFormLayout {
         treeGrid.setShowSelectedStyle(true);
         treeGrid.setShowPartialSelection(true);
         //treeGrid.setData(GTree);
-        treeGrid.setCascadeSelection(true);
+        treeGrid.setCascadeSelection(false);
         queryNameField = FieldUtil.getTextItem("100%", null);
 
         description = new RichTextEditor();
@@ -474,8 +509,7 @@ public class CheckboxTree extends AbstractFormLayout {
     }
 
     public void loadData() {
-        String body_val = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> select * from <http://e-ginseng.org/graph/ontology/semEHR> where {?x a rdfs:Class . ?x rdfs:label ?label}";
-
+       
         final AsyncCallback<List<String[]>> callback;
         callback = new AsyncCallback<List<String[]>>() {
             @Override
@@ -491,40 +525,41 @@ public class CheckboxTree extends AbstractFormLayout {
 
                 for (String[] s : result) {
                     i++;
-                    GinsengData.add(new GinsengTreeNode("" + i, "1", s[0].replace("@en", "").replaceAll(" ", ""), s[0].replace("@en", "").replaceAll(" ", ""), QueryConstants.ICON_BASE, "string", false, "", true, "?" + s[0].toLowerCase().replace("@en", "").replaceAll(" ", "") + " rdf:type " + s[1].replace("http://www.mnemotix.com/ontology/semEHR#", "semehr:"), true, false));
+                    GinsengData.add(new GinsengTreeNode("" + i, "1", s[0].replace("@en", "").replaceAll(" ", ""), s[0].replace("@en", "").replaceAll(" ", ""), QueryConstants.ICON_BASE, "string", false, "",false, "?" + s[0].toLowerCase().replace("@en", "").replaceAll(" ", "") + " rdf:type " + s[1].replace("http://www.mnemotix.com/ontology/semEHR#", "semehr:"), true, false));
                 }
                 GTree.setData(GinsengData.toArray(new GinsengTreeNode[]{}));
                 treeGrid.setData(GTree);
                 treeLength = i;
             }
         };
-        EndPointSparqlService.Util.getInstance().getUrlResultFormatTable(body_val, "label", "x", callback);
+        EndPointSparqlService.Util.getInstance().getUrlResultFormatTable("label", "x", callback);
     }
 
     private void loadProperties(String prop, final String nodeParent, final String nodeParentName) {
 
-        String query = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
-                + "PREFIX semehr: <http://www.mnemotix.com/ontology/semEHR#> "
-                + "select ?property ?label ?range (bound(?class) as ?isClass) where {"
-                + " {"
-                + " {"
-                + " ?property rdfs:domain semehr:" + prop + "."
-                + " }"
-                + " UNION"
-                + " {"
-                + " ?property rdfs:domain ?class ."
-                + " semehr:" + prop + " rdfs:subClassOf ?class ."
-                + " }"
-                + " }"
-                + " ?property rdfs:label ?label"
-                + " optional {"
-                + " ?property rdfs:range ?range ."
-                + " optional {"
-                + " ?range a ?class ."
-                + " filter(?class = rdfs:Class)"
-                + " }"
-                + " }"
-                + " }";
+        String query = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+"\n"
+                + "PREFIX semehr: <http://www.mnemotix.com/ontology/semEHR#> "+"\n"
+                + "select ?property ?label ?range (bound(?class) as ?isClass) "+"\n"
+                + "WHERE {"+"\n"
+                + " {"+"\n"
+                + " {"+"\n"
+                + " ?property rdfs:domain semehr:"+prop+"\n"
+                + " }"+"\n"
+                + " UNION"+"\n"
+                + " {"+"\n"
+                + " ?property rdfs:domain ?class ."+"\n"
+                + " semehr:"+prop+" rdfs:subClassOf ?class"+"\n"
+                + " }"+"\n"
+                + " }"+"\n"
+                + " ?property rdfs:label ?label"+"\n"
+                + " optional {"+"\n"
+                + " ?property rdfs:range ?range ."+"\n"
+                + " optional {"+"\n"
+                + " ?range a ?class"+"\n"
+                + " filter ( ?class = rdfs:Class )"+"\n"
+                + " }"+"\n"
+                + " }"+"\n"
+                + " }"+"\n";
 
         final AsyncCallback<List<String[]>> callback;
         callback = new AsyncCallback<List<String[]>>() {
