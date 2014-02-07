@@ -98,6 +98,7 @@ public class CheckboxTree extends AbstractFormLayout {
     private Label body;
     private int treeLength;
     CheckboxItem ascendingItem;
+    CheckboxItem advancedOption;
     private String type;
     private String name;
     TreeGrid treeGrid = new TreeGrid();
@@ -126,7 +127,7 @@ public class CheckboxTree extends AbstractFormLayout {
         GTree.setParentIdField("ReportsTo");
         GTree.setOpenProperty("isOpen");
         GTree.setIsFolderProperty("isFolder");
-       
+
 
         BTree = new Tree();
         BTree.setModelType(TreeModelType.PARENT);
@@ -136,7 +137,7 @@ public class CheckboxTree extends AbstractFormLayout {
         BTree.setParentIdField("ReportsTo");
         BTree.setOpenProperty("isOpen");
         BTree.setData(new GinsengTree().getGinsengBaseData());
-        
+
 
         BTreeGrid.setHeight(70);
         BTreeGrid.setLoadDataOnDemand(false);
@@ -161,7 +162,7 @@ public class CheckboxTree extends AbstractFormLayout {
             }
         });
 
-       treeGrid.setSelectionProperty("isSelected");
+        treeGrid.setSelectionProperty("isSelected");
 
         treeGrid.addFolderOpenedHandler((new FolderOpenedHandler() {
             public void onFolderOpened(FolderOpenedEvent event) {
@@ -176,7 +177,7 @@ public class CheckboxTree extends AbstractFormLayout {
 
         treeGrid.setShowSelectionCanvas(true);
         treeGrid.setAnimateSelectionUnder(true);
-        
+
         treeGrid.addCellClickHandler((new CellClickHandler() {
             public void onCellClick(CellClickEvent event) {
                 if (event.getColNum() == 1) {
@@ -186,47 +187,43 @@ public class CheckboxTree extends AbstractFormLayout {
                     getQueryExplorerTb().setForm(event.getRecord().getAttribute("Restriction"));
 
                 }
-                
-               
+
+
             }
         }));
-      
-              
-                
+
+
+
         treeGrid.addSelectionUpdatedHandler(new SelectionUpdatedHandler() {
             public void onSelectionUpdated(SelectionUpdatedEvent event) {
-               
+
                 generateBody();
                 //selectionner les attribus classes
-                ListGridRecord[] list = treeGrid.getSelectedRecords();  
+                ListGridRecord[] list = treeGrid.getSelectedRecords();
                 int n = list.length;
-                TreeNode[] children = GTree.getChildren((GinsengTreeNode) list[n-1]);
+                TreeNode[] children = GTree.getChildren((GinsengTreeNode) list[n - 1]);
 
                 for (TreeNode child : children) {
                     if (child.getAttribute("isFolder") != "true") {
                         treeGrid.selectRecord(child);
                     }
                 }
-                
-                
-                ListGridRecord[] AllRecords=treeGrid.getRecords();
-                for (ListGridRecord record :AllRecords ) {
-                    
-                    if(((GinsengTreeNode)record).getAttribute("isSelected")=="false"){
-                        TreeNode[] childrenn = GTree.getChildren(((GinsengTreeNode)record));
-                        if(childrenn!=null){
-                        treeGrid.deselectRecords(childrenn);
-                        }
-                }
-                
-                }
-                
-                
-               
 
+
+                ListGridRecord[] AllRecords = treeGrid.getRecords();
+                for (ListGridRecord record : AllRecords) {
+
+                    if (((GinsengTreeNode) record).getAttribute("isSelected") == "false") {
+                        TreeNode[] childrenn = GTree.getChildren(((GinsengTreeNode) record));
+                        if (childrenn != null) {
+                            treeGrid.deselectRecords(childrenn);
+                        }
+                    }
+
+                }
             }
         });
-       
+
         treeGrid.setLoadDataOnDemand(false);
         treeGrid.setNodeIcon(QueryConstants.ICON_BASE);
         treeGrid.setFolderIcon(QueryConstants.ICON_PROPERTIES);
@@ -258,9 +255,20 @@ public class CheckboxTree extends AbstractFormLayout {
         TreeGridField nameField = new TreeGridField("Name", "Name");
         TreeGridField typeField = new TreeGridField("Type", "Type");
         TreeGridField restriction = new TreeGridField("Restriction", "Restriction");
-        treeGrid.setFields(nameField, typeField, restriction);
+        TreeGridField groupBy = new TreeGridField("GroupBy", "Group By");
+        TreeGridField orderBy = new TreeGridField("OrderBy", "Order By");
+        orderBy.setType(ListGridFieldType.BOOLEAN);
+        orderBy.setCanEdit(true);
+        groupBy.setType(ListGridFieldType.BOOLEAN);
+        groupBy.setCanEdit(true);
+        treeGrid.setCanResizeFields(true);
+        treeGrid.setFields(nameField, typeField, restriction,groupBy,orderBy);
 
         typeField.setHidden(true);
+        orderBy.setHidden(true);
+         groupBy.setHidden(true);
+       
+        
         this.addMember(WidgetUtil.getLabel("<b>Selected Fields</b>", 15));
         this.addMember(treeGrid);
         HLayout layout = new HLayout();
@@ -276,11 +284,34 @@ public class CheckboxTree extends AbstractFormLayout {
 
         isPublic = new CheckboxItem();
         isPublic.setName("Public");
-        isPublic.setTitle("Public");
+        isPublic.setTitle("Make Query Public");
+        isPublic.setPrompt("A public query can be executed by all GINSENG users");
         isPublic.setRedrawOnChange(true);
         isPublic.setValue(false);
         DynamicForm form = new DynamicForm();
         form.setFields(isPublic);
+        
+        advancedOption = new CheckboxItem();
+        advancedOption .setName("Advanced Options");
+        advancedOption .setTitle("Advanced Options");
+        advancedOption .setRedrawOnChange(true);
+        advancedOption .setValue(false);
+        DynamicForm fo = new DynamicForm();
+        fo.setFields(advancedOption);
+        
+        advancedOption.addChangeHandler(new com.smartgwt.client.widgets.form.fields.events.ChangeHandler() {
+            public void onChange(ChangeEvent event) {
+                if ((Boolean) event.getValue()) {
+                    treeGrid.showField("GroupBy");
+                    treeGrid.showField("OrderBy");
+                   
+                } else {
+                    treeGrid.hideField("GroupBy");
+                    treeGrid.hideField("OrderBy");
+                   
+                }
+            }
+        });
 
 
 
@@ -333,6 +364,7 @@ public class CheckboxTree extends AbstractFormLayout {
 
         this.setBorder("1px solid #C0C0C0");
         this.addMember(form);
+        this.addMember(fo);
         this.addMember(layout);
         ascendingItem = new CheckboxItem();
         ascendingItem.setName("Show Query");
@@ -361,6 +393,9 @@ public class CheckboxTree extends AbstractFormLayout {
                 isPublicValue = (Boolean) event.getValue();
             }
         });
+        
+        
+       
     }
 
     private void save(Query query) throws QueryException {
@@ -491,14 +526,38 @@ public class CheckboxTree extends AbstractFormLayout {
             rollOverRecord2 = (GinsengTreeNode) list[i];
             if (rollOverRecord2.getAttribute("Restriction") != "") {
                 if (rollOverRecord2.getAttribute("Restriction").indexOf("regex") != -1) {
-                    // body.setContents(body.getContents() + "filter regex(" + "?" + rollOverRecord2.getAttribute("Name").toLowerCase() + "," + rollOverRecord2.getAttribute("Restriction").replaceAll("regex(", "") + "<br/>");
                     body.setContents(body.getContents() + "FILTER regex(" + "?" + rollOverRecord2.getAttribute("Name").toLowerCase() + "," + "&quot;" + rollOverRecord2.getAttribute("Restriction").replaceAll("regex:", "") + "&quot;" + ")" + "<br/>");
                 } else {
                     body.setContents(body.getContents() + "FILTER (" + "?" + rollOverRecord2.getAttribute("Name").toLowerCase() + " " + rollOverRecord2.getAttribute("Restriction") + ")" + "<br/>");
                 }
             }
         }
-        body.setContents(body.getContents() + "}");
+        //
+         body.setContents(body.getContents() + "}");
+        
+        //Bloc order By
+        
+        for (int i = 0; i < n; i++) {
+            rollOverRecord2 = (GinsengTreeNode) list[i];
+            if (rollOverRecord2.getAttribute("OrderBy") == "true") {
+                
+                    body.setContents(body.getContents()+ "<br/>"  + "order by "+ "?" + rollOverRecord2.getAttribute("Name").toLowerCase().replaceAll(" ", ""));
+                                
+            }
+        }
+        //Bloc Group By
+        
+         for (int i = 0; i < n; i++) {
+            rollOverRecord2 = (GinsengTreeNode) list[i];
+            if (rollOverRecord2.getAttribute("GroupBy") == "true") {
+                
+                    body.setContents(body.getContents() + "<br/>" + "group by "+ "?" + rollOverRecord2.getAttribute("Name").toLowerCase().replaceAll(" ", ""));
+                                
+            }
+        }
+        
+        
+       
     }
 
     public QueryExplorerTab getQueryExplorerTb() {
@@ -509,7 +568,7 @@ public class CheckboxTree extends AbstractFormLayout {
     }
 
     public void loadData() {
-       
+
         final AsyncCallback<List<String[]>> callback;
         callback = new AsyncCallback<List<String[]>>() {
             @Override
@@ -525,7 +584,7 @@ public class CheckboxTree extends AbstractFormLayout {
 
                 for (String[] s : result) {
                     i++;
-                    GinsengData.add(new GinsengTreeNode("" + i, "1", s[0].replace("@en", "").replaceAll(" ", ""), s[0].replace("@en", "").replaceAll(" ", ""), QueryConstants.ICON_BASE, "string", false, "",false, "?" + s[0].toLowerCase().replace("@en", "").replaceAll(" ", "") + " rdf:type " + s[1].replace("http://www.mnemotix.com/ontology/semEHR#", "semehr:"), true, false));
+                    GinsengData.add(new GinsengTreeNode("" + i, "1", s[0].replace("@en", "").replaceAll(" ", ""), s[0].replace("@en", "").replaceAll(" ", ""), QueryConstants.ICON_BASE, "string", false, "", false, "?" + s[0].toLowerCase().replace("@en", "").replaceAll(" ", "") + " rdf:type " + s[1].replace("http://www.mnemotix.com/ontology/semEHR#", "semehr:"), true, false,false,false));
                 }
                 GTree.setData(GinsengData.toArray(new GinsengTreeNode[]{}));
                 treeGrid.setData(GTree);
@@ -537,29 +596,29 @@ public class CheckboxTree extends AbstractFormLayout {
 
     private void loadProperties(String prop, final String nodeParent, final String nodeParentName) {
 
-        String query = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+"\n"
-                + "PREFIX semehr: <http://www.mnemotix.com/ontology/semEHR#> "+"\n"
-                + "select ?property ?label ?range (bound(?class) as ?isClass) "+"\n"
-                + "WHERE {"+"\n"
-                + " {"+"\n"
-                + " {"+"\n"
-                + " ?property rdfs:domain semehr:"+prop+"\n"
-                + " }"+"\n"
-                + " UNION"+"\n"
-                + " {"+"\n"
-                + " ?property rdfs:domain ?class ."+"\n"
-                + " semehr:"+prop+" rdfs:subClassOf ?class"+"\n"
-                + " }"+"\n"
-                + " }"+"\n"
-                + " ?property rdfs:label ?label"+"\n"
-                + " optional {"+"\n"
-                + " ?property rdfs:range ?range ."+"\n"
-                + " optional {"+"\n"
-                + " ?range a ?class"+"\n"
-                + " filter ( ?class = rdfs:Class )"+"\n"
-                + " }"+"\n"
-                + " }"+"\n"
-                + " }"+"\n";
+        String query = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> " + "\n"
+                + "PREFIX semehr: <http://www.mnemotix.com/ontology/semEHR#> " + "\n"
+                + "select ?property ?label ?range (bound(?class) as ?isClass) " + "\n"
+                + "WHERE {" + "\n"
+                + " {" + "\n"
+                + " {" + "\n"
+                + " ?property rdfs:domain semehr:" + prop + "\n"
+                + " }" + "\n"
+                + " UNION" + "\n"
+                + " {" + "\n"
+                + " ?property rdfs:domain ?class ." + "\n"
+                + " semehr:" + prop + " rdfs:subClassOf ?class" + "\n"
+                + " }" + "\n"
+                + " }" + "\n"
+                + " ?property rdfs:label ?label" + "\n"
+                + " optional {" + "\n"
+                + " ?property rdfs:range ?range ." + "\n"
+                + " optional {" + "\n"
+                + " ?range a ?class" + "\n"
+                + " filter ( ?class = rdfs:Class )" + "\n"
+                + " }" + "\n"
+                + " }" + "\n"
+                + " }" + "\n";
 
         final AsyncCallback<List<String[]>> callback;
         callback = new AsyncCallback<List<String[]>>() {
@@ -574,9 +633,9 @@ public class CheckboxTree extends AbstractFormLayout {
                     treeLength++;
                     //empty c'est une propriété
                     if (s[3] == "false^^http://www.w3.org/2001/XMLSchema#boolean") {
-                        GTree.add(new GinsengTreeNode("" + treeLength, nodeParent, s[0].replace("@en", "").replaceAll(" ", ""), s[2], QueryConstants.ICON_ATTRIBUT, s[2], false, "", false, "?" + nodeParentName.toLowerCase() + " " + s[1].replace("http://www.mnemotix.com/ontology/semEHR#", "semehr:") + " ?" + s[0].toLowerCase().replace("@en", "").replaceAll(" ", ""), false, false), GTree.findById(nodeParent));
+                        GTree.add(new GinsengTreeNode("" + treeLength, nodeParent, s[0].replace("@en", "").replaceAll(" ", ""), s[2], QueryConstants.ICON_ATTRIBUT, s[2], false, "", false, "?" + nodeParentName.toLowerCase() + " " + s[1].replace("http://www.mnemotix.com/ontology/semEHR#", "semehr:") + " ?" + s[0].toLowerCase().replace("@en", "").replaceAll(" ", ""), false, false,false,false), GTree.findById(nodeParent));
                     } else {
-                        GTree.add(new GinsengTreeNode("" + treeLength, nodeParent, s[0].replace("@en", "").replaceAll(" ", ""), s[2].substring(s[2].indexOf("#") + 1), QueryConstants.ICON_BASE, "string", false, "", false, "?" + nodeParentName.toLowerCase() + " " + s[1].replace("http://www.mnemotix.com/ontology/semEHR#", "semehr:") + " ?" + s[0].toLowerCase().replace("@en", "").replaceAll(" ", "") + "." + "?" + s[0].toLowerCase().replace("@en", "").replaceAll(" ", "") + " rdf:type " + s[2].replace("http://www.mnemotix.com/ontology/semEHR#", "semehr:"), true, false), GTree.findById(nodeParent));
+                        GTree.add(new GinsengTreeNode("" + treeLength, nodeParent, s[0].replace("@en", "").replaceAll(" ", ""), s[2].substring(s[2].indexOf("#") + 1), QueryConstants.ICON_BASE, "string", false, "", false, "?" + nodeParentName.toLowerCase() + " " + s[1].replace("http://www.mnemotix.com/ontology/semEHR#", "semehr:") + " ?" + s[0].toLowerCase().replace("@en", "").replaceAll(" ", "") + "." + "?" + s[0].toLowerCase().replace("@en", "").replaceAll(" ", "") + " rdf:type " + s[2].replace("http://www.mnemotix.com/ontology/semEHR#", "semehr:"), true, false,false,false), GTree.findById(nodeParent));
                     }
 
                 }

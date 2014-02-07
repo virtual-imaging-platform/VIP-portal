@@ -87,9 +87,10 @@ public class CreateQuery extends AbstractFormLayout {
 
         isPublic = new CheckboxItem();
         isPublic.setName("Public");
-        isPublic.setTitle("Public");
+        isPublic.setTitle("Make Query Public");
         isPublic.setRedrawOnChange(true);
         isPublic.setValue(false);
+        isPublic.setPrompt("A public query can be executed by all GINSENG users");
         DynamicForm form = new DynamicForm();
         form.setFields(isPublic);
 
