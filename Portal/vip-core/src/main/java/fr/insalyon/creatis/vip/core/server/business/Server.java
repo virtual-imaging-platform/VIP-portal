@@ -114,6 +114,10 @@ public class Server {
     //third-party auth
     private String samlTrustedCertificate;
     private String mozillaPersonaValidationURL;
+    //treeQuery
+    private String queryTree;
+
+   
     
     public static Server getInstance() {
         if (instance == null) {
@@ -193,6 +197,14 @@ public class Server {
             samlTrustedCertificate = config.getString(CoreConstants.SAML_TRUSTED_CERTIFICATE, System.getProperty( "user.home" )+File.separator+".vip"+File.separator+"trusted_saml_cert.pem");
             mozillaPersonaValidationURL = config.getString(CoreConstants.MOZILLA_PERSONA_VALIDATION_URL,"https://verifier.login.persona.org/verify");
                     
+            
+            queryTree=config.getString(CoreConstants.TreeQuery,"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> select * from <http://e-ginseng.org/graph/ontology/semEHR> where {?x a rdfs:Class . ?x rdfs:label ?label}");
+            
+            
+            
+           //queryTree
+             
+            
             config.setProperty(CoreConstants.LAB_DB_HOST, databaseServerHost);
             config.setProperty(CoreConstants.LAB_DB_PORT, databaseServerPort);
             config.setProperty(CoreConstants.LAB_ADMIN_FIRST_NAME, adminFirstName);
@@ -239,6 +251,8 @@ public class Server {
             config.setProperty(CoreConstants.SSH_PUBLIC_KEY, sshPublicKey);
             config.setProperty(CoreConstants.SAML_TRUSTED_CERTIFICATE, samlTrustedCertificate);
             config.setProperty(CoreConstants.MOZILLA_PERSONA_VALIDATION_URL,mozillaPersonaValidationURL);
+            
+            config.setProperty(CoreConstants.TreeQuery, queryTree);
             
             config.save();
 
@@ -437,6 +451,10 @@ public class Server {
 
     public String getMozillaPersonaValidationURL() {
         return mozillaPersonaValidationURL;
+    }
+    
+     public String getQueryTree() {
+        return queryTree;
     }
   
 }

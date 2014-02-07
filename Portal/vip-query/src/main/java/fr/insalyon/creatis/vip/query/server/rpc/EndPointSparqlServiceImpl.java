@@ -5,13 +5,19 @@
 package fr.insalyon.creatis.vip.query.server.rpc;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
 import fr.insalyon.creatis.vip.query.client.rpc.EndPointSparqlService;
 import java.io.UnsupportedEncodingException;
 import org.apache.http.client.utils.URIBuilder;
 import java.lang.Object.*;
 import java.net.URI;
 import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.query.*;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.query.server.dao.business.QueryData;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -55,11 +61,11 @@ public class EndPointSparqlServiceImpl extends RemoteServiceServlet
     
    
     
-     public List<String[]> getUrlResultFormatTable(String param1,String val1, String val2) {
+     public List<String[]> getUrlResultFormatTable(String val1, String val2) {
        
    
-         Query query = QueryFactory.create(param1);
-         QueryExecution qexec = QueryExecutionFactory.sparqlService("http://ginseng.i3s.unice.fr:9000/sparql", param1);
+         Query query = QueryFactory.create(Server.getInstance().getQueryTree());
+         QueryExecution qexec = QueryExecutionFactory.sparqlService("http://ginseng.i3s.unice.fr:9000/sparql", Server.getInstance().getQueryTree());
          ResultSet results = qexec.execSelect();
          List<String[]> rslt = new ArrayList<String[]>();
         
@@ -77,29 +83,48 @@ public class EndPointSparqlServiceImpl extends RemoteServiceServlet
      
       public List<String[]> getUrlResultFormatTable(String param1,String val1, String val2,String val3,String val4) {
        
-   
+   try{
+        logger.error(param1);
          Query query = QueryFactory.create(param1);
+         logger.error("1");
          QueryExecution qexec = QueryExecutionFactory.sparqlService("http://ginseng.i3s.unice.fr:9000/sparql", param1);
+         logger.error("2");
          ResultSet results = qexec.execSelect();
+         logger.error("3");
          List<String[]> rslt = new ArrayList<String[]>();
         
-
+       
          while (results.hasNext()) {
              QuerySolution row = results.next();
-          /*
-             String range;
+          
+             String valueVal1;
+             String valueVal2;
+             String valueVal3;
+             String valueVal4;
              try {
-                 range = row.get(val3).toString();
+                 valueVal1 = row.get(val1).toString();
+                 valueVal2 = row.get(val2).toString();
+                 valueVal3 = row.get(val3).toString();
+                 valueVal4 = row.get(val4).toString();
              } catch (Exception ex) {
-                 range = "empty";
+                  valueVal1 = "empty";
+                  valueVal2 = "empty";
+                  valueVal3 = "empty";
+                 valueVal4 = "empty";
+                   logger.error(ex);
              }  
-             * */
-             rslt.add(new String[]{row.get(val1).toString(),row.get(val2).toString(),row.get(val3).toString(),row.get(val4).toString()});
+             
+             rslt.add(new String[]{valueVal1,valueVal2,valueVal3,valueVal4});
              logger.info(row.get(val3).toString());
           
              }
-           
-        return rslt;
+           return rslt;
+        
+         } catch (Exception ex) {
+        
+         logger.info(ex);
+         return null;
+         }
         
     }
     
