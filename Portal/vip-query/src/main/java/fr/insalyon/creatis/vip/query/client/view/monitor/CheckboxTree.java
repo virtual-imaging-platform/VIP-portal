@@ -7,6 +7,7 @@ package fr.insalyon.creatis.vip.query.client.view.monitor;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.AnimationEffect;
 import com.smartgwt.client.types.ExpansionMode;
@@ -35,6 +36,8 @@ import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 
 import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -111,6 +114,7 @@ public class CheckboxTree extends AbstractFormLayout {
     boolean isPublicValue = false;
     private Tree BTree;
     private Tree GTree;
+    private TextItem limitValue;
 
     public CheckboxTree() {
 
@@ -284,21 +288,41 @@ public class CheckboxTree extends AbstractFormLayout {
         advancedOption .setTitle("Advanced Options");
         advancedOption .setRedrawOnChange(true);
         advancedOption .setValue(false);
-        DynamicForm fo = new DynamicForm();
-        fo.setFields(advancedOption);
+        final DynamicForm fo = new DynamicForm();
+        
+        limitValue=new TextItem();
+        limitValue.setTitle("Limit");
+        
+        limitValue.setWidth(100);
+        limitValue.setKeyPressFilter("[0-9]");
+        limitValue.addChangedHandler(new ChangedHandler() {
+                        @Override
+                        public void onChanged(ChangedEvent event) {
+                            event.getItem().validate();
+                        }
+                    });
+        fo.setFields(advancedOption,limitValue);
+        limitValue.setVisible(false);
+        
         fo.setWidth100();   
         advancedOption.addChangeHandler(new com.smartgwt.client.widgets.form.fields.events.ChangeHandler() {
             public void onChange(ChangeEvent event) {
+                
                 if ((Boolean) event.getValue()) {
                     treeGrid.showField("GroupBy");
                     treeGrid.showField("OrderBy");
                     treeGrid.setWidth100();
+                    
+                   limitValue.setVisible(true);
+                   
+                    
                    
                 } else {
                     treeGrid.hideField("GroupBy");
                     treeGrid.hideField("OrderBy");
                     treeGrid.setWidth100();
-                   
+                   limitValue.setVisible(false);
+                    
                 }
             }
         });
@@ -367,35 +391,22 @@ public class CheckboxTree extends AbstractFormLayout {
             }
         });
 
-       
+       layout.addMember(saveButton);
+       layout.addMember(executeButton);  
+       layout.setMembersMargin(10);
       
+       vlayout1.addMember(form);
+       vlayout1.addMember(layout);
         
-        
-         layout.addMember(saveButton);
-        layout.addMember(executeButton);  
-        layout.setMembersMargin(10);
-      
-        vlayout1.addMember(form);
-        vlayout1.addMember(layout);
+       vlayout2.addMember(fo);
+       vlayout2.addMember(forme);
        
-        this.setBorder("1px solid #C0C0C0");
-        
-         vlayout2.addMember(fo);
-         
-       
-        HLayout mainLayout=new HLayout();
-        
-        vlayout2.addMember(forme);
+        HLayout mainLayout=new HLayout(); 
         mainLayout.addMember(vlayout1);
         mainLayout.addMember(vlayout2);
-      
-        this.addMember(mainLayout);
-        this.addMember(body);
-
-
-       
-        
-       
+        this.setBorder("1px solid #C0C0C0");
+        this.addMember(mainLayout);   
+        this.addMember(body);   
     }
 
     private void save(Query query) throws QueryException {
@@ -555,11 +566,13 @@ public class CheckboxTree extends AbstractFormLayout {
                                 
             }
         }
-        
-        
-       
-    }
+         
+        //Bloc Limit
+        if (limitValue.isVisible() && limitValue.getValue().toString().length() != 0) {
 
+            body.setContents(body.getContents() + "<br/>" + "Limit " + limitValue.getValue().toString());
+        }
+    }
     public QueryExplorerTab getQueryExplorerTb() {
 
         QueryExplorerTab queryExplorerTab = (QueryExplorerTab) Layout.getInstance().
