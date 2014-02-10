@@ -31,6 +31,7 @@ import com.smartgwt.client.widgets.events.DrawHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
+import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
@@ -191,10 +192,10 @@ public class CheckboxTree extends AbstractFormLayout {
 
         treeGrid.addSelectionUpdatedHandler(new SelectionUpdatedHandler() {
             public void onSelectionUpdated(SelectionUpdatedEvent event) {
-
                 generateBody();          
             }
         });
+        
         treeGrid.setWidth100();
         treeGrid.setLoadDataOnDemand(false);
         treeGrid.setNodeIcon(QueryConstants.ICON_BASE);
@@ -230,24 +231,31 @@ public class CheckboxTree extends AbstractFormLayout {
      
         TreeGridField groupBy = new TreeGridField("GroupBy", "Group By");
         TreeGridField orderBy = new TreeGridField("OrderBy", "Order By");
+        //orderBy.setType(ListGridFieldType.BOOLEAN);
+        FormItem editorType = new RadioGroupItem();
+        orderBy.setEditorType(editorType);
         orderBy.setType(ListGridFieldType.BOOLEAN);
         orderBy.setCanEdit(true);
         groupBy.setType(ListGridFieldType.BOOLEAN);
         groupBy.setCanEdit(true);
+        
         treeGrid.setFields(nameField, typeField, restriction,groupBy,orderBy);
         treeGrid.setCanResizeFields(true);
-        
-
         typeField.setHidden(true);
         orderBy.setHidden(true);
         groupBy.setHidden(true);
-       
-        
+          
         this.addMember(WidgetUtil.getLabel("<b>Selected Fields</b>", 15));
         this.addMember(treeGrid);
         HLayout layout = new HLayout();
         layout.setHeight(30);
-
+        VLayout vlayout1 = new VLayout();
+        vlayout1.setHeight(60);
+        vlayout1.setMembersMargin(5);
+        
+        VLayout vlayout2 = new VLayout();
+        vlayout2.setHeight(60);
+        vlayout2.setMembersMargin(5);
         body = new Label("");
         body.setHeight(100);
         body.setWidth100();
@@ -264,6 +272,12 @@ public class CheckboxTree extends AbstractFormLayout {
         isPublic.setValue(false);
         DynamicForm form = new DynamicForm();
         form.setFields(isPublic);
+        form.setWidth100();
+        isPublic.addChangeHandler(new com.smartgwt.client.widgets.form.fields.events.ChangeHandler() {
+            public void onChange(ChangeEvent event) {
+                isPublicValue = (Boolean) event.getValue();
+            }
+        });
         
         advancedOption = new CheckboxItem();
         advancedOption .setName("Advanced Options");
@@ -272,7 +286,7 @@ public class CheckboxTree extends AbstractFormLayout {
         advancedOption .setValue(false);
         DynamicForm fo = new DynamicForm();
         fo.setFields(advancedOption);
-        
+        fo.setWidth100();   
         advancedOption.addChangeHandler(new com.smartgwt.client.widgets.form.fields.events.ChangeHandler() {
             public void onChange(ChangeEvent event) {
                 if ((Boolean) event.getValue()) {
@@ -289,6 +303,25 @@ public class CheckboxTree extends AbstractFormLayout {
             }
         });
 
+          
+        ascendingItem = new CheckboxItem();
+        ascendingItem.setName("Show Query");
+        ascendingItem.setTitle("Show Query");
+        ascendingItem.setRedrawOnChange(true);
+        ascendingItem.setValue(false);
+        DynamicForm forme = new DynamicForm();
+        forme.setFields(ascendingItem);
+        forme.setWidth100();
+          ascendingItem.addChangeHandler(new com.smartgwt.client.widgets.form.fields.events.ChangeHandler() {
+            public void onChange(ChangeEvent event) {
+                if ((Boolean) event.getValue()) {
+                    generateBody();
+                    body.animateShow(AnimationEffect.SLIDE);
+                } else {
+                    body.animateHide(AnimationEffect.SLIDE);
+                }
+            }
+        });
 
 
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVE,
@@ -334,42 +367,33 @@ public class CheckboxTree extends AbstractFormLayout {
             }
         });
 
-        layout.addMember(saveButton);
-        layout.addMember(executeButton);
+       
+      
+        
+        
+         layout.addMember(saveButton);
+        layout.addMember(executeButton);  
         layout.setMembersMargin(10);
-
+      
+        vlayout1.addMember(form);
+        vlayout1.addMember(layout);
+       
         this.setBorder("1px solid #C0C0C0");
-        this.addMember(form);
-        this.addMember(fo);
-        this.addMember(layout);
-        ascendingItem = new CheckboxItem();
-        ascendingItem.setName("Show Query");
-        ascendingItem.setTitle("Show Query");
-        ascendingItem.setRedrawOnChange(true);
-        ascendingItem.setValue(false);
-        DynamicForm forme = new DynamicForm();
-        forme.setFields(ascendingItem);
-        this.addMember(forme);
-
-        ascendingItem.addChangeHandler(new com.smartgwt.client.widgets.form.fields.events.ChangeHandler() {
-            public void onChange(ChangeEvent event) {
-                if ((Boolean) event.getValue()) {
-                    generateBody();
-                    body.animateShow(AnimationEffect.SLIDE);
-                } else {
-                    body.animateHide(AnimationEffect.SLIDE);
-                }
-            }
-        });
+        
+         vlayout2.addMember(fo);
+         
+       
+        HLayout mainLayout=new HLayout();
+        
+        vlayout2.addMember(forme);
+        mainLayout.addMember(vlayout1);
+        mainLayout.addMember(vlayout2);
+      
+        this.addMember(mainLayout);
         this.addMember(body);
 
 
-        isPublic.addChangeHandler(new com.smartgwt.client.widgets.form.fields.events.ChangeHandler() {
-            public void onChange(ChangeEvent event) {
-                isPublicValue = (Boolean) event.getValue();
-            }
-        });
-        
+       
         
        
     }
