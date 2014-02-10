@@ -163,7 +163,6 @@ public class CheckboxTree extends AbstractFormLayout {
         });
 
         treeGrid.setSelectionProperty("isSelected");
-
         treeGrid.addFolderOpenedHandler((new FolderOpenedHandler() {
             public void onFolderOpened(FolderOpenedEvent event) {
                 if (event.getNode().getAttribute("PropName") != "empty" && event.getNode().getAttribute("open") == "false") {
@@ -177,7 +176,6 @@ public class CheckboxTree extends AbstractFormLayout {
 
         treeGrid.setShowSelectionCanvas(true);
         treeGrid.setAnimateSelectionUnder(true);
-
         treeGrid.addCellClickHandler((new CellClickHandler() {
             public void onCellClick(CellClickEvent event) {
                 if (event.getColNum() == 1) {
@@ -185,10 +183,7 @@ public class CheckboxTree extends AbstractFormLayout {
                     type = rollOverRecord.getAttribute("Type");
                     name = rollOverRecord.getAttribute("Name");
                     getQueryExplorerTb().setForm(event.getRecord().getAttribute("Restriction"));
-
                 }
-
-
             }
         }));
 
@@ -197,33 +192,10 @@ public class CheckboxTree extends AbstractFormLayout {
         treeGrid.addSelectionUpdatedHandler(new SelectionUpdatedHandler() {
             public void onSelectionUpdated(SelectionUpdatedEvent event) {
 
-                generateBody();
-                //selectionner les attribus classes
-                ListGridRecord[] list = treeGrid.getSelectedRecords();
-                int n = list.length;
-                TreeNode[] children = GTree.getChildren((GinsengTreeNode) list[n - 1]);
-
-                for (TreeNode child : children) {
-                    if (child.getAttribute("isFolder") != "true") {
-                        treeGrid.selectRecord(child);
-                    }
-                }
-
-
-                ListGridRecord[] AllRecords = treeGrid.getRecords();
-                for (ListGridRecord record : AllRecords) {
-
-                    if (((GinsengTreeNode) record).getAttribute("isSelected") == "false") {
-                        TreeNode[] childrenn = GTree.getChildren(((GinsengTreeNode) record));
-                        if (childrenn != null) {
-                            treeGrid.deselectRecords(childrenn);
-                        }
-                    }
-
-                }
+                generateBody();          
             }
         });
-
+        treeGrid.setWidth100();
         treeGrid.setLoadDataOnDemand(false);
         treeGrid.setNodeIcon(QueryConstants.ICON_BASE);
         treeGrid.setFolderIcon(QueryConstants.ICON_PROPERTIES);
@@ -237,7 +209,7 @@ public class CheckboxTree extends AbstractFormLayout {
         treeGrid.setShowSelectedStyle(true);
         treeGrid.setShowPartialSelection(true);
         //treeGrid.setData(GTree);
-        treeGrid.setCascadeSelection(false);
+        treeGrid.setCascadeSelection(true);
         queryNameField = FieldUtil.getTextItem("100%", null);
 
         description = new RichTextEditor();
@@ -255,18 +227,20 @@ public class CheckboxTree extends AbstractFormLayout {
         TreeGridField nameField = new TreeGridField("Name", "Name");
         TreeGridField typeField = new TreeGridField("Type", "Type");
         TreeGridField restriction = new TreeGridField("Restriction", "Restriction");
+     
         TreeGridField groupBy = new TreeGridField("GroupBy", "Group By");
         TreeGridField orderBy = new TreeGridField("OrderBy", "Order By");
         orderBy.setType(ListGridFieldType.BOOLEAN);
         orderBy.setCanEdit(true);
         groupBy.setType(ListGridFieldType.BOOLEAN);
         groupBy.setCanEdit(true);
-        treeGrid.setCanResizeFields(true);
         treeGrid.setFields(nameField, typeField, restriction,groupBy,orderBy);
+        treeGrid.setCanResizeFields(true);
+        
 
         typeField.setHidden(true);
         orderBy.setHidden(true);
-         groupBy.setHidden(true);
+        groupBy.setHidden(true);
        
         
         this.addMember(WidgetUtil.getLabel("<b>Selected Fields</b>", 15));
@@ -304,10 +278,12 @@ public class CheckboxTree extends AbstractFormLayout {
                 if ((Boolean) event.getValue()) {
                     treeGrid.showField("GroupBy");
                     treeGrid.showField("OrderBy");
+                    treeGrid.setWidth100();
                    
                 } else {
                     treeGrid.hideField("GroupBy");
                     treeGrid.hideField("OrderBy");
+                    treeGrid.setWidth100();
                    
                 }
             }
