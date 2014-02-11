@@ -12,7 +12,7 @@ import com.smartgwt.client.widgets.tree.TreeNode;
  */
 public class GinsengTreeNode extends TreeNode {
 
-    public GinsengTreeNode(String Id, String reportsTo, String name,String propName, String icon, String type, boolean isOpen, String restriction,boolean select,String value,boolean isFolder,boolean open ) {
+    public GinsengTreeNode(String Id, String reportsTo, String name,String propName, String icon, String type, boolean isOpen, String restriction,boolean select,String value,boolean isFolder,boolean open,boolean orderBy,boolean groupBy ) {
         setAttribute("Id", Id);
         setAttribute("ReportsTo", reportsTo);
         setAttribute("Name", name);
@@ -21,12 +21,14 @@ public class GinsengTreeNode extends TreeNode {
         setAttribute("Type", type);
         setAttribute("isOpen", isOpen);
         setAttribute("Restriction", restriction);
-        setAttribute("Select", select);
+       // setAttribute("Select", select);
         setAttribute("Value", value);
         setAttribute("isSelected", select);
         setAttribute("isFolder",isFolder );
-         setAttribute("open", open);
-       
+        setAttribute("open", open);
+        setAttribute("OrderBy", orderBy);
+        setAttribute("GroupBy", groupBy);
+      
 
     }
     
@@ -40,8 +42,11 @@ public class GinsengTreeNode extends TreeNode {
         setAttribute("Select", select);
         setAttribute("Value", value);
         setAttribute("isSelected", select);
+       
 
         
 
     }
+     
+    
 }
