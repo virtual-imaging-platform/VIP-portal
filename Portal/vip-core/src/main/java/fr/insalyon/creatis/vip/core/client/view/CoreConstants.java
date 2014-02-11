@@ -159,7 +159,8 @@ public class CoreConstants implements IsSerializable {
     
     public static final String SAML_TRUSTED_CERTIFICATE="saml.trusted.certificates";
     public static String MOZILLA_PERSONA_VALIDATION_URL="mozilla.persona.validation.url";
-
+    //query
+    public static String TreeQuery="query.classes";
 
     public static enum GROUP_ROLE implements IsSerializable {
 
