@@ -39,14 +39,11 @@ import java.util.Date;
  */
 public class CheckboxTreeRestriction extends AbstractFormLayout {
 
-    VLayout layout;
+  
     TextAreaItem body;
 
     public CheckboxTreeRestriction() {
-        super("30%","100%");
-        layout = new VLayout();
-        layout.setMembersMargin(5);
-        this.addMember(layout);
+        super("100%","100%");
     }
 
     public void setForm(String restriction) {
@@ -66,7 +63,7 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
             hlayoutbuttons.setMembersMargin(5);
 
             body = new TextAreaItem();
-            body.setWidth(300);
+            body.setWidth("*");
             body.setHeight(150);
             body.setTitleOrientation(TitleOrientation.TOP);
             body.setTextAlign(Alignment.LEFT);
@@ -192,8 +189,8 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
 
             hlayoutbuttons.addMembers(saveButton, resetButton);
 
-            Canvas[] children = layout.getChildren();
-            layout.removeMembers(children);
+            Canvas[] children = getChildren();
+            removeMembers(children);
             l.addMember(b0);
             l.addMember(b);
             l.addMember(b3);
@@ -201,11 +198,11 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
             l.addMember(b5);
 
             l.setMembersMargin(5);
-            layout.addMember(label);
-            layout.addMember(l);
+            this.addMember(label);
+            this.addMember(l);
 
-            layout.addMember(FieldUtil.getForm(body));
-            layout.addMember(hlayoutbuttons);
+            this.addMember(FieldUtil.getFormOneColumn(body));
+            this.addMember(hlayoutbuttons);
        /** } else if (type == "nothing") {
 
             Canvas[] children = layout.getChildren();
@@ -218,7 +215,7 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
             hlayoutbuttons.setMembersMargin(5);
 
             body = new TextAreaItem();
-            body.setWidth(300);
+            body.setWidth("*");
             body.setHeight(150);
             body.setTitleOrientation(TitleOrientation.TOP);
             body.setTextAlign(Alignment.LEFT);
@@ -395,8 +392,8 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
 
             df.setFields(date);
 
-            Canvas[] children = layout.getChildren();
-            layout.removeMembers(children);
+            Canvas[] children = this.getChildren();
+            this.removeMembers(children);
 
             l.addMember(b0);
             l.addMember(b);
@@ -405,11 +402,11 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
             l.addMember(b3);
             l.addMember(b4);
             l.setMembersMargin(5);
-            layout.addMember(label);
-            layout.addMember(l);
-            layout.addMember(df);
-            layout.addMember(FieldUtil.getForm(body));
-            layout.addMember(hlayoutbuttons);
+            addMember(label);
+            addMember(l);
+            addMember(df);
+            addMember(FieldUtil.getFormOneColumn(body));
+            addMember(hlayoutbuttons);
 
       
        /* }else  if (type == "int") {**/
@@ -421,7 +418,7 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
             hlayoutbuttons.setMembersMargin(5);
 
             body = new TextAreaItem();
-            body.setWidth(300);
+            body.setWidth("*");
             body.setHeight(150);
             body.setTitleOrientation(TitleOrientation.TOP);
             body.setTextAlign(Alignment.LEFT);
@@ -560,8 +557,8 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
 
             hlayoutbuttons.addMembers(saveButton, resetButton);
 
-            Canvas[] children = layout.getChildren();
-            layout.removeMembers(children);
+            Canvas[] children = getChildren();
+            removeMembers(children);
             l.addMember(b0);
             l.addMember(b);
             l.addMember(b1);
@@ -570,10 +567,10 @@ public class CheckboxTreeRestriction extends AbstractFormLayout {
             l.addMember(b4);
 
             l.setMembersMargin(5);
-            layout.addMember(label);
-            layout.addMember(l);
-            layout.addMember(FieldUtil.getForm(body));
-            layout.addMember(hlayoutbuttons);
+            addMember(label);
+            addMember(l);
+            addMember(FieldUtil.getFormOneColumn(body));
+            addMember(hlayoutbuttons);
 
         }
 
