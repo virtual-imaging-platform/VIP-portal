@@ -33,7 +33,7 @@ public class CheckboxesOption extends AbstractFormLayout{
     private void configure(final CheckboxTree checkboxTree){
         advancedOption = new CheckboxItem();
         advancedOption.setName("Advanced Options");
-        advancedOption.setTitle("Advanced Optionss");
+        advancedOption.setTitle("Advanced Options");
         advancedOption.setValue(false);
         advancedOption.setWidth("*");
         advancedOption.setShowTitle(false);

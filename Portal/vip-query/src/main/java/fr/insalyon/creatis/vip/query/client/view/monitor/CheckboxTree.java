@@ -297,17 +297,17 @@ public class CheckboxTree extends AbstractFormLayout {
         limitValue.setName("Limit");
 
         limitValue.setWidth(100);
-        /**limitValue.setKeyPressFilter("[0-9]");
+        
+        limitValue.setKeyPressFilter("[0-9]");
         limitValue.addChangedHandler(new ChangedHandler() {
             @Override
             public void onChanged(ChangedEvent event) {
                 event.getItem().validate();
             }
         });
-        * */
+       
         formLimit.setFields(limitValue);
         limitValue.setVisible(false);
-
         formLimit.setWidth100();
        
 
@@ -527,13 +527,12 @@ public class CheckboxTree extends AbstractFormLayout {
         }
 
         //Bloc Limit
-        if (!limitValue.getValueField().equals(null) ) {
+        //isEmpty marche pas
+       if (limitValue.getValueAsString()!=null ) {
             
-            body.setContents(body.getContents() + "<br/>" + "Limit " + limitValue.getValue().toString());
-        }
-        //else{
-       // body.setContents(body.getContents());
-       // }
+            body.setContents(body.getContents() + "<br/>" + "Limit " + limitValue.getValueAsString());
+       }
+       
     }
     public QueryExplorerTab getQueryExplorerTb() {
 
