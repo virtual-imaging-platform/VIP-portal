@@ -91,6 +91,7 @@ public class CreateQuery extends AbstractFormLayout {
         isPublic.setRedrawOnChange(true);
         isPublic.setValue(false);
         isPublic.setPrompt("A public query can be executed by all GINSENG users");
+        isPublic.setShowTitle(false);
         DynamicForm form = new DynamicForm();
         form.setFields(isPublic);
 
@@ -458,10 +459,10 @@ public class CreateQuery extends AbstractFormLayout {
 
     public void reset(String message) {
 
-        querynameField.setValue("");
-        description.setValue("");
-        isPublic.setValue(false);
-        body.setValue("");
+        //querynameField.setValue("");
+        //description.setValue("");
+       // isPublic.setValue(false);
+        //body.setValue("");
         getQueryMakerTb().loadData();
         Layout.getInstance().setNoticeMessage(message);
 

@@ -98,13 +98,14 @@ public class CheckboxTree extends AbstractFormLayout {
     private IButton executeButton;
     private TextItem queryNameField;
     private RichTextEditor description;
-    private GinsengTreeNode rollOverRecord;
-    private GinsengTreeNode rollOverRecord2;
-    private GinsengTreeNode rollOverRecord3;
-    private Label body;
+    private   GinsengTreeNode rollOverRecord;
+    private  GinsengTreeNode rollOverRecord2;
+    private  GinsengTreeNode rollOverRecord3;
+    public  Label body;
     private int treeLength;
-    CheckboxItem ascendingItem;
-    CheckboxItem advancedOption;
+    public  DynamicForm formLimit;
+    
+  
     private String type;
     private String name;
     TreeGrid treeGrid = new TreeGrid();
@@ -116,16 +117,16 @@ public class CheckboxTree extends AbstractFormLayout {
     boolean isPublicValue = false;
     private Tree bTree;
     private Tree gTree;
-    private TextItem limitValue;
+    public TextItem limitValue;
 
-    public CheckboxTree() {
+    public  CheckboxTree() {
 
-        super("80%", "100%");
+        super("100%", "100%");
         configure();
 
     }
 
-    private void configure() {
+    public void configure() {
         gTree = new Tree();
         gTree.setModelType(TreeModelType.PARENT);
         gTree.setRootValue(1);
@@ -278,6 +279,7 @@ public class CheckboxTree extends AbstractFormLayout {
         isPublic.setPrompt("A public query can be executed by all GINSENG users");
         isPublic.setRedrawOnChange(true);
         isPublic.setValue(false);
+        isPublic.setShowTitle(false);
         DynamicForm form = new DynamicForm();
         form.setFields(isPublic);
         form.setWidth100();
@@ -287,70 +289,30 @@ public class CheckboxTree extends AbstractFormLayout {
             }
         });
 
-        advancedOption = new CheckboxItem();
-        advancedOption.setName("Advanced Options");
-        advancedOption.setTitle("Advanced Options");
-        advancedOption.setRedrawOnChange(true);
-        advancedOption.setValue(false);
-        final DynamicForm fo = new DynamicForm();
+       
+        formLimit = new DynamicForm();
 
         limitValue=new TextItem();
         limitValue.setTitle("Limit");
+        limitValue.setName("Limit");
 
         limitValue.setWidth(100);
-        limitValue.setKeyPressFilter("[0-9]");
+        /**limitValue.setKeyPressFilter("[0-9]");
         limitValue.addChangedHandler(new ChangedHandler() {
             @Override
             public void onChanged(ChangedEvent event) {
                 event.getItem().validate();
             }
         });
-        fo.setFields(advancedOption, limitValue);
+        * */
+        formLimit.setFields(limitValue);
         limitValue.setVisible(false);
 
-        fo.setWidth100();
-        advancedOption.addChangeHandler(new com.smartgwt.client.widgets.form.fields.events.ChangeHandler() {
-            public void onChange(ChangeEvent event) {
-
-                if ((Boolean) event.getValue()) {
-                    treeGrid.showField("GroupBy");
-                    treeGrid.showField("OrderBy");
-                    treeGrid.setWidth100();
-
-                    limitValue.setVisible(true);
+        formLimit.setWidth100();
+       
 
 
-
-                } else {
-                    treeGrid.hideField("GroupBy");
-                    treeGrid.hideField("OrderBy");
-                    treeGrid.setWidth100();
-                    limitValue.setVisible(false);
-
-                }
-            }
-        });
-
-
-        ascendingItem = new CheckboxItem();
-        ascendingItem.setName("Show Query");
-        ascendingItem.setTitle("Show Query");
-        ascendingItem.setRedrawOnChange(true);
-        ascendingItem.setValue(false);
-        DynamicForm forme = new DynamicForm();
-        forme.setFields(ascendingItem);
-        forme.setWidth100();
-        ascendingItem.addChangeHandler(new com.smartgwt.client.widgets.form.fields.events.ChangeHandler() {
-            public void onChange(ChangeEvent event) {
-                if ((Boolean) event.getValue()) {
-                    generateBody();
-                    body.animateShow(AnimationEffect.SLIDE);
-                } else {
-                    body.animateHide(AnimationEffect.SLIDE);
-                }
-            }
-        });
-
+      
 
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVE,
                 new ClickHandler() {
@@ -402,8 +364,8 @@ public class CheckboxTree extends AbstractFormLayout {
         vlayout1.addMember(form);
         vlayout1.addMember(layout);
 
-        vlayout2.addMember(fo);
-        vlayout2.addMember(forme);
+        vlayout2.addMember(formLimit);
+        //vlayout2.addMember(forme);
 
         HLayout mainLayout=new HLayout(); 
         mainLayout.addMember(vlayout1);
@@ -440,7 +402,7 @@ public class CheckboxTree extends AbstractFormLayout {
                 }
 
                 savev(new QueryVersion(1L, result, desc, body.getContents(), isPublicValue));
-                reset();
+                
 
 
             }
@@ -469,13 +431,6 @@ public class CheckboxTree extends AbstractFormLayout {
 
     }
 
-    private void reset() {
-        queryNameField.setValue("");
-        description.setValue("");
-        body.setContents("");
-
-    }
-
     public String getType() {
         return type;
 
@@ -496,7 +451,7 @@ public class CheckboxTree extends AbstractFormLayout {
 
     }
 
-    public void generateBody() {
+    public  void generateBody() {
         body.setContents("");
         body.setContents(body.getContents() + " PREFIX semehr: &lt;http://www.mnemotix.com/ontology/semEHR#&gt;");
         ListGridRecord[] list = treeGrid.getSelectedRecords();
@@ -572,10 +527,13 @@ public class CheckboxTree extends AbstractFormLayout {
         }
 
         //Bloc Limit
-        if (limitValue.isVisible() && limitValue.getValue().toString().length() != 0) {
-
+        if (!limitValue.getValueField().equals(null) ) {
+            
             body.setContents(body.getContents() + "<br/>" + "Limit " + limitValue.getValue().toString());
         }
+        //else{
+       // body.setContents(body.getContents());
+       // }
     }
     public QueryExplorerTab getQueryExplorerTb() {
 
