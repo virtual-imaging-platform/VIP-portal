@@ -5,7 +5,11 @@
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
+<<<<<<< HEAD
         <version>1.6</version>f
+=======
+        <version>1.6.1</version>
+>>>>>>> 72b1d5efd76f4dabe1bebf292c8a3346260f7f68
         <relativePath>..</relativePath>
     </parent>
     
