@@ -42,6 +42,7 @@ public class MySQLDAOFactory extends QueryDAOFactory {
                     + "body TEXT, "
                     + "dateCreation TIMESTAMP, "
                     + "description TEXT NULL, "
+                    + "isPublic BOOLEAN DEFAULT 0, "
                     + "PRIMARY KEY (queryVersionID ), "
                     + "FOREIGN KEY (queryID) REFERENCES Query(queryID) "
                     + "ON DELETE CASCADE ON UPDATE RESTRICT");

@@ -113,7 +113,7 @@ public class PlatformConnection {
                     + "last_login TIMESTAMP, "
                     + "level VARCHAR(50), "
                     + "country_code VARCHAR(2), "
-                    + "max_simulations int(11) "
+                    + "max_simulations int(11), "
                     + "PRIMARY KEY(email), UNIQUE KEY(first_name,last_name)")) {
 
                 Server server = Server.getInstance();
@@ -140,6 +140,8 @@ public class PlatformConnection {
             if (createTable("VIPGroups",
                     "groupname VARCHAR(50), "
                     + "public BOOLEAN, "
+                    + "gridfile BOOLEAN DEFAULT 0, "
+                    + "gridjobs BOOLEAN DEFAULT 0, "
                     + "PRIMARY KEY(groupname)")) {
 
                 try {
