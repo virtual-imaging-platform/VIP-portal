@@ -41,6 +41,11 @@
             <version>${vip.docs.version}</version>
         </dependency>
 
+         <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-n4u</artifactId>
+            <version>${vip.n4u.version}</version>
+        </dependency>
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-datamanager</artifactId>
