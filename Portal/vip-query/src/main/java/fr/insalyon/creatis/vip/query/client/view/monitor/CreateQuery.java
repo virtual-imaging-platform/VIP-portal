@@ -76,7 +76,7 @@ public class CreateQuery extends AbstractFormLayout {
         description.setControlGroups("styleControls", "editControls",
                 "colorControls");
 
-        querynameField = FieldUtil.getTextItem(900, false, "", "[0-9.,A-Za-z-+/_() ]");
+        querynameField = FieldUtil.getTextItem(900, false, "", "^([0-9.,A-Za-z-+/_() ])+$");
         querynameField.setWidth("*");
         querynameField.setValidators(ValidatorUtil.getStringValidator());
 
@@ -102,9 +102,13 @@ public class CreateQuery extends AbstractFormLayout {
             public void onClick(ClickEvent event) {
                 if (newQuery) {
                     try {
+                        if (querynameField.validate()) {
 
-                        Query q = new Query(querynameField.getValueAsString().trim());
-                        save(q);
+                            Query q = new Query(querynameField.getValueAsString().trim());
+                            save(q);
+                        } else {
+                            Layout.getInstance().setWarningMessage("Invalid Query Name");
+                        }
 
 
                     } catch (QueryException ex) {
@@ -131,8 +135,11 @@ public class CreateQuery extends AbstractFormLayout {
                             testt = result.booleanValue();
 
                             if (testt == true) {
-                                update(getVersionID(), querynameField.getValueAsString().trim(), description.getValue(), isPublicValue, true);
-
+                                if (querynameField.validate()) {
+                                    update(getVersionID(), querynameField.getValueAsString().trim(), description.getValue(), isPublicValue, true);
+                                } else {
+                                    Layout.getInstance().setWarningMessage("Invalid Query Name");
+                                }
                             } else {
 
                                 Long queryVersionID = getVersionID();
@@ -322,17 +329,18 @@ public class CreateQuery extends AbstractFormLayout {
             @Override
             public void onSuccess(Long result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
-
-
                 Parameter p = new Parameter(result);
                 saveParameter(p);
                 if (update == true) {
-                    update(result, querynameField.getValueAsString().trim(), description.getValue(), isPublicValue, false);
+                    if (querynameField.validate()) {
+                        update(result, querynameField.getValueAsString().trim(), description.getValue(), isPublicValue, false);
+                    } else {
+                        Layout.getInstance().setWarningMessage("Invalid Query Name");
+                    }
                 }
                 if (p.equals(null)) {
                     reset("the Query was successfully added");
                 }
-
             }
         };
         QueryService.Util.getInstance().addVersion(version, false, callback);
@@ -461,7 +469,7 @@ public class CreateQuery extends AbstractFormLayout {
 
         //querynameField.setValue("");
         //description.setValue("");
-       // isPublic.setValue(false);
+        // isPublic.setValue(false);
         //body.setValue("");
         getQueryMakerTb().loadData();
         Layout.getInstance().setNoticeMessage(message);
@@ -482,22 +490,22 @@ public class CreateQuery extends AbstractFormLayout {
     }
 
     public String descriptionTraitement(String desc) {
-        desc=desc.trim();
+        desc = desc.trim();
         desc = desc.replaceAll("<br><br>", "<br>");
-        desc=desc.trim();
+        desc = desc.trim();
         desc = desc.replaceAll("<div><br></div>", "");
-        desc=desc.trim();
+        desc = desc.trim();
         while (desc.indexOf("<br>") == 0) {
             desc = desc.replaceFirst("<br>", "");
-            desc=desc.trim();
+            desc = desc.trim();
         }
         while (desc.lastIndexOf("<br>") == desc.length() - 4) {
             desc = desc.substring(0, desc.length() - 4);
         }
-       
+
         while (desc.indexOf("&nbsp;") == 0) {
             desc = desc.replaceFirst("&nbsp;", "");
-            desc=desc.trim();
+            desc = desc.trim();
         }
 
         return desc;

@@ -21,6 +21,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.ValidatorUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.query.client.bean.Parameter;
 
@@ -72,14 +73,14 @@ public class ParameterTab extends AbstractFormLayout {
         executionName.setShowTitle(false);
         executionName.setTitleOrientation(TitleOrientation.TOP);
         executionName.setWidth("*");
-        executionName.setKeyPressFilter("[0-9.,A-Za-z-+/_() ]");
+        executionName.setKeyPressFilter("^([0-9.,A-Za-z-+/_() ])+$");
         executionName.addChangedHandler(new ChangedHandler() {
             @Override
             public void onChanged(ChangedEvent event) {
                 event.getItem().validate();
             }
         });
-
+        executionName.setValidators(ValidatorUtil.getStringValidator());
 
 
 
@@ -186,7 +187,6 @@ public class ParameterTab extends AbstractFormLayout {
                 final AsyncCallback<Long> callback = new AsyncCallback<Long>() {
                     @Override
                     public void onFailure(Throwable caught) {
-
                         Layout.getInstance().setWarningMessage("Unable to save Query Execution " + caught.getMessage());
                     }
 
@@ -199,19 +199,20 @@ public class ParameterTab extends AbstractFormLayout {
                             for (TextItem t : arrList) {
 
                                 saveValue(new Value(t.getValueAsString(), Long.parseLong(t.getName()), result));
-                                
-
                             }
                             queryExecutionID = result;
 
                         }
-                        
+
                         tab = new QueryHistoryTab();
                         Layout.getInstance().addTab(tab);
                     }
                 };
-
-                QueryService.Util.getInstance().addQueryExecution(new QueryExecution(queryVersionID, "waiting", executionName.getValueAsString(), " "), callback);
+                if (executionName.validate()) {
+                    QueryService.Util.getInstance().addQueryExecution(new QueryExecution(queryVersionID, "waiting", executionName.getValueAsString(), " "), callback);
+                } else {
+                    Layout.getInstance().setWarningMessage("Invalid Query Execution");
+                }
             }
         });
 
@@ -329,7 +330,7 @@ public class ParameterTab extends AbstractFormLayout {
 
 
 
-                if (result.get(1).length() == 0 || result.get(1).isEmpty() || result.get(1) == "" || result.get(1).equals(null) ||result.get(1)=="<br>"||result.get(1)==" ") {
+                if (result.get(1).length() == 0 || result.get(1).isEmpty() || result.get(1) == "" || result.get(1).equals(null) || result.get(1) == "<br>" || result.get(1) == " ") {
                     descriptionE = false;
                 } else {
                     descriptionE = true;
