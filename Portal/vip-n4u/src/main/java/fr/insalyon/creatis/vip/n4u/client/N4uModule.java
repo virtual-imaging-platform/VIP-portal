@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.insalyon.creatis.vip.query.client;
+package fr.insalyon.creatis.vip.n4u.client;
 
 /**
  *
@@ -10,15 +10,15 @@ package fr.insalyon.creatis.vip.query.client;
  */
 import fr.insalyon.creatis.vip.core.client.Module;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.query.client.view.QueryHomeParser;
-import fr.insalyon.creatis.vip.query.client.view.QueryTitleGrid;
+import fr.insalyon.creatis.vip.n4u.client.view.N4uHomeParser;
 
-public class QueryModule extends Module {
+
+public class N4uModule extends Module {
 
     @Override
     public void load() {
 
-        CoreModule.addGeneralApplicationParser(new QueryHomeParser());
+        CoreModule.addGeneralApplicationParser(new N4uHomeParser());
     }
 
     @Override
