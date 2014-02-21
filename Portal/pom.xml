@@ -26,6 +26,7 @@
         <vip.cardiac.version>0.9.4</vip.cardiac.version>
         <vip.physical-properties.version>0.1</vip.physical-properties.version>
         <vip.query.version>1.7</vip.query.version>
+        <vip.n4u.version>1.0</vip.n4u.version>
     </properties>
     
     <description>VIP</description>
@@ -58,7 +59,6 @@
     <modules>
         <module>vip-core</module>
         <module>vip-docs</module>
-        <module>vip-application</module>
         <module>vip-datamanagement</module>
         <module>vip-gatelab</module>
         <module>vip-portal</module>
@@ -68,7 +68,8 @@
         <module>vip-cowork</module>
         <module>vip-cardiac</module>
         <module>vip-query</module>
-    </modules>
+        <module>vip-n4u</module>
+  </modules>
     
     <repositories>
         
