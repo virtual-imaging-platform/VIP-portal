@@ -59,6 +59,7 @@
     <modules>
         <module>vip-core</module>
         <module>vip-docs</module>
+        <module>vip-application</module>
         <module>vip-datamanagement</module>
         <module>vip-gatelab</module>
         <module>vip-portal</module>
