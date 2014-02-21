@@ -57,6 +57,7 @@ import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
 import fr.insalyon.creatis.vip.docs.client.DocsModule;
 import fr.insalyon.creatis.vip.gatelab.client.GateLabModule;
 import fr.insalyon.creatis.vip.models.client.ModelModule;
+import fr.insalyon.creatis.vip.n4u.client.N4uModule;
 import fr.insalyon.creatis.vip.query.client.QueryModule;
 import fr.insalyon.creatis.vip.simulatedata.client.SimulatedDataModule;
 import fr.insalyon.creatis.vip.simulationgui.client.SimulationGUIModule;
@@ -94,6 +95,7 @@ public class Main implements EntryPoint {
         modulesInit.add(new GateLabModule());
         modulesInit.add(new CoworkModule());
         modulesInit.add(new CardiacModule());
+        modulesInit.add(new N4uModule());
 
         if (ticket == null && (login == null || !login.equals("CASN4U"))) {
             //regular VIP authentication
