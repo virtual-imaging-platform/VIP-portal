@@ -244,7 +244,6 @@ public class DataManagerBusiness {
                 throw new BusinessException(ex);
             }
 
-
         } catch (IOException ex) {
             imageDir.delete();
             throw new BusinessException(ex);
@@ -274,7 +273,6 @@ public class DataManagerBusiness {
             logger.info("Creating directory " + name + " in folder " + dir);
 
             CoreUtil.getGRIDAClient().createFolder(dir, name);
-
 
 //            CoreUtil.getGRIDAClient().createFolder(dir, name);
             SSHDAOFactory.getDAOFactory().getSSHDAO().addSSH(ssh);
@@ -318,4 +316,32 @@ public class DataManagerBusiness {
 
         return (homeDir + "/" + name + DataManagerConstants.SSH_APPEND);
     }
+
+    public String getSurfaceURL(String surfaceLFN, String localDir, User user) throws BusinessException {
+        
+        String relativeDirString = "surfaces/viewer" + System.getProperty("file.separator") + (new File(surfaceLFN)).getParent().replaceAll(" ", "_").replaceAll("\\([^\\(]*\\)", "");
+        String surfaceDirString = localDir + System.getProperty("file.separator") + relativeDirString;
+        File surfaceDir = new File(surfaceDirString);
+        String surfaceFileName = surfaceDir.getAbsolutePath() + System.getProperty("file.separator") + surfaceLFN.substring(surfaceLFN.lastIndexOf('/') + 1);
+
+        if (!surfaceDir.exists()) {
+            surfaceDir.mkdirs();
+            if (!surfaceDir.exists()) {
+                throw new BusinessException("Cannot create viewer dir: " + surfaceDir.getAbsolutePath());
+            }
+        }
+        if (!(new File(surfaceFileName)).exists()) {
+            try {
+                CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(user, surfaceLFN), surfaceDir.getAbsolutePath());
+            } catch (GRIDAClientException ex) {
+                surfaceDir.delete();
+                throw new BusinessException(ex);
+            } catch (DataManagerException ex) {
+                throw new BusinessException(ex);
+            }
+            
+        }
+        return relativeDirString + System.getProperty("file.separator") + surfaceLFN.substring(surfaceLFN.lastIndexOf('/') + 1);
+    }
+    
 }

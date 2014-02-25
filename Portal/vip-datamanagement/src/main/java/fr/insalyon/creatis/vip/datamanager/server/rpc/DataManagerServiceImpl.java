@@ -416,7 +416,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     public Image getImageSlicesURL(String imageLFN) throws DataManagerException {
 
         try {
-            trace(logger, "viewing image: " + imageLFN);
+            trace(logger, "Viewing image: " + imageLFN);
             User user = getSessionUser();
             return dataManagerBusiness.getImageSlicesURL(imageLFN, this.getServletContext().getRealPath("."), user);
         } catch (CoreException ex) {
@@ -439,7 +439,6 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         } catch (BusinessException ex) {
             throw new DataManagerException(ex);
         }
-
 
     }
 
@@ -482,5 +481,18 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public String getSSHPublicKey() {
         return Server.getInstance().getSshPublicKey();
+    }
+
+    @Override
+    public String getSurfaceFileURL(String surfaceLFN) throws DataManagerException {
+        try {
+            trace(logger, "Viewing surface: " + surfaceLFN);
+            User user = getSessionUser();
+            return dataManagerBusiness.getSurfaceURL(surfaceLFN, this.getServletContext().getRealPath("."), user);
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
+        }
     }
 }
