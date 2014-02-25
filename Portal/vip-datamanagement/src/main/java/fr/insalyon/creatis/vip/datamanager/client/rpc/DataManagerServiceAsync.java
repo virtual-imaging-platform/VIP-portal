@@ -67,15 +67,15 @@ public interface DataManagerServiceAsync {
     public void deleteCachedFiles(List<String> cachedFiles, AsyncCallback<Void> asyncCallback);
 
     public void getPoolOperationsByUser(AsyncCallback<List<PoolOperation>> asyncCallback);
-    
+
     public void getPoolOperationsByUserAndDate(Date startDate, AsyncCallback<List<PoolOperation>> asyncCallback);
 
     public void getPoolOperations(AsyncCallback<List<PoolOperation>> asyncCallback);
-    
+
     public void getPoolOperationById(String operationId, AsyncCallback<PoolOperation> asyncCallback);
 
     public void removeOperations(List<String> ids, AsyncCallback<Void> asyncCallback);
-    
+
     public void removeUserOperations(AsyncCallback<Void> asyncCallback);
 
     public void removeOperationById(String id, AsyncCallback<Void> asyncCallback);
@@ -91,20 +91,22 @@ public interface DataManagerServiceAsync {
     public void uploadFile(String localFile, String remoteName, String remoteDir, AsyncCallback<Void> asyncCallback);
 
     public void exists(String remoteFile, AsyncCallback<Boolean> asyncCallback);
-    
+
     public void getZombieFiles(AsyncCallback<List<DMZombieFile>> asyncCallback);
-    
+
     public void deleteZombieFiles(List<String> surls, AsyncCallback<Void> asyncCallback);
-    
-   public void getImageSlicesURL(String imageLFN, AsyncCallback<Image> asyncCallback);
-     
-   public void getSSHConnections(AsyncCallback<List<SSH>> asyncCallback);
-     
-   public void addSSH(SSH ssh, AsyncCallback<Void> asyncCallback);
-   
-   public void updateSSH(SSH ssh, AsyncCallback<Void> asyncCallback);
-   
-   public void removeSSH(String email, String name, AsyncCallback<Void> asyncCallback);
-   
-   public void getSSHPublicKey(AsyncCallback<String> asycCallback);
+
+    public void getImageSlicesURL(String imageLFN, AsyncCallback<Image> asyncCallback);
+
+    public void getSurfaceFileURL(String surfaceLFN, AsyncCallback<String> asyncCallback);
+
+    public void getSSHConnections(AsyncCallback<List<SSH>> asyncCallback);
+
+    public void addSSH(SSH ssh, AsyncCallback<Void> asyncCallback);
+
+    public void updateSSH(SSH ssh, AsyncCallback<Void> asyncCallback);
+
+    public void removeSSH(String email, String name, AsyncCallback<Void> asyncCallback);
+
+    public void getSSHPublicKey(AsyncCallback<String> asycCallback);
 }

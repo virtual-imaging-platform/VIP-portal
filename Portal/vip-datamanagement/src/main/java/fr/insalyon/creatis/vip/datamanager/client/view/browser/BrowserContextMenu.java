@@ -51,8 +51,9 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.ValidatorUtil;
-import fr.insalyon.creatis.vip.datamanager.client.view.image.ImageViewTab;
+import fr.insalyon.creatis.vip.datamanager.client.view.visualization.BrainBrowserViewTab;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
+import fr.insalyon.creatis.vip.datamanager.client.view.visualization.ImageViewTab;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -76,6 +77,16 @@ public class BrowserContextMenu extends Menu {
             @Override
             public void onClick(MenuItemClickEvent event) {
                 Layout.getInstance().addTab(new ImageViewTab(baseDir + "/" + data.getName()));
+            }
+        });
+        
+        MenuItem surfaceViewItem = new MenuItem("View Surface");
+        surfaceViewItem.setIcon(DataManagerConstants.ICON_VIEW);
+        surfaceViewItem.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(MenuItemClickEvent event) {
+                Layout.getInstance().addTab(new BrainBrowserViewTab(baseDir + "/" + data.getName()));
             }
         });
 
@@ -180,23 +191,31 @@ public class BrowserContextMenu extends Menu {
 
         MenuItemSeparator separator = new MenuItemSeparator();
 
-        if (DataManagerContext.getInstance().hasCutAction()) {
-            if (ImageViewTab.isSupported(data.getName())) {
-                this.setItems(imageViewItem, separator, uploadItem, downloadItem, separator, cutItem, pasteItem,
-                        separator, renameItem, deleteItem, separator, propertiesItem);
-            } else {
-                this.setItems(uploadItem, downloadItem, separator, cutItem, pasteItem,
-                        separator, renameItem, deleteItem, separator, propertiesItem);
-            }
-        } else {
-            if (ImageViewTab.isSupported(data.getName())) {
-                this.setItems(imageViewItem, separator, uploadItem, downloadItem, separator, cutItem, separator,
-                        renameItem, deleteItem, separator, propertiesItem);
-            } else {
-                this.setItems(uploadItem, downloadItem, separator, cutItem, separator,
-                        renameItem, deleteItem, separator, propertiesItem);
-            }
+        ArrayList<MenuItem> menuItems = new ArrayList<MenuItem>();
+        boolean sepView = false;
+        if (ImageViewTab.isSupported(data.getName())){
+            menuItems.add(imageViewItem);
+            sepView = true;
+        } 
+        if(BrainBrowserViewTab.isSupported(data.getName())){
+            menuItems.add(surfaceViewItem);
+            sepView = true;
         }
+        if(sepView)
+            menuItems.add(separator);  
+        menuItems.add(uploadItem);
+        menuItems.add(downloadItem);
+        menuItems.add(separator);
+        menuItems.add(cutItem);
+        if (DataManagerContext.getInstance().hasCutAction())
+            menuItems.add(pasteItem);
+        menuItems.add(separator);
+        menuItems.add(renameItem);
+        menuItems.add(deleteItem);
+        menuItems.add(separator);
+        menuItems.add(propertiesItem);
+        
+        this.setItems(menuItems.toArray(new MenuItem[0]));
     }
 
     /**

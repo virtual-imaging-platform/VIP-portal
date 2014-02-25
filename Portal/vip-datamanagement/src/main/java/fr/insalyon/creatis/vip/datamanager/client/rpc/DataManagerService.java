@@ -123,4 +123,6 @@ public interface DataManagerService extends RemoteService {
     public void removeSSH(String email, String name) throws DataManagerException; 
     
     public String getSSHPublicKey();
+    
+    public String getSurfaceFileURL(String surfaceLFN) throws DataManagerException;
 }
