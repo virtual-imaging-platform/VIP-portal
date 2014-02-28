@@ -43,6 +43,12 @@
                         <manifest>
                             <mainClass>fr.insalyon.creatis.vip.gatelab.applet.loadmac.Main</mainClass>
                         </manifest>
+                        <manifestEntries>
+                            <Permissions>all-permissions</Permissions>
+                            <Application-Name>DataManager Applet</Application-Name>
+                            <Codebase>*</Codebase>
+                            <Caller-Allowable-Codebase>*</Caller-Allowable-Codebase>
+                        </manifestEntries>
                     </archive>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>

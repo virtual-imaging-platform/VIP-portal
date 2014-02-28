@@ -67,6 +67,12 @@
                         <manifest>
                             <mainClass>fr.insalyon.creatis.vip.datamanager.applet.upload.UploadFiles</mainClass>
                         </manifest>
+                        <manifestEntries>
+                            <Permissions>all-permissions</Permissions>
+                            <Application-Name>DataManager Applet</Application-Name>
+                            <Codebase>*</Codebase>
+                            <Caller-Allowable-Codebase>*</Caller-Allowable-Codebase>
+                        </manifestEntries>
                     </archive>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
