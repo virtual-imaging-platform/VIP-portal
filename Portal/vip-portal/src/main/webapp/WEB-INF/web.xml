@@ -226,7 +226,21 @@
         <servlet-name>FileDownload</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/filedownload</url-pattern>
     </servlet-mapping>
+   
     <!-- End Query Module -->
+    
+    
+    <!--N4U Module-->
+    <servlet>
+        <servlet-name>FileProcessService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.n4u.server.FileProcessServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FileProcessService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/fileProcessService</url-pattern>
+    </servlet-mapping>
+    
+    <!--End N4U Module-->
     
     <session-config>
         <session-timeout>-1</session-timeout>

@@ -70,7 +70,9 @@
         <module>vip-cardiac</module>
         <module>vip-query</module>
         <module>vip-n4u</module>
-  </modules>
+        <module>vip-simulated-data</module>
+        <module>vip-simulation-gui</module>
+    </modules>
     
     <repositories>
         
