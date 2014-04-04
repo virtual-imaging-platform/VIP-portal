@@ -18,8 +18,14 @@ public class N4uConstants {
     public static final String ICON_EXPRESSLANE1 = IMG_FOLDER + "icon_n4u.png";
     public static final String ICON_PICKER_LESS= IMG_FOLDER + "icon-picker-less.png";
     public static final String ICON_PICKER_MORE= IMG_FOLDER + "icon-picker-more.png";
+    public static final String ICON_PICKER_EDIT= IMG_FOLDER + "icon-picker-edit.jpg";
     public static final String ICON_LAUNCH = IMG_FOLDER + "icon-launch.png";
     public static final String ICON_IMPORT = IMG_FOLDER + "icon-import.png";
+    
+       public static final String ICON_INPUT = IMG_FOLDER + "icon-input.png";
+    public static final String ICON_OUTPUT = IMG_FOLDER + "icon-output.png";
+       public static final String ICON_INFORMATION = IMG_FOLDER + "icon-information.png";
+    public static final String ICON_EXECUTABLE = IMG_FOLDER + "icon-executable.png";
   
     // Application Names
     public static final String APP_N4UCONVERTER = "ExpressLane2VIP";
@@ -29,5 +35,8 @@ public class N4uConstants {
     
     //group
     public static final String N4U_GROUP = "N4u";
+   
+    //vm files
+     public static final String VM_GASS = "gass.vm";
     
 }
