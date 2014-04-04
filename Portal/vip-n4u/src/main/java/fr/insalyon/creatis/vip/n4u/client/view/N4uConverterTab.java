@@ -25,6 +25,7 @@ import fr.insalyon.creatis.vip.core.client.view.util.ValidatorUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.selection.PathSelectionWindow;
 import fr.insalyon.creatis.vip.n4u.client.rpc.FileProcessService;
+import fr.insalyon.creatis.vip.n4u.client.view.N4uImportTab.InputType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +48,7 @@ public class N4uConverterTab extends Tab {
     private DynamicForm extItemForm;
     private DynamicForm envItemForm;
     private DynamicForm titleItemForm;
-    private IButton launchButton;
+    private IButton importButton;
     Label jobLabel;
     Label titleLabel;
     Label scriptLabel;
@@ -57,7 +58,7 @@ public class N4uConverterTab extends Tab {
     N4uImportTab tabImporter;
 
     public N4uConverterTab() {
-        this.setTitle(Canvas.imgHTML(N4uConstants.ICON_EXPRESSLANE1) + "ExpressLane2VIP");
+        this.setTitle(Canvas.imgHTML(N4uConstants.ICON_EXPRESSLANE1) + " ExpressLane2VIP");
         this.setID(N4uConstants.TAB_EXPRESSLANE_1);
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
@@ -75,10 +76,10 @@ public class N4uConverterTab extends Tab {
         titleLabel = new Label("<strong>Application Name </strong> <font color=red>(*)</font>");
         titleLabel.setHeight(20);
 
-        jobLabel = new Label("<strong>Job File</strong><font color=red>(*)</font>");
+        jobLabel = new Label("<strong>Job File </strong><font color=red>(*)</font>");
         jobLabel.setHeight(20);
 
-        expressLabel = new Label("<strong>Express File</strong><font color=red>(*)</font>");
+        expressLabel = new Label("<strong>Express File </strong><font color=red>(*)</font>");
         expressLabel.setHeight(20);
 
         scriptLabel = new Label("<strong>Script File </strong><font color=red>(*)</font>");
@@ -99,21 +100,6 @@ public class N4uConverterTab extends Tab {
             }
         });
         browsePicker.setPrompt("Browse on the Grid");
-
-        PickerIcon morePicker = new PickerIcon(new PickerIcon.Picker(N4uConstants.ICON_PICKER_MORE), new FormItemClickHandler() {
-            @Override
-            public void onFormItemClick(FormItemIconClickEvent event) {
-            }
-        });
-
-        morePicker.setPrompt("Add");
-        PickerIcon lessPicker = new PickerIcon(new PickerIcon.Picker(N4uConstants.ICON_PICKER_LESS), new FormItemClickHandler() {
-            @Override
-            public void onFormItemClick(FormItemIconClickEvent event) {
-                //parent.removeMember(instance);
-            }
-        });
-        lessPicker.setPrompt("Remove");
 
 
         title = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_() ]");
@@ -153,17 +139,18 @@ public class N4uConverterTab extends Tab {
         envItemForm = new DynamicForm();
         envItemForm.setFields(env);
 
-        launchButton = new IButton();
-        launchButton = WidgetUtil.getIButton("Import", N4uConstants.ICON_IMPORT,
+        importButton = new IButton();
+        importButton = WidgetUtil.getIButton("Import", N4uConstants.ICON_IMPORT,
                 new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                tabImporter = new N4uImportTab();
-                Layout.getInstance().addTab(tabImporter);
-                tabImporter.addfielsInputs("Appliction Name", title.getValueAsString());
-
-
-                final AsyncCallback<List<List<String>>> callback = new AsyncCallback<List<List<String>>>() {
+               tabImporter = new N4uImportTab();
+               Layout.getInstance().addTab(tabImporter);
+               tabImporter.addfiels("Application Name <font color=red>(*)</font>", false, title.getValueAsString(), false);
+               tabImporter.addFielDescription("Documentation and Terms of Use");
+               tabImporter.addFielsInputs(true, "results-directory ", N4uImportTab.InputType.File.name(), true);
+               tabImporter.addFielsInputs(true, "job name", N4uImportTab.InputType.Parameter.name(), false);
+                final AsyncCallback<int[]> callback = new AsyncCallback<int[]>() {
                     @Override
                     public void onFailure(Throwable caught) {
 
@@ -171,30 +158,37 @@ public class N4uConverterTab extends Tab {
                     }
 
                     @Override
-                    public void onSuccess(List<List<String>> result) {
+                    public void onSuccess(int[] result) {
 
 
-                        for (String s : result.get(0)) {
-                            tabImporter.addfielsInputs("InputDir", s);
+
+                        for (int i = 1; i < (int) result[0]; i++) {
+                            if (i <= result[1]) {
+                                tabImporter.addFielsInputs(false, "", InputType.File.name(), false);
+                            } else {
+                                tabImporter.addFielsInputs(false, "", InputType.Parameter.name(), false);
+                            }
                         }
-                        for (String s : result.get(1)) {
-                            tabImporter.addfielsInputs("OutputDir", s);
 
+                        tabImporter.addFielsOutput(true, "result", N4uImportTab.InputType.File.name(), true);
+                        tabImporter.addfiels("Main Executable <font color=red>(*)</font>", true, script.getValueAsString(), false);
+                       /* if (ext.getValueAsString() != "" || ext.getValueAsString() != null || !ext.getValueAsString().isEmpty()) {
+                            tabImporter.addfiels("Extension File", true, false, ext.getValueAsString(), false);
                         }
 
+                        if (env.getValueAsString()!="" || env.getValueAsString() != null || env.getValueAsString().length() == 0||!env.getValueAsString().isEmpty()) {
+                            tabImporter.addfiels("Environement File", true, false, env.getValueAsString(), false);
+                        }
+**/
+                        tabImporter.addfiels("Application Location <font color=red>(*)</font>", true, "", false);
+
+                        tabImporter.addLaunchButton();
 
 
                     }
                 };
-                 FileProcessService.Util.getInstance().fileTraitement(express.getValueAsString(), callback);
-                //FileProcessService.Util.getInstance().fileTraitement("/home/nouha/express.txt", callback);
-                tabImporter.addfielsInputs("Script File", script.getValueAsString());
-                if (ext.getValueAsString() != null || ext.getValueAsString().isEmpty()) {
-                    tabImporter.addfielsInputs("Extension File", ext.getValueAsString());
-                }
-                if (env.getValueAsString() != null || env.getValueAsString().isEmpty()) {
-                    tabImporter.addfielsInputs("Environment File", env.getValueAsString());
-                }
+                FileProcessService.Util.getInstance().fileJobTraitement(job.getValueAsString(), express.getValueAsString(), callback);
+
 
             }
         });
@@ -211,7 +205,7 @@ public class N4uConverterTab extends Tab {
         layout.addMember(extItemForm);
         layout.addMember(environementLabel);
         layout.addMember(envItemForm);
-        layout.addMember(launchButton);
+        layout.addMember(importButton);
 
     }
 }
