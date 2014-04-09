@@ -5,6 +5,7 @@
 package fr.insalyon.creatis.vip.n4u.client.rpc;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import java.util.ArrayList;
@@ -30,4 +31,8 @@ public interface FileProcessService extends RemoteService {
     }
     
      List<List<String>> fileTraitement(String param1);
+     int[] fileJobTraitement(String jobFile,String expressFile) ;
+     void generateScriptFile(ArrayList listInput,ArrayList listOutput,String wrapperScriptPath,String scriptFile,String applicationName,String applicationLocation,String description) ;
+    void generateGwendiaFile(ArrayList listInput,ArrayList listOutput,String wrapperScriptPath,String scriptFile,String applicationName,String applicationLocation,String description) ;
+   void generateGaswFile(ArrayList listInput,ArrayList listOutput,String wrapperScriptPath,String scriptFile,String applicationName,String applicationLocation,String description) ;
 }
