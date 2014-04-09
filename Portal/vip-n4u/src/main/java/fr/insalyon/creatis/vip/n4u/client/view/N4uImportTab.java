@@ -198,7 +198,9 @@ public class N4uImportTab extends Tab {
                    Layout.getInstance().setWarningMessage("There is an invalid Input");
                 }
                 }
-            if(go==true){
+               if(go==true){
+                   
+                Layout.getInstance().setNoticeMessage("Creating the application (this can take a while)");
                 final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
                     @Override
                     public void onFailure(Throwable caught) {
@@ -208,11 +210,45 @@ public class N4uImportTab extends Tab {
 
                     @Override
                     public void onSuccess(Void result) {
-                        Layout.getInstance().setNoticeMessage("Your application was successfully created");
+                        Layout.getInstance().setNoticeMessage("Your Gasw file was successfully created");
                     }
                 };
 
-                FileProcessService.Util.getInstance().generateFiles(listInputs, listOutputs, "", scriptFileName, applicationName, descriptionValue, applicationLocation, callback);
+                FileProcessService.Util.getInstance().generateGaswFile(listInputs, listOutputs, "", scriptFileName, applicationName,applicationLocation, descriptionValue, callback);
+            
+               
+               
+               final AsyncCallback<Void> callback1 = new AsyncCallback<Void>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+
+                        Layout.getInstance().setWarningMessage("Unable  " + caught.getMessage());
+                    }
+
+                    @Override
+                    public void onSuccess(Void result) {
+                        Layout.getInstance().setNoticeMessage("Your Gwendia file was successfully created");
+                    }
+                };
+
+                FileProcessService.Util.getInstance().generateGwendiaFile(listInputs, listOutputs, "", scriptFileName, applicationName,applicationLocation, descriptionValue,  callback1);
+            
+            
+            
+            final AsyncCallback<Void> callback2 = new AsyncCallback<Void>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+
+                        Layout.getInstance().setWarningMessage("Unable  " + caught.getMessage());
+                    }
+
+                    @Override
+                    public void onSuccess(Void result) {
+                        Layout.getInstance().setNoticeMessage("Your Script file was successfully created");
+                    }
+                };
+
+                FileProcessService.Util.getInstance().generateScriptFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, descriptionValue, callback2);
             }
             }
         });
