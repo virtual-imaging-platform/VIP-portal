@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<description>
+    <executable name="wrapper_$applicationName.sh">
+        <access type="LFN" cached="true"> 
+        </access>
+        <executor value="LOCAL"/>
+        <value value="$gassValue"/>
+        #set($i =$0 )
+        #foreach( $input in $inputList )
+        #set($i =$i + 1  )
+        #if($input.type=="LFN" )
+       <input name="$input.name" option="no$i"> 
+            <access type="LFN"/> 
+       </input>
+        #else
+        <input name="$input.name" option="no$i">
+        </input>
+        #end
+        #end
+        #foreach( $output in $outputList )
+        <output name="$output.name" option="$output.option">            
+            <template value="$dir1/$na1/$na2-${output.name}.tgz"/>
+            <access type="LFN">
+            </access>
+        </output>    
+        #end
+	
+    </executable>
+</description>

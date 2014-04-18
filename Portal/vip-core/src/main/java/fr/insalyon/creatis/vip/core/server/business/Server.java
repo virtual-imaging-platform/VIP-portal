@@ -116,6 +116,10 @@ public class Server {
     private String mozillaPersonaValidationURL;
     //treeQuery
     private String queryTree;
+    //N4U
+    private String applicationN4uClasse;
+    private String applicationFilesRepository;
+    private String deleteFilesAfterUpload;
 
    
     
@@ -197,12 +201,14 @@ public class Server {
             samlTrustedCertificate = config.getString(CoreConstants.SAML_TRUSTED_CERTIFICATE, System.getProperty( "user.home" )+File.separator+".vip"+File.separator+"trusted_saml_cert.pem");
             mozillaPersonaValidationURL = config.getString(CoreConstants.MOZILLA_PERSONA_VALIDATION_URL,"https://verifier.login.persona.org/verify");
                     
-            
+             //queryTree
             queryTree=config.getString(CoreConstants.TreeQuery,"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> select * from <http://e-ginseng.org/graph/ontology/semEHR> where {?x a rdfs:Class . ?x rdfs:label ?label}");
             
-            
-            
-           //queryTree
+            //N4U_model
+            applicationN4uClasse=config.getString(CoreConstants.APP_CLASSE,"Test");
+            applicationFilesRepository=config.getString(CoreConstants.APPLICATION_FILES_REPOSITORY,"/home/boujelben");
+            deleteFilesAfterUpload=config.getString(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD,"yes");
+          
              
             
             config.setProperty(CoreConstants.LAB_DB_HOST, databaseServerHost);
@@ -251,9 +257,11 @@ public class Server {
             config.setProperty(CoreConstants.SSH_PUBLIC_KEY, sshPublicKey);
             config.setProperty(CoreConstants.SAML_TRUSTED_CERTIFICATE, samlTrustedCertificate);
             config.setProperty(CoreConstants.MOZILLA_PERSONA_VALIDATION_URL,mozillaPersonaValidationURL);
-            
             config.setProperty(CoreConstants.TreeQuery, queryTree);
             
+            config.setProperty(CoreConstants.APP_CLASSE, applicationN4uClasse);
+            config.setProperty(CoreConstants.APPLICATION_FILES_REPOSITORY,applicationFilesRepository);
+            config.setProperty(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, deleteFilesAfterUpload);
             config.save();
 
         } catch (ConfigurationException ex) {
@@ -455,6 +463,19 @@ public class Server {
     
      public String getQueryTree() {
         return queryTree;
+    }
+     
+     
+    public String getApplicationN4uClasse() {
+        return applicationN4uClasse;
+    }
+
+    public String getApplicationFilesRepository() {
+        return applicationFilesRepository;
+    }
+
+    public String getDeleteFilesAfterUpload() {
+        return deleteFilesAfterUpload;
     }
   
 }

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow name="$applicationName" version="0.1">
+ #if($description=="") 
+  <description>""</description>
+  #else
+   <description>$description</description>
+#end
+  <interface>
+   #foreach( $input in $inputList )##
+      #if($input.type=="LFN" )   
+   <source name="$input.name" type="URI">
+      <source-comment>$input.description
+      </source-comment>
+    </source>
+   #else
+   <source name="$input.name" type="string">
+      <source-comment>$input.description
+      </source-comment>
+    </source>
+   #end##
+   #end##
+   #foreach( $output in $outputList ) 
+    <sink name="$output.name" type="string" />
+   #end
+  </interface>
+
+  <processors>
+    <processor name="$applicationName" >
+   #set($i =0 )    
+   #foreach( $input in $inputList )
+   #set($i =$i + 1  )
+   #if($input.type=="LFN" )   
+   <in name="input${i}" type="URI" depth="0" />
+   #else
+   <in name="input${i}" type="string" depth="0" /> 
+   #end
+   #end
+    #set($j =0 ) 
+    #foreach( $output in $outputList ) 
+    #set($j =$j + 1  )   
+   <out name="result$j" type="string" depth="0" />
+    #end
+   <iterationstrategy>
+        <cross>
+    #set($i =0 )
+    #foreach( $input in $inputList )
+    #set($i =$i + 1  )
+          <port name="input${i}" />     
+    #end
+        </cross>
+    </iterationstrategy>
+      <gasw descriptor="$gaswDescriptor"/>
+    </processor>
+  </processors>
+
+  <links>
+    #set($i =0 )##
+    #foreach( $input in $inputList )##
+    #set($i =$i + 1  )##
+    <link from="$input.name" to="$applicationName:input${i}" />
+    #end##
+    #set($j =0 ) 
+    #foreach($output in $outputList)##
+     #set($j =$j + 1  )
+    ##we suppose that we have one output##
+    <link from="$applicationName:result${j}" to="$output.name" />
+    #end##
+  </links>
+
+</workflow>

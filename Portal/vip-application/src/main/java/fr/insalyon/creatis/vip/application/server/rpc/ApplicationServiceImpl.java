@@ -214,7 +214,16 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             throw new ApplicationException(ex);
         }
     }
+@Override
+    public boolean applicationExist(String applicationName) throws ApplicationException {
 
+        try {
+            return applicationBusiness.applicationExist(applicationName);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
     /**
      *
      * @param applicationClass

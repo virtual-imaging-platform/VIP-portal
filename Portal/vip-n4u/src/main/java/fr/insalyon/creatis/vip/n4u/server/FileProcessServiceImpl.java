@@ -56,7 +56,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
         String localFilePat = null;
        try {
             
-                    localFilePat = CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(getSessionUser(),param1), System.getProperty("user.home"));
+                localFilePat = CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(getSessionUser(),param1), System.getProperty("user.home"));
                 } catch (CoreException ex) {
                    logger.error(ex);
                    logger.error(param1);
@@ -113,7 +113,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
        
        try {
             
-                    localFilePat = CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(getSessionUser(),jobFile), System.getProperty("user.home"));
+                localFilePat = CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(getSessionUser(),jobFile), System.getProperty("user.home"));
                 } catch (CoreException ex) {
                    logger.error(ex);
                    
@@ -200,15 +200,12 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
         final File homeDir = new File(Server.getInstance().getApplicationFilesRepository());
         File theDir = null;
         try {
-            theDir = new File(homeDir,applicationName+"_"+getSessionUser().getFolder()+"_"+getCurrentTimeStamp());
+            theDir = new File(homeDir,applicationName+"/"+getSessionUser().getFolder()+"/"+getCurrentTimeStamp());
+            theDir.mkdirs();
         } catch (CoreException ex) {
             java.util.logging.Logger.getLogger(FileProcessServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-    // if the directory does not exist, create it
-     if (!theDir.exists()&&theDir!=null) { 
-     boolean result = theDir.mkdir(); 
-   }
         
        String dir=theDir.getAbsolutePath();
       
@@ -216,7 +213,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
     }
 
     @Override
-    public void generateGwendiaFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) {
+    public String generateGwendiaFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) {
            String applicationRealLocation=null;
         try {
             applicationRealLocation=DataManagerUtil.parseBaseDir(getSessionUser(),applicationLocation);
@@ -230,20 +227,18 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
         final File homeDir = new File(Server.getInstance().getApplicationFilesRepository());
         File theDir = null;
         try {
-            theDir = new File(homeDir,applicationName+"_"+getSessionUser().getFolder()+"_"+getCurrentTimeStamp());
+            theDir = new File(homeDir,applicationName+"/"+getSessionUser().getFolder()+"/"+getCurrentTimeStamp());
+            theDir.mkdirs();
         } catch (CoreException ex) {
             java.util.logging.Logger.getLogger(FileProcessServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-    // if the directory does not exist, create it
-     if (!theDir.exists()&&theDir!=null) { 
-     boolean result = theDir.mkdir(); 
-   }
+    
         
        String dir=theDir.getAbsolutePath();
       
        
-        new Velocity().gwendiaFile(listInput,listOutput, applicationName,description,applicationRealLocation,dir);
+        return new Velocity().gwendiaFile(listInput,listOutput, applicationName,description,applicationRealLocation,dir);
     }
 
     @Override
@@ -251,28 +246,33 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
        String applicationRealLocation=null;
         try {
             applicationRealLocation=DataManagerUtil.parseBaseDir(getSessionUser(),applicationLocation);
-        } catch (CoreException ex) {
-            java.util.logging.Logger.getLogger(FileProcessServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CoreException e) {
+            logger.error(e);
         } catch (DataManagerException ex) {
-            java.util.logging.Logger.getLogger(FileProcessServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+           logger.error(ex);
         }
         
         //create floder to genrate file
         final File homeDir = new File(Server.getInstance().getApplicationFilesRepository());
         File theDir = null;
         try {
-            theDir = new File(homeDir,applicationName+"_"+getSessionUser().getFolder()+"_"+getCurrentTimeStamp());
+            theDir = new File(homeDir,applicationName+"/"+getSessionUser().getFolder()+"/"+getCurrentTimeStamp());
+            theDir.mkdirs();
+            
         } catch (CoreException ex) {
             java.util.logging.Logger.getLogger(FileProcessServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     // if the directory does not exist, create it
-     if (!theDir.exists()&&theDir!=null) { 
-     boolean result = theDir.mkdir(); 
-   }
+    
         
        String dir=theDir.getAbsolutePath();
         new Velocity().gassFile(listInput,listOutput,applicationName,wrapperScriptPath,applicationRealLocation,dir );
+    }
+
+   
+    public String getApplicationClasse() {
+        return Server.getInstance().getApplicationN4uClasse();
     }
     
     

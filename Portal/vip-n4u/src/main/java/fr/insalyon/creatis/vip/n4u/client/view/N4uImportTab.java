@@ -15,13 +15,20 @@ import com.google.gwt.event.shared.GwtEvent.Type;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.TextArea;
 import com.smartgwt.client.data.events.HasDataChangedHandlers;
 import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.util.BooleanCallback;
+import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.Dialog;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.RichTextEditor;
+import com.smartgwt.client.widgets.events.ButtonClickEvent;
+import com.smartgwt.client.widgets.events.ButtonClickHandler;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -52,31 +59,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.event.shared.HasHandlers;
-import com.google.gwt.event.shared.SimpleEventBus;
-import com.google.gwt.user.client.Event;
-import com.smartgwt.client.core.DataClass;
-import com.smartgwt.client.data.events.DataChangedEvent;
-import com.smartgwt.client.data.events.DataChangedHandler;
-import com.smartgwt.client.data.events.HasDataChangedHandlers;
-import com.smartgwt.client.util.EventHandler;
-import com.smartgwt.client.widgets.events.DropOutEvent;
-import com.smartgwt.client.widgets.events.DropOutHandler;
-import com.smartgwt.client.widgets.events.FocusChangedEvent;
-import com.smartgwt.client.widgets.events.FocusChangedHandler;
-import com.smartgwt.client.widgets.events.HoverEvent;
-import com.smartgwt.client.widgets.events.HoverHandler;
-import com.smartgwt.client.widgets.events.KeyDownHandler;
 import com.smartgwt.client.widgets.events.KeyPressEvent;
-
-
 import com.smartgwt.client.widgets.events.KeyPressHandler;
+
 import com.smartgwt.client.widgets.events.MouseOutEvent;
 import com.smartgwt.client.widgets.events.MouseOutHandler;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.events.KeyDownEvent;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.application.client.view.system.application.ManageApplicationsTab;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import java.util.List;
-
 
 /**
  *
@@ -92,21 +88,22 @@ public class N4uImportTab extends Tab {
     HLayout hLayout2;
     VLayout vlayout;
     private VLayout layout;
-    private VLayout layout2;
     PickerIcon browsePicker;
-    PickerIcon morePicker;
-    PickerIcon lessPicker;
-    PickerIcon editPicker;
     IButton createApplicationButton;
     ArrayList listInputs;
     ArrayList listOutputs;
-    List<TextItem>listItems;
+    List<TextItem> listItems;
     int i = 0;
     int j = 0;
     String scriptFileName;
     String applicationName;
     String descriptionValue;
     String applicationLocation;
+    boolean versionOverWrite = false;
+    boolean confirm1 = false;
+    boolean confirm2 = false;
+    boolean confirm3 = false;
+    String versionValue;
 
     public N4uImportTab() {
 
@@ -114,8 +111,6 @@ public class N4uImportTab extends Tab {
         this.setID(N4uConstants.TAB_EXPRESSLANE_2);
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
-
-
         configure();
         listInputs = new ArrayList();
         listOutputs = new ArrayList();
@@ -124,11 +119,7 @@ public class N4uImportTab extends Tab {
     }
 
     public void configure() {
-        layout2 = new VLayout();
-        layout2.setWidth100();
-        layout2.setHeight(20);
 
-        layout2.setMembersMargin(5);
 
         layout = new VLayout();
         layout.setWidth100();
@@ -139,16 +130,18 @@ public class N4uImportTab extends Tab {
 
         hLayout1 = new HLayout();
         hLayout1.setMembersMargin(10);
-        hLayout1.setHeight(250);
+        hLayout1.setHeight("50%");
+
         hLayout2 = new HLayout();
         hLayout2.setMembersMargin(10);
+        hLayout2.setHeight("50%");
 
         vlayout = new VLayout();
         vlayout.setHeight100();
         vlayout.setWidth100();
 
         vlayout.setMembersMargin(2);
-        vlayout.setOverflow(Overflow.SCROLL);
+        vlayout.setOverflow(Overflow.AUTO);
 
 
         layoutGeneralInformation = new GeneralInformation("50%", "100%");
@@ -179,11 +172,10 @@ public class N4uImportTab extends Tab {
         layoutInputs.getAddButton().addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                addFielsInputs(false, "", "", false);
+                addFielsInputs(false, "", "", "", false);
             }
         });
         layoutInputs.addMember(vlayout);
-
 
 
 
@@ -191,118 +183,279 @@ public class N4uImportTab extends Tab {
                 new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                boolean go=true;
-                for (TextItem i:listItems){
-               if(!i.validate()||i.getValueAsString()==""||i.getValueAsString()==null){
-                    go=false;
-                   Layout.getInstance().setWarningMessage("There is an invalid Input");
+                boolean go = true;
+                for (TextItem i : listItems) {
+                    if (!i.validate() || i.getValueAsString() == "" || i.getValueAsString() == null) {
+                        go = false;
+                        Layout.getInstance().setWarningMessage("There is an invalid Input");
+                    }
                 }
+                if (go == true) {
+                    //verifying the application existance
+                    AsyncCallback<Boolean> callback = new AsyncCallback<Boolean>() {
+                        @Override
+                        public void onFailure(Throwable caught) {
+
+                            Layout.getInstance().setWarningMessage(caught.getMessage());
+                        }
+
+                        @Override
+                        public void onSuccess(Boolean result) {
+                            if (result.booleanValue()) {
+
+                                final Dialog dialog = new Dialog();
+                                dialog.setMessage(" Application " + applicationName + " already exists");
+                                dialog.setIcon("[SKIN]ask.png");
+                                Button create = new Button("Create New Version");
+                                create.setWidth("130");
+                                create.setIcon(N4uConstants.ICON_ADD);
+                                create.addClickHandler(new ClickHandler() {
+                                    @Override
+                                    public void onClick(ClickEvent event) {
+
+                                        dialog.destroy();
+                                        //Create the Gasw file
+                                        createGaswFile();
+                                        //create Script File
+                                        createScriptFile();
+                                        //creategwendiaFile+applicationVersion
+                                        createGwendiaFile(true);
+
+                                    }
+                                });
+
+
+                                Button overWrite = new Button("Overwrite Current Version (1.0)");
+                                overWrite.setWidth("180");
+                                overWrite.setIcon(N4uConstants.ICON_OVERWRITE);
+                                overWrite.addClickHandler(new ClickHandler() {
+                                    @Override
+                                    public void onClick(ClickEvent event) {
+                                        dialog.destroy();
+                                        createGaswFile();
+                                        //create Script File
+                                        createScriptFile();
+                                        createGwendiaFile(false);
+
+                                    }
+                                });
+
+
+                                Button cancel = new Button("Cancel");
+                                cancel.setIcon(N4uConstants.ICON_CANCEL);
+                                cancel.setWidth("80");
+
+                                cancel.addClickHandler(new ClickHandler() {
+                                    @Override
+                                    public void onClick(ClickEvent event) {
+                                        dialog.destroy();
+                                    }
+                                });
+                                dialog.setButtons(create, overWrite, cancel);
+
+                                dialog.draw();
+
+
+
+                            } else {
+                                //ajouter application 
+                                createGaswFile();
+                                final AsyncCallback<String> callback1 = new AsyncCallback<String>() {
+                                    @Override
+                                    public void onFailure(Throwable caught) {
+
+                                        Layout.getInstance().setWarningMessage("Unable  " + caught.getMessage());
+                                    }
+
+                                    @Override
+                                    public void onSuccess(String result) {
+                                        Layout.getInstance().setNoticeMessage("Your Gwendia file was successfully created");
+
+                                        addApplication();
+                                        ApplicationService.Util.getInstance().addVersion(new AppVersion(applicationName, "1.0", result, true), getCallback("updateVersion"));
+
+                                        confirm2 = true;
+                                    }
+                                };
+
+                                FileProcessService.Util.getInstance().generateGwendiaFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, descriptionValue, callback1);
+
+
+                                createScriptFile();
+                            }
+                        }
+                    };
+
+                    ApplicationService.Util.getInstance().applicationExist(applicationName, callback);
                 }
-               if(go==true){
-                   
-                Layout.getInstance().setNoticeMessage("Creating the application (this can take a while)");
-                final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-                    @Override
-                    public void onFailure(Throwable caught) {
-
-                        Layout.getInstance().setWarningMessage("Unable  " + caught.getMessage());
-                    }
-
-                    @Override
-                    public void onSuccess(Void result) {
-                        Layout.getInstance().setNoticeMessage("Your Gasw file was successfully created");
-                    }
-                };
-
-                FileProcessService.Util.getInstance().generateGaswFile(listInputs, listOutputs, "", scriptFileName, applicationName,applicationLocation, descriptionValue, callback);
-            
-               
-               
-               final AsyncCallback<Void> callback1 = new AsyncCallback<Void>() {
-                    @Override
-                    public void onFailure(Throwable caught) {
-
-                        Layout.getInstance().setWarningMessage("Unable  " + caught.getMessage());
-                    }
-
-                    @Override
-                    public void onSuccess(Void result) {
-                        Layout.getInstance().setNoticeMessage("Your Gwendia file was successfully created");
-                    }
-                };
-
-                FileProcessService.Util.getInstance().generateGwendiaFile(listInputs, listOutputs, "", scriptFileName, applicationName,applicationLocation, descriptionValue,  callback1);
-            
-            
-            
-            final AsyncCallback<Void> callback2 = new AsyncCallback<Void>() {
-                    @Override
-                    public void onFailure(Throwable caught) {
-
-                        Layout.getInstance().setWarningMessage("Unable  " + caught.getMessage());
-                    }
-
-                    @Override
-                    public void onSuccess(Void result) {
-                        Layout.getInstance().setNoticeMessage("Your Script file was successfully created");
-                    }
-                };
-
-                FileProcessService.Util.getInstance().generateScriptFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, descriptionValue, callback2);
-            }
             }
         });
 
-
         createApplicationButton.setWidth("150");
+    }
+
+    private void addApplication() {
+        final List<String> applicationClasses = new ArrayList<String>();
+
+        final AsyncCallback<String> classApplicationCallback = new AsyncCallback<String>() {
+            @Override
+            public void onFailure(Throwable caught) {
+
+                Layout.getInstance().setWarningMessage("Unable to get Application Class  " + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(String result) {
+
+                applicationClasses.add(result);
+                ApplicationService.Util.getInstance().add(new Application(applicationName, applicationClasses, ""), getCallback("add"));
 
 
+            }
+        };
+
+        FileProcessService.Util.getInstance().getApplicationClasse(classApplicationCallback);
 
 
 
     }
+
+    private AsyncCallback<Void> getCallback(final String text) {
+
+        return new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                /*
+                 if(text=="add"){
+                 if(caught.getMessage().contains("An application named ")==true){
+                 ApplicationService.Util.getInstance().update(new Application(applicationName,descriptionValue),  getCallback("update"));
+                 }else{
+                 Layout.getInstance().setWarningMessage(caught.getMessage());
+              
+                 }
+                 * **/
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+            }
+        };
+    }
+
+    private void createGwendiaFile(final boolean newVersion) {
+        final AsyncCallback<String> callback1 = new AsyncCallback<String>() {
+            @Override
+            public void onFailure(Throwable caught) {
+
+                Layout.getInstance().setWarningMessage(caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(final String result1) {
+                Layout.getInstance().setNoticeMessage("Your Gwendia file was successfully created");
+                if (newVersion) {
+                    final AsyncCallback<List<AppVersion>> callback = new AsyncCallback<List<AppVersion>>() {
+                        @Override
+                        public void onFailure(Throwable caught) {
+                        }
+
+                        @Override
+                        public void onSuccess(List<AppVersion> result) {
+                            int size = result.size();
+                            String version = result.get(size - 1).getVersion();
+                            int indexPoint = version.indexOf(".");
+                            int value = Integer.parseInt(version.substring(indexPoint + 1));
+                            value = value + 1;
+                            versionValue = version.substring(0, indexPoint + 1) + value;
+                            ApplicationService.Util.getInstance().addVersion(new AppVersion(applicationName, versionValue, result1, true), getCallback("updateVersion"));
+                        }
+                    };
+                    ApplicationService.Util.getInstance().getVersions(applicationName, callback);
+
+                } else {
+
+                    ApplicationService.Util.getInstance().updateVersion(new AppVersion(applicationName, "1.0", result1, true), getCallback("updateVersion"));
+                }
+
+                confirm2 = true;
+            }
+        };
+
+        FileProcessService.Util.getInstance().generateGwendiaFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, descriptionValue, callback1);
+
+
+    }
+
+    private void createGaswFile() {
+
+        Layout.getInstance().setNoticeMessage("Creating the application (this can take a while)");
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+
+                Layout.getInstance().setWarningMessage("Unable  " + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                Layout.getInstance().setNoticeMessage("Your Gasw file was successfully created");
+                confirm1 = true;
+
+            }
+        };
+
+        FileProcessService.Util.getInstance().generateGaswFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, descriptionValue, callback);
+
+    }
+
+    private void createScriptFile() {
+
+        final AsyncCallback<Void> callback2 = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+
+                Layout.getInstance().setWarningMessage("Unable  " + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                Layout.getInstance().setNoticeMessage("Your Script file was successfully created");
+                confirm3 = true;
+            }
+        };
+
+        FileProcessService.Util.getInstance().generateScriptFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, descriptionValue, callback2);
+
+
+    }
+
 //inputs
-
-    public VLayout addFielsInputs(boolean fixedInput, String value, String typeValue, boolean fixedType) {
+    public VLayout addFielsInputs(boolean fixedInput, String value, String descriptionValue, String typeValue, boolean fixedType) {
         i++;
-       
-
         HLayout hlayout = new HLayout();
         hlayout.setHeight(80);
         hlayout.setWidth100();
-
         hlayout.setMembersMargin(2);
-
-
         final Map map = new HashMap();
-
-        final TextItem fieldItem = FieldUtil.getTextItem(280, false, "", "[0-9.,A-Za-z-+/_() ]");
+        final TextItem fieldItem = FieldUtil.getTextItem("30%", false, "", "[0-9.,A-Za-z-+/_() ]", false);
         fieldItem.setValue(value);
         fieldItem.setValidators(ValidatorUtil.getStringValidator());
-        
         map.put("name", fieldItem.getValueAsString());
-
         fieldItem.addEditorExitHandler(new EditorExitHandler() {
             @Override
             public void onEditorExit(EditorExitEvent event) {
                 map.put("name", fieldItem.getValueAsString());
             }
         });
-        final RichTextEditor description = new RichTextEditor();
-        description.setHeight(80);
-        description.setWidth(380);
-        description.setOverflow(Overflow.HIDDEN);
-        description.setShowEdges(true);
+        final TextArea description = new TextArea();
+        description.setHeight("100%");
+        description.setWidth("100%");
         description.setTitle("description");
-
-        description.setControlGroups("styleControls", "editControls",
-                "colorControls");
-        description.addKeyPressHandler(new KeyPressHandler() {
+        description.setValue(descriptionValue);
+        description.addChangeHandler(new com.google.gwt.event.dom.client.ChangeHandler() {
             @Override
-            public void onKeyPress(KeyPressEvent event) {
-                if(event.getKeyName().length()==1){
-              map.put("description", description.getValue()+event.getKeyName().toLowerCase());
-                }
+            public void onChange(com.google.gwt.event.dom.client.ChangeEvent event) {
+                map.put("description", description.getValue());
             }
         });
         map.put("description", description.getValue());
@@ -313,7 +466,7 @@ public class N4uImportTab extends Tab {
 
         selectItem.setValue(typeValue);
 
-        selectItem.setWidth(110);
+        selectItem.setWidth("100%");
         if (!fixedType) {
             LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
             valueMap.put(InputType.File.name(), InputType.File.name());
@@ -324,13 +477,13 @@ public class N4uImportTab extends Tab {
             selectItem.setValueMap(typeValue);
         }
 
-         selectItem.setValue(typeValue);
-         
-         if(typeValue==InputType.File.name()){
-          map.put("type", "LFN");
-         } else{
-          map.put("type", typeValue);
-         } 
+        selectItem.setValue(typeValue);
+
+        if (typeValue == InputType.File.name()) {
+            map.put("type", "LFN");
+        } else {
+            map.put("type", typeValue);
+        }
         selectItem.addChangedHandler(new ChangedHandler() {
             @Override
             public void onChanged(ChangedEvent event) {
@@ -350,6 +503,7 @@ public class N4uImportTab extends Tab {
 
         DynamicForm titleItemForm = new DynamicForm();
         titleItemForm.setHeight(20);
+        titleItemForm.setNumCols(1);
         titleItemForm.setFields(fieldItem);
 
         DynamicForm selectItemForm = new DynamicForm();
@@ -387,14 +541,12 @@ public class N4uImportTab extends Tab {
         removeButton.setShowDown(false);
         removeButton.addClickHandler(new ClickHandler() {
             public void onClick(ClickEvent event) {
-
+                listItems.remove(fieldItem);
                 vlayout.removeMember(sectionStack);
                 int id = Integer.parseInt(sectionStack.getTitle());
                 i = i - 1;
                 listInputs.remove(id - 1);
-                listItems.remove(fieldItem);
-                
-           
+
 
             }
         });
@@ -405,11 +557,10 @@ public class N4uImportTab extends Tab {
 
         section1.setExpanded(true);
         section1.setCanCollapse(false);
-
         sectionStack.setSections(section1);
         sectionStack.setHeight(120);
         sectionStack.setTitle("" + i);
-
+        sectionStack.setShowHover(false);
         listInputs.add(map);
         listItems.add(fieldItem);
         vlayout.addMember(sectionStack);
@@ -418,7 +569,7 @@ public class N4uImportTab extends Tab {
 
     }
 
-    public VLayout addFielsOutput(boolean fixedInput, String value, String typeValue, boolean fixedType) {
+    public VLayout addFielsOutput(boolean fixedInput, String value, String descriptionValue, String typeValue, boolean fixedType) {
         j++;
         HLayout hlayout = new HLayout();
         hlayout.setHeight(80);
@@ -426,7 +577,7 @@ public class N4uImportTab extends Tab {
         hlayout.setMembersMargin(2);
 
         final Map map = new HashMap();
-        final TextItem fieldItem = FieldUtil.getTextItem(280, false, "", "[0-9.,A-Za-z-+/_() ]");
+        final TextItem fieldItem = FieldUtil.getTextItem("30%", false, "", "[0-9.,A-Za-z-+/_() ]", false);
         fieldItem.setValue(value);
         fieldItem.setValidators(ValidatorUtil.getStringValidator());
         map.put("name", fieldItem.getValueAsString());
@@ -437,20 +588,15 @@ public class N4uImportTab extends Tab {
                 map.put("name", fieldItem.getValueAsString());
             }
         });
-        final RichTextEditor description = new RichTextEditor();
-        description.setHeight(80);
-        description.setWidth(380);
-        description.setOverflow(Overflow.HIDDEN);
-        description.setShowEdges(true);
+        final TextArea description = new TextArea();
+        description.setHeight("100%");
+        description.setWidth("100%");
         description.setTitle("description");
-        description.setControlGroups("styleControls", "editControls",
-                "colorControls");
-        description.addKeyPressHandler(new KeyPressHandler() {
+        description.setValue(descriptionValue);
+        description.addChangeHandler(new com.google.gwt.event.dom.client.ChangeHandler() {
             @Override
-            public void onKeyPress(KeyPressEvent event) {
-                if(event.getKeyName().length()==1){
-                map.put("description", description.getValue()+event.getKeyName().toLowerCase());
-                }
+            public void onChange(com.google.gwt.event.dom.client.ChangeEvent event) {
+                map.put("description", description.getValue());
             }
         });
 
@@ -463,7 +609,7 @@ public class N4uImportTab extends Tab {
 
         selectItem.setValue(typeValue);
 
-        selectItem.setWidth(110);
+        selectItem.setWidth("100%");
         if (!fixedType) {
             LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
             valueMap.put(InputType.File.name(), InputType.File.name());
@@ -475,11 +621,11 @@ public class N4uImportTab extends Tab {
         }
 
         selectItem.setValue(typeValue);
-        if(typeValue==InputType.File.name()){
-          map.put("type", "LFN");
-         } else{
-          map.put("type", typeValue);
-         } 
+        if (typeValue == InputType.File.name()) {
+            map.put("type", "LFN");
+        } else {
+            map.put("type", typeValue);
+        }
 
         selectItem.addChangedHandler(new ChangedHandler() {
             @Override
@@ -500,6 +646,7 @@ public class N4uImportTab extends Tab {
         title = "<strong>" + "Output" + j + "</strong>";
         DynamicForm titleItemForm = new DynamicForm();
         titleItemForm.setHeight(20);
+        titleItemForm.setNumCols(1);
         titleItemForm.setFields(fieldItem);
 
         DynamicForm selectItemForm = new DynamicForm();
@@ -550,7 +697,7 @@ public class N4uImportTab extends Tab {
 
         itemLabel.setHeight(20);
 
-        final TextItem fieldItem = FieldUtil.getTextItem(620, "[0-9.,A-Za-z-+/_() ]", disabled);
+        final TextItem fieldItem = FieldUtil.getTextItem("*", false, "", "[0-9.,A-Za-z-+/_() ]", disabled);
         fieldItem.setValidators(ValidatorUtil.getStringValidator());
         fieldItem.setName("editable");
         fieldItem.setValue(value);
@@ -559,10 +706,12 @@ public class N4uImportTab extends Tab {
         }
 
         DynamicForm titleItemForm = new DynamicForm();
+        titleItemForm.setWidth100();
+        titleItemForm.setNumCols(1);
         titleItemForm.setFields(fieldItem);
 
         if (title == "Main Executable <font color=red>(*)</font>") {
-            scriptFileName=value;
+            scriptFileName = value;
             fieldItem.addEditorExitHandler(new EditorExitHandler() {
                 @Override
                 public void onEditorExit(EditorExitEvent event) {
@@ -584,7 +733,7 @@ public class N4uImportTab extends Tab {
 
         }
         if (title == "Application Name <font color=red>(*)</font>") {
-             applicationName =value;
+            applicationName = value;
             fieldItem.addEditorExitHandler(new EditorExitHandler() {
                 @Override
                 public void onEditorExit(EditorExitEvent event) {
@@ -598,7 +747,7 @@ public class N4uImportTab extends Tab {
             layoutExecutable.addMember(itemLabel);
             layoutExecutable.addMember(titleItemForm);
         }
-      listItems.add(fieldItem);
+        listItems.add(fieldItem);
 
 
     }
@@ -608,26 +757,22 @@ public class N4uImportTab extends Tab {
         itemLabel.setHeight(20);
 
         final RichTextEditor description = new RichTextEditor();
-         description.addKeyPressHandler(new KeyPressHandler() {
+        description.addKeyPressHandler(new KeyPressHandler() {
             @Override
             public void onKeyPress(KeyPressEvent event) {
-                if(event.getKeyName().length()==1){
-                  descriptionValue =description.getValue()+event.getKeyName().toLowerCase();  
+                if (event.getKeyName().length() == 1) {
+                    descriptionValue = description.getValue() + event.getKeyName().toLowerCase();
                 }
             }
         });
-
-        description.setHeight(80);
-        description.setWidth(620);
+        description.setHeight("40%");
+        description.setWidth("100%");
         description.setOverflow(Overflow.HIDDEN);
         description.setShowEdges(true);
         description.setControlGroups("styleControls", "editControls",
                 "colorControls");
-
         layoutGeneralInformation.addMember(itemLabel);
         layoutGeneralInformation.addMember(description);
-
-
     }
 
     public static enum InputType {
@@ -636,26 +781,7 @@ public class N4uImportTab extends Tab {
     }
 
     public void addLaunchButton() {
+
         layout.addMember(createApplicationButton);
-
-    }
-
-    public class MyRichTextEditor extends RichTextEditor implements com.smartgwt.client.widgets.form.fields.events.HasEditorExitHandlers, HasHandlers {
-
-        public void test() {
-            fireEvent(new EditorExitEvent(this.getJsObj()));
-
-        }
-
-        @Override
-        public HandlerRegistration addEditorExitHandler(com.smartgwt.client.widgets.form.fields.events.EditorExitHandler handler) {
-
-            return doAddHandler(handler, com.smartgwt.client.widgets.form.fields.events.EditorExitEvent.getType());
-
-        }
-    }
-    
-    
-      
-
+   }
 }

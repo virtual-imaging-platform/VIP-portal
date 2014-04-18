@@ -65,7 +65,7 @@ public interface ApplicationService extends RemoteService {
     public void signout() throws ApplicationException;
     
     public List<Application> getApplications() throws ApplicationException;
-    
+    public boolean applicationExist(String applicationName) throws ApplicationException;
     public List<String[]> getApplications(String className) throws ApplicationException;
     
     public List<String[]> getApplicationsByClass(String className) throws ApplicationException;

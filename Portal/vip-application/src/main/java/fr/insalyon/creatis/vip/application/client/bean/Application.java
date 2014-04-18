@@ -54,7 +54,7 @@ public class Application implements IsSerializable {
 
         this(name, null, citation);
     }
-
+     
     public Application(String name, List<String> applicationClasses, String citation) {
 
         this.name = name;

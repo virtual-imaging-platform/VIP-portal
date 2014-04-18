@@ -50,6 +50,11 @@ public class AppVersion implements IsSerializable {
     public AppVersion() {
     }
 
+    public AppVersion(String lfn) {
+        this.lfn = lfn;
+    }
+    
+
     public AppVersion(String applicationName, String version, String lfn, boolean visible) {
 
         this.applicationName = applicationName;

@@ -315,10 +315,11 @@ public class ApplicationData implements ApplicationDAO {
      * @throws DAOException
      */
     @Override
-    public Application getApplication(String applicationName) throws DAOException {
-
+    public boolean applicationExist(String applicationName) throws DAOException {
+       boolean exist;
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps ;
+                    /*= connection.prepareStatement("SELECT "
                     + "class "
                     + "FROM VIPApplicationClasses "
                     + "WHERE application=?");
@@ -330,26 +331,36 @@ public class ApplicationData implements ApplicationDAO {
             while (rs.next()) {
                 classes.add(rs.getString("class"));
             }
+            * **/
 
             ps = connection.prepareStatement("SELECT "
-                    + "name, citation "
+                    + "name "
                     + "FROM VIPApplications "
                     + "WHERE name=?");
 
             ps.setString(1, applicationName);
-            rs = ps.executeQuery();
-            rs.next();
+            ResultSet  rs = ps.executeQuery();
+            if(rs.next()){
+            exist= true;
+          
+            }else
+            {
+            exist=false;
+          
+            }
+            
 
-            Application application = new Application(rs.getString("name"),
-                    classes, rs.getString("citation"));
+            
 
             ps.close();
-            return application;
+            
 
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
         }
+        logger.error(exist+applicationName);
+        return exist;
     }
 
     /**
