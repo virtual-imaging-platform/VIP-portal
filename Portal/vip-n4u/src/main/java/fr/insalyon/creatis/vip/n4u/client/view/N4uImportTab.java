@@ -204,7 +204,7 @@ public class N4uImportTab extends Tab {
                             if (result.booleanValue()) {
 
                                 final Dialog dialog = new Dialog();
-                                dialog.setMessage(" Application " + applicationName + " already exists");
+                                dialog.setMessage(" Application " +"\""+ applicationName +"\""+ " already exists");
                                 dialog.setIcon("[SKIN]ask.png");
                                 Button create = new Button("Create New Version");
                                 create.setWidth("130");
