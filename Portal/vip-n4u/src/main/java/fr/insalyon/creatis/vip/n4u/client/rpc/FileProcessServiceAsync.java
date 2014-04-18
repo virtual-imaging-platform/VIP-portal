@@ -18,6 +18,7 @@ public interface FileProcessServiceAsync {
     public void fileJobTraitement(String jobFile,String expressFile, AsyncCallback <int[]> callback) ;
 
     public void generateScriptFile(ArrayList listInput,ArrayList listOutput,String wrapperScriptPath,String scriptFile,String applicationName,String applicationLocation,String description,AsyncCallback <Void> callback) ;
-    public void generateGwendiaFile(ArrayList listInput,ArrayList listOutput,String wrapperScriptPath,String scriptFile,String applicationName,String applicationLocation,String description,AsyncCallback <Void> callback) ;
+    public void generateGwendiaFile(ArrayList listInput,ArrayList listOutput,String wrapperScriptPath,String scriptFile,String applicationName,String applicationLocation,String description,AsyncCallback <String> callback) ;
     public void generateGaswFile(ArrayList listInput,ArrayList listOutput,String wrapperScriptPath,String scriptFile,String applicationName,String applicationLocation,String description,AsyncCallback <Void> callback) ;
+    public void  getApplicationClasse(AsyncCallback <String> callback) ;
 }

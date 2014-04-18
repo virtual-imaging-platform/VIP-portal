@@ -67,7 +67,7 @@ public interface ApplicationDAO {
     
     public List<String> getApplicationsName(String applicationClass) throws DAOException;
 
-    public Application getApplication(String name) throws DAOException;
+    public boolean applicationExist(String name) throws DAOException;
     
     public String getCitation(String name) throws DAOException;
     

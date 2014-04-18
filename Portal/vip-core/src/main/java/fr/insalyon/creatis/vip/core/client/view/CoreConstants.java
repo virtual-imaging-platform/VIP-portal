@@ -161,6 +161,10 @@ public class CoreConstants implements IsSerializable {
     public static String MOZILLA_PERSONA_VALIDATION_URL="mozilla.persona.validation.url";
     //query
     public static String TreeQuery="query.classes";
+    //N4u 
+    public static String APP_CLASSE="expressLaneToVip.application.class";
+    public static String APPLICATION_FILES_REPOSITORY="expressLaneToVip.upload.repository";
+    public static String APP_DELETE_FILES_AFTER_UPLOAD="expressLaneToVip.upload.deleteFile";
 
     public static enum GROUP_ROLE implements IsSerializable {
 

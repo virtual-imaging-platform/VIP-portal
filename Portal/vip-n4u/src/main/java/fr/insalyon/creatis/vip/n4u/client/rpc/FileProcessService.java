@@ -33,6 +33,8 @@ public interface FileProcessService extends RemoteService {
      List<List<String>> fileTraitement(String param1);
      int[] fileJobTraitement(String jobFile,String expressFile) ;
      void generateScriptFile(ArrayList listInput,ArrayList listOutput,String wrapperScriptPath,String scriptFile,String applicationName,String applicationLocation,String description) ;
-    void generateGwendiaFile(ArrayList listInput,ArrayList listOutput,String wrapperScriptPath,String scriptFile,String applicationName,String applicationLocation,String description) ;
-   void generateGaswFile(ArrayList listInput,ArrayList listOutput,String wrapperScriptPath,String scriptFile,String applicationName,String applicationLocation,String description) ;
+    String generateGwendiaFile(ArrayList listInput,ArrayList listOutput,String wrapperScriptPath,String scriptFile,String applicationName,String applicationLocation,String description) ;
+    void generateGaswFile(ArrayList listInput,ArrayList listOutput,String wrapperScriptPath,String scriptFile,String applicationName,String applicationLocation,String description) ;
+   
+    String getApplicationClasse() ;
 }

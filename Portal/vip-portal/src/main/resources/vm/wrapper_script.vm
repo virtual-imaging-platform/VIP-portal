@@ -1,0 +1,39 @@
+#!/bin/bash
+if [ $# -ne $number ]
+then
+#set($listValues = "" )
+#foreach( $input in $inputList)
+#set($listValues = "$listValues <$input.name>" )
+#end
+#foreach( $output in $outputList)
+#set($listValues = "$listValues <$output.name>" )
+#end
+echo "usage: $0 $listValues"
+exit 1
+fi
+#environment file doit etre mis dans la sandbox
+#source $env
+#resultat est le dernier parametre du wrapper script
+chmod 555 $scriptFile
+#set($list = "" )
+#set($count =$number - 1  )
+#foreach($i in [2..$count])
+#set($list = "$list $$i" )
+#end
+
+./$scriptFile $list
+if [ $? != 0 ]
+then
+echo "Cannot execute script file "
+exit 1
+fi
+#foreach( $output in $outputList)
+
+tar cvzf $$number $output.name
+#end
+if [ $? != 0 ]
+then
+echo "Cannot tar Output file"
+exit 1
+fi
+echo "Execution of VIP wrapper script completed."
