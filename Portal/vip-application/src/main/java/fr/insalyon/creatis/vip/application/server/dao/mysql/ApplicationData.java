@@ -316,22 +316,22 @@ public class ApplicationData implements ApplicationDAO {
      */
     @Override
     public boolean applicationExist(String applicationName) throws DAOException {
-       boolean exist;
+        boolean exist;
         try {
-            PreparedStatement ps ;
-                    /*= connection.prepareStatement("SELECT "
-                    + "class "
-                    + "FROM VIPApplicationClasses "
-                    + "WHERE application=?");
+            PreparedStatement ps;
+            /*= connection.prepareStatement("SELECT "
+             + "class "
+             + "FROM VIPApplicationClasses "
+             + "WHERE application=?");
 
-            ps.setString(1, applicationName);
-            ResultSet rs = ps.executeQuery();
-            List<String> classes = new ArrayList<String>();
+             ps.setString(1, applicationName);
+             ResultSet rs = ps.executeQuery();
+             List<String> classes = new ArrayList<String>();
 
-            while (rs.next()) {
-                classes.add(rs.getString("class"));
-            }
-            * **/
+             while (rs.next()) {
+             classes.add(rs.getString("class"));
+             }
+             * **/
 
             ps = connection.prepareStatement("SELECT "
                     + "name "
@@ -339,27 +339,23 @@ public class ApplicationData implements ApplicationDAO {
                     + "WHERE name=?");
 
             ps.setString(1, applicationName);
-            ResultSet  rs = ps.executeQuery();
-            if(rs.next()){
-            exist= true;
-          
-            }else
-            {
-            exist=false;
-          
-            }
-            
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                exist = true;
 
-            
+            } else {
+                exist = false;
+
+            }
 
             ps.close();
-            
+
 
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
         }
-        logger.error(exist+applicationName);
+
         return exist;
     }
 
