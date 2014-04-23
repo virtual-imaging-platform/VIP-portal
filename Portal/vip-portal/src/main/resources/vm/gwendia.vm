@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workflow name="$applicationName" version="0.1">
- #if($description=="") 
-  <description>""</description>
-  #else
+
    <description>$description</description>
-#end
   <interface>
    #foreach( $input in $inputList )##
       #if($input.type=="LFN" )   

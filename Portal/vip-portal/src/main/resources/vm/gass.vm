@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <description>
-    <executable name="wrapper_$applicationName.sh">
+    <executable name="${applicationName}_wrapper.sh">
         <access type="LFN" cached="true"> 
         </access>
         <executor value="LOCAL"/>
