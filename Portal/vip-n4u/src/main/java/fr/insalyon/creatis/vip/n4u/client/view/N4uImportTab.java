@@ -72,6 +72,9 @@ import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.system.application.ManageApplicationsTab;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -97,13 +100,8 @@ public class N4uImportTab extends Tab {
     int j = 0;
     String scriptFileName;
     String applicationName;
-    String descriptionValue;
+    String descriptionValue = null;
     String applicationLocation;
-    boolean versionOverWrite = false;
-    boolean confirm1 = false;
-    boolean confirm2 = false;
-    boolean confirm3 = false;
-    String versionValue;
 
     public N4uImportTab() {
 
@@ -127,7 +125,6 @@ public class N4uImportTab extends Tab {
         layout.setMargin(6);
         layout.setMembersMargin(5);
 
-
         hLayout1 = new HLayout();
         hLayout1.setMembersMargin(10);
         hLayout1.setHeight("50%");
@@ -142,7 +139,6 @@ public class N4uImportTab extends Tab {
 
         vlayout.setMembersMargin(2);
         vlayout.setOverflow(Overflow.AUTO);
-
 
         layoutGeneralInformation = new GeneralInformation("50%", "100%");
 
@@ -191,6 +187,7 @@ public class N4uImportTab extends Tab {
                     }
                 }
                 if (go == true) {
+
                     //verifying the application existance
                     AsyncCallback<Boolean> callback = new AsyncCallback<Boolean>() {
                         @Override
@@ -202,86 +199,85 @@ public class N4uImportTab extends Tab {
                         @Override
                         public void onSuccess(Boolean result) {
                             if (result.booleanValue()) {
-
-                                final Dialog dialog = new Dialog();
-                                dialog.setMessage(" Application " +"\""+ applicationName +"\""+ " already exists");
-                                dialog.setIcon("[SKIN]ask.png");
-                                Button create = new Button("Create New Version");
-                                create.setWidth("130");
-                                create.setIcon(N4uConstants.ICON_ADD);
-                                create.addClickHandler(new ClickHandler() {
+                                final AsyncCallback<List<AppVersion>> callback = new AsyncCallback<List<AppVersion>>() {
                                     @Override
-                                    public void onClick(ClickEvent event) {
+                                    public void onFailure(Throwable caught) {
+                                    }
 
-                                        dialog.destroy();
-                                        //Create the Gasw file
-                                        createGaswFile();
-                                        //create Script File
-                                        createScriptFile();
-                                        //creategwendiaFile+applicationVersion
-                                        createGwendiaFile(true);
+                                    @Override
+                                    public void onSuccess(List<AppVersion> result) {
+                                        List<BigDecimal> IntVersion = new ArrayList< BigDecimal>();
+                                        for (AppVersion v : result) {
+                                            IntVersion.add(new BigDecimal(v.getVersion()));
+                                        }
+                                        Collections.sort(IntVersion);
+                                        BigDecimal versionn = IntVersion.get(IntVersion.size() - 1);
+                                        final String maxVersion = String.valueOf(versionn);
+                                        final Dialog dialog = new Dialog();
+                                        dialog.setMessage(" Application " + "\"" + applicationName + "\"" + " already exists");
+                                        dialog.setIcon("[SKIN]ask.png");
+
+
+                                        Button create = new Button("Create New Version");
+                                        create.setWidth("130");
+                                        create.setIcon(N4uConstants.ICON_ADD);
+                                        create.addClickHandler(new ClickHandler() {
+                                            @Override
+                                            public void onClick(ClickEvent event) {
+
+                                                dialog.destroy();
+                                                Layout.getInstance().setNoticeMessage("Creating the application (this can take a while)");
+                                                createScriptFile(true, false, maxVersion);
+
+                                            }
+                                        });
+
+
+                                        Button overWrite = new Button("Overwrite Current Version " + maxVersion);
+                                        overWrite.setWidth("180");
+                                        overWrite.setIcon(N4uConstants.ICON_OVERWRITE);
+                                        overWrite.addClickHandler(new ClickHandler() {
+                                            @Override
+                                            public void onClick(ClickEvent event) {
+                                                dialog.destroy();
+                                                Layout.getInstance().setNoticeMessage("Creating the application (this can take a while)");
+
+                                                createScriptFile(false, false, maxVersion);
+
+
+                                            }
+                                        });
+
+
+                                        Button cancel = new Button("Cancel");
+                                        cancel.setIcon(N4uConstants.ICON_CANCEL);
+                                        cancel.setWidth("80");
+
+                                        cancel.addClickHandler(new ClickHandler() {
+                                            @Override
+                                            public void onClick(ClickEvent event) {
+                                                dialog.destroy();
+                                            }
+                                        });
+                                        dialog.setButtons(create, overWrite, cancel);
+
+                                        dialog.draw();
+
+
+
+
+
 
                                     }
-                                });
-
-
-                                Button overWrite = new Button("Overwrite Current Version (1.0)");
-                                overWrite.setWidth("180");
-                                overWrite.setIcon(N4uConstants.ICON_OVERWRITE);
-                                overWrite.addClickHandler(new ClickHandler() {
-                                    @Override
-                                    public void onClick(ClickEvent event) {
-                                        dialog.destroy();
-                                        createGaswFile();
-                                        //create Script File
-                                        createScriptFile();
-                                        createGwendiaFile(false);
-
-                                    }
-                                });
-
-
-                                Button cancel = new Button("Cancel");
-                                cancel.setIcon(N4uConstants.ICON_CANCEL);
-                                cancel.setWidth("80");
-
-                                cancel.addClickHandler(new ClickHandler() {
-                                    @Override
-                                    public void onClick(ClickEvent event) {
-                                        dialog.destroy();
-                                    }
-                                });
-                                dialog.setButtons(create, overWrite, cancel);
-
-                                dialog.draw();
+                                };
+                                ApplicationService.Util.getInstance().getVersions(applicationName, callback);
 
 
 
                             } else {
-                                //ajouter application 
-                                createGaswFile();
-                                final AsyncCallback<String> callback1 = new AsyncCallback<String>() {
-                                    @Override
-                                    public void onFailure(Throwable caught) {
+                                Layout.getInstance().setNoticeMessage("Creating the application (this can take a while)");
+                                createScriptFile(true, true, "");
 
-                                        Layout.getInstance().setWarningMessage("Unable  " + caught.getMessage());
-                                    }
-
-                                    @Override
-                                    public void onSuccess(String result) {
-                                        Layout.getInstance().setNoticeMessage("Your Gwendia file was successfully created");
-
-                                        addApplication();
-                                        ApplicationService.Util.getInstance().addVersion(new AppVersion(applicationName, "1.0", result, true), getCallback("updateVersion"));
-
-                                        confirm2 = true;
-                                    }
-                                };
-
-                                FileProcessService.Util.getInstance().generateGwendiaFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, descriptionValue, callback1);
-
-
-                                createScriptFile();
                             }
                         }
                     };
@@ -294,7 +290,7 @@ public class N4uImportTab extends Tab {
         createApplicationButton.setWidth("150");
     }
 
-    private void addApplication() {
+    private void addApplication(final String lfn) {
         final List<String> applicationClasses = new ArrayList<String>();
 
         final AsyncCallback<String> classApplicationCallback = new AsyncCallback<String>() {
@@ -308,7 +304,19 @@ public class N4uImportTab extends Tab {
             public void onSuccess(String result) {
 
                 applicationClasses.add(result);
-                ApplicationService.Util.getInstance().add(new Application(applicationName, applicationClasses, ""), getCallback("add"));
+                final AsyncCallback<Void> call = new AsyncCallback<Void>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                    }
+
+                    @Override
+                    public void onSuccess(Void result) {
+                        ApplicationService.Util.getInstance().addVersion(new AppVersion(applicationName, "1.0", lfn, true), getCallback("add Version"));
+                    }
+                };
+                ApplicationService.Util.getInstance().add(new Application(applicationName, applicationClasses, ""), call);
+
 
 
             }
@@ -325,15 +333,8 @@ public class N4uImportTab extends Tab {
         return new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
-                /*
-                 if(text=="add"){
-                 if(caught.getMessage().contains("An application named ")==true){
-                 ApplicationService.Util.getInstance().update(new Application(applicationName,descriptionValue),  getCallback("update"));
-                 }else{
-                 Layout.getInstance().setWarningMessage(caught.getMessage());
-              
-                 }
-                 * **/
+
+                Layout.getInstance().setWarningMessage("could not" + text + " " + caught.getMessage());
             }
 
             @Override
@@ -342,42 +343,52 @@ public class N4uImportTab extends Tab {
         };
     }
 
-    private void createGwendiaFile(final boolean newVersion) {
+    private void createGwendiaFile(final boolean newVersion, final boolean newApplication, final String maxVersion) {
         final AsyncCallback<String> callback1 = new AsyncCallback<String>() {
             @Override
             public void onFailure(Throwable caught) {
-
-                Layout.getInstance().setWarningMessage(caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to create your Gwendia File" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(final String result1) {
-                Layout.getInstance().setNoticeMessage("Your Gwendia file was successfully created");
-                if (newVersion) {
-                    final AsyncCallback<List<AppVersion>> callback = new AsyncCallback<List<AppVersion>>() {
-                        @Override
-                        public void onFailure(Throwable caught) {
-                        }
 
-                        @Override
-                        public void onSuccess(List<AppVersion> result) {
-                            int size = result.size();
-                            String version = result.get(size - 1).getVersion();
-                            int indexPoint = version.indexOf(".");
-                            int value = Integer.parseInt(version.substring(indexPoint + 1));
-                            value = value + 1;
-                            versionValue = version.substring(0, indexPoint + 1) + value;
-                            ApplicationService.Util.getInstance().addVersion(new AppVersion(applicationName, versionValue, result1, true), getCallback("updateVersion"));
-                        }
-                    };
-                    ApplicationService.Util.getInstance().getVersions(applicationName, callback);
+                if (newVersion && !newApplication) {
+                    BigDecimal versionn = new BigDecimal(maxVersion);
+                    versionn = versionn.add(new BigDecimal("0.1"));
+                    String versionValue = String.valueOf(versionn);
+                    ApplicationService.Util.getInstance().addVersion(new AppVersion(applicationName, versionValue, result1, true), getCallback("add Version"));
+                    /*
+                     final AsyncCallback<List<AppVersion>> callback = new AsyncCallback<List<AppVersion>>() {
+                     @Override
+                     public void onFailure(Throwable caught) {
+                     }
 
-                } else {
+                     @Override
+                     public void onSuccess(List<AppVersion> result) {
+                     List<BigDecimal> IntVersion = new ArrayList< BigDecimal>();
+                     for (AppVersion v : result) {
+                     IntVersion.add(new BigDecimal(v.getVersion()));
+                     }
+                     Collections.sort(IntVersion);
+                     BigDecimal versionn = IntVersion.get(IntVersion.size() - 1);
+                     String ver = String.valueOf(versionn);
+                     versionn = versionn.add(new BigDecimal("0.1"));
+                     versionValue = String.valueOf(versionn);
+                     ApplicationService.Util.getInstance().addVersion(new AppVersion(applicationName, versionValue, result1, true), getCallback("add Version"));
+                     }
+                        
+                     };
+                     **/
 
-                    ApplicationService.Util.getInstance().updateVersion(new AppVersion(applicationName, "1.0", result1, true), getCallback("updateVersion"));
+                } else if (!newVersion && !newApplication) {
+                    ApplicationService.Util.getInstance().updateVersion(new AppVersion(applicationName, maxVersion, result1, true), getCallback("update Version"));
+                } else if (newVersion && newApplication) {
+                    addApplication(result1);
+
                 }
+                Layout.getInstance().setNoticeMessage("Your Gwendia file was successfully created");
 
-                confirm2 = true;
             }
         };
 
@@ -386,20 +397,21 @@ public class N4uImportTab extends Tab {
 
     }
 
-    private void createGaswFile() {
+    private void createGaswFile(final boolean newVersion, final boolean newApplication, final String maxVersion) {
 
-        Layout.getInstance().setNoticeMessage("Creating the application (this can take a while)");
+
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
 
-                Layout.getInstance().setWarningMessage("Unable  " + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to create your Gasw File  " + caught.getMessage());
             }
 
             @Override
             public void onSuccess(Void result) {
                 Layout.getInstance().setNoticeMessage("Your Gasw file was successfully created");
-                confirm1 = true;
+                createGwendiaFile(newVersion, newApplication, maxVersion);
+
 
             }
         };
@@ -408,19 +420,19 @@ public class N4uImportTab extends Tab {
 
     }
 
-    private void createScriptFile() {
+    private void createScriptFile(final boolean newVersion, final boolean newApplication, final String maxVersion) {
 
         final AsyncCallback<Void> callback2 = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
 
-                Layout.getInstance().setWarningMessage("Unable  " + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to create your Script File  " + caught.getMessage());
             }
 
             @Override
             public void onSuccess(Void result) {
                 Layout.getInstance().setNoticeMessage("Your Script file was successfully created");
-                confirm3 = true;
+                createGaswFile(newVersion, newApplication, maxVersion);
             }
         };
 
@@ -783,5 +795,5 @@ public class N4uImportTab extends Tab {
     public void addLaunchButton() {
 
         layout.addMember(createApplicationButton);
-   }
+    }
 }

@@ -10,6 +10,7 @@ import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.n4u.client.view.N4uConstants;
 import fr.insalyon.creatis.vip.n4u.server.FileProcessServiceImpl;
+import fr.insalyon.creatis.vip.n4u.server.N4uException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -47,166 +48,144 @@ public class Velocity {
 
     }
 
-    public void gassFile(ArrayList listInput,ArrayList listOutput,String applicationName,String wrapperScriptPath,String applicationLocation,String dir) {
-        Template t = null;
-        try {
-            t = ve.getTemplate("vm/gass.vm");
-
-        } catch (Exception e) {
-            logger.error(e);
-        }
-
+    public void gassFile(ArrayList listInput, ArrayList listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir) throws N4uException {
+        Template t = ve.getTemplate("vm/gass.vm");
         VelocityContext context = new VelocityContext();
-
         context.put("inputList", listInput);
         context.put("outputList", listOutput);
+        context.put("applicationName", applicationName);
         context.put("applicationLocation", applicationLocation);
-        context.put("gassValue",applicationLocation + "/bin/"+applicationName+"_wrapper.sh");
+        context.put("gassValue", applicationLocation + "/bin/" + applicationName + "_wrapper.sh");
         StringWriter writer = new StringWriter();
-
         t.merge(context, writer);
-        final String chemin = dir + "/"+applicationName+".xml";
-
+        final String chemin = dir + "/" + applicationName + ".xml";
         final File fichier = new File(chemin);
         FileWriter writerr;
         try {
-           
             fichier.createNewFile();
-          
             writerr = new FileWriter(fichier);
             try {
                 writerr.write(writer.toString());
-
             } finally {
-              
-                writerr.close();
+               writerr.close();
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.error("Impossible de creer le fichier" + e);
+             throw new N4uException(e);
         }
-      
+
         try {
             CoreUtil.getGRIDAClient().createFolder(applicationLocation, "gasw");
-              copyFile(chemin, dir + "/"+applicationName+".bak"+".xml");
-            CoreUtil.getGRIDAClient().uploadFile(chemin,applicationLocation+"/"+"gasw" );
+            copyFile(chemin, dir + "/" + applicationName + ".bak" + ".xml");
+            CoreUtil.getGRIDAClient().uploadFile(chemin, applicationLocation + "/" + "gasw");
         } catch (GRIDAClientException ex) {
             logger.error(ex);
+            throw new N4uException(ex);
         }
-      
-        
+
+
 
     }
-    
-    
-    public void wrapperScriptFile(ArrayList listInput,ArrayList listOutput,String applicationName,String scriptFile,String applicationLocation,String dir){
-        Template t = null;
-        int lastIndex=scriptFile.lastIndexOf("/");
-        String script=scriptFile.substring(lastIndex+1);
-        try {
-            t = ve.getTemplate("vm/wrapper_script.vm");
 
-        } catch (Exception e) {
-            logger.error(e);
-        }
-         VelocityContext context = new VelocityContext();
-         context.put("inputList", listInput);
-         context.put("number",listInput.size()+listOutput.size() );
-         context.put("scriptFile",script);
-         context.put("outputList", listOutput);
-      
-           StringWriter writer = new StringWriter();
-
+    public void wrapperScriptFile(ArrayList listInput, ArrayList listOutput, String applicationName, String scriptFile, String applicationLocation, String dir) throws N4uException {
+        
+        int lastIndex = scriptFile.lastIndexOf("/");
+        String script = scriptFile.substring(lastIndex + 1);
+        Template t = ve.getTemplate("vm/wrapper_script.vm");  
+        VelocityContext context = new VelocityContext();
+        context.put("inputList", listInput);
+        context.put("number", listInput.size() + listOutput.size());
+        context.put("scriptFile", script);
+        context.put("outputList", listOutput);
+        StringWriter writer = new StringWriter();
         t.merge(context, writer);
-        final String chemin = dir + "/"+applicationName+"_wrapper.sh";
-
+        final String chemin = dir + "/" + applicationName + "_wrapper.sh";
         final File fichier = new File(chemin);
         FileWriter writerr;
         try {
-           
+
             fichier.createNewFile();
-          
+
             writerr = new FileWriter(fichier);
             try {
                 writerr.write(writer.toString());
 
             } finally {
-              
+
                 writerr.close();
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.error("Impossible de creer le fichier" + e);
-        }
-        
-        try {
-           
-            CoreUtil.getGRIDAClient().createFolder(applicationLocation, "bin");
-            copyFile(chemin, dir + "/"+applicationName+".bak"+"._wrapper.sh");
-            CoreUtil.getGRIDAClient().uploadFile(chemin,applicationLocation+"/"+"bin" );
-             
-        } catch (GRIDAClientException ex) {
-            logger.error(ex);
-        }
-
-        
-        
-    }
-    
-    public String gwendiaFile(ArrayList listInput,ArrayList listOutput,String applicationName,String description,String applicationLocation,String dir){
-        Template t = null;
-        try {
-            t = ve.getTemplate("vm/gwendia.vm");
-
-        } catch (Exception e) {
-            logger.error(e);
-        }
-        final String gaswDescriptor = applicationLocation +"/gasw"+ "/"+applicationName+".xml";
-         VelocityContext context = new VelocityContext();
-         context.put("inputList", listInput);
-         context.put("outputList",listOutput);
-         context.put("applicationName", applicationName);
-         if(description.isEmpty()||description==null){
-         context.put("description", "");}
-         else{
-              String des=html2text(description);
-          context.put("description", des);
-         }
-         context.put("gaswDescriptor", gaswDescriptor);
-         StringWriter writer = new StringWriter();
-
-        t.merge(context, writer);
-        final String chemin = dir + "/"+applicationName+".gwendia";
-
-        final File fichier = new File(chemin);
-        FileWriter writerr;
-        try {
-           
-            fichier.createNewFile();
-          
-            writerr = new FileWriter(fichier);
-            try {
-                writerr.write(writer.toString());
-
-            } finally {
-              
-                writerr.close();
-            }
-        } catch (Exception e) {
-            logger.error("Impossible de creer le fichier" + e);
-        }
-        
-         try {
-            CoreUtil.getGRIDAClient().createFolder(applicationLocation, "workflows");
-            copyFile(chemin, dir + "/"+applicationName+".bak"+".gwendia");
-            CoreUtil.getGRIDAClient().uploadFile(chemin,applicationLocation+"/"+"workflows");
+              throw new N4uException(e);
             
-             
-        } catch (GRIDAClientException ex) {
-            logger.error(ex);
         }
 
-        return applicationLocation +"/workflows"+ "/"+applicationName+".gwendia";
+        try {
+
+            CoreUtil.getGRIDAClient().createFolder(applicationLocation, "bin");
+            copyFile(chemin, dir + "/" + applicationName + ".bak" + "._wrapper.sh");
+            CoreUtil.getGRIDAClient().uploadFile(chemin, applicationLocation + "/" + "bin");
+
+        } catch (GRIDAClientException ex) {
+            logger.error(ex);
+            throw new N4uException(ex);
+        }
+
+
+
     }
- 
+
+    public String gwendiaFile(ArrayList listInput, ArrayList listOutput, String applicationName, String description, String applicationLocation, String dir)  {
+        Template t =ve.getTemplate("vm/gwendia.vm");
+        final String gaswDescriptor = applicationLocation + "/gasw" + "/" + applicationName + ".xml";
+        VelocityContext context = new VelocityContext();
+        context.put("inputList", listInput);
+        context.put("outputList", listOutput);
+        context.put("applicationName", applicationName);
+        if (description == null) {
+            context.put("description", "");
+        } else {
+            String des = html2text(description);
+            context.put("description", des);
+        }
+        context.put("gaswDescriptor", gaswDescriptor);
+        StringWriter writer = new StringWriter();
+        t.merge(context, writer);
+        final String chemin = dir + "/" + applicationName + ".gwendia";
+
+        final File fichier = new File(chemin);
+        FileWriter writerr;
+        try {
+
+            fichier.createNewFile();
+
+            writerr = new FileWriter(fichier);
+            try {
+                writerr.write(writer.toString());
+
+            } finally {
+
+                writerr.close();
+            }
+        } catch (IOException e) {
+            logger.error("Impossible de creer le fichier" + e);
+             // throw new N4uException(e);
+        }
+
+        try {
+            CoreUtil.getGRIDAClient().createFolder(applicationLocation, "workflows");
+            copyFile(chemin, dir + "/" + applicationName + ".bak" + ".gwendia");
+            CoreUtil.getGRIDAClient().uploadFile(chemin, applicationLocation + "/" + "workflows");
+
+
+        } catch (GRIDAClientException ex) {
+            logger.error(ex);
+            //throw new N4uException(ex);
+        }
+
+        return applicationLocation + "/workflows" + "/" + applicationName + ".gwendia";
+    }
+
     public void copyFile(String source, String dest) {
         FileChannel in = null; // canal d'entrée
         FileChannel out = null; // canal de sortie
@@ -215,7 +194,6 @@ public class Velocity {
             // Init
             in = new FileInputStream(source).getChannel();
             out = new FileOutputStream(dest).getChannel();
-
             // Copie depuis le in vers le out
             in.transferTo(0, in.size(), out);
         } catch (Exception e) {
@@ -236,12 +214,11 @@ public class Velocity {
         }
 
     }
-    
-    
-    
-    
-       public static String html2text(String html) {
-    return Jsoup.parse(html).text();
-    
-}
+
+    public static String html2text(String html) {
+        return Jsoup.parse(html).text();
+
+    }
+
+   
 }
