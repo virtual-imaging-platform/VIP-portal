@@ -29,12 +29,14 @@ public interface FileProcessService extends RemoteService {
             return instance;
         }
     }
-    
-     List<List<String>> fileTraitement(String param1);
-     int[] fileJobTraitement(String jobFile,String expressFile) ;
-     void generateScriptFile(ArrayList listInput,ArrayList listOutput,String wrapperScriptPath,String scriptFile,String applicationName,String applicationLocation,String description) ;
-    String generateGwendiaFile(ArrayList listInput,ArrayList listOutput,String wrapperScriptPath,String scriptFile,String applicationName,String applicationLocation,String description) ;
-    void generateGaswFile(ArrayList listInput,ArrayList listOutput,String wrapperScriptPath,String scriptFile,String applicationName,String applicationLocation,String description) ;
-   
-    String getApplicationClasse() ;
+
+    int[] fileJobProcess(String jobFile, String expressFile) throws N4uException;
+
+    void generateScriptFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException;
+
+    String generateGwendiaFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException;
+
+    void generateGaswFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException;
+
+    String getApplicationClass() throws N4uException;
 }

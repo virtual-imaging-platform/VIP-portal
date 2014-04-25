@@ -173,8 +173,6 @@ public class N4uImportTab extends Tab {
         });
         layoutInputs.addMember(vlayout);
 
-
-
         createApplicationButton = WidgetUtil.getIButton("Create Application", N4uConstants.ICON_LAUNCH,
                 new ClickHandler() {
             @Override
@@ -192,7 +190,6 @@ public class N4uImportTab extends Tab {
                     AsyncCallback<Boolean> callback = new AsyncCallback<Boolean>() {
                         @Override
                         public void onFailure(Throwable caught) {
-
                             Layout.getInstance().setWarningMessage(caught.getMessage());
                         }
 
@@ -224,14 +221,12 @@ public class N4uImportTab extends Tab {
                                         create.addClickHandler(new ClickHandler() {
                                             @Override
                                             public void onClick(ClickEvent event) {
-
                                                 dialog.destroy();
                                                 Layout.getInstance().setNoticeMessage("Creating the application (this can take a while)");
                                                 createScriptFile(true, false, maxVersion);
 
                                             }
                                         });
-
 
                                         Button overWrite = new Button("Overwrite Current Version " + maxVersion);
                                         overWrite.setWidth("180");
@@ -241,13 +236,10 @@ public class N4uImportTab extends Tab {
                                             public void onClick(ClickEvent event) {
                                                 dialog.destroy();
                                                 Layout.getInstance().setNoticeMessage("Creating the application (this can take a while)");
-
                                                 createScriptFile(false, false, maxVersion);
-
 
                                             }
                                         });
-
 
                                         Button cancel = new Button("Cancel");
                                         cancel.setIcon(N4uConstants.ICON_CANCEL);
@@ -260,20 +252,11 @@ public class N4uImportTab extends Tab {
                                             }
                                         });
                                         dialog.setButtons(create, overWrite, cancel);
-
                                         dialog.draw();
-
-
-
-
-
 
                                     }
                                 };
                                 ApplicationService.Util.getInstance().getVersions(applicationName, callback);
-
-
-
                             } else {
                                 Layout.getInstance().setNoticeMessage("Creating the application (this can take a while)");
                                 createScriptFile(true, true, "");
@@ -322,7 +305,7 @@ public class N4uImportTab extends Tab {
             }
         };
 
-        FileProcessService.Util.getInstance().getApplicationClasse(classApplicationCallback);
+        FileProcessService.Util.getInstance().getApplicationClass(classApplicationCallback);
 
 
 
@@ -522,7 +505,6 @@ public class N4uImportTab extends Tab {
         selectItemForm.setHeight(20);
         selectItemForm.setFields(selectItem);
 
-
         Label typeLabel = new Label("<strong>" + "Type:" + "</strong>");
         typeLabel.setHeight(20);
         typeLabel.setWidth(20);
@@ -649,7 +631,6 @@ public class N4uImportTab extends Tab {
                 } else {
                     map.put("type", event.getValue().toString());
                 }
-
             }
         });
         String title;

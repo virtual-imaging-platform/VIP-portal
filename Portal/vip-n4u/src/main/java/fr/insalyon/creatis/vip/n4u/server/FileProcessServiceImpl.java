@@ -4,6 +4,7 @@
  */
 package fr.insalyon.creatis.vip.n4u.server;
 
+import fr.insalyon.creatis.vip.n4u.client.rpc.N4uException;
 import com.google.gwt.user.server.rpc.AbstractRemoteServiceServlet;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
@@ -17,6 +18,7 @@ import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import fr.insalyon.creatis.vip.n4u.client.rpc.FileProcessService;
 import fr.insalyon.creatis.vip.n4u.server.velocity.Velocity;
+import fr.insalyon.creatis.vip.n4u.server.velocity.VelocityException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,224 +47,127 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
 
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(FileProcessServiceImpl.class);
 
-    /**
-     *
-     * @param param1
-     * @return
-     * @throws IOException
-     */
-    //local dir
-    public List<List<String>> fileTraitement(String param1) {
-        String localFilePat = null;
-        try {
-
-            localFilePat = CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(getSessionUser(), param1), System.getProperty("user.home"));
-        } catch (CoreException ex) {
-            logger.error(ex);
-            logger.error(param1);
-
-        } catch (DataManagerException ex) {
-            logger.error(ex);
-        } catch (GRIDAClientException ex) {
-            logger.error(ex);
-        }
-
-        List<List<String>> result = new ArrayList<List<String>>();
-        List<String> inputsDir = new ArrayList<String>();
-        List<String> outputsDir = new ArrayList<String>();
-        try {
-            Scanner scanner = new Scanner(new FileInputStream(localFilePat));
-            while (scanner.hasNext()) {
-                String ligne = scanner.nextLine();
-                if (ligne.contains("inputDir=")) {
-                    int index = ligne.indexOf("inputDir=");
-                    inputsDir.add(ligne.substring(index + 9));
-
-                } else if (ligne.contains("outputDir=")) {
-                    int index = ligne.indexOf("outputDir=");
-                    outputsDir.add(ligne.substring(index + 11));
-                }
-
-
-            }
-
-
-        } catch (IOException ex) {
-            logger.error(ex);
-        }
-        result.add(inputsDir);
-        result.add(outputsDir);
-        return result;
-    }
-
     //retourne nombre d'entree ainsi que le nombre des entree de type file
-    public int[] fileJobTraitement(String jobFile, String expressFile) {
+    @Override
+    public int[] fileJobProcess(String jobFile, String expressFile) throws N4uException {
         int[] result = new int[2];
         int nb = 0;
-        String localFilePat = null;
-        String localFilePathExpress = null;
-
-
+        String localJobFilePath = null;
+        String localExpressFilePath = null;
         try {
-
-            localFilePat = CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(getSessionUser(), jobFile), System.getProperty("user.home"));
+            localJobFilePath = CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(getSessionUser(), jobFile), Server.getInstance().getN4uApplicationFilesRepository());
+            localExpressFilePath = CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(getSessionUser(), expressFile), Server.getInstance().getN4uApplicationFilesRepository());
         } catch (CoreException ex) {
             logger.error(ex);
-
-
+            throw new N4uException(ex);
         } catch (DataManagerException ex) {
             logger.error(ex);
+            throw new N4uException(ex);
         } catch (GRIDAClientException ex) {
             logger.error(ex);
+            throw new N4uException(ex);
         }
 
         try {
-            localFilePathExpress = CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(getSessionUser(), expressFile), System.getProperty("user.home"));
-        } catch (CoreException ex) {
-            logger.error(ex);
-
-
-        } catch (DataManagerException ex) {
-            logger.error(ex);
-        } catch (GRIDAClientException ex) {
-            logger.error(ex);
-        }
-
-
-        try {
-            Scanner scanner = new Scanner(new FileInputStream(localFilePat));
-            //Scanner scanner = new Scanner(new FileInputStream("/home/nouha/Siena.jobs"));
-
+            Scanner scanner = new Scanner(new FileInputStream(localJobFilePath));
             String ligne = scanner.nextLine();
             while (ligne.substring(0, 1).equals("#")) {
                 ligne = scanner.nextLine();
             }
-
             StringTokenizer strok = new StringTokenizer(ligne, "\t");
-
             nb = strok.countTokens();
             result[0] = nb;
-
-            Scanner scanner2 = new Scanner(new FileInputStream(localFilePathExpress));
-            // Scanner scanner2 = new Scanner(new FileInputStream("/home/nouha/Siena.express"));
-
+            Scanner scanner2 = new Scanner(new FileInputStream(localExpressFilePath));
             while (scanner2.hasNext()) {
                 String readLigne = scanner2.nextLine();
                 if (readLigne.contains("ExplicitFiles")) {
                     int fileNumber = Integer.parseInt(readLigne.substring(14));
                     result[1] = fileNumber;
                 }
-
-
             }
-
         } catch (IOException ex) {
             logger.error(ex);
+            throw new N4uException(ex);
         }
-
         return result;
     }
 
-   
-
     @Override
-    public void generateScriptFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) {
+    public void generateScriptFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException {
         String applicationRealLocation = null;
         try {
             applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
-        } catch (CoreException ex) {
-            java.util.logging.Logger.getLogger(FileProcessServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (DataManagerException ex) {
-            java.util.logging.Logger.getLogger(FileProcessServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        //create floder to genrate file
-        final File homeDir = new File(Server.getInstance().getApplicationFilesRepository());
-        File theDir = null;
-        try {
-            theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + getCurrentTimeStamp());
+            final File homeDir = new File(Server.getInstance().getN4uApplicationFilesRepository());
+            File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + getCurrentTimeStamp());
             theDir.mkdirs();
-        } catch (CoreException ex) {
-            java.util.logging.Logger.getLogger(FileProcessServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-
-        String dir = theDir.getAbsolutePath();
-        try {
+            String dir = theDir.getAbsolutePath();
             new Velocity().wrapperScriptFile(listInput, listOutput, applicationName, scriptFile, applicationRealLocation, dir);
-        } catch (N4uException ex) {
+        } catch (CoreException ex) {
             logger.error(ex);
-        }
-    }
-
-    @Override
-    public String generateGwendiaFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) {
-        String applicationRealLocation = null;
-        try {
-            applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
-        } catch (CoreException ex) {
-            java.util.logging.Logger.getLogger(FileProcessServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            throw new N4uException(ex);
         } catch (DataManagerException ex) {
-            java.util.logging.Logger.getLogger(FileProcessServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
+            throw new N4uException(ex);
+        } catch (VelocityException ex) {
+            logger.error(ex);
+            throw new N4uException(ex);
         }
-
-        //create floder to genrate file
-        final File homeDir = new File(Server.getInstance().getApplicationFilesRepository());
-        File theDir = null;
-        try {
-            theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + getCurrentTimeStamp());
-            theDir.mkdirs();
-        } catch (CoreException ex) {
-            java.util.logging.Logger.getLogger(FileProcessServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-
-
-        String dir = theDir.getAbsolutePath();
-       
-            return new Velocity().gwendiaFile(listInput, listOutput, applicationName, description, applicationRealLocation, dir);
-      
     }
 
     @Override
-    public void generateGaswFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) {
+    public String generateGwendiaFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException {
         String applicationRealLocation = null;
         try {
             applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
+            final File homeDir = new File(Server.getInstance().getN4uApplicationFilesRepository());
+            File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + getCurrentTimeStamp());
+            theDir.mkdirs();
+            String dir = theDir.getAbsolutePath();
+            return new Velocity().gwendiaFile(listInput, listOutput, applicationName, description, applicationRealLocation, dir);
+        } catch (CoreException ex) {
+            logger.error(ex);
+            throw new N4uException(ex);
+        } catch (DataManagerException ex) {
+            logger.error(ex);
+            throw new N4uException(ex);
+        } catch (VelocityException ex) {
+            logger.error(ex);
+            throw new N4uException(ex);
+        }
+
+
+    }
+
+    @Override
+    public void generateGaswFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException {
+        String applicationRealLocation = null;
+        try {
+            applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
+            //create folder to genrate file
+            final File homeDir = new File(Server.getInstance().getN4uApplicationFilesRepository());
+            File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + getCurrentTimeStamp());
+            theDir.mkdirs();
+            // if the directory does not exist, create it
+            String dir = theDir.getAbsolutePath();
+            new Velocity().gassFile(listInput, listOutput, applicationName, wrapperScriptPath, applicationRealLocation, dir);
         } catch (CoreException e) {
             logger.error(e);
+            throw new N4uException(e);
         } catch (DataManagerException ex) {
             logger.error(ex);
-        }
-
-        //create floder to genrate file
-        final File homeDir = new File(Server.getInstance().getApplicationFilesRepository());
-        File theDir = null;
-        try {
-            theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + getCurrentTimeStamp());
-            theDir.mkdirs();
-
-        } catch (CoreException ex) {
-            java.util.logging.Logger.getLogger(FileProcessServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        // if the directory does not exist, create it
-
-
-        String dir = theDir.getAbsolutePath();
-        try {
-            new Velocity().gassFile(listInput, listOutput, applicationName, wrapperScriptPath, applicationRealLocation, dir);
-        } catch (N4uException ex) {
+            throw new N4uException(ex);
+        } catch (VelocityException ex) {
             logger.error(ex);
+            throw new N4uException(ex);
         }
     }
 
-    public String getApplicationClasse() {
-        return Server.getInstance().getApplicationN4uClasse();
+    @Override
+    public String getApplicationClass() throws N4uException {
+        return Server.getInstance().getApplicationN4uClass();
     }
-    
-    private java.sql.Timestamp getCurrentTimeStamp() {
 
+    private java.sql.Timestamp getCurrentTimeStamp() {
         java.util.Date today = new java.util.Date();
         return new java.sql.Timestamp(today.getTime());
 

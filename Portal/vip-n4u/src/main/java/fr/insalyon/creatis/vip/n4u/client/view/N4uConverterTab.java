@@ -94,11 +94,11 @@ public class N4uConverterTab extends Tab {
         PickerIcon browsePicker = new PickerIcon(PickerIcon.SEARCH, new FormItemClickHandler() {
             @Override
             public void onFormItemClick(FormItemIconClickEvent event) {
-
                 event.getItem().setValue("");
                 new PathSelectionWindow((TextItem) event.getItem()).show();
             }
         });
+
         browsePicker.setPrompt("Browse on the Grid");
 
 
@@ -128,14 +128,19 @@ public class N4uConverterTab extends Tab {
 
         titleItemForm = new DynamicForm();
         titleItemForm.setFields(title);
+
         expressItemForm = new DynamicForm();
         expressItemForm.setFields(express);
+
         jobItemForm = new DynamicForm();
         jobItemForm.setFields(job);
+
         extItemForm = new DynamicForm();
         extItemForm.setFields(ext);
+
         scriptItemForm = new DynamicForm();
         scriptItemForm.setFields(script);
+
         envItemForm = new DynamicForm();
         envItemForm.setFields(env);
 
@@ -159,9 +164,6 @@ public class N4uConverterTab extends Tab {
 
                     @Override
                     public void onSuccess(int[] result) {
-
-
-
                         for (int i = 1; i < (int) result[0]; i++) {
                             if (i <= result[1]) {
                                 tabImporter.addFielsInputs(false, "", "", InputType.File.name(), false);
@@ -181,15 +183,11 @@ public class N4uConverterTab extends Tab {
                          }
                          **/
                         tabImporter.addfiels("Application Location <font color=red>(*)</font>", true, "", false);
-
                         tabImporter.addLaunchButton();
-
 
                     }
                 };
-                FileProcessService.Util.getInstance().fileJobTraitement(job.getValueAsString(), express.getValueAsString(), callback);
-
-
+                FileProcessService.Util.getInstance().fileJobProcess(job.getValueAsString(), express.getValueAsString(), callback);
             }
         });
 

@@ -14,8 +14,6 @@ public class LayoutExecutable extends AbstractFormLayout {
 
     public LayoutExecutable(String width, String height) {
         super(width, height);
-        this.addTitle("Executable",  N4uConstants.ICON_EXECUTABLE);
+        this.addTitle("Executable", N4uConstants.ICON_EXECUTABLE);
     }
-    
-    
 }

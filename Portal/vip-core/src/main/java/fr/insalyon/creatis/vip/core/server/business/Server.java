@@ -117,8 +117,8 @@ public class Server {
     //treeQuery
     private String queryTree;
     //N4U
-    private String applicationN4uClasse;
-    private String applicationFilesRepository;
+    private String applicationN4uClass;
+    private String N4uApplicationFilesRepository;
     private String deleteFilesAfterUpload;
 
    
@@ -205,8 +205,8 @@ public class Server {
             queryTree=config.getString(CoreConstants.TreeQuery,"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> select * from <http://e-ginseng.org/graph/ontology/semEHR> where {?x a rdfs:Class . ?x rdfs:label ?label}");
             
             //N4U_model
-            applicationN4uClasse=config.getString(CoreConstants.APP_CLASSE,"Test");
-            applicationFilesRepository=config.getString(CoreConstants.APPLICATION_FILES_REPOSITORY,"/home/boujelben");
+            applicationN4uClass=config.getString(CoreConstants.APP_CLASSE,"Test");
+            N4uApplicationFilesRepository=config.getString(CoreConstants.APPLICATION_FILES_REPOSITORY,"/home/boujelben");
             deleteFilesAfterUpload=config.getString(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD,"yes");
           
              
@@ -259,8 +259,8 @@ public class Server {
             config.setProperty(CoreConstants.MOZILLA_PERSONA_VALIDATION_URL,mozillaPersonaValidationURL);
             config.setProperty(CoreConstants.TreeQuery, queryTree);
             
-            config.setProperty(CoreConstants.APP_CLASSE, applicationN4uClasse);
-            config.setProperty(CoreConstants.APPLICATION_FILES_REPOSITORY,applicationFilesRepository);
+            config.setProperty(CoreConstants.APP_CLASSE, applicationN4uClass);
+            config.setProperty(CoreConstants.APPLICATION_FILES_REPOSITORY,N4uApplicationFilesRepository);
             config.setProperty(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, deleteFilesAfterUpload);
             config.save();
 
@@ -466,12 +466,12 @@ public class Server {
     }
      
      
-    public String getApplicationN4uClasse() {
-        return applicationN4uClasse;
+    public String getApplicationN4uClass() {
+        return applicationN4uClass;
     }
 
-    public String getApplicationFilesRepository() {
-        return applicationFilesRepository;
+    public String getN4uApplicationFilesRepository() {
+        return N4uApplicationFilesRepository;
     }
 
     public String getDeleteFilesAfterUpload() {

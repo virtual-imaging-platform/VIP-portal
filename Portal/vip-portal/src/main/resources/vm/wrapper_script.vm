@@ -11,9 +11,6 @@ then
 echo "usage: $0 $listValues"
 exit 1
 fi
-#environment file doit etre mis dans la sandbox
-#source $env
-#resultat est le dernier parametre du wrapper script
 chmod 555 $scriptFile
 #set($list = "" )
 #set($count =$number - 1  )

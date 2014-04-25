@@ -12,12 +12,10 @@ import fr.insalyon.creatis.vip.core.client.Module;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.n4u.client.view.N4uHomeParser;
 
-
 public class N4uModule extends Module {
 
     @Override
     public void load() {
-
         CoreModule.addGeneralApplicationParser(new N4uHomeParser());
     }
 
