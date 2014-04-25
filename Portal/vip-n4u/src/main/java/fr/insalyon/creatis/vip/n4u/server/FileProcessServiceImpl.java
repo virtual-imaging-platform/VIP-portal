@@ -46,6 +46,8 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
         implements FileProcessService {
 
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(FileProcessServiceImpl.class);
+    //get the value from first appel to generateScriptFile
+    private String generateTime=null;
 
     @Override
     public int[] fileJobProcess(String jobFile, String expressFile) throws N4uException {
@@ -97,7 +99,8 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
         try {
             applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
             final File homeDir = new File(Server.getInstance().getN4uApplicationFilesRepository());
-            File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + getCurrentTimeStamp());
+            generateTime=getCurrentTimeStamp().toString();
+            File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" +generateTime );
             theDir.mkdirs();
             String dir = theDir.getAbsolutePath();
             new Velocity().wrapperScriptFile(listInput, listOutput, applicationName, scriptFile, applicationRealLocation, dir);
@@ -119,7 +122,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
         try {
             applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
             final File homeDir = new File(Server.getInstance().getN4uApplicationFilesRepository());
-            File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + getCurrentTimeStamp());
+            File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + generateTime);
             theDir.mkdirs();
             String dir = theDir.getAbsolutePath();
             return new Velocity().gwendiaFile(listInput, listOutput, applicationName, description, applicationRealLocation, dir);
@@ -144,7 +147,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
             //create folder to genrate file
             final File homeDir = new File(Server.getInstance().getN4uApplicationFilesRepository());
-            File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + getCurrentTimeStamp());
+            File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + generateTime);
             theDir.mkdirs();
             // if the directory does not exist, create it
             String dir = theDir.getAbsolutePath();
