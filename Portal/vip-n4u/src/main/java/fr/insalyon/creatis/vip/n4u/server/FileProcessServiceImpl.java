@@ -47,7 +47,6 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
 
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(FileProcessServiceImpl.class);
 
-    //retourne nombre d'entree ainsi que le nombre des entree de type file
     @Override
     public int[] fileJobProcess(String jobFile, String expressFile) throws N4uException {
         int[] result = new int[2];
