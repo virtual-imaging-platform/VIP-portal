@@ -42,8 +42,7 @@ public class N4uHomeParser extends ApplicationParser {
          * (applicationName.equals(QueryConstants.APP_QUERYEXPLORER)) {
          * Layout.getInstance().addTab(new QueryExplorerTab());
          *
-         * return true; }
-        * *
+         * return true; } *
          */
         return false;
     }

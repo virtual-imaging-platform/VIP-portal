@@ -15,10 +15,5 @@ public class GeneralInformation extends AbstractFormLayout {
     public GeneralInformation(String width, String height) {
         super(width, height);
         this.addTitle("General Information", N4uConstants.ICON_INFORMATION);
-      
-        
-    }   
-    
-   
-    
+    }
 }

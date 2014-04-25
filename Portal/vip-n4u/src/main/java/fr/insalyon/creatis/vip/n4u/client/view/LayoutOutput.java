@@ -14,7 +14,6 @@ public class LayoutOutput extends AbstractFormLayout {
 
     public LayoutOutput(String width, String height) {
         super(width, height);
-         this.addTitle("Outputs",  N4uConstants.ICON_OUTPUT);
-    }  
-    
+        this.addTitle("Outputs", N4uConstants.ICON_OUTPUT);
+    }
 }
