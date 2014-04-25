@@ -117,8 +117,6 @@ public class N4uImportTab extends Tab {
     }
 
     public void configure() {
-
-
         layout = new VLayout();
         layout.setWidth100();
         layout.setHeight100();
@@ -299,9 +297,6 @@ public class N4uImportTab extends Tab {
                     }
                 };
                 ApplicationService.Util.getInstance().add(new Application(applicationName, applicationClasses, ""), call);
-
-
-
             }
         };
 
