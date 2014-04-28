@@ -206,6 +206,8 @@ public abstract class AbstractLaunchTab extends Tab {
                     public void onClick(ClickEvent event) {
                         if (validate()) {
                             saveInputs();
+                        } else {
+                            Layout.getInstance().setWarningMessage("Cannot save inputs. Some inputs are not valid.");
                         }
                     }
                 });

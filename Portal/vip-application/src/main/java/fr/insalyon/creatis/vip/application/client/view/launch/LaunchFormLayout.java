@@ -53,6 +53,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.ValidatorUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.HashMap;
 import java.util.Map;
@@ -82,6 +83,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
         this.addMember(docLabel);
 
         simulationNameItem = FieldUtil.getTextItem(400, "[0-9A-Za-z-_ ]");
+        simulationNameItem.setValidators(ValidatorUtil.getStringValidator());
         addField("Simulation Name", simulationNameItem);
 
         sourcesLayout = new VLayout(5);
