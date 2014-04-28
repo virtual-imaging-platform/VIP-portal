@@ -183,7 +183,9 @@ public class DataManagerBusiness {
     }
 
     public Image getImageSlicesURL(String imageLFN, String localDir, User user) throws BusinessException {
-        String relativeDirString = "/images/viewer" + System.getProperty("file.separator") + (new File(imageLFN)).getParent().replaceAll(" ", "_").replaceAll("\\([^\\(]*\\)", "");
+       //String relativeDirString = "/images/viewer" + System.getProperty("file.separator") + (new File(imageLFN)).getParent().replaceAll(" ", "_").replaceAll("\\([^\\(]*\\)", "");
+        String relativeDirString = "/images/viewer" + System.getProperty("file.separator") +user.getFolder()+(new File(imageLFN)).getParent().replaceAll(" ", "_").replaceAll("\\([^\\(]*\\)", "");
+
         String imageDirString = localDir + relativeDirString;
         File imageDir = new File(imageDirString);
         String imageFileName = imageDir.getAbsolutePath() + System.getProperty("file.separator") + imageLFN.substring(imageLFN.lastIndexOf('/') + 1);
