@@ -366,7 +366,6 @@ public class N4uImportTab extends Tab {
 
                 }
                 Layout.getInstance().setNoticeMessage("Your Gwendia file was successfully created");
-
             }
         };
 
@@ -437,6 +436,8 @@ public class N4uImportTab extends Tab {
                 map.put("name", fieldItem.getValueAsString());
             }
         });
+        
+      
         final TextArea description = new TextArea();
         description.setHeight("100%");
         description.setWidth("100%");

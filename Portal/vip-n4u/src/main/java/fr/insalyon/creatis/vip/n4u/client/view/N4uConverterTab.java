@@ -104,27 +104,33 @@ public class N4uConverterTab extends Tab {
 
         title = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_() ]");
         title.setValidators(ValidatorUtil.getStringValidator());
+        title.setRequired(Boolean.TRUE);
 
 
         express = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_() ]");
         express.setValidators(ValidatorUtil.getStringValidator());
         express.setIcons(browsePicker);
+        express.setRequired(Boolean.TRUE);
 
         job = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_() ]");
         job.setValidators(ValidatorUtil.getStringValidator());
         job.setIcons(browsePicker);
+        job.setRequired(Boolean.TRUE);
 
         script = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_() ]");
         script.setValidators(ValidatorUtil.getStringValidator());
         script.setIcons(browsePicker);
+        script.setRequired(Boolean.TRUE);
 
         ext = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_() ]");
         ext.setValidators(ValidatorUtil.getStringValidator());
         ext.setIcons(browsePicker);
+        ext.setRequired(Boolean.FALSE);
 
         env = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_() ]");
         env.setValidators(ValidatorUtil.getStringValidator());
         env.setIcons(browsePicker);
+        env.setRequired(Boolean.FALSE);
 
         titleItemForm = new DynamicForm();
         titleItemForm.setFields(title);
@@ -149,45 +155,53 @@ public class N4uConverterTab extends Tab {
                 new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                tabImporter = new N4uImportTab();
-                Layout.getInstance().addTab(tabImporter);
-                tabImporter.addfiels("Application Name <font color=red>(*)</font>", false, title.getValueAsString(), false);
-                tabImporter.addFielDescription("Documentation and Terms of Use");
-                tabImporter.addFielsInputs(true, "results-directory ", "Directory where the results will be stored", N4uImportTab.InputType.Parameter.name(), true);
-                tabImporter.addFielsInputs(true, "job name", "A string identifying the job name", N4uImportTab.InputType.Parameter.name(), false);
-                final AsyncCallback<int[]> callback = new AsyncCallback<int[]>() {
-                    @Override
-                    public void onFailure(Throwable caught) {
 
-                        Layout.getInstance().setWarningMessage("Unable to save parameters " + caught.getMessage());
-                    }
+                if (!title.validate() || !express.validate() || !job.validate() || !ext.validate() || !env.validate()) {
+                    Layout.getInstance().setWarningMessage("There is an invalid input");
+                } else {
 
-                    @Override
-                    public void onSuccess(int[] result) {
-                        for (int i = 1; i < (int) result[0]; i++) {
-                            if (i <= result[1]) {
-                                tabImporter.addFielsInputs(false, "", "", InputType.File.name(), false);
-                            } else {
-                                tabImporter.addFielsInputs(false, "", "", InputType.Parameter.name(), false);
-                            }
+
+                    final AsyncCallback<int[]> callback = new AsyncCallback<int[]>() {
+                        @Override
+                        public void onFailure(Throwable caught) {
+
+                            Layout.getInstance().setWarningMessage("Unable to read files :" + caught.getMessage());
                         }
 
-                        tabImporter.addFielsOutput(true, "result", "A tar.gz file containing the results", N4uImportTab.InputType.File.name(), true);
-                        tabImporter.addfiels("Main Executable <font color=red>(*)</font>", true, script.getValueAsString(), false);
-                        /* if (ext.getValueAsString() != "" || ext.getValueAsString() != null || !ext.getValueAsString().isEmpty()) {
-                         tabImporter.addfiels("Extension File", true, false, ext.getValueAsString(), false);
-                         }
+                        @Override
+                        public void onSuccess(int[] result) {
 
-                         if (env.getValueAsString()!="" || env.getValueAsString() != null || env.getValueAsString().length() == 0||!env.getValueAsString().isEmpty()) {
-                         tabImporter.addfiels("Environement File", true, false, env.getValueAsString(), false);
-                         }
-                         **/
-                        tabImporter.addfiels("Application Location <font color=red>(*)</font>", true, "", false);
-                        tabImporter.addLaunchButton();
+                            tabImporter = new N4uImportTab();
+                            Layout.getInstance().addTab(tabImporter);
+                            tabImporter.addfiels("Application Name <font color=red>(*)</font>", false, title.getValueAsString(), false);
+                            tabImporter.addFielDescription("Documentation and Terms of Use");
+                            tabImporter.addFielsInputs(true, "results-directory ", "Directory where the results will be stored", N4uImportTab.InputType.Parameter.name(), true);
+                            tabImporter.addFielsInputs(true, "job name", "A string identifying the job name", N4uImportTab.InputType.Parameter.name(), false);
+                            for (int i = 1; i < (int) result[0]; i++) {
+                                if (i <= result[1]) {
+                                    tabImporter.addFielsInputs(false, "", "", InputType.File.name(), false);
+                                } else {
+                                    tabImporter.addFielsInputs(false, "", "", InputType.Parameter.name(), false);
+                                }
+                            }
 
-                    }
-                };
-                FileProcessService.Util.getInstance().fileJobProcess(job.getValueAsString(), express.getValueAsString(), callback);
+                            tabImporter.addFielsOutput(true, "result", "A tar.gz file containing the results", N4uImportTab.InputType.File.name(), true);
+                            tabImporter.addfiels("Main Executable <font color=red>(*)</font>", true, script.getValueAsString(), false);
+                            /* if (ext.getValueAsString() != "" || ext.getValueAsString() != null || !ext.getValueAsString().isEmpty()) {
+                             tabImporter.addfiels("Extension File", true, false, ext.getValueAsString(), false);
+                             }
+
+                             if (env.getValueAsString()!="" || env.getValueAsString() != null || env.getValueAsString().length() == 0||!env.getValueAsString().isEmpty()) {
+                             tabImporter.addfiels("Environement File", true, false, env.getValueAsString(), false);
+                             }
+                             **/
+                            tabImporter.addfiels("Application Location <font color=red>(*)</font>", true, "", false);
+                            tabImporter.addLaunchButton();
+
+                        }
+                    };
+                    FileProcessService.Util.getInstance().fileJobProcess(job.getValueAsString(), express.getValueAsString(), callback);
+                }
             }
         });
 
