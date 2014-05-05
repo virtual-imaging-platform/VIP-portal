@@ -34,26 +34,26 @@ public class PersonaAuthenticationService extends AbstractAuthenticationService 
 
     private static final Logger logger = Logger.getLogger(PersonaAuthenticationService.class);
 
-      @Override
+    @Override
     protected String getEmailIfValidRequest(HttpServletRequest request) throws BusinessException {
-       logger.info("Mozilla Persona authentication request");
+        logger.info("Mozilla Persona authentication request");
 
         String verifyURL = Server.getInstance().getMozillaPersonaValidationURL();
         String audience = request.getScheme()+ "://"+ request.getServerName();
         String assertion = request.getParameter("assertion");
-        
+
         if(assertion == null){
             throw new BusinessException("Assertion string is null");
         }
-        
+
         String email;
         try {
             email = getEmailFromAssertionIfValid(assertion, audience, verifyURL);
         } catch (Exception ex) {
             throw new BusinessException(ex.getMessage());
-        } 
+        }
         return email;
-        
+
     }
 
     private String getEmailFromAssertionIfValid(String assertion, String audience, String verifyURL) throws IOException, JSONException, BusinessException {

@@ -70,11 +70,11 @@ public interface ConfigurationService extends RemoteService {
     }
 
     public User configure(String email, String session) throws CoreException;
-    
+
     public void signup(User user, String comments, String[] accountType) throws CoreException;
 
     public User signin(String email, String password) throws CoreException;
-    
+
     public User signin(String ticket) throws CoreException;
 
     public void signout() throws CoreException;
@@ -82,7 +82,7 @@ public interface ConfigurationService extends RemoteService {
     public User activate(String code) throws CoreException;
 
     public String sendActivationCode() throws CoreException;
-    
+
     public void sendResetCode(String email) throws CoreException;
 
     public List<User> getUsers() throws CoreException;
@@ -94,57 +94,57 @@ public interface ConfigurationService extends RemoteService {
     public void removeGroup(String groupName) throws CoreException;
 
     public List<Group> getGroups() throws CoreException;
-    
+
     public List<Group> getPublicGroups() throws CoreException;
 
     public User removeUser(String email) throws CoreException;
-    
+
     public Map<Group, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws CoreException;
-    
-    public List<Boolean> getUserPropertiesGroups() throws CoreException;     
-    
+
+    public List<Boolean> getUserPropertiesGroups() throws CoreException;
+
     public List<String> getUserGroups() throws CoreException;
-    
+
 
     public void updateUser(String email, UserLevel level, CountryCode countryCode, int maxRunningSimulations, Map<String, CoreConstants.GROUP_ROLE> groups) throws CoreException;
-    
+
     public User getUserData() throws CoreException;
-    
+
     public User updateUser(User user) throws CoreException;
-    
+
     public void updateUserPassword(String currentPassword, String newPassword) throws CoreException;
-    
+
     public void sendContactMail(String category, String subject, String comment) throws CoreException;
-    
+
     public void activateUser(String email) throws CoreException;
-    
+
     public void addUserToGroup(String groupName) throws CoreException;
-    
+
     public List<User> getUsersFromGroup(String groupName) throws CoreException;
-    
+
     public void removeUserFromGroup(String email, String groupName) throws CoreException;
-    
+
     public void resetPassword(String email, String code, String password) throws CoreException;
-    
+
     // Accounts
     public List<Account> getAccounts() throws CoreException;
-    
+
     public void addAccount(String name, List<String> groups) throws CoreException;
-    
+
     public void updateAccount(String oldName, String newName, List<String> groups) throws CoreException;
-    
+
     public void removeAccount(String name) throws CoreException;
-    
+
     public String getCASLoginPageUrl() throws CoreException;
-    
+
     public UsageStats getUsageStats() throws CoreException;
-    
+
     public String linkDropboxAccount() throws CoreException;
-    
+
     public void activateDropboxAccount(String oauth_token) throws CoreException;
-    
+
     public DropboxAccountStatus.AccountStatus getDropboxAccountStatus() throws CoreException;
-    
+
     public void unlinkDropboxAccount() throws CoreException;
 //    
 //    public void getPostParameters() throws CoreException;

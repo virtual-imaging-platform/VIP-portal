@@ -34,6 +34,9 @@ package fr.insalyon.creatis.vip.core.server.business;
 
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
@@ -110,7 +113,10 @@ public class Server {
     private String SAMLDefaultAccountType;
     //ssh
     private String sshPublicKey;
-    
+    //undesired email domains
+   
+
+    private List<String> undesiredMailDomains;
     //third-party auth
     private String samlTrustedCertificate;
     private String mozillaPersonaValidationURL;
@@ -120,9 +126,9 @@ public class Server {
     private String applicationN4uClass;
     private String N4uApplicationFilesRepository;
     private String deleteFilesAfterUpload;
+    
 
    
-    
     public static Server getInstance() {
         if (instance == null) {
             instance = new Server();
@@ -200,7 +206,12 @@ public class Server {
             sshPublicKey = config.getString(CoreConstants.SSH_PUBLIC_KEY, "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAuNjIXlgjuBR+WfjGtkieecZfe/ZL6EyNJTbL14bn3/Soof0kFSshDJvFgSH1hNwMMU1hynLbzcEbLTyVMoGQKfQkq7mJPajy9g8878WCKxCRbXv3W1/HT9iab/qqt2dcRYnDEruHwgyELBhQuMAe2W2/mgjd7Y5PxE01bwDcenYl3cU3iJk1sAOHao6P+3xU6Ov+TD8K9aC0LzZpM+rzAmS9HOZ9nvzERExd7k4TUpyffQV9Dpb5jEnEViF3VHqplB8AbWDdcJbiVkUBUe4hQb7nmWP0kHl1+v5SQJ1B4mWCZ+35Rc/9b1GsmPnXg3qqhjeKbrim/NbcUwKr9NPWjQ== vip-services@kingkong.grid.creatis.insa-lyon.fr");
             samlTrustedCertificate = config.getString(CoreConstants.SAML_TRUSTED_CERTIFICATE, System.getProperty( "user.home" )+File.separator+".vip"+File.separator+"trusted_saml_cert.pem");
             mozillaPersonaValidationURL = config.getString(CoreConstants.MOZILLA_PERSONA_VALIDATION_URL,"https://verifier.login.persona.org/verify");
-                    
+            //undesired Mail Domains
+            List <String> undisMailDomains=new ArrayList<String>();
+            undisMailDomains.add(".com");
+            undisMailDomains.add(".hack.rnu");
+            undesiredMailDomains = config.getList(CoreConstants.UNDESIRED_MAIL_DOMAINS, undisMailDomains);
+         
              //queryTree
             queryTree=config.getString(CoreConstants.TreeQuery,"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> select * from <http://e-ginseng.org/graph/ontology/semEHR> where {?x a rdfs:Class . ?x rdfs:label ?label}");
             
@@ -208,9 +219,9 @@ public class Server {
             applicationN4uClass=config.getString(CoreConstants.APP_CLASSE,"Test");
             N4uApplicationFilesRepository=config.getString(CoreConstants.APPLICATION_FILES_REPOSITORY,"/home/boujelben");
             deleteFilesAfterUpload=config.getString(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD,"yes");
+           
           
              
-            
             config.setProperty(CoreConstants.LAB_DB_HOST, databaseServerHost);
             config.setProperty(CoreConstants.LAB_DB_PORT, databaseServerPort);
             config.setProperty(CoreConstants.LAB_ADMIN_FIRST_NAME, adminFirstName);
@@ -262,6 +273,7 @@ public class Server {
             config.setProperty(CoreConstants.APP_CLASSE, applicationN4uClass);
             config.setProperty(CoreConstants.APPLICATION_FILES_REPOSITORY,N4uApplicationFilesRepository);
             config.setProperty(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, deleteFilesAfterUpload);
+            config.setProperty(CoreConstants.UNDESIRED_MAIL_DOMAINS,undesiredMailDomains );
             config.save();
 
         } catch (ConfigurationException ex) {
@@ -477,5 +489,14 @@ public class Server {
     public String getDeleteFilesAfterUpload() {
         return deleteFilesAfterUpload;
     }
-  
+
+    public List<String> getUndesiredMailDomains() {
+        return undesiredMailDomains;
+    }
+
+    public void setUndesiredMailDomains(List<String> undesiredMailDomainsConfig) {
+        this.undesiredMailDomains = undesiredMailDomainsConfig;
+    }
+    
+   
 }
