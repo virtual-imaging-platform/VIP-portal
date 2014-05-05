@@ -121,7 +121,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
         try {
             logger.info("Sign up request from '" + user.getEmail() + "'.");
-            configurationBusiness.signup(user, comments, accountType);
+             configurationBusiness.signup(user, comments, accountType);
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);

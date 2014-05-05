@@ -127,7 +127,8 @@ public class CoreConstants implements IsSerializable {
     public static final String ICON_WARNING = IMG_FOLDER + "icon-warning.png";
     public static final String ICON_WORLD = IMG_FOLDER + "flags/_world.png";
     public static final String ICON_DROPBOX = IMG_FOLDER + "icon-dropbox.png";
-        public static String ICON_MOZILLA_PERSONA= IMG_FOLDER + "icon-persona.png";;
+    public static String ICON_MOZILLA_PERSONA = IMG_FOLDER + "icon-persona.png";
+    ;
     // Folders
     public static final String FOLDER_TRASH = "Trash";
     public static final String FOLDER_FLAGS = IMG_FOLDER + "flags/";
@@ -156,15 +157,16 @@ public class CoreConstants implements IsSerializable {
     public static final String GROUP_DROPBOX = "Dropbox";
     // ssh
     public static final String SSH_PUBLIC_KEY = "ssh.publickey";
-    
-    public static final String SAML_TRUSTED_CERTIFICATE="saml.trusted.certificates";
-    public static String MOZILLA_PERSONA_VALIDATION_URL="mozilla.persona.validation.url";
+    //
+    public static final String UNDESIRED_MAIL_DOMAINS = "emails.prohibitDomainsList";
+    public static final String SAML_TRUSTED_CERTIFICATE = "saml.trusted.certificates";
+    public static String MOZILLA_PERSONA_VALIDATION_URL = "mozilla.persona.validation.url";
     //query
-    public static String TreeQuery="query.classes";
+    public static String TreeQuery = "query.classes";
     //N4u 
-    public static String APP_CLASSE="expressLaneToVip.application.class";
-    public static String APPLICATION_FILES_REPOSITORY="expressLaneToVip.upload.repository";
-    public static String APP_DELETE_FILES_AFTER_UPLOAD="expressLaneToVip.upload.deleteFile";
+    public static String APP_CLASSE = "expressLaneToVip.application.class";
+    public static String APPLICATION_FILES_REPOSITORY = "expressLaneToVip.upload.repository";
+    public static String APP_DELETE_FILES_AFTER_UPLOAD = "expressLaneToVip.upload.deleteFile";
 
     public static enum GROUP_ROLE implements IsSerializable {
 

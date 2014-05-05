@@ -92,7 +92,7 @@ public class SignUpTab extends Tab {
         vLayout.addMember(signupLayout);
 
         this.setPane(vLayout);
-        
+
         loadAccountTypes();
     }
 
@@ -140,7 +140,6 @@ public class SignUpTab extends Tab {
 
         signupButton = new IButton("Sign Up");
         signupButton.addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
 
@@ -163,7 +162,7 @@ public class SignUpTab extends Tab {
                         passwordField.focusInItem();
                         return;
                     }
-                    
+
                     User user = new User(
                             firstNameField.getValueAsString().trim(),
                             lastNameField.getValueAsString().trim(),
@@ -174,20 +173,27 @@ public class SignUpTab extends Tab {
                             CountryCode.valueOf(countryField.getValueAsString()));
 
                     final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
                         @Override
                         public void onFailure(Throwable caught) {
                             WidgetUtil.resetIButton(signupButton, "Sign Up", null);
+                            if(!caught.getMessage().contains("Undesired Mail Domain")){
                             Layout.getInstance().setWarningMessage("Unable to signing up:<br />" + caught.getMessage(), 10);
+                            }
                         }
 
                         @Override
                         public void onSuccess(Void result) {
-                            WidgetUtil.resetIButton(signupButton, "Sign Up", null);
-                            Layout.getInstance().setNoticeMessage("Your membership request was successfully processed.<br />"
-                                    + "An activation code was sent to your email.<br />"
-                                    + "This code will be requested on your first login.", 15);
-                            signin();
+                            /*if (result == false) {
+                                WidgetUtil.resetIButton(signupButton, "Sign Up", null);
+                                * 
+                                * ***/
+                         
+
+                                Layout.getInstance().setNoticeMessage("Your membership request was successfully processed.<br />"
+                                        + "An activation code was sent to your email.<br />"
+                                        + "This code will be requested on your first login.", 15);
+                                signin();
+                           
                         }
                     };
                     ConfigurationService.Util.getInstance().signup(user, commentsItem.getValueAsString(),
@@ -216,7 +222,6 @@ public class SignUpTab extends Tab {
     private void signin() {
 
         final AsyncCallback<User> callback = new AsyncCallback<User>() {
-
             @Override
             public void onFailure(Throwable caught) {
                 if (caught.getMessage().contains("Authentication failed")) {
@@ -248,7 +253,6 @@ public class SignUpTab extends Tab {
     private void loadAccountTypes() {
 
         final AsyncCallback<List<Account>> callback = new AsyncCallback<List<Account>>() {
-
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to load account types:<br />" + caught.getMessage(), 10);
@@ -256,7 +260,7 @@ public class SignUpTab extends Tab {
 
             @Override
             public void onSuccess(List<Account> result) {
-                
+
                 String[] values = new String[result.size()];
                 for (int i = 0; i < result.size(); i++) {
                     values[i] = result.get(i).getName();
