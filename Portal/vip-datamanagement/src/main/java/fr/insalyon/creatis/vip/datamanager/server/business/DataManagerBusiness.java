@@ -61,6 +61,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -183,9 +184,14 @@ public class DataManagerBusiness {
     }
 
     public Image getImageSlicesURL(String imageLFN, String localDir, User user) throws BusinessException {
-       //String relativeDirString = "/images/viewer" + System.getProperty("file.separator") + (new File(imageLFN)).getParent().replaceAll(" ", "_").replaceAll("\\([^\\(]*\\)", "");
-        String relativeDirString = "/images/viewer" + System.getProperty("file.separator") +user.getFolder()+(new File(imageLFN)).getParent().replaceAll(" ", "_").replaceAll("\\([^\\(]*\\)", "");
-
+        String relativeDirString;
+        try {
+            relativeDirString = "/images/viewer" + System.getProperty("file.separator")+ DataManagerUtil.parseBaseDir(user, imageLFN);
+        } catch (DataManagerException ex) {
+       throw new BusinessException(ex);
+        }
+        
+        
         String imageDirString = localDir + relativeDirString;
         File imageDir = new File(imageDirString);
         String imageFileName = imageDir.getAbsolutePath() + System.getProperty("file.separator") + imageLFN.substring(imageLFN.lastIndexOf('/') + 1);
