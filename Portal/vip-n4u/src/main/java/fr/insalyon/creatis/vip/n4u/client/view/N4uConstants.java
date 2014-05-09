@@ -21,6 +21,9 @@ public class N4uConstants {
     public static final String ICON_PICKER_EDIT = IMG_FOLDER + "icon-picker-edit.jpg";
     public static final String ICON_LAUNCH = IMG_FOLDER + "icon-launch.png";
     public static final String ICON_IMPORT = IMG_FOLDER + "icon-import.png";
+    public static final String ICON_FILE = IMG_FOLDER + "icon-file.png";
+    public static final String ICON_FILES = IMG_FOLDER + "icon-files.png";
+    
     //Icons confirm
     public static final String ICON_ADD = IMG_FOLDER + "add.png";
     public static final String ICON_CANCEL = IMG_FOLDER + "cancel.png";
