@@ -17,6 +17,8 @@ public interface FileProcessServiceAsync {
 
     public void fileJobProcess(String jobFile, String expressFile, AsyncCallback<int[]> callback);
 
+    public void parseXmlFile(String xmlFile, AsyncCallback<List<String[]>> callback);
+
     public void generateScriptFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, AsyncCallback<Void> callback);
 
     public void generateGwendiaFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, AsyncCallback<String> callback);

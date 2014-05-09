@@ -419,7 +419,7 @@ public class N4uImportTab extends Tab {
     }
 
 //inputs
-    public VLayout addFielsInputs(boolean fixedInput, String value, String descriptionValue, String typeValue, boolean fixedType) {
+    public VLayout addFielsInputs(boolean requiredInput, String value, String descriptionValue, String typeValue, boolean isFixedType) {
         i++;
         HLayout hlayout = new HLayout();
         hlayout.setHeight(80);
@@ -436,8 +436,8 @@ public class N4uImportTab extends Tab {
                 map.put("name", fieldItem.getValueAsString());
             }
         });
-        
-      
+
+
         final TextArea description = new TextArea();
         description.setHeight("100%");
         description.setWidth("100%");
@@ -458,7 +458,7 @@ public class N4uImportTab extends Tab {
         selectItem.setValue(typeValue);
 
         selectItem.setWidth("100%");
-        if (!fixedType) {
+        if (!isFixedType) {
             LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
             valueMap.put(InputType.File.name(), InputType.File.name());
             valueMap.put(InputType.Parameter.name(), InputType.Parameter.name());
@@ -541,7 +541,7 @@ public class N4uImportTab extends Tab {
             }
         });
         section1.setItems(hlayout);
-        if (!fixedInput) {
+        if (!requiredInput) {
             section1.setControls(removeButton);
         }
 
