@@ -49,6 +49,7 @@ import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -460,5 +461,11 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
+    }
+    
+     @Override
+     public List<String>getAppletGateLabClasses() throws ApplicationException {
+          return Server.getInstance().getAppletGateLabClasses();
+      
     }
 }

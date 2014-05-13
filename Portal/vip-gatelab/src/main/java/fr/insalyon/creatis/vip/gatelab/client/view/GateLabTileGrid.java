@@ -49,14 +49,14 @@ public class GateLabTileGrid extends ApplicationsTileGrid {
 
     private List<String> applicationNames;
 
-    public GateLabTileGrid() {
+    public GateLabTileGrid(String tileName) {
 
-        super(GateLabConstants.GATELAB_CLASS);
+        super(tileName);
         applicationNames = new ArrayList<String>();
-        loadApplications();
+        loadApplications(tileName);
     }
 
-    private void loadApplications() {
+    private void loadApplications(String applicationClass) {
 
         final AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
             @Override
@@ -73,7 +73,7 @@ public class GateLabTileGrid extends ApplicationsTileGrid {
                 }
             }
         };
-        ApplicationService.Util.getInstance().getApplications(GateLabConstants.GATELAB_CLASS, callback);
+        ApplicationService.Util.getInstance().getApplications(applicationClass, callback);
     }
 
     @Override

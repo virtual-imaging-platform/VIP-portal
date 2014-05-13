@@ -38,6 +38,7 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
+import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import java.util.List;
 
 /**
@@ -91,4 +92,6 @@ public interface ApplicationServiceAsync {
     public void removeEngine(String engineName, AsyncCallback<Void> asyncCallback);
     
     public void getEngines(AsyncCallback<List<Engine>> asyncCallback);
+    
+     public void getAppletGateLabClasses(AsyncCallback <List<String>> asyncCallback);
 }

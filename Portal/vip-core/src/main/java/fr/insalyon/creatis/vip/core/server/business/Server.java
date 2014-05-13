@@ -113,9 +113,9 @@ public class Server {
     private String SAMLDefaultAccountType;
     //ssh
     private String sshPublicKey;
+    //application,GateLab
+    private List<String> appletGateLabClasses;
     //undesired email domains
-   
-
     private List<String> undesiredMailDomains;
     //third-party auth
     private String samlTrustedCertificate;
@@ -126,9 +126,7 @@ public class Server {
     private String applicationN4uClass;
     private String N4uApplicationFilesRepository;
     private String deleteFilesAfterUpload;
-    
 
-   
     public static Server getInstance() {
         if (instance == null) {
             instance = new Server();
@@ -146,7 +144,7 @@ public class Server {
             // Configuration File
             String confFilePath = configurationFolder + CONF_FILE;
             PropertiesConfiguration config = new PropertiesConfiguration(confFilePath);
-            logger.info("Loading config file: "+confFilePath);
+            logger.info("Loading config file: " + confFilePath);
 
             databaseServerHost = config.getString(CoreConstants.LAB_DB_HOST, "localhost");
             databaseServerPort = config.getInt(CoreConstants.LAB_DB_PORT, 9092);
@@ -204,24 +202,28 @@ public class Server {
             SAMLDefaultAccountType = config.getString(CoreConstants.LAB_SAML_ACCOUNT_TYPE, "Neuroimaging");
 
             sshPublicKey = config.getString(CoreConstants.SSH_PUBLIC_KEY, "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAuNjIXlgjuBR+WfjGtkieecZfe/ZL6EyNJTbL14bn3/Soof0kFSshDJvFgSH1hNwMMU1hynLbzcEbLTyVMoGQKfQkq7mJPajy9g8878WCKxCRbXv3W1/HT9iab/qqt2dcRYnDEruHwgyELBhQuMAe2W2/mgjd7Y5PxE01bwDcenYl3cU3iJk1sAOHao6P+3xU6Ov+TD8K9aC0LzZpM+rzAmS9HOZ9nvzERExd7k4TUpyffQV9Dpb5jEnEViF3VHqplB8AbWDdcJbiVkUBUe4hQb7nmWP0kHl1+v5SQJ1B4mWCZ+35Rc/9b1GsmPnXg3qqhjeKbrim/NbcUwKr9NPWjQ== vip-services@kingkong.grid.creatis.insa-lyon.fr");
-            samlTrustedCertificate = config.getString(CoreConstants.SAML_TRUSTED_CERTIFICATE, System.getProperty( "user.home" )+File.separator+".vip"+File.separator+"trusted_saml_cert.pem");
-            mozillaPersonaValidationURL = config.getString(CoreConstants.MOZILLA_PERSONA_VALIDATION_URL,"https://verifier.login.persona.org/verify");
+            samlTrustedCertificate = config.getString(CoreConstants.SAML_TRUSTED_CERTIFICATE, System.getProperty("user.home") + File.separator + ".vip" + File.separator + "trusted_saml_cert.pem");
+            mozillaPersonaValidationURL = config.getString(CoreConstants.MOZILLA_PERSONA_VALIDATION_URL, "https://verifier.login.persona.org/verify");
+            //
+            List<String> appletGateLabCl = new ArrayList<String>();
+            appletGateLabCl.add("GateLab");
+            appletGateLabClasses = config.getList(CoreConstants.APPLET_GETLAB_CLASSES, appletGateLabCl);
+
             //undesired Mail Domains
-            List <String> undisMailDomains=new ArrayList<String>();
-            undisMailDomains.add(".com");
+            List<String> undisMailDomains = new ArrayList<String>();       
             undisMailDomains.add(".hack.rnu");
             undesiredMailDomains = config.getList(CoreConstants.UNDESIRED_MAIL_DOMAINS, undisMailDomains);
-         
-             //queryTree
-            queryTree=config.getString(CoreConstants.TreeQuery,"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> select * from <http://e-ginseng.org/graph/ontology/semEHR> where {?x a rdfs:Class . ?x rdfs:label ?label}");
-            
+
+            //queryTree
+            queryTree = config.getString(CoreConstants.TreeQuery, "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> select * from <http://e-ginseng.org/graph/ontology/semEHR> where {?x a rdfs:Class . ?x rdfs:label ?label}");
+
             //N4U_model
-            applicationN4uClass=config.getString(CoreConstants.APP_CLASSE,"Test");
-            N4uApplicationFilesRepository=config.getString(CoreConstants.APPLICATION_FILES_REPOSITORY,"/home/boujelben");
-            deleteFilesAfterUpload=config.getString(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD,"yes");
-           
-          
-             
+            applicationN4uClass = config.getString(CoreConstants.APP_CLASS, "Test");
+            N4uApplicationFilesRepository = config.getString(CoreConstants.APPLICATION_FILES_REPOSITORY, "/home/boujelben");
+            deleteFilesAfterUpload = config.getString(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, "yes");
+
+
+
             config.setProperty(CoreConstants.LAB_DB_HOST, databaseServerHost);
             config.setProperty(CoreConstants.LAB_DB_PORT, databaseServerPort);
             config.setProperty(CoreConstants.LAB_ADMIN_FIRST_NAME, adminFirstName);
@@ -267,13 +269,14 @@ public class Server {
             config.setProperty(CoreConstants.LAB_SAML_ACCOUNT_TYPE, SAMLDefaultAccountType);
             config.setProperty(CoreConstants.SSH_PUBLIC_KEY, sshPublicKey);
             config.setProperty(CoreConstants.SAML_TRUSTED_CERTIFICATE, samlTrustedCertificate);
-            config.setProperty(CoreConstants.MOZILLA_PERSONA_VALIDATION_URL,mozillaPersonaValidationURL);
+            config.setProperty(CoreConstants.MOZILLA_PERSONA_VALIDATION_URL, mozillaPersonaValidationURL);
             config.setProperty(CoreConstants.TreeQuery, queryTree);
-            
-            config.setProperty(CoreConstants.APP_CLASSE, applicationN4uClass);
-            config.setProperty(CoreConstants.APPLICATION_FILES_REPOSITORY,N4uApplicationFilesRepository);
+
+            config.setProperty(CoreConstants.APP_CLASS, applicationN4uClass);
+            config.setProperty(CoreConstants.APPLICATION_FILES_REPOSITORY, N4uApplicationFilesRepository);
             config.setProperty(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, deleteFilesAfterUpload);
-            config.setProperty(CoreConstants.UNDESIRED_MAIL_DOMAINS,undesiredMailDomains );
+            config.setProperty(CoreConstants.APPLET_GETLAB_CLASSES, appletGateLabClasses);
+            config.setProperty(CoreConstants.UNDESIRED_MAIL_DOMAINS, undesiredMailDomains);
             config.save();
 
         } catch (ConfigurationException ex) {
@@ -472,12 +475,11 @@ public class Server {
     public String getMozillaPersonaValidationURL() {
         return mozillaPersonaValidationURL;
     }
-    
-     public String getQueryTree() {
+
+    public String getQueryTree() {
         return queryTree;
     }
-     
-     
+
     public String getApplicationN4uClass() {
         return applicationN4uClass;
     }
@@ -490,6 +492,14 @@ public class Server {
         return deleteFilesAfterUpload;
     }
 
+    public List<String> getAppletGateLabClasses() {
+        return appletGateLabClasses;
+    }
+
+    public void setAppletGateLabClasses(List<String> appletGateLabClasses) {
+        this.appletGateLabClasses = appletGateLabClasses;
+    }
+
     public List<String> getUndesiredMailDomains() {
         return undesiredMailDomains;
     }
@@ -497,6 +507,4 @@ public class Server {
     public void setUndesiredMailDomains(List<String> undesiredMailDomainsConfig) {
         this.undesiredMailDomains = undesiredMailDomainsConfig;
     }
-    
-   
 }
