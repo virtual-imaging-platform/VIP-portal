@@ -50,6 +50,7 @@ import fr.insalyon.creatis.vip.core.client.Module;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.layout.CenterTabSet;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,9 +62,23 @@ public class ApplicationModule extends Module {
 
     public static List<String> reservedClasses;
 
-    public ApplicationModule() {
+     public ApplicationModule() {
+     
+       
+        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to load applet gatelab classes:<br />" + caught.getMessage());
+            }
 
-        reservedClasses = new ArrayList<String>();
+            @Override
+            public void onSuccess(List<String> result) {
+             reservedClasses=result;
+            }
+        };
+        ApplicationService.Util.getInstance().getAppletGateLabClasses(callback);
+      
+  
     }
 
     @Override

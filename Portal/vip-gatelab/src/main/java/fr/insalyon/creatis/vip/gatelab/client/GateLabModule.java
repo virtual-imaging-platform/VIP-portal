@@ -50,8 +50,7 @@ import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabTimelineParser
 public class GateLabModule extends Module {
 
     public GateLabModule() {
-
-        ApplicationModule.reservedClasses.add(GateLabConstants.GATELAB_CLASS);
+      new ApplicationModule();
     }
 
     @Override
@@ -59,7 +58,9 @@ public class GateLabModule extends Module {
 
         if (CoreModule.user.isSystemAdministrator()
                 || CoreModule.user.hasGroupAccess(GateLabConstants.GROUP_GATELAB)) {
-            CoreModule.addApplicationsTileGrid(new GateLabTileGrid());
+            for(String GateLabClass:ApplicationModule.reservedClasses){
+            CoreModule.addApplicationsTileGrid(new GateLabTileGrid(GateLabClass));
+            }
         }
         TimelineParser.getInstance().addParser(new GateLabTimelineParser());
         MonitorParser.getInstance().addParser(new GateLabMonitorParser());

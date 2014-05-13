@@ -157,14 +157,15 @@ public class CoreConstants implements IsSerializable {
     public static final String GROUP_DROPBOX = "Dropbox";
     // ssh
     public static final String SSH_PUBLIC_KEY = "ssh.publickey";
-    //
+    //application,Gatelab
+    public static final String APPLET_GETLAB_CLASSES = "appletGatelab.classes";
     public static final String UNDESIRED_MAIL_DOMAINS = "emails.prohibitDomainsList";
     public static final String SAML_TRUSTED_CERTIFICATE = "saml.trusted.certificates";
     public static String MOZILLA_PERSONA_VALIDATION_URL = "mozilla.persona.validation.url";
     //query
     public static String TreeQuery = "query.classes";
     //N4u 
-    public static String APP_CLASSE = "expressLaneToVip.application.class";
+    public static String APP_CLASS = "expressLaneToVip.application.class";
     public static String APPLICATION_FILES_REPOSITORY = "expressLaneToVip.upload.repository";
     public static String APP_DELETE_FILES_AFTER_UPLOAD = "expressLaneToVip.upload.deleteFile";
 
