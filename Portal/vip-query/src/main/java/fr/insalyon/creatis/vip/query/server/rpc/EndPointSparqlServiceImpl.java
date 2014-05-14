@@ -84,13 +84,13 @@ public class EndPointSparqlServiceImpl extends RemoteServiceServlet
       public List<String[]> getUrlResultFormatTable(String param1,String val1, String val2,String val3,String val4) {
        
    try{
-        logger.error(param1);
+       
          Query query = QueryFactory.create(param1);
-         logger.error("1");
+        
          QueryExecution qexec = QueryExecutionFactory.sparqlService("http://ginseng.i3s.unice.fr:9000/sparql", param1);
-         logger.error("2");
+       
          ResultSet results = qexec.execSelect();
-         logger.error("3");
+       
          List<String[]> rslt = new ArrayList<String[]>();
         
        
@@ -110,7 +110,7 @@ public class EndPointSparqlServiceImpl extends RemoteServiceServlet
                   valueVal1 = "empty";
                   valueVal2 = "empty";
                   valueVal3 = "empty";
-                 valueVal4 = "empty";
+                  valueVal4 = "empty";
                    logger.error(ex);
              }  
              
