@@ -47,6 +47,16 @@ public class Velocity implements VelocityProcess {
         ve.init();
     }
 
+    /**
+     *
+     * @param listInput
+     * @param listOutput
+     * @param applicationName
+     * @param wrapperScriptPath
+     * @param applicationLocation
+     * @param dir
+     * @throws VelocityException
+     */
     @Override
     public void gassFile(ArrayList listInput, ArrayList listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir) throws VelocityException {
         Template t = ve.getTemplate("vm/gass.vm");
@@ -72,6 +82,16 @@ public class Velocity implements VelocityProcess {
         }
     }
 
+    /**
+     *
+     * @param listInput
+     * @param listOutput
+     * @param applicationName
+     * @param scriptFile
+     * @param applicationLocation
+     * @param dir
+     * @throws VelocityException
+     */
     @Override
     public void wrapperScriptFile(ArrayList listInput, ArrayList listOutput, String applicationName, String scriptFile, String applicationLocation, String dir) throws VelocityException {
 
@@ -98,6 +118,17 @@ public class Velocity implements VelocityProcess {
         }
     }
 
+    /**
+     *
+     * @param listInput
+     * @param listOutput
+     * @param applicationName
+     * @param description
+     * @param applicationLocation
+     * @param dir
+     * @return
+     * @throws VelocityException
+     */
     @Override
     public String gwendiaFile(ArrayList listInput, ArrayList listOutput, String applicationName, String description, String applicationLocation, String dir) throws VelocityException {
         Template t = ve.getTemplate("vm/gwendia.vm");
@@ -132,6 +163,11 @@ public class Velocity implements VelocityProcess {
         return applicationLocation + "/workflows" + "/" + applicationName + ".gwendia";
     }
 
+    /**
+     *
+     * @param source
+     * @param dest
+     */
     public void copyFile(String source, String dest) {
         FileChannel in = null;
         FileChannel out = null;
@@ -160,6 +196,11 @@ public class Velocity implements VelocityProcess {
 
     }
 
+    /**
+     *
+     * @param f
+     * @param writer
+     */
     private void createFile(File f, StringWriter writer) {
         FileWriter writerr;
         try {
@@ -176,6 +217,11 @@ public class Velocity implements VelocityProcess {
 
     }
 
+    /**
+     *
+     * @param html
+     * @return
+     */
     public static String html2text(String html) {
         return Jsoup.parse(html).text();
     }

@@ -22,7 +22,11 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 public class LayoutInputs extends AbstractFormLayout {
 
     LabelButton addButton;
-
+/**
+ * 
+ * @param width
+ * @param height 
+ */
     public LayoutInputs(String width, String height) {
         super(width, height);
         this.addTitle("Application Inputs", N4uConstants.ICON_INPUT);
@@ -38,7 +42,10 @@ public class LayoutInputs extends AbstractFormLayout {
         toolstrip.addMember(addButton);
         this.addMember(toolstrip);
     }
-
+/**
+ * 
+ * @return 
+ */
     public LabelButton getAddButton() {
         return addButton;
     }

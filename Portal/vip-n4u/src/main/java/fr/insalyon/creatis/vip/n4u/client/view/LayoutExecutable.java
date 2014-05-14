@@ -11,7 +11,11 @@ import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
  * @author nouha
  */
 public class LayoutExecutable extends AbstractFormLayout {
-
+/**
+ * 
+ * @param width
+ * @param height 
+ */
     public LayoutExecutable(String width, String height) {
         super(width, height);
         this.addTitle("Executable", N4uConstants.ICON_EXECUTABLE);
