@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  *
- * @author nouha
+ * @author Nouha Boujelben
  */
 public class LayoutConverterOption2 extends AbstractFormLayout {
 
@@ -35,11 +35,21 @@ public class LayoutConverterOption2 extends AbstractFormLayout {
     private IButton importButton;
     N4uImportTab tabImporter;
 
+    /**
+     *
+     * @param width
+     * @param height
+     */
     public LayoutConverterOption2(int width, String height) {
         super(width, height);
         configure();
     }
 
+    /**
+     *
+     * @param width
+     * @param height
+     */
     public LayoutConverterOption2(String width, String height) {
         super(width, height);
         configure();
@@ -67,18 +77,18 @@ public class LayoutConverterOption2 extends AbstractFormLayout {
 
         xmlFileForm = new DynamicForm();
         xmlFileForm.setFields(xmlFileItem);
-        
-        
+
+
         importButton = new IButton();
         importButton = WidgetUtil.getIButton("Import", N4uConstants.ICON_IMPORT,
                 new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                 if (!xmlFileItem.validate()) {
+                if (!xmlFileItem.validate()) {
                     Layout.getInstance().setWarningMessage("There is an invalid input");
                 } else {
-                     
-                       final AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
+
+                    final AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
                         @Override
                         public void onFailure(Throwable caught) {
 
@@ -90,30 +100,34 @@ public class LayoutConverterOption2 extends AbstractFormLayout {
 
                             tabImporter = new N4uImportTab();
                             Layout.getInstance().addTab(tabImporter);
-                            tabImporter.addfiels("Application Name <font color=red>(*)</font>", false,"", false);
-                            tabImporter.addFielDescription("Documentation and Terms of Use");
-                            tabImporter.addFielsInputs(true, "results-directory ", "Directory where the results will be stored", N4uImportTab.InputType.Parameter.name(), true);
-                            tabImporter.addFielsInputs(true, "job name", "A string identifying the job name", N4uImportTab.InputType.Parameter.name(), false);
-                            for (String[] s:result) {
-                              // name,type;required
-                                //s[0],s[1],s[2]
-                                    tabImporter.addFielsInputs(Boolean.valueOf(s[2]), s[0], s[3], s[1],true);
-                                
-                                
+
+                            for (int i = 0; i < result.size(); i++) {
+                                if (i == 0) {
+                                    tabImporter.addfiels("Application Name <font color=red>(*)</font>", false,result.get(i)[0] , false);
+                                    tabImporter.addFielDescription("Documentation and Terms of Use",result.get(i)[1]);
+                                    tabImporter.addFielsInputs(true, "results-directory ", "Directory where the results will be stored", N4uImportTab.InputType.Parameter.name(), true);
+                                    tabImporter.addFielsInputs(true, "job name", "A string identifying the job name", N4uImportTab.InputType.Parameter.name(), false);
+
+                                } else {
+                                    // name,type;required
+                                    //s[0],s[1],s[2]
+                                    tabImporter.addFielsInputs(Boolean.valueOf(result.get(i)[2]), result.get(i)[0], result.get(i)[3], result.get(i)[1], true);
+                                }
+
                             }
 
                             tabImporter.addFielsOutput(true, "result", "A tar.gz file containing the results", N4uImportTab.InputType.File.name(), true);
-                            tabImporter.addfiels("Main Executable <font color=red>(*)</font>", true, "", false);      
+                            tabImporter.addfiels("Main Executable <font color=red>(*)</font>", true, "", false);
                             tabImporter.addfiels("Application Location <font color=red>(*)</font>", true, "", false);
                             tabImporter.addLaunchButton();
 
                         }
                     };
                     FileProcessService.Util.getInstance().parseXmlFile(xmlFileItem.getValueAsString(), callback);
-                     
-                 }
+
+                }
             }
-                });
+        });
 
         this.addMember(xmlFileLabel);
         this.addMember(xmlFileForm);
