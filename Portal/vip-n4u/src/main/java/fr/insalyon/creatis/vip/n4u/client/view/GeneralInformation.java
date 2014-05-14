@@ -12,6 +12,11 @@ import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
  */
 public class GeneralInformation extends AbstractFormLayout {
 
+    /**
+     *
+     * @param width the GeneralInformation layout's width 
+     * @param height the GeneralInformation layout's height 
+     */
     public GeneralInformation(String width, String height) {
         super(width, height);
         this.addTitle("General Information", N4uConstants.ICON_INFORMATION);

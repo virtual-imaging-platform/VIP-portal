@@ -63,7 +63,8 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @param jobFile the jobFIle path
      * @param expressFile the expressFile path
      * @see FileProcessService
-     * @return table of int first value is the number of inputs et the second valu is the number of input file.
+     * @return table of int first value is the number of inputs et the second
+     * valu is the number of input file.
      * @throws N4uException
      */
     @Override
@@ -121,10 +122,10 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
     public List<String[]> parseXmlFile(String xmlFile) throws N4uException {
 
         List<String[]> listInputs = new ArrayList<String[]>();
-         String localXmlFilePath=null;
+        String localXmlFilePath = null;
         try {
             localXmlFilePath = CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(getSessionUser(), xmlFile), Server.getInstance().getN4uApplicationFilesRepository());
-            } catch (CoreException ex) {
+        } catch (CoreException ex) {
             logger.error(ex);
             throw new N4uException(ex);
         } catch (DataManagerException ex) {
@@ -134,8 +135,8 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             logger.error(ex);
             throw new N4uException(ex);
         }
-        
-        
+
+
         try {
 
             File fXmlFile = new File(localXmlFilePath);
@@ -144,8 +145,8 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             Document doc = dBuilder.parse(fXmlFile);
             doc.getDocumentElement().normalize();
             String[] NameDesc = new String[2];
-            NameDesc[0]=doc.getDocumentElement().getAttribute("name");
-            NameDesc[1]=doc.getElementsByTagName("description").item(0).getTextContent();
+            NameDesc[0] = doc.getDocumentElement().getAttribute("name");
+            NameDesc[1] = doc.getElementsByTagName("description").item(0).getTextContent();
             listInputs.add(NameDesc);
             NodeList descr = doc.getElementsByTagName("input");
             NodeList nList = doc.getElementsByTagName("input");
@@ -153,7 +154,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             for (int temp = 0; temp < nList.getLength(); temp++) {
 
                 Node nNode = nList.item(temp);
-                
+
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                     String[] value = new String[4];
@@ -166,67 +167,24 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
                     listInputs.add(value);
                 }
             }
-            /*
-        try {
-           
-            Scanner scanner = new Scanner(new FileInputStream(localXmlFilePath));
-            String ligne = scanner.nextLine();
 
+            return listInputs;
 
-            do {
-                ligne = scanner.nextLine();
-
-            } while (!ligne.contains("<inputs>"));
-            String readInputs = ligne;
-
-            do {
-                ligne = scanner.nextLine();
-                readInputs = readInputs + ligne;
-
-            } while (!ligne.contains("</inputs>"));
-            readInputs = readInputs + ligne.substring(0, ligne.indexOf("</inputs>"));
-
-
-            String[] inputs = readInputs.split("</input>");
-
-
-            //don't take last string 
-            for (int i = 0; i < inputs.length - 1; i++) {
-                int beginDes = inputs[i].indexOf("<description>");
-                int endDes = inputs[i].indexOf("</description>");
-                String description = inputs[i].substring(beginDes + 13, endDes);
-                String[] values = inputs[i].split("\"");
-                String[] value = new String[4];
-                value[0] = values[1];//NAME
-                value[1] = parseTypeSupported(values[3]);;
-                value[2] = values[5];//required
-                value[3] = description;
-                listInputs.add(value);
-
-
-
-            }
-             
-        } catch (FileNotFoundException ex) {
-            throw new N4uException(ex);
-        }
-        * */
-        return listInputs;
-
-    }   catch (ParserConfigurationException ex) {
+        } catch (ParserConfigurationException ex) {
             logger.error(ex);
             throw new N4uException(ex);
         } catch (SAXException ex) {
-          logger.error(ex);
+            logger.error(ex);
             throw new N4uException(ex);
         } catch (IOException ex) {
-           logger.error(ex);
+            logger.error(ex);
             throw new N4uException(ex);
         }
     }
 
     /**
-     *method to generate the script file of the application
+     * method to generate the script file of the application
+     *
      * @param listInput
      * @param listOutput
      * @param wrapperScriptPath
@@ -260,7 +218,8 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
     }
 
     /**
-     *method to generate the Gwendia file of the application 
+     * method to generate the Gwendia file of the application
+     *
      * @param listInput
      * @param listOutput
      * @param wrapperScriptPath
@@ -296,7 +255,8 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
     }
 
     /**
-     *method to generate the Gasw file of the application
+     * method to generate the Gasw file of the application
+     *
      * @param listInput
      * @param listOutput
      * @param wrapperScriptPath

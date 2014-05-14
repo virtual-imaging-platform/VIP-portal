@@ -11,7 +11,11 @@ import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
  * @author nouha
  */
 public class LayoutOutput extends AbstractFormLayout {
-
+/**
+ * 
+ * @param width
+ * @param height 
+ */
     public LayoutOutput(String width, String height) {
         super(width, height);
         this.addTitle("Outputs", N4uConstants.ICON_OUTPUT);

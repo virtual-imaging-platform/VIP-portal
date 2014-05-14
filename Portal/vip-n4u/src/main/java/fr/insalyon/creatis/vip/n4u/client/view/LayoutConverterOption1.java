@@ -26,13 +26,14 @@ import fr.insalyon.creatis.vip.n4u.client.rpc.FileProcessService;
  *
  * @author nouha
  */
-   public class LayoutConverterOption1  extends AbstractFormLayout {
+public class LayoutConverterOption1 extends AbstractFormLayout {
+
     private TextItem express;
     private TextItem job;
     private TextItem script;
     private TextItem ext;
     private TextItem env;
-    private TextItem title; 
+    private TextItem title;
     private DynamicForm expressItemForm;
     private DynamicForm jobItemForm;
     private DynamicForm scriptItemForm;
@@ -48,19 +49,31 @@ import fr.insalyon.creatis.vip.n4u.client.rpc.FileProcessService;
     Label environementLabel;
     N4uImportTab tabImporter;
 
-    public LayoutConverterOption1(String width, String height) {   
+    /**
+     *
+     * @param width
+     * @param height
+     */
+    public LayoutConverterOption1(String width, String height) {
         super(width, height);
         this.setTitle("sdfdsdd");
-         configure();
+        configure();
     }
-    
-    
+
+    /**
+     *
+     * @param width
+     * @param height
+     */
     public LayoutConverterOption1(int width, int height) {
         super(width, height);
         configure();
     }
-    
-    private void configure(){
+
+    /**
+     *
+     */
+    private void configure() {
         titleLabel = new Label("<strong>Application Name </strong> <font color=red>(*)</font>");
         titleLabel.setHeight(20);
 
@@ -162,7 +175,7 @@ import fr.insalyon.creatis.vip.n4u.client.rpc.FileProcessService;
                             tabImporter = new N4uImportTab();
                             Layout.getInstance().addTab(tabImporter);
                             tabImporter.addfiels("Application Name <font color=red>(*)</font>", false, title.getValueAsString(), false);
-                            tabImporter.addFielDescription("Documentation and Terms of Use");
+                            tabImporter.addFielDescription("Documentation and Terms of Use","");
                             tabImporter.addFielsInputs(true, "results-directory ", "Directory where the results will be stored", N4uImportTab.InputType.Parameter.name(), true);
                             tabImporter.addFielsInputs(true, "job name", "A string identifying the job name", N4uImportTab.InputType.Parameter.name(), false);
                             for (int i = 1; i < (int) result[0]; i++) {
@@ -207,10 +220,8 @@ import fr.insalyon.creatis.vip.n4u.client.rpc.FileProcessService;
         this.addMember(envItemForm);
         this.addMember(importButton);
 
-    
-    
-    
+
+
+
     }
-    
-    
 }

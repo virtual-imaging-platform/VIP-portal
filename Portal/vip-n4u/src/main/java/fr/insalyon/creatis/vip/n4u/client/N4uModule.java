@@ -11,7 +11,10 @@ package fr.insalyon.creatis.vip.n4u.client;
 import fr.insalyon.creatis.vip.core.client.Module;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.n4u.client.view.N4uHomeParser;
-
+/**
+ * 
+ * @author nouha
+ */
 public class N4uModule extends Module {
 
     @Override

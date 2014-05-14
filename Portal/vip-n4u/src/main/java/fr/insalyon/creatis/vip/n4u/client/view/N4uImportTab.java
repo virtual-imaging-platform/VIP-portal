@@ -270,7 +270,10 @@ public class N4uImportTab extends Tab {
 
         createApplicationButton.setWidth("150");
     }
-
+/**
+ * 
+ * @param lfn 
+ */
     private void addApplication(final String lfn) {
         final List<String> applicationClasses = new ArrayList<String>();
 
@@ -320,7 +323,12 @@ public class N4uImportTab extends Tab {
             }
         };
     }
-
+/**
+ * 
+ * @param newVersion
+ * @param newApplication
+ * @param maxVersion 
+ */
     private void createGwendiaFile(final boolean newVersion, final boolean newApplication, final String maxVersion) {
         final AsyncCallback<String> callback1 = new AsyncCallback<String>() {
             @Override
@@ -373,7 +381,12 @@ public class N4uImportTab extends Tab {
 
 
     }
-
+/**
+ * 
+ * @param newVersion
+ * @param newApplication
+ * @param maxVersion 
+ */
     private void createGaswFile(final boolean newVersion, final boolean newApplication, final String maxVersion) {
 
 
@@ -396,7 +409,12 @@ public class N4uImportTab extends Tab {
         FileProcessService.Util.getInstance().generateGaswFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, descriptionValue, callback);
 
     }
-
+/**
+ * 
+ * @param newVersion
+ * @param newApplication
+ * @param maxVersion 
+ */
     private void createScriptFile(final boolean newVersion, final boolean newApplication, final String maxVersion) {
 
         final AsyncCallback<Void> callback2 = new AsyncCallback<Void>() {
@@ -741,7 +759,7 @@ public class N4uImportTab extends Tab {
 
     }
 
-    public void addFielDescription(String title) {
+    public void addFielDescription(String title,String value) {
         Label itemLabel = new Label("<strong>" + title + "</strong>");
         itemLabel.setHeight(20);
 
@@ -754,12 +772,14 @@ public class N4uImportTab extends Tab {
                 }
             }
         });
+       
         description.setHeight("40%");
         description.setWidth("100%");
         description.setOverflow(Overflow.HIDDEN);
         description.setShowEdges(true);
         description.setControlGroups("styleControls", "editControls",
                 "colorControls");
+         description.setValue(value);
         layoutGeneralInformation.addMember(itemLabel);
         layoutGeneralInformation.addMember(description);
     }

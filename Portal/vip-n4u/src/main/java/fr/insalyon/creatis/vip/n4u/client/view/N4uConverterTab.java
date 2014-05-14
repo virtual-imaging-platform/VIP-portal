@@ -43,7 +43,9 @@ public class N4uConverterTab extends Tab {
     private LayoutConverterOption1 layoutOption1;
     private LayoutConverterOption2 layoutOption2;
     final TabSet topTabSet;
-
+/**
+ * 
+ */
     public N4uConverterTab() {
         topTabSet = new TabSet(); 
         this.setTitle(Canvas.imgHTML(N4uConstants.ICON_EXPRESSLANE1) + " ExpressLane2VIP");
@@ -53,6 +55,9 @@ public class N4uConverterTab extends Tab {
         configure();
         this.setPane(topTabSet);
     }
+    /**
+     * 
+     */
 
     public void configure() {
          
