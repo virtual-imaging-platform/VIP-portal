@@ -56,7 +56,6 @@ public class LayoutConverterOption1 extends AbstractFormLayout {
      */
     public LayoutConverterOption1(String width, String height) {
         super(width, height);
-        this.setTitle("sdfdsdd");
         configure();
     }
 

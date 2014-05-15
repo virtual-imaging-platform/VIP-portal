@@ -46,7 +46,7 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public void gassFile(ArrayList listInput, ArrayList listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir) throws VelocityException {
+    public void gassFile(ArrayList listInput, ArrayList listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir,String date) throws VelocityException {
         Template t = ve.getTemplate("vm/gass.vm");
         VelocityContext context = new VelocityContext();
         context.put("inputList", listInput);
@@ -56,7 +56,7 @@ public class Velocity implements VelocityProcess {
         context.put("gassValue", applicationLocation + "/bin/" + applicationName + "_wrapper.sh");
         StringWriter writer = new StringWriter();
         t.merge(context, writer);
-        final String chemin = dir + "/" + applicationName + ".xml";
+        final String chemin = dir + "/" + applicationName +"_"+date+ ".xml";
         final File fichier = new File(chemin);
 
         try {
@@ -81,7 +81,7 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public void wrapperScriptFile(ArrayList listInput, ArrayList listOutput, String applicationName, String scriptFile, String applicationLocation, String dir) throws VelocityException {
+    public void wrapperScriptFile(ArrayList listInput, ArrayList listOutput, String applicationName, String scriptFile, String applicationLocation, String dir,String date) throws VelocityException {
 
         int lastIndex = scriptFile.lastIndexOf("/");
         String script = scriptFile.substring(lastIndex + 1);
@@ -93,7 +93,7 @@ public class Velocity implements VelocityProcess {
         context.put("outputList", listOutput);
         StringWriter writer = new StringWriter();
         t.merge(context, writer);
-        final String chemin = dir + "/" + applicationName + "_wrapper.sh";
+        final String chemin = dir + "/" + applicationName+"_"+date+ "_wrapper.sh";
         final File fichier = new File(chemin);
         try {
             createFile(fichier, writer);
@@ -118,7 +118,7 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public String gwendiaFile(ArrayList listInput, ArrayList listOutput, String applicationName, String description, String applicationLocation, String dir) throws VelocityException {
+    public String gwendiaFile(ArrayList listInput, ArrayList listOutput, String applicationName, String description, String applicationLocation, String dir,String date) throws VelocityException {
         Template t = ve.getTemplate("vm/gwendia.vm");
         final String gaswDescriptor = applicationLocation + "/gasw" + "/" + applicationName + ".xml";
         VelocityContext context = new VelocityContext();
@@ -134,7 +134,7 @@ public class Velocity implements VelocityProcess {
         context.put("gaswDescriptor", gaswDescriptor);
         StringWriter writer = new StringWriter();
         t.merge(context, writer);
-        final String chemin = dir + "/" + applicationName + ".gwendia";
+        final String chemin = dir + "/" + applicationName +"_"+date+ ".gwendia";
 
         final File fichier = new File(chemin);
 
@@ -165,6 +165,7 @@ public class Velocity implements VelocityProcess {
             in = new FileInputStream(source).getChannel();
             out = new FileOutputStream(dest).getChannel();
             in.transferTo(0, in.size(), out);
+            
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
