@@ -5,12 +5,7 @@
 package fr.insalyon.creatis.vip.n4u.server.velocity;
 
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
-import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-import fr.insalyon.creatis.vip.n4u.client.view.N4uConstants;
-import fr.insalyon.creatis.vip.n4u.server.FileProcessServiceImpl;
-import fr.insalyon.creatis.vip.n4u.client.rpc.N4uException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,21 +14,14 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.runtime.RuntimeConstants;
-import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.jsoup.Jsoup;
 
 /**
  *
- * @author nouha Boujelben
+ * @author Nouha Boujelben
  */
 public class Velocity implements VelocityProcess {
 
@@ -218,6 +206,7 @@ public class Velocity implements VelocityProcess {
     }
 
     /**
+     * parse a html string to text
      *
      * @param html
      * @return

@@ -12,6 +12,7 @@ import java.util.ArrayList;
  * @author Nouha boujelben
  */
 public interface VelocityProcess {
+
     public void gassFile(ArrayList listInput, ArrayList listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir) throws VelocityException;
 
     public void wrapperScriptFile(ArrayList listInput, ArrayList listOutput, String applicationName, String scriptFile, String applicationLocation, String dir) throws VelocityException;

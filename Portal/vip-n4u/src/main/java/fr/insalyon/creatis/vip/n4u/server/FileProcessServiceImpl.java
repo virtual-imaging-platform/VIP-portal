@@ -64,7 +64,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @param expressFile the expressFile path
      * @see FileProcessService
      * @return table of int first value is the number of inputs et the second
-     * valu is the number of input file.
+     * value is the number of input file.
      * @throws N4uException
      */
     @Override
@@ -293,7 +293,8 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
     /**
      * *
      *
-     * @return @throws N4uException
+     * @return 
+     * @throws N4uException
      */
     @Override
     public String getApplicationClass() throws N4uException {

@@ -24,7 +24,7 @@ import fr.insalyon.creatis.vip.n4u.client.rpc.FileProcessService;
 
 /**
  *
- * @author nouha
+ * @author Nouha Boujelben
  */
 public class LayoutConverterOption1 extends AbstractFormLayout {
 

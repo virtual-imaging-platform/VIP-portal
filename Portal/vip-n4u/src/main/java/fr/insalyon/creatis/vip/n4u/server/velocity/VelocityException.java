@@ -9,17 +9,19 @@ package fr.insalyon.creatis.vip.n4u.server.velocity;
  * @author Nouha Boujelben
  */
 public class VelocityException extends Exception {
-/**
- * 
- * @param message 
- */
+
+    /**
+     *
+     * @param message
+     */
     public VelocityException(String message) {
         super(message);
     }
-/**
- * 
- * @param cause 
- */
+
+    /**
+     *
+     * @param cause
+     */
     public VelocityException(Throwable cause) {
         super(cause);
     }
