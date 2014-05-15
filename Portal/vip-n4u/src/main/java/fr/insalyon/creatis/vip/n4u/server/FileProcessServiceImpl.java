@@ -204,7 +204,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + generateTime);
             theDir.mkdirs();
             String dir = theDir.getAbsolutePath();
-            new Velocity().wrapperScriptFile(listInput, listOutput, applicationName, scriptFile, applicationRealLocation, dir);
+            new Velocity().wrapperScriptFile(listInput, listOutput, applicationName, scriptFile, applicationRealLocation, dir,generateTime);
         } catch (CoreException ex) {
             logger.error(ex);
             throw new N4uException(ex);
@@ -239,7 +239,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + generateTime);
             theDir.mkdirs();
             String dir = theDir.getAbsolutePath();
-            return new Velocity().gwendiaFile(listInput, listOutput, applicationName, description, applicationRealLocation, dir);
+            return new Velocity().gwendiaFile(listInput, listOutput, applicationName, description, applicationRealLocation, dir,generateTime);
         } catch (CoreException ex) {
             logger.error(ex);
             throw new N4uException(ex);
@@ -277,7 +277,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             theDir.mkdirs();
             // if the directory does not exist, create it
             String dir = theDir.getAbsolutePath();
-            new Velocity().gassFile(listInput, listOutput, applicationName, wrapperScriptPath, applicationRealLocation, dir);
+            new Velocity().gassFile(listInput, listOutput, applicationName, wrapperScriptPath, applicationRealLocation, dir,generateTime);
         } catch (CoreException e) {
             logger.error(e);
             throw new N4uException(e);
