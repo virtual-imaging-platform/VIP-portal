@@ -33,17 +33,6 @@ public class N4uHomeParser extends ApplicationParser {
             Layout.getInstance().addTab(new N4uConverterTab());
             return true;
         }
-
-        /**
-         * } else if (applicationName.equals(QueryConstants.APP_QUERYHISTORY)) {
-         * Layout.getInstance().addTab(new QueryHistoryTab());
-         *
-         * return true; } else if
-         * (applicationName.equals(QueryConstants.APP_QUERYEXPLORER)) {
-         * Layout.getInstance().addTab(new QueryExplorerTab());
-         *
-         * return true; } *
-         */
         return false;
     }
 }

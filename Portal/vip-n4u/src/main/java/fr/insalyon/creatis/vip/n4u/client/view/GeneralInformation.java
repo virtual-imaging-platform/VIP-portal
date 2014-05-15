@@ -8,7 +8,7 @@ import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 
 /**
  *
- * @author nouha
+ * @author Nouha Boujelben
  */
 public class GeneralInformation extends AbstractFormLayout {
 
