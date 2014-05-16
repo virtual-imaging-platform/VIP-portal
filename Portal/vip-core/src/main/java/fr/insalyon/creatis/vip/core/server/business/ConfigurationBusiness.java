@@ -76,8 +76,8 @@ public class ConfigurationBusiness {
 
         try {
             logger.info("Configuring VIP server proxy.");
-            ProxyClient myproxy = new ProxyClient();
-            myproxy.getProxy();
+            //ProxyClient myproxy = new ProxyClient();
+            //myproxy.getProxy();
 
         } catch (Exception ex) {
             logger.error(ex);
@@ -132,12 +132,12 @@ public class ConfigurationBusiness {
 
         boolean existUndesiredMailDomain = false;
         for (String udm : Server.getInstance().getUndesiredMailDomains()) {
-            if (user.getEmail().contains(udm)) {
+            if (user.getEmail().endsWith(udm)) {
                 existUndesiredMailDomain = true;
             }
         }
         if (existUndesiredMailDomain) {
-            logger.info("Undesired Mail Domain");
+            logger.info("Undesired Mail Domain for "+user.getEmail());
             throw new BusinessException("Undesired Mail Domain");
         } else {
 
