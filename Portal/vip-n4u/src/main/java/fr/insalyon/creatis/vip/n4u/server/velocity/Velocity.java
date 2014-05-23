@@ -6,6 +6,7 @@ package fr.insalyon.creatis.vip.n4u.server.velocity;
 
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,6 +15,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -46,7 +49,7 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public void gassFile(ArrayList listInput, ArrayList listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir,String date) throws VelocityException {
+    public void gassFile(ArrayList listInput, ArrayList listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir,String date,String sandboxFile,String environementFile) throws VelocityException {
         Template t = ve.getTemplate("vm/gass.vm");
         VelocityContext context = new VelocityContext();
         context.put("inputList", listInput);
@@ -54,6 +57,33 @@ public class Velocity implements VelocityProcess {
         context.put("applicationName", applicationName);
         context.put("applicationLocation", applicationLocation);
         context.put("gassValue", applicationLocation + "/bin/" + applicationName + "_wrapper.sh");
+        
+        
+        
+            if(!sandboxFile.isEmpty()){
+                try {
+            CoreUtil.getGRIDAClient().rename(sandboxFile,applicationLocation + "/bin/" + sandboxFile.substring(sandboxFile.lastIndexOf("/")+1) );
+                } catch (GRIDAClientException ex) { 
+            logger.error(ex);
+            throw new VelocityException(ex);
+        }
+            }
+            if(!environementFile.isEmpty()){
+                 try {
+            CoreUtil.getGRIDAClient().rename(environementFile,applicationLocation + "/bin/" + environementFile.substring(environementFile.lastIndexOf("/")+1));
+                     } catch (GRIDAClientException ex) { 
+            logger.error(ex);
+            throw new VelocityException(ex);
+        }
+            }
+            
+        
+        if (!sandboxFile.isEmpty()) {
+            context.put("sandboxFile", applicationLocation + "/bin/" + sandboxFile.substring(sandboxFile.lastIndexOf("/")+1));
+        }
+        if (!environementFile.isEmpty()) {
+            context.put("environementFile", applicationLocation + "/bin/" + environementFile.substring(environementFile.lastIndexOf("/")+1));
+        }
         StringWriter writer = new StringWriter();
         t.merge(context, writer);
         final String chemin = dir + "/" + applicationName +"_"+date+ ".xml";
@@ -81,16 +111,26 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public void wrapperScriptFile(ArrayList listInput, ArrayList listOutput, String applicationName, String scriptFile, String applicationLocation, String dir,String date) throws VelocityException {
+    public void wrapperScriptFile(ArrayList listInput, ArrayList listOutput, String applicationName, String scriptFile, String applicationLocation,String environementFile, String dir,String date) throws VelocityException {
 
         int lastIndex = scriptFile.lastIndexOf("/");
         String script = scriptFile.substring(lastIndex + 1);
+        String env;
+        if(!environementFile.isEmpty()){
+         env=environementFile.substring(environementFile.lastIndexOf("/")+1);}
+        else{
+         env=environementFile;
+        }
         Template t = ve.getTemplate("vm/wrapper_script.vm");
         VelocityContext context = new VelocityContext();
         context.put("inputList", listInput);
         context.put("number", listInput.size() + listOutput.size());
         context.put("scriptFile", script);
         context.put("outputList", listOutput);
+        if (!env.isEmpty()) {
+            context.put("env", env);
+        } 
+        
         StringWriter writer = new StringWriter();
         t.merge(context, writer);
         final String chemin = dir + "/" + applicationName+"_"+date+ "_wrapper.sh";

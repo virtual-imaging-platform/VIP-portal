@@ -19,11 +19,11 @@ public interface FileProcessServiceAsync {
 
     public void parseXmlFile(String xmlFile, AsyncCallback<List<String[]>> callback);
 
-    public void generateScriptFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, AsyncCallback<Void> callback);
+    public void generateScriptFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation,String environementFile, String description, AsyncCallback<Void> callback);
 
     public void generateGwendiaFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, AsyncCallback<String> callback);
 
-    public void generateGaswFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, AsyncCallback<Void> callback);
+    public void generateGaswFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description,String sandboxFile,String environementFile, AsyncCallback<Void> callback);
 
     public void getApplicationClass(AsyncCallback<String> callback);
 }

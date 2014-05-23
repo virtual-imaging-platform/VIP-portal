@@ -34,11 +34,11 @@ public interface FileProcessService extends RemoteService {
    
     List<String[]> parseXmlFile(String xmlFile) throws N4uException;
     
-    void generateScriptFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException;
+    void generateScriptFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation,String environementFile, String description) throws N4uException;
 
     String generateGwendiaFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException;
 
-    void generateGaswFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException;
+    void generateGaswFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description,String sandboxFile,String environementFile) throws N4uException;
 
     String getApplicationClass() throws N4uException;
 }

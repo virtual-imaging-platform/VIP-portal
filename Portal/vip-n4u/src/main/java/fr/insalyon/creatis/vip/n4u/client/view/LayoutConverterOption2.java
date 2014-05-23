@@ -103,7 +103,7 @@ public class LayoutConverterOption2 extends AbstractFormLayout {
 
                             for (int i = 0; i < result.size(); i++) {
                                 if (i == 0) {
-                                    tabImporter.addfiels("Application Name <font color=red>(*)</font>", false,result.get(i)[0] , false);
+                                    tabImporter.addfiels("Application Name <font color=red>(*)</font>", false,result.get(i)[0] , false,true);
                                     tabImporter.addFielDescription("Documentation and Terms of Use",result.get(i)[1]);
                                     tabImporter.addFielsInputs(true, "results-directory ", "Directory where the results will be stored", N4uImportTab.InputType.Parameter.name(), true);
                                     tabImporter.addFielsInputs(true, "job name", "A string identifying the job name", N4uImportTab.InputType.Parameter.name(), false);
@@ -117,8 +117,10 @@ public class LayoutConverterOption2 extends AbstractFormLayout {
                             }
 
                             tabImporter.addFielsOutput(true, "result", "A tar.gz file containing the results", N4uImportTab.InputType.File.name(), true);
-                            tabImporter.addfiels("Main Executable <font color=red>(*)</font>", true, "", false);
-                            tabImporter.addfiels("Application Location <font color=red>(*)</font>", true, "", false);
+                            tabImporter.addfiels("Main Executable <font color=red>(*)</font>", true, "", false,true);
+                            tabImporter.addfiels("Application Location <font color=red>(*)</font>", true, "", false,true);
+                            tabImporter.addfiels("Environement File", true,"", false,false);
+                            tabImporter.addfiels("Sandbox File", true, "", false,false);
                             tabImporter.addLaunchButton();
 
                         }
