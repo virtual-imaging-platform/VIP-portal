@@ -100,8 +100,11 @@ public class N4uImportTab extends Tab {
     int j = 0;
     String scriptFileName;
     String applicationName;
+    String sandbox="";
+    String environementFile="";
     String descriptionValue = null;
     String applicationLocation;
+   
 
     public N4uImportTab() {
 
@@ -177,7 +180,7 @@ public class N4uImportTab extends Tab {
             public void onClick(ClickEvent event) {
                 boolean go = true;
                 for (TextItem i : listItems) {
-                    if (!i.validate() || i.getValueAsString() == "" || i.getValueAsString() == null) {
+                        if (!i.validate()|| i.getValueAsString() == null) {
                         go = false;
                         Layout.getInstance().setWarningMessage("There is an invalid Input");
                     }
@@ -346,28 +349,6 @@ public class N4uImportTab extends Tab {
                     versionn = versionn.add(new BigDecimal("0.1"));
                     String versionValue = String.valueOf(versionn);
                     ApplicationService.Util.getInstance().addVersion(new AppVersion(applicationName, versionValue, result1, true), getCallback("add Version"));
-                    /*
-                     final AsyncCallback<List<AppVersion>> callback = new AsyncCallback<List<AppVersion>>() {
-                     @Override
-                     public void onFailure(Throwable caught) {
-                     }
-
-                     @Override
-                     public void onSuccess(List<AppVersion> result) {
-                     List<BigDecimal> IntVersion = new ArrayList< BigDecimal>();
-                     for (AppVersion v : result) {
-                     IntVersion.add(new BigDecimal(v.getVersion()));
-                     }
-                     Collections.sort(IntVersion);
-                     BigDecimal versionn = IntVersion.get(IntVersion.size() - 1);
-                     String ver = String.valueOf(versionn);
-                     versionn = versionn.add(new BigDecimal("0.1"));
-                     versionValue = String.valueOf(versionn);
-                     ApplicationService.Util.getInstance().addVersion(new AppVersion(applicationName, versionValue, result1, true), getCallback("add Version"));
-                     }
-                        
-                     };
-                     **/
 
                 } else if (!newVersion && !newApplication) {
                     ApplicationService.Util.getInstance().updateVersion(new AppVersion(applicationName, maxVersion, result1, true), getCallback("update Version"));
@@ -409,7 +390,7 @@ public class N4uImportTab extends Tab {
             }
         };
 
-        FileProcessService.Util.getInstance().generateGaswFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, descriptionValue, callback);
+        FileProcessService.Util.getInstance().generateGaswFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, descriptionValue,sandbox,environementFile, callback);
 
     }
 
@@ -435,7 +416,7 @@ public class N4uImportTab extends Tab {
             }
         };
 
-        FileProcessService.Util.getInstance().generateScriptFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, descriptionValue, callback2);
+        FileProcessService.Util.getInstance().generateScriptFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation,environementFile, descriptionValue, callback2);
 
 
     }
@@ -701,14 +682,14 @@ public class N4uImportTab extends Tab {
     }
 
     //script, extention,env
-    public void addfiels(String title, boolean addBrowseIcon, String value, boolean disabled) {
+    public void addfiels(String title, boolean addBrowseIcon, String value, boolean disabled,boolean required) {
 
         Label itemLabel = new Label("<strong>" + title + "</strong>");
 
 
         itemLabel.setHeight(20);
 
-        final TextItem fieldItem = FieldUtil.getTextItem("*", false, "", "[0-9.,A-Za-z-+/_() ]", disabled);
+        final TextItem fieldItem = FieldUtil.getTextItem("*", false, "", "[0-9.,A-Za-z-+/_() ]", disabled,required);
         fieldItem.setValidators(ValidatorUtil.getStringValidator());
         fieldItem.setName("editable");
         fieldItem.setValue(value);
@@ -720,6 +701,18 @@ public class N4uImportTab extends Tab {
         titleItemForm.setWidth100();
         titleItemForm.setNumCols(1);
         titleItemForm.setFields(fieldItem);
+         if (title == "Environement File") {
+             environementFile = value;
+            fieldItem.addEditorExitHandler(new EditorExitHandler() {
+                @Override
+                public void onEditorExit(EditorExitEvent event) {
+
+                    environementFile = fieldItem.getValueAsString();
+                }
+            });
+
+        }
+       
 
         if (title == "Main Executable <font color=red>(*)</font>") {
             scriptFileName = value;
@@ -728,6 +721,18 @@ public class N4uImportTab extends Tab {
                 public void onEditorExit(EditorExitEvent event) {
 
                     scriptFileName = fieldItem.getValueAsString();
+                }
+            });
+
+        }
+        
+         if (title == "Sandbox File") {
+           
+            fieldItem.addEditorExitHandler(new EditorExitHandler() {
+                @Override
+                public void onEditorExit(EditorExitEvent event) {
+
+                    sandbox= fieldItem.getValueAsString();
                 }
             });
 
