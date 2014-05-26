@@ -42,15 +42,23 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.grid.ListGridField;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  *
@@ -62,6 +70,7 @@ public class EditVersionLayout extends AbstractFormLayout {
     private String applicationName;
     private Label applicationLabel;
     private TextItem versionField;
+    private SelectItem usersPickList;
     private TextItem lfnField;
     private CheckboxItem isVisibleField;
     private IButton saveButton;
@@ -79,13 +88,18 @@ public class EditVersionLayout extends AbstractFormLayout {
 
         newVersion = true;
         applicationLabel = WidgetUtil.getLabel("", 15);
-        
+
         versionField = FieldUtil.getTextItem(450, null);
         versionField.setDisabled(true);
+
+        usersPickList = new SelectItem();
+        usersPickList.setShowTitle(false);
+        usersPickList.setWidth(450);
+        usersPickList.setRequired(true);
         
         lfnField = FieldUtil.getTextItem(450, null);
         lfnField.setDisabled(true);
-        
+
         isVisibleField = new CheckboxItem();
         isVisibleField.setTitle("Visible");
         isVisibleField.setWidth(450);
@@ -93,46 +107,55 @@ public class EditVersionLayout extends AbstractFormLayout {
 
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent event) {
-                        if (versionField.validate() & lfnField.validate()) {
+            @Override
+            public void onClick(ClickEvent event) {
+                if (versionField.validate() & lfnField.validate()) {
+                    if (newVersion) {
+                        save(new AppVersion(applicationName, versionField.getValueAsString().trim(),
+                                lfnField.getValueAsString().trim(), isVisibleField.getValueAsBoolean()));
+                    } else {
+                        save(new AppVersion(applicationName, versionField.getValueAsString().trim(),
+                                lfnField.getValueAsString().trim(), usersPickList.getValueAsString(), isVisibleField.getValueAsBoolean()));
 
-                            save(new AppVersion(applicationName, versionField.getValueAsString().trim(),
-                                    lfnField.getValueAsString().trim(), isVisibleField.getValueAsBoolean()));
-                        }
                     }
-                });
+                }
+            }
+        });
         saveButton.setDisabled(true);
 
         removeButton = WidgetUtil.getIButton("Remove", CoreConstants.ICON_DELETE,
                 new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                SC.ask("Do you really want to remove this version?", new BooleanCallback() {
                     @Override
-                    public void onClick(ClickEvent event) {
-                        SC.ask("Do you really want to remove this version?", new BooleanCallback() {
-                            @Override
-                            public void execute(Boolean value) {
-                                if (value) {
-                                    remove(applicationName, versionField.getValueAsString().trim());
-                                }
-                            }
-                        });
+                    public void execute(Boolean value) {
+                        if (value) {
+                            remove(applicationName, versionField.getValueAsString().trim());
+                        }
                     }
                 });
+            }
+        });
         removeButton.setDisabled(true);
-        
+
         this.addMember(applicationLabel);
         addField("Version", versionField);
+        if (CoreModule.user.isSystemAdministrator()) {
+            this.addMember(WidgetUtil.getLabel("<b>Owner</b>", 15));
+            this.addMember(FieldUtil.getForm(usersPickList));
+        }
         addField("LFN", lfnField);
         this.addMember(FieldUtil.getForm(isVisibleField));
         addButtons(saveButton, removeButton);
     }
-    
+
     /**
-     * 
-     * @param version 
+     *
+     * @param version
      */
     private void save(AppVersion version) {
-        
+
         WidgetUtil.setLoadingIButton(saveButton, "Saving...");
 
         if (newVersion) {
@@ -141,7 +164,7 @@ public class EditVersionLayout extends AbstractFormLayout {
             ApplicationService.Util.getInstance().updateVersion(version, getCallback("update"));
         }
     }
-    
+
     /**
      * Removes an application.
      *
@@ -153,11 +176,11 @@ public class EditVersionLayout extends AbstractFormLayout {
         WidgetUtil.setLoadingIButton(removeButton, "Removing...");
         ApplicationService.Util.getInstance().removeVersion(applicationName, version, getCallback("remove"));
     }
-    
+
     /**
-     * 
+     *
      * @param text
-     * @return 
+     * @return
      */
     private AsyncCallback<Void> getCallback(final String text) {
 
@@ -173,45 +196,49 @@ public class EditVersionLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setVersion(null, null, true);
+                setVersion(null, null, null, true);
                 ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
                 tab.loadVersions(applicationName);
             }
         };
     }
-    
+
     /**
-     * 
-     * @param applicationName 
+     *
+     * @param applicationName
      */
     public void setApplication(String applicationName) {
-        
+
         this.applicationName = applicationName;
         this.applicationLabel.setContents("<b>Application:</b> " + applicationName);
         this.versionField.setDisabled(false);
         this.lfnField.setDisabled(false);
         this.saveButton.setDisabled(false);
     }
-    
+
     /**
      * Sets a version to edit or creates a blank form.
-     * 
+     *
      * @param version
-     * @param lfn 
-     * @param isVisible 
+     * @param lfn
+     * @param isVisible
      */
-    public void setVersion(String version, String lfn, boolean isVisible) {
+    public void setVersion(String version, String lfn, String owner, boolean isVisible) {
 
         if (version != null) {
+            usersPickList.setCanEdit(true);
             this.versionField.setValue(version);
             this.versionField.setDisabled(true);
             this.lfnField.setValue(lfn);
             this.isVisibleField.setValue(isVisible);
             this.newVersion = false;
+            loadUsers(owner);
             this.removeButton.setDisabled(false);
 
         } else {
+            usersPickList.setCanEdit(false);
+            usersPickList.setValue("");
             this.versionField.setValue("");
             this.versionField.setDisabled(false);
             this.lfnField.setValue("");
@@ -219,5 +246,34 @@ public class EditVersionLayout extends AbstractFormLayout {
             this.newVersion = true;
             this.removeButton.setDisabled(true);
         }
+    }
+
+    private void loadUsers(final String currentUser) {
+
+        final AsyncCallback<List<User>> callback = new AsyncCallback<List<User>>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to load users:<br />" + caught.getMessage());
+                usersPickList.setValues(currentUser);
+
+            }
+
+            @Override
+            public void onSuccess(List<User> result) {
+
+                LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
+
+                for (User user : result) {
+
+
+                    valueMap.put(user.getEmail(), user.getFirstName() + " " + user.getLastName());
+
+                }
+                usersPickList.setValueMap(valueMap);
+                usersPickList.setValue(currentUser);
+
+            }
+        };
+        ConfigurationService.Util.getInstance().getUsers(callback);
     }
 }

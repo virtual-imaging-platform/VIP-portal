@@ -85,7 +85,7 @@ public class ManageApplicationsTab extends AbstractManageTab {
         editLayout.setApplication(name, classes, citation);
     }
     
-    public void setVersion(String version, String lfn, boolean isVisible) {
-        editVersionLayout.setVersion(version, lfn, isVisible);
+    public void setVersion(String version, String lfn,String owner, boolean isVisible) {
+        editVersionLayout.setVersion(version, lfn, owner, isVisible);
     }
 }

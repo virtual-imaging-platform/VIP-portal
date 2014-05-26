@@ -319,20 +319,6 @@ public class ApplicationData implements ApplicationDAO {
         boolean exist;
         try {
             PreparedStatement ps;
-            /*= connection.prepareStatement("SELECT "
-             + "class "
-             + "FROM VIPApplicationClasses "
-             + "WHERE application=?");
-
-             ps.setString(1, applicationName);
-             ResultSet rs = ps.executeQuery();
-             List<String> classes = new ArrayList<String>();
-
-             while (rs.next()) {
-             classes.add(rs.getString("class"));
-             }
-             * **/
-
             ps = connection.prepareStatement("SELECT "
                     + "name "
                     + "FROM VIPApplications "
@@ -477,9 +463,9 @@ public class ApplicationData implements ApplicationDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "version, lfn, visible FROM "
-                    + "VIPAppVersions "
-                    + "WHERE application = ? "
+                    + "version, lfn,owner, visible,first_name,last_name FROM "
+                    + "VIPAppVersions v,VIPUsers u "
+                    + "WHERE application = ? AND v.owner=u.email  "
                     + "ORDER BY version");
             ps.setString(1, name);
 
@@ -489,7 +475,7 @@ public class ApplicationData implements ApplicationDAO {
             while (rs.next()) {
                 versions.add(new AppVersion(
                         name, rs.getString("version"),
-                        rs.getString("lfn"), rs.getBoolean("visible")));
+                        rs.getString("lfn"), rs.getString("owner"), rs.getString("first_name") + " " + rs.getString("last_name"), rs.getBoolean("visible")));
             }
             ps.close();
             return versions;
@@ -505,13 +491,14 @@ public class ApplicationData implements ApplicationDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO VIPAppVersions(application, version, lfn, visible) "
-                    + "VALUES (?, ?, ?, ?)");
+                    "INSERT INTO VIPAppVersions(application, version, lfn,owner, visible) "
+                    + "VALUES (?, ?, ?, ?,?)");
 
             ps.setString(1, version.getApplicationName());
             ps.setString(2, version.getVersion());
             ps.setString(3, version.getLfn());
-            ps.setBoolean(4, version.isVisible());
+            ps.setString(4, version.getOwner());
+            ps.setBoolean(5, version.isVisible());
             ps.execute();
             ps.close();
 
@@ -528,17 +515,18 @@ public class ApplicationData implements ApplicationDAO {
 
     @Override
     public void updateVersion(AppVersion version) throws DAOException {
-
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
                     + "VIPAppVersions "
-                    + "SET lfn=?, visible=? "
+                    + "SET lfn=?, visible=?, owner=? "
                     + "WHERE application=? AND version=?");
+
 
             ps.setString(1, version.getLfn());
             ps.setBoolean(2, version.isVisible());
-            ps.setString(3, version.getApplicationName());
-            ps.setString(4, version.getVersion());
+            ps.setString(3, version.getOwner());
+            ps.setString(4, version.getApplicationName());
+            ps.setString(5, version.getVersion());
             ps.executeUpdate();
             ps.close();
 
@@ -571,7 +559,7 @@ public class ApplicationData implements ApplicationDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "application, version, lfn, visible "
+                    + "application, version, lfn,owner, visible "
                     + "FROM VIPAppVersions WHERE "
                     + "application = ? AND version = ?");
             ps.setString(1, applicationName);
@@ -581,7 +569,7 @@ public class ApplicationData implements ApplicationDAO {
             rs.next();
 
             AppVersion version = new AppVersion(rs.getString("application"),
-                    rs.getString("version"), rs.getString("lfn"),
+                    rs.getString("version"), rs.getString("lfn"), rs.getString("owner"),
                     rs.getBoolean("visible"));
             ps.close();
 

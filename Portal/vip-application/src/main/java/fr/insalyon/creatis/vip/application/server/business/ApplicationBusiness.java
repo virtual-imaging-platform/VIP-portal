@@ -200,9 +200,9 @@ public class ApplicationBusiness {
     }
 
     /**
-     * 
+     *
      * @param version
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void addVersion(AppVersion version) throws BusinessException {
 
@@ -215,9 +215,9 @@ public class ApplicationBusiness {
     }
 
     /**
-     * 
+     *
      * @param version
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void updateVersion(AppVersion version) throws BusinessException {
 
@@ -230,10 +230,10 @@ public class ApplicationBusiness {
     }
 
     /**
-     * 
+     *
      * @param applicationName
      * @param version
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void removeVersion(String applicationName, String version) throws BusinessException {
 
@@ -269,6 +269,16 @@ public class ApplicationBusiness {
 
         try {
             return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getVersions(applicationName);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    public AppVersion getVersion(String applicationName, String applicationVersion)
+            throws BusinessException {
+
+        try {
+            return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getVersion(applicationName, applicationVersion);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
