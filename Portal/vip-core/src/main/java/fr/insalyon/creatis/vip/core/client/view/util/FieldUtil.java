@@ -72,7 +72,7 @@ public class FieldUtil {
         iconField.setImageWidth(12);
         iconField.setImageHeight(12);
         return iconField;
-       
+
     }
 
     /**
@@ -110,22 +110,21 @@ public class FieldUtil {
 
         DynamicForm form = new DynamicForm();
         form.setWidth100();
-       
+
         form.setFields(items);
         return form;
     }
-     public static DynamicForm getFormOneColumnResponsiveHeight(FormItem... items) {
+    public static DynamicForm getFormOneColumnResponsiveHeight(FormItem... items) {
 
         DynamicForm form = new DynamicForm();
         form.setWidth100();
-        form.setHeight("*"); 
+        form.setHeight("*");
         form.setNumCols(1);
         form.setFields(items);
         return form;
     }
-    
-    
-     public static DynamicForm getFormOneColumn(FormItem... items) {
+
+    public static DynamicForm getFormOneColumn(FormItem... items) {
 
         DynamicForm form = new DynamicForm();
         form.setWidth100();
@@ -145,8 +144,7 @@ public class FieldUtil {
 
         return getTextItem(size, false, "", keyPressFilter, false);
     }
-    
-    
+
     public static TextItem getTextItem(String size, String keyPressFilter) {
 
         return getTextItem(size, false, "", keyPressFilter, false);
@@ -202,7 +200,7 @@ public class FieldUtil {
         textItem.setRequired(true);
         textItem.setDisabled(disabled);
         textItem.addChangedHandler(new ChangedHandler() {
-
+            
             @Override
             public void onChanged(ChangedEvent event) {
                 event.getItem().validate();
@@ -211,7 +209,7 @@ public class FieldUtil {
 
         return textItem;
     }
-   
+
     public static TextItem getTextItem(String size, boolean showTitle, String title,
             String keyPressFilter, boolean disabled) {
 
@@ -224,7 +222,27 @@ public class FieldUtil {
         textItem.setRequired(true);
         textItem.setDisabled(disabled);
         textItem.addChangedHandler(new ChangedHandler() {
+            @Override
+            public void onChanged(ChangedEvent event) {
+                event.getItem().validate();
+            }
+        });
 
+        return textItem;
+    }
+
+    public static TextItem getTextItem(String size, boolean showTitle, String title,
+            String keyPressFilter, boolean disabled, boolean required) {
+
+        TextItem textItem = new TextItem();
+        textItem.setTitle(title);
+        textItem.setShowTitle(showTitle);
+        textItem.setWidth(size);
+        textItem.setKeyPressFilter(keyPressFilter);
+        textItem.setAlign(Alignment.LEFT);
+        textItem.setRequired(required);
+        textItem.setDisabled(disabled);
+        textItem.addChangedHandler(new ChangedHandler() {
             @Override
             public void onChanged(ChangedEvent event) {
                 event.getItem().validate();
@@ -236,12 +254,12 @@ public class FieldUtil {
 
     /**
      * Gets a PasswordItem configured according to the provided parameters.
-     * 
+     *
      * @param name Field name
      * @param title Title to be displayed
      * @param width Field size
      * @param length Field maximum length
-     * @return 
+     * @return
      */
     public static PasswordItem getPasswordItem(int width, int length) {
 
@@ -317,18 +335,18 @@ public class FieldUtil {
 
         return button;
     }
-    
+
     /**
      * Gets a Link Item according to the provided parameters.
-     * 
+     *
      * @param name
      * @param title
      * @param clickHandler
-     * @return 
+     * @return
      */
-    public static LinkItem getLinkItem(String name, String title, 
+    public static LinkItem getLinkItem(String name, String title,
             com.smartgwt.client.widgets.form.fields.events.ClickHandler clickHandler) {
-        
+
         LinkItem link = new LinkItem(name);
         link.setShowTitle(false);
         link.setLinkTitle(title);
