@@ -138,6 +138,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Adding version '" + version.getVersion() + "' ('" + version.getApplicationName() + "').");
+                version.setOwner(getSessionUser().getEmail());
                 applicationBusiness.addVersion(version);
             } else {
                 throw new ApplicationException("You have no administrator rights.");
@@ -155,6 +156,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Updating version '" + version.getVersion() + "' ('" + version.getApplicationName() + "').");
+                
                 applicationBusiness.updateVersion(version);
 
             } else {
@@ -467,5 +469,15 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
      public List<String>getAppletGateLabClasses() throws ApplicationException {
           return Server.getInstance().getAppletGateLabClasses();
       
+    }
+
+    @Override
+    public AppVersion getVersion(String applicationName, String applicationVersion) throws ApplicationException {
+       try {
+            return applicationBusiness.getVersion(applicationName,applicationVersion);
+
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
     }
 }
