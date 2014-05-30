@@ -72,7 +72,7 @@ public interface ConfigurationServiceAsync {
     public void removeGroup(String groupName, AsyncCallback<Void> asyncCallback);
 
     public void getGroups(AsyncCallback<List<Group>> asyncCallback);
-    
+
     public void getPublicGroups(AsyncCallback<List<Group>> asyncCallback);
 
     public void updateGroup(String name, Group group, AsyncCallback<Void> asyncCallback);
@@ -80,9 +80,8 @@ public interface ConfigurationServiceAsync {
     public void removeUser(String email, AsyncCallback<User> asyncCallback);
 
     public void getUserGroups(String email, AsyncCallback<Map<Group, CoreConstants.GROUP_ROLE>> asyncCallback);
-    
-    public void getUserPropertiesGroups(AsyncCallback<List<Boolean>> asyncCallback);    
 
+    public void getUserPropertiesGroups(AsyncCallback<List<Boolean>> asyncCallback);
 
     public void getUserGroups(AsyncCallback<List<String>> asyncCallback);
 
@@ -93,6 +92,8 @@ public interface ConfigurationServiceAsync {
     public void getUserData(AsyncCallback<User> asyncCallback);
 
     public void updateUser(User user, AsyncCallback<User> asyncCallback);
+
+    public void updateTermsOfUse(AsyncCallback<Void> asyncCallback);
 
     public void updateUserPassword(String currentPassword, String newPassword, AsyncCallback<Void> asyncCallback);
 
@@ -118,15 +119,15 @@ public interface ConfigurationServiceAsync {
     public void removeAccount(String name, AsyncCallback<Void> asyncCallback);
 
     public void getCASLoginPageUrl(AsyncCallback<String> asyncCallback);
-    
+
     public void getUsageStats(AsyncCallback<UsageStats> asyncCallback);
-    
+
     public void linkDropboxAccount(AsyncCallback<String> asyncCallback);
-    
+
     public void activateDropboxAccount(String oauth_token, AsyncCallback<Void> asyncCallback);
-    
+
     public void getDropboxAccountStatus(AsyncCallback<DropboxAccountStatus.AccountStatus> asyncCallback);
-    
+
     public void unlinkDropboxAccount(AsyncCallback<Void> asyncCallback);
 //    
 //    public void getPostParameters(AsyncCallback<Void> asyncCallback);

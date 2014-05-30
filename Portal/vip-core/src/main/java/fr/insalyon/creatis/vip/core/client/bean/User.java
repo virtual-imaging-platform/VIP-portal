@@ -36,6 +36,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -65,31 +66,10 @@ public class User implements IsSerializable {
     private int maxRunningSimulations;
     private CountryCode countryCode;
     private Map<Group, GROUP_ROLE> groups;
+    private Timestamp termsOfUse;
     private Boolean isgridfile;
-
-    public Boolean getIsgridfile() {
-        return isgridfile;
-    }
-
-    public void setIsgridfile(Boolean isgridfile) {
-        this.isgridfile = isgridfile;
-    }
-
-    public Boolean getIsgridjobs() {
-        return isgridjobs;
-    }
-
-    public void setIsgridjobs(Boolean isgridjobs) {
-        this.isgridjobs = isgridjobs;
-    }
     private Boolean isgridjobs;
     
-   
-
-    
-
-   
-
     public User() {
     }
 
@@ -97,21 +77,21 @@ public class User implements IsSerializable {
             String phone, UserLevel level, CountryCode countryCode) {
 
         this(firstName, lastName, email, institution, "", phone, false, "", "",
-                "", null, null, level, countryCode, 1);
+                "", null, null, level, countryCode, 1,null);
     }
 
     public User(String firstName, String lastName, String email, String institution,
             String password, String phone, CountryCode countryCode) {
 
         this(firstName, lastName, email, institution, password, phone, false,
-                "", "", "", new Date(), new Date(), null, countryCode, 1);
+                "", "", "", new Date(), new Date(), null, countryCode, 1,null);
     }
 
     public User(String firstName, String lastName, String email,
             String institution, String password, String phone, boolean confirmed,
             String code, String folder, String session, Date registration,
             Date lastLogin, UserLevel level, CountryCode countryCode, 
-            int maxRunningSimulations) {
+            int maxRunningSimulations,Timestamp termsOfUse) {
 
         this.firstName = firstName;
         this.lastName = lastName;
@@ -128,6 +108,7 @@ public class User implements IsSerializable {
         this.level = level;
         this.maxRunningSimulations = maxRunningSimulations;
         this.countryCode = countryCode;
+        this.termsOfUse=termsOfUse;
     }
 
     public boolean isConfirmed() {
@@ -234,6 +215,32 @@ public class User implements IsSerializable {
         this.groups = groups;
         
     }
+    
+     
+
+    public Timestamp getTermsOfUse() {
+        return termsOfUse;
+    }
+
+    public void setTermsOfUse(Timestamp termsOfUse) {
+        this.termsOfUse = termsOfUse;
+    }
+
+    public Boolean getIsgridfile() {
+        return isgridfile;
+    }
+
+    public void setIsgridfile(Boolean isgridfile) {
+        this.isgridfile = isgridfile;
+    }
+
+    public Boolean getIsgridjobs() {
+        return isgridjobs;
+    }
+
+    public void setIsgridjobs(Boolean isgridjobs) {
+        this.isgridjobs = isgridjobs;
+    }
 
     public boolean hasGroupAccess(String groupName) {
 
@@ -265,12 +272,13 @@ public class User implements IsSerializable {
         }
         return false;
     }
-
+    
+     public boolean hasAcceptTermsOfUse(){
+   return getTermsOfUse()!=null;
+       }
 
     public boolean hasGroups(){
         return groups.size() != 0;
-    }
-    
     
     public void getGroups() {
        

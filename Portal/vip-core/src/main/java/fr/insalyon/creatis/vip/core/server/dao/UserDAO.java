@@ -36,6 +36,7 @@ import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -74,6 +75,8 @@ public interface UserDAO {
     public void update(String email, UserLevel level, CountryCode countryCode, int maxRunningSimulations) throws DAOException;
     
     public void updateCode(String email, String code) throws DAOException;
+    
+     public void updateTermsOfUse(String email, Timestamp termsUse)throws DAOException;
     
     public void resetPassword(String email, String newPassword) throws DAOException;
     

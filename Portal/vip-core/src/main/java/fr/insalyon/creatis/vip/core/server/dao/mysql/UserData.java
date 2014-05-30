@@ -72,8 +72,8 @@ public class UserData implements UserDAO {
                     "INSERT INTO VIPUsers("
                     + "email, pass, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, registration, last_login, level, "
-                    + "country_code, max_simulations) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    + "country_code, max_simulations, termsUse) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getPassword());
@@ -89,12 +89,14 @@ public class UserData implements UserDAO {
             ps.setString(12, user.getLevel().name());
             ps.setString(13, user.getCountryCode().name());
             ps.setInt(14, user.getMaxRunningSimulations());
+            ps.setTimestamp(15, user.getTermsOfUse());
+
             ps.execute();
             ps.close();
 
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Duplicate entry")) {
-                logger.error("There is an existing account associated with the email: " + user.getEmail()+" or with this {first name,last name} ("+ex.getMessage()+")");
+                logger.error("There is an existing account associated with the email: " + user.getEmail() + " or with this {first name,last name} (" + ex.getMessage() + ")");
                 throw new DAOException("There is an existing account associated with this email or with this {first name,last name}.");
             } else {
                 logger.error(ex);
@@ -188,7 +190,7 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, session, registration, "
-                    + "last_login, level, country_code, max_simulations "
+                    + "last_login, level, country_code, max_simulations,termsUse "
                     + "FROM VIPUsers "
                     + "WHERE email=?");
 
@@ -206,7 +208,8 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations"));
+                        rs.getInt("max_simulations"),
+                        rs.getTimestamp("termsUse"));
 
                 ps.close();
                 return user;
@@ -232,7 +235,7 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, registration, last_login, "
-                    + "level, country_code, max_simulations "
+                    + "level, country_code, max_simulations,termsUse "
                     + "FROM VIPUsers "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
 
@@ -249,7 +252,7 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations")));
+                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse")));
             }
             ps.close();
             return users;
@@ -426,6 +429,25 @@ public class UserData implements UserDAO {
         }
     }
 
+    @Override
+    public void updateTermsOfUse(String email, Timestamp termsUse) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "VIPUsers SET termsUse = ? WHERE email = ?");
+
+            ps.setTimestamp(1, termsUse);
+            ps.setString(2, email);
+
+            ps.executeUpdate();
+            ps.close();
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
     /**
      *
      * @param session
@@ -439,7 +461,7 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, session, registration, "
-                    + "last_login, level, country_code, max_simulations "
+                    + "last_login, level, country_code, max_simulations,termsUse "
                     + "FROM VIPUsers "
                     + "WHERE session = ?");
 
@@ -457,7 +479,7 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations"));
+                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse"));
                 ps.close();
                 return user;
             }
@@ -482,7 +504,7 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, registration, last_login, "
-                    + "level, country_code, max_simulations "
+                    + "level, country_code, max_simulations,termsUse "
                     + "FROM VIPUsers WHERE level = ? "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
             ps.setString(1, UserLevel.Administrator.name());
@@ -500,7 +522,7 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations")));
+                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse")));
             }
             ps.close();
             return users;
