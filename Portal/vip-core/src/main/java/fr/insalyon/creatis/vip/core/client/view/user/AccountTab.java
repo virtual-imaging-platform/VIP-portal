@@ -46,12 +46,15 @@ import fr.insalyon.creatis.vip.core.client.view.user.account.GroupLayout;
 import fr.insalyon.creatis.vip.core.client.view.user.account.PasswordLayout;
 import fr.insalyon.creatis.vip.core.client.view.user.account.PersonalLayout;
 import fr.insalyon.creatis.vip.core.client.view.user.account.RemoveAccountLayout;
+import fr.insalyon.creatis.vip.core.client.view.user.account.TermsOfUseLayout;
 
 /**
  *
  * @author Rafael Silva
  */
 public class AccountTab extends Tab {
+
+    private TermsOfUseLayout layouttermsOfUse;
 
     public AccountTab() {
 
@@ -78,18 +81,23 @@ public class AccountTab extends Tab {
         VLayout rightLayout = new VLayout(15);
         rightLayout.setWidth("*");
         rightLayout.setHeight100();
-        
-        rightLayout.addMember(new GroupLayout());
-        
-        if(CoreModule.user.isSystemAdministrator()
-                || CoreModule.user.hasGroupAccess(CoreConstants.GROUP_DROPBOX))
-            rightLayout.addMember(new DropboxLayout());
-        
-        rightLayout.addMember(new RemoveAccountLayout());
 
+        rightLayout.addMember(new GroupLayout());
+
+        if (CoreModule.user.isSystemAdministrator()
+                || CoreModule.user.hasGroupAccess(CoreConstants.GROUP_DROPBOX)) {
+            rightLayout.addMember(new DropboxLayout());
+        }
+        layouttermsOfUse = new TermsOfUseLayout();
+        rightLayout.addMember(new RemoveAccountLayout());
+        rightLayout.addMember(layouttermsOfUse);
         hLayout.addMember(leftLayout);
         hLayout.addMember(rightLayout);
 
         this.setPane(hLayout);
+    }
+
+    public TermsOfUseLayout getLayouttermsOfUse() {
+        return layouttermsOfUse;
     }
 }

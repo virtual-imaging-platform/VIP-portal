@@ -61,6 +61,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
@@ -121,7 +122,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
         try {
             logger.info("Sign up request from '" + user.getEmail() + "'.");
-             configurationBusiness.signup(user, comments, accountType);
+            configurationBusiness.signup(user, comments, accountType);
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
@@ -338,8 +339,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             throw new CoreException(ex);
         }
     }
-    
-     /**
+
+    /**
      *
      * @return @throws CoreException
      */
@@ -347,7 +348,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public List<Group> getPublicGroups() throws CoreException {
 
         try {
-             return configurationBusiness.getPublicGroups();
+            return configurationBusiness.getPublicGroups();
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
@@ -399,20 +400,18 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             throw new CoreException(ex);
         }
     }
-  
-   
-   @Override
+
+    @Override
     public List<Boolean> getUserPropertiesGroups() throws CoreException {
         try {
-            String email=getSessionUser().getEmail();
+            String email = getSessionUser().getEmail();
             return configurationBusiness.getUserPropertiesGroups(email);
-            
+
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
     }
-
 
     /**
      *
@@ -543,10 +542,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      */
     public User setUserSession(User user) throws BusinessException {
 
-        return setUserSession(user,getSession());
-        
+        return setUserSession(user, getSession());
+
     }
-    
+
     public User setUserSession(User user, HttpSession session) throws BusinessException {
         Map<Group, GROUP_ROLE> groups = configurationBusiness.getUserGroups(user.getEmail());
         user.setGroups(groups);
@@ -752,30 +751,29 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     @Override
     public String linkDropboxAccount() throws CoreException {
-       trace(logger, "Linking Dropbox account.");
+        trace(logger, "Linking Dropbox account.");
         User user = getSessionUser();
-       //TODO: put this key pair in config file
-       AppKeyPair consumerTokenPair = new AppKeyPair("wqkjwy11upck7vi", "euieqqi699m3zu6");
-       WebAuthSession session = new WebAuthSession(consumerTokenPair, AccessType.APP_FOLDER);
+        //TODO: put this key pair in config file
+        AppKeyPair consumerTokenPair = new AppKeyPair("wqkjwy11upck7vi", "euieqqi699m3zu6");
+        WebAuthSession session = new WebAuthSession(consumerTokenPair, AccessType.APP_FOLDER);
         try {
             //TODO: put server URL instead
             WebAuthInfo wai = session.getAuthInfo("REDIRECT");
-            
+
             try {
-                String dir = Server.getInstance().getDataManagerUsersHome()+"/"+user.getFolder();
+                String dir = Server.getInstance().getDataManagerUsersHome() + "/" + user.getFolder();
                 CoreUtil.getGRIDAClient().createFolder(dir, "Dropbox");
-                CoreDAOFactory.getDAOFactory().getUserDAO().linkDropboxAccount(user.getEmail(), dir+"/Dropbox", wai.requestTokenPair.key, wai.requestTokenPair.secret);
+                CoreDAOFactory.getDAOFactory().getUserDAO().linkDropboxAccount(user.getEmail(), dir + "/Dropbox", wai.requestTokenPair.key, wai.requestTokenPair.secret);
             } catch (DAOException ex) {
                 throw new CoreException(ex);
-            }
-             catch (GRIDAClientException ex) {
+            } catch (GRIDAClientException ex) {
                 throw new CoreException(ex);
             }
             return wai.url;
         } catch (DropboxException ex) {
             throw new CoreException(ex);
         }
-       
+
     }
 
     @Override
@@ -802,7 +800,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     @Override
     public void unlinkDropboxAccount() throws CoreException {
-           trace(logger, "Unlinking Dropbox account.");
+        trace(logger, "Unlinking Dropbox account.");
         User user = getSessionUser();
         try {
             CoreDAOFactory.getDAOFactory().getUserDAO().unlinkDropboxAccount(user.getEmail());
@@ -811,6 +809,14 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         }
     }
 
-       
+    @Override
+    public void updateTermsOfUse() throws CoreException {
+        User user = getSessionUser();
+        try {
+            configurationBusiness.updateTermsOfUse(user.getEmail());
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
     }
-   
+}

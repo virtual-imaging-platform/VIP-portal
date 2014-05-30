@@ -96,7 +96,7 @@ public class SignInTab extends Tab {
         configureSigninLayout();
 
         injectMozillaPersonaScripts();
-        
+
         vLayout.addMember(personaImage);
         vLayout.addMember(orLayout);
         vLayout.addMember(signinLayout);
@@ -172,19 +172,19 @@ public class SignInTab extends Tab {
 
         LinkItem createAccount = FieldUtil.getLinkItem("link_create", "Create an account.",
                 new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-                    @Override
-                    public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-                        Layout.getInstance().addTab(new SignUpTab());
-                    }
-                });
+            @Override
+            public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
+                Layout.getInstance().addTab(new SignUpTab());
+            }
+        });
 
         LinkItem recoverAccount = FieldUtil.getLinkItem("link_reset", "Forgot your password?",
                 new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-                    @Override
-                    public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-                        Layout.getInstance().addTab(new RecoveryTab());
-                    }
-                });
+            @Override
+            public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
+                Layout.getInstance().addTab(new RecoveryTab());
+            }
+        });
 
         newForm = FieldUtil.getForm(createAccount, recoverAccount);
         newForm.setWidth(250);
@@ -255,12 +255,12 @@ public class SignInTab extends Tab {
     private void injectScript(final String url) {
         ScriptInjector.fromUrl(url).setCallback(
                 new Callback() {
-                    public void onFailure(Object reason) {
-                        Window.alert("Script load failed: " + url);
-                    }
+            public void onFailure(Object reason) {
+                Window.alert("Script load failed: " + url);
+            }
 
-                    public void onSuccess(Object result) {
-                    }
-                }).inject();
+            public void onSuccess(Object result) {
+            }
+        }).inject();
     }
 }

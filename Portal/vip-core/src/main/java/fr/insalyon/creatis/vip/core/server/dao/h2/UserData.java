@@ -189,7 +189,7 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, session, registration, "
-                    + "last_login, level, country_code, max_simulations "
+                    + "last_login, level, country_code, max_simulations,termsUse "
                     + "FROM VIPUsers "
                     + "WHERE email=?");
 
@@ -207,7 +207,7 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations"));
+                        rs.getInt("max_simulations"),rs.getTimestamp("termsUse"));
                  
                  ps.close();
                  return user;
@@ -233,7 +233,7 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, registration, last_login, "
-                    + "level, country_code, max_simulations"
+                    + "level, country_code, max_simulations,termsUse "
                     + "FROM VIPUsers "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
 
@@ -250,7 +250,7 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                         rs.getInt("max_simulations")));
+                         rs.getInt("max_simulations"),rs.getTimestamp("termsUse")));
             }
             ps.close();
             return users;
@@ -440,7 +440,7 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, session, registration, "
-                    + "last_login, level, country_code, max_simulations "
+                    + "last_login, level, country_code, max_simulations,termsUse "
                     + "FROM VIPUsers "
                     + "WHERE session = ?");
 
@@ -458,7 +458,7 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations"));
+                        rs.getInt("max_simulations"),rs.getTimestamp("termsUse"));
                 ps.close();
                 return user;
             }
@@ -483,7 +483,7 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, registration, last_login, "
-                    + "level, country_code, max_simulations "
+                    + "level, country_code, max_simulations,termsUse "
                     + "FROM VIPUsers WHERE level = ? "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
             ps.setString(1, UserLevel.Administrator.name());
@@ -501,7 +501,7 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations")));
+                        rs.getInt("max_simulations"),rs.getTimestamp("termsUse")));
             }
             ps.close();
             return users;
@@ -618,6 +618,24 @@ public class UserData implements UserDAO {
             throw new DAOException(ex);
         }
         return -1;
+    }
+ @Override
+    public void updateTermsOfUse(String email, Timestamp termsUse) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "VIPUsers SET termsUse = ? WHERE email = ?");
+
+            ps.setTimestamp(1, termsUse);
+            ps.setString(2, email);
+
+            ps.executeUpdate();
+            ps.close();
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
     }
 
     @Override

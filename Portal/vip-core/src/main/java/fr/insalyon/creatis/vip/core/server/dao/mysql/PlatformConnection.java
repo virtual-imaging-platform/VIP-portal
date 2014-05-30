@@ -114,6 +114,7 @@ public class PlatformConnection {
                     + "level VARCHAR(50), "
                     + "country_code VARCHAR(2), "
                     + "max_simulations int(11), "
+                    + "termsUse TIMESTAMP, "
                     + "PRIMARY KEY(email), UNIQUE KEY(first_name,last_name)")) {
 
                 Server server = Server.getInstance();
@@ -130,7 +131,7 @@ public class PlatformConnection {
                             server.getAdminPhone(), true,
                             UUID.randomUUID().toString(), folder, "",
                             new Date(), new Date(), UserLevel.Administrator,
-                            CountryCode.fr, 100));
+                            CountryCode.fr, 100, null));
 
                 } catch (DAOException ex) {
                     logger.error(ex);
@@ -146,7 +147,7 @@ public class PlatformConnection {
 
                 try {
                     CoreDAOFactory.getDAOFactory().getGroupDAO().add(
-                            new Group(CoreConstants.GROUP_SUPPORT, false,true,true));
+                            new Group(CoreConstants.GROUP_SUPPORT, false, true, true));
                 } catch (DAOException ex) {
                     logger.error(ex);
                 }

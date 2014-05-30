@@ -34,11 +34,27 @@
  */
 package fr.insalyon.creatis.vip.core.client;
 
+import com.google.gwt.user.client.Cookies;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Frame;
+import com.smartgwt.client.util.BooleanCallback;
+import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Button;
+import com.smartgwt.client.widgets.Dialog;
+import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.events.ButtonClickEvent;
+import com.smartgwt.client.widgets.events.ButtonClickHandler;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.events.CloseClickEvent;
+import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid;
@@ -51,6 +67,8 @@ import fr.insalyon.creatis.vip.core.client.view.main.SystemParser;
 import fr.insalyon.creatis.vip.core.client.view.main.SystemTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.user.AccountTab;
 import fr.insalyon.creatis.vip.core.client.view.user.UserMenuButton;
+import fr.insalyon.creatis.vip.core.client.view.user.account.TermsOfUseLayout;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.List;
 
 /**
@@ -77,7 +95,7 @@ public class CoreModule extends Module {
         homeTab.addTileGrid(generalTileGrid);
         if (user.isSystemAdministrator() || user.isGroupAdmin()) {
             systemTileGrid.addParser(new SystemParser());
-            homeTab.addTileGrid(systemTileGrid);   
+            homeTab.addTileGrid(systemTileGrid);
         }
 
         // Configure User's toolstrip        
@@ -85,11 +103,71 @@ public class CoreModule extends Module {
 
         // Home Tab
         Layout.getInstance().addTab(homeTab);
-        
+
         // For users with no group (e.g. they just signed in using Mozilla Persona)
-        if(!user.hasGroups())
-            Layout.getInstance().addTab(new AccountTab());
-        
+
+        if (!user.hasGroups() || !user.hasAcceptTermsOfUse()) {
+            final AccountTab accountTab = new AccountTab();
+            Layout.getInstance().addTab(accountTab);
+            if (!user.hasAcceptTermsOfUse()) {
+                final Dialog dialog = new Dialog();
+                dialog.setHeight("40%");
+                dialog.setWidth(500);
+                dialog.setTitle("Terms Of Use");
+                dialog.addCloseClickHandler(new CloseClickHandler() {
+                    @Override
+                    public void onCloseClick(CloseClickEvent event) {
+                        dialog.destroy();
+                        Layout.getInstance().signout();
+                    }
+                });
+                Button ok = new Button("OK");
+                Button cancel = new Button("Cancel");
+                Frame frame = new Frame("documentation/terms.html");
+                frame.setWidth("420");
+                Label l = new Label("You have to accept this terms of Use");
+                l.setHeight(100);
+                l.setWidth100();
+                dialog.setMembersMargin(2);
+                dialog.addItem(l);
+                dialog.addItem(frame);
+                dialog.setButtons(ok, cancel);
+                dialog.setIsModal(Boolean.TRUE);
+                cancel.addClickHandler(new ClickHandler() {
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        dialog.destroy();
+                        Layout.getInstance().signout();
+                    }
+                });
+                ok.addClickHandler(new ClickHandler() {
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        //mettre a jour le champs de la base de donner
+                        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+                        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+                            @Override
+                            public void onFailure(Throwable caught) {
+
+                                Layout.getInstance().setWarningMessage("can't update field terms of use" + caught.getMessage(), 10);
+
+                            }
+
+                            @Override
+                            public void onSuccess(Void result) {
+                                accountTab.getLayouttermsOfUse().load();
+                                dialog.destroy();
+                            }
+                        };
+                        service.updateTermsOfUse(callback);
+
+                    }
+                });
+
+                dialog.draw();
+            }
+        }
+
     }
 
     @Override
@@ -99,7 +177,6 @@ public class CoreModule extends Module {
         ToolStripButton helpButton = new ToolStripButton("Experiencing problems?");
         helpButton.setIcon(CoreConstants.ICON_HELP);
         helpButton.addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 Layout.getInstance().addTab(new ContactTab());
@@ -118,7 +195,7 @@ public class CoreModule extends Module {
 
     /**
      * Adds an application parser to the general tile grid.
-     * 
+     *
      * @param parser Application parser
      */
     public static void addGeneralApplicationParser(ApplicationParser parser) {
@@ -128,7 +205,7 @@ public class CoreModule extends Module {
 
     /**
      * Adds an application parser to the system tile grid.
-     * 
+     *
      * @param parser Application parser
      */
     public static void addSystemApplicationParser(ApplicationParser parser) {
@@ -138,23 +215,23 @@ public class CoreModule extends Module {
 
     /**
      * Adds a new applications tile grid to the home tab.
-     * 
-     * @param tileGrid 
+     *
+     * @param tileGrid
      */
     public static void addApplicationsTileGrid(ApplicationsTileGrid tileGrid) {
-       
+
         homeTab.addTileGrid(tileGrid);
-       
-         
+
+
     }
-    
+
     /**
      * Adds a layout to the home tab.
-     * 
-     * @param layout 
+     *
+     * @param layout
      */
     public static void addLayoutToHomeTab(VLayout layout) {
-        
+
         homeTab.addToRightLayout(layout);
     }
 

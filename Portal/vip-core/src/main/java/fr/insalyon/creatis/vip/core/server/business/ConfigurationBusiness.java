@@ -50,6 +50,9 @@ import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.Normalizer;
 import java.util.*;
 import org.apache.log4j.Logger;
@@ -137,11 +140,14 @@ public class ConfigurationBusiness {
             }
         }
         if (existUndesiredMailDomain) {
-            logger.info("Undesired Mail Domain for "+user.getEmail());
+            logger.info("Undesired Mail Domain for " + user.getEmail());
             throw new BusinessException("Undesired Mail Domain");
         } else {
 
             try {
+                if (!automaticCreation) {
+                    user.setTermsOfUse(getCurrentTimeStamp());
+                }
                 user.setCode(UUID.randomUUID().toString());
                 user.setPassword(MD5.get(user.getPassword()));
                 String folder = user.getFirstName().replaceAll(" ", "_").toLowerCase() + "_"
@@ -743,9 +749,11 @@ public class ConfigurationBusiness {
     public List<Group> getPublicGroups() throws BusinessException {
         try {
             List<Group> publicGroups = new ArrayList<Group>();
-            for(Group g : CoreDAOFactory.getDAOFactory().getGroupDAO().getGroups())
-                if(g.isPublicGroup())
+            for (Group g : CoreDAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
+                if (g.isPublicGroup()) {
                     publicGroups.add(g);
+                }
+            }
             return publicGroups;
 
         } catch (DAOException ex) {
@@ -883,6 +891,16 @@ public class ConfigurationBusiness {
             logger.error(ex);
             throw new BusinessException(ex);
         } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    public void updateTermsOfUse(String email) throws BusinessException {
+        try {
+            CoreDAOFactory.getDAOFactory().getUserDAO().updateTermsOfUse(email, getCurrentTimeStamp());
+
+        } catch (DAOException ex) {
+            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -1159,5 +1177,12 @@ public class ConfigurationBusiness {
 
         }
         return user;
+    }
+
+    private static java.sql.Timestamp getCurrentTimeStamp() {
+
+        java.util.Date today = new java.util.Date();
+        return new java.sql.Timestamp(today.getTime());
+
     }
 }

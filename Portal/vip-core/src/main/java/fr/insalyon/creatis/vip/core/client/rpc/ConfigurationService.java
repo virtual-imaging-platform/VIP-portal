@@ -105,12 +105,13 @@ public interface ConfigurationService extends RemoteService {
 
     public List<String> getUserGroups() throws CoreException;
 
-
     public void updateUser(String email, UserLevel level, CountryCode countryCode, int maxRunningSimulations, Map<String, CoreConstants.GROUP_ROLE> groups) throws CoreException;
 
     public User getUserData() throws CoreException;
 
     public User updateUser(User user) throws CoreException;
+
+    public void updateTermsOfUse() throws CoreException;
 
     public void updateUserPassword(String currentPassword, String newPassword) throws CoreException;
 
