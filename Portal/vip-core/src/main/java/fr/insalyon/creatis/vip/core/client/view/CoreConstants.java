@@ -127,6 +127,7 @@ public class CoreConstants implements IsSerializable {
     public static final String ICON_WARNING = IMG_FOLDER + "icon-warning.png";
     public static final String ICON_WORLD = IMG_FOLDER + "flags/_world.png";
     public static final String ICON_DROPBOX = IMG_FOLDER + "icon-dropbox.png";
+    public static final String ICON_TERMS_USE =IMG_FOLDER +"icon-terms_of_use.png";
     public static String ICON_MOZILLA_PERSONA = IMG_FOLDER + "icon-persona.png";
     ;
     // Folders
