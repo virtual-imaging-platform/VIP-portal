@@ -84,6 +84,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Adding application '" + application.getName() + "'.");
+                application.setOwner(getSessionUser().getEmail());
                 applicationBusiness.add(application);
             } else {
                 throw new ApplicationException("You have no administrator rights.");
@@ -138,7 +139,6 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Adding version '" + version.getVersion() + "' ('" + version.getApplicationName() + "').");
-                version.setOwner(getSessionUser().getEmail());
                 applicationBusiness.addVersion(version);
             } else {
                 throw new ApplicationException("You have no administrator rights.");
@@ -156,7 +156,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Updating version '" + version.getVersion() + "' ('" + version.getApplicationName() + "').");
-                
+
                 applicationBusiness.updateVersion(version);
 
             } else {
@@ -217,7 +217,8 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             throw new ApplicationException(ex);
         }
     }
-@Override
+
+    @Override
     public boolean applicationExist(String applicationName) throws ApplicationException {
 
         try {
@@ -227,6 +228,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             throw new ApplicationException(ex);
         }
     }
+
     /**
      *
      * @param applicationClass
@@ -309,14 +311,14 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                 List<String> classes = classBusiness.getClassesName();
                 //trace(logger, "Admin classes are '" + classes.toString() + "'.");
                 return new List[]{configurationBusiness.getUserNames(user.getEmail(), false),
-                            applicationBusiness.getApplicationNames(), classes};
+                    applicationBusiness.getApplicationNames(), classes};
 
             } else {
                 List<String> classes = classBusiness.getUserClassesName(user.getEmail(), !user.isSystemAdministrator());
                 classes.removeAll(reservedClasses);
                 //trace(logger, "User classes are '" + classes.toString() + "'.");
                 return new List[]{configurationBusiness.getUserNames(user.getEmail(), true),
-                            applicationBusiness.getApplicationNames(classes), classes};
+                    applicationBusiness.getApplicationNames(classes), classes};
             }
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
@@ -326,9 +328,8 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     /**
-     * 
-     * @return
-     * @throws ApplicationException 
+     *
+     * @return @throws ApplicationException
      */
     @Override
     public ApplicationStatus getApplicationStatus() throws ApplicationException {
@@ -447,13 +448,12 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     /**
-     * 
-     * @return
-     * @throws ApplicationException 
+     *
+     * @return @throws ApplicationException
      */
     @Override
     public List<Engine> getEngines() throws ApplicationException {
-        
+
         try {
             authenticateSystemAdministrator(logger);
             return engineBusiness.get();
@@ -464,17 +464,17 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             throw new ApplicationException(ex);
         }
     }
-    
-     @Override
-     public List<String>getAppletGateLabClasses() throws ApplicationException {
-          return Server.getInstance().getAppletGateLabClasses();
-      
+
+    @Override
+    public List<String> getAppletGateLabClasses() throws ApplicationException {
+        return Server.getInstance().getAppletGateLabClasses();
+
     }
 
     @Override
     public AppVersion getVersion(String applicationName, String applicationVersion) throws ApplicationException {
-       try {
-            return applicationBusiness.getVersion(applicationName,applicationVersion);
+        try {
+            return applicationBusiness.getVersion(applicationName, applicationVersion);
 
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);

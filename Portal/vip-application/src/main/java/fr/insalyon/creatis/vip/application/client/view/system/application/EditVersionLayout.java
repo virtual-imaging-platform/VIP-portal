@@ -70,7 +70,6 @@ public class EditVersionLayout extends AbstractFormLayout {
     private String applicationName;
     private Label applicationLabel;
     private TextItem versionField;
-    private SelectItem usersPickList;
     private TextItem lfnField;
     private CheckboxItem isVisibleField;
     private IButton saveButton;
@@ -92,11 +91,6 @@ public class EditVersionLayout extends AbstractFormLayout {
         versionField = FieldUtil.getTextItem(450, null);
         versionField.setDisabled(true);
 
-        usersPickList = new SelectItem();
-        usersPickList.setShowTitle(false);
-        usersPickList.setWidth(450);
-        usersPickList.setRequired(true);
-        
         lfnField = FieldUtil.getTextItem(450, null);
         lfnField.setDisabled(true);
 
@@ -115,7 +109,7 @@ public class EditVersionLayout extends AbstractFormLayout {
                                 lfnField.getValueAsString().trim(), isVisibleField.getValueAsBoolean()));
                     } else {
                         save(new AppVersion(applicationName, versionField.getValueAsString().trim(),
-                                lfnField.getValueAsString().trim(), usersPickList.getValueAsString(), isVisibleField.getValueAsBoolean()));
+                                lfnField.getValueAsString().trim(), isVisibleField.getValueAsBoolean()));
 
                     }
                 }
@@ -141,10 +135,6 @@ public class EditVersionLayout extends AbstractFormLayout {
 
         this.addMember(applicationLabel);
         addField("Version", versionField);
-        if (CoreModule.user.isSystemAdministrator()) {
-            this.addMember(WidgetUtil.getLabel("<b>Owner</b>", 15));
-            this.addMember(FieldUtil.getForm(usersPickList));
-        }
         addField("LFN", lfnField);
         this.addMember(FieldUtil.getForm(isVisibleField));
         addButtons(saveButton, removeButton);
@@ -196,7 +186,7 @@ public class EditVersionLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setVersion(null, null, null, true);
+                setVersion(null, null, true);
                 ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
                 tab.loadVersions(applicationName);
@@ -224,21 +214,18 @@ public class EditVersionLayout extends AbstractFormLayout {
      * @param lfn
      * @param isVisible
      */
-    public void setVersion(String version, String lfn, String owner, boolean isVisible) {
+    public void setVersion(String version, String lfn, boolean isVisible) {
 
         if (version != null) {
-            usersPickList.setCanEdit(true);
             this.versionField.setValue(version);
             this.versionField.setDisabled(true);
             this.lfnField.setValue(lfn);
             this.isVisibleField.setValue(isVisible);
             this.newVersion = false;
-            loadUsers(owner);
             this.removeButton.setDisabled(false);
 
         } else {
-            usersPickList.setCanEdit(false);
-            usersPickList.setValue("");
+
             this.versionField.setValue("");
             this.versionField.setDisabled(false);
             this.lfnField.setValue("");
@@ -246,34 +233,5 @@ public class EditVersionLayout extends AbstractFormLayout {
             this.newVersion = true;
             this.removeButton.setDisabled(true);
         }
-    }
-
-    private void loadUsers(final String currentUser) {
-
-        final AsyncCallback<List<User>> callback = new AsyncCallback<List<User>>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to load users:<br />" + caught.getMessage());
-                usersPickList.setValues(currentUser);
-
-            }
-
-            @Override
-            public void onSuccess(List<User> result) {
-
-                LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
-
-                for (User user : result) {
-
-
-                    valueMap.put(user.getEmail(), user.getFirstName() + " " + user.getLastName());
-
-                }
-                usersPickList.setValueMap(valueMap);
-                usersPickList.setValue(currentUser);
-
-            }
-        };
-        ConfigurationService.Util.getInstance().getUsers(callback);
     }
 }

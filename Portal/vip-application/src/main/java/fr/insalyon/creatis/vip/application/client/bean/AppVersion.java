@@ -45,9 +45,7 @@ public class AppVersion implements IsSerializable {
     private String applicationName;
     private String version;
     private String lfn;
-    private String owner;
     private boolean visible;
-    private String fullName;
 
     public AppVersion() {
     }
@@ -62,29 +60,6 @@ public class AppVersion implements IsSerializable {
         this.version = version;
         this.lfn = lfn;
         this.visible = visible;
-
-
-    }
-
-    public AppVersion(String applicationName, String version, String lfn, String owner, boolean visible) {
-
-        this.applicationName = applicationName;
-        this.version = version;
-        this.lfn = lfn;
-        this.owner = owner;
-        this.visible = visible;
-
-    }
-
-    public AppVersion(String applicationName, String version, String lfn, String owner, String fullName, boolean visible) {
-
-        this.applicationName = applicationName;
-        this.version = version;
-        this.lfn = lfn;
-        this.owner = owner;
-        this.visible = visible;
-        this.fullName = fullName;
-
     }
 
     public String getApplicationName() {
@@ -99,23 +74,7 @@ public class AppVersion implements IsSerializable {
         return lfn;
     }
 
-    public String getOwner() {
-        return owner;
-    }
-
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
     public boolean isVisible() {
         return visible;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
     }
 }
