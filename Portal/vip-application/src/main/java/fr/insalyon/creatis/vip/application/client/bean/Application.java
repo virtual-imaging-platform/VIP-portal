@@ -39,27 +39,45 @@ import java.util.List;
 
 /**
  *
- * @author Rafael Ferreira da Silva
+ * @author Rafael Ferreira da Silva,Nouha boujelben
  */
 public class Application implements IsSerializable {
 
     private String name;
     private List<String> applicationClasses;
     private String citation;
+    private String owner;
+    private String fullName;
 
     public Application() {
     }
 
     public Application(String name, String citation) {
 
-        this(name, null, citation);
+        this(name, null, null, null, citation);
     }
-     
+
     public Application(String name, List<String> applicationClasses, String citation) {
+
+        this(name, applicationClasses, null, null, citation);
+    }
+
+    public Application(String name, List<String> applicationClasses, String owner, String fullName, String citation) {
 
         this.name = name;
         this.applicationClasses = applicationClasses;
         this.citation = citation;
+        this.owner = owner;
+        this.fullName = fullName;
+    }
+
+    public Application(String name, List<String> applicationClasses, String owner, String citation) {
+
+        this.name = name;
+        this.applicationClasses = applicationClasses;
+        this.citation = citation;
+        this.owner = owner;
+
     }
 
     public String getName() {
@@ -72,5 +90,17 @@ public class Application implements IsSerializable {
 
     public String getCitation() {
         return citation;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public String getFullName() {
+        return fullName;
     }
 }

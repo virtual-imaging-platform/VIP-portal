@@ -42,13 +42,11 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class VersionRecord extends ListGridRecord {
 
-    public VersionRecord(String version, String lfn,String owner,String ownerFullName, boolean isVisible) {
+    public VersionRecord(String version, String lfn, boolean isVisible) {
 
         setAttribute("version", version);
         setAttribute("lfn", lfn);
-        setAttribute("owner", owner);
-        setAttribute("ownerFullName", ownerFullName);
         setAttribute("visible", isVisible);
-        
+
     }
 }

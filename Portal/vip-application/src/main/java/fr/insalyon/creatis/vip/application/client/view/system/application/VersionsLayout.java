@@ -105,7 +105,7 @@ public class VersionsLayout extends VLayout {
             public void onClick(ClickEvent event) {
                 ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                appsTab.setVersion(null, null,null, true);
+                appsTab.setVersion(null, null, true);
             }
         });
         toolstrip.addMember(addButton);
@@ -142,7 +142,6 @@ public class VersionsLayout extends VLayout {
                         public void onClick(ClickEvent event) {
                             edit(rollOverRecord.getAttribute("version"),
                                     rollOverRecord.getAttribute("lfn"),
-                                    rollOverRecord.getAttribute("owner"),
                                     rollOverRecord.getAttributeAsBoolean("visible"));
                         }
                     });
@@ -187,26 +186,21 @@ public class VersionsLayout extends VLayout {
         grid.setShowEmptyMessage(true);
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
-        
+
         ListGridField isVisibleField = new ListGridField("visible", "Visible");
-        ListGridField ownerField =  new ListGridField("owner", "Owner");
         isVisibleField.setType(ListGridFieldType.BOOLEAN);
-        
+
         grid.setFields(
                 isVisibleField,
                 new ListGridField("version", "Version"),
-                ownerField,
-                new ListGridField("ownerFullName", "Owner"),
                 new ListGridField("lfn", "LFN"));
         grid.setSortField("version");
-        ownerField.setHidden(true);
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
             @Override
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 edit(event.getRecord().getAttribute("version"),
                         event.getRecord().getAttribute("lfn"),
-                        event.getRecord().getAttribute("owner"),
                         event.getRecord().getAttributeAsBoolean("visible"));
             }
         });
@@ -229,7 +223,7 @@ public class VersionsLayout extends VLayout {
                 List<VersionRecord> dataList = new ArrayList<VersionRecord>();
 
                 for (AppVersion version : result) {
-                    dataList.add(new VersionRecord(version.getVersion(), version.getLfn(),version.getOwner(),version.getFullName(), version.isVisible()));
+                    dataList.add(new VersionRecord(version.getVersion(), version.getLfn(), version.isVisible()));
                 }
                 grid.setData(dataList.toArray(new VersionRecord[]{}));
             }
@@ -255,11 +249,11 @@ public class VersionsLayout extends VLayout {
      * @param lfn
      * @param isVisible
      */
-    private void edit(String version, String lfn,String owner, boolean isVisible) {
+    private void edit(String version, String lfn, boolean isVisible) {
 
         ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                 getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-        appsTab.setVersion(version,lfn,owner, isVisible);
+        appsTab.setVersion(version, lfn, isVisible);
     }
 
     /**

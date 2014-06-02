@@ -52,40 +52,40 @@ public class ManageApplicationsTab extends AbstractManageTab {
     public ManageApplicationsTab() {
 
         super(ApplicationConstants.ICON_APPLICATION, ApplicationConstants.APP_APPLICATION, ApplicationConstants.TAB_MANAGE_APPLICATION);
-               
+
         appsLayout = new ApplicationsLayout();
         editLayout = new EditApplicationLayout();
-        
+
         HLayout appLayout = new HLayout(5);
         appLayout.setHeight("50%");
         appLayout.addMember(appsLayout);
         appLayout.addMember(editLayout);
         vLayout.addMember(appLayout);
-        
+
         versionsLayout = new VersionsLayout();
         editVersionLayout = new EditVersionLayout();
-        
+
         HLayout versionLayout = new HLayout(5);
         versionLayout.setHeight("50%");
         versionLayout.addMember(versionsLayout);
         versionLayout.addMember(editVersionLayout);
         vLayout.addMember(versionLayout);
     }
-    
+
     public void loadApplications() {
         appsLayout.loadData();
     }
-    
+
     public void loadVersions(String applicationName) {
         versionsLayout.setApplication(applicationName);
         editVersionLayout.setApplication(applicationName);
     }
 
-    public void setApplication(String name, String classes, String citation) {
-        editLayout.setApplication(name, classes, citation);
+    public void setApplication(String name, String owner, String classes, String citation) {
+        editLayout.setApplication(name, owner, classes, citation);
     }
-    
-    public void setVersion(String version, String lfn,String owner, boolean isVisible) {
-        editVersionLayout.setVersion(version, lfn, owner, isVisible);
+
+    public void setVersion(String version, String lfn, boolean isVisible) {
+        editVersionLayout.setVersion(version, lfn, isVisible);
     }
 }
