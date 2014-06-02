@@ -81,7 +81,6 @@ public class ApplicationsLayout extends VLayout {
         configureActions();
         configureGrid();
         modal = new ModalWindow(grid);
-
         loadData();
     }
 
