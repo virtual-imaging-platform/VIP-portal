@@ -34,7 +34,7 @@ package fr.insalyon.creatis.vip.core.server.dao;
 
 /**
  *
- * @author Rafael Ferreira da Silva
+ * @author Rafael Ferreira da Silva,Nouha boujelben
  */
 public abstract class CoreDAOFactory {
 
@@ -50,4 +50,6 @@ public abstract class CoreDAOFactory {
     public abstract UsersGroupsDAO getUsersGroupsDAO() throws DAOException;
 
     public abstract AccountDAO getAccountDAO() throws DAOException;
+
+    public abstract PublicationDAO getPublicationDAO() throws DAOException;
 }
