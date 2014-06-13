@@ -62,7 +62,7 @@ public class PasswordLayout extends AbstractFormLayout {
 
     public PasswordLayout() {
 
-        super(330, 240);
+        super("100%", "240");
         addTitle("Password", CoreConstants.ICON_PASSWORD);
 
         configure();
@@ -70,9 +70,9 @@ public class PasswordLayout extends AbstractFormLayout {
 
     private void configure() {
 
-        currentPasswordField = FieldUtil.getPasswordItem(150, 32);
-        newPasswordField = FieldUtil.getPasswordItem(150, 32);
-        confirmPasswordField = FieldUtil.getPasswordItem(150, 32);
+        currentPasswordField = FieldUtil.getPasswordItem(500, 32);
+        newPasswordField = FieldUtil.getPasswordItem(500, 32);
+        confirmPasswordField = FieldUtil.getPasswordItem(500, 32);
         
 
         saveButton = WidgetUtil.getIButton("Save Changes", CoreConstants.ICON_SAVED,
@@ -107,22 +107,22 @@ public class PasswordLayout extends AbstractFormLayout {
                                 }
                             };
                             WidgetUtil.setLoadingIButton(saveButton, "Saving...");
-                            service.updateUserPassword(
-                                    currentPasswordField.getValueAsString(),
-                                    newPasswordField.getValueAsString(), callback);
-                        }
-                    }
-                });
-        saveButton.setWidth("50%");
-                
-        recoverButton = WidgetUtil.getIButton("Forgot Password?", CoreConstants.ICON_HELP,  new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                 Layout.getInstance().addTab(new RecoveryTab());
+                    service.updateUserPassword(
+                            currentPasswordField.getValueAsString(),
+                            newPasswordField.getValueAsString(), callback);
+                }
             }
         });
-        recoverButton.setWidth("50%");
-        
+
+        saveButton.setWidth(150);
+        recoverButton = WidgetUtil.getIButton("Forgot Password?", CoreConstants.ICON_HELP, new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                Layout.getInstance().addTab(new RecoveryTab());
+            }
+        });
+
+        recoverButton.setWidth(150);
         currentPasswordField.setTooltip("Note: you may not know your VIP password in case your account was automatically generated. If you need it, you can still recover it using the button below.");
         addField("Current", currentPasswordField);
         addField("New", newPasswordField);

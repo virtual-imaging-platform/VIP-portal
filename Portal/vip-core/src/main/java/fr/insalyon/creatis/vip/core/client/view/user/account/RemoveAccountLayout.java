@@ -63,7 +63,7 @@ public class RemoveAccountLayout extends AbstractFormLayout {
 
     public RemoveAccountLayout() {
 
-        super(350, 120);
+        super("350", "113");
         addTitle("Delete Account", CoreConstants.ICON_ACCOUNT_REMOVE);
 
         configure();
@@ -79,10 +79,9 @@ public class RemoveAccountLayout extends AbstractFormLayout {
         confirmField.setWidth(320);
         confirmField.setAlign(Alignment.LEFT);
         confirmField.addChangedHandler(new ChangedHandler() {
-
             @Override
             public void onChanged(ChangedEvent event) {
-                
+
                 if (confirmField.getValueAsBoolean()) {
                     removeButton.setDisabled(false);
                 } else {
@@ -90,20 +89,19 @@ public class RemoveAccountLayout extends AbstractFormLayout {
                 }
             }
         });
-        
+
         this.addMember(FieldUtil.getForm(confirmField));
 
         removeButton = new IButton("Delete VIP Account");
+        removeButton.setWidth(150);
         removeButton.setDisabled(true);
         removeButton.addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
 
                 if (confirmField.validate() && confirmField.getValueAsBoolean()) {
                     ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
                     final AsyncCallback<User> callback = new AsyncCallback<User>() {
-
                         @Override
                         public void onFailure(Throwable caught) {
                             WidgetUtil.resetIButton(removeButton, "Delete VIP Account", null);

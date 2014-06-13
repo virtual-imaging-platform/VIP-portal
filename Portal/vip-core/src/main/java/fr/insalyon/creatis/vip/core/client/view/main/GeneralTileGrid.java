@@ -38,6 +38,7 @@ import fr.insalyon.creatis.vip.core.client.view.application.ApplicationTileRecor
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.user.AccountTab;
+import fr.insalyon.creatis.vip.core.client.view.user.PublicationTab;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +54,7 @@ public class GeneralTileGrid extends ApplicationsTileGrid {
 
         super("General");
         addApplication(CoreConstants.APP_ACCOUNT, CoreConstants.APP_IMG_ACCOUNT);
+        addApplication(CoreConstants.APP_PUBLICATIONS, CoreConstants.APP_IMG_PUBLICATIONS);
         parsers = new ArrayList<ApplicationParser>();
     }
 
@@ -61,6 +63,11 @@ public class GeneralTileGrid extends ApplicationsTileGrid {
 
         if (applicationName.equals(CoreConstants.APP_ACCOUNT)) {
             Layout.getInstance().addTab(new AccountTab());
+            return;
+        }
+        
+        if (applicationName.equals(CoreConstants.APP_PUBLICATIONS)) {
+            Layout.getInstance().addTab( new PublicationTab());
             return;
         }
         

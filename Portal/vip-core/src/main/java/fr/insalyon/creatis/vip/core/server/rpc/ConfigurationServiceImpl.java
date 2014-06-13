@@ -42,6 +42,7 @@ import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.Publication;
 import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
@@ -68,7 +69,7 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author Rafael Ferreira da Silva
+ * @author Rafael Ferreira da Silva,Nouha boujelben
  */
 public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet implements ConfigurationService {
 
@@ -818,5 +819,52 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
+    }
+
+    @Override
+    public List<Publication> getPublications() throws CoreException {
+        try {
+            return configurationBusiness.getPublications(getSessionUser().getEmail());
+
+        } catch (BusinessException ex) {
+            logger.error(ex);
+            throw new CoreException(ex);
+        }
+    }
+
+    @Override
+    public void removePublication(Long id) throws CoreException {
+        try {
+            configurationBusiness.removePublication(id);
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    @Override
+    public void addPublication(Publication pub) throws CoreException {
+        try {
+            User user = getSessionUser();
+            pub.setVipAuthor(user.getEmail());
+            configurationBusiness.addPublication(pub);
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+
+    }
+
+    @Override
+    public void updatePublication(Publication pub) throws CoreException {
+        try {
+            User user = getSessionUser();
+            pub.setVipAuthor(user.getEmail());
+            configurationBusiness.updatePublication(pub);
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+
     }
 }

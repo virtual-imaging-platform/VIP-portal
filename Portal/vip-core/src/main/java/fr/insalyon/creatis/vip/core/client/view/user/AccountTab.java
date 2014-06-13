@@ -70,7 +70,7 @@ public class AccountTab extends Tab {
         hLayout.setPadding(10);
 
         // Left column
-        VLayout leftLayout = new VLayout(15);
+        VLayout leftLayout = new VLayout(14);
         leftLayout.setWidth(350);
         leftLayout.setHeight100();
 
@@ -78,7 +78,7 @@ public class AccountTab extends Tab {
         leftLayout.addMember(new PasswordLayout());
 
         // Right column
-        VLayout rightLayout = new VLayout(15);
+        VLayout rightLayout = new VLayout(14);
         rightLayout.setWidth("*");
         rightLayout.setHeight100();
 
