@@ -36,6 +36,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.Publication;
 import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -129,6 +130,14 @@ public interface ConfigurationServiceAsync {
     public void getDropboxAccountStatus(AsyncCallback<DropboxAccountStatus.AccountStatus> asyncCallback);
 
     public void unlinkDropboxAccount(AsyncCallback<Void> asyncCallback);
-//    
-//    public void getPostParameters(AsyncCallback<Void> asyncCallback);
+
+    // public void getPostParameters(AsyncCallback<Void> asyncCallback);
+    //publications
+    public void getPublications(AsyncCallback<List<Publication>> asyncCallback);
+
+    public void removePublication(Long id, AsyncCallback<Void> asyncCallback);
+
+    public void addPublication(Publication pub, AsyncCallback<Void> asyncCallback);
+
+    public void updatePublication(Publication pub, AsyncCallback<Void> asyncCallback);
 }

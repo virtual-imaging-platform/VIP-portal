@@ -84,6 +84,7 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_SIMULATION_EXEC_MODE = "workflows.exec.mode";
     // Tabs
     public static final String TAB_ACCOUNT = "account-tab";
+    public static final String TAB_PUBLICATION = "publications-tab";
     public static final String TAB_ACTIVATION = "activation-tab";
     public static final String TAB_CONTACT = "contact-tab";
     public static final String TAB_HOME = "home-tab";
@@ -113,6 +114,7 @@ public class CoreConstants implements IsSerializable {
     public static final String ICON_LOADING = IMG_FOLDER + "icon-loading.gif";
     public static final String ICON_LOCK = IMG_FOLDER + "icon-lock.png";
     public static final String ICON_PASSWORD = IMG_FOLDER + "icon-password.png";
+    public static final String ICON_PUBLICATION = IMG_FOLDER + "icon-publication.png";
     public static final String ICON_PERSONAL = IMG_FOLDER + "icon-personal.png";
     public static final String ICON_PICKER_QUESTION = IMG_FOLDER + "icon-picker-question.png";
     public static final String ICON_REFRESH = IMG_FOLDER + "icon-refresh.png";
@@ -127,7 +129,7 @@ public class CoreConstants implements IsSerializable {
     public static final String ICON_WARNING = IMG_FOLDER + "icon-warning.png";
     public static final String ICON_WORLD = IMG_FOLDER + "flags/_world.png";
     public static final String ICON_DROPBOX = IMG_FOLDER + "icon-dropbox.png";
-    public static final String ICON_TERMS_USE =IMG_FOLDER +"icon-terms_of_use.png";
+    public static final String ICON_TERMS_USE = IMG_FOLDER + "icon-terms_of_use.png";
     public static String ICON_MOZILLA_PERSONA = IMG_FOLDER + "icon-persona.png";
     ;
     // Folders
@@ -135,12 +137,14 @@ public class CoreConstants implements IsSerializable {
     public static final String FOLDER_FLAGS = IMG_FOLDER + "flags/";
     // Application Names
     public static final String APP_ACCOUNT = "My Account";
+    public static final String APP_PUBLICATIONS = "Publications";
     public static final String APP_ACCOUNT_MANAGER = "Accounts Type";
     public static final String APP_GROUP = "Groups";
     public static final String APP_TIP = "Tips";
     public static final String APP_USER = "Users";
     // Application Images
     public static final String APP_IMG_ACCOUNT = IMG_FOLDER + "app-account.png";
+    public static final String APP_IMG_PUBLICATIONS = IMG_FOLDER + "app-articles.png";
     public static final String APP_IMG_ACCOUNT_MANAGER = IMG_FOLDER + "system/app-account.png";
     public static final String APP_IMG_GROUP = IMG_FOLDER + "system/app-group.png";
     public static final String APP_IMG_TIP = IMG_FOLDER + "system/app-tip.png";

@@ -61,7 +61,7 @@ public class GroupLayout extends AbstractFormLayout {
 
     public GroupLayout() {
 
-        super(350, 430);
+        super("350", "430");
         addTitle("Groups", CoreConstants.ICON_GROUP);
 
         messageLabel = WidgetUtil.getLabel("", 15);

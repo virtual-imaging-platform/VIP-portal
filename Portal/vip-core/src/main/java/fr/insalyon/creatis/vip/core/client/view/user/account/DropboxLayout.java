@@ -63,7 +63,7 @@ public class DropboxLayout extends AbstractFormLayout {
 
     public DropboxLayout() {
 
-        super(350, 120);
+        super("350", "113");
         addTitle("Link Dropbox account", CoreConstants.ICON_DROPBOX);
 
         configure();
@@ -75,19 +75,15 @@ public class DropboxLayout extends AbstractFormLayout {
         this.addMember(text);
 
         linkDropboxButton = new IButton("Link Dropbox Account");
+        linkDropboxButton.setWidth(150);
         unlinkDropboxButton = new IButton("Unlink Dropbox Account");
-
-        linkDropboxButton.setWidth100();
-        unlinkDropboxButton.setWidth100();
-        
+        unlinkDropboxButton.setWidth(150);
         linkDropboxButton.addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
 
 
                 final AsyncCallback<String> callback = new AsyncCallback<String>() {
-
                     @Override
                     public void onFailure(Throwable caught) {
                         Layout.getInstance().setWarningMessage("Unable to link Dropbox account:<br />" + caught.getMessage());
@@ -95,9 +91,9 @@ public class DropboxLayout extends AbstractFormLayout {
 
                     @Override
                     public void onSuccess(String result) {
-                       
-                            Window.Location.replace(result.replace("REDIRECT",  com.google.gwt.http.client.URL.encode(GWT.getHostPageBaseURL())));
-                       
+
+                        Window.Location.replace(result.replace("REDIRECT", com.google.gwt.http.client.URL.encode(GWT.getHostPageBaseURL())));
+
                     }
                 };
                 ConfigurationService.Util.getInstance().linkDropboxAccount(callback);
@@ -106,11 +102,9 @@ public class DropboxLayout extends AbstractFormLayout {
         });
 
         unlinkDropboxButton.addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(ClickEvent event) {
                 ConfigurationService.Util.getInstance().unlinkDropboxAccount(new AsyncCallback<Void>() {
-
                     @Override
                     public void onFailure(Throwable caught) {
                         Layout.getInstance().setWarningMessage("Cannot unlink Dropbox account");
@@ -132,7 +126,6 @@ public class DropboxLayout extends AbstractFormLayout {
     private void load() {
         final ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         service.getDropboxAccountStatus(new AsyncCallback<AccountStatus>() {
-
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Cannot get status of Dropbox account");
@@ -150,12 +143,12 @@ public class DropboxLayout extends AbstractFormLayout {
                         text.setContents("You have linked your Dropbox account, but VIP's request hasn't been confirmed in time. Synchronization will not work. You should try to unlink it and link it again.");
                         linkDropboxButton.setVisible(false);
                     } else {
-                        if(result == DropboxAccountStatus.AccountStatus.AUTHENTICATION_FAILED){
+                        if (result == DropboxAccountStatus.AccountStatus.AUTHENTICATION_FAILED) {
                             text.setContents("You have linked your Dropbox account, but authentication doesn't seem to be working. You should try to unlink it and link it again.");
                             linkDropboxButton.setVisible(false);
-                        }
-                        else                            
+                        } else {
                             unlinkDropboxButton.setVisible(false);
+                        }
                     }
                 }
             }

@@ -38,6 +38,7 @@ import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.Publication;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
@@ -63,7 +64,7 @@ import org.jasig.cas.client.validation.TicketValidationException;
 
 /**
  *
- * @author Rafael Ferreira da Silva
+ * @author Rafael Ferreira da Silva, Nouha Boujelben
  */
 public class ConfigurationBusiness {
 
@@ -1177,6 +1178,51 @@ public class ConfigurationBusiness {
 
         }
         return user;
+    }
+
+    //Publications
+    /**
+     *
+     * @return @throws BusinessException
+     */
+    public List<Publication> getPublications(String email) throws BusinessException {
+
+        try {
+            return CoreDAOFactory.getDAOFactory().getPublicationDAO().getList(email);
+        } catch (DAOException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
+    public void removePublication(Long id) throws BusinessException {
+
+        try {
+            CoreDAOFactory.getDAOFactory().getPublicationDAO().remove(id);
+        } catch (DAOException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
+    public void addPublication(Publication pub) throws BusinessException {
+
+        try {
+            CoreDAOFactory.getDAOFactory().getPublicationDAO().add(pub);
+        } catch (DAOException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
+    public void updatePublication(Publication pub) throws BusinessException {
+
+        try {
+            CoreDAOFactory.getDAOFactory().getPublicationDAO().update(pub);
+        } catch (DAOException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
     }
 
     private static java.sql.Timestamp getCurrentTimeStamp() {

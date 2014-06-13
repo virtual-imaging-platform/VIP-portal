@@ -38,6 +38,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.Publication;
 import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -147,6 +148,14 @@ public interface ConfigurationService extends RemoteService {
     public DropboxAccountStatus.AccountStatus getDropboxAccountStatus() throws CoreException;
 
     public void unlinkDropboxAccount() throws CoreException;
-//    
-//    public void getPostParameters() throws CoreException;
+
+    // public void getPostParameters() throws CoreException;
+    //Publications
+    public List<Publication> getPublications() throws CoreException;
+
+    public void removePublication(Long id) throws CoreException;
+
+    public void addPublication(Publication pub) throws CoreException;
+
+    public void updatePublication(Publication pub) throws CoreException;
 }

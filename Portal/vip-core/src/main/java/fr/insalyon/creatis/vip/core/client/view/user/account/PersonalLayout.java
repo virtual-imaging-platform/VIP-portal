@@ -76,7 +76,7 @@ public class PersonalLayout extends AbstractFormLayout {
 
     public PersonalLayout() {
 
-        super(330, 430);
+        super("330", "430");
         addTitle("Account Information", CoreConstants.ICON_PERSONAL);
 
         configure();
@@ -92,8 +92,8 @@ public class PersonalLayout extends AbstractFormLayout {
         emailLabel = WidgetUtil.getLabel("", 15);
         firstNameField = WidgetUtil.getLabel("", 15);
         lastNameField = WidgetUtil.getLabel("", 15);
-        institutionField = FieldUtil.getTextItem(300, null);
-        phoneField = FieldUtil.getTextItem(150, "[0-9\\(\\)\\-+. ]");
+        institutionField = FieldUtil.getTextItem(500, null);
+        phoneField = FieldUtil.getTextItem(500, "[0-9\\(\\)\\-+. ]");
 
         countryField = new SelectItem();
         countryField.setShowTitle(false);
@@ -102,7 +102,7 @@ public class PersonalLayout extends AbstractFormLayout {
         countryField.setImageURLPrefix(CoreConstants.FOLDER_FLAGS);
         countryField.setImageURLSuffix(".png");
         countryField.setRequired(true);
-
+        countryField.setWidth("250");
         saveButton = WidgetUtil.getIButton("Save Changes", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
                     @Override
@@ -142,7 +142,7 @@ public class PersonalLayout extends AbstractFormLayout {
                         }
                     }
                 });
-
+        saveButton.setWidth(150);
         this.addMember(messageLabel);
         this.addMember(WidgetUtil.getLabel("<b>Level</b>", 15));
         this.addMember(levelLabel);
