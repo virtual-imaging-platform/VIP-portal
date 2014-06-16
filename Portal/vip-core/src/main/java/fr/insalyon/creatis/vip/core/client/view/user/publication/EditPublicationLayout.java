@@ -17,6 +17,8 @@ import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.DateItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.bean.Publication;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -39,7 +41,7 @@ public class EditPublicationLayout extends AbstractFormLayout {
     private IButton saveButton;
     private ComboBoxItem publicationType;
     private TextItem publicationTypeName;
-    private boolean newPublication;
+    private boolean newPublication = true;
     private Long idPub;
 
     public EditPublicationLayout() {
@@ -54,7 +56,7 @@ public class EditPublicationLayout extends AbstractFormLayout {
 
         publicationDate = new ComboBoxItem();
         publicationDate.setWidth("60");
-        publicationDate.setValueMap("1997", "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015");
+        publicationDate.setValueMap("2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015");
         publicationDate.setDefaultValue("2014");
         publicationDate.setShowTitle(false);
 
@@ -64,28 +66,32 @@ public class EditPublicationLayout extends AbstractFormLayout {
 
 
         publicationType = new ComboBoxItem();
-        publicationType.setTitle("<b>" + "Type" + "</b>");
         publicationType.setWidth("250");
         publicationType.setValueMap("Article In Conference Proceedings", "Journal Article", "Book Chapter", "Other");
         publicationType.setDefaultValue("Article In Conference Proceedings");
         publicationType.setTitleOrientation(TitleOrientation.TOP);
+        publicationType.setShowTitle(false);
 
-        publicationTypeName = new TextItem();
-        publicationTypeName.setTitle("Journal, Conference or Book Name");
-        publicationTypeName.setRequired(true);
-        publicationTypeName.setTitleOrientation(TitleOrientation.TOP);
-        publicationTypeName.setWidth("250");
-
-
-        addMember(WidgetUtil.getLabel("Please list here the references of the publications that you made using VIP. These references may"
-                + " be used by the VIP team to justify the use of computing and storage resources to the European Grid Infrastructure.", 20));
+        publicationTypeName = FieldUtil.getTextItem(250, null);
         addField("<font color=red>*</font> Title", titleField);
-        addMember(FieldUtil.getForm(publicationType, publicationTypeName));
-        addField("Authors", authorsField);
-        addField("Date", publicationDate);
+        VLayout v = new VLayout(5);
+        v.setWidth(250);
+        v.addMember(WidgetUtil.getLabel("<b>" + "<font color=red>*</font>" + " Type" + "</b>", 15));
+        v.addMember(FieldUtil.getForm(publicationType));
+        VLayout v2 = new VLayout(5);
+        v2.setWidth(250);
+        v2.addMember(WidgetUtil.getLabel("<b>" + "<font color=red>*</font>" + " Journal, Conference or Book Name" + "</b>", 15));
+        v2.addMember(FieldUtil.getForm(publicationTypeName));
+        HLayout h = new HLayout(5);
+        h.addMember(v);
+        h.addMember(v2);
+        h.setHeight(50);
+        addMember(h);
+        addField("<font color=red>*</font>" + " Authors", authorsField);
+        addField("<font color=red>*</font>" + " Date", publicationDate);
         addField("Doi", doiField);
 
-        saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_ADD,
+        saveButton = WidgetUtil.getIButton("Add", CoreConstants.ICON_ADD,
                 new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
@@ -104,6 +110,7 @@ public class EditPublicationLayout extends AbstractFormLayout {
         if (title != null) {
             idPub = Long.valueOf(id);
             this.newPublication = false;
+            WidgetUtil.resetIButton(saveButton, "Update", CoreConstants.ICON_EDIT);
             this.titleField.setValue(title);
             this.publicationType.setValue(type);
             this.publicationTypeName.setValue(nameType);
@@ -113,6 +120,7 @@ public class EditPublicationLayout extends AbstractFormLayout {
 
         } else {
             this.newPublication = true;
+            WidgetUtil.resetIButton(saveButton, "Add", CoreConstants.ICON_ADD);
             this.titleField.setValue("");
             this.publicationType.setValue("");
             this.publicationTypeName.setValue("");
@@ -139,13 +147,13 @@ public class EditPublicationLayout extends AbstractFormLayout {
         return new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
-                WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
+
                 Layout.getInstance().setWarningMessage("Unable to " + text + " publication:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(Void result) {
-                WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
+
                 setPublication(null, null, null, null, null, null, null);
                 PublicationTab pubTab = (PublicationTab) Layout.getInstance().
                         getTab(CoreConstants.TAB_PUBLICATION);

@@ -75,6 +75,14 @@ public class CoreUtil {
                 Server.getInstance().getServerProxy());
     }
 
+    public static GRIDAClient getGRIDAN4uClient() {
+
+        return new GRIDAClient(
+                Server.getInstance().getN4uGridaHost(),
+                Server.getInstance().getN4uGridaPort(),
+                Server.getInstance().getServerProxy());
+    }
+
     /**
      *
      * @return

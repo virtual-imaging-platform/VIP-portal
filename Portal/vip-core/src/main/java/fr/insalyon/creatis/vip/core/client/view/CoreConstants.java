@@ -62,6 +62,8 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_MYPROXY_MIN_HOURS = "myproxy.min.hours";
     public static final String LAB_GRIDA_HOST = "grida.server.host";
     public static final String LAB_GRIDA_PORT = "grida.server.port";
+    public static final String LAB_N4U_GRIDA_HOST = "n4u.grida.server.host";
+    public static final String LAB_N4U_GRIDA_PORT = "n4u.grida.server.port";
     public static final String LAB_DATA_USERS_HOME = "datamanager.users.home";
     public static final String LAB_DATA_GROUPS_HOME = "datamanager.groups.home";
     public static final String LAB_DATA_PATH = "datamanager.path";
@@ -115,6 +117,7 @@ public class CoreConstants implements IsSerializable {
     public static final String ICON_LOCK = IMG_FOLDER + "icon-lock.png";
     public static final String ICON_PASSWORD = IMG_FOLDER + "icon-password.png";
     public static final String ICON_PUBLICATION = IMG_FOLDER + "icon-publication.png";
+    public static final String ICON_INFO = IMG_FOLDER + "icon-info.png";
     public static final String ICON_PERSONAL = IMG_FOLDER + "icon-personal.png";
     public static final String ICON_PICKER_QUESTION = IMG_FOLDER + "icon-picker-question.png";
     public static final String ICON_REFRESH = IMG_FOLDER + "icon-refresh.png";
@@ -163,7 +166,7 @@ public class CoreConstants implements IsSerializable {
     // ssh
     public static final String SSH_PUBLIC_KEY = "ssh.publickey";
     //application,Gatelab
-    public static final String APPLET_GETLAB_CLASSES = "appletGatelab.classes";
+    public static final String APPLET_GATELAB_CLASSES = "appletGatelab.classes";
     public static final String UNDESIRED_MAIL_DOMAINS = "emails.prohibitDomainsList";
     public static final String SAML_TRUSTED_CERTIFICATE = "saml.trusted.certificates";
     public static String MOZILLA_PERSONA_VALIDATION_URL = "mozilla.persona.validation.url";
