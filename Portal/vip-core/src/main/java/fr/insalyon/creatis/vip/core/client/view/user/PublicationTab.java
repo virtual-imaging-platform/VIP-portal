@@ -3,10 +3,13 @@ package fr.insalyon.creatis.vip.core.client.view.user;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.user.publication.EditPublicationLayout;
+import fr.insalyon.creatis.vip.core.client.view.user.publication.PublicationInfoTab;
 import fr.insalyon.creatis.vip.core.client.view.user.publication.PublicationLayout;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
@@ -22,16 +25,21 @@ public class PublicationTab extends Tab {
                 + CoreConstants.APP_PUBLICATIONS);
         this.setID(CoreConstants.TAB_PUBLICATION);
         this.setCanClose(true);
+        VLayout vLayout = new VLayout(5);
+        vLayout.setWidth100();
+        vLayout.setPadding(10);
+        vLayout.setMembersMargin(5);
 
         HLayout hLayout = new HLayout(5);
         hLayout.setWidth100();
         hLayout.setHeight100();
         hLayout.setOverflow(Overflow.AUTO);
-        hLayout.setPadding(10);
-
+        hLayout.setMembersMargin(5);
         hLayout.addMember(publicationLayout = new PublicationLayout());
         hLayout.addMember(editPublicationLayout = new EditPublicationLayout());
-        this.setPane(hLayout);
+        vLayout.addMember(new PublicationInfoTab());
+        vLayout.addMember(hLayout);
+        this.setPane(vLayout);
 
     }
 

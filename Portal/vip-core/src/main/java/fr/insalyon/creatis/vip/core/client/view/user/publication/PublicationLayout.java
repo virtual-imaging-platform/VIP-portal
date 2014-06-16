@@ -1,7 +1,9 @@
 package fr.insalyon.creatis.vip.core.client.view.user.publication;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.DateDisplayFormat;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
@@ -17,6 +19,8 @@ import com.smartgwt.client.widgets.grid.events.CellClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.viewer.DetailViewer;
+import com.smartgwt.client.widgets.viewer.DetailViewerField;
 import fr.insalyon.creatis.vip.core.client.bean.Publication;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
@@ -40,6 +44,7 @@ public class PublicationLayout extends VLayout {
     private ListGrid grid;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
+    private DetailViewer detailViewer;
 
     public PublicationLayout() {
 
@@ -137,18 +142,44 @@ public class PublicationLayout extends VLayout {
                 button.setWidth(16);
                 return button;
             }
+
+            @Override
+            protected Canvas getCellHoverComponent(Record record, Integer rowNum, Integer colNum) {
+
+
+
+                detailViewer = new DetailViewer();
+                detailViewer.setWidth(400);
+                detailViewer.setFields(
+                        new DetailViewerField("title", "Title"),
+                        new DetailViewerField("type", "Type"),
+                        new DetailViewerField("typeName", "Journal, Conference or Book Name"),
+                        new DetailViewerField("authors", "Authors"),
+                        new DetailViewerField("date", "Date"),
+                        new DetailViewerField("doi", "Doi"));
+
+                detailViewer.setData(new Record[]{record});
+
+                return detailViewer;
+            }
         };
         grid.setWidth100();
         grid.setHeight100();
         grid.setShowRollOverCanvas(true);
-        grid.setShowAllRecords(false);
         grid.setShowEmptyMessage(true);
+        grid.setShowAllRecords(false);
+        grid.setShowRowNumbers(true);
+        grid.setCanHover(true);
+        grid.setShowHover(true);
+        grid.setShowHoverComponents(true);
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
         ListGridField id = new ListGridField("id", "ID");
         grid.setFields(id, new ListGridField("title", "Title"),
                 new ListGridField("type", "Type"),
-                new ListGridField("typeName", "Name"));
+                new ListGridField("typeName", "Journal, Conference or Book Name"),
+                new ListGridField("authors", "Authors"),
+                new ListGridField("date", "Date"));
 
 
         id.setHidden(true);

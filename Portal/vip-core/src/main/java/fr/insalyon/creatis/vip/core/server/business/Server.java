@@ -79,6 +79,9 @@ public class Server {
     // GRIDA server
     private String gridaHost;
     private int gridaPort;
+    // N4u GRIDA server
+    private String n4uGridaHost;
+    private int n4uGridaPort;
     // Data Manager
     private String dataManagerUsersHome;
     private String dataManagerGroupsHome;
@@ -169,6 +172,9 @@ public class Server {
             gridaHost = config.getString(CoreConstants.LAB_GRIDA_HOST, "localhost");
             gridaPort = config.getInt(CoreConstants.LAB_GRIDA_PORT, 9006);
 
+            n4uGridaHost = config.getString(CoreConstants.LAB_N4U_GRIDA_HOST, "localhost");
+            n4uGridaPort = config.getInt(CoreConstants.LAB_N4U_GRIDA_PORT, 9008);
+
             dataManagerUsersHome = config.getString(CoreConstants.LAB_DATA_USERS_HOME, "/users");
             dataManagerGroupsHome = config.getString(CoreConstants.LAB_DATA_GROUPS_HOME, "/groups");
             dataManagerPath = config.getString(CoreConstants.LAB_DATA_PATH, "/tmp");
@@ -207,11 +213,11 @@ public class Server {
             //
             List<String> appletGateLabCl = new ArrayList<String>();
             appletGateLabCl.add("GateLab");
-            appletGateLabClasses = config.getList(CoreConstants.APPLET_GETLAB_CLASSES, appletGateLabCl);
+            appletGateLabClasses = config.getList(CoreConstants.APPLET_GATELAB_CLASSES, appletGateLabCl);
 
             //undesired Mail Domains
-            List<String> undisMailDomains = new ArrayList<String>();       
-            undisMailDomains.add(".hack.rnu");
+            List<String> undisMailDomains = new ArrayList<String>();
+            //undisMailDomains.add(".hack.rnu");
             undesiredMailDomains = config.getList(CoreConstants.UNDESIRED_MAIL_DOMAINS, undisMailDomains);
 
             //queryTree
@@ -242,6 +248,8 @@ public class Server {
             config.setProperty(CoreConstants.LAB_SMA_PORT, SMAPort);
             config.setProperty(CoreConstants.LAB_GRIDA_HOST, gridaHost);
             config.setProperty(CoreConstants.LAB_GRIDA_PORT, gridaPort);
+            config.setProperty(CoreConstants.LAB_N4U_GRIDA_HOST, n4uGridaHost);
+            config.setProperty(CoreConstants.LAB_N4U_GRIDA_PORT, n4uGridaPort);
             config.setProperty(CoreConstants.LAB_DATA_USERS_HOME, dataManagerUsersHome);
             config.setProperty(CoreConstants.LAB_DATA_GROUPS_HOME, dataManagerGroupsHome);
             config.setProperty(CoreConstants.LAB_DATA_PATH, dataManagerPath);
@@ -275,7 +283,7 @@ public class Server {
             config.setProperty(CoreConstants.APP_CLASS, applicationN4uClass);
             config.setProperty(CoreConstants.APPLICATION_FILES_REPOSITORY, N4uApplicationFilesRepository);
             config.setProperty(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, deleteFilesAfterUpload);
-            config.setProperty(CoreConstants.APPLET_GETLAB_CLASSES, appletGateLabClasses);
+            config.setProperty(CoreConstants.APPLET_GATELAB_CLASSES, appletGateLabClasses);
             config.setProperty(CoreConstants.UNDESIRED_MAIL_DOMAINS, undesiredMailDomains);
             config.save();
 
@@ -342,6 +350,14 @@ public class Server {
 
     public int getGRIDAPort() {
         return gridaPort;
+    }
+
+    public String getN4uGridaHost() {
+        return n4uGridaHost;
+    }
+
+    public int getN4uGridaPort() {
+        return n4uGridaPort;
     }
 
     public String getWorkflowsDB() {
