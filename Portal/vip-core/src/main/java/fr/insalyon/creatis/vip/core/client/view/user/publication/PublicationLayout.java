@@ -1,6 +1,7 @@
 package fr.insalyon.creatis.vip.core.client.view.user.publication;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DateDisplayFormat;
@@ -45,6 +46,8 @@ public class PublicationLayout extends VLayout {
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
     private DetailViewer detailViewer;
+    DataSource ds;
+    boolean state = true;
 
     public PublicationLayout() {
 
@@ -61,8 +64,18 @@ public class PublicationLayout extends VLayout {
     private void configureActions() {
 
         ToolstripLayout toolstrip = new ToolstripLayout();
+        LabelButton searchButton = new LabelButton("Search", CoreConstants.ICON_SEARCH);
+        searchButton.setWidth(150);
+        searchButton.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                setFilter();
+            }
+        });
+
 
         toolstrip.addMember(WidgetUtil.getSpaceLabel(15));
+        toolstrip.addMember(searchButton);
 
         LabelButton addButton = new LabelButton("Add Publicaton", CoreConstants.ICON_ADD);
         addButton.setWidth(150);
@@ -88,6 +101,8 @@ public class PublicationLayout extends VLayout {
     }
 
     private void configureGrid() {
+
+        ds = new Data();
 
         grid = new ListGrid() {
             @Override
@@ -174,6 +189,9 @@ public class PublicationLayout extends VLayout {
         grid.setShowHoverComponents(true);
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
+        grid.setFilterOnKeypress(true);
+        grid.setDataSource(ds);
+        grid.setAutoFetchData(Boolean.TRUE);
         ListGridField id = new ListGridField("id", "ID");
         grid.setFields(id, new ListGridField("title", "Title"),
                 new ListGridField("type", "Type"),
@@ -214,6 +232,7 @@ public class PublicationLayout extends VLayout {
                     dataList.add(new PublicationRecord(pub.getId(), pub.getTitle(), pub.getType(), pub.getTypeName(), pub.getDate(), pub.getAuthors(), pub.getDoi()));
                 }
                 grid.setData(dataList.toArray(new PublicationRecord[]{}));
+                ds.setTestData(dataList.toArray(new PublicationRecord[]{}));
             }
         };
         modal.show("Loading Publications...", true);
@@ -247,5 +266,17 @@ public class PublicationLayout extends VLayout {
         };
         modal.show("Removing publication '" + "'...", true);
         ConfigurationService.Util.getInstance().removePublication(id, callback);
+    }
+
+    public void setFilter() {
+
+        if (state == false) {
+            grid.setShowFilterEditor(false);
+            state = true;
+        } else {
+            grid.setShowFilterEditor(true);
+            state = false;
+        }
+
     }
 }
