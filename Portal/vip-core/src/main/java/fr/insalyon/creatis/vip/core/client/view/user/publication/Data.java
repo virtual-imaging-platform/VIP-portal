@@ -23,7 +23,7 @@ public class Data extends DataSource {
         DataSourceIntegerField id = new DataSourceIntegerField("id", "Id");
         id.setPrimaryKey(true);
         id.setHidden(true);
-
+        
         DataSourceTextField title = new DataSourceTextField("title", "Title");
         
         DataSourceTextField type = new DataSourceTextField("type", "type");
