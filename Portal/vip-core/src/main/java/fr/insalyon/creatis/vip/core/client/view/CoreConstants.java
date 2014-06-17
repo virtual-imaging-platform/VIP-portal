@@ -100,6 +100,7 @@ public class CoreConstants implements IsSerializable {
     public static final String TAB_MANAGE_USERS = "manage-users-tab";
     // Icons
     private static final String IMG_FOLDER = "core/";
+    public static final String ICON_SEARCH = "icon-search.png";
     public static final String ICON_ACCOUNT = IMG_FOLDER + "icon-account.png";
     public static final String ICON_ACCOUNT_REMOVE = IMG_FOLDER + "icon-account-remove.png";
     public static final String ICON_ACTIVATE = IMG_FOLDER + "icon-select.png";
