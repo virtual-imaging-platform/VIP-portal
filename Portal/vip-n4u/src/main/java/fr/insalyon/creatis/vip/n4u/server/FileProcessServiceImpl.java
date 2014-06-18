@@ -148,8 +148,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             NameDesc[0] = doc.getDocumentElement().getAttribute("name");
             NameDesc[1] = doc.getElementsByTagName("description").item(0).getTextContent();
             listInputs.add(NameDesc);
-            NodeList descr = doc.getElementsByTagName("input");
-            NodeList nList = doc.getElementsByTagName("input");
+            NodeList nList = doc.getElementsByTagName("entry");
 
             for (int temp = 0; temp < nList.getLength(); temp++) {
 
@@ -161,7 +160,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
 
                     Element eElement = (Element) nNode;
                     value[0] = eElement.getAttribute("name");//NAME
-                    value[1] = parseTypeSupported(eElement.getAttribute("type"));;
+                    value[1] = parseTypeSupported(eElement.getAttribute("type"));//test if the type is supported
                     value[2] = eElement.getAttribute("required");//required
                     value[3] = eElement.getElementsByTagName("description").item(0).getTextContent();
                     listInputs.add(value);
@@ -195,7 +194,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public void generateScriptFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation,String environementFile, String description) throws N4uException {
+    public void generateScriptFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String environementFile, String description) throws N4uException {
         String applicationRealLocation = null;
         try {
             applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
@@ -204,7 +203,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + generateTime);
             theDir.mkdirs();
             String dir = theDir.getAbsolutePath();
-            new Velocity().wrapperScriptFile(listInput, listOutput, applicationName, scriptFile, applicationRealLocation,environementFile, dir,generateTime);
+            new Velocity().wrapperScriptFile(listInput, listOutput, applicationName, scriptFile, applicationRealLocation, environementFile, dir, generateTime);
         } catch (CoreException ex) {
             logger.error(ex);
             throw new N4uException(ex);
@@ -239,7 +238,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + generateTime);
             theDir.mkdirs();
             String dir = theDir.getAbsolutePath();
-            return new Velocity().gwendiaFile(listInput, listOutput, applicationName, description, applicationRealLocation, dir,generateTime);
+            return new Velocity().gwendiaFile(listInput, listOutput, applicationName, description, applicationRealLocation, dir, generateTime);
         } catch (CoreException ex) {
             logger.error(ex);
             throw new N4uException(ex);
@@ -267,7 +266,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public void generateGaswFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description,String sandboxFile,String environementFile) throws N4uException {
+    public void generateGaswFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String sandboxFile, String environementFile) throws N4uException {
         String applicationRealLocation = null;
         try {
             logger.error(sandboxFile);
@@ -276,21 +275,21 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             final File homeDir = new File(Server.getInstance().getN4uApplicationFilesRepository());
             File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + generateTime);
             theDir.mkdirs();
-           
-           
+
+
             // if the directory does not exist, create it
             String dir = theDir.getAbsolutePath();
-            String envF="";
-            String sandboxF="";
+            String envF = "";
+            String sandboxF = "";
             if (!environementFile.isEmpty()) {
                 envF = DataManagerUtil.parseBaseDir(getSessionUser(), environementFile);
             }
             if (!sandboxFile.isEmpty()) {
-               sandboxF=DataManagerUtil.parseBaseDir(getSessionUser(), sandboxFile);
+                sandboxF = DataManagerUtil.parseBaseDir(getSessionUser(), sandboxFile);
             }
-            logger.error("environement "+envF);
-            logger.error("sandbox "+sandboxF);
-            new Velocity().gassFile(listInput, listOutput, applicationName, wrapperScriptPath, applicationRealLocation, dir,generateTime,sandboxF ,envF);
+            logger.error("environement " + envF);
+            logger.error("sandbox " + sandboxF);
+            new Velocity().gassFile(listInput, listOutput, applicationName, wrapperScriptPath, applicationRealLocation, dir, generateTime, sandboxF, envF);
         } catch (CoreException e) {
             logger.error(e);
             throw new N4uException(e);
@@ -306,8 +305,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
     /**
      * *
      *
-     * @return 
-     * @throws N4uException
+     * @return @throws N4uException
      */
     @Override
     public String getApplicationClass() throws N4uException {
