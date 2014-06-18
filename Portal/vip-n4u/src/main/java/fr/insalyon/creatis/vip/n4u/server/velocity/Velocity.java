@@ -49,7 +49,7 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public void gassFile(ArrayList listInput, ArrayList listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir,String date,String sandboxFile,String environementFile) throws VelocityException {
+    public void gassFile(ArrayList listInput, ArrayList listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir, String date, String sandboxFile, String environementFile) throws VelocityException {
         Template t = ve.getTemplate("vm/gass.vm");
         VelocityContext context = new VelocityContext();
         context.put("inputList", listInput);
@@ -57,36 +57,36 @@ public class Velocity implements VelocityProcess {
         context.put("applicationName", applicationName);
         context.put("applicationLocation", applicationLocation);
         context.put("gassValue", applicationLocation + "/bin/" + applicationName + "_wrapper.sh");
-        
-        
-        
-            if(!sandboxFile.isEmpty()){
-                try {
-            CoreUtil.getGRIDAClient().rename(sandboxFile,applicationLocation + "/bin/" + sandboxFile.substring(sandboxFile.lastIndexOf("/")+1) );
-                } catch (GRIDAClientException ex) { 
-            logger.error(ex);
-            throw new VelocityException(ex);
-        }
-            }
-            if(!environementFile.isEmpty()){
-                 try {
-            CoreUtil.getGRIDAClient().rename(environementFile,applicationLocation + "/bin/" + environementFile.substring(environementFile.lastIndexOf("/")+1));
-                     } catch (GRIDAClientException ex) { 
-            logger.error(ex);
-            throw new VelocityException(ex);
-        }
-            }
-            
-        
+
+
+
         if (!sandboxFile.isEmpty()) {
-            context.put("sandboxFile", applicationLocation + "/bin/" + sandboxFile.substring(sandboxFile.lastIndexOf("/")+1));
+            try {
+                CoreUtil.getGRIDAClient().rename(sandboxFile, applicationLocation + "/bin/" + sandboxFile.substring(sandboxFile.lastIndexOf("/") + 1));
+            } catch (GRIDAClientException ex) {
+                logger.error(ex);
+                throw new VelocityException(ex);
+            }
         }
         if (!environementFile.isEmpty()) {
-            context.put("environementFile", applicationLocation + "/bin/" + environementFile.substring(environementFile.lastIndexOf("/")+1));
+            try {
+                CoreUtil.getGRIDAClient().rename(environementFile, applicationLocation + "/bin/" + environementFile.substring(environementFile.lastIndexOf("/") + 1));
+            } catch (GRIDAClientException ex) {
+                logger.error(ex);
+                throw new VelocityException(ex);
+            }
+        }
+
+
+        if (!sandboxFile.isEmpty()) {
+            context.put("sandboxFile", applicationLocation + "/bin/" + sandboxFile.substring(sandboxFile.lastIndexOf("/") + 1));
+        }
+        if (!environementFile.isEmpty()) {
+            context.put("environementFile", applicationLocation + "/bin/" + environementFile.substring(environementFile.lastIndexOf("/") + 1));
         }
         StringWriter writer = new StringWriter();
         t.merge(context, writer);
-        final String chemin = dir + "/" + applicationName +"_"+date+ ".xml";
+        final String chemin = dir + "/" + applicationName + "_" + date + ".xml";
         final File fichier = new File(chemin);
 
         try {
@@ -94,6 +94,7 @@ public class Velocity implements VelocityProcess {
             CoreUtil.getGRIDAClient().createFolder(applicationLocation, "gasw");
             copyFile(chemin, dir + "/" + applicationName + ".bak" + ".xml");
             CoreUtil.getGRIDAClient().uploadFile(chemin, applicationLocation + "/" + "gasw");
+            //CoreUtil.getGRIDAN4uClient().uploadFile(chemin, applicationLocation.replace("/grid/biomed/creatis/vip/", "/grid/vo.neugrid.eu/home/vip/") + "/" + "gasw");
         } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new VelocityException(ex);
@@ -111,15 +112,15 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public void wrapperScriptFile(ArrayList listInput, ArrayList listOutput, String applicationName, String scriptFile, String applicationLocation,String environementFile, String dir,String date) throws VelocityException {
+    public void wrapperScriptFile(ArrayList listInput, ArrayList listOutput, String applicationName, String scriptFile, String applicationLocation, String environementFile, String dir, String date) throws VelocityException {
 
         int lastIndex = scriptFile.lastIndexOf("/");
         String script = scriptFile.substring(lastIndex + 1);
         String env;
-        if(!environementFile.isEmpty()){
-         env=environementFile.substring(environementFile.lastIndexOf("/")+1);}
-        else{
-         env=environementFile;
+        if (!environementFile.isEmpty()) {
+            env = environementFile.substring(environementFile.lastIndexOf("/") + 1);
+        } else {
+            env = environementFile;
         }
         Template t = ve.getTemplate("vm/wrapper_script.vm");
         VelocityContext context = new VelocityContext();
@@ -129,11 +130,11 @@ public class Velocity implements VelocityProcess {
         context.put("outputList", listOutput);
         if (!env.isEmpty()) {
             context.put("env", env);
-        } 
-        
+        }
+
         StringWriter writer = new StringWriter();
         t.merge(context, writer);
-        final String chemin = dir + "/" + applicationName+"_"+date+ "_wrapper.sh";
+        final String chemin = dir + "/" + applicationName + "_" + date + "_wrapper.sh";
         final File fichier = new File(chemin);
         try {
             createFile(fichier, writer);
@@ -158,7 +159,7 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public String gwendiaFile(ArrayList listInput, ArrayList listOutput, String applicationName, String description, String applicationLocation, String dir,String date) throws VelocityException {
+    public String gwendiaFile(ArrayList listInput, ArrayList listOutput, String applicationName, String description, String applicationLocation, String dir, String date) throws VelocityException {
         Template t = ve.getTemplate("vm/gwendia.vm");
         final String gaswDescriptor = applicationLocation + "/gasw" + "/" + applicationName + ".xml";
         VelocityContext context = new VelocityContext();
@@ -174,7 +175,7 @@ public class Velocity implements VelocityProcess {
         context.put("gaswDescriptor", gaswDescriptor);
         StringWriter writer = new StringWriter();
         t.merge(context, writer);
-        final String chemin = dir + "/" + applicationName +"_"+date+ ".gwendia";
+        final String chemin = dir + "/" + applicationName + "_" + date + ".gwendia";
 
         final File fichier = new File(chemin);
 
@@ -205,7 +206,7 @@ public class Velocity implements VelocityProcess {
             in = new FileInputStream(source).getChannel();
             out = new FileOutputStream(dest).getChannel();
             in.transferTo(0, in.size(), out);
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

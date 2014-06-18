@@ -100,11 +100,10 @@ public class N4uImportTab extends Tab {
     int j = 0;
     String scriptFileName;
     String applicationName;
-    String sandbox="";
-    String environementFile="";
+    String sandbox = "";
+    String environementFile = "";
     String descriptionValue = null;
     String applicationLocation;
-   
 
     public N4uImportTab() {
 
@@ -180,7 +179,7 @@ public class N4uImportTab extends Tab {
             public void onClick(ClickEvent event) {
                 boolean go = true;
                 for (TextItem i : listItems) {
-                        if (!i.validate()|| i.getValueAsString() == null) {
+                    if (!i.validate() || i.getValueAsString() == null) {
                         go = false;
                         Layout.getInstance().setWarningMessage("There is an invalid Input");
                     }
@@ -200,6 +199,9 @@ public class N4uImportTab extends Tab {
                                 final AsyncCallback<List<AppVersion>> callback = new AsyncCallback<List<AppVersion>>() {
                                     @Override
                                     public void onFailure(Throwable caught) {
+
+                                        Layout.getInstance().setWarningMessage(caught.getMessage());
+
                                     }
 
                                     @Override
@@ -236,6 +238,7 @@ public class N4uImportTab extends Tab {
                                             @Override
                                             public void onClick(ClickEvent event) {
                                                 dialog.destroy();
+                                                //delete folder
                                                 Layout.getInstance().setNoticeMessage("Creating the application (this can take a while)");
                                                 createScriptFile(false, false, maxVersion);
 
@@ -295,7 +298,7 @@ public class N4uImportTab extends Tab {
                 final AsyncCallback<Void> call = new AsyncCallback<Void>() {
                     @Override
                     public void onFailure(Throwable caught) {
-                        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                        throw new UnsupportedOperationException("Not supported yet.");
                     }
 
                     @Override
@@ -351,6 +354,20 @@ public class N4uImportTab extends Tab {
                     ApplicationService.Util.getInstance().addVersion(new AppVersion(applicationName, versionValue, result1, true), getCallback("add Version"));
 
                 } else if (!newVersion && !newApplication) {
+
+                    //DELETE LAST VERSION
+                    //appel rpc to have lfn of version after get the result you should remove the repository
+                    final AsyncCallback<AppVersion> call = new AsyncCallback<AppVersion>() {
+                        @Override
+                        public void onFailure(Throwable caught) {
+                            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                        }
+
+                        @Override
+                        public void onSuccess(AppVersion result) {
+                        }
+                    };
+                    ApplicationService.Util.getInstance().getVersion(applicationName, maxVersion, call);
                     ApplicationService.Util.getInstance().updateVersion(new AppVersion(applicationName, maxVersion, result1, true), getCallback("update Version"));
                 } else if (newVersion && newApplication) {
                     addApplication(result1);
@@ -390,7 +407,7 @@ public class N4uImportTab extends Tab {
             }
         };
 
-        FileProcessService.Util.getInstance().generateGaswFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, descriptionValue,sandbox,environementFile, callback);
+        FileProcessService.Util.getInstance().generateGaswFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, descriptionValue, sandbox, environementFile, callback);
 
     }
 
@@ -416,7 +433,7 @@ public class N4uImportTab extends Tab {
             }
         };
 
-        FileProcessService.Util.getInstance().generateScriptFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation,environementFile, descriptionValue, callback2);
+        FileProcessService.Util.getInstance().generateScriptFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, environementFile, descriptionValue, callback2);
 
 
     }
@@ -682,14 +699,14 @@ public class N4uImportTab extends Tab {
     }
 
     //script, extention,env
-    public void addfiels(String title, boolean addBrowseIcon, String value, boolean disabled,boolean required) {
+    public void addfiels(String title, boolean addBrowseIcon, String value, boolean disabled, boolean required) {
 
         Label itemLabel = new Label("<strong>" + title + "</strong>");
 
 
         itemLabel.setHeight(20);
 
-        final TextItem fieldItem = FieldUtil.getTextItem("*", false, "", "[0-9.,A-Za-z-+/_() ]", disabled,required);
+        final TextItem fieldItem = FieldUtil.getTextItem("*", false, "", "[0-9.,A-Za-z-+/_() ]", disabled, required);
         fieldItem.setValidators(ValidatorUtil.getStringValidator());
         fieldItem.setName("editable");
         fieldItem.setValue(value);
@@ -701,8 +718,8 @@ public class N4uImportTab extends Tab {
         titleItemForm.setWidth100();
         titleItemForm.setNumCols(1);
         titleItemForm.setFields(fieldItem);
-         if (title == "Environement File") {
-             environementFile = value;
+        if (title == "Environement File") {
+            environementFile = value;
             fieldItem.addEditorExitHandler(new EditorExitHandler() {
                 @Override
                 public void onEditorExit(EditorExitEvent event) {
@@ -712,7 +729,7 @@ public class N4uImportTab extends Tab {
             });
 
         }
-       
+
 
         if (title == "Main Executable <font color=red>(*)</font>") {
             scriptFileName = value;
@@ -725,14 +742,14 @@ public class N4uImportTab extends Tab {
             });
 
         }
-        
-         if (title == "Sandbox File") {
-           
+
+        if (title == "Sandbox File") {
+
             fieldItem.addEditorExitHandler(new EditorExitHandler() {
                 @Override
                 public void onEditorExit(EditorExitEvent event) {
 
-                    sandbox= fieldItem.getValueAsString();
+                    sandbox = fieldItem.getValueAsString();
                 }
             });
 
