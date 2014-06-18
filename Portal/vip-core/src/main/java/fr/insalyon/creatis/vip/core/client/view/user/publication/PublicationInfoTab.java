@@ -18,7 +18,7 @@ public class PublicationInfoTab extends AbstractFormLayout{
         super("100%", "50");
         addTitle("", CoreConstants.ICON_INFO);
         addMember(WidgetUtil.getLabel("<b>Please list here the references of the publications that you made using VIP. These references may"
-                + " be used by the VIP team to justify the use of computing and storage resources to the European Grid Infrastructure.</b>", 20));
+                + " be used by the VIP team to justify the use of computing and storage resources.</b>", 20));
         
     }
     
