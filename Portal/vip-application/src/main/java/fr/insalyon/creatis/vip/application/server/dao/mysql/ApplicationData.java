@@ -330,19 +330,24 @@ public class ApplicationData implements ApplicationDAO {
      * @throws DAOException
      */
     @Override
-    public boolean applicationExist(String applicationName) throws DAOException {
+    public boolean applicationExist(String applicationName, String userEmail) throws DAOException {
         boolean exist;
         try {
             PreparedStatement ps;
             ps = connection.prepareStatement("SELECT "
-                    + "name "
+                    + "name,owner "
                     + "FROM VIPApplications "
                     + "WHERE name=?");
 
             ps.setString(1, applicationName);
+
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 exist = true;
+                String owner = rs.getString("owner");
+                if (!owner.equals(userEmail) || owner == null) {
+                    throw new DAOException("this application already exist, you can't modify/overwrite application that's not yours.");
+                }
 
             } else {
                 exist = false;
@@ -350,6 +355,8 @@ public class ApplicationData implements ApplicationDAO {
             }
 
             ps.close();
+
+
 
 
         } catch (SQLException ex) {

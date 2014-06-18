@@ -50,28 +50,28 @@ public interface ApplicationDAO {
     public void update(Application workflowDescriptor) throws DAOException;
 
     public void remove(String name) throws DAOException;
-    
+
     public void remove(String email, String name) throws DAOException;
-    
+
     public void addVersion(AppVersion version) throws DAOException;
 
     public void updateVersion(AppVersion version) throws DAOException;
 
     public void removeVersion(String applicationName, String version) throws DAOException;
-    
+
     public List<Application> getApplications() throws DAOException;
-    
+
     public List<String[]> getApplications(String className) throws DAOException;
-    
+
     public List<Application> getApplications(List<String> classes) throws DAOException;
-    
+
     public List<String> getApplicationsName(String applicationClass) throws DAOException;
 
-    public boolean applicationExist(String name) throws DAOException;
-    
+    public boolean applicationExist(String name, String userEmail) throws DAOException;
+
     public String getCitation(String name) throws DAOException;
-    
+
     public List<AppVersion> getVersions(String name) throws DAOException;
-    
+
     public AppVersion getVersion(String applicationName, String applicationVersion) throws DAOException;
 }

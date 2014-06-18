@@ -222,8 +222,9 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     public boolean applicationExist(String applicationName) throws ApplicationException {
 
         try {
-            return applicationBusiness.applicationExist(applicationName);
-
+            return applicationBusiness.applicationExist(applicationName, getSessionUser().getEmail());
+        } catch (CoreException ex) {
+            throw new ApplicationException(ex);
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }

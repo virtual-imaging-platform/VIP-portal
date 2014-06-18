@@ -54,10 +54,10 @@ public class ApplicationBusiness {
      * @return
      * @throws BusinessException
      */
-    public boolean applicationExist(String applicationName) throws BusinessException {
+    public boolean applicationExist(String applicationName, String userEmail) throws BusinessException {
 
         try {
-            return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().applicationExist(applicationName);
+            return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().applicationExist(applicationName, userEmail);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);

@@ -67,7 +67,7 @@ import java.util.List;
  * @author Rafael Ferreira da Silva
  */
 public class EditApplicationLayout extends AbstractFormLayout {
-    
+
     private boolean newApplication = true;
     private TextItem nameField;
     private SelectItem classesPickList;
@@ -75,59 +75,59 @@ public class EditApplicationLayout extends AbstractFormLayout {
     private IButton saveButton;
     private IButton removeButton;
     private SelectItem usersPickList;
-    
+
     public EditApplicationLayout() {
-        
+
         super(480, 200);
         addTitle("Add/Edit Application", ApplicationConstants.ICON_APPLICATION);
-        
+
         configure();
         loadClasses();
     }
-    
+
     private void configure() {
-        
+
         nameField = FieldUtil.getTextItem(450, null);
-        
+
         classesPickList = new SelectItem();
         classesPickList.setShowTitle(false);
         classesPickList.setMultiple(true);
         classesPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
         classesPickList.setWidth(450);
-        
+
         usersPickList = new SelectItem();
         usersPickList.setShowTitle(false);
         usersPickList.setWidth(450);
         usersPickList.setRequired(true);
-        
+
         richTextEditor = new RichTextEditor();
         richTextEditor.setHeight(200);
         richTextEditor.setOverflow(Overflow.HIDDEN);
         richTextEditor.setShowEdges(true);
         richTextEditor.setControlGroups("styleControls", "editControls",
                 "colorControls", "insertControls");
-        
+
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
                 if (nameField.validate() & classesPickList.validate()) {
-                    
+
                     List<String> values = new ArrayList<String>();
                     values.addAll(Arrays.asList(classesPickList.getValues()));
-                    
+
                     if (newApplication) {
                         save(new Application(nameField.getValueAsString().trim(),
                                 values, richTextEditor.getValue()));
                     } else {
                         save(new Application(nameField.getValueAsString().trim(),
                                 values, usersPickList.getValueAsString(), richTextEditor.getValue()));
-                        
+
                     }
                 }
             }
         });
-        
+
         removeButton = WidgetUtil.getIButton("Remove", CoreConstants.ICON_DELETE,
                 new ClickHandler() {
             @Override
@@ -143,7 +143,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
             }
         });
         removeButton.setDisabled(true);
-        
+
         addField("Name", nameField);
         if (CoreModule.user.isSystemAdministrator()) {
             this.addMember(WidgetUtil.getLabel("<b>Owner</b>", 15));
@@ -163,7 +163,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
      * @param citation Application citation
      */
     public void setApplication(String name, String owner, String classes, String citation) {
-        
+
         if (name != null) {
             usersPickList.setCanEdit(true);
             loadUsers(owner);
@@ -173,7 +173,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
             this.richTextEditor.setValue(citation);
             this.newApplication = false;
             this.removeButton.setDisabled(false);
-            
+
         } else {
             usersPickList.setCanEdit(false);
             usersPickList.setValue("");
@@ -182,7 +182,6 @@ public class EditApplicationLayout extends AbstractFormLayout {
             this.classesPickList.setValues(new String[]{});
             this.richTextEditor.setValue("");
             this.newApplication = true;
-            
             this.removeButton.setDisabled(true);
         }
     }
@@ -192,9 +191,9 @@ public class EditApplicationLayout extends AbstractFormLayout {
      * @param app
      */
     private void save(Application app) {
-        
+
         WidgetUtil.setLoadingIButton(saveButton, "Saving...");
-        
+
         if (newApplication) {
             ApplicationService.Util.getInstance().add(app, getCallback("add"));
         } else {
@@ -208,7 +207,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
      * @param name Application name
      */
     private void remove(String name) {
-        
+
         WidgetUtil.setLoadingIButton(removeButton, "Removing...");
         ApplicationService.Util.getInstance().remove(name, getCallback("remove"));
     }
@@ -219,7 +218,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
      * @return
      */
     private AsyncCallback<Void> getCallback(final String text) {
-        
+
         return new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -227,7 +226,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
                 Layout.getInstance().setWarningMessage("Unable to " + text + " application:<br />" + caught.getMessage());
             }
-            
+
             @Override
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
@@ -244,13 +243,13 @@ public class EditApplicationLayout extends AbstractFormLayout {
      * Loads classes list
      */
     private void loadClasses() {
-        
+
         final AsyncCallback<List<AppClass>> callback = new AsyncCallback<List<AppClass>>() {
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to get list of classes:<br />" + caught.getMessage());
             }
-            
+
             @Override
             public void onSuccess(List<AppClass> result) {
                 List<String> dataList = new ArrayList<String>();
@@ -262,31 +261,31 @@ public class EditApplicationLayout extends AbstractFormLayout {
         };
         ApplicationService.Util.getInstance().getClasses(callback);
     }
-    
+
     private void loadUsers(final String currentUser) {
-        
+
         final AsyncCallback<List<User>> callback = new AsyncCallback<List<User>>() {
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to load users:<br />" + caught.getMessage());
                 usersPickList.setValues(currentUser);
-                
+
             }
-            
+
             @Override
             public void onSuccess(List<User> result) {
-                
+
                 LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
-                
+
                 for (User user : result) {
-                    
-                    
+
+
                     valueMap.put(user.getEmail(), user.getFirstName() + " " + user.getLastName());
-                    
+
                 }
                 usersPickList.setValueMap(valueMap);
                 usersPickList.setValue(currentUser);
-                
+
             }
         };
         ConfigurationService.Util.getInstance().getUsers(callback);
