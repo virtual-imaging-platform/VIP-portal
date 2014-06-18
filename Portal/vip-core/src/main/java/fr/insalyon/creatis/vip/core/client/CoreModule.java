@@ -125,7 +125,7 @@ public class CoreModule extends Module {
                 Button cancel = new Button("Cancel");
                 Frame frame = new Frame("documentation/terms.html");
                 frame.setWidth("420");
-                Label l = new Label("You have to accept this terms of Use");
+                Label l = new Label("Please accept our Terms of Use");
                 l.setHeight(100);
                 l.setWidth100();
                 dialog.setMembersMargin(2);

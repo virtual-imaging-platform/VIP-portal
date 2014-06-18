@@ -56,7 +56,7 @@ public class TermsOfUseLayout extends AbstractFormLayout {
                     String termsUse = termsOfuse.substring(0, termsOfuse.lastIndexOf("."));
                     text = WidgetUtil.getLabel("You accepted <a href=\"documentation/terms.html\">the terms of use</a> on " + termsUse, 20);
                 } else {
-                    text = WidgetUtil.getLabel("You have to accept our terms of use", 20);
+                    text = WidgetUtil.getLabel("Please accept our Terms of Use", 20);
                     text.setBackgroundColor("#F79191");
                 }
                 if (getMember(1) == null) {
