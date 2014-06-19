@@ -173,22 +173,22 @@ public class LayoutConverterOption1 extends AbstractFormLayout {
 
                             tabImporter = new N4uImportTab();
                             Layout.getInstance().addTab(tabImporter);
-                            tabImporter.addfiels("Application Name <font color=red>(*)</font>", false, title.getValueAsString(), false, true);
+                            tabImporter.addFiles("Application Name <font color=red>(*)</font>", false, title.getValueAsString(), false, true);
                             tabImporter.addFielDescription("Documentation and Terms of Use", "");
-                            tabImporter.addFielsInputs(true, "results-directory ", "Directory where the results will be stored", N4uImportTab.InputType.Parameter.name(), true);
-                            tabImporter.addFielsInputs(true, "job name", "A string identifying the job name", N4uImportTab.InputType.Parameter.name(), false);
+                            tabImporter.addInputFiles(true, "results-directory ", "Directory where the results will be stored", N4uImportTab.InputType.Parameter.name(), true);
+                            tabImporter.addInputFiles(true, "job name", "A string identifying the job name", N4uImportTab.InputType.Parameter.name(), false);
                             for (int i = 1; i < (int) result[0]; i++) {
                                 if (i <= result[1]) {
-                                    tabImporter.addFielsInputs(false, "", "", N4uImportTab.InputType.File.name(), false);
+                                    tabImporter.addInputFiles(false, "", "", N4uImportTab.InputType.File.name(), false);
                                 } else {
-                                    tabImporter.addFielsInputs(false, "", "", N4uImportTab.InputType.Parameter.name(), false);
+                                    tabImporter.addInputFiles(false, "", "", N4uImportTab.InputType.Parameter.name(), false);
                                 }
                             }
 
-                            tabImporter.addFielsOutput(true, "result", "A tar.gz file containing the results", N4uImportTab.InputType.File.name(), true);
-                            tabImporter.addfiels("Main Executable <font color=red>(*)</font>", true, script.getValueAsString(), false, true);
-                            tabImporter.addfiels("Application Location <font color=red>(*)</font>", true, "", false, true);
-                            tabImporter.addfiels("Environement File", true, env.getValueAsString(), false, false);
+                            tabImporter.addOutputFile(true, "result", "A tar.gz file containing the results", N4uImportTab.InputType.File.name(), true);
+                            tabImporter.addFiles("Main Executable <font color=red>(*)</font>", true, script.getValueAsString(), false, true);
+                            tabImporter.addFiles("Application Location <font color=red>(*)</font>", true, "", false, true);
+                            tabImporter.addFiles("Environement File", true, env.getValueAsString(), false, false);
                             /* if (ext.getValueAsString() != "" || ext.getValueAsString() != null || !ext.getValueAsString().isEmpty()) {
                              tabImporter.addfiels("Extension File", true, false, ext.getValueAsString(), false);
                              }
@@ -198,7 +198,7 @@ public class LayoutConverterOption1 extends AbstractFormLayout {
                              }
                              **/
 
-                            tabImporter.addfiels("Sandbox File", true, "", false, false);
+                            tabImporter.addFiles("Sandbox File", true, "", false, false);
                             tabImporter.addLaunchButton();
 
                         }

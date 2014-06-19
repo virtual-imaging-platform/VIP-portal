@@ -168,7 +168,7 @@ public class N4uImportTab extends Tab {
         layoutInputs.getAddButton().addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                addFielsInputs(false, "", "", "", false);
+                addInputFiles(false, "", "", "", false);
             }
         });
         layoutInputs.addMember(vlayout);
@@ -181,7 +181,7 @@ public class N4uImportTab extends Tab {
                 for (TextItem i : listItems) {
                     if (!i.validate() || i.getValueAsString() == null) {
                         go = false;
-                        Layout.getInstance().setWarningMessage("There is an invalid Input");
+                        Layout.getInstance().setWarningMessage("There is an invalid input");
                     }
                 }
                 if (go == true) {
@@ -439,7 +439,7 @@ public class N4uImportTab extends Tab {
     }
 
 //inputs
-    public VLayout addFielsInputs(boolean requiredInput, String value, String descriptionValue, String typeValue, boolean isFixedType) {
+    public VLayout addInputFiles(boolean requiredInput, String value, String descriptionValue, String typeValue, boolean isFixedType) {
         i++;
         HLayout hlayout = new HLayout();
         hlayout.setHeight(80);
@@ -579,7 +579,7 @@ public class N4uImportTab extends Tab {
 
     }
 
-    public VLayout addFielsOutput(boolean fixedInput, String value, String descriptionValue, String typeValue, boolean fixedType) {
+    public VLayout addOutputFile(boolean fixedInput, String value, String descriptionValue, String typeValue, boolean fixedType) {
         j++;
         HLayout hlayout = new HLayout();
         hlayout.setHeight(80);
@@ -699,7 +699,7 @@ public class N4uImportTab extends Tab {
     }
 
     //script, extention,env
-    public void addfiels(String title, boolean addBrowseIcon, String value, boolean disabled, boolean required) {
+    public void addFiles(String title, boolean addBrowseIcon, String value, boolean disabled, boolean required) {
 
         Label itemLabel = new Label("<strong>" + title + "</strong>");
 
@@ -813,7 +813,7 @@ public class N4uImportTab extends Tab {
     public static enum InputType {
 
         File, Parameter;
-    }
+        }
 
     public void addLaunchButton() {
 

@@ -177,7 +177,7 @@ public class SignUpTab extends Tab {
                         public void onFailure(Throwable caught) {
                             WidgetUtil.resetIButton(signupButton, "Sign Up", null);
                             if(!caught.getMessage().contains("Undesired Mail Domain")){
-                            Layout.getInstance().setWarningMessage("Unable to signing up:<br />" + caught.getMessage(), 10);
+                                Layout.getInstance().setWarningMessage("Unable to sign up:<br />" + caught.getMessage(), 10);
                             }
                         }
 
