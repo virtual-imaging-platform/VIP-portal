@@ -6,7 +6,7 @@
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip-datamanager-applet</artifactId>
     <packaging>jar</packaging>
-    <version>1.0</version>
+    <version>1.7.1</version>
 
     <name>VIP-DataManager-Applet</name>
 
