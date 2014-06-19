@@ -135,6 +135,11 @@ public class ConfigurationBusiness {
     public void signup(User user, String comments, boolean automaticCreation, boolean mapPrivateGroups, String... accountType) throws BusinessException {
 
         boolean existUndesiredMailDomain = false;
+        String message = "Signing up "+user.getEmail()+" (list of undesired mail domains: ";
+        for(String s : Server.getInstance().getUndesiredMailDomains())
+            message+=" "+s;
+        message+=")";
+        logger.info(message);
         for (String udm : Server.getInstance().getUndesiredMailDomains()) {
             if (user.getEmail().endsWith(udm)) {
                 existUndesiredMailDomain = true;
