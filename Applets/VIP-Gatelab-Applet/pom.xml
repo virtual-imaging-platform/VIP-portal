@@ -5,7 +5,7 @@
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip-gatelab-applet</artifactId>
     <packaging>jar</packaging>
-    <version>1.7.1</version>
+    <version>1.9</version>
     <name>VIP-Gatelab-Applet</name>
     <dependencies>
 
@@ -19,7 +19,7 @@
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-datamanager-applet</artifactId>
-            <version>1.7.1</version>
+            <version>1.9</version>
         </dependency>
 
         <dependency>
