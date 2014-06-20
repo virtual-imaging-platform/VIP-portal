@@ -50,7 +50,7 @@
         <dependency>
             <groupId>sun.jdk</groupId>
             <artifactId>plugin</artifactId>
-            <version>1.6.0</version>
+            <version>1.7.0</version>
             <scope>system</scope>
             <systemPath>${java.home}/lib/plugin.jar</systemPath>
         </dependency>
