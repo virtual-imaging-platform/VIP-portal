@@ -45,7 +45,7 @@
                         </manifest>
                         <manifestEntries>
                             <Permissions>all-permissions</Permissions>
-                            <Application-Name>DataManager Applet</Application-Name>
+                            <Application-Name>GATE-Lab Applet</Application-Name>
                             <Codebase>*</Codebase>
                             <Caller-Allowable-Codebase>*</Caller-Allowable-Codebase>
                         </manifestEntries>
