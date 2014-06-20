@@ -35,7 +35,6 @@ public class PublicationData implements PublicationDAO {
                     "INSERT INTO VIPPublication(title,date,doi,authors,type,typeName,vipAuthor) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?)");
 
-
             ps.setString(1, pub.getTitle());
             ps.setString(2, pub.getDate());
             ps.setString(3, pub.getDoi());
@@ -59,8 +58,6 @@ public class PublicationData implements PublicationDAO {
                     + "SET title=?, date=?, doi=?, authors=?, type=?, typeName=?,vipAuthor=? "
                     + "WHERE id=?");
 
-
-
             ps.setString(1, publication.getTitle());
             ps.setString(2, publication.getDate());
             ps.setString(3, publication.getDoi());
@@ -71,8 +68,6 @@ public class PublicationData implements PublicationDAO {
             ps.setLong(8, publication.getId());
             ps.executeUpdate();
             ps.close();
-
-
 
         } catch (SQLException ex) {
             logger.error(ex);
@@ -98,30 +93,14 @@ public class PublicationData implements PublicationDAO {
     }
 
     @Override
-    public List<Publication> getList(String email) throws DAOException {
+    public List<Publication> getList() throws DAOException {
         try {
             String level = null;
             PreparedStatement ps;
-            PreparedStatement pr = connection.prepareStatement("SELECT "
-                    + "level FROM "
-                    + "VIPUsers where email=?");
-            pr.setString(1, email);
-            ResultSet rs1 = pr.executeQuery();
-            while (rs1.next()) {
-                level = rs1.getString("level");
-            }
-            if (level.equals(UserLevel.Administrator.toString())) {
-                ps = connection.prepareStatement("SELECT "
-                        + "id,title,date,doi,authors,type,typeName,VIPAuthor FROM "
-                        + "VIPPublication");
-            } else {
-                ps = connection.prepareStatement("SELECT "
-                        + "id,title,date,doi,authors,type,typeName,VIPAuthor FROM "
-                        + "VIPPublication where VIPAuthor=?");
-                ps.setString(1, email);
 
-            }
-
+            ps = connection.prepareStatement("SELECT "
+                    + "id,title,date,doi,authors,type,typeName,VIPAuthor FROM "
+                    + "VIPPublication");
 
             ResultSet rs = ps.executeQuery();
 
@@ -134,6 +113,33 @@ public class PublicationData implements PublicationDAO {
 
             rs.close();
             return publications;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    @Override
+    public Publication getPublication(Long id) throws DAOException {
+        try {
+            String level = null;
+            PreparedStatement ps;
+
+            ps = connection.prepareStatement("SELECT "
+                    + "id,title,date,doi,authors,type,typeName,VIPAuthor FROM "
+                    + "VIPPublication where id=?");
+
+            ps.setLong(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            Publication p = null;
+            if (rs.next()) {
+                p = new Publication(rs.getLong("id"), rs.getString("title"), rs.getString("date"), rs.getString("doi"), rs.getString("authors"), rs.getString("type"), rs.getString("typeName"), rs.getString("VIPAuthor"));
+            }
+
+            rs.close();
+            return p;
 
         } catch (SQLException ex) {
             logger.error(ex);

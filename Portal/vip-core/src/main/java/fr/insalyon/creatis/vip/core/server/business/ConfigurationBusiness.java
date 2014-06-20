@@ -1190,10 +1190,10 @@ public class ConfigurationBusiness {
      *
      * @return @throws BusinessException
      */
-    public List<Publication> getPublications(String email) throws BusinessException {
+    public List<Publication> getPublications() throws BusinessException {
 
         try {
-            return CoreDAOFactory.getDAOFactory().getPublicationDAO().getList(email);
+            return CoreDAOFactory.getDAOFactory().getPublicationDAO().getList();
         } catch (DAOException ex) {
             logger.error(ex);
             throw new BusinessException(ex);

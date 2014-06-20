@@ -12,7 +12,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class PublicationRecord extends ListGridRecord {
 
-    public PublicationRecord(Long id, String title, String type, String typeName, String date, String authors, String doi) {
+    public PublicationRecord(Long id, String title, String type, String typeName, String date, String authors, String doi, String vipAuthor) {
 
         setAttribute("id", id);
         setAttribute("title", title);
@@ -21,5 +21,6 @@ public class PublicationRecord extends ListGridRecord {
         setAttribute("date", date);
         setAttribute("authors", authors);
         setAttribute("doi", doi);
+        setAttribute("vipAuthor", vipAuthor);
     }
 }
