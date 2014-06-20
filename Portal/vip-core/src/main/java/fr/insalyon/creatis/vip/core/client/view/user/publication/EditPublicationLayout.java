@@ -55,7 +55,7 @@ public class EditPublicationLayout extends AbstractFormLayout {
 
 
         publicationDate = new ComboBoxItem();
-        publicationDate.setWidth("60");
+        publicationDate.setWidth("80");
         publicationDate.setValueMap("2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015");
         publicationDate.setDefaultValue("2014");
         publicationDate.setShowTitle(false);
@@ -147,7 +147,6 @@ public class EditPublicationLayout extends AbstractFormLayout {
         return new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
-
                 Layout.getInstance().setWarningMessage("Unable to " + text + " publication:<br />" + caught.getMessage());
             }
 

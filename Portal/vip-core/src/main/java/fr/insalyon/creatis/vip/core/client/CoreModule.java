@@ -34,23 +34,16 @@
  */
 package fr.insalyon.creatis.vip.core.client;
 
-import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Frame;
-import com.smartgwt.client.util.BooleanCallback;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Dialog;
-import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.events.ButtonClickEvent;
-import com.smartgwt.client.widgets.events.ButtonClickHandler;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
@@ -67,8 +60,6 @@ import fr.insalyon.creatis.vip.core.client.view.main.SystemParser;
 import fr.insalyon.creatis.vip.core.client.view.main.SystemTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.user.AccountTab;
 import fr.insalyon.creatis.vip.core.client.view.user.UserMenuButton;
-import fr.insalyon.creatis.vip.core.client.view.user.account.TermsOfUseLayout;
-import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.List;
 
 /**

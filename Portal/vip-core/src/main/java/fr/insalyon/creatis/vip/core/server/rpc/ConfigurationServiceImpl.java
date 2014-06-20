@@ -37,7 +37,6 @@ import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session.AccessType;
 import com.dropbox.client2.session.WebAuthSession;
 import com.dropbox.client2.session.WebAuthSession.WebAuthInfo;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
@@ -407,7 +406,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             String email = getSessionUser().getEmail();
             return configurationBusiness.getUserPropertiesGroups(email);
-
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
@@ -812,6 +810,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     @Override
     public void updateTermsOfUse() throws CoreException {
+        trace(logger, "Updating terms of use.");
         User user = getSessionUser();
         try {
             configurationBusiness.updateTermsOfUse(user.getEmail());
@@ -823,8 +822,9 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     @Override
     public List<Publication> getPublications() throws CoreException {
+        trace(logger, "Getting publication list.");
         try {
-            return configurationBusiness.getPublications(getSessionUser().getEmail());
+            return configurationBusiness.getPublications();
 
         } catch (BusinessException ex) {
             logger.error(ex);
@@ -834,16 +834,19 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     @Override
     public void removePublication(Long id) throws CoreException {
+        trace(logger, "Removing publication.");
         try {
+            authenticateSystemAdministrator(logger);
             configurationBusiness.removePublication(id);
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
-        }
+        } 
     }
 
     @Override
     public void addPublication(Publication pub) throws CoreException {
+        trace(logger, "Adding publication.");
         try {
             User user = getSessionUser();
             pub.setVipAuthor(user.getEmail());
@@ -857,9 +860,9 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     @Override
     public void updatePublication(Publication pub) throws CoreException {
+        trace(logger, "Updating publication.");
         try {
-            User user = getSessionUser();
-            pub.setVipAuthor(user.getEmail());
+            authenticateSystemAdministrator(logger);
             configurationBusiness.updatePublication(pub);
 
         } catch (BusinessException ex) {

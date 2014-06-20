@@ -15,6 +15,8 @@ public interface PublicationDAO {
     public void update(Publication publication) throws DAOException;
 
     public void remove(Long publicationID) throws DAOException;
+    
+    public Publication getPublication(Long publicationID) throws DAOException;
 
-    public List<Publication> getList(String email) throws DAOException;
+    public List<Publication> getList() throws DAOException;
 }

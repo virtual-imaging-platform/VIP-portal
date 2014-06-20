@@ -4,7 +4,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.DateDisplayFormat;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
@@ -22,8 +21,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.viewer.DetailViewer;
 import com.smartgwt.client.widgets.viewer.DetailViewerField;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.bean.Publication;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
@@ -31,6 +30,7 @@ import fr.insalyon.creatis.vip.core.client.view.common.LabelButton;
 import fr.insalyon.creatis.vip.core.client.view.common.ToolstripLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.user.PublicationTab;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,7 @@ import java.util.List;
  */
 public class PublicationLayout extends VLayout {
 
-    private ModalWindow modal;
+    private final ModalWindow modal;
     private ListGrid grid;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
@@ -51,7 +51,7 @@ public class PublicationLayout extends VLayout {
 
     public PublicationLayout() {
 
-        this.setWidth("50%");
+        this.setWidth100();
         this.setHeight100();
         this.setOverflow(Overflow.AUTO);
 
@@ -73,11 +73,10 @@ public class PublicationLayout extends VLayout {
             }
         });
 
-
         toolstrip.addMember(WidgetUtil.getSpaceLabel(15));
         toolstrip.addMember(searchButton);
 
-        LabelButton addButton = new LabelButton("Add Publicaton", CoreConstants.ICON_ADD);
+        LabelButton addButton = new LabelButton("Add Publication", CoreConstants.ICON_ADD);
         addButton.setWidth(150);
         addButton.addClickHandler(new ClickHandler() {
             @Override
@@ -115,7 +114,7 @@ public class PublicationLayout extends VLayout {
                     rollOverCanvas.setWidth(50);
                     rollOverCanvas.setHeight(22);
 
-                    ImgButton loadImg = getImgButton(CoreConstants.ICON_EDIT, "Edit");
+                    final ImgButton loadImg = getImgButton(CoreConstants.ICON_EDIT, "Edit");
                     loadImg.addClickHandler(new ClickHandler() {
                         @Override
                         public void onClick(ClickEvent event) {
@@ -124,24 +123,28 @@ public class PublicationLayout extends VLayout {
                                     rollOverRecord.getAttribute("typeName"), rollOverRecord.getAttribute("authors"), rollOverRecord.getAttribute("date"), rollOverRecord.getAttribute("doi"));
                         }
                     });
-                    ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
+                    final ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
                     deleteImg.addClickHandler(new ClickHandler() {
                         @Override
                         public void onClick(ClickEvent event) {
                             final String id = rollOverRecord.getAttribute("id");
                             SC.ask("Do you really want to remove the publication \""
                                     + rollOverRecord.getAttribute("title") + " ?", new BooleanCallback() {
-                                @Override
-                                public void execute(Boolean value) {
-                                    if (value) {
-                                        remove(Long.valueOf(id));
-                                    }
-                                }
-                            });
+                                        @Override
+                                        public void execute(Boolean value) {
+                                            if (value) {
+                                                remove(Long.valueOf(id));
+                                            }
+                                        }
+                                    });
                         }
                     });
-                    rollOverCanvas.addMember(loadImg);
-                    rollOverCanvas.addMember(deleteImg);
+
+                    if (CoreModule.user.getLevel() == UserLevel.Administrator) {
+                        rollOverCanvas.addMember(loadImg);
+                        rollOverCanvas.addMember(deleteImg);
+                    }
+
                 }
                 return rollOverCanvas;
             }
@@ -161,8 +164,6 @@ public class PublicationLayout extends VLayout {
             @Override
             protected Canvas getCellHoverComponent(Record record, Integer rowNum, Integer colNum) {
 
-
-
                 detailViewer = new DetailViewer();
                 detailViewer.setWidth(400);
                 detailViewer.setFields(
@@ -172,7 +173,6 @@ public class PublicationLayout extends VLayout {
                         new DetailViewerField("authors", "Authors"),
                         new DetailViewerField("date", "Date"),
                         new DetailViewerField("doi", "Doi"));
-
                 detailViewer.setData(new Record[]{record});
 
                 return detailViewer;
@@ -199,16 +199,17 @@ public class PublicationLayout extends VLayout {
                 new ListGridField("authors", "Authors"),
                 new ListGridField("date", "Date"));
 
-
         id.setHidden(true);
         grid.setSortField("title");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellClickHandler(new CellClickHandler() {
             @Override
             public void onCellClick(CellClickEvent event) {
-                edit(event.getRecord().getAttribute("id"), event.getRecord().getAttribute("title"),
-                        event.getRecord().getAttribute("type"),
-                        event.getRecord().getAttribute("typeName"), event.getRecord().getAttribute("authors"), event.getRecord().getAttribute("date"), event.getRecord().getAttribute("doi"));
+                if (CoreModule.user.getLevel() == UserLevel.Administrator) {
+                    edit(event.getRecord().getAttribute("id"), event.getRecord().getAttribute("title"),
+                            event.getRecord().getAttribute("type"),
+                            event.getRecord().getAttribute("typeName"), event.getRecord().getAttribute("authors"), event.getRecord().getAttribute("date"), event.getRecord().getAttribute("doi"));
+                }
             }
         });
         this.addMember(grid);
@@ -226,10 +227,8 @@ public class PublicationLayout extends VLayout {
             public void onSuccess(List<Publication> result) {
                 modal.hide();
                 List<PublicationRecord> dataList = new ArrayList<PublicationRecord>();
-
                 for (Publication pub : result) {
-
-                    dataList.add(new PublicationRecord(pub.getId(), pub.getTitle(), pub.getType(), pub.getTypeName(), pub.getDate(), pub.getAuthors(), pub.getDoi()));
+                    dataList.add(new PublicationRecord(pub.getId(), pub.getTitle(), pub.getType(), pub.getTypeName(), pub.getDate(), pub.getAuthors(), pub.getDoi(), pub.getVipAuthor()));
                 }
                 grid.setData(dataList.toArray(new PublicationRecord[]{}));
                 ds.setTestData(dataList.toArray(new PublicationRecord[]{}));
@@ -243,8 +242,6 @@ public class PublicationLayout extends VLayout {
 
         PublicationTab pubTab = (PublicationTab) Layout.getInstance().
                 getTab(CoreConstants.TAB_PUBLICATION);
-
-
         pubTab.setPublication(id, title, type, typeName, authors, date, doi);
     }
 
