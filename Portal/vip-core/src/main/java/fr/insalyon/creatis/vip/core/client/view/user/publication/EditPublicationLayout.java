@@ -4,18 +4,13 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.user.publication;
 
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.DateDisplayFormat;
-import com.smartgwt.client.types.DateItemSelectorFormat;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.BooleanCallback;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
-import com.smartgwt.client.widgets.form.fields.DateItem;
-import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -27,6 +22,9 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.user.PublicationTab;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -56,7 +54,7 @@ public class EditPublicationLayout extends AbstractFormLayout {
 
         publicationDate = new ComboBoxItem();
         publicationDate.setWidth("80");
-        publicationDate.setValueMap("2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015");
+        publicationDate.setValueMap(configureYear());
         publicationDate.setDefaultValue("2014");
         publicationDate.setShowTitle(false);
 
@@ -159,5 +157,15 @@ public class EditPublicationLayout extends AbstractFormLayout {
                 pubTab.loadPublication();
             }
         };
+    }
+
+    private String[] configureYear() {
+        String year = DateTimeFormat.getFormat("d-M-yyyy").format(new Date()).split("-")[2];
+        List<String> values = new ArrayList<String>();
+        for (int i = 2008; i < Integer.valueOf(year) + 2; i++) {
+            values.add(String.valueOf(i));
+        }
+        String[] yearTable = new String[values.size()];
+        return values.toArray(yearTable);
     }
 }
