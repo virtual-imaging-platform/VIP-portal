@@ -38,6 +38,7 @@ import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.system.account.ManageAccountsTab;
 import fr.insalyon.creatis.vip.core.client.view.system.group.ManageGroupsTab;
+import fr.insalyon.creatis.vip.core.client.view.system.setting.ManageSettingTab;
 import fr.insalyon.creatis.vip.core.client.view.system.user.ManageUsersTab;
 
 /**
@@ -53,6 +54,7 @@ public class SystemParser extends ApplicationParser {
             addApplication(CoreConstants.APP_USER, CoreConstants.APP_IMG_USER);
             addApplication(CoreConstants.APP_GROUP, CoreConstants.APP_IMG_GROUP);
             addApplication(CoreConstants.APP_ACCOUNT_MANAGER, CoreConstants.APP_IMG_ACCOUNT_MANAGER);
+            addApplication(CoreConstants.APP_SETTING, CoreConstants.APP_IMG_SETTING);
         }
     }
 
@@ -69,6 +71,10 @@ public class SystemParser extends ApplicationParser {
 
         } else if (applicationName.equals(CoreConstants.APP_ACCOUNT_MANAGER)) {
             Layout.getInstance().addTab(new ManageAccountsTab());
+            return true;
+        
+        } else if (applicationName.equals(CoreConstants.APP_SETTING)) {
+            Layout.getInstance().addTab(new ManageSettingTab());
             return true;
         }
         return false;
