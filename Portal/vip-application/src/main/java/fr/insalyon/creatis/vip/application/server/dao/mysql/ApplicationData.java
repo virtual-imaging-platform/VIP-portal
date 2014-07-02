@@ -79,7 +79,7 @@ public class ApplicationData implements ApplicationDAO {
             ps.setString(2, application.getCitation());
             ps.setString(3, application.getOwner());
             ps.execute();
-
+       
             for (String className : application.getApplicationClasses()) {
                 addClassToApplication(application.getName(), className);
             }
@@ -115,12 +115,13 @@ public class ApplicationData implements ApplicationDAO {
             ps.setString(3, application.getName());
             ps.executeUpdate();
             ps.close();
-
             removeAllClassesFromApplication(application.getName());
             for (String className : application.getApplicationClasses()) {
+                if(!className.equals("")){
                 addClassToApplication(application.getName(), className);
+                }
             }
-
+            
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
