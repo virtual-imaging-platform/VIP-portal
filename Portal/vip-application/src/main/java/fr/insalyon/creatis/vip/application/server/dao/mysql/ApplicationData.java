@@ -290,7 +290,7 @@ public class ApplicationData implements ApplicationDAO {
                 String clause = sb.length() > 0 ? " AND (" + sb.toString() + ")" : "";
 
                 PreparedStatement ps = connection.prepareStatement("SELECT DISTINCT "
-                        + "name, citation FROM "
+                        + "name,owner, citation FROM "
                         + "VIPApplications app, VIPApplicationClasses appc "
                         + "WHERE app.name = appc.application " + clause + " "
                         + "ORDER BY name");
@@ -311,8 +311,21 @@ public class ApplicationData implements ApplicationDAO {
                         appClasses.add(rs2.getString("class"));
                     }
                     ps2.close();
+                    
+                     String owner = rs.getString("owner");
+                PreparedStatement ps3 = connection.prepareStatement("SELECT "
+                        + "first_name,last_name FROM VIPUsers WHERE email=?");
+                ps3.setString(1, owner);
+                ResultSet rs3 = ps3.executeQuery();
+                String firstName = null;
+                String lastName = null;
+                while (rs3.next()) {
+                    firstName = rs3.getString("first_name");
+                    lastName = rs3.getString("last_name");
+                }
+                ps3.close();
 
-                    applications.add(new Application(name, appClasses, rs.getString("citation")));
+                    applications.add(new Application(name, appClasses,rs.getString("owner"),firstName + " " + lastName, rs.getString("citation")));
                 }
                 ps.close();
             }
