@@ -98,6 +98,7 @@ public class CoreConstants implements IsSerializable {
     public static final String TAB_MANAGE_GROUPS = "manage-groups-tab";
     public static final String TAB_MANAGE_TIPS = "manage-tips-tab";
     public static final String TAB_MANAGE_USERS = "manage-users-tab";
+    public static final String TAB_MANAGE_SETTING = "manage-setting-tab";
     // Icons
     private static final String IMG_FOLDER = "core/";
     public static final String ICON_SEARCH = "icon-search.png";
@@ -129,6 +130,7 @@ public class CoreConstants implements IsSerializable {
     public static final String ICON_SYSTEM = IMG_FOLDER + "system/icon-system.png";
     public static final String ICON_TIP = IMG_FOLDER + "icon-tip.png";
     public static final String ICON_USER = IMG_FOLDER + "system/icon-user.png";
+    public static final String ICON_SETTING = IMG_FOLDER + "system/icon-setting.png";
     public static final String ICON_USER_INFO = IMG_FOLDER + "system/icon-user-info.png";
     public static final String ICON_WARNING = IMG_FOLDER + "icon-warning.png";
     public static final String ICON_WORLD = IMG_FOLDER + "flags/_world.png";
@@ -146,6 +148,7 @@ public class CoreConstants implements IsSerializable {
     public static final String APP_GROUP = "Groups";
     public static final String APP_TIP = "Tips";
     public static final String APP_USER = "Users";
+    public static final String APP_SETTING = "Setting";
     // Application Images
     public static final String APP_IMG_ACCOUNT = IMG_FOLDER + "app-account.png";
     public static final String APP_IMG_PUBLICATIONS = IMG_FOLDER + "app-articles.png";
@@ -153,6 +156,7 @@ public class CoreConstants implements IsSerializable {
     public static final String APP_IMG_GROUP = IMG_FOLDER + "system/app-group.png";
     public static final String APP_IMG_TIP = IMG_FOLDER + "system/app-tip.png";
     public static final String APP_IMG_USER = IMG_FOLDER + "system/app-user.png";
+    public static final String APP_IMG_SETTING = IMG_FOLDER + "system/app-setting.png";
     // Session Attributes
     public static final String COOKIES_USER = "vip-cookie-user";
     public static final String COOKIES_SESSION = "vip-cookie-session";
