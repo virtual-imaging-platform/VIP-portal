@@ -113,15 +113,12 @@ public class EditApplicationLayout extends AbstractFormLayout {
             public void onClick(ClickEvent event) {
                 if (nameField.validate() & classesPickList.validate()) {
 
-                    List<String> values = new ArrayList<String>();
-                    values.addAll(Arrays.asList(classesPickList.getValues()));
-
                     if (newApplication) {
                         save(new Application(nameField.getValueAsString().trim(),
-                                values, richTextEditor.getValue()));
+                               Arrays.asList(classesPickList.getValues()), richTextEditor.getValue()));
                     } else {
                         save(new Application(nameField.getValueAsString().trim(),
-                                values, usersPickList.getValueAsString(), richTextEditor.getValue()));
+                                Arrays.asList(classesPickList.getValues()), usersPickList.getValueAsString(), richTextEditor.getValue()));
 
                     }
                 }
