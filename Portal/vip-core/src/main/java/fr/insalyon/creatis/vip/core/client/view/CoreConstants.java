@@ -148,7 +148,7 @@ public class CoreConstants implements IsSerializable {
     public static final String APP_GROUP = "Groups";
     public static final String APP_TIP = "Tips";
     public static final String APP_USER = "Users";
-    public static final String APP_SETTING = "Setting";
+    public static final String APP_SETTING = "Settings";
     // Application Images
     public static final String APP_IMG_ACCOUNT = IMG_FOLDER + "app-account.png";
     public static final String APP_IMG_PUBLICATIONS = IMG_FOLDER + "app-articles.png";

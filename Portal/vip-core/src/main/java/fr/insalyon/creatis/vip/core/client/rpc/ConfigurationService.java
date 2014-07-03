@@ -39,6 +39,7 @@ import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.Publication;
+import fr.insalyon.creatis.vip.core.client.bean.TermsOfUse;
 import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -48,6 +49,7 @@ import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -158,4 +160,9 @@ public interface ConfigurationService extends RemoteService {
     public void addPublication(Publication pub) throws CoreException;
 
     public void updatePublication(Publication pub) throws CoreException;
+    
+    //TermsOfUse
+    public void addTermsUse(TermsOfUse termsofUse) throws CoreException;
+    public Timestamp getLastUpdateTermsOfUse() throws CoreException;
+    public boolean compare()throws CoreException;
 }

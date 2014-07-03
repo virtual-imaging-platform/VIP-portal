@@ -37,12 +37,14 @@ import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.Publication;
+import fr.insalyon.creatis.vip.core.client.bean.TermsOfUse;
 import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -140,4 +142,11 @@ public interface ConfigurationServiceAsync {
     public void addPublication(Publication pub, AsyncCallback<Void> asyncCallback);
 
     public void updatePublication(Publication pub, AsyncCallback<Void> asyncCallback);
+    
+    //TermsOfUse
+    public void addTermsUse(TermsOfUse termsofUse,AsyncCallback<Void> asyncCallback);
+    
+    public void getLastUpdateTermsOfUse(AsyncCallback<Timestamp> asyncCallback);
+    
+    public void compare(AsyncCallback<Boolean> asyncCallback);
 }

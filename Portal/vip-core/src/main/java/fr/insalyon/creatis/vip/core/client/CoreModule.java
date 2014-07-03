@@ -101,63 +101,31 @@ public class CoreModule extends Module {
             final AccountTab accountTab = new AccountTab();
             Layout.getInstance().addTab(accountTab);
             if (!user.hasAcceptTermsOfUse()) {
-                final Dialog dialog = new Dialog();
-                dialog.setHeight("40%");
-                dialog.setWidth(500);
-                dialog.setTitle("Terms Of Use");
-                dialog.addCloseClickHandler(new CloseClickHandler() {
-                    @Override
-                    public void onCloseClick(CloseClickEvent event) {
-                        dialog.destroy();
-                        Layout.getInstance().signout();
-                    }
-                });
-                Button ok = new Button("OK");
-                Button cancel = new Button("Cancel");
-                Frame frame = new Frame("documentation/terms.html");
-                frame.setWidth("420");
-                Label l = new Label("Please accept our Terms of Use");
-                l.setHeight(100);
-                l.setWidth100();
-                dialog.setMembersMargin(2);
-                dialog.addItem(l);
-                dialog.addItem(frame);
-                dialog.setButtons(ok, cancel);
-                dialog.setIsModal(Boolean.TRUE);
-                cancel.addClickHandler(new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent event) {
-                        dialog.destroy();
-                        Layout.getInstance().signout();
-                    }
-                });
-                ok.addClickHandler(new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent event) {
-                        //mettre a jour le champs de la base de donner
-                        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-                        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-                            @Override
-                            public void onFailure(Throwable caught) {
-
-                                Layout.getInstance().setWarningMessage("can't update field terms of use" + caught.getMessage(), 10);
-
-                            }
-
-                            @Override
-                            public void onSuccess(Void result) {
-                                accountTab.getLayouttermsOfUse().load();
-                                dialog.destroy();
-                            }
-                        };
-                        service.updateTermsOfUse(callback);
-
-                    }
-                });
-
-                dialog.draw();
+                showDialog("Please accept our Terms of Use", accountTab);
             }
         }
+
+        //call to terms of use
+        final AsyncCallback<Boolean> callback = new AsyncCallback<Boolean>() {
+            @Override
+            public void onFailure(Throwable caught) {
+
+                Layout.getInstance().setWarningMessage("can't get last date of terms of use" + caught.getMessage(), 10);
+
+            }
+
+            @Override
+            public void onSuccess(Boolean result) {
+                Layout.getInstance().setWarningMessage(""+result , 10);
+                if (result) {
+                    final AccountTab accountTab = new AccountTab();
+                    Layout.getInstance().addTab(accountTab);
+                    showDialog("Please reaccept our Terms of Use", accountTab);
+
+                }
+            }
+        };
+        ConfigurationService.Util.getInstance().compare(callback );
 
     }
 
@@ -231,5 +199,66 @@ public class CoreModule extends Module {
         generalTileGrid = new GeneralTileGrid();
         systemTileGrid = new SystemTileGrid();
         homeTab = new HomeTab();
+    }
+
+    private void showDialog(String message, final AccountTab tab) {
+        final Dialog dialog = new Dialog();
+        dialog.setHeight("40%");
+        dialog.setWidth(500);
+        dialog.setTitle("Terms Of Use");
+        dialog.addCloseClickHandler(new CloseClickHandler() {
+            @Override
+            public void onCloseClick(CloseClickEvent event) {
+                dialog.destroy();
+                Layout.getInstance().signout();
+            }
+        });
+        Button ok = new Button("OK");
+        Button cancel = new Button("Cancel");
+        Frame frame = new Frame("documentation/terms.html");
+        frame.setWidth("420");
+        Label l = new Label(message);
+        l.setHeight(100);
+        l.setWidth100();
+        dialog.setMembersMargin(2);
+        dialog.addItem(l);
+        dialog.addItem(frame);
+        dialog.setButtons(ok, cancel);
+        dialog.setIsModal(Boolean.TRUE);
+        cancel.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                dialog.destroy();
+                Layout.getInstance().signout();
+            }
+        });
+        ok.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                //mettre a jour le champs de la base de donner
+                ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+                final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+
+                        Layout.getInstance().setWarningMessage("can't update field terms of use" + caught.getMessage(), 10);
+
+                    }
+
+                    @Override
+                    public void onSuccess(Void result) {
+                        tab.getLayouttermsOfUse().load();
+                        dialog.destroy();
+                    }
+                };
+                service.updateTermsOfUse(callback);
+
+            }
+        });
+
+        dialog.draw();
+
+
+
     }
 }

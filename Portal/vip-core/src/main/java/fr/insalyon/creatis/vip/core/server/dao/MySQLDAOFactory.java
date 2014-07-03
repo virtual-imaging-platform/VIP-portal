@@ -37,6 +37,7 @@ package fr.insalyon.creatis.vip.core.server.dao;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.AccountData;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.GroupData;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PublicationData;
+import fr.insalyon.creatis.vip.core.server.dao.mysql.TermsUseData;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.UserData;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.UsersGroupsData;
 
@@ -82,5 +83,10 @@ public class MySQLDAOFactory extends CoreDAOFactory {
     @Override
     public PublicationDAO getPublicationDAO() throws DAOException {
         return new PublicationData();
+    }
+
+    @Override
+    public TermsUseDAO getTermsUseDAO() throws DAOException {
+        return new TermsUseData();
     }
 }
