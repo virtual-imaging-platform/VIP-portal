@@ -5,9 +5,6 @@
 package fr.insalyon.creatis.vip.n4u.client.view;
 
 import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
 
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;

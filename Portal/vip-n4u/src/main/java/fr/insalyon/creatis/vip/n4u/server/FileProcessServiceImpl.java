@@ -4,43 +4,28 @@
  */
 package fr.insalyon.creatis.vip.n4u.server;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.n4u.client.rpc.N4uException;
-import com.google.gwt.user.server.rpc.AbstractRemoteServiceServlet;
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import fr.insalyon.creatis.vip.n4u.client.rpc.FileProcessService;
+import fr.insalyon.creatis.vip.n4u.client.view.InputTypes;
 import fr.insalyon.creatis.vip.n4u.server.velocity.Velocity;
 import fr.insalyon.creatis.vip.n4u.server.velocity.VelocityException;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -70,7 +55,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
     @Override
     public int[] fileJobProcess(String jobFile, String expressFile) throws N4uException {
         int[] result = new int[2];
-        int nb = 0;
+        int nb;
         String localJobFilePath = null;
         String localExpressFilePath = null;
         try {
@@ -194,9 +179,10 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public void generateScriptFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String environementFile, String description) throws N4uException {
-        String applicationRealLocation = null;
+    public void generateScriptFile(Map<Integer,Map> listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String environementFile, String description) throws N4uException {
+        String applicationRealLocation;
         try {
+
             applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
             final File homeDir = new File(Server.getInstance().getN4uApplicationFilesRepository());
             generateTime = getCurrentTimeStamp().toString();
@@ -230,8 +216,8 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public String generateGwendiaFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException {
-        String applicationRealLocation = null;
+    public String generateGwendiaFile(Map<Integer,Map> listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException {
+        String applicationRealLocation;
         try {
             applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
             final File homeDir = new File(Server.getInstance().getN4uApplicationFilesRepository());
@@ -266,10 +252,9 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public void generateGaswFile(ArrayList listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String sandboxFile, String environementFile) throws N4uException {
+    public void generateGaswFile(Map<Integer,Map> listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String sandboxFile, String environementFile) throws N4uException {
         String applicationRealLocation = null;
         try {
-            logger.error(sandboxFile);
             applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
             //create folder to genrate file
             final File homeDir = new File(Server.getInstance().getN4uApplicationFilesRepository());
@@ -281,14 +266,14 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             String dir = theDir.getAbsolutePath();
             String envF = "";
             String sandboxF = "";
+
             if (!environementFile.isEmpty()) {
                 envF = DataManagerUtil.parseBaseDir(getSessionUser(), environementFile);
+
             }
             if (!sandboxFile.isEmpty()) {
                 sandboxF = DataManagerUtil.parseBaseDir(getSessionUser(), sandboxFile);
             }
-            logger.error("environement " + envF);
-            logger.error("sandbox " + sandboxF);
             new Velocity().gassFile(listInput, listOutput, applicationName, wrapperScriptPath, applicationRealLocation, dir, generateTime, sandboxF, envF);
         } catch (CoreException e) {
             logger.error(e);
@@ -325,22 +310,17 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     private String parseTypeSupported(String val) throws N4uException {
-        String param1 = new String("text");
-        String param2 = new String("integer");
-        String param3 = new String("float");
-        String param4 = new String("double");
-        String file = new String("file");
+        String param1 = "text";
+        String param2 = "integer";
+        String param3 = "float";
+        String param4 = "double";
+        String file = "file";
         if (val.equals(param1) || val.equals(param2) || val.equals(param3) || val.equals(param4)) {
-            return new String(InputType.Parameter.name());
+            return InputTypes.Parameter.toString();
         } else if (val.equals(file)) {
-            return new String(InputType.File.name());
+            return InputTypes.File.toString();
         } else {
             throw new N4uException("type " + val + " " + "not supported by the application ");
         }
-    }
-
-    public static enum InputType {
-
-        File, Parameter;
     }
 }

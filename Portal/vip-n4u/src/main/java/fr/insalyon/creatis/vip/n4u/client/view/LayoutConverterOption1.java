@@ -102,33 +102,32 @@ public class LayoutConverterOption1 extends AbstractFormLayout {
         browsePicker.setPrompt("Browse on the Grid");
 
 
-        title = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_() ]");
-        title.setValidators(ValidatorUtil.getStringValidator());
+        title = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+_(): ]");
+        title.setValidators(ValidatorUtil.getStringValidator("[0-9.,A-Za-z-+_(): ]"));
         title.setRequired(Boolean.TRUE);
-
-
-        express = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_() ]");
-        express.setValidators(ValidatorUtil.getStringValidator());
+        
+        express = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_(): ]");
+        express.setValidators(ValidatorUtil.getStringValidator("[0-9.,A-Za-z-+/_(): ]"));
         express.setIcons(browsePicker);
         express.setRequired(Boolean.TRUE);
 
-        job = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_() ]");
-        job.setValidators(ValidatorUtil.getStringValidator());
+        job = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_(): ]");
+        job.setValidators(ValidatorUtil.getStringValidator("[0-9.,A-Za-z-+/_(): ]"));
         job.setIcons(browsePicker);
         job.setRequired(Boolean.TRUE);
 
-        script = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_() ]");
-        script.setValidators(ValidatorUtil.getStringValidator());
+        script = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_(): ]");
+        script.setValidators(ValidatorUtil.getStringValidator("[0-9.,A-Za-z-+/_(): ]"));
         script.setIcons(browsePicker);
         script.setRequired(Boolean.TRUE);
 
-        ext = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_() ]");
-        ext.setValidators(ValidatorUtil.getStringValidator());
+        ext = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_(): ]");
+        ext.setValidators(ValidatorUtil.getStringValidator("[0-9.,A-Za-z-+/_(): ]"));
         ext.setIcons(browsePicker);
         ext.setRequired(Boolean.FALSE);
 
-        env = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_() ]");
-        env.setValidators(ValidatorUtil.getStringValidator());
+        env = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_(): ]");
+        env.setValidators(ValidatorUtil.getStringValidator("[0-9.,A-Za-z-+/_(): ]"));
         env.setIcons(browsePicker);
         env.setRequired(Boolean.FALSE);
 
@@ -155,12 +154,9 @@ public class LayoutConverterOption1 extends AbstractFormLayout {
                 new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-
-                if (!title.validate() || !express.validate() || !job.validate() || !ext.validate() || !env.validate()) {
+                if (!title.validate()|| !job.validate() || !express.validate()  || !ext.validate() || !env.validate()) {
                     Layout.getInstance().setWarningMessage("There is an invalid input");
                 } else {
-
-
                     final AsyncCallback<int[]> callback = new AsyncCallback<int[]>() {
                         @Override
                         public void onFailure(Throwable caught) {
@@ -173,32 +169,23 @@ public class LayoutConverterOption1 extends AbstractFormLayout {
 
                             tabImporter = new N4uImportTab();
                             Layout.getInstance().addTab(tabImporter);
-                            tabImporter.addFiles("Application Name <font color=red>(*)</font>", false, title.getValueAsString(), false, true);
+                            tabImporter.addFields(FieldTitles.ApplicationName, false, title.getValueAsString(),"[0-9.,A-Za-z-+_() ]", false, true);
                             tabImporter.addFielDescription("Documentation and Terms of Use", "");
-                            tabImporter.addInputFiles(true, "results-directory ", "Directory where the results will be stored", N4uImportTab.InputType.Parameter.name(), true);
-                            tabImporter.addInputFiles(true, "job name", "A string identifying the job name", N4uImportTab.InputType.Parameter.name(), false);
+                            tabImporter.addInputField(true, "results-directory ", "Directory where the results will be stored", InputTypes.Parameter, true);
+                            tabImporter.addInputField(true, "job name", "A string identifying the job name", InputTypes.Parameter, false);
                             for (int i = 1; i < (int) result[0]; i++) {
                                 if (i <= result[1]) {
-                                    tabImporter.addInputFiles(false, "", "", N4uImportTab.InputType.File.name(), false);
+                                    tabImporter.addInputField(false, "", "", InputTypes.File, false);
                                 } else {
-                                    tabImporter.addInputFiles(false, "", "", N4uImportTab.InputType.Parameter.name(), false);
+                                    tabImporter.addInputField(false, "", "", InputTypes.Parameter, false);
                                 }
                             }
 
-                            tabImporter.addOutputFile(true, "result", "A tar.gz file containing the results", N4uImportTab.InputType.File.name(), true);
-                            tabImporter.addFiles("Main Executable <font color=red>(*)</font>", true, script.getValueAsString(), false, true);
-                            tabImporter.addFiles("Application Location <font color=red>(*)</font>", true, "", false, true);
-                            tabImporter.addFiles("Environement File", true, env.getValueAsString(), false, false);
-                            /* if (ext.getValueAsString() != "" || ext.getValueAsString() != null || !ext.getValueAsString().isEmpty()) {
-                             tabImporter.addfiels("Extension File", true, false, ext.getValueAsString(), false);
-                             }
-
-                             if (env.getValueAsString()!="" || env.getValueAsString() != null || env.getValueAsString().length() == 0||!env.getValueAsString().isEmpty()) {
-                             tabImporter.addfiels("Environement File", true, false, env.getValueAsString(), false);
-                             }
-                             **/
-
-                            tabImporter.addFiles("Sandbox File", true, "", false, false);
+                            tabImporter.addOutputField(true, "result", "A tar.gz file containing the results", InputTypes.File, true);
+                            tabImporter.addFields(FieldTitles.MainExecutable, true, script.getValueAsString(),"[0-9.,A-Za-z-+/_() ]", false, true);
+                            tabImporter.addFields(FieldTitles.ApplicationLocation, true, "","[0-9.,A-Za-z-+/_() ]", false, true);
+                            tabImporter.addFields(FieldTitles.EnvironementFile, true, env.getValueAsString(),"[0-9.,A-Za-z-+/_() ]", false, false);
+                            tabImporter.addFields(FieldTitles.SandboxFile, true, "","[0-9.,A-Za-z-+/_() ]", false, false);
                             tabImporter.addLaunchButton();
 
                         }
