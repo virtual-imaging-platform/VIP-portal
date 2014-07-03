@@ -188,6 +188,12 @@ public class PlatformConnection {
                     + "PRIMARY KEY (id), "
                     + "FOREIGN KEY (VIPAuthor) REFERENCES VIPUsers(email) "
                     + "ON DELETE CASCADE ON UPDATE NO ACTION");
+            
+            createTable("VIPTermsOfuse",
+                    "idTermsOfuse INT(11) NOT NULL AUTO_INCREMENT, "
+                    +"date TIMESTAMP NULL, "
+                    + "text TEXT NULL, "
+                    + "PRIMARY KEY (idTermsOfuse)");
 
             firstExecution = false;
         }
