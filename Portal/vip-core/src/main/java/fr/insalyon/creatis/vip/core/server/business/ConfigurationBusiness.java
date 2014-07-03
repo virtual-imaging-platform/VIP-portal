@@ -81,8 +81,8 @@ public class ConfigurationBusiness {
 
         try {
             logger.info("Configuring VIP server proxy.");
-            //ProxyClient myproxy = new ProxyClient();
-            // myproxy.getProxy();
+             ProxyClient myproxy = new ProxyClient();
+             myproxy.getProxy();
 
         } catch (Exception ex) {
             logger.error(ex);
