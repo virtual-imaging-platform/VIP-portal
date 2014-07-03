@@ -66,11 +66,12 @@ public class N4uImportTab extends Tab {
     private VLayout layout;
     PickerIcon browsePicker;
     IButton createApplicationButton;
-    ArrayList listInputs;
+    Map<Integer,Map> listInputs;
     ArrayList listOutputs;
     List<TextItem> listItems;
     int item = 0;
-    int j = 0;
+    int key = 0;
+    int outputItems = 0;
     String scriptFileName;
     String applicationName;
     String sandbox = "";
@@ -85,7 +86,7 @@ public class N4uImportTab extends Tab {
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
         configure();
-        listInputs = new ArrayList();
+        listInputs = new HashMap<Integer,Map>();
         listOutputs = new ArrayList();
         listItems = new ArrayList<TextItem>();
         this.setPane(layout);
@@ -204,7 +205,7 @@ public class N4uImportTab extends Tab {
                 final AsyncCallback<Void> call = new AsyncCallback<Void>() {
                     @Override
                     public void onFailure(Throwable caught) {
-                        throw new UnsupportedOperationException("Not supported yet.");
+                       Layout.getInstance().setWarningMessage("can't add application  " + caught.getMessage());
                     }
 
                     @Override
@@ -262,7 +263,7 @@ public class N4uImportTab extends Tab {
                     final AsyncCallback<AppVersion> call = new AsyncCallback<AppVersion>() {
                         @Override
                         public void onFailure(Throwable caught) {
-                            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                            Layout.getInstance().setWarningMessage("can't get the version of application" + caught.getMessage());
                         }
 
                         @Override
@@ -340,15 +341,19 @@ public class N4uImportTab extends Tab {
 //inputs
     public VLayout addInputField(boolean requiredInput, String value, String descriptionValue, InputTypes typeValue, boolean isFixedType) {
         item++;
+        key++;
+        final int nombre=key;
         HLayout hlayout = new HLayout();
         hlayout.setHeight(80);
         hlayout.setWidth100();
         hlayout.setMembersMargin(2);
+        
         final Map map = new HashMap();
-        final TextItem fieldItem = FieldUtil.getTextItem("30%", false, "", "[0-9.,A-Za-z-+/_() ]", false);
-        fieldItem.setValue(value);
-        fieldItem.setValidators(ValidatorUtil.getStringValidator());
+        final TextItem fieldItem = FieldUtil.getTextItem("30%", false, "", "[0-9.,A-Za-z-+/_(): ]", false);
+        fieldItem.setValidators(ValidatorUtil.getStringValidator("[0-9.,A-Za-z-+/_(): ]"));
         fieldItem.setRequired(true);
+        fieldItem.setValue(value);
+        
         map.put("name", fieldItem.getValueAsString());
         fieldItem.addEditorExitHandler(new EditorExitHandler() {
             @Override
@@ -451,14 +456,11 @@ public class N4uImportTab extends Tab {
 
         removeButton.addClickHandler(new ClickHandler() {
             public void onClick(ClickEvent event) {
-                listItems.remove(fieldItem);
-                vlayout.removeMember(sectionStack);
-                int id = Integer.parseInt(sectionStack.getTitle());
+                listItems.remove(fieldItem);  
                 item = item - 1;
-                listInputs.remove(id - 1);
-
-
-            }
+                listInputs.remove(nombre);
+                vlayout.removeMember(sectionStack);
+           }
         });
         section1.setItems(hlayout);
         if (!requiredInput) {
@@ -471,25 +473,26 @@ public class N4uImportTab extends Tab {
         sectionStack.setHeight(120);
         sectionStack.setTitle("" + item);
         sectionStack.setShowHover(false);
-        listInputs.add(map);
+        listInputs.put(nombre,map);
         listItems.add(fieldItem);
         vlayout.addMember(sectionStack);
+       
 
         return vlayout;
 
     }
 
     public VLayout addOutputField(boolean fixedInput, String value, String descriptionValue, InputTypes typeValue, boolean fixedType) {
-        j++;
+        outputItems++;
         HLayout hlayout = new HLayout();
         hlayout.setHeight(80);
         hlayout.setWidth100();
         hlayout.setMembersMargin(2);
         final Map map = new HashMap();
         final TextItem fieldItem = FieldUtil.getTextItem("30%", false, "", "[0-9.,A-Za-z-+/_() ]", false);
-        fieldItem.setValue(value);
-        fieldItem.setValidators(ValidatorUtil.getStringValidator());
+        fieldItem.setValidators(ValidatorUtil.getStringValidator("[0-9.,A-Za-z-+/_() ]"));
         fieldItem.setRequired(true);
+        fieldItem.setValue(value);
         map.put("name", fieldItem.getValueAsString());
 
         fieldItem.addEditorExitHandler(new EditorExitHandler() {
@@ -510,7 +513,7 @@ public class N4uImportTab extends Tab {
             }
         });
 
-        int k = item + j;
+        int k = item + outputItems;
         map.put("option", "no" + k);
         map.put("description", description.getValue());
 
@@ -551,7 +554,7 @@ public class N4uImportTab extends Tab {
         String title;
 
 
-        title = "<strong>" + "Output" + j + "</strong>";
+        title = "<strong>" + "Output" + outputItems + "</strong>";
         DynamicForm titleItemForm = new DynamicForm();
         titleItemForm.setHeight(20);
         titleItemForm.setNumCols(1);
@@ -598,20 +601,17 @@ public class N4uImportTab extends Tab {
     }
 
     //Name,script, extention,env
-    public void addFields(FieldTitles title, boolean addBrowseIcon, String value, boolean disabled, boolean required) {
+    public void addFields(FieldTitles title, boolean addBrowseIcon, String value, String keyPressFilter, boolean disabled, boolean required) {
 
         Label itemLabel = new Label("<strong>" + title + "</strong>");
         itemLabel.setHeight(20);
 
-
-        final TextItem fieldItem = FieldUtil.getTextItem("*", false, "", "[0-9.,A-Za-z-+/_() ]", disabled, required);
-        fieldItem.setValidators(ValidatorUtil.getStringValidator());
-        fieldItem.setName("editable");
+        final TextItem fieldItem = FieldUtil.getTextItem("*", false, "", keyPressFilter, disabled, required);
+        fieldItem.setValidators(ValidatorUtil.getStringValidator(keyPressFilter));
         fieldItem.setValue(value);
         if (addBrowseIcon) {
             fieldItem.setIcons(browsePicker);
         }
-
         DynamicForm titleItemForm = new DynamicForm();
         titleItemForm.setWidth100();
         titleItemForm.setNumCols(1);
@@ -629,7 +629,6 @@ public class N4uImportTab extends Tab {
             });
 
         }
-
 
         if (title.equals(FieldTitles.MainExecutable)) {
             scriptFileName = value;
@@ -665,17 +664,22 @@ public class N4uImportTab extends Tab {
 
         }
         if (title.equals(FieldTitles.ApplicationName)) {
-            applicationName = value;
+        
+            applicationName = value.replaceAll("/", "");
+            fieldItem.setValue(applicationName);
             fieldItem.addEditorExitHandler(new EditorExitHandler() {
                 @Override
                 public void onEditorExit(EditorExitEvent event) {
                     applicationName = fieldItem.getValueAsString();
                 }
             });
+
+        }
+        //add Member
+        if (title.equals(FieldTitles.ApplicationName)) {
             layoutGeneralInformation.addMember(itemLabel);
             layoutGeneralInformation.addMember(titleItemForm);
         } else {
-
             layoutExecutable.addMember(itemLabel);
             layoutExecutable.addMember(titleItemForm);
         }
@@ -775,8 +779,6 @@ public class N4uImportTab extends Tab {
             }
         };
         ApplicationService.Util.getInstance().getVersions(applicationName, callback);
-
-
     }
 
     public void addLaunchButton() {

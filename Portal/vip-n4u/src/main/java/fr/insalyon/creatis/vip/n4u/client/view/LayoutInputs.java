@@ -4,15 +4,10 @@
  */
 package fr.insalyon.creatis.vip.n4u.client.view;
 
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.common.LabelButton;
-import fr.insalyon.creatis.vip.core.client.view.common.ToolstripLayout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
@@ -22,11 +17,12 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 public class LayoutInputs extends AbstractFormLayout {
 
     LabelButton addButton;
-/**
- * 
- * @param width
- * @param height 
- */
+
+    /**
+     *
+     * @param width
+     * @param height
+     */
     public LayoutInputs(String width, String height) {
         super(width, height);
         this.addTitle("Application Inputs", N4uConstants.ICON_INPUT);
@@ -42,10 +38,11 @@ public class LayoutInputs extends AbstractFormLayout {
         toolstrip.addMember(addButton);
         this.addMember(toolstrip);
     }
-/**
- * 
- * @return 
- */
+
+    /**
+     *
+     * @return
+     */
     public LabelButton getAddButton() {
         return addButton;
     }

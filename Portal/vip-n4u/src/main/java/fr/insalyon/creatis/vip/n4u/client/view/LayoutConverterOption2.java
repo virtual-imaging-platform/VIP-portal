@@ -70,7 +70,7 @@ public class LayoutConverterOption2 extends AbstractFormLayout {
 
 
 
-        xmlFileItem = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_() ]");
+        xmlFileItem = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_(): ]");
         xmlFileItem.setValidators(ValidatorUtil.getStringValidator());
         xmlFileItem.setIcons(browsePicker);
         xmlFileItem.setRequired(Boolean.TRUE);
@@ -103,24 +103,24 @@ public class LayoutConverterOption2 extends AbstractFormLayout {
 
                             for (int i = 0; i < result.size(); i++) {
                                 if (i == 0) {
-                                    tabImporter.addFiles("Application Name <font color=red>(*)</font>", false, result.get(i)[0], false, true);
+                                    tabImporter.addFields(FieldTitles.ApplicationName, false, result.get(i)[0],"[0-9.,A-Za-z-+_(): ]", false, true);
                                     tabImporter.addFielDescription("Documentation and Terms of Use", result.get(i)[1]);
-                                    tabImporter.addInputFiles(true, "results-directory ", "Directory where the results will be stored", N4uImportTab.InputType.Parameter.name(), true);
-                                    tabImporter.addInputFiles(true, "job name", "A string identifying the job name", N4uImportTab.InputType.Parameter.name(), false);
+                                    tabImporter.addInputField(true, "results-directory ", "Directory where the results will be stored", InputTypes.Parameter, true);
+                                    tabImporter.addInputField(true, "job name", "A string identifying the job name", InputTypes.Parameter, false);
 
                                 } else {
                                     // name,type;required
                                     //s[0],s[1],s[2]
-                                    tabImporter.addInputFiles(Boolean.valueOf(result.get(i)[2]), result.get(i)[0], result.get(i)[3], result.get(i)[1], true);
+                                    tabImporter.addInputField(Boolean.valueOf(result.get(i)[2]), result.get(i)[0], result.get(i)[3], InputTypes.valueOf(result.get(i)[1]), true);
                                 }
 
                             }
 
-                            tabImporter.addOutputFile(true, "result", "A tar.gz file containing the results", N4uImportTab.InputType.File.name(), true);
-                            tabImporter.addFiles("Main Executable <font color=red>(*)</font>", true, "", false, true);
-                            tabImporter.addFiles("Application Location <font color=red>(*)</font>", true, "", false, true);
-                            tabImporter.addFiles("Environement File", true, "", false, false);
-                            tabImporter.addFiles("Sandbox File", true, "", false, false);
+                            tabImporter.addOutputField(true, "result", "A tar.gz file containing the results",InputTypes.File, true);
+                            tabImporter.addFields(FieldTitles.MainExecutable, true, "","[0-9.,A-Za-z-+/_(): ]", false, true);
+                            tabImporter.addFields(FieldTitles.ApplicationLocation, true, "","[0-9.,A-Za-z-+/_(): ]", false, true);
+                            tabImporter.addFields(FieldTitles.EnvironementFile, true, "","[0-9.,A-Za-z-+/_(): ]", false, false);
+                            tabImporter.addFields(FieldTitles.SandboxFile, true, "","[0-9.,A-Za-z-+/_(): ]", false, false);
                             tabImporter.addLaunchButton();
 
                         }

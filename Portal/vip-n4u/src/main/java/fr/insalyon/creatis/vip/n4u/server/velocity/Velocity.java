@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.velocity.Template;
@@ -49,17 +50,15 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public void gassFile(ArrayList listInput, ArrayList listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir, String date, String sandboxFile, String environementFile) throws VelocityException {
+    public void gassFile(Map<Integer,Map> listInput, ArrayList listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir, String date, String sandboxFile, String environementFile) throws VelocityException {
         Template t = ve.getTemplate("vm/gass.vm");
         VelocityContext context = new VelocityContext();
+        applicationLocation= applicationLocation+"/"+date;
         context.put("inputList", listInput);
         context.put("outputList", listOutput);
         context.put("applicationName", applicationName);
         context.put("applicationLocation", applicationLocation);
-        context.put("gassValue", applicationLocation + "/bin/" + applicationName + "_wrapper.sh");
-
-
-
+        context.put("gassValue", applicationLocation + "/bin/" + applicationName + "._wrapper.sh");
         if (!sandboxFile.isEmpty()) {
             try {
                 CoreUtil.getGRIDAClient().rename(sandboxFile, applicationLocation + "/bin/" + sandboxFile.substring(sandboxFile.lastIndexOf("/") + 1));
@@ -86,7 +85,7 @@ public class Velocity implements VelocityProcess {
         }
         StringWriter writer = new StringWriter();
         t.merge(context, writer);
-        final String chemin = dir + "/" + applicationName + "_" + date + ".xml";
+        final String chemin = dir + "/" + applicationName + ".xml";
         final File fichier = new File(chemin);
 
         try {
@@ -112,11 +111,11 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public void wrapperScriptFile(ArrayList listInput, ArrayList listOutput, String applicationName, String scriptFile, String applicationLocation, String environementFile, String dir, String date) throws VelocityException {
-
+    public void wrapperScriptFile(Map<Integer,Map> listInput, ArrayList listOutput, String applicationName, String scriptFile, String applicationLocation, String environementFile, String dir, String date) throws VelocityException {
+        applicationLocation= applicationLocation+"/"+date;
         int lastIndex = scriptFile.lastIndexOf("/");
         String script = scriptFile.substring(lastIndex + 1);
-        String env;
+        String env = "";
         if (!environementFile.isEmpty()) {
             env = environementFile.substring(environementFile.lastIndexOf("/") + 1);
         } else {
@@ -134,12 +133,12 @@ public class Velocity implements VelocityProcess {
 
         StringWriter writer = new StringWriter();
         t.merge(context, writer);
-        final String chemin = dir + "/" + applicationName + "_" + date + "_wrapper.sh";
+        final String chemin = dir + "/" + applicationName + "_wrapper.sh";
         final File fichier = new File(chemin);
         try {
             createFile(fichier, writer);
             CoreUtil.getGRIDAClient().createFolder(applicationLocation, "bin");
-            copyFile(chemin, dir + "/" + applicationName + ".bak" + "._wrapper.sh");
+            copyFile(chemin, dir + "/" + applicationName + ".bak" + "_wrapper.sh");
             CoreUtil.getGRIDAClient().uploadFile(chemin, applicationLocation + "/" + "bin");
         } catch (GRIDAClientException ex) {
             logger.error(ex);
@@ -159,8 +158,9 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public String gwendiaFile(ArrayList listInput, ArrayList listOutput, String applicationName, String description, String applicationLocation, String dir, String date) throws VelocityException {
+    public String gwendiaFile(Map<Integer,Map> listInput, ArrayList listOutput, String applicationName, String description, String applicationLocation, String dir, String date) throws VelocityException {
         Template t = ve.getTemplate("vm/gwendia.vm");
+        applicationLocation= applicationLocation+ "/"+date;
         final String gaswDescriptor = applicationLocation + "/gasw" + "/" + applicationName + ".xml";
         VelocityContext context = new VelocityContext();
         context.put("inputList", listInput);
@@ -175,7 +175,7 @@ public class Velocity implements VelocityProcess {
         context.put("gaswDescriptor", gaswDescriptor);
         StringWriter writer = new StringWriter();
         t.merge(context, writer);
-        final String chemin = dir + "/" + applicationName + "_" + date + ".gwendia";
+        final String chemin = dir + "/" + applicationName + ".gwendia";
 
         final File fichier = new File(chemin);
 
