@@ -58,6 +58,9 @@ public class SettingTermsUseLayout extends AbstractFormLayout {
 
             @Override
             public void onSuccess(Void result) {
+                if(text.equals("add")){
+                Layout.getInstance().setNoticeMessage("Terms of use has been updated");
+                }
             }
         };
     }
