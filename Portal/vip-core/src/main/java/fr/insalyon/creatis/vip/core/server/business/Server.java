@@ -35,7 +35,6 @@ package fr.insalyon.creatis.vip.core.server.business;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -166,7 +165,7 @@ public class Server {
             myProxyLifeTime = config.getString(CoreConstants.LAB_MYPROXY_LIFETIME, "86400");
             myProxyMinHours = config.getInt(CoreConstants.LAB_MYPROXY_MIN_HOURS, 12);
 
-            SMAHost = config.getString(CoreConstants.LAB_SMA_HOST, "localhost");
+            SMAHost = config.getString(CoreConstants.LAB_SMA_HOST, "kingkong.grid.creatis.insa-lyon.fr");
             SMAPort = config.getInt(CoreConstants.LAB_SMA_PORT, 8082);
 
             gridaHost = config.getString(CoreConstants.LAB_GRIDA_HOST, "localhost");
