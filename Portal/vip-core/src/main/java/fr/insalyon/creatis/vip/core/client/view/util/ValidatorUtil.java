@@ -81,4 +81,12 @@ public class ValidatorUtil {
         validator.setExpression("^([0-9.,A-Za-z-+/_() ])+$"); 
         return validator;
     }
+    
+     public static RegExpValidator getStringValidator(String validatorExpression) {
+        
+        RegExpValidator validator = new RegExpValidator();  
+        validator.setErrorMessage("Invalid string");  
+        validator.setExpression(validatorExpression); 
+        return validator;
+    }
 }

@@ -92,8 +92,8 @@ public class PersonalLayout extends AbstractFormLayout {
         emailLabel = WidgetUtil.getLabel("", 15);
         firstNameField = WidgetUtil.getLabel("", 15);
         lastNameField = WidgetUtil.getLabel("", 15);
-        institutionField = FieldUtil.getTextItem(500, null);
-        phoneField = FieldUtil.getTextItem(500, "[0-9\\(\\)\\-+. ]");
+        institutionField = FieldUtil.getTextItem(200, null);
+        phoneField = FieldUtil.getTextItem(200, "[0-9\\(\\)\\-+. ]");
 
         countryField = new SelectItem();
         countryField.setShowTitle(false);
@@ -102,7 +102,7 @@ public class PersonalLayout extends AbstractFormLayout {
         countryField.setImageURLPrefix(CoreConstants.FOLDER_FLAGS);
         countryField.setImageURLSuffix(".png");
         countryField.setRequired(true);
-        countryField.setWidth("250");
+        countryField.setWidth("150");
         saveButton = WidgetUtil.getIButton("Save Changes", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
                     @Override
