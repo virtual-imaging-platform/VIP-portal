@@ -42,6 +42,7 @@ import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.Publication;
+import fr.insalyon.creatis.vip.core.client.bean.TermsOfUse;
 import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
@@ -58,10 +59,10 @@ import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
@@ -841,7 +842,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
-        } 
+        }
     }
 
     @Override
@@ -870,4 +871,36 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         }
 
     }
+
+    @Override
+    public void addTermsUse(TermsOfUse termsofUse) throws CoreException {
+        trace(logger, "adding new terms of Use.");
+        try {
+
+            authenticateSystemAdministrator(logger);
+            configurationBusiness.addTermsUse(termsofUse);
+
+
+        } catch (BusinessException ex) {
+
+            throw new CoreException(ex);
+        }
+    }
+
+    @Override
+    public Timestamp getLastUpdateTermsOfUse() throws CoreException {
+        try {
+            return configurationBusiness.getLastUpdateTermsOfUse();
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    @Override
+    public boolean compare() throws CoreException {
+        return getLastUpdateTermsOfUse().after(getSessionUser().getTermsOfUse());
+    }
+    
+   
+   
 }

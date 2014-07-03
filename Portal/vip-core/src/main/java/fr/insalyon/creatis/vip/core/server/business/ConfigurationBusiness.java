@@ -39,6 +39,7 @@ import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.Publication;
+import fr.insalyon.creatis.vip.core.client.bean.TermsOfUse;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
@@ -80,8 +81,8 @@ public class ConfigurationBusiness {
 
         try {
             logger.info("Configuring VIP server proxy.");
-            ProxyClient myproxy = new ProxyClient();
-            myproxy.getProxy();
+            //ProxyClient myproxy = new ProxyClient();
+            // myproxy.getProxy();
 
         } catch (Exception ex) {
             logger.error(ex);
@@ -135,10 +136,11 @@ public class ConfigurationBusiness {
     public void signup(User user, String comments, boolean automaticCreation, boolean mapPrivateGroups, String... accountType) throws BusinessException {
 
         boolean existUndesiredMailDomain = false;
-        String message = "Signing up "+user.getEmail()+" (list of undesired mail domains: ";
-        for(String s : Server.getInstance().getUndesiredMailDomains())
-            message+=" "+s;
-        message+=")";
+        String message = "Signing up " + user.getEmail() + " (list of undesired mail domains: ";
+        for (String s : Server.getInstance().getUndesiredMailDomains()) {
+            message += " " + s;
+        }
+        message += ")";
         logger.info(message);
         for (String udm : Server.getInstance().getUndesiredMailDomains()) {
             if (user.getEmail().endsWith(udm)) {
@@ -1224,6 +1226,29 @@ public class ConfigurationBusiness {
 
         try {
             CoreDAOFactory.getDAOFactory().getPublicationDAO().update(pub);
+        } catch (DAOException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
+    public void addTermsUse(TermsOfUse termsOfUse) throws BusinessException {
+
+        try {
+
+            termsOfUse.setDate(getCurrentTimeStamp());
+            CoreDAOFactory.getDAOFactory().getTermsUseDAO().add(termsOfUse);
+        } catch (DAOException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
+    public Timestamp getLastUpdateTermsOfUse() throws BusinessException {
+
+        try {
+
+            return CoreDAOFactory.getDAOFactory().getTermsUseDAO().getLastUpdateTermsOfUse();
         } catch (DAOException ex) {
             logger.error(ex);
             throw new BusinessException(ex);

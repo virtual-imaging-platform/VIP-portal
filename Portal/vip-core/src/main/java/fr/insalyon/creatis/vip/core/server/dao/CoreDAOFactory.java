@@ -52,4 +52,6 @@ public abstract class CoreDAOFactory {
     public abstract AccountDAO getAccountDAO() throws DAOException;
 
     public abstract PublicationDAO getPublicationDAO() throws DAOException;
+    
+    public abstract TermsUseDAO getTermsUseDAO() throws DAOException;
 }
