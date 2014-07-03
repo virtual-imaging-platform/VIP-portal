@@ -37,9 +37,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 
@@ -274,11 +272,14 @@ public class User implements IsSerializable {
     }
     
      public boolean hasAcceptTermsOfUse(){
-   return getTermsOfUse()!=null;
+        return getTermsOfUse()!=null;
        }
 
     public boolean hasGroups(){
-        return groups.size() != 0;
+        return !groups.isEmpty();
+    }
+    
+
     
     public void getGroups() {
        

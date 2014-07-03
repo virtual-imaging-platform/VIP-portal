@@ -70,9 +70,9 @@ public class PasswordLayout extends AbstractFormLayout {
 
     private void configure() {
 
-        currentPasswordField = FieldUtil.getPasswordItem(500, 32);
-        newPasswordField = FieldUtil.getPasswordItem(500, 32);
-        confirmPasswordField = FieldUtil.getPasswordItem(500, 32);
+        currentPasswordField = FieldUtil.getPasswordItem(200, 32);
+        newPasswordField = FieldUtil.getPasswordItem(200, 32);
+        confirmPasswordField = FieldUtil.getPasswordItem(200, 32);
         
 
         saveButton = WidgetUtil.getIButton("Save Changes", CoreConstants.ICON_SAVED,
