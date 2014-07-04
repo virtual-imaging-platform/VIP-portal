@@ -42,7 +42,7 @@ import java.util.List;
  */
 public class CoreConstants implements IsSerializable {
 
-    public static final String VERSION = "v1.10";
+    public static final String VERSION = "v1.11";
     // Configuration Labels
     public static final String LAB_DB_HOST = "database.server.host";
     public static final String LAB_DB_PORT = "database.server.port";
