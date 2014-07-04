@@ -110,7 +110,7 @@ public class CoreModule extends Module {
             @Override
             public void onFailure(Throwable caught) {
 
-                Layout.getInstance().setWarningMessage("can't get last date of terms of use" + caught.getMessage(), 10);
+                Layout.getInstance().setWarningMessage("Cannot get last update of Terms of Use" + caught.getMessage(), 10);
 
             }
 
@@ -119,7 +119,7 @@ public class CoreModule extends Module {
                 if (result) {
                     final AccountTab accountTab = new AccountTab();
                     Layout.getInstance().addTab(accountTab);
-                    showDialog("Please reaccept our Terms of Use", accountTab);
+                    showDialog("Our Terms of Use have changed. Please accept them again.", accountTab);
 
                 }
             }
