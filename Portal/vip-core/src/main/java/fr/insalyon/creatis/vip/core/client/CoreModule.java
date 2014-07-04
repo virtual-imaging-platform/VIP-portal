@@ -116,7 +116,6 @@ public class CoreModule extends Module {
 
             @Override
             public void onSuccess(Boolean result) {
-                Layout.getInstance().setWarningMessage(""+result , 10);
                 if (result) {
                     final AccountTab accountTab = new AccountTab();
                     Layout.getInstance().addTab(accountTab);
