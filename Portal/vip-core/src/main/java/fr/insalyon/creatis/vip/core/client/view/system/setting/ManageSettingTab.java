@@ -11,17 +11,19 @@ import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
 
 /**
  *
- * @author Rafael Ferreira da Silva
+ * @author Nouha Boujelben
  */
 public class ManageSettingTab extends AbstractManageTab {
 
     private SettingTermsUseLayout settingTermsUseLayout;
+    private SettingMaxRunningSimulationsLayout maxRunningSimulationsLayout;
 
     public ManageSettingTab() {
 
         super(CoreConstants.ICON_SETTING, CoreConstants.APP_SETTING, CoreConstants.TAB_MANAGE_SETTING);
 
         settingTermsUseLayout = new SettingTermsUseLayout();
+        maxRunningSimulationsLayout=new SettingMaxRunningSimulationsLayout();
 
 
         HLayout hLayout = new HLayout(5);
@@ -30,6 +32,8 @@ public class ManageSettingTab extends AbstractManageTab {
         leftLayout.setWidth(350);
         leftLayout.setHeight100();
         leftLayout.addMember(settingTermsUseLayout);
+        leftLayout.addMember(maxRunningSimulationsLayout);
+        
         VLayout rightLayout = new VLayout(14);
         rightLayout.setWidth(350);
         rightLayout.setHeight100();

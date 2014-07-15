@@ -45,7 +45,7 @@ import org.apache.log4j.Logger;
  * @author Rafael Ferreira da Silva
  */
 public class Server {
-
+PropertiesConfiguration config;
     // Constants
     private static final Logger logger = Logger.getLogger(Server.class);
     private static Server instance;
@@ -94,6 +94,7 @@ public class Server {
     // Simulations
     private int beginnerMaxRunningSimulations;
     private int advancedMaxRunningSimulations;
+    private int maxPlatformRunningSimulations;
     private String workflowsPath;
     private String workflowsDB;
     private String workflowsHost;
@@ -128,7 +129,7 @@ public class Server {
     private String applicationN4uClass;
     private String N4uApplicationFilesRepository;
     private String deleteFilesAfterUpload;
-
+    
     public static Server getInstance() {
         if (instance == null) {
             instance = new Server();
@@ -145,7 +146,7 @@ public class Server {
 
             // Configuration File
             String confFilePath = configurationFolder + CONF_FILE;
-            PropertiesConfiguration config = new PropertiesConfiguration(confFilePath);
+            config = new PropertiesConfiguration(confFilePath);
             logger.info("Loading config file: " + confFilePath);
 
             databaseServerHost = config.getString(CoreConstants.LAB_DB_HOST, "localhost");
@@ -186,6 +187,7 @@ public class Server {
 
             beginnerMaxRunningSimulations = config.getInt(CoreConstants.LAB_SIMULATION_BEGINNER_MAX, 1);
             advancedMaxRunningSimulations = config.getInt(CoreConstants.LAB_SIMULATION_ADVANCED_MAX, Integer.MAX_VALUE);
+            maxPlatformRunningSimulations=config.getInt(CoreConstants.LAB_SIMULATION_PLATFORM_MAX, Integer.MAX_VALUE);
             workflowsPath = config.getString(CoreConstants.LAB_SIMULATION_FOLDER, "/var/www/html/workflows");
             workflowsDB = config.getString(CoreConstants.LAB_SIMULATION_DB_NAME, "/var/www/workflows.db");
             workflowsHost = config.getString(CoreConstants.LAB_SIMULATION_DB_HOST, "localhost");
@@ -226,8 +228,8 @@ public class Server {
             applicationN4uClass = config.getString(CoreConstants.APP_CLASS, "Test");
             N4uApplicationFilesRepository = config.getString(CoreConstants.APPLICATION_FILES_REPOSITORY, "/home/boujelben");
             deleteFilesAfterUpload = config.getString(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, "yes");
-
-
+            
+           
 
             config.setProperty(CoreConstants.LAB_DB_HOST, databaseServerHost);
             config.setProperty(CoreConstants.LAB_DB_PORT, databaseServerPort);
@@ -259,6 +261,8 @@ public class Server {
             config.setProperty(CoreConstants.LAB_TRUSTSTORE_PASS, truststorePass);
             config.setProperty(CoreConstants.LAB_SIMULATION_BEGINNER_MAX, beginnerMaxRunningSimulations);
             config.setProperty(CoreConstants.LAB_SIMULATION_ADVANCED_MAX, advancedMaxRunningSimulations);
+            config.setProperty(CoreConstants.LAB_SIMULATION_PLATFORM_MAX, maxPlatformRunningSimulations);
+           
             config.setProperty(CoreConstants.LAB_SIMULATION_FOLDER, workflowsPath);
             config.setProperty(CoreConstants.LAB_SIMULATION_DB_NAME, workflowsDB);
             config.setProperty(CoreConstants.LAB_SIMULATION_DB_HOST, workflowsHost);
@@ -521,5 +525,16 @@ public class Server {
 
     public void setUndesiredMailDomains(List<String> undesiredMailDomainsConfig) {
         this.undesiredMailDomains = undesiredMailDomainsConfig;
+    }
+    
+    public int getMaxPlatformRunningSimulations() {
+        return maxPlatformRunningSimulations;
+    }
+
+    public void setMaxPlatformRunningSimulations(int maxPlatformRunningSimulations) throws ConfigurationException {
+        
+        this.maxPlatformRunningSimulations = maxPlatformRunningSimulations;
+        config.setProperty(CoreConstants.LAB_SIMULATION_PLATFORM_MAX, maxPlatformRunningSimulations);
+        config.save();
     }
 }

@@ -163,6 +163,12 @@ public interface ConfigurationService extends RemoteService {
     
     //TermsOfUse
     public void addTermsUse(TermsOfUse termsofUse) throws CoreException;
+    
     public Timestamp getLastUpdateTermsOfUse() throws CoreException;
+    
     public boolean compare()throws CoreException;
+    
+    public int getMaxConfiguredPlatformSimulation() throws CoreException;
+    
+    public void changeMaxConfiguredPlatformSimulation(int maxPlatformRunningSimulations) throws CoreException;
 }

@@ -63,8 +63,10 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 
 /**
@@ -900,6 +902,23 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public boolean compare() throws CoreException {
         return getLastUpdateTermsOfUse().after(getSessionUser().getTermsOfUse());
     }
+
+    @Override
+    public int getMaxConfiguredPlatformSimulation() throws CoreException {
+       return Server.getInstance().getMaxPlatformRunningSimulations();
+    }
+
+    @Override
+    public void changeMaxConfiguredPlatformSimulation(int maxPlatformRunningSimulations ) throws CoreException {
+        try {
+            Server.getInstance().setMaxPlatformRunningSimulations(maxPlatformRunningSimulations);
+        } catch (ConfigurationException ex) {
+           logger.error(ex); 
+           throw new CoreException(ex);
+        }
+    }
+    
+   
     
    
    

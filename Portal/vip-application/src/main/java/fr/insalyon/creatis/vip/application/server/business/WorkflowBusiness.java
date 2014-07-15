@@ -133,6 +133,13 @@ public class WorkflowBusiness {
 
         try {
             long runningWorkflows = workflowDAO.getNumberOfRunning(user.getFullName());
+            long runningSimulations=workflowDAO.getRunning().size();
+            if(runningSimulations >= Server.getInstance().getMaxPlatformRunningSimulations()){
+            logger.warn("Unable to launch simulation '" + simulationName + "': max "
+                        + "number of running workflows reached in the platform.");
+                throw new fr.insalyon.creatis.vip.core.server.business.BusinessException(
+                        "Max number of running simulations reached.");
+            }
             if (runningWorkflows >= user.getMaxRunningSimulations()) {
 
                 logger.warn("Unable to launch simulation '" + simulationName + "': max "
