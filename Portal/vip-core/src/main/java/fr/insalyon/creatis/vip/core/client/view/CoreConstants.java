@@ -78,6 +78,7 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_SIMULATED_DATA_DB_PASSWORD = "simulated-data.db.pass";
     public static final String LAB_SIMULATED_DATA_DB_URL = "simulated-data.db.url";
     public static final String LAB_SIMULATION_ADVANCED_MAX = "simulation.max.advanced";
+    public static final String LAB_SIMULATION_PLATFORM_MAX = "simulation.max.platfrom";
     public static final String LAB_SIMULATION_BEGINNER_MAX = "simulation.max.beginner";
     public static final String LAB_SIMULATION_DB_HOST = "workflows.db.host";
     public static final String LAB_SIMULATION_DB_NAME = "workflows.db.name";
@@ -136,8 +137,8 @@ public class CoreConstants implements IsSerializable {
     public static final String ICON_WORLD = IMG_FOLDER + "flags/_world.png";
     public static final String ICON_DROPBOX = IMG_FOLDER + "icon-dropbox.png";
     public static final String ICON_TERMS_USE = IMG_FOLDER + "icon-terms_of_use.png";
+    public static final String ICON_RUNNING_SIMULATIONS = IMG_FOLDER +"icon-runningSimulation.png";
     public static String ICON_MOZILLA_PERSONA = IMG_FOLDER + "icon-persona.png";
-    ;
     // Folders
     public static final String FOLDER_TRASH = "Trash";
     public static final String FOLDER_FLAGS = IMG_FOLDER + "flags/";

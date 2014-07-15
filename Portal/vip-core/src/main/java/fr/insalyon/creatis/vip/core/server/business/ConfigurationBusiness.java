@@ -52,8 +52,6 @@ import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.Normalizer;
 import java.util.*;

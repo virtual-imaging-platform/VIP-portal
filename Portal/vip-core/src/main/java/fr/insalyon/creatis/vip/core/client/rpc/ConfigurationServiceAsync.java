@@ -149,4 +149,8 @@ public interface ConfigurationServiceAsync {
     public void getLastUpdateTermsOfUse(AsyncCallback<Timestamp> asyncCallback);
     
     public void compare(AsyncCallback<Boolean> asyncCallback);
+    
+    public void getMaxConfiguredPlatformSimulation(AsyncCallback<Integer> asyncCallback);
+    
+    public void changeMaxConfiguredPlatformSimulation(int maxPlatformRunningSimulations,AsyncCallback<Void> asyncCallback);
 }
