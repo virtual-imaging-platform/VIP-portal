@@ -33,6 +33,7 @@
 package fr.insalyon.creatis.vip.core.client.view.system.user;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.DateDisplayFormat;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -61,6 +62,7 @@ import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.user.publication.PublicationRecord;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import java.util.ArrayList;
 import java.util.Date;
@@ -77,16 +79,18 @@ public class UsersLayout extends VLayout {
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
     private DetailViewer detailViewer;
+    DataSource ds;
+    boolean state=true;
 
     public UsersLayout() {
 
         this.setWidth100();
         this.setHeight100();
         this.setOverflow(Overflow.AUTO);
-
+        ds = new DataUsersLayout();
         configureGrid();
         modal = new ModalWindow(grid);
-
+ 
         this.addMember(new UsersToolStrip());
         this.addMember(grid);
 
@@ -200,6 +204,9 @@ public class UsersLayout extends VLayout {
         grid.setShowHover(true);
         grid.setShowHoverComponents(true);
         grid.setEmptyMessage("<br>No data available.");
+        grid.setFilterOnKeypress(true);
+        grid.setDataSource(ds);
+        grid.setAutoFetchData(Boolean.TRUE);
 
         ListGridField confirmedField = new ListGridField("confirmed", "Confirmed");
         confirmedField.setType(ListGridFieldType.BOOLEAN);
@@ -258,6 +265,7 @@ public class UsersLayout extends VLayout {
                     dataList.add(new UserRecord(user));
                 }
                 grid.setData(dataList.toArray(new UserRecord[]{}));
+                ds.setTestData(dataList.toArray(new UserRecord[]{}));
             }
         };
         modal.show("Loading Users...", true);
@@ -301,5 +309,18 @@ public class UsersLayout extends VLayout {
         ManageUsersTab usersTab = (ManageUsersTab) Layout.getInstance().
                 getTab(CoreConstants.TAB_MANAGE_USERS);
         usersTab.setUser(userName, email, confirmed, level, countryCode, maxRunningSimulations);
+    }
+    
+    
+     public void setFilter() {
+
+        if (state == false) {
+            grid.setShowFilterEditor(false);
+            state = true;
+        } else {
+            grid.setShowFilterEditor(true);
+            state = false;
+        }
+
     }
 }
