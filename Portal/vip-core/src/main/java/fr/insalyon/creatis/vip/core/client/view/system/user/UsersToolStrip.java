@@ -39,7 +39,9 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.common.LabelButton;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
@@ -50,7 +52,20 @@ public class UsersToolStrip extends ToolStrip {
     public UsersToolStrip() {
 
         this.setWidth100();
+        ToolStripButton  searchButton = new ToolStripButton("Search");
+        searchButton.setIcon(CoreConstants.ICON_SEARCH);
+        searchButton.setWidth(150);
+        searchButton.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+               ManageUsersTab usersTab = (ManageUsersTab) Layout.getInstance().
+                        getTab(CoreConstants.TAB_MANAGE_USERS);
+                usersTab.setFilter();
+            }
+        });
 
+        
+        
         ToolStripButton refreshButton = new ToolStripButton("Refresh");
         refreshButton.setIcon(CoreConstants.ICON_REFRESH);
         refreshButton.addClickHandler(new ClickHandler() {
@@ -63,5 +78,6 @@ public class UsersToolStrip extends ToolStrip {
             }
         });
         this.addButton(refreshButton);
+        this.addButton(searchButton);
     }
 }

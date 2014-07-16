@@ -62,6 +62,12 @@ public class ManageUsersTab extends AbstractManageTab {
     /**
      * 
      */
+    
+    public void setFilter() {
+        
+        usersLayout.setFilter();
+    }
+    
     public void loadUsers() {
         
         usersLayout.loadData();
