@@ -50,6 +50,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.user.publication.PublicationTypes;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
@@ -57,17 +58,21 @@ import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
+import org.jbibtex.ParseException;
+import org.jbibtex.TokenMgrException;
 
 /**
  *
@@ -839,8 +844,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public void removePublication(Long id) throws CoreException {
         trace(logger, "Removing publication.");
         try {
+            logger.error("1");
             authenticateSystemAdministrator(logger);
+            logger.error("2");
             configurationBusiness.removePublication(id);
+            logger.error("3");
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
@@ -905,21 +913,76 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     @Override
     public int getMaxConfiguredPlatformSimulation() throws CoreException {
-       return Server.getInstance().getMaxPlatformRunningSimulations();
+        return Server.getInstance().getMaxPlatformRunningSimulations();
     }
 
     @Override
-    public void changeMaxConfiguredPlatformSimulation(int maxPlatformRunningSimulations ) throws CoreException {
+    public void changeMaxConfiguredPlatformSimulation(int maxPlatformRunningSimulations) throws CoreException {
         try {
             Server.getInstance().setMaxPlatformRunningSimulations(maxPlatformRunningSimulations);
         } catch (ConfigurationException ex) {
-           logger.error(ex); 
-           throw new CoreException(ex);
+            logger.error(ex);
+            throw new CoreException(ex);
         }
     }
-    
-   
-    
-   
-   
+
+    @Override
+    public List<Publication> parseBibtexText(String s) throws CoreException {
+        List<Publication> publications = new ArrayList<Publication>();
+        try {
+            Reader reader = new StringReader(s);
+            org.jbibtex.BibTeXParser bibtexParser = new org.jbibtex.BibTeXParser();
+            org.jbibtex.BibTeXDatabase database = bibtexParser.parseFully(reader);
+            Map<org.jbibtex.Key, org.jbibtex.BibTeXEntry> entryMap = database.getEntries();
+            Collection<org.jbibtex.BibTeXEntry> entries = entryMap.values();
+            for (org.jbibtex.BibTeXEntry entry : entries) {
+                String type = entry.getType().toString();
+                org.jbibtex.Value title = entry.getField(org.jbibtex.BibTeXEntry.KEY_TITLE);
+                org.jbibtex.Value date = entry.getField(org.jbibtex.BibTeXEntry.KEY_YEAR);
+                org.jbibtex.Value doi = entry.getField(org.jbibtex.BibTeXEntry.KEY_DOI);
+                org.jbibtex.Value authors = entry.getField(org.jbibtex.BibTeXEntry.KEY_AUTHOR);
+                org.jbibtex.Value typeName = entry.getField(org.jbibtex.BibTeXEntry.KEY_BOOKTITLE);
+                String doiv;
+                if (doi == null) {
+                    doiv = "";
+                } else {
+                    doiv = doi.toUserString();
+                }
+                publications.add(new Publication(title.toUserString(), date.toUserString(), doiv, authors.toUserString(), parseTypePublication(type), getTypeName(entry, type), getSessionUser().getEmail()));
+
+            }
+
+        } catch (ParseException ex) {
+            logger.error(ex);
+            throw new CoreException(ex);
+        } catch (TokenMgrException ex) {
+            logger.error(ex);
+            throw new CoreException(ex);
+        }
+        return publications;
+    }
+
+    private String parseTypePublication(String type) {
+        if (type.equals("inproceedings") || type.equals("conference")) {
+            return PublicationTypes.ConferenceArticle.name();
+        } else if (type.equals("article")) {
+            return PublicationTypes.Journal.name();
+        } else if (type.equals("inbook") || type.equals("incollection")) {
+            return PublicationTypes.BookChapter.name();
+        } else {
+            return PublicationTypes.Other.name();
+        }
+
+    }
+
+    private String getTypeName(org.jbibtex.BibTeXEntry entry, String type) {
+        if (type.equals("inproceedings") || type.equals("conference") || type.equals("incollection")) {
+            return entry.getField(org.jbibtex.BibTeXEntry.KEY_BOOKTITLE).toUserString();
+        } else if (type.equals("article")) {
+            return entry.getField(org.jbibtex.BibTeXEntry.KEY_JOURNAL).toUserString();
+        } else {
+            return "";
+        }
+
+    }
 }

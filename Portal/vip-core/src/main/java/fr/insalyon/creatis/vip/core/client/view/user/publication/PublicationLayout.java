@@ -26,7 +26,6 @@ public class PublicationLayout extends VLayout {
 
     PublicationGrid publicationGrid;
     private final ModalWindow modal;
-    private ListGrid grid;
     private static PublicationLayout instance;
     boolean state = true;
 
@@ -42,10 +41,10 @@ public class PublicationLayout extends VLayout {
         this.setWidth100();
         this.setHeight100();
         this.setOverflow(Overflow.AUTO);
-
+        publicationGrid = new PublicationGrid();
         configureActions();
         configureGrid();
-        modal = new ModalWindow(grid);
+        modal = new ModalWindow(publicationGrid.getGrid());
         loadData();
     }
 
@@ -89,12 +88,7 @@ public class PublicationLayout extends VLayout {
 
     private void configureGrid() {
 
-
-
-        publicationGrid = new PublicationGrid();
-        grid = publicationGrid.grid;
-
-        this.addMember(grid);
+        this.addMember(publicationGrid.getGrid());
     }
 
     public void loadData() {
@@ -112,8 +106,8 @@ public class PublicationLayout extends VLayout {
                 for (Publication pub : result) {
                     dataList.add(new PublicationRecord(pub.getId(), pub.getTitle(), pub.getType(), pub.getTypeName(), pub.getDate(), pub.getAuthors(), pub.getDoi(), pub.getVipAuthor()));
                 }
-                grid.setData(dataList.toArray(new PublicationRecord[]{}));
-                publicationGrid.ds.setTestData(dataList.toArray(new PublicationRecord[]{}));
+                publicationGrid.getGrid().setData(dataList.toArray(new PublicationRecord[]{}));
+                publicationGrid.getDs().setTestData(dataList.toArray(new PublicationRecord[]{}));
             }
         };
         modal.show("Loading Publications...", true);
@@ -127,33 +121,13 @@ public class PublicationLayout extends VLayout {
         pubTab.setPublication(id, title, type, typeName, authors, date, doi);
     }
 
-    private void remove(Long id) {
-
-        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to remove publication:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(Void result) {
-                modal.hide();
-                Layout.getInstance().setNoticeMessage("The publication was successfully removed!");
-                loadData();
-            }
-        };
-        modal.show("Removing publication '" + "'...", true);
-        ConfigurationService.Util.getInstance().removePublication(id, callback);
-    }
-
     public void setFilter() {
 
         if (state == false) {
-            grid.setShowFilterEditor(false);
+            publicationGrid.getGrid().setShowFilterEditor(false);
             state = true;
         } else {
-            grid.setShowFilterEditor(true);
+            publicationGrid.getGrid().setShowFilterEditor(true);
             state = false;
         }
 

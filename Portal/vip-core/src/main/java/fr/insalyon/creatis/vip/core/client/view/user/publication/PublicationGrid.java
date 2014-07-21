@@ -34,15 +34,19 @@ import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 
 /**
  *
- * @author nouha
+ * @author Nouha Boujelben
  */
 public class PublicationGrid extends ListGrid  {
 
-    ListGrid grid;
+    private ListGrid grid;
+
+    
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
     private DetailViewer detailViewer;
     DataSource ds;
+
+   
     private ModalWindow modal;
 
     public PublicationGrid() {
@@ -77,10 +81,12 @@ public class PublicationGrid extends ListGrid  {
                                 @Override
                                 public void execute(Boolean value) {
                                     if (value) {
-                                        remove(Long.valueOf(id));
+                                        
+                                        remove(Long.parseLong(id));
                                     }
                                 }
                             });
+                            
                         }
                     });
 
@@ -186,7 +192,7 @@ public class PublicationGrid extends ListGrid  {
     }
 
     private void remove(Long id) {
-
+      
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -203,5 +209,13 @@ public class PublicationGrid extends ListGrid  {
         };
         modal.show("Removing publication '" + "'...", true);
         ConfigurationService.Util.getInstance().removePublication(id, callback);
+    }
+    
+    public ListGrid getGrid() {
+        return grid;
+    }
+    
+     public DataSource getDs() {
+        return ds;
     }
 }

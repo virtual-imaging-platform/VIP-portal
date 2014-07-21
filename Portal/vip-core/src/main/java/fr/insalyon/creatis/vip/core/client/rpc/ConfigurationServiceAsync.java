@@ -143,6 +143,8 @@ public interface ConfigurationServiceAsync {
 
     public void updatePublication(Publication pub, AsyncCallback<Void> asyncCallback);
     
+     public void parseBibtexText(String text,AsyncCallback<List<Publication>> asyncCallback) ;
+    
     //TermsOfUse
     public void addTermsUse(TermsOfUse termsofUse,AsyncCallback<Void> asyncCallback);
     

@@ -161,6 +161,8 @@ public interface ConfigurationService extends RemoteService {
 
     public void updatePublication(Publication pub) throws CoreException;
     
+    public List<Publication> parseBibtexText(String text) throws CoreException;
+    
     //TermsOfUse
     public void addTermsUse(TermsOfUse termsofUse) throws CoreException;
     
