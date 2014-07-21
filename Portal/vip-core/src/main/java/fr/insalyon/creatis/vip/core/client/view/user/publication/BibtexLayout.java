@@ -29,7 +29,7 @@ public class BibtexLayout extends AbstractFormLayout {
 
     public BibtexLayout() {
         super("100%", "50%");
-        addTitle("Add Publications From Bibtex ", CoreConstants.ICON_PUBLICATION);
+        addTitle("Add Publications From Bibtex Format", CoreConstants.ICON_PUBLICATION);
         configure();
     }
 
@@ -68,7 +68,7 @@ public class BibtexLayout extends AbstractFormLayout {
             }
         });
 
-        addFieldResponsiveHeight("Bibtex text", textAreaItem);
+        addFieldResponsiveHeight("Add your bibtex base here:", textAreaItem);
         addButtons(saveButton);
         
         
