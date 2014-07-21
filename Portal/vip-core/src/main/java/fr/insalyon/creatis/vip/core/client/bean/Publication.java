@@ -43,7 +43,16 @@ public class Publication implements IsSerializable {
         this.type = type;
         this.typeName = typeName;
     }
-    
+     public Publication(String title, String date, String doi, String authors, String type, String typeName,String vipAuthor) {
+        
+        this.title = title;
+        this.date = date;
+        this.doi = doi;
+        this.authors = authors;
+        this.type = type;
+        this.typeName = typeName;
+        this.vipAuthor=vipAuthor;
+    }
 
     public Long getId() {
         return id;

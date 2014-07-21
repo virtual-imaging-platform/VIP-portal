@@ -44,7 +44,7 @@ public class EditPublicationLayout extends AbstractFormLayout {
 
     public EditPublicationLayout() {
 
-        super("50%", "100%");
+        super("100%", "50%");
         addTitle("Add/Edit Publications", CoreConstants.ICON_PUBLICATION);
         configure();
     }
