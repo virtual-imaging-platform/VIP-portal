@@ -344,7 +344,7 @@ public class ApplicationData implements ApplicationDAO {
      * @throws DAOException
      */
     @Override
-    public boolean applicationExist(String applicationName, String userEmail) throws DAOException {
+    public boolean checkApplicationExistWithAnOtherOwner(String applicationName, String userEmail) throws DAOException {
         boolean exist;
         try {
             PreparedStatement ps;
@@ -369,10 +369,6 @@ public class ApplicationData implements ApplicationDAO {
             }
 
             ps.close();
-
-
-
-
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);

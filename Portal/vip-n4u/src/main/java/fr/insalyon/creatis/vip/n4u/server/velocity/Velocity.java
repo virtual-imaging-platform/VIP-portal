@@ -6,7 +6,6 @@ package fr.insalyon.creatis.vip.n4u.server.velocity;
 
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
-import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -16,8 +15,6 @@ import java.io.StringWriter;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -184,6 +181,9 @@ public class Velocity implements VelocityProcess {
             CoreUtil.getGRIDAClient().createFolder(applicationLocation, "workflows");
             copyFile(chemin, dir + "/" + applicationName + ".bak" + ".gwendia");
             CoreUtil.getGRIDAClient().uploadFile(chemin, applicationLocation + "/" + "workflows");
+            //String n4uLocation=applicationLocation.replace("/grid/biomed/creatis/vip",  "/grid/vo.neugrid.eu/home/vip");
+            //CoreUtil.getGRIDAN4uClient().createFolder("/grid/vo.neugrid.eu/home/vip", "workflows");
+           // CoreUtil.getGRIDAN4uClient().uploadFile(chemin,"/grid/vo.neugrid.eu/home/vip/workflows");
         } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new VelocityException(ex);

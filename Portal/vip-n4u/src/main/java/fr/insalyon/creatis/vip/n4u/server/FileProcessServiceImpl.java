@@ -129,10 +129,12 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(fXmlFile);
             doc.getDocumentElement().normalize();
-            String[] NameDesc = new String[2];
-            NameDesc[0] = doc.getDocumentElement().getAttribute("name");
-            NameDesc[1] = doc.getElementsByTagName("description").item(0).getTextContent();
-            listInputs.add(NameDesc);
+            String[] nameDesc = new String[3];
+            nameDesc[0] = doc.getDocumentElement().getAttribute("name");
+            nameDesc[1] = doc.getDocumentElement().getAttribute("version");
+            nameDesc[2] = doc.getElementsByTagName("description").item(0).getTextContent();
+           
+            listInputs.add(nameDesc);
             NodeList nList = doc.getElementsByTagName("entry");
 
             for (int temp = 0; temp < nList.getLength(); temp++) {

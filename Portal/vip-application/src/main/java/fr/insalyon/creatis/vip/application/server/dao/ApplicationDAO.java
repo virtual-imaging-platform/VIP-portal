@@ -67,7 +67,7 @@ public interface ApplicationDAO {
 
     public List<String> getApplicationsName(String applicationClass) throws DAOException;
 
-    public boolean applicationExist(String name, String userEmail) throws DAOException;
+    public boolean checkApplicationExistWithAnOtherOwner(String name, String userEmail) throws DAOException;
 
     public String getCitation(String name) throws DAOException;
 
