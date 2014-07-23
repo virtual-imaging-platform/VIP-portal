@@ -105,7 +105,7 @@ public class LayoutConverterOption1 extends AbstractFormLayout {
         title = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+_(): ]");
         title.setValidators(ValidatorUtil.getStringValidator("[0-9.,A-Za-z-+_(): ]"));
         title.setRequired(Boolean.TRUE);
-        
+
         express = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_(): ]");
         express.setValidators(ValidatorUtil.getStringValidator("[0-9.,A-Za-z-+/_(): ]"));
         express.setIcons(browsePicker);
@@ -154,7 +154,7 @@ public class LayoutConverterOption1 extends AbstractFormLayout {
                 new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                if (!title.validate()|| !job.validate() || !express.validate()  || !ext.validate() || !env.validate()) {
+                if (!title.validate() || !job.validate() || !express.validate() || !ext.validate() || !env.validate()) {
                     Layout.getInstance().setWarningMessage("There is an invalid input");
                 } else {
                     final AsyncCallback<int[]> callback = new AsyncCallback<int[]>() {
@@ -169,8 +169,8 @@ public class LayoutConverterOption1 extends AbstractFormLayout {
 
                             tabImporter = new N4uImportTab();
                             Layout.getInstance().addTab(tabImporter);
-                            tabImporter.addFields(FieldTitles.ApplicationName, false, title.getValueAsString(),"[0-9.,A-Za-z-+_() ]", false, true);
-                            tabImporter.addFields(FieldTitles.ApplicationVersion, false, "","[0-9.,A-Za-z-+_() ]", false, true);
+                            tabImporter.addFields(FieldTitles.ApplicationName, false, title.getValueAsString(), "[0-9.,A-Za-z-+_() ]", false, true);
+                            tabImporter.addFields(FieldTitles.ApplicationVersion, false, "", "[0-9.,A-Za-z-+_() ]", false, true);
                             tabImporter.addFielDescription("Documentation and Terms of Use", "");
                             tabImporter.addInputField(true, "results-directory ", "Directory where the results will be stored", InputTypes.Parameter, true);
                             tabImporter.addInputField(true, "job name", "A string identifying the job name", InputTypes.Parameter, false);
@@ -183,10 +183,10 @@ public class LayoutConverterOption1 extends AbstractFormLayout {
                             }
 
                             tabImporter.addOutputField(true, "result", "A tar.gz file containing the results", InputTypes.File, true);
-                            tabImporter.addFields(FieldTitles.MainExecutable, true, script.getValueAsString(),"[0-9.,A-Za-z-+/_() ]", false, true);
-                            tabImporter.addFields(FieldTitles.ApplicationLocation, true, "","[0-9.,A-Za-z-+/_() ]", false, true);
-                            tabImporter.addFields(FieldTitles.EnvironementFile, true, env.getValueAsString(),"[0-9.,A-Za-z-+/_() ]", false, false);
-                            tabImporter.addFields(FieldTitles.SandboxFile, true, "","[0-9.,A-Za-z-+/_() ]", false, false);
+                            tabImporter.addFields(FieldTitles.MainExecutable, true, script.getValueAsString(), "[0-9.,A-Za-z-+/_() ]", false, true);
+                            tabImporter.addFields(FieldTitles.ApplicationLocation, true, "", "[0-9.,A-Za-z-+/_() ]", false, true);
+                            tabImporter.addFields(FieldTitles.EnvironementFile, true, env.getValueAsString(), "[0-9.,A-Za-z-+/_() ]", false, false);
+                            tabImporter.addFields(FieldTitles.SandboxFile, true, "", "[0-9.,A-Za-z-+/_() ]", false, false);
                             tabImporter.addLaunchButton();
 
                         }

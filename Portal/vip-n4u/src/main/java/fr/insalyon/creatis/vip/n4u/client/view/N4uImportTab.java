@@ -66,7 +66,7 @@ public class N4uImportTab extends Tab {
     private VLayout layout;
     PickerIcon browsePicker;
     IButton createApplicationButton;
-    Map<Integer,Map> listInputs;
+    Map<Integer, Map> listInputs;
     ArrayList listOutputs;
     List<TextItem> listItems;
     int item = 0;
@@ -87,7 +87,7 @@ public class N4uImportTab extends Tab {
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
         configure();
-        listInputs = new HashMap<Integer,Map>();
+        listInputs = new HashMap<Integer, Map>();
         listOutputs = new ArrayList();
         listItems = new ArrayList<TextItem>();
         this.setPane(layout);
@@ -170,12 +170,12 @@ public class N4uImportTab extends Tab {
                     public void onSuccess(Boolean result) {
                         //application exist and will create new version 
                         //create new application and new version
-                       
+
                         if (result.booleanValue()) {
                             Layout.getInstance().setNoticeMessage("Creating the application (this can take a while)");
                             createScriptFile(true, false);
-                       } else {
-                             Layout.getInstance().setNoticeMessage("Creating the application (this can take a while)");
+                        } else {
+                            Layout.getInstance().setNoticeMessage("Creating the application (this can take a while)");
                             createScriptFile(true, true);
                         }
                     }
@@ -210,7 +210,7 @@ public class N4uImportTab extends Tab {
                 final AsyncCallback<Void> call = new AsyncCallback<Void>() {
                     @Override
                     public void onFailure(Throwable caught) {
-                       Layout.getInstance().setWarningMessage("can't add application  " + caught.getMessage());
+                        Layout.getInstance().setWarningMessage("can't add application  " + caught.getMessage());
                     }
 
                     @Override
@@ -330,18 +330,18 @@ public class N4uImportTab extends Tab {
     public VLayout addInputField(boolean requiredInput, String value, String descriptionValue, InputTypes typeValue, boolean isFixedType) {
         item++;
         key++;
-        final int nombre=key;
+        final int nombre = key;
         HLayout hlayout = new HLayout();
         hlayout.setHeight(80);
         hlayout.setWidth100();
         hlayout.setMembersMargin(2);
-        
+
         final Map map = new HashMap();
         final TextItem fieldItem = FieldUtil.getTextItem("30%", false, "", "[0-9.,A-Za-z-+/_(): ]", false);
         fieldItem.setValidators(ValidatorUtil.getStringValidator("[0-9.,A-Za-z-+/_(): ]"));
         fieldItem.setRequired(true);
         fieldItem.setValue(value);
-        
+
         map.put("name", fieldItem.getValueAsString());
         fieldItem.addEditorExitHandler(new EditorExitHandler() {
             @Override
@@ -444,11 +444,11 @@ public class N4uImportTab extends Tab {
 
         removeButton.addClickHandler(new ClickHandler() {
             public void onClick(ClickEvent event) {
-                listItems.remove(fieldItem);  
+                listItems.remove(fieldItem);
                 item = item - 1;
                 listInputs.remove(nombre);
                 vlayout.removeMember(sectionStack);
-           }
+            }
         });
         section1.setItems(hlayout);
         if (!requiredInput) {
@@ -461,10 +461,10 @@ public class N4uImportTab extends Tab {
         sectionStack.setHeight(120);
         sectionStack.setTitle("" + item);
         sectionStack.setShowHover(false);
-        listInputs.put(nombre,map);
+        listInputs.put(nombre, map);
         listItems.add(fieldItem);
         vlayout.addMember(sectionStack);
-       
+
 
         return vlayout;
 
@@ -652,7 +652,7 @@ public class N4uImportTab extends Tab {
 
         }
         if (title.equals(FieldTitles.ApplicationName)) {
-        
+
             applicationName = value.replaceAll("/", "");
             fieldItem.setValue(applicationName);
             fieldItem.addEditorExitHandler(new EditorExitHandler() {
@@ -665,7 +665,7 @@ public class N4uImportTab extends Tab {
         }
         if (title.equals(FieldTitles.ApplicationVersion)) {
             fieldItem.setValue(value);
-            version=value;
+            version = value;
             fieldItem.addEditorExitHandler(new EditorExitHandler() {
                 @Override
                 public void onEditorExit(EditorExitEvent event) {
@@ -675,7 +675,7 @@ public class N4uImportTab extends Tab {
 
         }
         //add Member
-        if (title.equals(FieldTitles.ApplicationName)||title.equals(FieldTitles.ApplicationVersion)) {
+        if (title.equals(FieldTitles.ApplicationName) || title.equals(FieldTitles.ApplicationVersion)) {
             layoutGeneralInformation.addMember(itemLabel);
             layoutGeneralInformation.addMember(titleItemForm);
         } else {
