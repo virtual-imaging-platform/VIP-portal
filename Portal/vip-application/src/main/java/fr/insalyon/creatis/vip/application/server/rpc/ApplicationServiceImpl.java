@@ -219,10 +219,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public boolean applicationExist(String applicationName) throws ApplicationException {
+    public boolean checkApplicationExistWithAnOtherOwner(String applicationName) throws ApplicationException {
 
         try {
-            return applicationBusiness.applicationExist(applicationName, getSessionUser().getEmail());
+            return applicationBusiness.checkApplicationExistWithAnOtherOwner(applicationName, getSessionUser().getEmail());
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
         } catch (BusinessException ex) {

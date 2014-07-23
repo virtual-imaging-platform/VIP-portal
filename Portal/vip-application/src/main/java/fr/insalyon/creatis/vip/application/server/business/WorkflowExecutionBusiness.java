@@ -38,6 +38,7 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import java.io.File;
@@ -78,7 +79,7 @@ public class WorkflowExecutionBusiness {
         try {
             engine.setWorkflow(new File(workflowPath));
             engine.setInput(parameters);
-            String launchID = engine.launch(Server.getInstance().getServerProxy(), null);
+            String launchID = engine.launch(Server.getInstance().getServerProxy(CoreConstants.VO_BIOMED), null);
             String workflowID = engine.getSimulationId(launchID);
 
             return new Workflow(workflowID, user.getFullName(), 

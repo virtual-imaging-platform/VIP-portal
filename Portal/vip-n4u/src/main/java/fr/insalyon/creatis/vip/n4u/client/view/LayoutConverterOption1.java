@@ -170,6 +170,7 @@ public class LayoutConverterOption1 extends AbstractFormLayout {
                             tabImporter = new N4uImportTab();
                             Layout.getInstance().addTab(tabImporter);
                             tabImporter.addFields(FieldTitles.ApplicationName, false, title.getValueAsString(),"[0-9.,A-Za-z-+_() ]", false, true);
+                            tabImporter.addFields(FieldTitles.ApplicationVersion, false, "","[0-9.,A-Za-z-+_() ]", false, true);
                             tabImporter.addFielDescription("Documentation and Terms of Use", "");
                             tabImporter.addInputField(true, "results-directory ", "Directory where the results will be stored", InputTypes.Parameter, true);
                             tabImporter.addInputField(true, "job name", "A string identifying the job name", InputTypes.Parameter, false);

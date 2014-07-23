@@ -104,7 +104,8 @@ public class LayoutConverterOption2 extends AbstractFormLayout {
                             for (int i = 0; i < result.size(); i++) {
                                 if (i == 0) {
                                     tabImporter.addFields(FieldTitles.ApplicationName, false, result.get(i)[0],"[0-9.,A-Za-z-+_(): ]", false, true);
-                                    tabImporter.addFielDescription("Documentation and Terms of Use", result.get(i)[1]);
+                                    tabImporter.addFields(FieldTitles.ApplicationVersion, false, result.get(i)[1],"[0-9.,A-Za-z-+_() ]", false, true);
+                                    tabImporter.addFielDescription("Documentation and Terms of Use", result.get(i)[2]);
                                     tabImporter.addInputField(true, "results-directory ", "Directory where the results will be stored", InputTypes.Parameter, true);
                                     tabImporter.addInputField(true, "job name", "A string identifying the job name", InputTypes.Parameter, false);
 

@@ -12,6 +12,7 @@ public enum FieldTitles {
 
     SandboxFile("Sandbox File"),
     ApplicationName("Application Name <font color=red>(*)</font>"),
+    ApplicationVersion("Version <font color=red>(*)</font>"),
     ApplicationLocation("Application Location <font color=red>(*)</font>"),
     EnvironementFile("Environement File"),
     MainExecutable("Main Executable <font color=red>(*)</font>");
