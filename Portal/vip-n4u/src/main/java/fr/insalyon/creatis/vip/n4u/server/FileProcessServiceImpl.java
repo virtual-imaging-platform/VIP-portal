@@ -133,7 +133,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             nameDesc[0] = doc.getDocumentElement().getAttribute("name");
             nameDesc[1] = doc.getDocumentElement().getAttribute("version");
             nameDesc[2] = doc.getElementsByTagName("description").item(0).getTextContent();
-           
+
             listInputs.add(nameDesc);
             NodeList nList = doc.getElementsByTagName("entry");
 
@@ -181,7 +181,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public void generateScriptFile(Map<Integer,Map> listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String environementFile, String description) throws N4uException {
+    public void generateScriptFile(Map<Integer, Map> listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String environementFile, String description) throws N4uException {
         String applicationRealLocation;
         try {
 
@@ -218,7 +218,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public String generateGwendiaFile(Map<Integer,Map> listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException {
+    public String generateGwendiaFile(Map<Integer, Map> listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException {
         String applicationRealLocation;
         try {
             applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
@@ -254,7 +254,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public void generateGaswFile(Map<Integer,Map> listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String sandboxFile, String environementFile) throws N4uException {
+    public void generateGaswFile(Map<Integer, Map> listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String sandboxFile, String environementFile) throws N4uException {
         String applicationRealLocation = null;
         try {
             applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);

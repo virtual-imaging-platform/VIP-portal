@@ -103,8 +103,8 @@ public class LayoutConverterOption2 extends AbstractFormLayout {
 
                             for (int i = 0; i < result.size(); i++) {
                                 if (i == 0) {
-                                    tabImporter.addFields(FieldTitles.ApplicationName, false, result.get(i)[0],"[0-9.,A-Za-z-+_(): ]", false, true);
-                                    tabImporter.addFields(FieldTitles.ApplicationVersion, false, result.get(i)[1],"[0-9.,A-Za-z-+_() ]", false, true);
+                                    tabImporter.addFields(FieldTitles.ApplicationName, false, result.get(i)[0], "[0-9.,A-Za-z-+_(): ]", false, true);
+                                    tabImporter.addFields(FieldTitles.ApplicationVersion, false, result.get(i)[1], "[0-9.,A-Za-z-+_() ]", false, true);
                                     tabImporter.addFielDescription("Documentation and Terms of Use", result.get(i)[2]);
                                     tabImporter.addInputField(true, "results-directory ", "Directory where the results will be stored", InputTypes.Parameter, true);
                                     tabImporter.addInputField(true, "job name", "A string identifying the job name", InputTypes.Parameter, false);
@@ -117,11 +117,11 @@ public class LayoutConverterOption2 extends AbstractFormLayout {
 
                             }
 
-                            tabImporter.addOutputField(true, "result", "A tar.gz file containing the results",InputTypes.File, true);
-                            tabImporter.addFields(FieldTitles.MainExecutable, true, "","[0-9.,A-Za-z-+/_(): ]", false, true);
-                            tabImporter.addFields(FieldTitles.ApplicationLocation, true, "","[0-9.,A-Za-z-+/_(): ]", false, true);
-                            tabImporter.addFields(FieldTitles.EnvironementFile, true, "","[0-9.,A-Za-z-+/_(): ]", false, false);
-                            tabImporter.addFields(FieldTitles.SandboxFile, true, "","[0-9.,A-Za-z-+/_(): ]", false, false);
+                            tabImporter.addOutputField(true, "result", "A tar.gz file containing the results", InputTypes.File, true);
+                            tabImporter.addFields(FieldTitles.MainExecutable, true, "", "[0-9.,A-Za-z-+/_(): ]", false, true);
+                            tabImporter.addFields(FieldTitles.ApplicationLocation, true, "", "[0-9.,A-Za-z-+/_(): ]", false, true);
+                            tabImporter.addFields(FieldTitles.EnvironementFile, true, "", "[0-9.,A-Za-z-+/_(): ]", false, false);
+                            tabImporter.addFields(FieldTitles.SandboxFile, true, "", "[0-9.,A-Za-z-+/_(): ]", false, false);
                             tabImporter.addLaunchButton();
 
                         }
