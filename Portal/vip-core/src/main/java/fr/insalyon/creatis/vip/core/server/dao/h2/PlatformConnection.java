@@ -123,7 +123,8 @@ public class PlatformConnection {
                     + "level VARCHAR(50), "
                     + "country_code VARCHAR(2), "
                     + "max_simulations int(11), "
-                    + "termsUse TIMESTAMP, "
+                    + "termsUse TIMESTAMP,"
+                    + "lastUpdatePublications TIMESTAMP,"
                     + "PRIMARY KEY(email), UNIQUE KEY(first_name,last_name)")) {
 
                 Server server = Server.getInstance();
