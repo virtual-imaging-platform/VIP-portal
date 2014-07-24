@@ -657,4 +657,26 @@ public class UserData implements UserDAO {
     public void unlinkDropboxAccount(String email) throws DAOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+    
+     @Override
+    public Timestamp getLastPublicationUpdate(String email) throws DAOException {
+      try {
+            Timestamp lastupdatePublication = null;
+            PreparedStatement ps = connection.prepareStatement("SELECT lastUpdatePublications "
+                    + "FROM VIPUsers WHERE email=?");
+            
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+            lastupdatePublication= rs.getTimestamp("lastUpdatePublications");
+            }
+            
+            ps.close();
+            return lastupdatePublication;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        } 
+    }
 }
