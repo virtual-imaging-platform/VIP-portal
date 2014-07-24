@@ -36,6 +36,8 @@ package fr.insalyon.creatis.vip.core.client;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Frame;
+import com.smartgwt.client.util.BooleanCallback;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Dialog;
 import com.smartgwt.client.widgets.Label;
@@ -124,7 +126,27 @@ public class CoreModule extends Module {
                 }
             }
         };
-        ConfigurationService.Util.getInstance().compare(callback );
+        ConfigurationService.Util.getInstance().compare(callback);
+
+        //call to test last publication update
+        //testLastUpdatePublicationforSixMonth
+        final AsyncCallback<Boolean> callback2 = new AsyncCallback<Boolean>() {
+            @Override
+            public void onFailure(Throwable caught) {
+
+                Layout.getInstance().setWarningMessage("Cannot get the date of last publication update" + caught.getMessage(), 10);
+
+            }
+
+            @Override
+            public void onSuccess(Boolean result) {
+                if (result) {
+                    SC.say("You didn't update your publications for 6 months. Please add your publications that you made using vip.");
+                }
+
+            }
+        };
+        ConfigurationService.Util.getInstance().testLastUpdatePublicationforSixMonth(callback2);
 
     }
 

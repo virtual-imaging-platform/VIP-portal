@@ -129,6 +129,8 @@ public interface ConfigurationService extends RemoteService {
     public void removeUserFromGroup(String email, String groupName) throws CoreException;
 
     public void resetPassword(String email, String code, String password) throws CoreException;
+    
+   
 
     // Accounts
     public List<Account> getAccounts() throws CoreException;
@@ -150,6 +152,8 @@ public interface ConfigurationService extends RemoteService {
     public DropboxAccountStatus.AccountStatus getDropboxAccountStatus() throws CoreException;
 
     public void unlinkDropboxAccount() throws CoreException;
+    
+    public boolean testLastUpdatePublicationforSixMonth()throws CoreException;
 
     // public void getPostParameters() throws CoreException;
     //Publications

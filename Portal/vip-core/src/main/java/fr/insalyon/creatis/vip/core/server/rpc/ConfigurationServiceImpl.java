@@ -113,6 +113,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             }
             return null;
 
+
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -984,5 +985,16 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             return "";
         }
 
+    }
+
+    @Override
+    public boolean testLastUpdatePublicationforSixMonth() throws CoreException {
+        try {
+
+            return configurationBusiness.testLastUpdatePublicationforSixMonth(getSessionUser().getEmail());
+
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
     }
 }

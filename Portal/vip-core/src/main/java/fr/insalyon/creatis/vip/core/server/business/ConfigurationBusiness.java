@@ -1253,6 +1253,22 @@ public class ConfigurationBusiness {
         }
     }
 
+    public boolean testLastUpdatePublicationforSixMonth(String email) throws BusinessException {
+
+        try {
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(CoreDAOFactory.getDAOFactory().getUserDAO().getLastPublicationUpdate(email));
+            cal.add(Calendar.MONTH, 6);
+            Timestamp ts = new Timestamp(cal.getTime().getTime());
+            return ts.before(getCurrentTimeStamp());
+
+        } catch (DAOException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
     private static java.sql.Timestamp getCurrentTimeStamp() {
 
         java.util.Date today = new java.util.Date();
