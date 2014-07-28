@@ -25,30 +25,22 @@ import java.util.List;
 public class PublicationLayout extends VLayout {
 
     PublicationGrid publicationGrid;
-    private final ModalWindow modal;
-    private static PublicationLayout instance;
     boolean state = true;
+   
 
-    public static PublicationLayout getInstance() {
-        if (instance == null) {
-            instance = new PublicationLayout();
-        }
-        return instance;
-    }
-
-    public PublicationLayout() {
+    public PublicationLayout(ModalWindow modal) {
 
         this.setWidth100();
         this.setHeight100();
         this.setOverflow(Overflow.AUTO);
         publicationGrid = new PublicationGrid();
-        configureActions();
+        configureActions(modal);
         configureGrid();
-        modal = new ModalWindow(publicationGrid.getGrid());
-        loadData();
+
+        loadData(modal);
     }
 
-    private void configureActions() {
+    private void configureActions(final ModalWindow modal) {
 
         ToolstripLayout toolstrip = new ToolstripLayout();
         LabelButton searchButton = new LabelButton("Search", CoreConstants.ICON_SEARCH);
@@ -78,7 +70,7 @@ public class PublicationLayout extends VLayout {
         refreshButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                loadData();
+                loadData(modal);
             }
         });
         toolstrip.addMember(refreshButton);
@@ -91,7 +83,7 @@ public class PublicationLayout extends VLayout {
         this.addMember(publicationGrid.getGrid());
     }
 
-    public void loadData() {
+    public void loadData(final ModalWindow modal) {
         final AsyncCallback<List<Publication>> callback = new AsyncCallback<List<Publication>>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -101,7 +93,7 @@ public class PublicationLayout extends VLayout {
 
             @Override
             public void onSuccess(List<Publication> result) {
-                modal.hide();
+               modal.hide();
                 List<PublicationRecord> dataList = new ArrayList<PublicationRecord>();
                 for (Publication pub : result) {
                     dataList.add(new PublicationRecord(pub.getId(), pub.getTitle(), pub.getType(), pub.getTypeName(), pub.getDate(), pub.getAuthors(), pub.getDoi(), pub.getVipAuthor()));
@@ -110,7 +102,7 @@ public class PublicationLayout extends VLayout {
                 publicationGrid.getDs().setTestData(dataList.toArray(new PublicationRecord[]{}));
             }
         };
-        modal.show("Loading Publications...", true);
+      modal.show("Loading Publications...", true);
         ConfigurationService.Util.getInstance().getPublications(callback);
     }
 
@@ -132,4 +124,6 @@ public class PublicationLayout extends VLayout {
         }
 
     }
+
+   
 }

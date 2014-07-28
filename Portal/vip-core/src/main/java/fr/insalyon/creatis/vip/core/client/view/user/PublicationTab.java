@@ -6,6 +6,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.user.publication.BibtexLayout;
 import fr.insalyon.creatis.vip.core.client.view.user.publication.EditPublicationLayout;
 import fr.insalyon.creatis.vip.core.client.view.user.publication.PublicationInfoTab;
@@ -20,6 +21,7 @@ public class PublicationTab extends Tab {
     PublicationLayout publicationLayout;
     EditPublicationLayout editPublicationLayout;
     BibtexLayout bibtexLayout;
+    private ModalWindow modal;
 
     public PublicationTab() {
         this.setTitle(Canvas.imgHTML(CoreConstants.ICON_PUBLICATION) + " "
@@ -30,7 +32,7 @@ public class PublicationTab extends Tab {
         vLayout.setWidth100();
         vLayout.setPadding(10);
         vLayout.setMembersMargin(5);
-        
+
         VLayout vLayout2 = new VLayout(5);
         vLayout2.setWidth100();
         vLayout2.setPadding(10);
@@ -41,14 +43,16 @@ public class PublicationTab extends Tab {
         hLayout.setHeight100();
         hLayout.setOverflow(Overflow.AUTO);
         hLayout.setMembersMargin(5);
-       
+
         vLayout2.addMember(editPublicationLayout = new EditPublicationLayout());
         vLayout2.addMember(bibtexLayout = new BibtexLayout());
-        
-        hLayout.addMember(publicationLayout = new PublicationLayout());
+         modal = new ModalWindow(hLayout);
+
+        hLayout.addMember(publicationLayout = new PublicationLayout( modal));
         hLayout.addMember(vLayout2);
         vLayout.addMember(new PublicationInfoTab());
         vLayout.addMember(hLayout);
+       
         this.setPane(vLayout);
 
     }
@@ -58,6 +62,11 @@ public class PublicationTab extends Tab {
     }
 
     public void loadPublication() {
-        publicationLayout.loadData();
+        publicationLayout.loadData( modal);
     }
+  
+    public ModalWindow getModal() {
+        return modal;
+    }
+    
 }
