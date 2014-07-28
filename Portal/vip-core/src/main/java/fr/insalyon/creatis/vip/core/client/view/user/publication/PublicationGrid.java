@@ -21,7 +21,6 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
-import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.viewer.DetailViewer;
 import com.smartgwt.client.widgets.viewer.DetailViewerField;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
@@ -36,18 +35,14 @@ import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
  *
  * @author Nouha Boujelben
  */
-public class PublicationGrid extends ListGrid  {
+public class PublicationGrid extends ListGrid {
 
     private ListGrid grid;
-
-    
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
     private DetailViewer detailViewer;
     DataSource ds;
-
    
-    private ModalWindow modal;
 
     public PublicationGrid() {
         ds = new Data();
@@ -80,13 +75,12 @@ public class PublicationGrid extends ListGrid  {
                                     + rollOverRecord.getAttribute("title") + " ?", new BooleanCallback() {
                                 @Override
                                 public void execute(Boolean value) {
-                                    if (value) {
-                                        
+                                    if (value != null && value) {
                                         remove(Long.parseLong(id));
                                     }
                                 }
                             });
-                            
+
                         }
                     });
 
@@ -114,7 +108,7 @@ public class PublicationGrid extends ListGrid  {
             @Override
             protected Canvas getCellHoverComponent(Record record, Integer rowNum, Integer colNum) {
 
-                
+
                 detailViewer = new DetailViewer();
                 detailViewer.setWidth(400);
                 if (CoreModule.user.isSystemAdministrator()) {
@@ -192,30 +186,43 @@ public class PublicationGrid extends ListGrid  {
     }
 
     private void remove(Long id) {
-      
+
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
-                modal.hide();
+               getPubTab().getModal().hide();
                 Layout.getInstance().setWarningMessage("Unable to remove publication:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(Void result) {
-                modal.hide();
+                Layout.getInstance().setNoticeMessage("222");
+                getPubTab().getModal().hide();
                 Layout.getInstance().setNoticeMessage("The publication was successfully removed!");
-                PublicationLayout.getInstance().loadData();
+                loadData();
             }
         };
-        modal.show("Removing publication '" + "'...", true);
+       getPubTab().getModal().show("Removing publication '" + "'...", true);
+
         ConfigurationService.Util.getInstance().removePublication(id, callback);
+
     }
-    
+
     public ListGrid getGrid() {
         return grid;
     }
-    
-     public DataSource getDs() {
+
+    public DataSource getDs() {
         return ds;
+    }
+
+    protected void loadData() {
+
+        getPubTab().loadPublication();
+    }
+
+    private PublicationTab getPubTab() {
+        return (PublicationTab) Layout.getInstance().
+                getTab(CoreConstants.TAB_PUBLICATION);
     }
 }
