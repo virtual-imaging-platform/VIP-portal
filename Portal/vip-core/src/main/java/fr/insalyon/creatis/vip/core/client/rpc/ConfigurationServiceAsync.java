@@ -133,7 +133,7 @@ public interface ConfigurationServiceAsync {
 
     public void unlinkDropboxAccount(AsyncCallback<Void> asyncCallback);
     
-    public void testLastUpdatePublicationforSixMonth(AsyncCallback<Boolean> asyncCallback);
+    public void testLastUpdatePublication(AsyncCallback<Boolean> asyncCallback);
     
     // public void getPostParameters(AsyncCallback<Void> asyncCallback);
     //publications

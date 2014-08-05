@@ -860,6 +860,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public void addPublication(Publication pub) throws CoreException {
         trace(logger, "Adding publication.");
         try {
+            authenticateSystemAdministrator(logger);
             User user = getSessionUser();
             pub.setVipAuthor(user.getEmail());
             configurationBusiness.addPublication(pub);
@@ -874,7 +875,9 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public void updatePublication(Publication pub) throws CoreException {
         trace(logger, "Updating publication.");
         try {
-            authenticateSystemAdministrator(logger);
+             authenticateSystemAdministrator(logger);
+             User user = getSessionUser();
+             pub.setVipAuthor(user.getEmail());
             configurationBusiness.updatePublication(pub);
 
         } catch (BusinessException ex) {
@@ -988,10 +991,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     @Override
-    public boolean testLastUpdatePublicationforSixMonth() throws CoreException {
+    public boolean testLastUpdatePublication() throws CoreException {
         try {
 
-            return configurationBusiness.testLastUpdatePublicationforSixMonth(getSessionUser().getEmail());
+            return configurationBusiness.testLastUpdatePublication(getSessionUser().getEmail());
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);

@@ -153,7 +153,7 @@ public interface ConfigurationService extends RemoteService {
 
     public void unlinkDropboxAccount() throws CoreException;
     
-    public boolean testLastUpdatePublicationforSixMonth()throws CoreException;
+    public boolean testLastUpdatePublication()throws CoreException;
 
     // public void getPostParameters() throws CoreException;
     //Publications

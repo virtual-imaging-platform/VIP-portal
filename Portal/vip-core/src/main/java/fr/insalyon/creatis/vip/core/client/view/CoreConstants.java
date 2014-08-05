@@ -184,6 +184,8 @@ public class CoreConstants implements IsSerializable {
     public static String APP_CLASS = "expressLaneToVip.application.class";
     public static String APPLICATION_FILES_REPOSITORY = "expressLaneToVip.upload.repository";
     public static String APP_DELETE_FILES_AFTER_UPLOAD = "expressLaneToVip.upload.deleteFile";
+    //Publiction
+    public static final String  PUB_MONTHS_UPDATES = "last.publication.update";
 
     public static enum GROUP_ROLE implements IsSerializable {
 

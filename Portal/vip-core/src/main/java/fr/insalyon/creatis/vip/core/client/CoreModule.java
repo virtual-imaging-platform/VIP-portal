@@ -141,12 +141,12 @@ public class CoreModule extends Module {
             @Override
             public void onSuccess(Boolean result) {
                 if (result) {
-                    SC.say("You didn't update your publications for 6 months. Please add your publications that you made using vip.");
+                    SC.say("You didn't update your publications for a while. Please add your publications that you made using vip.");
                 }
 
             }
         };
-        ConfigurationService.Util.getInstance().testLastUpdatePublicationforSixMonth(callback2);
+        ConfigurationService.Util.getInstance().testLastUpdatePublication(callback2);
 
     }
 
