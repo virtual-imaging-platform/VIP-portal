@@ -129,7 +129,9 @@ PropertiesConfiguration config;
     private String applicationN4uClass;
     private String N4uApplicationFilesRepository;
     private String deleteFilesAfterUpload;
-    
+    //Publication
+    private int numberMonthsToTestLastPublicationUpdates;
+
     public static Server getInstance() {
         if (instance == null) {
             instance = new Server();
@@ -143,7 +145,7 @@ PropertiesConfiguration config;
             // Directories
             configurationFolder = setPath(System.getenv("HOME") + VIP_DIR);
             serverProxy = setPath(configurationFolder + PROXIES_DIR) + "/x509up_server";
-
+            
             // Configuration File
             String confFilePath = configurationFolder + CONF_FILE;
             config = new PropertiesConfiguration(confFilePath);
@@ -229,7 +231,8 @@ PropertiesConfiguration config;
             N4uApplicationFilesRepository = config.getString(CoreConstants.APPLICATION_FILES_REPOSITORY, "/home/boujelben");
             deleteFilesAfterUpload = config.getString(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, "yes");
             
-           
+           //Publication
+            numberMonthsToTestLastPublicationUpdates=config.getInt(CoreConstants.PUB_MONTHS_UPDATES, 6);
 
             config.setProperty(CoreConstants.LAB_DB_HOST, databaseServerHost);
             config.setProperty(CoreConstants.LAB_DB_PORT, databaseServerPort);
@@ -288,6 +291,7 @@ PropertiesConfiguration config;
             config.setProperty(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, deleteFilesAfterUpload);
             config.setProperty(CoreConstants.APPLET_GATELAB_CLASSES, appletGateLabClasses);
             config.setProperty(CoreConstants.UNDESIRED_MAIL_DOMAINS, undesiredMailDomains);
+            config.setProperty(CoreConstants.PUB_MONTHS_UPDATES, numberMonthsToTestLastPublicationUpdates);
             config.save();
 
         } catch (ConfigurationException ex) {
@@ -317,6 +321,10 @@ PropertiesConfiguration config;
 
     public String getServerProxy() {
         return serverProxy;
+    }
+    
+    public String getServerProxy(String vo){
+    return setPath(configurationFolder + PROXIES_DIR+vo)+ "/x509up_server";
     }
 
     public String getMyProxyHost() {
@@ -529,6 +537,10 @@ PropertiesConfiguration config;
     
     public int getMaxPlatformRunningSimulations() {
         return maxPlatformRunningSimulations;
+    }
+    
+     public int getNumberMonthsToTestLastPublicationUpdates() {
+        return numberMonthsToTestLastPublicationUpdates;
     }
 
     public void setMaxPlatformRunningSimulations(int maxPlatformRunningSimulations) throws ConfigurationException {

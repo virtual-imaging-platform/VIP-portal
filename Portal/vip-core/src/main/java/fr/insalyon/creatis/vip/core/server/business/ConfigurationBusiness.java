@@ -79,8 +79,8 @@ public class ConfigurationBusiness {
 
         try {
             logger.info("Configuring VIP server proxy.");
-             ProxyClient myproxy = new ProxyClient();
-             myproxy.getProxy();
+            ProxyClient myproxy = new ProxyClient();
+            myproxy.getProxy();
 
         } catch (Exception ex) {
             logger.error(ex);
@@ -1253,13 +1253,13 @@ public class ConfigurationBusiness {
         }
     }
 
-    public boolean testLastUpdatePublicationforSixMonth(String email) throws BusinessException {
+    public boolean testLastUpdatePublication(String email) throws BusinessException {
 
         try {
 
             Calendar cal = Calendar.getInstance();
             cal.setTime(CoreDAOFactory.getDAOFactory().getUserDAO().getLastPublicationUpdate(email));
-            cal.add(Calendar.MONTH, 6);
+            cal.add(Calendar.MONTH, Server.getInstance().getNumberMonthsToTestLastPublicationUpdates());
             Timestamp ts = new Timestamp(cal.getTime().getTime());
             return ts.before(getCurrentTimeStamp());
 
