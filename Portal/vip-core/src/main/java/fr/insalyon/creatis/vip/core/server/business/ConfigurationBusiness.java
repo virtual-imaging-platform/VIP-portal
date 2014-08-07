@@ -910,6 +910,17 @@ public class ConfigurationBusiness {
             throw new BusinessException(ex);
         }
     }
+    
+    
+     public void updateLastUpdatePublication(String email) throws BusinessException {
+        try {
+            CoreDAOFactory.getDAOFactory().getUserDAO().updateLastUpdatePublication(email, getCurrentTimeStamp());
+
+        } catch (DAOException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
 
     /**
      *
@@ -1256,13 +1267,15 @@ public class ConfigurationBusiness {
     public boolean testLastUpdatePublication(String email) throws BusinessException {
 
         try {
-
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(CoreDAOFactory.getDAOFactory().getUserDAO().getLastPublicationUpdate(email));
-            cal.add(Calendar.MONTH, Server.getInstance().getNumberMonthsToTestLastPublicationUpdates());
-            Timestamp ts = new Timestamp(cal.getTime().getTime());
-            return ts.before(getCurrentTimeStamp());
-
+            if (CoreDAOFactory.getDAOFactory().getUserDAO().getLastPublicationUpdate(email) == null) {
+                return true;
+            } else {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(CoreDAOFactory.getDAOFactory().getUserDAO().getLastPublicationUpdate(email));
+                cal.add(Calendar.MONTH, Server.getInstance().getNumberMonthsToTestLastPublicationUpdates());
+                Timestamp ts = new Timestamp(cal.getTime().getTime());
+                return ts.before(getCurrentTimeStamp());
+            }
         } catch (DAOException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
