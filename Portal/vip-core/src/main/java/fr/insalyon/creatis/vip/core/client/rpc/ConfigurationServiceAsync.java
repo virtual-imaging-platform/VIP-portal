@@ -112,6 +112,8 @@ public interface ConfigurationServiceAsync {
 
     public void resetPassword(String email, String code, String password, AsyncCallback<Void> asyncCallback);
 
+    public void updateLastUpdatePublication(AsyncCallback<Void> asyncCallback);
+
     // Accounts
     public void getAccounts(AsyncCallback<List<Account>> asyncCallback);
 
@@ -132,9 +134,9 @@ public interface ConfigurationServiceAsync {
     public void getDropboxAccountStatus(AsyncCallback<DropboxAccountStatus.AccountStatus> asyncCallback);
 
     public void unlinkDropboxAccount(AsyncCallback<Void> asyncCallback);
-    
+
     public void testLastUpdatePublication(AsyncCallback<Boolean> asyncCallback);
-    
+
     // public void getPostParameters(AsyncCallback<Void> asyncCallback);
     //publications
     public void getPublications(AsyncCallback<List<Publication>> asyncCallback);
@@ -144,17 +146,17 @@ public interface ConfigurationServiceAsync {
     public void addPublication(Publication pub, AsyncCallback<Void> asyncCallback);
 
     public void updatePublication(Publication pub, AsyncCallback<Void> asyncCallback);
-    
-     public void parseBibtexText(String text,AsyncCallback<List<Publication>> asyncCallback) ;
-    
+
+    public void parseBibtexText(String text, AsyncCallback<List<Publication>> asyncCallback);
+
     //TermsOfUse
-    public void addTermsUse(TermsOfUse termsofUse,AsyncCallback<Void> asyncCallback);
-    
+    public void addTermsUse(TermsOfUse termsofUse, AsyncCallback<Void> asyncCallback);
+
     public void getLastUpdateTermsOfUse(AsyncCallback<Timestamp> asyncCallback);
-    
+
     public void compare(AsyncCallback<Boolean> asyncCallback);
-    
+
     public void getMaxConfiguredPlatformSimulation(AsyncCallback<Integer> asyncCallback);
-    
-    public void changeMaxConfiguredPlatformSimulation(int maxPlatformRunningSimulations,AsyncCallback<Void> asyncCallback);
+
+    public void changeMaxConfiguredPlatformSimulation(int maxPlatformRunningSimulations, AsyncCallback<Void> asyncCallback);
 }

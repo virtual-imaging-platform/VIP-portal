@@ -47,50 +47,52 @@ import java.util.List;
 public interface UserDAO {
 
     public void add(User user) throws DAOException;
-    
+
     public void update(User user) throws DAOException;
 
     public boolean authenticate(String email, String password) throws DAOException;
 
     public boolean activate(String email, String code) throws DAOException;
-    
+
     public User getUser(String email) throws DAOException;
 
     public List<User> getUsers() throws DAOException;
 
     public void remove(String email) throws DAOException;
-    
+
     public void updatePassword(String email, String currentPassword, String newPassword) throws DAOException;
-    
+
     public void updateSession(String email, String session) throws DAOException;
-    
+
     public boolean verifySession(String email, String session) throws DAOException;
-    
+
     public void updateLastLogin(String email, Date lastLogin) throws DAOException;
-    
+
     public User getUserBySession(String session) throws DAOException;
-    
+
     public List<User> getAdministrators() throws DAOException;
-    
+
     public void update(String email, UserLevel level, CountryCode countryCode, int maxRunningSimulations) throws DAOException;
-    
+
     public void updateCode(String email, String code) throws DAOException;
-    
-     public void updateTermsOfUse(String email, Timestamp termsUse)throws DAOException;
-    
+
+    public void updateTermsOfUse(String email, Timestamp termsUse) throws DAOException;
+
     public void resetPassword(String email, String newPassword) throws DAOException;
-    
+
     public int getNUsers() throws DAOException;
-    
+
     public int getNCountries() throws DAOException;
-    
+
     public void linkDropboxAccount(String email, String directory, String auth_key, String auth_secret) throws DAOException;
-    
+
     public void activateDropboxAccount(String email, String auth_key) throws DAOException;
-    
+
     public DropboxAccountStatus.AccountStatus getDropboxAccountStatus(String email) throws DAOException;
-    
-    public void unlinkDropboxAccount(String email) throws DAOException;   
-    
-    public Timestamp getLastPublicationUpdate(String email) throws DAOException;   
+
+    public void unlinkDropboxAccount(String email) throws DAOException;
+
+    public Timestamp getLastPublicationUpdate(String email) throws DAOException;
+
+    public void updateLastUpdatePublication(String email, Timestamp lastUpdatePublication) throws DAOException;
 }

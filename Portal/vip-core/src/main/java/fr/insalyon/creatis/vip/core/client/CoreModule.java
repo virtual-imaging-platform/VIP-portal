@@ -62,6 +62,7 @@ import fr.insalyon.creatis.vip.core.client.view.main.SystemParser;
 import fr.insalyon.creatis.vip.core.client.view.main.SystemTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.user.AccountTab;
 import fr.insalyon.creatis.vip.core.client.view.user.UserMenuButton;
+import fr.insalyon.creatis.vip.core.client.view.user.PublicationTab;
 import java.util.List;
 
 /**
@@ -129,7 +130,6 @@ public class CoreModule extends Module {
         ConfigurationService.Util.getInstance().compare(callback);
 
         //call to test last publication update
-        //testLastUpdatePublicationforSixMonth
         final AsyncCallback<Boolean> callback2 = new AsyncCallback<Boolean>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -141,7 +141,7 @@ public class CoreModule extends Module {
             @Override
             public void onSuccess(Boolean result) {
                 if (result) {
-                    SC.say("You didn't update your publications for a while. Please add your publications that you made using vip.");
+                    showDialog(" You haven't updated your publications for a while. Please take a few minutes to review the list of publications that you made using VIP.");
                 }
 
             }
@@ -201,7 +201,6 @@ public class CoreModule extends Module {
     public static void addApplicationsTileGrid(ApplicationsTileGrid tileGrid) {
 
         homeTab.addTileGrid(tileGrid);
-
 
     }
 
@@ -263,7 +262,6 @@ public class CoreModule extends Module {
                     public void onFailure(Throwable caught) {
 
                         Layout.getInstance().setWarningMessage("can't update field terms of use" + caught.getMessage(), 10);
-
                     }
 
                     @Override
@@ -273,13 +271,56 @@ public class CoreModule extends Module {
                     }
                 };
                 service.updateTermsOfUse(callback);
-
             }
         });
 
         dialog.draw();
+    }
 
+    private void showDialog(String message) {
+        final Dialog dialog = new Dialog();
+        dialog.setTitle("Update publications");
+        dialog.setMessage(message);
+        dialog.setIcon("[SKIN]ask.png");
+        dialog.addCloseClickHandler(new CloseClickHandler() {
+            @Override
+            public void onCloseClick(CloseClickEvent event) {
+                dialog.destroy();
+            }
+        });
+        Button ok = new Button("OK");
+        ok.setWidth(180);
+        Button anyPublication = new Button("I don't have any publication to add");
+        anyPublication.setWidth(180);
+        dialog.setButtons(ok, anyPublication);
+        dialog.setIsModal(Boolean.TRUE);
+        anyPublication.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
 
+                ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+                final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
 
+                        Layout.getInstance().setWarningMessage("can't update field lastUpdatePublication in VIPUsers " + caught.getMessage(), 10);
+                    }
+
+                    @Override
+                    public void onSuccess(Void result) {
+                        dialog.destroy();
+                    }
+                };
+                service.updateLastUpdatePublication(callback);
+            }
+        });
+        ok.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                Layout.getInstance().addTab(new PublicationTab());
+                dialog.destroy();
+            }
+        });
+        dialog.draw();
     }
 }

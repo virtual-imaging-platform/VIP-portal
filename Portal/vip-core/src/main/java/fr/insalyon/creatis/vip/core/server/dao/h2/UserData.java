@@ -197,7 +197,7 @@ public class UserData implements UserDAO {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                 User user = new User(
+                User user = new User(
                         rs.getString("first_name"), rs.getString("last_name"),
                         rs.getString("email"), rs.getString("institution"),
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
@@ -207,10 +207,10 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations"),rs.getTimestamp("termsUse"));
-                 
-                 ps.close();
-                 return user;
+                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse"));
+
+                ps.close();
+                return user;
             }
 
             logger.error("There is no user registered with the e-mail: " + email);
@@ -250,7 +250,7 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                         rs.getInt("max_simulations"),rs.getTimestamp("termsUse")));
+                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse")));
             }
             ps.close();
             return users;
@@ -458,7 +458,7 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations"),rs.getTimestamp("termsUse"));
+                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse"));
                 ps.close();
                 return user;
             }
@@ -501,7 +501,7 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations"),rs.getTimestamp("termsUse")));
+                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse")));
             }
             ps.close();
             return users;
@@ -520,7 +520,7 @@ public class UserData implements UserDAO {
      * @throws DAOException
      */
     @Override
-    public void update(String email, UserLevel level, CountryCode countryCode, int maxRunningSimulations) 
+    public void update(String email, UserLevel level, CountryCode countryCode, int maxRunningSimulations)
             throws DAOException {
 
         try {
@@ -565,10 +565,10 @@ public class UserData implements UserDAO {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param newPassword
-     * @throws DAOException 
+     * @throws DAOException
      */
     @Override
     public void resetPassword(String email, String newPassword) throws DAOException {
@@ -587,13 +587,13 @@ public class UserData implements UserDAO {
             throw new DAOException(ex);
         }
     }
-    
-     @Override
+
+    @Override
     public int getNUsers() throws DAOException {
         try {
             PreparedStatement ps = connection.prepareStatement("select COUNT(*) as count from VIPUsers");
             ResultSet rs = ps.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 return rs.getInt("count");
             }
             ps.close();
@@ -609,7 +609,7 @@ public class UserData implements UserDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("select COUNT(distinct country_code) as count from VIPUsers");
             ResultSet rs = ps.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 return rs.getInt("count");
             }
             ps.close();
@@ -619,7 +619,8 @@ public class UserData implements UserDAO {
         }
         return -1;
     }
- @Override
+
+    @Override
     public void updateTermsOfUse(String email, Timestamp termsUse) throws DAOException {
 
         try {
@@ -657,26 +658,44 @@ public class UserData implements UserDAO {
     public void unlinkDropboxAccount(String email) throws DAOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
-     @Override
+
+    @Override
     public Timestamp getLastPublicationUpdate(String email) throws DAOException {
-      try {
+        try {
             Timestamp lastupdatePublication = null;
             PreparedStatement ps = connection.prepareStatement("SELECT lastUpdatePublications "
                     + "FROM VIPUsers WHERE email=?");
-            
+
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
-            while(rs.next()){
-            lastupdatePublication= rs.getTimestamp("lastUpdatePublications");
+            while (rs.next()) {
+                lastupdatePublication = rs.getTimestamp("lastUpdatePublications");
             }
-            
+
             ps.close();
             return lastupdatePublication;
 
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
-        } 
+        }
+    }
+
+    @Override
+    public void updateLastUpdatePublication(String email, Timestamp lastUpdatePublication) throws DAOException {
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "VIPUsers SET lastUpdatePublications = ? WHERE email = ?");
+
+            ps.setTimestamp(1, lastUpdatePublication);
+            ps.setString(2, email);
+
+            ps.executeUpdate();
+            ps.close();
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
     }
 }

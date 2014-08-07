@@ -752,4 +752,22 @@ public class UserData implements UserDAO {
             throw new DAOException(ex);
         } 
     }
+
+    @Override
+    public void updateLastUpdatePublication(String email, Timestamp lastUpdatePublication) throws DAOException {
+      try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "VIPUsers SET lastUpdatePublications = ? WHERE email = ?");
+
+            ps.setTimestamp(1, lastUpdatePublication);
+            ps.setString(2, email);
+
+            ps.executeUpdate();
+            ps.close();
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
 }
