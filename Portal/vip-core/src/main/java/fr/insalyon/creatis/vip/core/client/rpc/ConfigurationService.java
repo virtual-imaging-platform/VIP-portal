@@ -129,8 +129,8 @@ public interface ConfigurationService extends RemoteService {
     public void removeUserFromGroup(String email, String groupName) throws CoreException;
 
     public void resetPassword(String email, String code, String password) throws CoreException;
-    
-   
+
+    public void updateLastUpdatePublication() throws CoreException;
 
     // Accounts
     public List<Account> getAccounts() throws CoreException;
@@ -152,8 +152,8 @@ public interface ConfigurationService extends RemoteService {
     public DropboxAccountStatus.AccountStatus getDropboxAccountStatus() throws CoreException;
 
     public void unlinkDropboxAccount() throws CoreException;
-    
-    public boolean testLastUpdatePublication()throws CoreException;
+
+    public boolean testLastUpdatePublication() throws CoreException;
 
     // public void getPostParameters() throws CoreException;
     //Publications
@@ -164,17 +164,17 @@ public interface ConfigurationService extends RemoteService {
     public void addPublication(Publication pub) throws CoreException;
 
     public void updatePublication(Publication pub) throws CoreException;
-    
+
     public List<Publication> parseBibtexText(String text) throws CoreException;
-    
+
     //TermsOfUse
     public void addTermsUse(TermsOfUse termsofUse) throws CoreException;
-    
+
     public Timestamp getLastUpdateTermsOfUse() throws CoreException;
-    
-    public boolean compare()throws CoreException;
-    
+
+    public boolean compare() throws CoreException;
+
     public int getMaxConfiguredPlatformSimulation() throws CoreException;
-    
+
     public void changeMaxConfiguredPlatformSimulation(int maxPlatformRunningSimulations) throws CoreException;
 }
