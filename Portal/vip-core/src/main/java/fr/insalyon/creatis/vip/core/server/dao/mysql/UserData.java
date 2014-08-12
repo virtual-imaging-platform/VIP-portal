@@ -72,8 +72,8 @@ public class UserData implements UserDAO {
                     "INSERT INTO VIPUsers("
                     + "email, pass, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, registration, last_login, level, "
-                    + "country_code, max_simulations, termsUse) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    + "country_code, max_simulations, termsUse,lastUpdatePublications) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getPassword());
@@ -90,6 +90,7 @@ public class UserData implements UserDAO {
             ps.setString(13, user.getCountryCode().name());
             ps.setInt(14, user.getMaxRunningSimulations());
             ps.setTimestamp(15, user.getTermsOfUse());
+            ps.setTimestamp(16, getCurrentTimeStamp());
 
             ps.execute();
             ps.close();
@@ -769,5 +770,12 @@ public class UserData implements UserDAO {
             logger.error(ex);
             throw new DAOException(ex);
         }
+    }
+    
+     private static java.sql.Timestamp getCurrentTimeStamp() {
+
+        java.util.Date today = new java.util.Date();
+        return new java.sql.Timestamp(today.getTime());
+
     }
 }

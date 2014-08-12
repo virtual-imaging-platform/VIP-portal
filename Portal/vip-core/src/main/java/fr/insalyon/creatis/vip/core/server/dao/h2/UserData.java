@@ -74,8 +74,8 @@ public class UserData implements UserDAO {
                     "INSERT INTO VIPUsers("
                     + "email, pass, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, registration, last_login, level, "
-                    + "country_code) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    + "country_code, max_simulations, termsUse,lastUpdatePublications) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getPassword());
@@ -90,12 +90,16 @@ public class UserData implements UserDAO {
             ps.setTimestamp(11, new Timestamp(user.getLastLogin().getTime()));
             ps.setString(12, user.getLevel().name());
             ps.setString(13, user.getCountryCode().name());
+            ps.setInt(14, user.getMaxRunningSimulations());
+            ps.setTimestamp(15, user.getTermsOfUse());
+            ps.setTimestamp(16, getCurrentTimeStamp());
+
             ps.execute();
             ps.close();
 
         } catch (SQLException ex) {
-            if (ex.getMessage().contains("Unique index or primary key violation")) {
-                logger.error("There is an existing account associated with the email or with this {first name,last name}: " + user.getEmail());
+            if (ex.getMessage().contains("Duplicate entry")) {
+                logger.error("There is an existing account associated with the email: " + user.getEmail() + " or with this {first name,last name} (" + ex.getMessage() + ")");
                 throw new DAOException("There is an existing account associated with this email or with this {first name,last name}.");
             } else {
                 logger.error(ex);
@@ -103,6 +107,7 @@ public class UserData implements UserDAO {
             }
         }
     }
+
 
     /**
      *
@@ -697,5 +702,11 @@ public class UserData implements UserDAO {
             logger.error(ex);
             throw new DAOException(ex);
         }
+    }
+    private static java.sql.Timestamp getCurrentTimeStamp() {
+
+        java.util.Date today = new java.util.Date();
+        return new java.sql.Timestamp(today.getTime());
+
     }
 }
