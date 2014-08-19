@@ -53,6 +53,7 @@ import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import java.util.List;
 import org.apache.log4j.Logger;
+import org.jsoup.Jsoup;
 
 /**
  *
@@ -364,7 +365,12 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     public String getCitation(String applicationName) throws ApplicationException {
 
         try {
-            return applicationBusiness.getCitation(applicationName);
+            String citationWithoutHtml = Jsoup.parse(applicationBusiness.getCitation(applicationName)).text();
+            if (citationWithoutHtml.isEmpty() || citationWithoutHtml == null) {
+                return null;
+            } else {
+                return applicationBusiness.getCitation(applicationName);
+            }
 
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
@@ -475,6 +481,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public AppVersion getVersion(String applicationName, String applicationVersion) throws ApplicationException {
         try {
+             
             return applicationBusiness.getVersion(applicationName, applicationVersion);
 
         } catch (BusinessException ex) {

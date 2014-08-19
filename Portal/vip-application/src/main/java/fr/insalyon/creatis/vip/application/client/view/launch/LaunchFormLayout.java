@@ -275,7 +275,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
 
             @Override
             public void onSuccess(String result) {
-                if (result != null && !result.isEmpty()) {
+                if (result != null || !result.isEmpty() ||!result.equals("")) {
 
                     VLayout citationLayout = new VLayout(5);
                     citationLayout.addMember(WidgetUtil.getLabel("<b>Please refer to the following publication:</b>", 20));
