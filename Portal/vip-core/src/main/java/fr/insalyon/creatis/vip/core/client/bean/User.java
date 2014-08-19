@@ -65,6 +65,9 @@ public class User implements IsSerializable {
     private CountryCode countryCode;
     private Map<Group, GROUP_ROLE> groups;
     private Timestamp termsOfUse;
+    private Timestamp lastUpdatePublications;
+
+    
     private Boolean isgridfile;
     private Boolean isgridjobs;
     
@@ -75,21 +78,22 @@ public class User implements IsSerializable {
             String phone, UserLevel level, CountryCode countryCode) {
 
         this(firstName, lastName, email, institution, "", phone, false, "", "",
-                "", null, null, level, countryCode, 1,null);
+                "", null, null, level, countryCode, 1,null,null);
+        
     }
 
     public User(String firstName, String lastName, String email, String institution,
             String password, String phone, CountryCode countryCode) {
 
         this(firstName, lastName, email, institution, password, phone, false,
-                "", "", "", new Date(), new Date(), null, countryCode, 1,null);
+                "", "", "", new Date(), new Date(), null, countryCode, 1,null,null);
     }
 
     public User(String firstName, String lastName, String email,
             String institution, String password, String phone, boolean confirmed,
             String code, String folder, String session, Date registration,
             Date lastLogin, UserLevel level, CountryCode countryCode, 
-            int maxRunningSimulations,Timestamp termsOfUse) {
+            int maxRunningSimulations,Timestamp termsOfUse,Timestamp lastUpdatePublications) {
 
         this.firstName = firstName;
         this.lastName = lastName;
@@ -107,6 +111,7 @@ public class User implements IsSerializable {
         this.maxRunningSimulations = maxRunningSimulations;
         this.countryCode = countryCode;
         this.termsOfUse=termsOfUse;
+        this.lastUpdatePublications=lastUpdatePublications;
     }
 
     public boolean isConfirmed() {
@@ -238,6 +243,14 @@ public class User implements IsSerializable {
 
     public void setIsgridjobs(Boolean isgridjobs) {
         this.isgridjobs = isgridjobs;
+    }
+    
+    public Timestamp getLastUpdatePublications() {
+        return lastUpdatePublications;
+    }
+
+    public void setLastUpdatePublications(Timestamp lastUpdatePublications) {
+        this.lastUpdatePublications = lastUpdatePublications;
     }
 
     public boolean hasGroupAccess(String groupName) {

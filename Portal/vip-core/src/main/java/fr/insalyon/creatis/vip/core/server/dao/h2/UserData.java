@@ -92,7 +92,7 @@ public class UserData implements UserDAO {
             ps.setString(13, user.getCountryCode().name());
             ps.setInt(14, user.getMaxRunningSimulations());
             ps.setTimestamp(15, user.getTermsOfUse());
-            ps.setTimestamp(16, getCurrentTimeStamp());
+            ps.setTimestamp(16, user.getLastUpdatePublications());
 
             ps.execute();
             ps.close();
@@ -194,7 +194,7 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, session, registration, "
-                    + "last_login, level, country_code, max_simulations,termsUse "
+                    + "last_login, level, country_code, max_simulations,termsUse,lastUpdatePublications "
                     + "FROM VIPUsers "
                     + "WHERE email=?");
 
@@ -212,7 +212,7 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse"));
+                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse"),rs.getTimestamp("lastUpdatePublications"));
 
                 ps.close();
                 return user;
@@ -238,7 +238,7 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, registration, last_login, "
-                    + "level, country_code, max_simulations,termsUse "
+                    + "level, country_code, max_simulations,termsUse,lastUpdatePublications "
                     + "FROM VIPUsers "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
 
@@ -255,7 +255,7 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse")));
+                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse"),rs.getTimestamp("lastUpdatePublications")));
             }
             ps.close();
             return users;
@@ -445,7 +445,7 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, session, registration, "
-                    + "last_login, level, country_code, max_simulations,termsUse "
+                    + "last_login, level, country_code, max_simulations,termsUse,lastUpdatePublications "
                     + "FROM VIPUsers "
                     + "WHERE session = ?");
 
@@ -463,7 +463,7 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse"));
+                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse"),rs.getTimestamp("lastUpdatePublications"));
                 ps.close();
                 return user;
             }
@@ -488,7 +488,7 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, registration, last_login, "
-                    + "level, country_code, max_simulations,termsUse "
+                    + "level, country_code, max_simulations,termsUse,lastUpdatePublications "
                     + "FROM VIPUsers WHERE level = ? "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
             ps.setString(1, UserLevel.Administrator.name());
@@ -506,7 +506,7 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse")));
+                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse"),rs.getTimestamp("lastUpdatePublications")));
             }
             ps.close();
             return users;
