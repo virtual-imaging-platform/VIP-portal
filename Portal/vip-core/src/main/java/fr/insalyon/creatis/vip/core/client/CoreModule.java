@@ -109,6 +109,7 @@ public class CoreModule extends Module {
         }
 
         //call to terms of use
+         if (user.hasAcceptTermsOfUse()) {
         final AsyncCallback<Boolean> callback = new AsyncCallback<Boolean>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -128,6 +129,7 @@ public class CoreModule extends Module {
             }
         };
         ConfigurationService.Util.getInstance().compare(callback);
+        }
 
         //call to test last publication update
         final AsyncCallback<Boolean> callback2 = new AsyncCallback<Boolean>() {

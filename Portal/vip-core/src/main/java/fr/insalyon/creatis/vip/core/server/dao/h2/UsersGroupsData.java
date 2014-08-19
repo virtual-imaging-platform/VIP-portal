@@ -280,7 +280,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "us.email AS uemail, first_name, last_name, institution, "
                     + "phone, code, confirmed, folder, registration, last_login, "
-                    + "level, country_code, max_simulations,termsUse  "
+                    + "level, country_code, max_simulations,termsUse,lastUpdatePublications  "
                     + "FROM VIPUsers us, VIPUsersGroups ug "
                     + "WHERE us.email = ug.email AND ug.groupname = ? "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
@@ -300,7 +300,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations"),rs.getTimestamp("termsUse")));
+                        rs.getInt("max_simulations"),rs.getTimestamp("termsUse"),rs.getTimestamp("lastUpdatePublications")));
             }
             ps.close();
             return users;

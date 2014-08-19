@@ -132,7 +132,7 @@ public class PlatformConnection {
                             server.getAdminPhone(), true,
                             UUID.randomUUID().toString(), folder, "",
                             new Date(), new Date(), UserLevel.Administrator,
-                            CountryCode.fr, 100, null));
+                            CountryCode.fr, 100, null,null));
 
                 } catch (DAOException ex) {
                     logger.error(ex);
