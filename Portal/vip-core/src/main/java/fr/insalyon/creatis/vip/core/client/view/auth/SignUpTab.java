@@ -170,7 +170,7 @@ public class SignUpTab extends Tab {
                             institutionField.getValueAsString().trim(),
                             passwordField.getValueAsString(),
                             phoneField.getValueAsString().trim(),
-                            CountryCode.valueOf(countryField.getValueAsString()));
+                            CountryCode.valueOf(countryField.getValueAsString()),null);
 
                     final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
                         @Override

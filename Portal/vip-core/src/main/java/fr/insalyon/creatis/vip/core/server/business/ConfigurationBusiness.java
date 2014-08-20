@@ -154,6 +154,7 @@ public class ConfigurationBusiness {
                 if (!automaticCreation) {
                     user.setTermsOfUse(getCurrentTimeStamp());
                 }
+                user.setLastUpdatePublications(getCurrentTimeStamp());
                 user.setCode(UUID.randomUUID().toString());
                 user.setPassword(MD5.get(user.getPassword()));
                 String folder = user.getFirstName().replaceAll(" ", "_").toLowerCase() + "_"
@@ -397,8 +398,8 @@ public class ConfigurationBusiness {
                 "Unknown",
                 UUID.randomUUID().toString(),
                 "0000",
-                cc);
-
+                cc,getCurrentTimeStamp());
+  
         return u;
     }
 
@@ -910,9 +911,9 @@ public class ConfigurationBusiness {
             throw new BusinessException(ex);
         }
     }
+
     
-    
-     public void updateLastUpdatePublication(String email) throws BusinessException {
+    public void updateLastUpdatePublication(String email) throws BusinessException {
         try {
             CoreDAOFactory.getDAOFactory().getUserDAO().updateLastUpdatePublication(email, getCurrentTimeStamp());
 
