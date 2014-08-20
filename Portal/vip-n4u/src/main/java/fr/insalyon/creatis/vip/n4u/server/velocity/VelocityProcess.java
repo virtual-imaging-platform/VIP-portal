@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public interface VelocityProcess {
 
-    public void gassFile(Map<Integer,Map> listInput, ArrayList listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir, String date, String sandbox, String environementFile) throws VelocityException;
+    public void gassFile(Map<Integer,Map> listInput, ArrayList listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir, String date, String sandbox, String environementFile,String  extensionFileValue) throws VelocityException;
 
     public void wrapperScriptFile(Map<Integer,Map> listInput, ArrayList listOutput, String applicationName, String scriptFile, String applicationLocation, String environementFile, String dir, String date) throws VelocityException;
 

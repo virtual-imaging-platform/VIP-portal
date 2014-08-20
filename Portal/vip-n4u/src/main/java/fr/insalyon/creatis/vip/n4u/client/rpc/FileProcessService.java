@@ -39,7 +39,7 @@ public interface FileProcessService extends RemoteService {
 
     String generateGwendiaFile(Map<Integer,Map> listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException;
 
-    void generateGaswFile(Map<Integer,Map> listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String sandboxFile, String environementFile) throws N4uException;
+    void generateGaswFile(Map<Integer,Map> listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String sandboxFile, String environementFile,String extensionFile) throws N4uException;
 
     String getApplicationClass() throws N4uException;
 }

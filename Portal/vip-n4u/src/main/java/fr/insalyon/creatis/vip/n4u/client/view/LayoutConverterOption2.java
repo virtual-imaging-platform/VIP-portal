@@ -120,6 +120,7 @@ public class LayoutConverterOption2 extends AbstractFormLayout {
                             tabImporter.addOutputField(true, "result", "A tar.gz file containing the results", InputTypes.File, true);
                             tabImporter.addFields(FieldTitles.MainExecutable, true, "", "[0-9.,A-Za-z-+/_(): ]", false, true);
                             tabImporter.addFields(FieldTitles.ApplicationLocation, true, "", "[0-9.,A-Za-z-+/_(): ]", false, true);
+                            tabImporter.addFields(FieldTitles.ExtensionFile, true,"", "[0-9.,A-Za-z-+/_() ]", false, false);
                             tabImporter.addFields(FieldTitles.EnvironementFile, true, "", "[0-9.,A-Za-z-+/_(): ]", false, false);
                             tabImporter.addFields(FieldTitles.SandboxFile, true, "", "[0-9.,A-Za-z-+/_(): ]", false, false);
                             tabImporter.addLaunchButton();
