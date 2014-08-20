@@ -45,7 +45,7 @@ public class SettingMaxRunningSimulationsLayout extends AbstractFormLayout {
         setMaxRunningSimulations();
         //Integer.parseInt(maxRunningSimulationsItem.getValueAsString()
         addField("Max Running Simulations", maxRunningSimulationsItem);
-        maxRunningSimulations = WidgetUtil.getIButton("save", CoreConstants.ICON_EDIT,
+        maxRunningSimulations = WidgetUtil.getIButton("Save", CoreConstants.ICON_EDIT,
                 new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
