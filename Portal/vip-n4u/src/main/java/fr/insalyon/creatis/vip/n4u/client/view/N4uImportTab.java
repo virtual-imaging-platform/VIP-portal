@@ -76,6 +76,7 @@ public class N4uImportTab extends Tab {
     String applicationName;
     String sandbox = "";
     String environementFile = "";
+    String extensionFile = "";
     String descriptionValue = null;
     String applicationLocation;
     String version;
@@ -297,7 +298,7 @@ public class N4uImportTab extends Tab {
             }
         };
 
-        FileProcessService.Util.getInstance().generateGaswFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, descriptionValue, sandbox, environementFile, callback);
+        FileProcessService.Util.getInstance().generateGaswFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, descriptionValue, sandbox, environementFile,extensionFile, callback);
 
     }
 
@@ -613,6 +614,19 @@ public class N4uImportTab extends Tab {
                 @Override
                 public void onEditorExit(EditorExitEvent event) {
                     environementFile = fieldItem.getValueAsString();
+                }
+            });
+
+        }
+        
+        if (title.equals(FieldTitles.ExtensionFile)) {
+            if (value != null) {
+                extensionFile = value;
+            }
+            fieldItem.addEditorExitHandler(new EditorExitHandler() {
+                @Override
+                public void onEditorExit(EditorExitEvent event) {
+                   extensionFile = fieldItem.getValueAsString();
                 }
             });
 

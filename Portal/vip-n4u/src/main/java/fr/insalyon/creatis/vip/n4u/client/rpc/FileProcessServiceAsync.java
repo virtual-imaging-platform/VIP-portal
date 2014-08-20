@@ -24,7 +24,7 @@ public interface FileProcessServiceAsync {
 
     public void generateGwendiaFile(Map<Integer, Map> listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, AsyncCallback<String> callback);
 
-    public void generateGaswFile(Map<Integer, Map> listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String sandboxFile, String environementFile, AsyncCallback<Void> callback);
+    public void generateGaswFile(Map<Integer, Map> listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String sandboxFile, String environementFile,String extensionFile, AsyncCallback<Void> callback);
 
     public void getApplicationClass(AsyncCallback<String> callback);
 }

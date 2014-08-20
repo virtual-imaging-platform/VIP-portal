@@ -15,6 +15,7 @@ public enum FieldTitles {
     ApplicationVersion("Version <font color=red>(*)</font>"),
     ApplicationLocation("Application Location <font color=red>(*)</font>"),
     EnvironementFile("Environement File"),
+    ExtensionFile("Extension File"),
     MainExecutable("Main Executable <font color=red>(*)</font>");
     private String name;
 

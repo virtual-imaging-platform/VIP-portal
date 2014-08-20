@@ -15,6 +15,7 @@ import java.io.StringWriter;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Map;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -47,14 +48,15 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public void gassFile(Map<Integer,Map> listInput, ArrayList listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir, String date, String sandboxFile, String environementFile) throws VelocityException {
+    public void gassFile(Map<Integer,Map> listInput, ArrayList listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir, String date, String sandboxFile, String environementFile,String extensionFileValue) throws VelocityException {
         Template t = ve.getTemplate("vm/gass.vm");
         VelocityContext context = new VelocityContext();
         applicationLocation= applicationLocation+"/"+date;
         context.put("inputList", listInput);
         context.put("outputList", listOutput);
         context.put("applicationName", applicationName);
-        context.put("applicationLocation", applicationLocation);
+        context.put("applicationLocation", applicationLocation);  
+        context.put("extensionFileValue",  StringEscapeUtils.escapeXml(extensionFileValue));
         context.put("gassValue", applicationLocation + "/bin/" + applicationName + "._wrapper.sh");
         if (!sandboxFile.isEmpty()) {
             try {
@@ -133,6 +135,7 @@ public class Velocity implements VelocityProcess {
         final String chemin = dir + "/" + applicationName + "_wrapper.sh";
         final File fichier = new File(chemin);
         try {
+            //CoreUtil.getGRIDAN4uClient().createFolder("/grid/vo.neugrid.eu/home/vip/", "nn");
             createFile(fichier, writer);
             CoreUtil.getGRIDAClient().createFolder(applicationLocation, "bin");
             copyFile(chemin, dir + "/" + applicationName + ".bak" + "_wrapper.sh");
