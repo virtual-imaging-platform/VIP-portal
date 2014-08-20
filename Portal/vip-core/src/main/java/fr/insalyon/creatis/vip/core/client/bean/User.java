@@ -83,10 +83,10 @@ public class User implements IsSerializable {
     }
 
     public User(String firstName, String lastName, String email, String institution,
-            String password, String phone, CountryCode countryCode) {
+            String password, String phone, CountryCode countryCode,Timestamp lastUpdatePublications) {
 
         this(firstName, lastName, email, institution, password, phone, false,
-                "", "", "", new Date(), new Date(), null, countryCode, 1,null,null);
+                "", "", "", new Date(), new Date(), null, countryCode, 1,null,lastUpdatePublications);
     }
 
     public User(String firstName, String lastName, String email,
