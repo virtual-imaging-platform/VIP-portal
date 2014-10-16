@@ -42,7 +42,7 @@ import java.util.List;
  */
 public class CoreConstants implements IsSerializable {
 
-    public static final String VERSION = "v1.11";
+    public static final String VERSION = "v1.12";
     // Configuration Labels
     public static final String VO_BIOMED = "biomed";
     public static final String VO_NEUGRID = "vo.neugrid.eu";
