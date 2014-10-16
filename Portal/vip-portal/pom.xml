@@ -79,8 +79,13 @@
             <groupId>fr.insalyon.creatis.vip</groupId>
             <artifactId>VIP-Cowork-Applet</artifactId>
             <version>${vip.cowork-applet.version}</version>
+          <exclusions>
+            <exclusion>  
+              <groupId>org.apache.httpcomponents</groupId>
+              <artifactId>httpclient</artifactId>
+            </exclusion>
+          </exclusions> 
         </dependency>
-        
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-cowork</artifactId>
@@ -92,7 +97,7 @@
             <version>${vip.cardiac.version}</version>
         </dependency>
 
-        <!--        <dependency>
+<!--        <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-provenance</artifactId>
             <version>${vip.provenance.version}</version>
