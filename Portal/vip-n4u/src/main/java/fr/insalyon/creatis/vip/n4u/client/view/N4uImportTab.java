@@ -7,9 +7,7 @@ package fr.insalyon.creatis.vip.n4u.client.view;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.TextArea;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.Dialog;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.Label;
@@ -46,8 +44,6 @@ import com.smartgwt.client.widgets.events.KeyPressHandler;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
-import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -67,7 +63,7 @@ public class N4uImportTab extends Tab {
     PickerIcon browsePicker;
     IButton createApplicationButton;
     Map<Integer, Map> listInputs;
-    ArrayList listOutputs;
+    List<Map> listOutputs;
     List<TextItem> listItems;
     int item = 0;
     int key = 0;
@@ -89,7 +85,7 @@ public class N4uImportTab extends Tab {
         this.setAttribute("paneMargin", 0);
         configure();
         listInputs = new HashMap<Integer, Map>();
-        listOutputs = new ArrayList();
+        listOutputs = new ArrayList<Map>();
         listItems = new ArrayList<TextItem>();
         this.setPane(layout);
     }

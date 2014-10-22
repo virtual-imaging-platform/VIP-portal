@@ -184,7 +184,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public void generateScriptFile(Map<Integer, Map> listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String environementFile, String description) throws N4uException {
+    public void generateScriptFile(Map<Integer, Map> listInput,List<Map> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String environementFile, String description) throws N4uException {
         String applicationRealLocation;
         try {
 
@@ -221,7 +221,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public String generateGwendiaFile(Map<Integer, Map> listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException {
+    public String generateGwendiaFile(Map<Integer, Map> listInput, List<Map>  listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException {
         String applicationRealLocation;
         try {
             applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
@@ -257,7 +257,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public void generateGaswFile(Map<Integer, Map> listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String sandboxFile, String environementFile,String extensionFile) throws N4uException {
+    public void generateGaswFile(Map<Integer, Map> listInput,List<Map> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String sandboxFile, String environementFile,String extensionFile) throws N4uException {
         String applicationRealLocation = null;
         try {
             applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);

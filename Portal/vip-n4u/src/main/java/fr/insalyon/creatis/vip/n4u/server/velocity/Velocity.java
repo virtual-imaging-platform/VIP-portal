@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.velocity.Template;
@@ -48,7 +49,7 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public void gassFile(Map<Integer,Map> listInput, ArrayList listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir, String date, String sandboxFile, String environementFile,String extensionFileValue) throws VelocityException {
+    public void gassFile(Map<Integer,Map> listInput,List<Map> listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir, String date, String sandboxFile, String environementFile,String extensionFileValue) throws VelocityException {
         Template t = ve.getTemplate("vm/gass.vm");
         VelocityContext context = new VelocityContext();
         applicationLocation= applicationLocation+"/"+date;
@@ -110,7 +111,7 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public void wrapperScriptFile(Map<Integer,Map> listInput, ArrayList listOutput, String applicationName, String scriptFile, String applicationLocation, String environementFile, String dir, String date) throws VelocityException {
+    public void wrapperScriptFile(Map<Integer,Map> listInput,List<Map> listOutput, String applicationName, String scriptFile, String applicationLocation, String environementFile, String dir, String date) throws VelocityException {
         applicationLocation= applicationLocation+"/"+date;
         int lastIndex = scriptFile.lastIndexOf("/");
         String script = scriptFile.substring(lastIndex + 1);
@@ -158,7 +159,7 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public String gwendiaFile(Map<Integer,Map> listInput, ArrayList listOutput, String applicationName, String description, String applicationLocation, String dir, String date) throws VelocityException {
+    public String gwendiaFile(Map<Integer,Map> listInput, List<Map> listOutput, String applicationName, String description, String applicationLocation, String dir, String date) throws VelocityException {
         Template t = ve.getTemplate("vm/gwendia.vm");
         applicationLocation= applicationLocation+ "/"+date;
         final String gaswDescriptor = applicationLocation + "/gasw" + "/" + applicationName + ".xml";
