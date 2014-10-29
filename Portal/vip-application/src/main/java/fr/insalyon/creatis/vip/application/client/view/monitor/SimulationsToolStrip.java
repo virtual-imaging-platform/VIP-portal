@@ -52,6 +52,7 @@ import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.social.client.view.message.MessageComposerWindow;
+import fr.insalyon.creatis.vip.social.client.view.message.MessageComposerWindowToReportIssue;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -117,6 +118,24 @@ public class SimulationsToolStrip extends ToolStrip {
                 });
             }
         }));
+        //Report issue Button
+        this.addButton(WidgetUtil.getToolStripButton("Report Issue About This Execution",
+                ApplicationConstants.ICON_REPORT_ISSUE, null, new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                ListGridRecord[] records = getSimulationsTab().getGridSelection();
+                List<String> simulationIDs = new ArrayList<String>();
+                List<String> simulationNames = new ArrayList<String>();
+                for (ListGridRecord record : records) {
+                    SimulationRecord data = (SimulationRecord) record;
+                    SimulationStatus status = SimulationStatus.valueOf(data.getStatus());
+                    simulationIDs.add(data.getSimulationId());
+                    simulationNames.add(data.getSimulationName());
+                }
+                sendMailToVIP(simulationIDs, simulationNames);
+            }
+        }));
+
 
         if (CoreModule.user.isSystemAdministrator()) {
             this.addSeparator();
@@ -390,5 +409,12 @@ public class SimulationsToolStrip extends ToolStrip {
         messageWindow.setSubjectValue(subjectValue);
         messageWindow.setTextMessage(message);
 
+    }
+
+    private void sendMailToVIP(List<String> workflowID, List<String> simulationNames) {
+
+
+        MessageComposerWindowToReportIssue messageWindow = new MessageComposerWindowToReportIssue(workflowID, simulationNames);
+        messageWindow.show();
     }
 }
