@@ -47,6 +47,7 @@ import fr.insalyon.creatis.vip.social.server.dao.MessageDAO;
 import fr.insalyon.creatis.vip.social.server.dao.SocialDAOFactory;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -219,6 +220,39 @@ public class MessageBusiness {
                 CoreUtil.sendEmail("VIP Message: " + subject + " (" + user.getFullName() + ")",
                         emailContent, new String[]{email}, true, user.getEmail());
             }
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    public void sendMessageToVip(User user, String[] recipients,
+            String subject, String message, List<String> workflowIDs, List<String> simulationNames) throws BusinessException {
+
+        try {
+
+            MessageDAO messageDAO = SocialDAOFactory.getDAOFactory().getMessageDAO();
+            long messageId = messageDAO.add(user.getEmail(), subject, message);
+
+            for (String recipient : recipients) {
+                messageDAO.associateMessageToUser(recipient, messageId);
+            }
+
+            String emailContent = "<html>"
+                    + "<head></head>"
+                    + "<body>"
+                    + "<p><b>" + user.getFullName() + "</b> sent you a message on VIP:</p>"
+                    + "<p style=\"background-color: #F2F2F2\"><br />"
+                    + "<b>Subject:</b> " + subject + "<br />"
+                    + "<em>" + message + "</em><br /></p>"
+                    + "<p>Workflow ID " + workflowIDs + "</p>"
+                    + "<p>Simulation Name " + simulationNames + "</p>"
+                    + "</body>"
+                    + "</html>";
+
+
+            CoreUtil.sendEmail("VIP Message: " + subject + " (" + user.getFullName() + ")",
+                    emailContent, recipients, true, user.getEmail());
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

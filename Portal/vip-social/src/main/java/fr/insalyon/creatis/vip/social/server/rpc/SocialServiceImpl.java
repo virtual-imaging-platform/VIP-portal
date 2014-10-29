@@ -85,7 +85,7 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
             throw new SocialException(ex);
         }
     }
-    
+
     public List<GroupMessage> getGroupMessages(String groupName, Date startDate) throws SocialException {
 
         try {
@@ -127,7 +127,7 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
             throw new SocialException(ex);
         }
     }
-    
+
     public void removeGroupMessage(long id) throws SocialException {
 
         try {
@@ -166,7 +166,21 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
             throw new SocialException(ex);
         }
     }
-    
+
+    public void sendMessageToVip(String[] recipients, String subject, String message, List<String> workflowID, List<String> simulationNames) throws SocialException {
+
+        try {
+            trace(logger, "Sending message '" + subject + "' to '" + "vip-support" + "'.");
+            messageBusiness.sendMessageToVip(getSessionUser(), recipients,
+                    subject, message, workflowID, simulationNames);
+
+        } catch (CoreException ex) {
+            throw new SocialException(ex);
+        } catch (BusinessException ex) {
+            throw new SocialException(ex);
+        }
+    }
+
     public void sendGroupMessage(String groupName, String subject, String message) throws SocialException {
 
         try {
