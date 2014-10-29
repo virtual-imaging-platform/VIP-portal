@@ -54,6 +54,7 @@ public class ApplicationConstants {
     public static final String ICON_CLEAN = IMG_FOLDER + "icon-clean.png";
     public static final String ICON_GENERAL = IMG_FOLDER + "icon-general.png";
     public static final String ICON_KILL = IMG_FOLDER + "icon-kill.png";
+    public static final String ICON_KILLWR = IMG_FOLDER + "icon-killWR.png";
     public static final String ICON_LAUNCH = IMG_FOLDER + "icon-launch.png";
     public static final String ICON_LOG = IMG_FOLDER + "icon-log.png";
     public static final String ICON_SEMANTICS = IMG_FOLDER + "icon-semantics.png";
@@ -67,8 +68,9 @@ public class ApplicationConstants {
     public static final String ICON_MONITOR_SEARCH = IMG_FOLDER + "monitor/icon-search.png";
     public static final String ICON_MONITOR_SIMULATION_CLEANED = IMG_FOLDER + "monitor/icon-simulation-cleaned.png";
     public static final String ICON_MONITOR_SIMULATION_COMPLETED = IMG_FOLDER + "monitor/icon-simulation-completed.png";
-    public static final String ICON_MARK_COMPLETED  = IMG_FOLDER+"icon-mark-completed.png";
-    public static final String ICON_USER = IMG_FOLDER+"icon-user.png";;
+    public static final String ICON_MARK_COMPLETED = IMG_FOLDER + "icon-mark-completed.png";
+    public static final String ICON_USER = IMG_FOLDER + "icon-user.png";
+    ;
     public static final String ICON_MONITOR_SIMULATION_FAILED = IMG_FOLDER + "monitor/icon-simulation-failed.png";
     public static final String ICON_MONITOR_SIMULATION_RUNNING = IMG_FOLDER + "monitor/icon-simulation-running.png";
     public static final String ICON_MONITOR_TIMELINE = IMG_FOLDER + "monitor/icon-timeline.png";
@@ -112,7 +114,7 @@ public class ApplicationConstants {
     public static final String SESSION_CLASSES = "vip-classes";
     public static final String SEPARATOR_INPUT = "##";
     public static final String SEPARATOR_LIST = "@@";
-   
+
     public static String getLaunchTabID(String applicationName) {
 
         return "launch-" + applicationName.replaceAll(" ", "-").toLowerCase()
