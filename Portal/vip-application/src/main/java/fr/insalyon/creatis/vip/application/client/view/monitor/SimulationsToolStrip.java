@@ -46,10 +46,12 @@ import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.SimulationRecord;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+import fr.insalyon.creatis.vip.social.client.view.message.MessageComposerWindow;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -117,7 +119,7 @@ public class SimulationsToolStrip extends ToolStrip {
         }));
 
         if (CoreModule.user.isSystemAdministrator()) {
-
+            this.addSeparator();
             // Purge Simulations
             this.addButton(WidgetUtil.getToolStripButton("Purge Simulations",
                     CoreConstants.ICON_CLEAR, null, new ClickHandler() {
@@ -128,6 +130,22 @@ public class SimulationsToolStrip extends ToolStrip {
                         public void execute(Boolean value) {
                             if (value) {
                                 purgeSimulations();
+                            }
+                        }
+                    });
+                }
+            }));
+
+            // kill Simulation With Reason
+            this.addButton(WidgetUtil.getToolStripButton("Kill Simulation With Reason",
+                    ApplicationConstants.ICON_KILLWR, null, new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    SC.ask("Do you really want to kill the selected running simulations?", new BooleanCallback() {
+                        @Override
+                        public void execute(Boolean value) {
+                            if (value) {
+                                killSimulationWithReason();
                             }
                         }
                     });
@@ -209,6 +227,52 @@ public class SimulationsToolStrip extends ToolStrip {
         };
         service.killSimulations(simulationIDs, callback);
         modal.show("Sending killing signal to selected simulations...", true);
+    }
+
+    private void killSimulationWithReason() {
+        final String applicationName;
+        final String user;
+        final String date;
+        final String simulationName;
+
+        ListGridRecord[] records = getSimulationsTab().getGridSelection();
+        List<String> simulationIDs = new ArrayList<String>();
+        if (records.length > 1) {
+            SC.say("there is more than one selected simulation");
+        } else if (records.length == 1) {
+            applicationName = records[0].getAttribute("application");
+            user = records[0].getAttribute("user");
+            date = records[0].getAttribute("date");
+            simulationName = records[0].getAttribute("simulationName");
+            SimulationRecord data = (SimulationRecord) records[0];
+            SimulationStatus status = SimulationStatus.valueOf(data.getStatus());
+
+            if (status == SimulationStatus.Running) {
+                simulationIDs.add(data.getSimulationId());
+            }
+
+            WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+            final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                    modal.hide();
+                    Layout.getInstance().setWarningMessage("Unable to kill simulations:<br />" + caught.getMessage());
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                    modal.hide();
+                    getSimulationsTab().loadData();
+                    openWindowToSendMail("your " + applicationName + " Simulation", "Dear " + user + ",<br>"
+                            + " I had to kill your " + applicationName + " simulation " + simulationName + " submitted on " + date + " because all the jobs were failing with the following error:<br><br><br><br>");
+
+
+
+                }
+            };
+            service.killSimulations(simulationIDs, callback);
+            modal.show("Sending killing signal to selected simulations...", true);
+        }
     }
 
     /**
@@ -318,5 +382,13 @@ public class SimulationsToolStrip extends ToolStrip {
 
     private SimulationsTab getSimulationsTab() {
         return (SimulationsTab) Layout.getInstance().getTab(ApplicationConstants.TAB_MONITOR);
+    }
+
+    private void openWindowToSendMail(String subjectValue, String message) {
+        MessageComposerWindow messageWindow = new MessageComposerWindow();
+        messageWindow.show();
+        messageWindow.setSubjectValue(subjectValue);
+        messageWindow.setTextMessage(message);
+
     }
 }

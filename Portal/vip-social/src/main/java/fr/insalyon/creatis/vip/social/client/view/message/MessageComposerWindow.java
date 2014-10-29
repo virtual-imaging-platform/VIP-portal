@@ -101,7 +101,6 @@ public class MessageComposerWindow extends AbstractComposeWindow {
         form = FieldUtil.getForm(usersPickList, subjectItem);
         form.setWidth(500);
         vLayout.addMember(form);
-
         richTextEditor = new RichTextEditor();
         richTextEditor.setHeight100();
         richTextEditor.setOverflow(Overflow.HIDDEN);
@@ -152,5 +151,18 @@ public class MessageComposerWindow extends AbstractComposeWindow {
         };
         service.sendMessage(recipients, subject, message, callback);
         modal.show("Sending message...", true);
+    }
+
+    public void setUsersPickerListValue(String email) {
+        usersPickList.setValues(email);
+    }
+
+    public void setSubjectValue(String value) {
+        subjectItem.setValue(value);
+    }
+
+    public void setTextMessage(String message) {
+        richTextEditor.setValue(message);
+
     }
 }
