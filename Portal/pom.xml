@@ -19,7 +19,7 @@
         <vip.simulation-gui.version>0.4.1</vip.simulation-gui.version>
         <vip.models.version>0.9.1</vip.models.version>
         <vip.simulated-data.version>1.3.1</vip.simulated-data.version>
-        <vip.social.version>1.5</vip.social.version>
+        <vip.social.version>1.12</vip.social.version>
         <vip.provenance.version>0.1.2</vip.provenance.version>
         <vip.cowork.version>0.1</vip.cowork.version>
         <vip.cowork-applet.version>0.1.1</vip.cowork-applet.version>
@@ -63,15 +63,8 @@
         <module>vip-datamanagement</module>
         <module>vip-gatelab</module>
         <module>vip-portal</module>
-        <!--        <module>vip-provenance</module>-->
-        <!--        <module>vip-physical-properties</module>-->
-        <module>vip-social</module>
-        <module>vip-cowork</module>
-        <module>vip-cardiac</module>
-        <module>vip-query</module>
         <module>vip-n4u</module>
-        <module>vip-simulated-data</module>
-        <module>vip-simulation-gui</module>
+        <module>vip-social</module>
     </modules>
     
     <repositories>
