@@ -41,6 +41,8 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Image;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
+import fr.insalyon.creatis.vip.datamanager.client.bean.VisualizationItem;
+import java.net.URL;
 import java.util.Date;
 import java.util.List;
 
@@ -96,9 +98,9 @@ public interface DataManagerServiceAsync {
 
     public void deleteZombieFiles(List<String> surls, AsyncCallback<Void> asyncCallback);
 
-    public void getImageSlicesURL(String imageLFN, AsyncCallback<Image> asyncCallback);
+    public void getImageSlicesURL(String imageLocalPath, AsyncCallback<Image> asyncCallback);
 
-    public void getSurfaceFileURL(String surfaceLFN, AsyncCallback<String> asyncCallback);
+    public void getVisualizationItemFromLFN(String lfn, AsyncCallback<VisualizationItem> asyncCallback);
 
     public void getSSHConnections(AsyncCallback<List<SSH>> asyncCallback);
 

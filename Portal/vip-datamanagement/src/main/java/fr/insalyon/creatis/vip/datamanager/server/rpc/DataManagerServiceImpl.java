@@ -45,6 +45,7 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Image;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
+import fr.insalyon.creatis.vip.datamanager.client.bean.VisualizationItem;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
@@ -62,9 +63,9 @@ import org.apache.log4j.Logger;
 public class DataManagerServiceImpl extends AbstractRemoteServiceServlet implements DataManagerService {
 
     private static final Logger logger = Logger.getLogger(DataManagerServiceImpl.class);
-    private DataManagerBusiness dataManagerBusiness;
-    private LFCBusiness lfcBusiness;
-    private TransferPoolBusiness transferPoolBusiness;
+    private final DataManagerBusiness dataManagerBusiness;
+    private final LFCBusiness lfcBusiness;
+    private final TransferPoolBusiness transferPoolBusiness;
 
     public DataManagerServiceImpl() {
 
@@ -413,12 +414,12 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public Image getImageSlicesURL(String imageLFN) throws DataManagerException {
+    public Image getImageSlicesURL(String imageFileName) throws DataManagerException {
 
         try {
-            trace(logger, "Viewing image: " + imageLFN);
+            trace(logger, "Slicing image: " + imageFileName);
             User user = getSessionUser();
-            return dataManagerBusiness.getImageSlicesURL(imageLFN, this.getServletContext().getRealPath("."), user);
+            return dataManagerBusiness.getImageSlicesURL(imageFileName);
         } catch (CoreException ex) {
             throw new DataManagerException(ex);
         } catch (BusinessException ex) {
@@ -484,11 +485,11 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public String getSurfaceFileURL(String surfaceLFN) throws DataManagerException {
+    public VisualizationItem getVisualizationItemFromLFN(String lfn) throws DataManagerException {
         try {
-            trace(logger, "Viewing surface: " + surfaceLFN);
+            trace(logger, "Getting URL for file: " + lfn);
             User user = getSessionUser();
-            return dataManagerBusiness.getSurfaceURL(surfaceLFN, this.getServletContext().getRealPath("."), user);
+            return dataManagerBusiness.getVisualizationItemFromLFN(lfn, this.getServletContext().getRealPath("."), user);
         } catch (CoreException ex) {
             throw new DataManagerException(ex);
         } catch (BusinessException ex) {

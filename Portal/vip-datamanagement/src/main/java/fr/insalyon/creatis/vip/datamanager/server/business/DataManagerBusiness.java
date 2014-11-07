@@ -52,6 +52,7 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Image;
 import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
+import fr.insalyon.creatis.vip.datamanager.client.bean.VisualizationItem;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.dao.SSHDAOFactory;
@@ -61,7 +62,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -183,36 +183,19 @@ public class DataManagerBusiness {
         }
     }
 
-    public Image getImageSlicesURL(String imageLFN, String localDir, User user) throws BusinessException {
-        String relativeDirString;
-        try {
-            relativeDirString = "/images/viewer" + System.getProperty("file.separator")+ DataManagerUtil.parseBaseDir(user, imageLFN);
-        } catch (DataManagerException ex) {
-       throw new BusinessException(ex);
-        }
-        
-        
-        String imageDirString = localDir + relativeDirString;
-        File imageDir = new File(imageDirString);
-        String imageFileName = imageDir.getAbsolutePath() + System.getProperty("file.separator") + imageLFN.substring(imageLFN.lastIndexOf('/') + 1);
+    public Image getImageSlicesURL(String imageFileName) throws BusinessException {
 
+        File imageFile = new File(imageFileName);
+        String imageDirName = imageFile.getParent() + "/" + imageFile.getName() + "-slices";
+        File imageDir = new File(imageDirName);
         if (!imageDir.exists()) {
             imageDir.mkdirs();
-            if (!imageDir.exists()) {
-                throw new BusinessException("Cannot create viewer dir: " + imageDir.getAbsolutePath());
-            }
         }
-        if (!(new File(imageFileName)).exists()) {
-            try {
-                CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(user, imageLFN), imageDir.getAbsolutePath());
-            } catch (GRIDAClientException ex) {
-                imageDir.delete();
-                throw new BusinessException(ex);
-            } catch (DataManagerException ex) {
-                throw new BusinessException(ex);
-            }
+        String sliceZeroFileName = imageDirName + "/slice0.png";
+        File sliceZero = new File(sliceZeroFileName);
+        if (!sliceZero.exists()) {
             //split slices
-            ProcessBuilder builder = new ProcessBuilder("slice.sh", imageFileName, imageDir.getAbsolutePath());
+            ProcessBuilder builder = new ProcessBuilder("slice.sh", imageFileName, imageDirName);
             builder.redirectErrorStream(true);
             try {
 
@@ -221,11 +204,11 @@ public class DataManagerBusiness {
                     //wait for the first slice to be produced but not for all slices ;)
                     Thread.currentThread().sleep(1000);
                 } catch (InterruptedException ex) {
-                    imageDir.delete();
+                    new File(imageDirName).delete();
                     throw new BusinessException(ex);
                 }
             } catch (IOException ex) {
-                imageDir.delete();
+                new File(imageDirName).delete();
                 throw new BusinessException(ex);
             }
         }
@@ -248,16 +231,17 @@ public class DataManagerBusiness {
                     number += line;
                 }
             } catch (InterruptedException ex) {
-                imageDir.delete();
+                new File(imageDirName).delete();
                 throw new BusinessException(ex);
             }
 
         } catch (IOException ex) {
-            imageDir.delete();
+            new File(imageDirName).delete();
             throw new BusinessException(ex);
         }
-        System.out.println(relativeDirString);
-        return new Image(relativeDirString, Integer.parseInt(number.trim()));//tempDir.listFiles().length -1);
+
+        logger.info("IMAGE DIR NAME IS " + imageDirName);
+        return new Image(imageDirName, Integer.parseInt(number.trim()), imageDirName.substring(imageDirName.indexOf("/files/viewer")) + "/");
 
     }
 
@@ -325,31 +309,38 @@ public class DataManagerBusiness {
         return (homeDir + "/" + name + DataManagerConstants.SSH_APPEND);
     }
 
-    public String getSurfaceURL(String surfaceLFN, String localDir, User user) throws BusinessException {
-        
-        String relativeDirString = "surfaces/viewer" + System.getProperty("file.separator") + (new File(surfaceLFN)).getParent().replaceAll(" ", "_").replaceAll("\\([^\\(]*\\)", "");
-        String surfaceDirString = localDir + System.getProperty("file.separator") + relativeDirString;
-        File surfaceDir = new File(surfaceDirString);
-        String surfaceFileName = surfaceDir.getAbsolutePath() + System.getProperty("file.separator") + surfaceLFN.substring(surfaceLFN.lastIndexOf('/') + 1);
+    public VisualizationItem getVisualizationItemFromLFN(String lfn, String localDir, User user) throws BusinessException {
 
-        if (!surfaceDir.exists()) {
-            surfaceDir.mkdirs();
-            if (!surfaceDir.exists()) {
-                throw new BusinessException("Cannot create viewer dir: " + surfaceDir.getAbsolutePath());
+        String relativeDirString;
+        try {
+            relativeDirString = "files/viewer" + System.getProperty("file.separator") + (new File(DataManagerUtil.parseBaseDir(user, lfn))).getParent().replaceAll(" ", "_").replaceAll("\\([^\\(]*\\)", "");
+        } catch (DataManagerException ex) {
+            throw new BusinessException(ex);
+        }
+        String fileDirString = localDir + System.getProperty("file.separator") + relativeDirString;
+        File fileDir = new File(fileDirString);
+        String fileName = fileDir.getAbsolutePath() + System.getProperty("file.separator") + lfn.substring(lfn.lastIndexOf('/') + 1);
+
+        if (!fileDir.exists()) {
+            fileDir.mkdirs();
+            if (!fileDir.exists()) {
+                throw new BusinessException("Cannot create viewer dir: " + fileDir.getAbsolutePath());
             }
         }
-        if (!(new File(surfaceFileName)).exists()) {
+        fileDir.setWritable(true, false);
+        if (!(new File(fileName)).exists()) {
             try {
-                CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(user, surfaceLFN), surfaceDir.getAbsolutePath());
+                CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(user, lfn), fileDir.getAbsolutePath());
             } catch (GRIDAClientException ex) {
-                surfaceDir.delete();
+                fileDir.delete();
                 throw new BusinessException(ex);
             } catch (DataManagerException ex) {
                 throw new BusinessException(ex);
             }
-            
+
         }
-        return relativeDirString + System.getProperty("file.separator") + surfaceLFN.substring(surfaceLFN.lastIndexOf('/') + 1);
+        String url = relativeDirString + System.getProperty("file.separator") + lfn.substring(lfn.lastIndexOf('/') + 1);
+        return new VisualizationItem(url, fileName);
     }
-    
+
 }

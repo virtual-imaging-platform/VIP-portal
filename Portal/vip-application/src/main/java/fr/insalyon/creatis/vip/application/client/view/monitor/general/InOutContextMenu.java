@@ -45,6 +45,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
+import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserContextMenu;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 import fr.insalyon.creatis.vip.datamanager.client.view.visualization.BrainBrowserViewTab;
@@ -126,15 +127,11 @@ public class InOutContextMenu extends Menu {
 
         if (!node.getType().equals("Simulation")) {
             if (node.getName().startsWith(DataManagerConstants.ROOT + "/")) {
-                if (ImageViewTab.isSupported(node.getName())) {
-                    this.setItems(viewImageItem, downloadFileItem, jumpToItem);
-                } else {
-                    if (BrainBrowserViewTab.isSupported(node.getName())) {
-                        this.setItems(viewSurfaceItem, downloadFileItem, jumpToItem);
-                    } else {
-                        this.setItems(downloadFileItem, jumpToItem);
-                    }
-                }
+                 ArrayList<MenuItem> menuItems = new ArrayList<MenuItem>();
+                 
+                 BrowserContextMenu.addVizualisers(menuItems, node.getName());
+                 menuItems.add(downloadFileItem);
+                 menuItems.add(jumpToItem);
             } else {
                 this.setItems(downloadFilesItem);
             }
