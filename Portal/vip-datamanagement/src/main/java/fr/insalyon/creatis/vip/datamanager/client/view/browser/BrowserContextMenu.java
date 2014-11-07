@@ -51,8 +51,9 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.ValidatorUtil;
-import fr.insalyon.creatis.vip.datamanager.client.view.visualization.BrainBrowserViewTab;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
+import fr.insalyon.creatis.vip.datamanager.client.view.visualization.AbstractViewTab;
+import fr.insalyon.creatis.vip.datamanager.client.view.visualization.BrainBrowserViewTab;
 import fr.insalyon.creatis.vip.datamanager.client.view.visualization.ImageViewTab;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,27 +70,7 @@ public class BrowserContextMenu extends Menu {
         this.setShowShadow(true);
         this.setShadowDepth(10);
         this.setWidth(90);
-
-        MenuItem imageViewItem = new MenuItem("View Image");
-        imageViewItem.setIcon(DataManagerConstants.ICON_VIEW);
-        imageViewItem.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new ImageViewTab(baseDir + "/" + data.getName()));
-            }
-        });
         
-        MenuItem surfaceViewItem = new MenuItem("View Surface");
-        surfaceViewItem.setIcon(DataManagerConstants.ICON_VIEW);
-        surfaceViewItem.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new BrainBrowserViewTab(baseDir + "/" + data.getName()));
-            }
-        });
-
         MenuItem uploadItem = new MenuItem("Upload");
         uploadItem.setIcon(DataManagerConstants.ICON_UPLOAD);
         uploadItem.addClickHandler(new ClickHandler() {
@@ -169,7 +150,7 @@ public class BrowserContextMenu extends Menu {
             public void onClick(MenuItemClickEvent event) {
                 if (ValidatorUtil.validateRootPath(baseDir, "delete from")
                         && ValidatorUtil.validateUserLevel(baseDir, "delete from")
-                         && ValidatorUtil.validateDropboxDir(baseDir, "delete from")) {
+                        && ValidatorUtil.validateDropboxDir(baseDir, "delete from")) {
 
                     delete(modal, baseDir, data.getName());
                 }
@@ -189,20 +170,11 @@ public class BrowserContextMenu extends Menu {
             }
         });
 
-        MenuItemSeparator separator = new MenuItemSeparator();
-
+        
         ArrayList<MenuItem> menuItems = new ArrayList<MenuItem>();
-        boolean sepView = false;
-        if (ImageViewTab.isSupported(data.getName())){
-            menuItems.add(imageViewItem);
-            sepView = true;
-        } 
-        if(BrainBrowserViewTab.isSupported(data.getName())){
-            menuItems.add(surfaceViewItem);
-            sepView = true;
-        }
-        if(sepView)
-            menuItems.add(separator);  
+        String fileName = baseDir + "/" + data.getName();
+        addVizualisers(menuItems,fileName);
+        MenuItemSeparator separator = new MenuItemSeparator();
         menuItems.add(uploadItem);
         menuItems.add(downloadItem);
         menuItems.add(separator);
@@ -214,7 +186,7 @@ public class BrowserContextMenu extends Menu {
         menuItems.add(deleteItem);
         menuItems.add(separator);
         menuItems.add(propertiesItem);
-        
+
         this.setItems(menuItems.toArray(new MenuItem[0]));
     }
 
@@ -381,5 +353,34 @@ public class BrowserContextMenu extends Menu {
         } else {
             Layout.getInstance().setWarningMessage("Unable to move data into the same folder.");
         }
+    }
+
+    public static void addVizualisers(ArrayList<MenuItem> menuItems, String fileName) {
+        MenuItemSeparator separator = new MenuItemSeparator();
+        boolean sepView = false;
+        
+        ArrayList<AbstractViewTab> viewTabs = new ArrayList<AbstractViewTab>();
+        viewTabs.add(new BrainBrowserViewTab(fileName));
+        viewTabs.add(new ImageViewTab(fileName));
+        // add your viewerTab here
+        
+        for(final AbstractViewTab avt : viewTabs){
+           MenuItem viewItem = new MenuItem("View "+avt.fileTypeName());
+           viewItem.setIcon(DataManagerConstants.ICON_VIEW);
+            viewItem.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(MenuItemClickEvent event) {
+                    Layout.getInstance().addTab(avt);
+                    avt.load();
+                }
+            });
+            if(avt.isFileSupported(fileName)){
+                menuItems.add(viewItem);
+                sepView = true;
+            }
+        }
+        
+        if(sepView)
+            menuItems.add(separator);
     }
 }
