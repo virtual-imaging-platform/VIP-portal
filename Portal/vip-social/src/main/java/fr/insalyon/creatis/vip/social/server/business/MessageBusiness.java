@@ -35,9 +35,11 @@
 package fr.insalyon.creatis.vip.social.server.business;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
+import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
 import fr.insalyon.creatis.vip.social.client.bean.GroupMessage;
@@ -225,18 +227,9 @@ public class MessageBusiness {
         }
     }
 
-    public void sendMessageToVip(User user, String[] recipients,
-            String subject, String message, List<String> workflowIDs, List<String> simulationNames) throws BusinessException {
+    public void sendMessageToVipSupport(User user, String subject, String message, List<String> workflowIDs, List<String> simulationNames) throws BusinessException {
 
         try {
-
-            MessageDAO messageDAO = SocialDAOFactory.getDAOFactory().getMessageDAO();
-            long messageId = messageDAO.add(user.getEmail(), subject, message);
-
-            for (String recipient : recipients) {
-                messageDAO.associateMessageToUser(recipient, messageId);
-            }
-
             String emailContent = "<html>"
                     + "<head></head>"
                     + "<body>"
@@ -249,9 +242,10 @@ public class MessageBusiness {
                     + "</body>"
                     + "</html>";
 
-
-            CoreUtil.sendEmail("VIP Message: " + subject + " (" + user.getFullName() + ")",
-                    emailContent, recipients, true, user.getEmail());
+            for (User u : CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
+                CoreUtil.sendEmail("[VIP Contact] " + subject + " (" + user.getFullName() + ")", emailContent,
+                        new String[]{u.getEmail()}, true, user.getEmail());
+            }
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);

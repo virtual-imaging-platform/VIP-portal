@@ -66,7 +66,7 @@ public interface SocialServiceAsync {
 
     public void sendMessage(String[] recipients, String subject, String message, AsyncCallback<Void> asyncCallback);
 
-    public void sendMessageToVip(String[] recipients, String subject, String message, List<String> workflowID, List<String> simulationNames, AsyncCallback<Void> asyncCallback);
+    public void sendMessageToVipSupport(String subject, String message, List<String> workflowID, List<String> simulationNames, AsyncCallback<Void> asyncCallback);
 
     public void sendGroupMessage(String groupName, String subject, String message, AsyncCallback<Void> asyncCallback);
 

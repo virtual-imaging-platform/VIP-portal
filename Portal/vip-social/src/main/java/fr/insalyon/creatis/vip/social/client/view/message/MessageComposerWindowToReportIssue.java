@@ -30,15 +30,12 @@ import java.util.List;
  * @author Nouha Boujelben
  */
 public class MessageComposerWindowToReportIssue extends AbstractComposeWindow {
-
-    private TextItem vipEmail;
     private TextItem subjectItem;
     List<String> recepients;
 
     public MessageComposerWindowToReportIssue(List<String> workflowID, List<String> simulationNames) {
 
         super("Compose New Message");
-        loadVIPAdmin();
         configureForm(workflowID, simulationNames);
 
     }
@@ -50,8 +47,7 @@ public class MessageComposerWindowToReportIssue extends AbstractComposeWindow {
         sendLabel.addClickHandler(new ClickHandler() {
             public void onClick(ClickEvent event) {
                 if (form.validate()) {
-                    sendMessage(recepients.toArray(new String[0]),
-                            subjectItem.getValueAsString().trim(),
+                    sendMessage(subjectItem.getValueAsString().trim(),
                             richTextEditor.getValue(), workflowID, simulationNames);
                 }
             }
@@ -59,13 +55,10 @@ public class MessageComposerWindowToReportIssue extends AbstractComposeWindow {
         buttonsLayout.addMember(sendLabel);
         vLayout.addMember(buttonsLayout);
 
-        vipEmail = FieldUtil.getTextItem(350, true, "To", "[0-9.,A-Za-z-@+/_(): ]");
-        vipEmail.setValue("vip-support@creatis.insa-lyon.fr");
-        vipEmail.setCanEdit(false);
 
         subjectItem = FieldUtil.getTextItem(350, true, "Subject", "[0-9.,A-Za-z-+/_(): ]");
 
-        form = FieldUtil.getForm(vipEmail, subjectItem);
+        form = FieldUtil.getForm(subjectItem);
         form.setWidth(500);
         vLayout.addMember(form);
         richTextEditor = new RichTextEditor();
@@ -77,34 +70,7 @@ public class MessageComposerWindowToReportIssue extends AbstractComposeWindow {
                 "styleControls", "editControls", "colorControls", "insertControls");
         vLayout.addMember(richTextEditor);
     }
-
-    private void loadVIPAdmin() {
-
-        SocialServiceAsync service = SocialService.Util.getInstance();
-        AsyncCallback<List<User>> callback = new AsyncCallback<List<User>>() {
-            public void onFailure(Throwable caught) {
-                modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to get users list:<br />" + caught.getMessage());
-            }
-
-            public void onSuccess(List<User> result) {
-
-                recepients = new ArrayList<String>();
-
-                for (User user : result) {
-                    if (user.isSystemAdministrator()) {
-                        recepients.add(user.getEmail());
-                    }
-                }
-                modal.hide();
-
-            }
-        };
-        service.getUsers(callback);
-        modal.show("Loading users list...", true);
-    }
-
-    private void sendMessage(String[] recipients, String subject, String message, List<String> workflowID, List<String> simulationNames) {
+    private void sendMessage(String subject, String message, List<String> workflowID, List<String> simulationNames) {
 
         SocialServiceAsync service = SocialService.Util.getInstance();
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
@@ -118,7 +84,7 @@ public class MessageComposerWindowToReportIssue extends AbstractComposeWindow {
                 Layout.getInstance().setNoticeMessage("Message successfully sent.");
             }
         };
-        service.sendMessageToVip(recipients, subject, message, workflowID, simulationNames, callback);
+        service.sendMessageToVipSupport(subject, message, workflowID, simulationNames, callback);
         modal.show("Sending message...", true);
     }
 
