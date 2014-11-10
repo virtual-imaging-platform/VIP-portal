@@ -58,7 +58,7 @@ public class Velocity implements VelocityProcess {
         context.put("applicationName", applicationName);
         context.put("applicationLocation", applicationLocation);  
         context.put("extensionFileValue",  StringEscapeUtils.escapeXml(extensionFileValue));
-        context.put("gassValue", applicationLocation + "/bin/" + applicationName + "._wrapper.sh");
+        context.put("gassValue", applicationLocation + "/bin/" + applicationName + "_wrapper.sh");
         if (!sandboxFile.isEmpty()) {
             try {
                 CoreUtil.getGRIDAClient().rename(sandboxFile, applicationLocation + "/bin/" + sandboxFile.substring(sandboxFile.lastIndexOf("/") + 1));
@@ -136,7 +136,7 @@ public class Velocity implements VelocityProcess {
         final String chemin = dir + "/" + applicationName + "_wrapper.sh";
         final File fichier = new File(chemin);
         try {
-            //CoreUtil.getGRIDAN4uClient().createFolder("/grid/vo.neugrid.eu/home/vip/", "nn");
+            //CoreUtil.getGRIDAN4uClient().createFolder("/grid/vo.neugrid.eu/home/vip", "nn");
             createFile(fichier, writer);
             CoreUtil.getGRIDAClient().createFolder(applicationLocation, "bin");
             copyFile(chemin, dir + "/" + applicationName + ".bak" + "_wrapper.sh");
@@ -177,7 +177,6 @@ public class Velocity implements VelocityProcess {
         StringWriter writer = new StringWriter();
         t.merge(context, writer);
         final String chemin = dir + "/" + applicationName + ".gwendia";
-
         final File fichier = new File(chemin);
 
         try {
@@ -185,9 +184,9 @@ public class Velocity implements VelocityProcess {
             CoreUtil.getGRIDAClient().createFolder(applicationLocation, "workflows");
             copyFile(chemin, dir + "/" + applicationName + ".bak" + ".gwendia");
             CoreUtil.getGRIDAClient().uploadFile(chemin, applicationLocation + "/" + "workflows");
-            //String n4uLocation=applicationLocation.replace("/grid/biomed/creatis/vip",  "/grid/vo.neugrid.eu/home/vip");
-            //CoreUtil.getGRIDAN4uClient().createFolder("/grid/vo.neugrid.eu/home/vip", "workflows");
-           // CoreUtil.getGRIDAN4uClient().uploadFile(chemin,"/grid/vo.neugrid.eu/home/vip/workflows");
+            copyFile(dir + "/" + applicationName + ".bak" + ".gwendia", chemin);
+            String n4uLocation=applicationLocation.replace("/grid/biomed/creatis/vip",  "/grid/vo.neugrid.eu/home/vip");
+            CoreUtil.getGRIDAN4uClient().uploadFile(chemin,n4uLocation+ "/" + "workflows");
         } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new VelocityException(ex);
