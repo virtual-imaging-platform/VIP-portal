@@ -63,7 +63,7 @@ public class N4uImportTab extends Tab {
     PickerIcon browsePicker;
     IButton createApplicationButton;
     Map<Integer, Map> listInputs;
-    List<Map> listOutputs;
+    ArrayList listOutputs;
     List<TextItem> listItems;
     int item = 0;
     int key = 0;
