@@ -281,8 +281,8 @@ public class SimulationsToolStrip extends ToolStrip {
                 public void onSuccess(Void result) {
                     modal.hide();
                     getSimulationsTab().loadData();
-                    openWindowToSendMail("your " + applicationName + " Simulation", "Dear " + user + ",<br>"
-                            + " I had to kill your " + applicationName + " simulation " + simulationName + " submitted on " + date + " because all the jobs were failing with the following error:<br><br><br><br>");
+                    openWindowToSendMail("your " + "\""+applicationName+"\"" + " Execution", "Dear " + user + ",<br><br>"
+                            + " I had to kill your " + "\""+ applicationName+ "\"" + " execution " + "\""+ simulationName+ "\""+ " submitted on " + date + " because all the jobs were failing with the following error:<br><br><br><br>",user);
 
 
 
@@ -402,10 +402,11 @@ public class SimulationsToolStrip extends ToolStrip {
         return (SimulationsTab) Layout.getInstance().getTab(ApplicationConstants.TAB_MONITOR);
     }
 
-    private void openWindowToSendMail(String subjectValue, String message) {
+    private void openWindowToSendMail(String subjectValue, String message,String userFullName) {
         MessageComposerWindow messageWindow = new MessageComposerWindow();
         messageWindow.show();
         messageWindow.setSubjectValue(subjectValue);
+        messageWindow.setUsersPickerListValue(userFullName);
         messageWindow.setTextMessage(message);
 
     }
