@@ -126,6 +126,7 @@ public class MessageComposerWindow extends AbstractComposeWindow {
                 usersMap.put("All", "All");
                 for (User user : result) {
                     usersMap.put(user.getEmail(), user.getFullName());
+
                 }
                 usersPickList.setValueMap(usersMap);
                 modal.hide();
@@ -133,6 +134,29 @@ public class MessageComposerWindow extends AbstractComposeWindow {
         };
         service.getUsers(callback);
         modal.show("Loading users list...", true);
+    }
+
+    public void setUsersPickerListValue(final String userFullName) {
+
+        SocialServiceAsync service = SocialService.Util.getInstance();
+        AsyncCallback<List<User>> callback = new AsyncCallback<List<User>>() {
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                Layout.getInstance().setWarningMessage("Unable to get users list:<br />" + caught.getMessage());
+            }
+
+            public void onSuccess(List<User> result) {
+                for (User user : result) {
+                    if (user.getFullName().equals(userFullName)) {
+                        usersPickList.setValue(user.getEmail());
+                    }
+
+                }
+                modal.hide();
+            }
+        };
+        service.getUsers(callback);
+
     }
 
     private void sendMessage(String[] recipients, String subject, String message) {
@@ -151,10 +175,6 @@ public class MessageComposerWindow extends AbstractComposeWindow {
         };
         service.sendMessage(recipients, subject, message, callback);
         modal.show("Sending message...", true);
-    }
-
-    public void setUsersPickerListValue(String email) {
-        usersPickList.setValues(email);
     }
 
     public void setSubjectValue(String value) {
