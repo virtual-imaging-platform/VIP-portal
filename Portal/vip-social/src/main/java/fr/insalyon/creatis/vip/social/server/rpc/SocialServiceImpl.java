@@ -167,11 +167,11 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         }
     }
 
-    public void sendMessageToVip(String[] recipients, String subject, String message, List<String> workflowID, List<String> simulationNames) throws SocialException {
+    public void sendMessageToVipSupport(String subject, String message, List<String> workflowID, List<String> simulationNames) throws SocialException {
 
         try {
             trace(logger, "Sending message '" + subject + "' to '" + "vip-support" + "'.");
-            messageBusiness.sendMessageToVip(getSessionUser(), recipients,
+            messageBusiness.sendMessageToVipSupport(getSessionUser(),
                     subject, message, workflowID, simulationNames);
 
         } catch (CoreException ex) {
