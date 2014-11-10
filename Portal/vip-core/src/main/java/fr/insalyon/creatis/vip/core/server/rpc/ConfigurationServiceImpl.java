@@ -967,22 +967,22 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     private String parseTypePublication(String type) {
-        if (type.equals("inproceedings") || type.equals("conference")) {
-            return PublicationTypes.ConferenceArticle.name();
-        } else if (type.equals("article")) {
-            return PublicationTypes.Journal.name();
-        } else if (type.equals("inbook") || type.equals("incollection")) {
-            return PublicationTypes.BookChapter.name();
+        if (type.equalsIgnoreCase("inproceedings") || type.equalsIgnoreCase("conference")) {
+            return PublicationTypes.ConferenceArticle.toString();
+        } else if (type.equalsIgnoreCase("article")) {
+            return PublicationTypes.Journal.toString();
+        } else if (type.equalsIgnoreCase("inbook") || type.equalsIgnoreCase("incollection")) {
+            return PublicationTypes.BookChapter.toString();
         } else {
-            return PublicationTypes.Other.name();
+            return PublicationTypes.Other.toString();
         }
 
     }
 
     private String getTypeName(org.jbibtex.BibTeXEntry entry, String type) {
-        if (type.equals("inproceedings") || type.equals("conference") || type.equals("incollection")) {
+        if (type.equalsIgnoreCase("inproceedings") || type.equalsIgnoreCase("conference") || type.equalsIgnoreCase("incollection")) {
             return entry.getField(org.jbibtex.BibTeXEntry.KEY_BOOKTITLE).toUserString();
-        } else if (type.equals("article")) {
+        } else if (type.equalsIgnoreCase("article")) {
             return entry.getField(org.jbibtex.BibTeXEntry.KEY_JOURNAL).toUserString();
         } else {
             return "";
