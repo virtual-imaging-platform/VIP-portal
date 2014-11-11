@@ -5,7 +5,7 @@
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip-gatelab-applet</artifactId>
     <packaging>jar</packaging>
-    <version>1.9</version>
+    <version>1.12</version>
     <name>VIP-Gatelab-Applet</name>
     <dependencies>
 
@@ -80,8 +80,8 @@
                 <configuration>
                     <keystore>src/main/resources/keystore.jks</keystore>
                     <alias>1</alias>
-                    <storepass></storepass>
-                    <keypass></keypass>
+                    <storepass>Ra@#sil89</storepass>
+                    <keypass>vipcreatis</keypass>
                 </configuration>
             </plugin>
             <plugin>
