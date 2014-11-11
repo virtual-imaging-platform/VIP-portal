@@ -288,7 +288,12 @@ public class Parser extends javax.swing.JPanel {
             dataList.add(localSimuFolder.concat(macroParser.getSeparator()).concat("data"));
             dataList.add(localSimuFolder.concat(macroParser.getSeparator()).concat("mac"));
             dataList.add(localSimuFolder.concat(macroParser.getSeparator()).concat("wfl_config.txt"));
-
+            String[] xmlFileNames = {localSimuFolder.concat(macroParser.getSeparator()).concat("materials.xml"),localSimuFolder.concat(macroParser.getSeparator()).concat("surfaces.xml")};
+            for (String xmlFileName : xmlFileNames){
+                if(new File(xmlFileName).exists())
+                    dataList.add(xmlFileName);
+            }
+                
             business = new UploadFilesBusiness(sessionId, beforeRunnable,
                     afterRunnable, errorRunnable, progressRunnable, dataList, path,
                     unzip, usePool, codeBase, true);

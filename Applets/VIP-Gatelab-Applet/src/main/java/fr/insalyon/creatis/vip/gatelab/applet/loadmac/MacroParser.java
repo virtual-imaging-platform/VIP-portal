@@ -98,9 +98,9 @@ public class MacroParser {
         this.setMaxFileSize = false;
         this.autoEngineSeed = false;
 
-        String dirname = mainMacroVRL.getParentFile().getName().toString();
+        String dirname = mainMacroVRL.getParentFile().getName();
 
-        System.out.println("MacroParser COnstructor 2, dirname is " + dirname);
+        System.out.println("MacroParser Constructor 2, dirname is " + dirname);
         // TODO Sorina : print this as a message to the user and ask the user
         // for another entry (don't go further)
         if (dirname.compareTo("mac") != 0) {
@@ -177,6 +177,26 @@ public class MacroParser {
             }
         }
 
+        //adding materials.xml and surfaces.xml if they exist
+        File macFile = new File(macroFiles.get(0));
+        if (macFile.exists()) {
+            File macDir = macFile.getParentFile();
+            if (macDir != null) {
+                File mainDir = macDir.getParentFile();
+                File materials_file = new File(mainDir + File.separator + "materials.xml");
+                File surfaces_file = new File(mainDir + File.separator + "surfaces.xml");
+                if (materials_file.exists()) {
+                    System.out.println("Copying materials.xml in main simulation directory");
+                    FileUtilities.copyFile(materials_file, new File(simuDir+File.separator+materials_file.getName()));
+                }
+                if (surfaces_file.exists()) {
+                    System.out.println("Copying surfaces.xml in main simulation directory");
+                    FileUtilities.copyFile(surfaces_file, new File(simuDir+File.separator+surfaces_file.getName()));
+                }
+            }
+        }
+        
+
     }
 
     public void handleMacFile(String macFile) throws GateException {
@@ -209,7 +229,7 @@ public class MacroParser {
 
     public void handleInputs(String input) throws GateException {
         String inputVRL;
-        String dirname = (new File(input)).getParentFile().getName().toString();
+        String dirname = (new File(input)).getParentFile().getName();
         // if ((result.length == 2) && result[0].equals("data")) {
         if ((dirname != null) && dirname.equals("data")) {
             inputVRL = this.baseVRL.concat(input);
@@ -236,7 +256,7 @@ public class MacroParser {
                         // " ***, basename is "+baseFileName);
                         if (filesInNode[i].isFile()
                                 && filesInNode[i].toString().contains(
-                                baseFileName.substring(0, baseFileName.lastIndexOf(extension)))
+                                        baseFileName.substring(0, baseFileName.lastIndexOf(extension)))
                                 && !filesInNode[i].toString().endsWith(extension)) {
 
                             String inputVRL1 = filesInNode[i].toString();
@@ -415,7 +435,7 @@ public class MacroParser {
                 } else {
                     if (currentLineTrim.contains("setMaxFileSize")) {
                         this.setMaxFileSize = true;
-                       // break;
+                        // break;
                     } else {
                         macFile = processLine(mac_pattern, delimiter, currentLine, 0);
                     }
@@ -426,7 +446,7 @@ public class MacroParser {
                         ps = processLine(phaseSpace_pattern, delimiter, currentLine, 1);
                         if (ps != null) {
                             this.phaseSpaceFiles.add(ps);
-                        }else{
+                        } else {
                             input = processLine(input_pattern, delimiter, currentLine,
                                     0);
                             if (input != null) {
@@ -566,12 +586,11 @@ public class MacroParser {
          */
         return this.nparticles;
     }
-    
+
     public String getTimeStart() {
         return this.nstart;
     }
-     
-     
+
     public String getTimeStop() {
         return this.nstop;
     }
@@ -603,7 +622,7 @@ public class MacroParser {
     public List<String> getUnidentifiedFiles() {
         return unidentifiedFiles;
     }
-    
+
     public List<String> getPhaseSpaceFiles() {
         return this.phaseSpaceFiles;
     }
@@ -612,5 +631,4 @@ public class MacroParser {
         return (mac_file.getName().equals("Gate") || mac_file.getName().matches("[A-Za-z0-9\\.\\-\\_]*\\.so") || mac_file.getName().matches("[A-Za-z0-9\\.\\-\\_]*\\.so\\.[A-Za-z0-9\\.\\-\\_]*"));
     }
 
-   
 }
