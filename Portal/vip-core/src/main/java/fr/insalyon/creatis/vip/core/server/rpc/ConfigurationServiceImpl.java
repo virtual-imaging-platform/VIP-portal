@@ -113,7 +113,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             }
             return null;
 
-
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -153,7 +152,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             User user = configurationBusiness.signin(email, password);
             user = setUserSession(user);
             configurationBusiness.updateUserLastLogin(email);
-            trace(logger, "Connected.");
+            logger.info("Connected.");
 
             return user;
 
@@ -256,7 +255,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public void sendResetCode(String email) throws CoreException {
 
         try {
-            logger.info("(" + email + ") Requested to reset the password.");
+            trace(logger, "(" + email + ") Requested to reset the password.");
             configurationBusiness.sendResetCode(email);
 
         } catch (BusinessException ex) {
@@ -408,6 +407,27 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
+    }
+
+    /**
+     *
+     * @param logger
+     * @param groupName
+     * @throws CoreException
+     */
+    protected void authenticateGroupAdministrator(Logger logger, String groupName) throws CoreException {
+
+        User user = getSessionUser();
+        Map<Group, GROUP_ROLE> userGroups = getUserGroups(null);
+
+        for (Group g : userGroups.keySet()) {
+            if (g.getName().equals(groupName) && userGroups.get(g) == GROUP_ROLE.Admin) {
+                return;
+            }
+        }
+
+        logger.error("The user has no admin rights for group " + groupName + ": " + user.getEmail());
+        throw new CoreException("The user has no group administrator rights.");
     }
 
     @Override
@@ -607,7 +627,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public List<User> getUsersFromGroup(String groupName) throws CoreException {
 
         try {
-            authenticateSystemAdministrator(logger);
+            authenticateGroupAdministrator(logger, groupName);
             return configurationBusiness.getUsersFromGroup(groupName);
 
         } catch (BusinessException ex) {
@@ -893,7 +913,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
             authenticateSystemAdministrator(logger);
             configurationBusiness.addTermsUse(termsofUse);
-
 
         } catch (BusinessException ex) {
 

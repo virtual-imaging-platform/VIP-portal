@@ -127,17 +127,20 @@
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-social</artifactId>
             <version>${vip.social.version}</version>
-        </dependency><dependency>
+        </dependency>
+        
+        <dependency>
              <groupId>fr.insalyon.creatis</groupId>
              <artifactId>vip-query</artifactId>
             <version>${vip.query.version}</version>
         </dependency>
+        
+        <dependency>
+             <groupId>fr.insalyon.creatis</groupId>
+             <artifactId>vip-api</artifactId>
+            <version>${vip.api.version}</version>
+        </dependency>
 
-        <!--dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-physical-properties</artifactId>
-            <version>0.1</version>
-        </dependency-->
         <!-- END VIP MODULES -->
         
     </dependencies>
