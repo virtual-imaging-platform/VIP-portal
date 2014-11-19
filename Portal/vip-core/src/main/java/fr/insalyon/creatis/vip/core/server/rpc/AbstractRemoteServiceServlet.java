@@ -54,6 +54,7 @@ import org.apache.log4j.Logger;
 public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet {
 
     protected ConfigurationBusiness configurationBusiness;
+    protected HttpSession session;
 
     public AbstractRemoteServiceServlet() {
 
@@ -76,8 +77,14 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
      * @return 
      */
     protected HttpSession getSession() {
-
-        return this.getThreadLocalRequest().getSession();
+        if(session == null)
+            session = this.getThreadLocalRequest().getSession();
+        return session;
+        
+    }
+    
+    public void setSession(HttpSession session){
+        this.session = session;
     }
 
     /**
@@ -85,7 +92,7 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
      * @return
      * @throws CoreException 
      */
-    protected User getSessionUser() throws CoreException {
+    public User getSessionUser() throws CoreException {
 
         User user = (User) getSession().getAttribute(CoreConstants.SESSION_USER);
         if (user != null) {
@@ -111,8 +118,7 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
     /**
      * 
      * @param logger
-     * @throws CoreException
-     * @throws BusinessException 
+     * @throws CoreException 
      */
     protected void authenticateSystemAdministrator(Logger logger) throws CoreException {
 

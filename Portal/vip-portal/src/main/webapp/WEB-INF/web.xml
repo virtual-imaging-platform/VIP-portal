@@ -27,7 +27,7 @@
         <servlet-name>SamlAuthenticationService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/samlauthenticationservice</url-pattern>
     </servlet-mapping>
-        <servlet>
+    <servlet>
         <servlet-name>PersonaAuthenticationService</servlet-name>
         <servlet-class>fr.insalyon.creatis.vip.core.server.auth.PersonaAuthenticationService</servlet-class>
     </servlet>
@@ -239,8 +239,25 @@
         <servlet-name>FileProcessService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/fileProcessService</url-pattern>
     </servlet-mapping>
-    
     <!--End N4U Module-->
+    
+    <!-- REST API -->
+    <servlet>
+        <servlet-name>API</servlet-name>
+        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <param-name>jersey.config.server.provider.packages</param-name>
+            <param-value>
+                fr.insalyon.creatis.vip.api
+            </param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>API</servlet-name>
+        <url-pattern>/api/*</url-pattern>
+    </servlet-mapping>
+    <!-- End VIP API -->
     
     <session-config>
         <session-timeout>-1</session-timeout>

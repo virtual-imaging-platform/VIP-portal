@@ -27,6 +27,7 @@
         <vip.physical-properties.version>0.1</vip.physical-properties.version>
         <vip.query.version>1.7</vip.query.version>
         <vip.n4u.version>1.11</vip.n4u.version>
+        <vip.api.version>1.12</vip.api.version>
     </properties>
     
     <description>VIP</description>
@@ -65,6 +66,7 @@
         <module>vip-portal</module>
         <module>vip-n4u</module>
         <module>vip-social</module>
+        <module>vip-api</module>
     </modules>
     
     <repositories>
