@@ -183,8 +183,8 @@ public class MacroParser {
             File macDir = macFile.getParentFile();
             if (macDir != null) {
                 File mainDir = macDir.getParentFile();
-                File materials_file = new File(mainDir + File.separator + "materials.xml");
-                File surfaces_file = new File(mainDir + File.separator + "surfaces.xml");
+                File materials_file = new File(mainDir + File.separator + "Materials.xml");
+                File surfaces_file = new File(mainDir + File.separator + "Surfaces.xml");
                 if (materials_file.exists()) {
                     System.out.println("Copying materials.xml in main simulation directory");
                     FileUtilities.copyFile(materials_file, new File(simuDir+File.separator+materials_file.getName()));
