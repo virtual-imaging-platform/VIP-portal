@@ -3,11 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.rest;
 
+import fr.insalyon.creatis.vip.api.business.ApiException;
+import fr.insalyon.creatis.vip.api.business.AuthenticationBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import javax.servlet.http.HttpServletRequest;
@@ -24,29 +25,25 @@ import javax.ws.rs.core.Response;
  */
 @Path("/auth")
 
-public class Auth extends APIClass {
+public class AuthenticationService {
 
     @POST
     public Response authenticate(@Context HttpServletRequest req, @FormParam("email") String email, @FormParam("password") String password) {
+        User user = null;
         try {
-            
-            getLogger().info("Authenticating "+email+" "+password);
-            this.getConfigurationServiceImpl().setSession(req.getSession());
-            User user = getConfigurationServiceImpl().signin(email, password);
-       
-            try {
-                return Response.
-                        status(Response.Status.OK)
-                        .cookie(new NewCookie(CoreConstants.COOKIES_USER,URLEncoder.encode(user.getEmail(), "UTF-8")))
-                        .cookie(new NewCookie(CoreConstants.COOKIES_SESSION,user.getSession()))
-                        .build();
-            } catch (UnsupportedEncodingException ex) {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-            }
-         } catch (CoreException ex) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+            user = new AuthenticationBusiness().authenticate(req, new fr.insalyon.creatis.vip.api.bean.User(email, password)); //throws an exception if authentication fails
+        } catch (ApiException ex) {
+            return Response.status(Response.Status.UNAUTHORIZED).build(); // we should separate unauthorized from internal server error
         }
-    }    
 
-    
+        try {
+            return Response.
+                    status(Response.Status.OK)
+                    .cookie(new NewCookie(CoreConstants.COOKIES_USER, URLEncoder.encode(user.getEmail(), "UTF-8")))
+                    .cookie(new NewCookie(CoreConstants.COOKIES_SESSION, user.getSession()))
+                    .build();
+        } catch (UnsupportedEncodingException ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
