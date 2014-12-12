@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
     <display-name>VIP</display-name>
-      
     <!-- Core Module -->
     <servlet>
         <servlet-name>ConfigurationService</servlet-name>
@@ -36,7 +35,6 @@
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/personaauthenticationservice</url-pattern>
     </servlet-mapping>
     <!-- End Core Module -->
-    
     <!-- Provenance Module -->
     <servlet>
         <servlet-name>ProvenanceService</servlet-name>
@@ -47,7 +45,6 @@
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/provenanceservice</url-pattern>
     </servlet-mapping>
     <!-- End Provenance Module -->
-    
     <!-- Data Manager Module -->
     <servlet>
         <servlet-name>DataManagerService</servlet-name>
@@ -82,7 +79,6 @@
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/uploadfilesservice</url-pattern>
     </servlet-mapping>
     <!-- End Data Manager Module -->
-    
     <!-- Application Module -->
     <servlet>
         <servlet-name>ApplicationService</servlet-name>
@@ -109,7 +105,6 @@
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/jobservice</url-pattern>
     </servlet-mapping>
     <!-- End Application Module -->
-    
     <!-- GateLab Module -->
     <servlet>
         <servlet-name>GatelabService</servlet-name>
@@ -120,7 +115,6 @@
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/gatelabservice</url-pattern>
     </servlet-mapping>
     <!-- End GateLab Module -->
-    
     <!-- Physical Properties Module -->
     <servlet>
         <servlet-name>TissueService</servlet-name>
@@ -131,7 +125,6 @@
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/tissueservice</url-pattern>
     </servlet-mapping>
     <!-- End Physical Properties Module -->
-    
     <!-- Models Module -->
     <servlet>
         <servlet-name>ModelService</servlet-name>
@@ -142,7 +135,6 @@
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/modelservice</url-pattern>
     </servlet-mapping>
     <!-- End Models Module -->
-     
     <!-- SimulatedData Module -->
     <servlet>
         <servlet-name>SimulatedDataService</servlet-name>
@@ -153,7 +145,6 @@
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/simulateddataservice</url-pattern>
     </servlet-mapping>
     <!-- End SimulatedData Module -->
-     
     <!-- Models Module -->
     <servlet>
         <servlet-name>VTKController</servlet-name>
@@ -164,7 +155,6 @@
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/vtkcontroller</url-pattern>
     </servlet-mapping>
     <!-- End Models Module -->
-    
     <!-- Social Module -->
     <servlet>
         <servlet-name>SocialService</servlet-name>
@@ -175,7 +165,6 @@
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/socialservice</url-pattern>
     </servlet-mapping>
     <!-- End Social Module -->
-    
     <!-- Cowork Module -->
     <servlet>
         <servlet-name>CoworkService</servlet-name>
@@ -185,9 +174,7 @@
         <servlet-name>CoworkService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/coworkservice</url-pattern>
     </servlet-mapping>
-    
     <!-- End Cowork Module -->
-    
     <!-- Cardiac Module -->
     <servlet>
         <servlet-name>CardiacService</servlet-name>
@@ -197,9 +184,7 @@
         <servlet-name>CardiacService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/cardiacservice</url-pattern>
     </servlet-mapping>
-    
     <!-- End Cardiac Module -->
-    
     <!-- Query Module -->
     <servlet>
         <servlet-name>QueryService</servlet-name>
@@ -209,7 +194,6 @@
         <servlet-name>QueryService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/queryService</url-pattern>
     </servlet-mapping>
-
     <servlet>
         <servlet-name>EndPointService</servlet-name>
         <servlet-class>fr.insalyon.creatis.vip.query.server.rpc.EndPointSparqlServiceImpl</servlet-class>
@@ -226,10 +210,7 @@
         <servlet-name>FileDownload</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/filedownload</url-pattern>
     </servlet-mapping>
-   
     <!-- End Query Module -->
-    
-    
     <!--N4U Module-->
     <servlet>
         <servlet-name>FileProcessService</servlet-name>
@@ -240,33 +221,43 @@
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/fileProcessService</url-pattern>
     </servlet-mapping>
     <!--End N4U Module-->
-    
     <!-- REST API -->
     <servlet>
-        <servlet-name>API</servlet-name>
+        <servlet-name>RestAPI</servlet-name>
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
         <init-param>
             <param-name>jersey.config.server.provider.packages</param-name>
             <param-value>
-                fr.insalyon.creatis.vip.api
+                fr.insalyon.creatis.vip.api.rest
             </param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
-        <servlet-name>API</servlet-name>
-        <url-pattern>/api/*</url-pattern>
+        <servlet-name>RestAPI</servlet-name>
+        <url-pattern>/rest/*</url-pattern>
     </servlet-mapping>
-    <!-- End VIP API -->
-    
+    <!-- END REST API -->
+    <!-- SOAP API -->
+    <listener>
+        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
+    </listener>
+    <servlet>
+        <servlet-name>api</servlet-name>
+        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>api</servlet-name>
+        <url-pattern>/api</url-pattern>
+    </servlet-mapping>
+    <!-- END SOAP API -->
     <session-config>
         <session-timeout>-1</session-timeout>
     </session-config>
-    
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
-    
     <!--    <security-constraint>
         <web-resource-collection>
             <web-resource-name>site</web-resource-name>
@@ -280,17 +271,14 @@
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
         </user-data-constraint>
     </security-constraint>-->
-    
     <!--    <login-config>
         <auth-method>CLIENT-CERT</auth-method>
         <realm-name>Client Cert Users-only Area</realm-name>
     </login-config>-->
-    
     <resource-ref>
         <description>VIP MySQL Connection</description>
         <res-ref-name>jdbc/vip</res-ref-name>
         <res-type>javax.sql.DataSource</res-type>
         <res-auth>Container</res-auth>
     </resource-ref>
-    
 </web-app>
