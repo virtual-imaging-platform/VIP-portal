@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -45,6 +43,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(FileProcessServiceImpl.class);
     //get the value from first appel to generateScriptFile
     private String generateTime = null;
+    Velocity ve=new Velocity();
 
     /**
      *
@@ -184,17 +183,21 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public void generateScriptFile(Map<Integer, Map> listInput,List<Map> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String environementFile, String description) throws N4uException {
+    public void generateScriptFile(Map<Integer, Map> listInput,ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String environementFile, String description) throws N4uException {
         String applicationRealLocation;
         try {
 
             applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
             final File homeDir = new File(Server.getInstance().getN4uApplicationFilesRepository());
-            generateTime = getCurrentTimeStamp().toString();
+            generateTime = getCurrentTimeStamp().toString().replaceAll(":", "_").replaceAll(" ", "");
             File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + generateTime);
             theDir.mkdirs();
             String dir = theDir.getAbsolutePath();
-            new Velocity().wrapperScriptFile(listInput, listOutput, applicationName, scriptFile, applicationRealLocation, environementFile, dir, generateTime);
+            if (!scriptFile.isEmpty()) {
+                scriptFile= DataManagerUtil.parseBaseDir(getSessionUser(),scriptFile );
+
+            }
+            ve.wrapperScriptFile(listInput, listOutput, applicationName, scriptFile, applicationRealLocation, environementFile, dir, generateTime);
         } catch (CoreException ex) {
             logger.error(ex);
             throw new N4uException(ex);
@@ -229,7 +232,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + generateTime);
             theDir.mkdirs();
             String dir = theDir.getAbsolutePath();
-            return new Velocity().gwendiaFile(listInput, listOutput, applicationName, description, applicationRealLocation, dir, generateTime);
+            return ve.gwendiaFile(listInput, listOutput, applicationName, description, applicationRealLocation, dir, generateTime);
         } catch (CoreException ex) {
             logger.error(ex);
             throw new N4uException(ex);
@@ -269,6 +272,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
 
             // if the directory does not exist, create it
             String dir = theDir.getAbsolutePath();
+            String executableSandbox ="";
             String envF = "";
             String sandboxF = "";
             String extensionFValue = null;
@@ -295,6 +299,11 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
               extensionFValue=extensionFValue.substring(0, extensionFValue.length()-1);
             }
 
+             
+             if (!scriptFile.isEmpty()) {
+                executableSandbox = DataManagerUtil.parseBaseDir(getSessionUser(),scriptFile );
+
+            }
             if (!environementFile.isEmpty()) {
                 envF = DataManagerUtil.parseBaseDir(getSessionUser(), environementFile);
 
@@ -302,7 +311,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             if (!sandboxFile.isEmpty()) {
                 sandboxF = DataManagerUtil.parseBaseDir(getSessionUser(), sandboxFile);
             }
-            new Velocity().gassFile(listInput, listOutput, applicationName, wrapperScriptPath, applicationRealLocation, dir, generateTime, sandboxF, envF,extensionFValue);
+           ve.gassFile(listInput, listOutput, applicationName, wrapperScriptPath, applicationRealLocation, dir, generateTime, sandboxF, envF,extensionFValue,executableSandbox);
         } catch (CoreException e) {
             logger.error(e);
             throw new N4uException(e);
