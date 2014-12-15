@@ -865,11 +865,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public void removePublication(Long id) throws CoreException {
         trace(logger, "Removing publication.");
         try {
-            logger.error("1");
             authenticateSystemAdministrator(logger);
-            logger.error("2");
             configurationBusiness.removePublication(id);
-            logger.error("3");
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
