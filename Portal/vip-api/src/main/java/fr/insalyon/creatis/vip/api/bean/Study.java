@@ -13,13 +13,23 @@ import java.util.List;
  */
 public class Study {
 
-    private String identifier; // group name in our case
+    private String identifier; 
+    
     private String name;
+    
     private String description;
+    
     private List<User> managers;
+    
     private List<User> contributors;
+    
     private List<User> users;
-    private List<Service> services; //list of services accessible by this study
+    
+    private List<Pipeline> pipelines; //list of pipelines accessible by users of this study
+    
+    private Path home; // home dir of the study. All the files accessible by this study are below this directory.
+    
+    // Each user may have his/her own private study, created with the user account.
 
     public Study() {
     }

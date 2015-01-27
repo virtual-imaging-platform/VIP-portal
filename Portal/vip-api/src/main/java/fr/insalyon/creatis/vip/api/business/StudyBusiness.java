@@ -5,7 +5,7 @@
  */
 package fr.insalyon.creatis.vip.api.business;
 
-import fr.insalyon.creatis.vip.api.bean.Service;
+import fr.insalyon.creatis.vip.api.bean.Pipeline;
 import fr.insalyon.creatis.vip.api.bean.Study;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -39,33 +39,34 @@ public class StudyBusiness {
         return csi;
     }
 
-    //////////////////////////////////////// API methods /////////////////////////////////////
-    public void newStudy(Study study) throws ApiException {
-        throw new ApiException("Not implemented yet");
-    }
+    // General 
     
-    public void deleteStudy(String studyIdentifier) throws ApiException {
-        throw new ApiException("Not implemented yet");
-    }
+    public void newStudy(Study study) throws ApiException { throw new ApiException("Not implemented yet"); }
+    
+    public void updateStudy(Study study) throws ApiException { throw new ApiException("Not implemented yet"); }
+    
+    public void deleteStudy(String studyIdentifier) throws ApiException { throw new ApiException("Not implemented yet"); }
     
     public Study getStudy(String studyIdentifier) throws ApiException { throw new ApiException("Not implemented yet"); }
     
-    public List<Study> getStudies() throws ApiException { throw new ApiException("Not implemented yet"); }
+    public List<Study> getStudies() throws ApiException { throw new ApiException("Not implemented yet"); } // returns all the studies accessible by the user
+
+    // Specific
     
     public List<Study> getStudiesOfUser(String userIdentifier) throws ApiException { throw new ApiException("Not implemented yet"); }
     
-    public List<Study> getStudiesOfService(String serviceIdentifier) throws ApiException { throw new ApiException("Not implemented yet;");}
-    /// user-study 
-    
+    public List<Study> getStudiesOfPipeline(String pipelineIdentifier) throws ApiException { throw new ApiException("Not implemented yet;");}
+       
+        // user/study
     public void setRoleInStudies(List<String> studyIdentifier, List<String> userIdentifiers, Study.Role role) throws ApiException{ throw new ApiException("Not implemented yet"); }
     
     public void removeUsersFromStudies(List<String> studyIdentifier, List<String> userIdentifiers) throws ApiException { throw new ApiException("Not implemented yet."); }
        
-    /// service-study
+       // service/study
     
-    public void addServicesToStudies(List<String> studyIdentifier, List<String> serviceIdentifiers) throws ApiException { throw new ApiException ("Not implemented yet");}
+    public void addPipelinesToStudies(List<String> studyIdentifier, List<String> pipelineIdentifiers) throws ApiException { throw new ApiException ("Not implemented yet");}
 
-    public void removeServicesFromStudies(List<String> studyIdentifier, List<String> serviceIdentifiers) throws ApiException { throw new ApiException("Not implemented yet");}
+    public void removePipelinesFromStudies(List<String> studyIdentifier, List<String> pipelineIdentifiers) throws ApiException { throw new ApiException("Not implemented yet");}
     
     //////////////////////////////// Private methods ////////////////////////////
     

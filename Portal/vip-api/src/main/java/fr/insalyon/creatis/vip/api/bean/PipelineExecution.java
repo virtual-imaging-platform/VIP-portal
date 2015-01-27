@@ -6,20 +6,30 @@
 
 package fr.insalyon.creatis.vip.api.bean;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  *
  * @author Tristan Glatard
  */
-public class Job {
+public class PipelineExecution {
+    
     private String identifier;
-    private Service service;
+    
+    private Pipeline pipeline;
+    
     private User owner;
-    private Map<Service.Input, ParameterValue> inputValues;
-    private Map<Service.Output, ParameterValue> outputValues;
+    
+    private List <ParameterValue> inputValues;
+    
+    private List <ParameterValue> outputValues;
+    
     private Status status;
-    // does a job belong to a study?
+    
+    // Does a pipeline execution belong to a Study?
+    
+    
 
     /**
      *

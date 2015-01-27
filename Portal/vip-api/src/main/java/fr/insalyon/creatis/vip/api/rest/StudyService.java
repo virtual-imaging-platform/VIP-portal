@@ -29,27 +29,15 @@ public class StudyService {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public Response getStudies(@Context HttpServletRequest req) {
-        String output;
-        try {
-            output = new StudyBusiness().getStudies(req).toString();
-        } catch (ApiException ex) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        }
-        return Response.status(Response.Status.OK).entity(output).build();
+    public Response getStudies(@Context HttpServletRequest req) throws ApiException {
+       throw new ApiException("Not implemented");
     }
 
     @GET
     @Path("/{name}")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response getStudy(@PathParam("name") Study study, @Context HttpServletRequest req) {
-        String output;
-        try {
-            output = new StudyBusiness().getStudy(study, req).toString();
-        } catch (ApiException ex) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        }
-        return Response.status(Response.Status.OK).entity(output).build();
+    public Response getStudy(@PathParam("name") Study study, @Context HttpServletRequest req) throws ApiException {
+       throw new ApiException("Not implemented");
 
     }
     
