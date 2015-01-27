@@ -35,18 +35,18 @@ public class ApiWebService {
 
     @WebMethod(operationName = "authenticate")
     public void authenticate(@WebParam(name = "email") String email, @WebParam(name = "password") String password) throws ApiException {
-
-        User user = null;
-        user = new AuthenticationBusiness().authenticate(getRequest(), email, password); //throws an exception if authentication fails
-
-        // user is authenticated
-        HttpSession session = getRequest().getSession();
-        try {
-            session.setAttribute(CoreConstants.COOKIES_USER, URLEncoder.encode(user.getEmail(), "UTF-8"));
-        } catch (UnsupportedEncodingException ex) {
-            throw new ApiException(ex);
-        }
-        session.setAttribute(CoreConstants.COOKIES_SESSION, user.getSession());
+        throw new ApiException("Not implemented");
+//        User user = null;
+//        user = new AuthenticationBusiness().authenticate(getRequest(), email, password); //throws an exception if authentication fails
+//
+//        // user is authenticated
+//        HttpSession session = getRequest().getSession();
+//        try {
+//            session.setAttribute(CoreConstants.COOKIES_USER, URLEncoder.encode(user.getEmail(), "UTF-8"));
+//        } catch (UnsupportedEncodingException ex) {
+//            throw new ApiException(ex);
+//        }
+//        session.setAttribute(CoreConstants.COOKIES_SESSION, user.getSession());
 
     }
 
@@ -54,12 +54,12 @@ public class ApiWebService {
     //Studies
     @WebMethod(operationName = "list_studies")
     public List<Study> getStudies() throws ApiException {
-        return new StudyBusiness().getStudies(getRequest());
+        throw new ApiException("Not implemented");
     }
 
     @WebMethod(operationName = "list_study")
     public Study getStudy(@WebParam(name = "studyName") Study study) throws ApiException {
-        return (new StudyBusiness()).getStudy(study, getRequest());
+        throw new ApiException("Not implemented");
     }
     
      private HttpServletRequest getRequest() {
