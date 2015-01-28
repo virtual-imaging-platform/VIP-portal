@@ -40,6 +40,7 @@ import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.grida.client.GRIDAZombieClient;
 import fr.insalyon.creatis.sma.client.SMAClient;
 import fr.insalyon.creatis.sma.client.SMAClientException;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import org.apache.log4j.Logger;
 
 /**
@@ -72,7 +73,7 @@ public class CoreUtil {
         return new GRIDAClient(
                 Server.getInstance().getGRIDAHost(),
                 Server.getInstance().getGRIDAPort(),
-                Server.getInstance().getServerProxy());
+                Server.getInstance().getServerProxy(CoreConstants.VO_BIOMED));
     }
 
     public static GRIDAClient getGRIDAN4uClient() {
@@ -80,7 +81,7 @@ public class CoreUtil {
         return new GRIDAClient(
                 Server.getInstance().getN4uGridaHost(),
                 Server.getInstance().getN4uGridaPort(),
-                Server.getInstance().getServerProxy());
+                Server.getInstance().getServerProxy(CoreConstants.VO_NEUGRID));
     }
 
     /**
@@ -92,7 +93,7 @@ public class CoreUtil {
         return new GRIDAPoolClient(
                 Server.getInstance().getGRIDAHost(),
                 Server.getInstance().getGRIDAPort(),
-                Server.getInstance().getServerProxy());
+                Server.getInstance().getServerProxy(CoreConstants.VO_BIOMED));
     }
 
     /**
@@ -104,7 +105,7 @@ public class CoreUtil {
         return new GRIDACacheClient(
                 Server.getInstance().getGRIDAHost(),
                 Server.getInstance().getGRIDAPort(),
-                Server.getInstance().getServerProxy());
+                Server.getInstance().getServerProxy(CoreConstants.VO_BIOMED));
     }
 
     /**
@@ -116,6 +117,6 @@ public class CoreUtil {
         return new GRIDAZombieClient(
                 Server.getInstance().getGRIDAHost(),
                 Server.getInstance().getGRIDAPort(),
-                Server.getInstance().getServerProxy());
+                Server.getInstance().getServerProxy(CoreConstants.VO_BIOMED));
     }
 }

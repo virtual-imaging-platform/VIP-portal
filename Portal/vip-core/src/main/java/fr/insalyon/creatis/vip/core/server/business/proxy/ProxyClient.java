@@ -38,11 +38,13 @@
  */
 package fr.insalyon.creatis.vip.core.server.business.proxy;
 
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.ProtocolException;
+import java.nio.channels.FileChannel;
 import java.security.*;
 import java.security.cert.*;
 import java.util.*;
@@ -96,8 +98,8 @@ public class ProxyClient {
     public Proxy getProxy() throws BusinessException {
 
         try {
-            String proxyFileName = Server.getInstance().getServerProxy();
 
+            String proxyFileName = Server.getInstance().getServerProxy();
             if (new File(proxyFileName).exists()) {
 
                 FileInputStream is = new FileInputStream(proxyFileName);
@@ -135,7 +137,11 @@ public class ProxyClient {
             getCredentials();
             Date endDate = saveCredentials(proxyFileName);
             disconnect();
-            addVomsExtension();
+            //copy the proxy file and add extenstion
+            copyFile(Server.getInstance().getServerProxy(), Server.getInstance().getServerProxyFolder(CoreConstants.VO_BIOMED));
+            copyFile(Server.getInstance().getServerProxy(), Server.getInstance().getServerProxyFolder(CoreConstants.VO_NEUGRID));
+            addVomsExtension(CoreConstants.VO_BIOMED);
+            addVomsExtension(CoreConstants.VO_NEUGRID);
 
             return new Proxy(proxyFileName, endDate);
 
@@ -151,16 +157,16 @@ public class ProxyClient {
         }
     }
 
-    private void addVomsExtension() throws Exception {
-        
-        logger.info("Adding VOMS Extension to server proxy.");
+    private void addVomsExtension(String vo) throws Exception {
+
+        logger.info("Adding" + vo + "Extension to server proxy.");
         // Voms Extension
         Server serverConf = Server.getInstance();
         long hours = Long.parseLong(serverConf.getMyProxyLifeTime()) / 3600;
-        String command = "voms-proxy-init --voms biomed"
+        String command = "voms-proxy-init -voms " + vo
                 + " -cert " + serverConf.getServerProxy()
                 + " -key " + serverConf.getServerProxy()
-                + " -out " + serverConf.getServerProxy()
+                + " -out " + serverConf.getServerProxy(vo)
                 + " -noregen -valid " + hours + ":00";
         Process process = Runtime.getRuntime().exec(command);
 
@@ -186,7 +192,7 @@ public class ProxyClient {
     private void connect() throws Exception {
 
         SSLContext sc = SSLContext.getInstance("SSL");
-        sc.init(new KeyManager[]{}, new TrustManager[]{new MyTrustManager()}, new SecureRandom());
+        sc.init(new KeyManager[]{}, new TrustManager[]{new ProxyClient.MyTrustManager()}, new SecureRandom());
         SSLSocketFactory sf = sc.getSocketFactory();
 
         this.socket = (SSLSocket) sf.createSocket(
@@ -523,6 +529,7 @@ public class ProxyClient {
 
     /**
      * Gets the existing trusted CA certificates directory.
+     *
      * @return directory path string or null if none found
      */
     public String getExistingTrustRootPath() {
@@ -557,5 +564,34 @@ public class ProxyClient {
             return f.getAbsolutePath();
         }
         return null;
+    }
+
+    public void copyFile(String source, String dest) {
+        FileChannel in = null;
+        FileChannel out = null;
+
+        try {
+            // Init
+            in = new FileInputStream(source).getChannel();
+            out = new FileOutputStream(dest).getChannel();
+            in.transferTo(0, in.size(), out);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                }
+            }
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+
     }
 }
