@@ -173,7 +173,7 @@ public class LayoutConverterOption1 extends AbstractFormLayout {
                             tabImporter.addFields(FieldTitles.ApplicationVersion, false, "", "[0-9.,A-Za-z-+_() ]", false, true);
                             tabImporter.addFielDescription("Documentation and Terms of Use", "");
                             tabImporter.addInputField(true, "results-directory ", "Directory where the results will be stored", InputTypes.Parameter, true);
-                            tabImporter.addInputField(true, "job name", "A string identifying the job name", InputTypes.Parameter, false);
+                            tabImporter.addInputField(true, "job name", "A string identifying the job name", InputTypes.Parameter, true);
                             for (int i = 1; i < (int) result[0]; i++) {
                                 if (i <= result[1]) {
                                     tabImporter.addInputField(false, "", "", InputTypes.File, false);
@@ -182,7 +182,7 @@ public class LayoutConverterOption1 extends AbstractFormLayout {
                                 }
                             }
 
-                            tabImporter.addOutputField(true, "result", "A tar.gz file containing the results", InputTypes.File, true);
+                            tabImporter.addOutputField(true, "Output", "A tar.gz file containing the results", InputTypes.File, true);
                             tabImporter.addFields(FieldTitles.MainExecutable, true, script.getValueAsString(), "[0-9.,A-Za-z-+/_() ]", false, true);
                             tabImporter.addFields(FieldTitles.ApplicationLocation, true, "", "[0-9.,A-Za-z-+/_() ]", false, true);
                             tabImporter.addFields(FieldTitles.ExtensionFile, true, ext.getValueAsString(), "[0-9.,A-Za-z-+/_() ]", false, false);

@@ -6,6 +6,7 @@ package fr.insalyon.creatis.vip.n4u.server.velocity;
 
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -16,13 +17,23 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.codehaus.plexus.archiver.ArchiveEntry;
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.tar.TarArchiver;
+import org.codehaus.plexus.archiver.tar.TarEntry;
+import org.h2.util.IOUtils;
 import org.jsoup.Jsoup;
 
 /**
@@ -54,11 +65,15 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public void wrapperScriptFile(Map<Integer, Map> listInput, List<Map> listOutput, String applicationName, String scriptFile, String applicationLocation, String environementFile, String dir, String date) throws VelocityException {
+    public void wrapperScriptFile(Map<Integer, Map> listInput, List<Map> listOutput, String applicationName, String scriptFile, String applicationLocation, String environementFile, String dir, String date, String mandatoryDir) throws VelocityException {
 
         applicationLocation = applicationLocation + "/" + date;
+
+        //the Script file
         int lastIndex = scriptFile.lastIndexOf("/");
-        //String script = scriptFile.substring(lastIndex + 1);
+
+        String scriptName = scriptFile.substring(lastIndex + 1);
+
         String env = "";
         if (!environementFile.isEmpty()) {
             env = environementFile.substring(environementFile.lastIndexOf("/") + 1);
@@ -69,8 +84,12 @@ public class Velocity implements VelocityProcess {
         VelocityContext context = new VelocityContext();
         context.put("inputList", listInput);
         context.put("number", listInput.size() + listOutput.size());
-        context.put("scriptFile", scriptFile);
+        context.put("scriptFile", scriptName);
         context.put("outputList", listOutput);
+        if (mandatoryDir != null) {
+            String directName = mandatoryDir.substring((mandatoryDir.lastIndexOf("/")) + 1);
+            context.put("directName", directName);
+        }
         if (!env.isEmpty()) {
             context.put("env", env);
         }
@@ -83,6 +102,11 @@ public class Velocity implements VelocityProcess {
             CoreUtil.getGRIDAClient().createFolder(applicationLocation, "bin");
             copyFile(chemin, dir + "/" + applicationName + ".bak" + "_wrapper.sh");
             CoreUtil.getGRIDAClient().uploadFile(chemin, applicationLocation + "/" + "bin");
+
+            //script File
+            CoreUtil.getGRIDAClient().getRemoteFile(scriptFile, dir);
+            files.add(new File(dir + "/" + scriptName));
+
             //SECOND copy of the wrapper file to create archive
             copyFile(dir + "/" + applicationName + ".bak" + "_wrapper.sh", chemin);
             files.add(new File(dir + "/" + applicationName + "_wrapper.sh"));
@@ -118,7 +142,7 @@ public class Velocity implements VelocityProcess {
         if (!sandboxFile.isEmpty()) {
             try {
                 CoreUtil.getGRIDAClient().getRemoteFile(sandboxFile, dir);
-                files.add(new File(dir + sandboxFile.substring(sandboxFile.lastIndexOf("/")+1)));
+                files.add(new File(dir + sandboxFile.substring(sandboxFile.lastIndexOf("/"))));
             } catch (GRIDAClientException ex) {
                 logger.error(ex);
                 throw new VelocityException(ex);
@@ -128,7 +152,7 @@ public class Velocity implements VelocityProcess {
             try {
                 CoreUtil.getGRIDAClient().getRemoteFile(environementFile, dir);
                 // CoreUtil.getGRIDAClient().rename(environementFile, applicationLocation + "/bin/" + environementFile.substring(environementFile.lastIndexOf("/") + 1));
-                files.add(new File(dir + environementFile.substring(environementFile.lastIndexOf("/") + 1)));
+                files.add(new File(dir + environementFile.substring(environementFile.lastIndexOf("/"))));
             } catch (GRIDAClientException ex) {
                 logger.error(ex);
                 throw new VelocityException(ex);
@@ -173,7 +197,7 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public String gwendiaFile(Map<Integer, Map> listInput, List<Map> listOutput, String applicationName, String description, String applicationLocation, String dir, String date) throws VelocityException {
+    public String gwendiaFile(Map<Integer, Map> listInput, List<Map> listOutput, String applicationName, String description, String applicationLocation, String dir, String date, String mandatoryDir) throws VelocityException {
         Template t = ve.getTemplate("vm/gwendia.vm");
         applicationLocation = applicationLocation + "/" + date;
         final String gaswDescriptor = applicationLocation.replace("/grid/biomed/creatis/vip", "/grid/vo.neugrid.eu/home/vip") + "/gasw" + "/" + applicationName + ".xml";
@@ -199,12 +223,34 @@ public class Velocity implements VelocityProcess {
             copyFile(chemin, dir + "/" + applicationName + ".bak" + ".gwendia");
             CoreUtil.getGRIDAClient().uploadFile(chemin, applicationLocation + "/" + "workflows");
 
-          
-            createArchive(files, dir, applicationName + "_wrapper.sh.tar.gz");
+            if (mandatoryDir != null) {
+                int index = mandatoryDir.indexOf(":");
+                String folderName = mandatoryDir.substring((mandatoryDir.lastIndexOf("/")) + 1);
+                String dirr = mandatoryDir.substring(index + 1);
+                if(folderName.contains(".")){
+                    logger.error(dirr);
+                    logger.error(dir);
+                CoreUtil.getGRIDAN4uClient().getRemoteFile(dirr, dir );
+                
+                }else{
+                  CoreUtil.getGRIDAN4uClient().getRemoteFolder(dirr, dir + "/" + folderName);
+                  ArchiveTools.unzip(new File(dir + "/" + folderName + ".zip"), new File(dir));
+                }
+               
+                files.add(new File(dir + "/" + folderName));
+                logger.error(dir + "/" + folderName);
+            }
+            ArchiveTools.compress(files, dir + "/" + applicationName + "_wrapper.sh.tar.gz");
+
+            //createArchive(files, dir, applicationName + "_wrapper.sh.tar.gz");
+            logger.error("archive was created");
             CoreUtil.getGRIDAClient().uploadFile(dir + "/" + applicationName + "_wrapper.sh.tar.gz", applicationLocation + "/" + "bin");
 
         } catch (GRIDAClientException ex) {
             logger.error(ex);
+            throw new VelocityException(ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Velocity.class.getName()).log(Level.SEVERE, null, ex);
             throw new VelocityException(ex);
         }
 
@@ -276,29 +322,4 @@ public class Velocity implements VelocityProcess {
         return Jsoup.parse(html).text();
     }
 
-    private File createArchive(final List<File> listFiles, String targetDirectory, String outputFileName) throws VelocityException {
-
-        File targetFileDirectory = new File(targetDirectory);
-        if (!targetFileDirectory.exists() && !targetFileDirectory.mkdir()) {
-            throw new VelocityException("Could not create: " + targetFileDirectory.getAbsolutePath());
-        }
-        final File destFile = new File(targetDirectory, outputFileName);
-        if (destFile.exists() && !destFile.delete()) {
-            throw new VelocityException("Could not delete: " + destFile.getAbsolutePath());
-        }
-        Archiver archiver = new TarArchiver();
-        archiver.setDestFile(destFile);
-        try {
-            for (File dir : listFiles) {
-                archiver.addFile(dir, dir.getName());
-            }
-
-            archiver.createArchive();
-        } catch (ArchiverException e) {
-            throw new VelocityException("Error building archive." + e);
-        } catch (IOException e) {
-            throw new VelocityException("Error building archive." + e);
-        }
-        return destFile;
-    }
 }

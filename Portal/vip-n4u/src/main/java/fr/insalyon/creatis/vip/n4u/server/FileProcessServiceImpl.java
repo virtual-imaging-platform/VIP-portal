@@ -43,7 +43,8 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(FileProcessServiceImpl.class);
     //get the value from first appel to generateScriptFile
     private String generateTime = null;
-    Velocity ve=new Velocity();
+    Velocity ve;
+    String mandatoryDir;
 
     /**
      *
@@ -84,8 +85,12 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             nb = strok.countTokens();
             result[0] = nb;
             Scanner scanner2 = new Scanner(new FileInputStream(localExpressFilePath));
+            mandatoryDir = null;
             while (scanner2.hasNext()) {
                 String readLigne = scanner2.nextLine();
+                if (readLigne.contains("commonDir")) {
+                    mandatoryDir = readLigne;
+                }
                 if (readLigne.contains("ExplicitFiles")) {
                     int fileNumber = Integer.parseInt(readLigne.substring(14));
                     result[1] = fileNumber;
@@ -109,6 +114,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
     public List<String[]> parseXmlFile(String xmlFile) throws N4uException {
 
         List<String[]> listInputs = new ArrayList<String[]>();
+
         String localXmlFilePath = null;
         try {
             localXmlFilePath = CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(getSessionUser(), xmlFile), Server.getInstance().getN4uApplicationFilesRepository());
@@ -123,7 +129,6 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             throw new N4uException(ex);
         }
 
-
         try {
 
             File fXmlFile = new File(localXmlFilePath);
@@ -137,21 +142,66 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             nameDesc[2] = doc.getElementsByTagName("description").item(0).getTextContent();
 
             listInputs.add(nameDesc);
-            NodeList nList = doc.getElementsByTagName("entry");
+            //commonDir 
+            NodeList mandatoryCommonDirs = doc.getElementsByTagName("mandatoryCommonDirs");
+            mandatoryDir = null;
+            if (mandatoryCommonDirs.getLength() != 0) {
+                NodeList commonDirs = mandatoryCommonDirs.item(0).getChildNodes();
 
-            for (int temp = 0; temp < nList.getLength(); temp++) {
+                for (int j = 0; j < commonDirs.getLength(); j++) {
+                    Node nNode = commonDirs.item(j);
 
-                Node nNode = nList.item(temp);
+                    if (nNode.getNodeType() == Node.ELEMENT_NODE & nNode.getNodeName().equals("mandatoryCommonDir")) {
+                        Element eElement = (Element) nNode;
+                        String value = eElement.getAttribute("value");
+                        mandatoryDir = value;
 
+                    }
+                }
+            }
 
-                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+            NodeList nList2 = null;
+            NodeList e = doc.getElementsByTagName("inputs");
+            NodeList nList = e.item(0).getChildNodes();
+            for (int tempp = 0; tempp < nList.getLength(); tempp++) {
+
+                Node nNode = nList.item(tempp);
+                if (nNode.getNodeName().equals("entries")) {
+                    nList2 = nNode.getChildNodes();
+                }
+            }
+            //  doc2.getDocumentElement().normalize();
+            // = doc2.getElementsByTagName("entry");
+
+            for (int temp = 0; temp < nList2.getLength(); temp++) {
+
+                Node nNode = nList2.item(temp);
+
+                if (nNode.getNodeType() == Node.ELEMENT_NODE & nNode.getNodeName().equals("entry")) {
                     String[] value = new String[4];
-
                     Element eElement = (Element) nNode;
                     value[0] = eElement.getAttribute("name");//NAME
                     value[1] = parseTypeSupported(eElement.getAttribute("type"));//test if the type is supported
+                    if (eElement.getAttribute("type").equals("combo")||eElement.getAttribute("type").equals("checkbox")||eElement.getAttribute("type").equals("radio")||eElement.getAttribute("type").equals("twincol")) {
+                        String vals = "";
+                        //add value of combo to description 
+                        //default value
+                        String defaulVal = eElement.getAttribute("default");
+                        //values of type combo                  
+                        NodeList el = eElement.getChildNodes();
+                        for (int i = 0; i < el.getLength(); i++) {
+                            Node eNode = el.item(i);
+                            if (eNode.getNodeName().equals("value")) {
+                                Element eElementNode = (Element) eNode;
+                                vals = vals + " " + eElementNode.getAttribute("val");
+                            }
+                        }
+                        value[3] = eElement.getElementsByTagName("description").item(0).getTextContent() + "  " + "Default value is: " + defaulVal + "  " + "Values:" + vals;
+                    } else {
+
+                        value[3] = eElement.getElementsByTagName("description").item(0).getTextContent();
+                    }
                     value[2] = eElement.getAttribute("required");//required
-                    value[3] = eElement.getElementsByTagName("description").item(0).getTextContent();
                     listInputs.add(value);
                 }
             }
@@ -183,7 +233,8 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public void generateScriptFile(Map<Integer, Map> listInput,ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String environementFile, String description) throws N4uException {
+    public void generateScriptFile(Map<Integer, Map> listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String environementFile, String description) throws N4uException {
+        ve = new Velocity();
         String applicationRealLocation;
         try {
 
@@ -194,10 +245,9 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             theDir.mkdirs();
             String dir = theDir.getAbsolutePath();
             if (!scriptFile.isEmpty()) {
-                scriptFile= DataManagerUtil.parseBaseDir(getSessionUser(),scriptFile );
-
+                scriptFile = DataManagerUtil.parseBaseDir(getSessionUser(), scriptFile);
             }
-            ve.wrapperScriptFile(listInput, listOutput, applicationName, scriptFile, applicationRealLocation, environementFile, dir, generateTime);
+            ve.wrapperScriptFile(listInput, listOutput, applicationName, scriptFile, applicationRealLocation, environementFile, dir, generateTime, mandatoryDir);
         } catch (CoreException ex) {
             logger.error(ex);
             throw new N4uException(ex);
@@ -224,7 +274,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public String generateGwendiaFile(Map<Integer, Map> listInput, List<Map>  listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException {
+    public String generateGwendiaFile(Map<Integer, Map> listInput, List<Map> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException {
         String applicationRealLocation;
         try {
             applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
@@ -232,7 +282,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + generateTime);
             theDir.mkdirs();
             String dir = theDir.getAbsolutePath();
-            return ve.gwendiaFile(listInput, listOutput, applicationName, description, applicationRealLocation, dir, generateTime);
+            return ve.gwendiaFile(listInput, listOutput, applicationName, description, applicationRealLocation, dir, generateTime, mandatoryDir);
         } catch (CoreException ex) {
             logger.error(ex);
             throw new N4uException(ex);
@@ -243,7 +293,6 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             logger.error(ex);
             throw new N4uException(ex);
         }
-
 
     }
 
@@ -260,7 +309,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public void generateGaswFile(Map<Integer, Map> listInput,List<Map> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String sandboxFile, String environementFile,String extensionFile) throws N4uException {
+    public void generateGaswFile(Map<Integer, Map> listInput, List<Map> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String sandboxFile, String environementFile, String extensionFile) throws N4uException {
         String applicationRealLocation = null;
         try {
             applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
@@ -269,39 +318,37 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + generateTime);
             theDir.mkdirs();
 
-
             // if the directory does not exist, create it
             String dir = theDir.getAbsolutePath();
-            String executableSandbox ="";
+            String executableSandbox = "";
             String envF = "";
             String sandboxF = "";
             String extensionFValue = null;
-             String extensionF = "";
-             if (!extensionFile.isEmpty()) {
+            String extensionF = "";
+            if (!extensionFile.isEmpty()) {
                 try {
-                    extensionF= CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(getSessionUser(), extensionFile), Server.getInstance().getN4uApplicationFilesRepository());
+                    extensionF = CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(getSessionUser(), extensionFile), Server.getInstance().getN4uApplicationFilesRepository());
                 } catch (GRIDAClientException ex) {
                     logger.error(ex);
                     throw new N4uException(ex);
                 }
-                 Scanner scanner;
+                Scanner scanner;
                 try {
                     scanner = new Scanner(new FileInputStream(extensionF));
                 } catch (FileNotFoundException ex) {
-                  logger.error(ex);
-                  throw new N4uException(ex);
+                    logger.error(ex);
+                    throw new N4uException(ex);
                 }
-                String ligne ;
-              do{       
-                ligne = scanner.nextLine();
-              }while(ligne.contains("requirement="));
-              extensionFValue=ligne.substring(14);
-              extensionFValue=extensionFValue.substring(0, extensionFValue.length()-1);
+                String ligne;
+                do {
+                    ligne = scanner.nextLine();
+                } while (ligne.contains("requirement="));
+                extensionFValue = ligne.substring(14);
+                extensionFValue = extensionFValue.substring(0, extensionFValue.length() - 1);
             }
 
-             
-             if (!scriptFile.isEmpty()) {
-                executableSandbox = DataManagerUtil.parseBaseDir(getSessionUser(),scriptFile );
+            if (!scriptFile.isEmpty()) {
+                executableSandbox = DataManagerUtil.parseBaseDir(getSessionUser(), scriptFile);
 
             }
             if (!environementFile.isEmpty()) {
@@ -311,7 +358,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             if (!sandboxFile.isEmpty()) {
                 sandboxF = DataManagerUtil.parseBaseDir(getSessionUser(), sandboxFile);
             }
-           ve.gassFile(listInput, listOutput, applicationName, wrapperScriptPath, applicationRealLocation, dir, generateTime, sandboxF, envF,extensionFValue,executableSandbox);
+            ve.gassFile(listInput, listOutput, applicationName, wrapperScriptPath, applicationRealLocation, dir, generateTime, sandboxF, envF, extensionFValue, executableSandbox);
         } catch (CoreException e) {
             logger.error(e);
             throw new N4uException(e);
@@ -351,8 +398,13 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
         String param2 = "integer";
         String param3 = "float";
         String param4 = "double";
+        String param5 = "combo";
         String file = "file";
-        if (val.equals(param1) || val.equals(param2) || val.equals(param3) || val.equals(param4)) {
+        String param6="checkbox";
+        String param7="radio";
+        String param8="twincol";
+        
+        if (val.equals(param1) || val.equals(param2) || val.equals(param3) || val.equals(param4) || val.equals(param5)||val.equals(param6)||val.equals(param7)||val.equals(param8)) {
             return InputTypes.Parameter.toString();
         } else if (val.equals(file)) {
             return InputTypes.File.toString();
