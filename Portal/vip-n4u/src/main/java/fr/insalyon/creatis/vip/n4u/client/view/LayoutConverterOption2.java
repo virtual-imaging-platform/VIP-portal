@@ -107,17 +107,17 @@ public class LayoutConverterOption2 extends AbstractFormLayout {
                                     tabImporter.addFields(FieldTitles.ApplicationVersion, false, result.get(i)[1], "[0-9.,A-Za-z-+_() ]", false, true);
                                     tabImporter.addFielDescription("Documentation and Terms of Use", result.get(i)[2]);
                                     tabImporter.addInputField(true, "results-directory ", "Directory where the results will be stored", InputTypes.Parameter, true);
-                                    tabImporter.addInputField(true, "job name", "A string identifying the job name", InputTypes.Parameter, false);
+                                    tabImporter.addInputField(true, "job name", "A string identifying the job name", InputTypes.Parameter, true);
 
                                 } else {
                                     // name,type;required
                                     //s[0],s[1],s[2]
-                                    tabImporter.addInputField(Boolean.valueOf(result.get(i)[2]), result.get(i)[0], result.get(i)[3], InputTypes.valueOf(result.get(i)[1]), true);
+                                    tabImporter.addInputField(Boolean.valueOf(result.get(i)[2]), result.get(i)[0], result.get(i)[3], InputTypes.valueOf(result.get(i)[1]),false);
                                 }
 
                             }
 
-                            tabImporter.addOutputField(true, "result", "A tar.gz file containing the results", InputTypes.File, true);
+                            tabImporter.addOutputField(true, "Output", "A tar.gz file containing the results", InputTypes.File, true);
                             tabImporter.addFields(FieldTitles.MainExecutable, true, "", "[0-9.,A-Za-z-+/_(): ]", false, true);
                             tabImporter.addFields(FieldTitles.ApplicationLocation, true, "", "[0-9.,A-Za-z-+/_(): ]", false, true);
                             tabImporter.addFields(FieldTitles.ExtensionFile, true,"", "[0-9.,A-Za-z-+/_() ]", false, false);

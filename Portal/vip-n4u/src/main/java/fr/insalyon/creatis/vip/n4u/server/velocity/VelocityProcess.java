@@ -13,9 +13,9 @@ import java.util.Map;
  */
 public interface VelocityProcess {
 
-    public void gassFile(Map<Integer,Map> listInput,List<Map> listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir, String date, String sandbox, String environementFile,String  extensionFileValue) throws VelocityException;
+    public void gassFile(Map<Integer, Map> listInput, List<Map> listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir, String date, String sandbox, String environementFile, String extensionFileValue, String executableSandbox) throws VelocityException;
 
-    public void wrapperScriptFile(Map<Integer,Map> listInput,List<Map> listOutput, String applicationName, String scriptFile, String applicationLocation, String environementFile, String dir, String date) throws VelocityException;
+    public void wrapperScriptFile(Map<Integer, Map> listInput, List<Map> listOutput, String applicationName, String scriptFile, String applicationLocation, String environementFile, String dir, String date, String mandatoryDir) throws VelocityException;
 
-    public String gwendiaFile(Map<Integer,Map> listInput, List<Map> listOutput, String applicationName, String description, String applicationLocation, String dir, String date) throws VelocityException;
+    public String gwendiaFile(Map<Integer, Map> listInput, List<Map> listOutput, String applicationName, String description, String applicationLocation, String dir, String date, String mandatoryDir) throws VelocityException;
 }
