@@ -12,7 +12,8 @@ import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.n4u.client.rpc.FileProcessService;
-import fr.insalyon.creatis.vip.n4u.client.view.InputTypes;
+import fr.insalyon.creatis.vip.n4u.client.EnumInputTypes;
+import fr.insalyon.creatis.vip.n4u.client.EnumTypes;
 import fr.insalyon.creatis.vip.n4u.server.velocity.Velocity;
 import fr.insalyon.creatis.vip.n4u.server.velocity.VelocityException;
 import java.io.File;
@@ -160,49 +161,56 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
                 }
             }
 
-            NodeList nList2 = null;
+            List<NodeList> l = new ArrayList<NodeList>();
             NodeList e = doc.getElementsByTagName("inputs");
+            //All nodes in the inputs
             NodeList nList = e.item(0).getChildNodes();
+
             for (int tempp = 0; tempp < nList.getLength(); tempp++) {
 
                 Node nNode = nList.item(tempp);
+
                 if (nNode.getNodeName().equals("entries")) {
-                    nList2 = nNode.getChildNodes();
+
+                    NodeList nList2 = nNode.getChildNodes();
+
+                    l.add(nList2);
                 }
+
             }
-            //  doc2.getDocumentElement().normalize();
-            // = doc2.getElementsByTagName("entry");
 
-            for (int temp = 0; temp < nList2.getLength(); temp++) {
+            for (NodeList entriesList : l) {
+                for (int temp = 0; temp < entriesList.getLength(); temp++) {
 
-                Node nNode = nList2.item(temp);
+                    Node nNode = entriesList.item(temp);
 
-                if (nNode.getNodeType() == Node.ELEMENT_NODE & nNode.getNodeName().equals("entry")) {
-                    String[] value = new String[4];
-                    Element eElement = (Element) nNode;
-                    value[0] = eElement.getAttribute("name");//NAME
-                    value[1] = parseTypeSupported(eElement.getAttribute("type"));//test if the type is supported
-                    if (eElement.getAttribute("type").equals("combo")||eElement.getAttribute("type").equals("checkbox")||eElement.getAttribute("type").equals("radio")||eElement.getAttribute("type").equals("twincol")) {
-                        String vals = "";
-                        //add value of combo to description 
-                        //default value
-                        String defaulVal = eElement.getAttribute("default");
-                        //values of type combo                  
-                        NodeList el = eElement.getChildNodes();
-                        for (int i = 0; i < el.getLength(); i++) {
-                            Node eNode = el.item(i);
-                            if (eNode.getNodeName().equals("value")) {
-                                Element eElementNode = (Element) eNode;
-                                vals = vals + " " + eElementNode.getAttribute("val");
+                    if (nNode.getNodeType() == Node.ELEMENT_NODE & nNode.getNodeName().equals("entry")) {
+                        String[] value = new String[4];
+                        Element eElement = (Element) nNode;
+                        value[0] = eElement.getAttribute("name");//NAME
+                        value[1] = parseTypeSupported(eElement.getAttribute("type"));//test if the type is supported
+                        if (eElement.getAttribute("type").equalsIgnoreCase(EnumTypes.Combo.toString()) || eElement.getAttribute("type").equalsIgnoreCase(EnumTypes.CheckBox.toString()) || eElement.getAttribute("type").equalsIgnoreCase(EnumTypes.Radio.toString())) {
+                            String vals = "";
+                            //add value of combo to description 
+                            //default value
+                            String defaulVal = eElement.getAttribute("default");
+                            //values of type combo                  
+                            NodeList el = eElement.getChildNodes();
+                            for (int i = 0; i < el.getLength(); i++) {
+                                Node eNode = el.item(i);
+                                if (eNode.getNodeName().equals("value")) {
+                                    Element eElementNode = (Element) eNode;
+                                    vals = vals + " " + eElementNode.getAttribute("val");
+                                }
                             }
-                        }
-                        value[3] = eElement.getElementsByTagName("description").item(0).getTextContent() + "  " + "Default value is: " + defaulVal + "  " + "Values:" + vals;
-                    } else {
+                            value[3] = eElement.getElementsByTagName("description").item(0).getTextContent() + "  " + "Default value is: " + defaulVal + "  " + "Values:" + vals;
+                        } else {
 
-                        value[3] = eElement.getElementsByTagName("description").item(0).getTextContent();
+                            value[3] = eElement.getElementsByTagName("description").item(0).getTextContent();
+                        }
+                        value[2] = eElement.getAttribute("required");//required
+                        listInputs.add(value);
                     }
-                    value[2] = eElement.getAttribute("required");//required
-                    listInputs.add(value);
                 }
             }
 
@@ -342,7 +350,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
                 String ligne;
                 do {
                     ligne = scanner.nextLine();
-                } while (ligne.contains("requirement="));
+                } while (ligne.startsWith("requirement="));
                 extensionFValue = ligne.substring(14);
                 extensionFValue = extensionFValue.substring(0, extensionFValue.length() - 1);
             }
@@ -358,7 +366,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             if (!sandboxFile.isEmpty()) {
                 sandboxF = DataManagerUtil.parseBaseDir(getSessionUser(), sandboxFile);
             }
-            ve.gassFile(listInput, listOutput, applicationName, wrapperScriptPath, applicationRealLocation, dir, generateTime, sandboxF, envF, extensionFValue, executableSandbox);
+            ve.gaswFile(listInput, listOutput, applicationName, wrapperScriptPath, applicationRealLocation, dir, generateTime, sandboxF, envF, extensionFValue, executableSandbox);
         } catch (CoreException e) {
             logger.error(e);
             throw new N4uException(e);
@@ -394,22 +402,13 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     private String parseTypeSupported(String val) throws N4uException {
-        String param1 = "text";
-        String param2 = "integer";
-        String param3 = "float";
-        String param4 = "double";
-        String param5 = "combo";
-        String file = "file";
-        String param6="checkbox";
-        String param7="radio";
-        String param8="twincol";
-        
-        if (val.equals(param1) || val.equals(param2) || val.equals(param3) || val.equals(param4) || val.equals(param5)||val.equals(param6)||val.equals(param7)||val.equals(param8)) {
-            return InputTypes.Parameter.toString();
-        } else if (val.equals(file)) {
-            return InputTypes.File.toString();
+        if (val.equalsIgnoreCase(EnumTypes.Text.toString()) || val.equalsIgnoreCase(EnumTypes.Integer.toString()) || val.equalsIgnoreCase(EnumTypes.Float.toString())) {
+            return EnumInputTypes.Parameter.toString();
+        } else if (val.equalsIgnoreCase(EnumTypes.File.toString())) {
+            return EnumInputTypes.File.toString();
         } else {
             throw new N4uException("type " + val + " " + "not supported by the application ");
         }
     }
+
 }
