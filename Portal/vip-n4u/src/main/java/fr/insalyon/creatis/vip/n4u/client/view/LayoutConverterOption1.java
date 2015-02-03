@@ -4,6 +4,8 @@
  */
 package fr.insalyon.creatis.vip.n4u.client.view;
 
+import fr.insalyon.creatis.vip.n4u.client.EnumFieldTitles;
+import fr.insalyon.creatis.vip.n4u.client.EnumInputTypes;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
@@ -102,8 +104,8 @@ public class LayoutConverterOption1 extends AbstractFormLayout {
         browsePicker.setPrompt("Browse on the Grid");
 
 
-        title = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+_(): ]");
-        title.setValidators(ValidatorUtil.getStringValidator("[0-9.,A-Za-z-+_(): ]"));
+        title = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+_ ]");
+        title.setValidators(ValidatorUtil.getStringValidator("[0-9.,A-Za-z-+_ ]"));
         title.setRequired(Boolean.TRUE);
 
         express = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_(): ]");
@@ -169,25 +171,25 @@ public class LayoutConverterOption1 extends AbstractFormLayout {
 
                             tabImporter = new N4uImportTab();
                             Layout.getInstance().addTab(tabImporter);
-                            tabImporter.addFields(FieldTitles.ApplicationName, false, title.getValueAsString(), "[0-9.,A-Za-z-+_() ]", false, true);
-                            tabImporter.addFields(FieldTitles.ApplicationVersion, false, "", "[0-9.,A-Za-z-+_() ]", false, true);
+                            tabImporter.addFields(EnumFieldTitles.ApplicationName, false, title.getValueAsString(), "[0-9.,A-Za-z-+_ ]", false, true);
+                            tabImporter.addFields(EnumFieldTitles.ApplicationVersion, false, "", "[0-9.,A-Za-z-+_() ]", false, true);
                             tabImporter.addFielDescription("Documentation and Terms of Use", "");
-                            tabImporter.addInputField(true, "results-directory ", "Directory where the results will be stored", InputTypes.Parameter, true);
-                            tabImporter.addInputField(true, "job name", "A string identifying the job name", InputTypes.Parameter, true);
+                            tabImporter.addInputField(true, "results-directory ", "Directory where the results will be stored", EnumInputTypes.Parameter, true);
+                            tabImporter.addInputField(true, "job name", "A string identifying the job name", EnumInputTypes.Parameter, true);
                             for (int i = 1; i < (int) result[0]; i++) {
                                 if (i <= result[1]) {
-                                    tabImporter.addInputField(false, "", "", InputTypes.File, false);
+                                    tabImporter.addInputField(false, "", "", EnumInputTypes.File, false);
                                 } else {
-                                    tabImporter.addInputField(false, "", "", InputTypes.Parameter, false);
+                                    tabImporter.addInputField(false, "", "", EnumInputTypes.Parameter, false);
                                 }
                             }
 
-                            tabImporter.addOutputField(true, "Output", "A tar.gz file containing the results", InputTypes.File, true);
-                            tabImporter.addFields(FieldTitles.MainExecutable, true, script.getValueAsString(), "[0-9.,A-Za-z-+/_() ]", false, true);
-                            tabImporter.addFields(FieldTitles.ApplicationLocation, true, "", "[0-9.,A-Za-z-+/_() ]", false, true);
-                            tabImporter.addFields(FieldTitles.ExtensionFile, true, ext.getValueAsString(), "[0-9.,A-Za-z-+/_() ]", false, false);
-                            tabImporter.addFields(FieldTitles.EnvironementFile, true, env.getValueAsString(), "[0-9.,A-Za-z-+/_() ]", false, false);
-                            tabImporter.addFields(FieldTitles.SandboxFile, true, "", "[0-9.,A-Za-z-+/_() ]", false, false);
+                            tabImporter.addOutputField(true, "Output", "A tar.gz file containing the results", EnumInputTypes.File, true);
+                            tabImporter.addFields(EnumFieldTitles.MainExecutable, true, script.getValueAsString(), "[0-9.,A-Za-z-+/_() ]", false, true);
+                            tabImporter.addFields(EnumFieldTitles.ApplicationLocation, true, "", "[0-9.,A-Za-z-+/_() ]", false, true);
+                            tabImporter.addFields(EnumFieldTitles.ExtensionFile, true, ext.getValueAsString(), "[0-9.,A-Za-z-+/_() ]", false, false);
+                            tabImporter.addFields(EnumFieldTitles.EnvironementFile, true, env.getValueAsString(), "[0-9.,A-Za-z-+/_() ]", false, false);
+                            tabImporter.addFields(EnumFieldTitles.SandboxFile, true, "", "[0-9.,A-Za-z-+/_() ]", false, false);
                             tabImporter.addLaunchButton();
 
                         }

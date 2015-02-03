@@ -4,6 +4,8 @@
  */
 package fr.insalyon.creatis.vip.n4u.client.view;
 
+import fr.insalyon.creatis.vip.n4u.client.EnumFieldTitles;
+import fr.insalyon.creatis.vip.n4u.client.EnumInputTypes;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
@@ -103,26 +105,26 @@ public class LayoutConverterOption2 extends AbstractFormLayout {
 
                             for (int i = 0; i < result.size(); i++) {
                                 if (i == 0) {
-                                    tabImporter.addFields(FieldTitles.ApplicationName, false, result.get(i)[0], "[0-9.,A-Za-z-+_(): ]", false, true);
-                                    tabImporter.addFields(FieldTitles.ApplicationVersion, false, result.get(i)[1], "[0-9.,A-Za-z-+_() ]", false, true);
+                                    tabImporter.addFields(EnumFieldTitles.ApplicationName, false, result.get(i)[0], "[0-9.,A-Za-z-+_ ]", false, true);
+                                    tabImporter.addFields(EnumFieldTitles.ApplicationVersion, false, result.get(i)[1], "[0-9.,A-Za-z-+_() ]", false, true);
                                     tabImporter.addFielDescription("Documentation and Terms of Use", result.get(i)[2]);
-                                    tabImporter.addInputField(true, "results-directory ", "Directory where the results will be stored", InputTypes.Parameter, true);
-                                    tabImporter.addInputField(true, "job name", "A string identifying the job name", InputTypes.Parameter, true);
+                                    tabImporter.addInputField(true, "results-directory ", "Directory where the results will be stored", EnumInputTypes.Parameter, true);
+                                    tabImporter.addInputField(true, "job name", "A string identifying the job name", EnumInputTypes.Parameter, true);
 
                                 } else {
                                     // name,type;required
                                     //s[0],s[1],s[2]
-                                    tabImporter.addInputField(Boolean.valueOf(result.get(i)[2]), result.get(i)[0], result.get(i)[3], InputTypes.valueOf(result.get(i)[1]),false);
+                                    tabImporter.addInputField(Boolean.valueOf(result.get(i)[2]), result.get(i)[0], result.get(i)[3], EnumInputTypes.valueOf(result.get(i)[1]),false);
                                 }
 
                             }
 
-                            tabImporter.addOutputField(true, "Output", "A tar.gz file containing the results", InputTypes.File, true);
-                            tabImporter.addFields(FieldTitles.MainExecutable, true, "", "[0-9.,A-Za-z-+/_(): ]", false, true);
-                            tabImporter.addFields(FieldTitles.ApplicationLocation, true, "", "[0-9.,A-Za-z-+/_(): ]", false, true);
-                            tabImporter.addFields(FieldTitles.ExtensionFile, true,"", "[0-9.,A-Za-z-+/_() ]", false, false);
-                            tabImporter.addFields(FieldTitles.EnvironementFile, true, "", "[0-9.,A-Za-z-+/_(): ]", false, false);
-                            tabImporter.addFields(FieldTitles.SandboxFile, true, "", "[0-9.,A-Za-z-+/_(): ]", false, false);
+                            tabImporter.addOutputField(true, "Output", "A tar.gz file containing the results", EnumInputTypes.File, true);
+                            tabImporter.addFields(EnumFieldTitles.MainExecutable, true, "", "[0-9.,A-Za-z-+/_(): ]", false, true);
+                            tabImporter.addFields(EnumFieldTitles.ApplicationLocation, true, "", "[0-9.,A-Za-z-+/_(): ]", false, true);
+                            tabImporter.addFields(EnumFieldTitles.ExtensionFile, true,"", "[0-9.,A-Za-z-+/_() ]", false, false);
+                            tabImporter.addFields(EnumFieldTitles.EnvironementFile, true, "", "[0-9.,A-Za-z-+/_(): ]", false, false);
+                            tabImporter.addFields(EnumFieldTitles.SandboxFile, true, "", "[0-9.,A-Za-z-+/_(): ]", false, false);
                             tabImporter.addLaunchButton();
 
                         }
