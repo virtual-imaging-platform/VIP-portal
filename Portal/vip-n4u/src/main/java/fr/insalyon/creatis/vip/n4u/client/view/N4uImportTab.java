@@ -4,6 +4,8 @@
  */
 package fr.insalyon.creatis.vip.n4u.client.view;
 
+import fr.insalyon.creatis.vip.n4u.client.EnumFieldTitles;
+import fr.insalyon.creatis.vip.n4u.client.EnumInputTypes;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.TextArea;
 import com.smartgwt.client.types.Overflow;
@@ -324,7 +326,7 @@ public class N4uImportTab extends Tab {
     }
 
 //inputs
-    public VLayout addInputField(boolean requiredInput, String value, String descriptionValue, InputTypes typeValue, boolean isFixedType) {
+    public VLayout addInputField(boolean requiredInput, String value, String descriptionValue, EnumInputTypes typeValue, boolean isFixedType) {
         item++;
         key++;
         final int nombre = key;
@@ -370,8 +372,8 @@ public class N4uImportTab extends Tab {
         selectItem.setWidth("100%");
         if (!isFixedType) {
             LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
-            valueMap.put(InputTypes.File.toString(), InputTypes.File.toString());
-            valueMap.put(InputTypes.Parameter.toString(), InputTypes.Parameter.toString());
+            valueMap.put(EnumInputTypes.File.toString(), EnumInputTypes.File.toString());
+            valueMap.put(EnumInputTypes.Parameter.toString(), EnumInputTypes.Parameter.toString());
             selectItem.setValueMap(valueMap);
         } else {
             selectItem.setValueMap(typeValue.toString());
@@ -379,7 +381,7 @@ public class N4uImportTab extends Tab {
 
         selectItem.setValue(typeValue);
 
-        if (typeValue.equals(InputTypes.File)) {
+        if (typeValue.equals(EnumInputTypes.File)) {
             map.put("type", "LFN");
         } else {
             map.put("type", typeValue);
@@ -388,7 +390,7 @@ public class N4uImportTab extends Tab {
             @Override
             public void onChanged(ChangedEvent event) {
                 String ds = (String) event.getValue();
-                if (ds.equals(InputTypes.File.toString())) {
+                if (ds.equals(EnumInputTypes.File.toString())) {
 
                     map.put("type", "LFN");
                 } else {
@@ -467,7 +469,7 @@ public class N4uImportTab extends Tab {
 
     }
 
-    public VLayout addOutputField(boolean fixedInput, String value, String descriptionValue, InputTypes typeValue, boolean fixedType) {
+    public VLayout addOutputField(boolean fixedInput, String value, String descriptionValue, EnumInputTypes typeValue, boolean fixedType) {
         outputItems++;
         HLayout hlayout = new HLayout();
         hlayout.setHeight(80);
@@ -510,15 +512,15 @@ public class N4uImportTab extends Tab {
         selectItem.setWidth("100%");
         if (!fixedType) {
             LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
-            valueMap.put(InputTypes.File.toString(), InputTypes.File.toString());
-            valueMap.put(InputTypes.Parameter.toString(), InputTypes.Parameter.toString());
+            valueMap.put(EnumInputTypes.File.toString(), EnumInputTypes.File.toString());
+            valueMap.put(EnumInputTypes.Parameter.toString(), EnumInputTypes.Parameter.toString());
             selectItem.setValueMap(valueMap);
         } else {
             selectItem.setValueMap(typeValue.toString());
         }
 
         selectItem.setValue(typeValue);
-        if (typeValue.equals(InputTypes.File)) {
+        if (typeValue.equals(EnumInputTypes.File)) {
             map.put("type", "LFN");
         } else {
             map.put("type", typeValue.toString());
@@ -528,7 +530,7 @@ public class N4uImportTab extends Tab {
             @Override
             public void onChanged(ChangedEvent event) {
                 String ds = (String) event.getValue();
-                if (ds.equals(InputTypes.File.toString())) {
+                if (ds.equals(EnumInputTypes.File.toString())) {
 
                     map.put("type", "LFN");
                 } else {
@@ -586,7 +588,7 @@ public class N4uImportTab extends Tab {
     }
 
     //Name,script, extention,env
-    public void addFields(FieldTitles title, boolean addBrowseIcon, String value, String keyPressFilter, boolean disabled, boolean required) {
+    public void addFields(EnumFieldTitles title, boolean addBrowseIcon, String value, String keyPressFilter, boolean disabled, boolean required) {
 
         Label itemLabel = new Label("<strong>" + title + "</strong>");
         itemLabel.setHeight(20);
@@ -602,7 +604,7 @@ public class N4uImportTab extends Tab {
         titleItemForm.setNumCols(1);
         titleItemForm.setFields(fieldItem);
 
-        if (title.equals(FieldTitles.EnvironementFile)) {
+        if (title.equals(EnumFieldTitles.EnvironementFile)) {
             if (value != null) {
                 environementFile = value;
             }
@@ -615,7 +617,7 @@ public class N4uImportTab extends Tab {
 
         }
         
-        if (title.equals(FieldTitles.ExtensionFile)) {
+        if (title.equals(EnumFieldTitles.ExtensionFile)) {
             if (value != null) {
                 extensionFile = value;
             }
@@ -628,7 +630,7 @@ public class N4uImportTab extends Tab {
 
         }
 
-        if (title.equals(FieldTitles.MainExecutable)) {
+        if (title.equals(EnumFieldTitles.MainExecutable)) {
             scriptFileName = value;
             fieldItem.addEditorExitHandler(new EditorExitHandler() {
                 @Override
@@ -640,7 +642,7 @@ public class N4uImportTab extends Tab {
 
         }
 
-        if (title.equals(FieldTitles.SandboxFile)) {
+        if (title.equals(EnumFieldTitles.SandboxFile)) {
 
             fieldItem.addEditorExitHandler(new EditorExitHandler() {
                 @Override
@@ -651,7 +653,7 @@ public class N4uImportTab extends Tab {
 
         }
 
-        if (title.equals(FieldTitles.ApplicationLocation)) {
+        if (title.equals(EnumFieldTitles.ApplicationLocation)) {
 
             fieldItem.addEditorExitHandler(new EditorExitHandler() {
                 @Override
@@ -661,7 +663,7 @@ public class N4uImportTab extends Tab {
             });
 
         }
-        if (title.equals(FieldTitles.ApplicationName)) {
+        if (title.equals(EnumFieldTitles.ApplicationName)) {
 
             applicationName = value.replaceAll("/", "");
             fieldItem.setValue(applicationName);
@@ -673,7 +675,8 @@ public class N4uImportTab extends Tab {
             });
 
         }
-        if (title.equals(FieldTitles.ApplicationVersion)) {
+        
+        if (title.equals(EnumFieldTitles.ApplicationVersion)) {
             fieldItem.setValue(value);
             version = value;
             fieldItem.addEditorExitHandler(new EditorExitHandler() {
@@ -685,7 +688,7 @@ public class N4uImportTab extends Tab {
 
         }
         //add Member
-        if (title.equals(FieldTitles.ApplicationName) || title.equals(FieldTitles.ApplicationVersion)) {
+        if (title.equals(EnumFieldTitles.ApplicationName) || title.equals(EnumFieldTitles.ApplicationVersion)) {
             layoutGeneralInformation.addMember(itemLabel);
             layoutGeneralInformation.addMember(titleItemForm);
         } else {
