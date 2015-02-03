@@ -128,8 +128,8 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public void gassFile(Map<Integer, Map> listInput, List<Map> listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir, String date, String sandboxFile, String environementFile, String extensionFileValue, String executableSandbox) throws VelocityException {
-        Template t = ve.getTemplate("vm/gass.vm");
+    public void gaswFile(Map<Integer, Map> listInput, List<Map> listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir, String date, String sandboxFile, String environementFile, String extensionFileValue, String executableSandbox) throws VelocityException {
+        Template t = ve.getTemplate("vm/gasw.vm");
         VelocityContext context = new VelocityContext();
         applicationLocation = applicationLocation + "/" + date;
         context.put("inputList", listInput);
@@ -137,7 +137,7 @@ public class Velocity implements VelocityProcess {
         context.put("applicationName", applicationName);
         context.put("applicationLocation", applicationLocation);
         context.put("extensionFileValue", StringEscapeUtils.escapeXml(extensionFileValue));
-        context.put("gassValue", applicationLocation + "/bin/" + applicationName + "_wrapper.sh");
+        context.put("gaswValue", applicationLocation + "/bin/" + applicationName + "_wrapper.sh");
         context.put("exSandbox", executableSandbox);
         if (!sandboxFile.isEmpty()) {
             try {
@@ -231,7 +231,7 @@ public class Velocity implements VelocityProcess {
                     logger.error(dirr);
                     logger.error(dir);
                 CoreUtil.getGRIDAN4uClient().getRemoteFile(dirr, dir );
-                
+              
                 }else{
                   CoreUtil.getGRIDAN4uClient().getRemoteFolder(dirr, dir + "/" + folderName);
                   ArchiveTools.unzip(new File(dir + "/" + folderName + ".zip"), new File(dir));
