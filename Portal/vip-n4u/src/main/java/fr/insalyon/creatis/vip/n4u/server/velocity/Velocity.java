@@ -65,7 +65,7 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public void wrapperScriptFile(Map<Integer, Map> listInput, List<Map> listOutput, String applicationName, String scriptFile, String applicationLocation, String environementFile, String dir, String date, String mandatoryDir) throws VelocityException {
+    public void wrapperScriptFile(Map<Integer, Map> listInput, List<Map> listOutput, String applicationName, String scriptFile, String applicationLocation, String environementFile, String dir, String date, List<String> mandatoryDir) throws VelocityException {
 
         applicationLocation = applicationLocation + "/" + date;
 
@@ -86,8 +86,9 @@ public class Velocity implements VelocityProcess {
         context.put("number", listInput.size() + listOutput.size());
         context.put("scriptFile", scriptName);
         context.put("outputList", listOutput);
+        //to define the wrapper_common_dir
         if (mandatoryDir != null) {
-            String directName = mandatoryDir.substring((mandatoryDir.lastIndexOf("/")) + 1);
+            String directName = mandatoryDir.get(0).substring((mandatoryDir.lastIndexOf("/")) + 1);
             context.put("directName", directName);
         }
         if (!env.isEmpty()) {
@@ -197,7 +198,7 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public String gwendiaFile(Map<Integer, Map> listInput, List<Map> listOutput, String applicationName, String description, String applicationLocation, String dir, String date, String mandatoryDir) throws VelocityException {
+    public String gwendiaFile(Map<Integer, Map> listInput, List<Map> listOutput, String applicationName, String description, String applicationLocation, String dir, String date, List<String> mandatoryDir) throws VelocityException {
         Template t = ve.getTemplate("vm/gwendia.vm");
         applicationLocation = applicationLocation + "/" + date;
         final String gaswDescriptor = applicationLocation.replace("/grid/biomed/creatis/vip", "/grid/vo.neugrid.eu/home/vip") + "/gasw" + "/" + applicationName + ".xml";
@@ -224,21 +225,20 @@ public class Velocity implements VelocityProcess {
             CoreUtil.getGRIDAClient().uploadFile(chemin, applicationLocation + "/" + "workflows");
 
             if (mandatoryDir != null) {
-                int index = mandatoryDir.indexOf(":");
-                String folderName = mandatoryDir.substring((mandatoryDir.lastIndexOf("/")) + 1);
-                String dirr = mandatoryDir.substring(index + 1);
-                if(folderName.contains(".")){
-                    logger.error(dirr);
-                    logger.error(dir);
-                CoreUtil.getGRIDAN4uClient().getRemoteFile(dirr, dir );
-              
-                }else{
-                  CoreUtil.getGRIDAN4uClient().getRemoteFolder(dirr, dir + "/" + folderName);
-                  ArchiveTools.unzip(new File(dir + "/" + folderName + ".zip"), new File(dir));
+                for (String strDir : mandatoryDir) {
+                    int index = strDir.indexOf(":");
+                    String folderName = strDir.substring((strDir.lastIndexOf("/")) + 1);
+                    String dirPath = strDir.substring(index + 1);
+                    if (folderName.contains(".")) {
+                        CoreUtil.getGRIDAN4uClient().getRemoteFile(dirPath, dir);
+                    } else {
+                        CoreUtil.getGRIDAN4uClient().getRemoteFolder(dirPath, dir + "/" + folderName);
+                        ArchiveTools.unzip(new File(dir + "/" + folderName + ".zip"), new File(dir));
+                    }
+
+                    files.add(new File(dir + "/" + folderName));
+
                 }
-               
-                files.add(new File(dir + "/" + folderName));
-                logger.error(dir + "/" + folderName);
             }
             ArchiveTools.compress(files, dir + "/" + applicationName + "_wrapper.sh.tar.gz");
 

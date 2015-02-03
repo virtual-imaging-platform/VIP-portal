@@ -45,7 +45,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
     //get the value from first appel to generateScriptFile
     private String generateTime = null;
     Velocity ve;
-    String mandatoryDir;
+    List<String> mandatoryDir;
 
     /**
      *
@@ -86,11 +86,11 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             nb = strok.countTokens();
             result[0] = nb;
             Scanner scanner2 = new Scanner(new FileInputStream(localExpressFilePath));
-            mandatoryDir = null;
+            mandatoryDir = new ArrayList<String>();
             while (scanner2.hasNext()) {
                 String readLigne = scanner2.nextLine();
                 if (readLigne.contains("commonDir")) {
-                    mandatoryDir = readLigne;
+                    mandatoryDir.add(readLigne);
                 }
                 if (readLigne.contains("ExplicitFiles")) {
                     int fileNumber = Integer.parseInt(readLigne.substring(14));
@@ -145,7 +145,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             listInputs.add(nameDesc);
             //commonDir 
             NodeList mandatoryCommonDirs = doc.getElementsByTagName("mandatoryCommonDirs");
-            mandatoryDir = null;
+            mandatoryDir = new ArrayList<String>();
             if (mandatoryCommonDirs.getLength() != 0) {
                 NodeList commonDirs = mandatoryCommonDirs.item(0).getChildNodes();
 
@@ -155,7 +155,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
                     if (nNode.getNodeType() == Node.ELEMENT_NODE & nNode.getNodeName().equals("mandatoryCommonDir")) {
                         Element eElement = (Element) nNode;
                         String value = eElement.getAttribute("value");
-                        mandatoryDir = value;
+                        mandatoryDir.add(value);
 
                     }
                 }
