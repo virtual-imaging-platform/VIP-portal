@@ -39,5 +39,5 @@ public class N4uConstants {
     //Group
     public static final String N4U_GROUP = "expressLane2VIP";
     //vm files
-    public static final String VM_GASS = "gass.vm";
+    public static final String VM_GASW = "gasw.vm";
 }
