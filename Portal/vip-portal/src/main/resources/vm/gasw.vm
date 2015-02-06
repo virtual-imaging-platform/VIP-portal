@@ -4,7 +4,10 @@
         <access type="LFN" cached="true"> 
         </access>
         <executor value="LOCAL"/>
-        <requirement value="$extensionFileValue"/> 
+        
+        #foreach($value in $extensionFileValues )
+        <requirement value="$value"/> 
+        #end
         <value value="$gaswValue"/>
         #set($i =$0 )
         #foreach( $input in $inputList )
