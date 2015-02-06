@@ -23,11 +23,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -331,7 +333,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             String executableSandbox = "";
             String envF = "";
             String sandboxF = "";
-            String extensionFValue = null;
+            List<String> extensionFValue = new ArrayList<String>();
             String extensionF = "";
             if (!extensionFile.isEmpty()) {
                 try {
@@ -340,20 +342,40 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
                     logger.error(ex);
                     throw new N4uException(ex);
                 }
-                Scanner scanner;
+
                 try {
-                    scanner = new Scanner(new FileInputStream(extensionF));
-                } catch (FileNotFoundException ex) {
-                    logger.error(ex);
-                    throw new N4uException(ex);
+                    logger.error("11");
+                    Scanner scanner = new Scanner(new FileInputStream(extensionF));
+                    logger.error("2");
+                    List<String> requirements = new ArrayList<String>();
+                    String ligne = null;
+                    logger.error("33");
+                    while (scanner.hasNextLine()) {
+                        logger.error("44");
+                        ligne = scanner.nextLine();
+                        if (ligne.startsWith("requirements=")) {
+                            requirements.add(ligne.substring(14));
+                            logger.error("55");
+                        }
+                    }
+                    logger.error("66");
+                    scanner.close();
+                    logger.error("77");
+
+                    for (String requirement : requirements) {
+
+                        extensionFValue.add(StringEscapeUtils.escapeXml(requirement.substring(0, requirement.length() - 1)));
+
+                    }
+
+                } catch (FileNotFoundException exc) {
+                    logger.error(exc);
+                    throw new N4uException("Can't find the extension file :" + extensionF);
+
                 }
-                String ligne;
-                do {
-                    ligne = scanner.nextLine();
-                } while (ligne.startsWith("requirement="));
-                extensionFValue = ligne.substring(14);
-                extensionFValue = extensionFValue.substring(0, extensionFValue.length() - 1);
+
             }
+            logger.error("hhhhhhh");
 
             if (!scriptFile.isEmpty()) {
                 executableSandbox = DataManagerUtil.parseBaseDir(getSessionUser(), scriptFile);
@@ -402,7 +424,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     private String parseTypeSupported(String val) throws N4uException {
-        if (val.equalsIgnoreCase(EnumTypes.Text.toString()) || val.equalsIgnoreCase(EnumTypes.Integer.toString()) || val.equalsIgnoreCase(EnumTypes.Float.toString())) {
+        if (val.equalsIgnoreCase(EnumTypes.Text.toString()) || val.equalsIgnoreCase(EnumTypes.Integer.toString()) || val.equalsIgnoreCase(EnumTypes.Float.toString()) || val.equalsIgnoreCase(EnumTypes.Combo.toString()) || val.equalsIgnoreCase(EnumTypes.CheckBox.toString()) || val.equalsIgnoreCase(EnumTypes.Radio.toString())) {
             return EnumInputTypes.Parameter.toString();
         } else if (val.equalsIgnoreCase(EnumTypes.File.toString())) {
             return EnumInputTypes.File.toString();

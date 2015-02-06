@@ -129,7 +129,7 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public void gaswFile(Map<Integer, Map> listInput, List<Map> listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir, String date, String sandboxFile, String environementFile, String extensionFileValue, String executableSandbox) throws VelocityException {
+    public void gaswFile(Map<Integer, Map> listInput, List<Map> listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir, String date, String sandboxFile, String environementFile, List<String> extensionFileValues, String executableSandbox) throws VelocityException {
         Template t = ve.getTemplate("vm/gasw.vm");
         VelocityContext context = new VelocityContext();
         applicationLocation = applicationLocation + "/" + date;
@@ -137,7 +137,7 @@ public class Velocity implements VelocityProcess {
         context.put("outputList", listOutput);
         context.put("applicationName", applicationName);
         context.put("applicationLocation", applicationLocation);
-        context.put("extensionFileValue", StringEscapeUtils.escapeXml(extensionFileValue));
+        context.put("extensionFileValues",extensionFileValues);
         context.put("gaswValue", applicationLocation + "/bin/" + applicationName + "_wrapper.sh");
         context.put("exSandbox", executableSandbox);
         if (!sandboxFile.isEmpty()) {
