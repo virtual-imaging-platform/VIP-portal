@@ -66,7 +66,7 @@ public class Parser extends javax.swing.JPanel {
     private String localSimuFolder;
     private UploadFilesBusiness business;
     private String inputFile;
-    private String[] inputs;
+    private String inputs;
 
     /**
      * Creates new form Parser
@@ -375,11 +375,13 @@ public class Parser extends javax.swing.JPanel {
             addMessage("Completed.");
             jProgressBar.setValue(100);
             JSObject win = JSObject.getWindow(main);
-            win.call("uploadMacComplete", inputs);
+            // #2368
+            //win.call("uploadMacComplete", inputs);
+            win.eval("uploadMacComplete('"+inputs+"')");
         }
     }
 
-    private String[] fillInInputs() {
+    private String fillInInputs() {
 
         String type = this.macroParser.isStatic() ? "stat" : "dyn";
         String ps="";
@@ -397,12 +399,15 @@ public class Parser extends javax.swing.JPanel {
         }else{
             ps = "dummy";
         }
-        
+        // #2368
+      /*
         String inputsList[] = {
             "GateInput = ".concat(this.inputFile),
             "ParallelizationType = ".concat(type),
             "NumberOfParticles = ".concat(parts),
             "phaseSpace = ".concat(ps)};
+        */
+        String inputsList="GateInput = "+this.inputFile+", ParallelizationType = "+type+", NumberOfParticles = "+parts+", phaseSpace = "+ps;
         //System.out.println("************FIlled in PS input "+ps);
         return inputsList;
     }

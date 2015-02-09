@@ -118,26 +118,27 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
         loadMacButton.setWidth(150);
     }
 
-    public void uploadMacComplete(String inputTgz, String simuType, String nbPart, String phaseSpace) {
+    //Bug #2368
+    public void uploadMacComplete(String inputList) {
        
         if (loadMacWindow != null) {
             loadMacWindow.destroy();
             loadMacWindow = null;
 
             modal.hide();
-
-            String[] it = inputTgz.split(" = ");
+            String[] inputs = inputList.split(", ");
+            String[] it = inputs[0].split(" = ");
             setInputValue(it[0], baseDir.concat("/").concat(it[1]));
             //We do not fill in the parallelization type automaticlaly for the moment
             //String[] st = simuType.split(" = ");
             //setInputValue(st[0], st[1]);
-            String[] np = nbPart.split(" = ");
+            String[] np = inputs[1].split(" = ");
             setInputValue(np[0], np[1]);
 
-            String[] st = simuType.split(" = ");
+            String[] st = inputs[2].split(" = ");
             setInputValue(st[0], st[1]);
 
-            String[] ps = phaseSpace.split(" = ");
+            String[] ps = inputs[3].split(" = ");
             setInputValue(ps[0], ps[1]);
             
             loadMacButton.hide();
@@ -181,9 +182,10 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
         service.reportProblem(message.replaceAll("\\n", "<br />"), callback);
     }
 
+     //Bug #2368
     private native void initComplete(GateLabLaunchTab uploadMac) /*-{
-     $wnd.uploadMacComplete = function (inputTgz,simuType,nbPart,phaseSpace) {
-     uploadMac.@fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab::uploadMacComplete(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)(inputTgz,simuType,nbPart,phaseSpace);
+     $wnd.uploadMacComplete = function (inputList) {
+     uploadMac.@fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab::uploadMacComplete(Ljava/lang/String;)(inputList);
      };
      $wnd.close = function () {
      uploadMac.@fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab::close()();
