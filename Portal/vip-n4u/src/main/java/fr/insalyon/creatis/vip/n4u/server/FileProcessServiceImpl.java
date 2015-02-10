@@ -206,9 +206,22 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
                                 }
                             }
                             value[3] = eElement.getElementsByTagName("description").item(0).getTextContent() + "  " + "Default value is: " + defaulVal + "  " + "Values:" + vals;
-                        } else {
+                        } else if (eElement.getAttribute("type").equalsIgnoreCase(EnumTypes.File.toString())){
 
-                            value[3] = eElement.getElementsByTagName("description").item(0).getTextContent();
+                            NodeList el = eElement.getChildNodes();
+                            String extensions="";
+                            for (int i = 0; i < el.getLength(); i++) {
+                                Node eNode = el.item(i);
+                                if (eNode.getNodeName().equals("ext")) {
+                                    Element eElementNode = (Element) eNode;
+                                    extensions = extensions + " " + eElementNode.getTextContent();
+                                }
+                            }
+                            
+                          value[3] = eElement.getElementsByTagName("description").item(0).getTextContent() + "  " +"Possible extension values "+extensions;
+                            
+                        }else{
+                         value[3] = eElement.getElementsByTagName("description").item(0).getTextContent();
                         }
                         value[2] = eElement.getAttribute("required");//required
                         listInputs.add(value);
@@ -344,23 +357,17 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
                 }
 
                 try {
-                    logger.error("11");
-                    Scanner scanner = new Scanner(new FileInputStream(extensionF));
-                    logger.error("2");
+                    
+                    Scanner scanner = new Scanner(new FileInputStream(extensionF));                 
                     List<String> requirements = new ArrayList<String>();
                     String ligne = null;
-                    logger.error("33");
                     while (scanner.hasNextLine()) {
-                        logger.error("44");
                         ligne = scanner.nextLine();
                         if (ligne.startsWith("requirements=")) {
                             requirements.add(ligne.substring(14));
-                            logger.error("55");
                         }
                     }
-                    logger.error("66");
                     scanner.close();
-                    logger.error("77");
 
                     for (String requirement : requirements) {
 
@@ -373,9 +380,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
                     throw new N4uException("Can't find the extension file :" + extensionF);
 
                 }
-
             }
-            logger.error("hhhhhhh");
 
             if (!scriptFile.isEmpty()) {
                 executableSandbox = DataManagerUtil.parseBaseDir(getSessionUser(), scriptFile);
