@@ -80,8 +80,8 @@
                 <configuration>
                     <keystore>src/main/resources/keystore.jks</keystore>
                     <alias>1</alias>
-                    <storepass>Ra@#sil89</storepass>
-                    <keypass>vipcreatis</keypass>
+                    <storepass></storepass>
+                    <keypass></keypass>
                 </configuration>
             </plugin>
             <plugin>
