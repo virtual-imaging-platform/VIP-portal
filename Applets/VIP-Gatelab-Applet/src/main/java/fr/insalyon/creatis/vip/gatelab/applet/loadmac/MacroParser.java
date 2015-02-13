@@ -526,9 +526,11 @@ public class MacroParser {
     }
 
     protected String processLine(Pattern toLookFor, Pattern delimiter,
-            String aLine, int place) {
+            String myLine, int place) {
         // use a second Scanner to parse the content of each line
-        Scanner scanner = new Scanner(aLine);
+        //sometimes comments (#) start in the middle of the line ; in that case only take into account the first part of the line (#2503)
+        String[] splitLine = myLine.split("#");
+        Scanner scanner = new Scanner(splitLine[0]);
         String value = null;
         // scanner.next(pattern);
         scanner.useDelimiter(delimiter);
