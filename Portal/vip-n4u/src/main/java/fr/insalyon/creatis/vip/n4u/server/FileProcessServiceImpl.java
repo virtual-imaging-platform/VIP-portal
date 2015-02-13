@@ -150,15 +150,16 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             mandatoryDir = new ArrayList<String>();
             if (mandatoryCommonDirs.getLength() != 0) {
                 NodeList commonDirs = mandatoryCommonDirs.item(0).getChildNodes();
+                if (commonDirs.getLength() != 0) {
+                    for (int j = 0; j < commonDirs.getLength(); j++) {
+                        Node nNode = commonDirs.item(j);
 
-                for (int j = 0; j < commonDirs.getLength(); j++) {
-                    Node nNode = commonDirs.item(j);
+                        if (nNode.getNodeType() == Node.ELEMENT_NODE & nNode.getNodeName().equals("mandatoryCommonDir")) {
+                            Element eElement = (Element) nNode;
+                            String value = eElement.getAttribute("value");
+                            mandatoryDir.add(value);
 
-                    if (nNode.getNodeType() == Node.ELEMENT_NODE & nNode.getNodeName().equals("mandatoryCommonDir")) {
-                        Element eElement = (Element) nNode;
-                        String value = eElement.getAttribute("value");
-                        mandatoryDir.add(value);
-
+                        }
                     }
                 }
             }

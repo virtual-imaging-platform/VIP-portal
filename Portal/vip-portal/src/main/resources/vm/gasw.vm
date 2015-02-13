@@ -3,7 +3,7 @@
 <executable name="${applicationName}_wrapper.sh">
 <access type="LFN" cached="true"> 
 </access>
-        #foreach($value in $extensionFileValues)
+        #foreach($value in $requirementValues)
         <requirement value="$value"/> 
         #end
         <value value="$gaswValue"/>

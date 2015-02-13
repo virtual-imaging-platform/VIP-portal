@@ -80,15 +80,24 @@ public class Velocity implements VelocityProcess {
         } else {
             env = environementFile;
         }
-        Template t = ve.getTemplate("vm/wrapper_script.vm");
+
+        Template t;
+        try {
+            t = ve.getTemplate("vm/wrapper_script.vm");
+        } catch (Exception ex) {
+            logger.error(ex);
+            throw new VelocityException(ex);
+        }
+
         VelocityContext context = new VelocityContext();
         context.put("inputList", listInput);
         context.put("number", listInput.size() + listOutput.size());
         context.put("scriptFile", scriptName);
         context.put("outputList", listOutput);
         //to define the wrapper_common_dir
-        if (mandatoryDir != null) {
-            String directName = mandatoryDir.get(0).substring((mandatoryDir.lastIndexOf("/")) + 1);
+        if (!mandatoryDir.isEmpty()) {
+            int index = mandatoryDir.get(0).lastIndexOf("/") + 1;
+            String directName = mandatoryDir.get(0).substring(index);
             context.put("directName", directName);
         }
         if (!env.isEmpty()) {
@@ -129,15 +138,21 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public void gaswFile(Map<Integer, Map> listInput, List<Map> listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir, String date, String sandboxFile, String environementFile, List<String> extensionFileValues, String executableSandbox) throws VelocityException {
-        Template t = ve.getTemplate("vm/gasw.vm");
+    public void gaswFile(Map<Integer, Map> listInput, List<Map> listOutput, String applicationName, String wrapperScriptPath, String applicationLocation, String dir, String date, String sandboxFile, String environementFile, List<String> requirementValues, String executableSandbox) throws VelocityException {
+        Template t;
+        try {
+            t = ve.getTemplate("vm/gasw.vm");
+        } catch (Exception ex) {
+            logger.error(ex);
+            throw new VelocityException(ex);
+        }
         VelocityContext context = new VelocityContext();
         applicationLocation = applicationLocation + "/" + date;
         context.put("inputList", listInput);
         context.put("outputList", listOutput);
         context.put("applicationName", applicationName);
         context.put("applicationLocation", applicationLocation);
-        context.put("extensionFileValues",extensionFileValues);
+        context.put("requirementValues", requirementValues);
         context.put("gaswValue", applicationLocation + "/bin/" + applicationName + "_wrapper.sh");
         context.put("exSandbox", executableSandbox);
         if (!sandboxFile.isEmpty()) {
@@ -199,7 +214,13 @@ public class Velocity implements VelocityProcess {
      */
     @Override
     public String gwendiaFile(Map<Integer, Map> listInput, List<Map> listOutput, String applicationName, String description, String applicationLocation, String dir, String date, List<String> mandatoryDir) throws VelocityException {
-        Template t = ve.getTemplate("vm/gwendia.vm");
+        Template t;
+        try {
+            t = ve.getTemplate("vm/gwendia.vm");
+        } catch (Exception ex) {
+            logger.error(ex);
+            throw new VelocityException(ex);
+        }
         applicationLocation = applicationLocation + "/" + date;
         final String gaswDescriptor = applicationLocation.replace("/grid/biomed/creatis/vip", "/grid/vo.neugrid.eu/home/vip") + "/gasw" + "/" + applicationName + ".xml";
         VelocityContext context = new VelocityContext();
@@ -243,14 +264,13 @@ public class Velocity implements VelocityProcess {
             ArchiveTools.compress(files, dir + "/" + applicationName + "_wrapper.sh.tar.gz");
 
             //createArchive(files, dir, applicationName + "_wrapper.sh.tar.gz");
-            logger.error("archive was created");
             CoreUtil.getGRIDAClient().uploadFile(dir + "/" + applicationName + "_wrapper.sh.tar.gz", applicationLocation + "/" + "bin");
 
         } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new VelocityException(ex);
         } catch (IOException ex) {
-            Logger.getLogger(Velocity.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
             throw new VelocityException(ex);
         }
 
