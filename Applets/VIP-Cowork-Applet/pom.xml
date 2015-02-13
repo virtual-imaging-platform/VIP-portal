@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.insalyon.creatis.vip</groupId>
   <artifactId>VIP-Cowork-Applet</artifactId>
-  <version>0.12</version>
+  <version>1.12</version>
   <name>VIP-Cowork-Applet</name>
   <url>http://maven.apache.org</url>
   <properties>
