@@ -33,16 +33,17 @@ public class AuthenticationBusiness {
     }
 
     public User authenticate(HttpServletRequest req, fr.insalyon.creatis.vip.api.bean.User user) throws ApiException {
-        String email = user.getUserName();
-        String password = user.getPassword();
-        getLogger().info("Authenticating " + email + " " + password);
-        getCsi().setSession(req.getSession());
-        try {
-            User vipUser = getCsi().signin(email, password);
-            return vipUser;
-        } catch (CoreException ex) {
-            throw new ApiException(ex);
-        }
+        throw new ApiException("Not implemented");
+//        String email = user.getUserName();
+//        String password = user.getPassword();
+//        getLogger().info("API authenticating " + email + " " + password);
+//        //getCsi().setSession(req.getSession()); 
+//        try {
+//            User vipUser = getCsi().signin(email, password);
+//            return vipUser;
+//        } catch (CoreException ex) {
+//            throw new ApiException(ex);
+//        }
 
     }
 
