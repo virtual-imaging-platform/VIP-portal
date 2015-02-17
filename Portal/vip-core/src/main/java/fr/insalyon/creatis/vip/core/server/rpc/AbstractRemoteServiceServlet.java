@@ -54,7 +54,6 @@ import org.apache.log4j.Logger;
 public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet {
 
     protected ConfigurationBusiness configurationBusiness;
-    protected HttpSession session;
 
     public AbstractRemoteServiceServlet() {
 
@@ -77,14 +76,7 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
      * @return 
      */
     protected HttpSession getSession() {
-        if(session == null)
-            session = this.getThreadLocalRequest().getSession();
-        return session;
-        
-    }
-    
-    public void setSession(HttpSession session){
-        this.session = session;
+        return this.getThreadLocalRequest().getSession();
     }
 
     /**
