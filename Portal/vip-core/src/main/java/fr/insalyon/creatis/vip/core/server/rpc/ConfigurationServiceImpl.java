@@ -155,7 +155,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             logger.info("Connected.");
 
             return user;
-
+            
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -877,7 +877,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public void addPublication(Publication pub) throws CoreException {
         trace(logger, "Adding publication.");
         try {
-            authenticateSystemAdministrator(logger);
             User user = getSessionUser();
             pub.setVipAuthor(user.getEmail());
             configurationBusiness.addPublication(pub);
