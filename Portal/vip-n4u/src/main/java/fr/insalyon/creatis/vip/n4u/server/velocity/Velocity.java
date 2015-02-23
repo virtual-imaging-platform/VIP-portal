@@ -6,7 +6,6 @@ package fr.insalyon.creatis.vip.n4u.server.velocity;
 
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -17,23 +16,10 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.GZIPOutputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-import org.codehaus.plexus.archiver.ArchiveEntry;
-import org.codehaus.plexus.archiver.Archiver;
-import org.codehaus.plexus.archiver.ArchiverException;
-import org.codehaus.plexus.archiver.tar.TarArchiver;
-import org.codehaus.plexus.archiver.tar.TarEntry;
-import org.h2.util.IOUtils;
 import org.jsoup.Jsoup;
 
 /**
@@ -114,6 +100,7 @@ public class Velocity implements VelocityProcess {
             CoreUtil.getGRIDAClient().uploadFile(chemin, applicationLocation + "/" + "bin");
 
             //script File
+            setDirRights(dir, "vip-services");
             CoreUtil.getGRIDAClient().getRemoteFile(scriptFile, dir);
             files.add(new File(dir + "/" + scriptName));
 
@@ -157,6 +144,7 @@ public class Velocity implements VelocityProcess {
         context.put("exSandbox", executableSandbox);
         if (!sandboxFile.isEmpty()) {
             try {
+                setDirRights(dir, "vip-services");
                 CoreUtil.getGRIDAClient().getRemoteFile(sandboxFile, dir);
                 files.add(new File(dir + sandboxFile.substring(sandboxFile.lastIndexOf("/"))));
             } catch (GRIDAClientException ex) {
@@ -166,6 +154,7 @@ public class Velocity implements VelocityProcess {
         }
         if (!environementFile.isEmpty()) {
             try {
+                setDirRights(dir, "vip-services");
                 CoreUtil.getGRIDAClient().getRemoteFile(environementFile, dir);
                 // CoreUtil.getGRIDAClient().rename(environementFile, applicationLocation + "/bin/" + environementFile.substring(environementFile.lastIndexOf("/") + 1));
                 files.add(new File(dir + environementFile.substring(environementFile.lastIndexOf("/"))));
@@ -251,8 +240,10 @@ public class Velocity implements VelocityProcess {
                     String folderName = strDir.substring((strDir.lastIndexOf("/")) + 1);
                     String dirPath = strDir.substring(index + 1);
                     if (folderName.contains(".")) {
+                        setDirRights(dir, "n4u-services");
                         CoreUtil.getGRIDAN4uClient().getRemoteFile(dirPath, dir);
                     } else {
+                        setDirRights(dir, "n4u-services");
                         CoreUtil.getGRIDAN4uClient().getRemoteFolder(dirPath, dir + "/" + folderName);
                         ArchiveTools.unzip(new File(dir + "/" + folderName + ".zip"), new File(dir));
                     }
@@ -264,6 +255,7 @@ public class Velocity implements VelocityProcess {
             ArchiveTools.compress(files, dir + "/" + applicationName + "_wrapper.sh.tar.gz");
 
             //createArchive(files, dir, applicationName + "_wrapper.sh.tar.gz");
+            setDirRights(dir + "/" + applicationName + "_wrapper.sh.tar.gz", "vip-services");
             CoreUtil.getGRIDAClient().uploadFile(dir + "/" + applicationName + "_wrapper.sh.tar.gz", applicationLocation + "/" + "bin");
 
         } catch (GRIDAClientException ex) {
@@ -340,6 +332,17 @@ public class Velocity implements VelocityProcess {
      */
     public static String html2text(String html) {
         return Jsoup.parse(html).text();
+    }
+
+    private void setDirRights(String dir, String user) throws VelocityException {
+
+        Runtime rt = Runtime.getRuntime();
+        try {
+            Process pr = rt.exec("chown -R " + user + ":" + user + " " + dir);
+        } catch (IOException ex) {
+            throw new VelocityException(ex);
+
+        }
     }
 
 }
