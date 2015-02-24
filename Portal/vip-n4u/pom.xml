@@ -4,7 +4,7 @@
     <parent>
         <artifactId>vip</artifactId>
         <groupId>fr.insalyon.creatis</groupId>
-        <version>1.12</version>
+        <version>1.13</version>
     </parent>
 
     <groupId>fr.insalyon.creatis</groupId>
