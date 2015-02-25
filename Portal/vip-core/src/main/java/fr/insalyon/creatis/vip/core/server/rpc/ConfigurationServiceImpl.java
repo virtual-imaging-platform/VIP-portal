@@ -155,7 +155,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             logger.info("Connected.");
 
             return user;
-            
+
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -864,9 +864,15 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     @Override
     public void removePublication(Long id) throws CoreException {
         trace(logger, "Removing publication.");
+
         try {
-            authenticateSystemAdministrator(logger);
-            configurationBusiness.removePublication(id);
+            User user = getSessionUser();
+            if (user.isSystemAdministrator() || configurationBusiness.getpublication(id).getVipAuthor().equals(user.getEmail())) {
+                configurationBusiness.removePublication(id);
+            } else {
+                throw new CoreException("you can't remove a publication that is not yours");
+
+            }
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
@@ -876,6 +882,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     @Override
     public void addPublication(Publication pub) throws CoreException {
         trace(logger, "Adding publication.");
+
         try {
             User user = getSessionUser();
             pub.setVipAuthor(user.getEmail());
@@ -890,11 +897,16 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     @Override
     public void updatePublication(Publication pub) throws CoreException {
         trace(logger, "Updating publication.");
+
         try {
-            authenticateSystemAdministrator(logger);
             User user = getSessionUser();
-            pub.setVipAuthor(user.getEmail());
-            configurationBusiness.updatePublication(pub);
+            if (user.isSystemAdministrator() || configurationBusiness.getpublication(pub.getId()).getVipAuthor().equals(user.getEmail())) {
+                pub.setVipAuthor(user.getEmail());
+                configurationBusiness.updatePublication(pub);
+            } else {
+                throw new CoreException("you can't modify a publication that is not yours");
+
+            }
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
