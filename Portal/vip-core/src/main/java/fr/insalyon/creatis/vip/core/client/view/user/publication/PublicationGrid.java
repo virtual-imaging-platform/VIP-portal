@@ -83,11 +83,10 @@ public class PublicationGrid extends ListGrid {
                         }
                     });
 
-                    if (CoreModule.user.getLevel() == UserLevel.Administrator) {
+                    
                         rollOverCanvas.addMember(loadImg);
                         rollOverCanvas.addMember(deleteImg);
-                    }
-
+                    
                 }
                 return rollOverCanvas;
             }

@@ -1242,6 +1242,17 @@ public class ConfigurationBusiness {
         }
     }
 
+     public Publication getpublication(Long id) throws BusinessException {
+
+        try {
+
+            return CoreDAOFactory.getDAOFactory().getPublicationDAO().getPublication(id);
+        } catch (DAOException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
     public void addTermsUse(TermsOfUse termsOfUse) throws BusinessException {
 
         try {
@@ -1264,7 +1275,8 @@ public class ConfigurationBusiness {
             throw new BusinessException(ex);
         }
     }
-
+    
+   
     public boolean testLastUpdatePublication(String email) throws BusinessException {
 
         try {

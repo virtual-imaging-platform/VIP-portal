@@ -2,6 +2,7 @@ package fr.insalyon.creatis.vip.core.server.dao.mysql;
 
 import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.Publication;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.PublicationDAO;
@@ -53,6 +54,7 @@ public class PublicationData implements PublicationDAO {
     @Override
     public void update(Publication publication) throws DAOException {
         try {
+          
             PreparedStatement ps = connection.prepareStatement("UPDATE "
                     + "VIPPublication "
                     + "SET title=?, date=?, doi=?, authors=?, type=?, typeName=?,vipAuthor=? "
