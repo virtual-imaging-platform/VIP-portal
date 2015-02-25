@@ -26,7 +26,7 @@
         <vip.cardiac.version>0.9.4</vip.cardiac.version>
         <vip.physical-properties.version>0.1</vip.physical-properties.version>
         <vip.query.version>1.7</vip.query.version>
-        <vip.n4u.version>1.11</vip.n4u.version>
+        <vip.n4u.version>1.13</vip.n4u.version>
         <vip.api.version>1.12</vip.api.version>
     </properties>
     
