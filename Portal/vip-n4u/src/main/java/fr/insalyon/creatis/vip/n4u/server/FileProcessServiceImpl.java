@@ -21,9 +21,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import javax.xml.parsers.DocumentBuilder;
@@ -207,10 +207,10 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
                                 }
                             }
                             value[3] = eElement.getElementsByTagName("description").item(0).getTextContent() + "  " + "Default value is: " + defaulVal + "  " + "Values:" + vals;
-                        } else if (eElement.getAttribute("type").equalsIgnoreCase(EnumTypes.File.toString())){
+                        } else if (eElement.getAttribute("type").equalsIgnoreCase(EnumTypes.File.toString())) {
 
                             NodeList el = eElement.getChildNodes();
-                            String extensions="";
+                            String extensions = "";
                             for (int i = 0; i < el.getLength(); i++) {
                                 Node eNode = el.item(i);
                                 if (eNode.getNodeName().equals("ext")) {
@@ -218,11 +218,11 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
                                     extensions = extensions + " " + eElementNode.getTextContent();
                                 }
                             }
-                            
-                          value[3] = eElement.getElementsByTagName("description").item(0).getTextContent() + "  " +"Possible extension values "+extensions;
-                            
-                        }else{
-                         value[3] = eElement.getElementsByTagName("description").item(0).getTextContent();
+
+                            value[3] = eElement.getElementsByTagName("description").item(0).getTextContent() + "  " + "Possible extension values " + extensions;
+
+                        } else {
+                            value[3] = eElement.getElementsByTagName("description").item(0).getTextContent();
                         }
                         value[2] = eElement.getAttribute("required");//required
                         listInputs.add(value);
@@ -257,7 +257,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public void generateScriptFile(Map<Integer, Map> listInput, ArrayList listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String environementFile, String description) throws N4uException {
+    public void generateScriptFile(HashMap<Integer, HashMap<String, String>> listInput, HashMap<Integer, HashMap<String, String>> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String environementFile, String description) throws N4uException {
         ve = new Velocity();
         String applicationRealLocation;
         try {
@@ -298,7 +298,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public String generateGwendiaFile(Map<Integer, Map> listInput, List<Map> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException {
+    public String generateGwendiaFile(HashMap<Integer, HashMap<String, String>> listInput, HashMap<Integer, HashMap<String, String>> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException {
         String applicationRealLocation;
         try {
             applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
@@ -333,7 +333,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public void generateGaswFile(Map<Integer, Map> listInput, List<Map> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String sandboxFile, String environementFile, String extensionFile) throws N4uException {
+    public void generateGaswFile(HashMap<Integer, HashMap<String, String>> listInput, HashMap<Integer, HashMap<String, String>> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String sandboxFile, String environementFile, String extensionFile) throws N4uException {
         String applicationRealLocation = null;
         try {
             applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
@@ -358,8 +358,8 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
                 }
 
                 try {
-                    
-                    Scanner scanner = new Scanner(new FileInputStream(extensionF));                 
+
+                    Scanner scanner = new Scanner(new FileInputStream(extensionF));
                     List<String> requirements = new ArrayList<String>();
                     String ligne = null;
                     while (scanner.hasNextLine()) {
