@@ -306,7 +306,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + generateTime);
             theDir.mkdirs();
             String dir = theDir.getAbsolutePath();
-            return ve.gwendiaFile(listInput, listOutput, applicationName, description, applicationRealLocation, dir, generateTime, mandatoryDir);
+            return ve.gwendiaFile(listInput, listOutput, applicationName, description, applicationRealLocation, dir,new File(homeDir, applicationName), generateTime, mandatoryDir);
         } catch (CoreException ex) {
             logger.error(ex);
             throw new N4uException(ex);
