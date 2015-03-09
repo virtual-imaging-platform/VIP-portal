@@ -4,6 +4,7 @@
  */
 package fr.insalyon.creatis.vip.n4u.server.velocity;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
@@ -17,5 +18,5 @@ public interface VelocityProcess {
 
     public void wrapperScriptFile(HashMap<Integer, HashMap<String, String>> listInput, HashMap<Integer, HashMap<String, String>> listOutput, String applicationName, String scriptFile, String applicationLocation, String environementFile, String dir, String date, List<String> mandatoryDir) throws VelocityException;
 
-    public String gwendiaFile(HashMap<Integer, HashMap<String, String>> listInput, HashMap<Integer, HashMap<String, String>> listOutput, String applicationName, String description, String applicationLocation, String dir, String date, List<String> mandatoryDir) throws VelocityException;
+    public String gwendiaFile(HashMap<Integer, HashMap<String, String>> listInput, HashMap<Integer, HashMap<String, String>> listOutput, String applicationName, String description, String applicationLocation, String dir, File theDirApp, String date, List<String> mandatoryDir) throws VelocityException;
 }

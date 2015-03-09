@@ -6,6 +6,7 @@ package fr.insalyon.creatis.vip.n4u.server.velocity;
 
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -95,18 +96,18 @@ public class Velocity implements VelocityProcess {
         final String chemin = dir + "/" + applicationName + "_wrapper.sh";
         final File fichier = new File(chemin);
         try {
-            createFile(fichier, writer);
+            FileTools.createFile(fichier, writer);
             CoreUtil.getGRIDAClient().createFolder(applicationLocation, "bin");
-            copyFile(chemin, dir + "/" + applicationName + ".bak" + "_wrapper.sh");
+            FileTools.copyFile(chemin, dir + "/" + applicationName + ".bak" + "_wrapper.sh");
             CoreUtil.getGRIDAClient().uploadFile(chemin, applicationLocation + "/" + "bin");
 
             //script File
-            setDirRights(dir, "vip-services");
+            FileTools.setDirRights(dir, "vip-services");
             CoreUtil.getGRIDAClient().getRemoteFile(scriptFile, dir);
             files.add(new File(dir + "/" + scriptName));
 
             //SECOND copy of the wrapper file to create archive
-            copyFile(dir + "/" + applicationName + ".bak" + "_wrapper.sh", chemin);
+            FileTools.copyFile(dir + "/" + applicationName + ".bak" + "_wrapper.sh", chemin);
             files.add(new File(dir + "/" + applicationName + "_wrapper.sh"));
 
         } catch (GRIDAClientException ex) {
@@ -145,7 +146,7 @@ public class Velocity implements VelocityProcess {
         context.put("exSandbox", executableSandbox);
         if (!sandboxFile.isEmpty()) {
             try {
-                setDirRights(dir, "vip-services");
+                FileTools.setDirRights(dir, "vip-services");
                 CoreUtil.getGRIDAClient().getRemoteFile(sandboxFile, dir);
                 files.add(new File(dir + sandboxFile.substring(sandboxFile.lastIndexOf("/"))));
             } catch (GRIDAClientException ex) {
@@ -155,7 +156,7 @@ public class Velocity implements VelocityProcess {
         }
         if (!environementFile.isEmpty()) {
             try {
-                setDirRights(dir, "vip-services");
+                FileTools.setDirRights(dir, "vip-services");
                 CoreUtil.getGRIDAClient().getRemoteFile(environementFile, dir);
                 // CoreUtil.getGRIDAClient().rename(environementFile, applicationLocation + "/bin/" + environementFile.substring(environementFile.lastIndexOf("/") + 1));
                 files.add(new File(dir + environementFile.substring(environementFile.lastIndexOf("/"))));
@@ -177,11 +178,11 @@ public class Velocity implements VelocityProcess {
         final File fichier = new File(chemin);
 
         try {
-            createFile(fichier, writer);
+            FileTools.createFile(fichier, writer);
             CoreUtil.getGRIDAClient().createFolder(applicationLocation, "gasw");
-            copyFile(chemin, dir + "/" + applicationName + ".bak" + ".xml");
+            FileTools.copyFile(chemin, dir + "/" + applicationName + ".bak" + ".xml");
             CoreUtil.getGRIDAClient().uploadFile(chemin, applicationLocation + "/" + "gasw");
-            copyFile(dir + "/" + applicationName + ".bak" + ".xml", chemin);
+            FileTools.copyFile(dir + "/" + applicationName + ".bak" + ".xml", chemin);
             String n4uLocation = applicationLocation.replace("/grid/biomed/creatis/vip", "/grid/vo.neugrid.eu/home/vip");
             CoreUtil.getGRIDAN4uClient().uploadFile(chemin, n4uLocation + "/" + "gasw");
 
@@ -203,7 +204,7 @@ public class Velocity implements VelocityProcess {
      * @throws VelocityException
      */
     @Override
-    public String gwendiaFile(HashMap<Integer, HashMap<String, String>> listInput, HashMap<Integer, HashMap<String, String>> listOutput, String applicationName, String description, String applicationLocation, String dir, String date, List<String> mandatoryDir) throws VelocityException {
+    public String gwendiaFile(HashMap<Integer, HashMap<String, String>> listInput, HashMap<Integer, HashMap<String, String>> listOutput, String applicationName, String description, String applicationLocation, String dir, File theDirApp, String date, List<String> mandatoryDir) throws VelocityException {
         Template t;
         try {
             t = ve.getTemplate("vm/gwendia.vm");
@@ -220,7 +221,7 @@ public class Velocity implements VelocityProcess {
         if (description == null) {
             context.put("description", "");
         } else {
-            String des = html2text(description);
+            String des = FileTools.html2text(description);
             context.put("description", des);
         }
         context.put("gaswDescriptor", gaswDescriptor);
@@ -230,9 +231,9 @@ public class Velocity implements VelocityProcess {
         final File fichier = new File(chemin);
 
         try {
-            createFile(fichier, writer);
+            FileTools.createFile(fichier, writer);
             CoreUtil.getGRIDAClient().createFolder(applicationLocation, "workflows");
-            copyFile(chemin, dir + "/" + applicationName + ".bak" + ".gwendia");
+            FileTools.copyFile(chemin, dir + "/" + applicationName + ".bak" + ".gwendia");
             CoreUtil.getGRIDAClient().uploadFile(chemin, applicationLocation + "/" + "workflows");
 
             if (mandatoryDir != null) {
@@ -241,10 +242,10 @@ public class Velocity implements VelocityProcess {
                     String folderName = strDir.substring((strDir.lastIndexOf("/")) + 1);
                     String dirPath = strDir.substring(index + 1);
                     if (folderName.contains(".")) {
-                        setDirRights(dir, "n4u-services");
+                        FileTools.setDirRights(dir, "n4u-services");
                         CoreUtil.getGRIDAN4uClient().getRemoteFile(dirPath, dir);
                     } else {
-                        setDirRights(dir, "n4u-services");
+                        FileTools.setDirRights(dir, "n4u-services");
                         CoreUtil.getGRIDAN4uClient().getRemoteFolder(dirPath, dir + "/" + folderName);
                         ArchiveTools.unzip(new File(dir + "/" + folderName + ".zip"), new File(dir));
                     }
@@ -255,9 +256,12 @@ public class Velocity implements VelocityProcess {
             }
             ArchiveTools.compress(files, dir + "/" + applicationName + "_wrapper.sh.tar.gz");
 
-            //createArchive(files, dir, applicationName + "_wrapper.sh.tar.gz");
-            setDirRights(dir + "/" + applicationName + "_wrapper.sh.tar.gz", "vip-services");
+            FileTools.setDirRights(dir + "/" + applicationName + "_wrapper.sh.tar.gz", "vip-services");
             CoreUtil.getGRIDAClient().uploadFile(dir + "/" + applicationName + "_wrapper.sh.tar.gz", applicationLocation + "/" + "bin");
+
+            if (Server.getInstance().getDeleteFilesAfterUpload().equals("yes")) {
+                FileTools.delete(theDirApp);
+            }
 
         } catch (GRIDAClientException ex) {
             logger.error(ex);
@@ -268,82 +272,6 @@ public class Velocity implements VelocityProcess {
         }
 
         return applicationLocation + "/workflows" + "/" + applicationName + ".gwendia";
-    }
-
-    /**
-     *
-     * @param source
-     * @param dest
-     */
-    public void copyFile(String source, String dest) {
-        FileChannel in = null;
-        FileChannel out = null;
-
-        try {
-            // Init
-            in = new FileInputStream(source).getChannel();
-            out = new FileOutputStream(dest).getChannel();
-            in.transferTo(0, in.size(), out);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                }
-            }
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                }
-            }
-        }
-
-    }
-
-    /**
-     *
-     * @param f
-     * @param writer
-     */
-    private void createFile(File f, StringWriter writer) {
-        FileWriter writerr;
-        try {
-            f.createNewFile();
-            writerr = new FileWriter(f);
-            try {
-                writerr.write(writer.toString());
-            } finally {
-                writerr.close();
-            }
-        } catch (IOException e) {
-            logger.error("can't create file" + e);
-        }
-
-    }
-
-    /**
-     * parse a html string to text
-     *
-     * @param html
-     * @return
-     */
-    public static String html2text(String html) {
-        return Jsoup.parse(html).text();
-    }
-
-    private void setDirRights(String dir, String user) throws VelocityException {
-
-        Runtime rt = Runtime.getRuntime();
-        try {
-            Process pr = rt.exec("chown -R " + user + ":" + user + " " + dir);
-        } catch (IOException ex) {
-            throw new VelocityException(ex);
-
-}
     }
 
 }
