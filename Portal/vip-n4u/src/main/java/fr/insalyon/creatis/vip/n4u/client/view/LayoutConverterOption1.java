@@ -171,26 +171,26 @@ public class LayoutConverterOption1 extends AbstractFormLayout {
 
                             tabImporter = new N4uImportTab();
                             Layout.getInstance().addTab(tabImporter);
-                            tabImporter.addFields(EnumFieldTitles.ApplicationName, false, title.getValueAsString(), "[0-9.,A-Za-z-+_ ]", false, true);
-                            tabImporter.addFields(EnumFieldTitles.ApplicationVersion, false, "", "[0-9.,A-Za-z-+_() ]", false, true);
+                            tabImporter.addFields(EnumFieldTitles.ApplicationName, false, title.getValueAsString(), "[0-9.,A-Za-z-+_ ]", false, true,true);
+                            tabImporter.addFields(EnumFieldTitles.ApplicationVersion, false, "", "[0-9.,A-Za-z-+_() ]", false, true,true);
                             tabImporter.addFielDescription("Documentation and Terms of Use", "");
-                            tabImporter.addInputField(true, "results-directory ", "Directory where the results will be stored", EnumInputTypes.Parameter, true);
-                            tabImporter.addInputField(true, "job name", "A string identifying the job name", EnumInputTypes.Parameter, true);
+                            tabImporter.addInputField(true, "results-directory ", "Directory where the results will be stored", EnumInputTypes.Parameter, true,null,null);
+                            tabImporter.addInputField(true, "job name", "A string identifying the job name", EnumInputTypes.Parameter, true,null,null);
                             for (int i = 1; i < (int) result[0]; i++) {
                                 if (i <= result[1]) {
-                                    tabImporter.addInputField(false, "", "", EnumInputTypes.File, false);
+                                    tabImporter.addInputField(false, "", "", EnumInputTypes.File, false,null,null);
                                 } else {
-                                    tabImporter.addInputField(false, "", "", EnumInputTypes.Parameter, false);
+                                    tabImporter.addInputField(false, "", "", EnumInputTypes.Parameter, false,null,null);
                                 }
                             }
 
-                            tabImporter.addOutputField(true, "Output", "A tar.gz file containing the results", EnumInputTypes.File, true);
-                            tabImporter.addFields(EnumFieldTitles.MainExecutable, true, script.getValueAsString(), "[0-9.,A-Za-z-+/_() ]", false, true);
-                            tabImporter.addFields(EnumFieldTitles.ApplicationLocation, true, "", "[0-9.,A-Za-z-+/_() ]", false, true);
-                            tabImporter.addFields(EnumFieldTitles.ExtensionFile, true, ext.getValueAsString(), "[0-9.,A-Za-z-+/_() ]", false, false);
-                            tabImporter.addFields(EnumFieldTitles.EnvironementFile, true, env.getValueAsString(), "[0-9.,A-Za-z-+/_() ]", false, false);
-                            tabImporter.addFields(EnumFieldTitles.SandboxFile, true, "", "[0-9.,A-Za-z-+/_() ]", false, false);
-                            tabImporter.addLaunchButton();
+                            tabImporter.addOutputField(true, "Output", "A tar.gz file containing the results", EnumInputTypes.File, true,null,null,null);
+                            tabImporter.addFields(EnumFieldTitles.MainExecutable, true, script.getValueAsString(), "[0-9.,A-Za-z-+/_() ]", false, true,false);
+                            tabImporter.addFields(EnumFieldTitles.ApplicationLocation, true, "", "[0-9.,A-Za-z-+/_() ]", false, true,false);
+                            tabImporter.addFields(EnumFieldTitles.ExtensionFile, true, ext.getValueAsString(), "[0-9.,A-Za-z-+/_() ]", false, false,false);
+                            tabImporter.addFields(EnumFieldTitles.EnvironementFile, true, env.getValueAsString(), "[0-9.,A-Za-z-+/_() ]", false, false,false);
+                            tabImporter.addFields(EnumFieldTitles.SandboxFile, true, "", "[0-9.,A-Za-z-+/_() ]", false, false,false);
+                            tabImporter.addLaunchButton("neugrid");
 
                         }
                     };

@@ -105,27 +105,27 @@ public class LayoutConverterOption2 extends AbstractFormLayout {
 
                             for (int i = 0; i < result.size(); i++) {
                                 if (i == 0) {
-                                    tabImporter.addFields(EnumFieldTitles.ApplicationName, false, result.get(i)[0], "[0-9.,A-Za-z-+_ ]", false, true);
-                                    tabImporter.addFields(EnumFieldTitles.ApplicationVersion, false, result.get(i)[1], "[0-9.,A-Za-z-+_() ]", false, true);
+                                    tabImporter.addFields(EnumFieldTitles.ApplicationName, false, result.get(i)[0], "[0-9.,A-Za-z-+_ ]", false, true,true);
+                                    tabImporter.addFields(EnumFieldTitles.ApplicationVersion, false, result.get(i)[1], "[0-9.,A-Za-z-+_() ]", false, true,true);
                                     tabImporter.addFielDescription("Documentation and Terms of Use", result.get(i)[2]);
-                                    tabImporter.addInputField(true, "results-directory ", "Directory where the results will be stored", EnumInputTypes.Parameter, true);
-                                    tabImporter.addInputField(true, "job name", "A string identifying the job name", EnumInputTypes.Parameter, true);
+                                    tabImporter.addInputField(true, "results-directory ", "Directory where the results will be stored", EnumInputTypes.Parameter, true,null,null);
+                                    tabImporter.addInputField(true, "job name", "A string identifying the job name", EnumInputTypes.Parameter, true,null,null);
 
                                 } else {
                                     // name,type;required
                                     //s[0],s[1],s[2]
-                                    tabImporter.addInputField(Boolean.valueOf(result.get(i)[2]), result.get(i)[0], result.get(i)[3], EnumInputTypes.valueOf(result.get(i)[1]),false);
+                                    tabImporter.addInputField(Boolean.valueOf(result.get(i)[2]), result.get(i)[0], result.get(i)[3], EnumInputTypes.valueOf(result.get(i)[1]),false,null,null);
                                 }
 
                             }
 
-                            tabImporter.addOutputField(true, "Output", "A tar.gz file containing the results", EnumInputTypes.File, true);
-                            tabImporter.addFields(EnumFieldTitles.MainExecutable, true, "", "[0-9.,A-Za-z-+/_(): ]", false, true);
-                            tabImporter.addFields(EnumFieldTitles.ApplicationLocation, true, "", "[0-9.,A-Za-z-+/_(): ]", false, true);
-                            tabImporter.addFields(EnumFieldTitles.ExtensionFile, true,"", "[0-9.,A-Za-z-+/_() ]", false, false);
-                            tabImporter.addFields(EnumFieldTitles.EnvironementFile, true, "", "[0-9.,A-Za-z-+/_(): ]", false, false);
-                            tabImporter.addFields(EnumFieldTitles.SandboxFile, true, "", "[0-9.,A-Za-z-+/_(): ]", false, false);
-                            tabImporter.addLaunchButton();
+                            tabImporter.addOutputField(true, "Output", "A tar.gz file containing the results", EnumInputTypes.File, true,null,null,null);
+                            tabImporter.addFields(EnumFieldTitles.MainExecutable, true, "", "[0-9.,A-Za-z-+/_(): ]", false, true,false);
+                            tabImporter.addFields(EnumFieldTitles.ApplicationLocation, true, "", "[0-9.,A-Za-z-+/_(): ]", false, true,false);
+                            tabImporter.addFields(EnumFieldTitles.ExtensionFile, true,"", "[0-9.,A-Za-z-+/_() ]", false, false,false);
+                            tabImporter.addFields(EnumFieldTitles.EnvironementFile, true, "", "[0-9.,A-Za-z-+/_(): ]", false, false,false);
+                            tabImporter.addFields(EnumFieldTitles.SandboxFile, true, "", "[0-9.,A-Za-z-+/_(): ]", false, false,false);
+                            tabImporter.addLaunchButton("neugrid");
 
                         }
                     };

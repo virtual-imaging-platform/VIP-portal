@@ -1,0 +1,30 @@
+#!/bin/bash
+if [ $# -ne $number ]
+then
+#set($listValues = "" )
+#foreach( $input in $inputList)
+#set($listValues = "$listValues <$input.name>" )
+#end
+#foreach( $output in $outputList)
+#set($listValues = "$listValues <$output.name>" )
+#end
+echo "usage: $0 $listValues"
+exit 1
+fi
+
+DOCKER_IMAGE=$dockerImage
+COMMAND_LINE=$commandLine
+#set($i =$0 )
+#foreach( $input in $inputList)
+#set($i =$i +1 )
+PARAM${i}KEY="$input.commandLineKey"
+PARAM${i}VALUE="$${i}"
+#set($commandLine =$commandLine.replace("$input.commandLineKey","$$i"))
+#end
+docker run -v $PWD:/gasw-execution-dir -w /gasw-execution-dir  $dockerImage $commandLine
+if [ $? != 0 ]
+then
+    echo "Application execution failed!"
+    exit 1
+fi
+echo "Execution of VIP wrapper script in Docker container completed."

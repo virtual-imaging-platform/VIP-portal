@@ -19,6 +19,7 @@ import fr.insalyon.creatis.vip.n4u.server.velocity.VelocityException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +36,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
+import java.io.FileReader;
+import java.util.Iterator;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 /**
  *
  * @author Nouha Boujelben
@@ -47,7 +52,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
     //get the value from first appel to generateScriptFile
     private String generateTime = null;
     Velocity ve;
-    List<String> mandatoryDir;
+    List<String> mandatoryDir=null;
 
     /**
      *
@@ -257,7 +262,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public void generateScriptFile(HashMap<Integer, HashMap<String, String>> listInput, HashMap<Integer, HashMap<String, String>> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String environementFile, String description) throws N4uException {
+    public void generateScriptFile(String templateFolder,HashMap<Integer, HashMap<String, String>> listInput, HashMap<Integer, HashMap<String, String>> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String environementFile, String description,String dockerImage,String commandLine) throws N4uException {
         ve = new Velocity();
         String applicationRealLocation;
         try {
@@ -268,10 +273,12 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + generateTime);
             theDir.mkdirs();
             String dir = theDir.getAbsolutePath();
+            if(scriptFile!=null){
             if (!scriptFile.isEmpty()) {
                 scriptFile = DataManagerUtil.parseBaseDir(getSessionUser(), scriptFile);
             }
-            ve.wrapperScriptFile(listInput, listOutput, applicationName, scriptFile, applicationRealLocation, environementFile, dir, generateTime, mandatoryDir);
+            }
+            ve.wrapperScriptFile(templateFolder,listInput, listOutput, applicationName, scriptFile, applicationRealLocation, environementFile, dir, generateTime, mandatoryDir,dockerImage,commandLine);
         } catch (CoreException ex) {
             logger.error(ex);
             throw new N4uException(ex);
@@ -298,7 +305,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public String generateGwendiaFile(HashMap<Integer, HashMap<String, String>> listInput, HashMap<Integer, HashMap<String, String>> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description) throws N4uException {
+    public String generateGwendiaFile(String templateFolder,HashMap<Integer, HashMap<String, String>> listInput, HashMap<Integer, HashMap<String, String>> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description,String vo) throws N4uException {
         String applicationRealLocation;
         try {
             applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
@@ -306,7 +313,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
             File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + generateTime);
             theDir.mkdirs();
             String dir = theDir.getAbsolutePath();
-            return ve.gwendiaFile(listInput, listOutput, applicationName, description, applicationRealLocation, dir,new File(homeDir, applicationName), generateTime, mandatoryDir);
+            return ve.gwendiaFile(templateFolder,listInput, listOutput, applicationName, description, applicationRealLocation, dir,new File(homeDir, applicationName), generateTime, mandatoryDir,vo);
         } catch (CoreException ex) {
             logger.error(ex);
             throw new N4uException(ex);
@@ -333,7 +340,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     @Override
-    public void generateGaswFile(HashMap<Integer, HashMap<String, String>> listInput, HashMap<Integer, HashMap<String, String>> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String sandboxFile, String environementFile, String extensionFile) throws N4uException {
+    public void generateGaswFile(String templateFolder,HashMap<Integer, HashMap<String, String>> listInput, HashMap<Integer, HashMap<String, String>> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String sandboxFile, String environementFile, String extensionFile) throws N4uException {
         String applicationRealLocation = null;
         try {
             applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
@@ -344,11 +351,13 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
 
             // if the directory does not exist, create it
             String dir = theDir.getAbsolutePath();
-            String executableSandbox = "";
-            String envF = "";
-            String sandboxF = "";
-            List<String> extensionFValue = new ArrayList<String>();
+            String executableSandbox =null;
+            String envF = null;
+            String sandboxF =null;
+            List<String> extensionFValue = null;
             String extensionF = "";
+            if(extensionFile!=null){
+                extensionFValue = new ArrayList<String>();
             if (!extensionFile.isEmpty()) {
                 try {
                     extensionF = CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(getSessionUser(), extensionFile), Server.getInstance().getN4uApplicationFilesRepository());
@@ -382,19 +391,25 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
 
                 }
             }
-
+            }
+            if(scriptFile!=null){
             if (!scriptFile.isEmpty()) {
                 executableSandbox = DataManagerUtil.parseBaseDir(getSessionUser(), scriptFile);
 
             }
+            }
+            if(environementFile!=null){
             if (!environementFile.isEmpty()) {
                 envF = DataManagerUtil.parseBaseDir(getSessionUser(), environementFile);
 
             }
+            }
+            if(sandboxFile!=null){
             if (!sandboxFile.isEmpty()) {
                 sandboxF = DataManagerUtil.parseBaseDir(getSessionUser(), sandboxFile);
             }
-            ve.gaswFile(listInput, listOutput, applicationName, wrapperScriptPath, applicationRealLocation, dir, generateTime, sandboxF, envF, extensionFValue, executableSandbox);
+            }
+            ve.gaswFile(templateFolder,listInput, listOutput, applicationName, wrapperScriptPath, applicationRealLocation, dir, generateTime, sandboxF, envF, extensionFValue, executableSandbox);
         } catch (CoreException e) {
             logger.error(e);
             throw new N4uException(e);
@@ -430,7 +445,7 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
      * @throws N4uException
      */
     private String parseTypeSupported(String val) throws N4uException {
-        if (val.equalsIgnoreCase(EnumTypes.Text.toString()) || val.equalsIgnoreCase(EnumTypes.Integer.toString()) || val.equalsIgnoreCase(EnumTypes.Float.toString()) || val.equalsIgnoreCase(EnumTypes.Combo.toString()) || val.equalsIgnoreCase(EnumTypes.CheckBox.toString()) || val.equalsIgnoreCase(EnumTypes.Radio.toString())) {
+        if (val.equalsIgnoreCase(EnumTypes.Text.toString())||val.equalsIgnoreCase(EnumTypes.String.toString()) || val.equalsIgnoreCase(EnumTypes.Integer.toString()) || val.equalsIgnoreCase(EnumTypes.Float.toString()) || val.equalsIgnoreCase(EnumTypes.Combo.toString()) || val.equalsIgnoreCase(EnumTypes.CheckBox.toString()) || val.equalsIgnoreCase(EnumTypes.Radio.toString())) {
             return EnumInputTypes.Parameter.toString();
         } else if (val.equalsIgnoreCase(EnumTypes.File.toString())) {
             return EnumInputTypes.File.toString();
@@ -439,4 +454,95 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
         }
     }
 
+    @Override
+    public List<List<HashMap<String,String>>> parseJsonFile(String jsonFile) throws N4uException {
+       String localJsonFilePath = null;
+        try {
+            localJsonFilePath = CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(getSessionUser(), jsonFile), Server.getInstance().getN4uApplicationFilesRepository());
+        } catch (CoreException ex) {
+            logger.error(ex);
+            throw new N4uException(ex);
+        } catch (DataManagerException ex) {
+            logger.error(ex);
+            throw new N4uException(ex);
+        } catch (GRIDAClientException ex) {
+            logger.error(ex);
+            throw new N4uException(ex);
+        }
+ 
+           JSONParser parser = new JSONParser();
+           List<List<HashMap<String,String>>> allValues=null;
+ 
+        try {
+            allValues=new ArrayList<List<HashMap<String,String>>>();
+            Object obj = parser.parse(new FileReader(localJsonFilePath));
+            List<HashMap<String,String>> val=new ArrayList<HashMap<String,String>>();
+            HashMap<String,String> values=new HashMap<String,String>();
+            JSONObject jsonObject = (JSONObject) obj;
+            String name = (String) jsonObject.get("name");
+            values.put("name",name);
+            String description = (String) jsonObject.get("description");
+            values.put("description",description);
+            String commandLine = (String) jsonObject.get("command-line");
+            values.put("command-line",commandLine);
+            String dockerImage = (String) jsonObject.get("docker-image");
+            values.put("docker-image",dockerImage);
+            String dockerIndex = (String) jsonObject.get("docker-index");
+            values.put("docker-index",dockerIndex);
+            String shemaVersion = (String) jsonObject.get("schema-version");
+            values.put("schema-version",shemaVersion);
+            val.add(values);
+            allValues.add(val);
+            JSONArray inputList = (JSONArray) jsonObject.get("inputs");
+            
+            List<HashMap<String,String>> inputs=new ArrayList<HashMap<String,String>>();
+            Iterator i = inputList.iterator();
+            while (i.hasNext()) {
+                     HashMap<String,String> inputt=new HashMap<String,String>();
+	             JSONObject input = (JSONObject) i.next();
+	             String inputName=input.get("name").toString();
+                     inputt.put("name",inputName);
+                     String inputType=input.get("type").toString();
+                     inputt.put("type",parseTypeSupported(inputType));
+                     String inputDescription=input.get("description").toString();
+                     inputt.put("description",inputDescription);
+                     String inputCommandLine=input.get("command-line-key").toString();
+                     inputt.put("command-line-key",inputCommandLine);
+                     String inputCardinality=input.get("cardinality").toString();
+                     inputt.put("cardinality",inputCardinality);
+                     inputs.add(inputt);
+                    
+	            }
+            
+            allValues.add(inputs);          
+            JSONArray outputList = (JSONArray) jsonObject.get("outputs");
+             List<HashMap<String,String>> outputs=new ArrayList<HashMap<String,String>>();
+             Iterator j = outputList.iterator();
+              while (j.hasNext()) {
+	             JSONObject input = (JSONObject) j.next();
+                      HashMap<String,String> outputt=new HashMap<String,String>();
+	             String outputName=input.get("name").toString();
+                     outputt.put("name",outputName);
+                     String outputType=input.get("type").toString();
+                     outputt.put("type",parseTypeSupported(outputType));
+                     String outputDescription=input.get("description").toString();
+                     outputt.put("description",outputDescription);
+                     String outputCommandLine=input.get("command-line-key").toString();
+                     outputt.put("command-line-key",outputCommandLine);
+                     String outputCardinality=input.get("cardinality").toString();
+                     outputt.put("cardinality",outputCardinality);
+                     String outputTemplate=input.get("value-template").toString();
+                     outputt.put("value-template",outputTemplate);
+                     outputs.add(outputt);
+	            }
+              
+              allValues.add(outputs);
+             } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+          return allValues;
+    
+
+}
 }
