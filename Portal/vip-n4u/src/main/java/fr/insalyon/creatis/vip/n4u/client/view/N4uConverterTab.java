@@ -19,6 +19,7 @@ public class N4uConverterTab extends Tab {
     private HLayout layout;
     private LayoutConverterOption1 layoutOption1;
     private LayoutConverterOption2 layoutOption2;
+    private LayoutConverterOption3 layoutOption3;
     final TabSet topTabSet;
 
     /**
@@ -51,9 +52,15 @@ public class N4uConverterTab extends Tab {
         tTab2.setPrompt("Xml File");
         layoutOption2 = new LayoutConverterOption2("100%", "100%");
         tTab2.setPane(layoutOption2);
+        
+        Tab tTab3 = new Tab("Json File", N4uConstants.ICON_FILE);
+        tTab3.setPrompt("Json File");
+        layoutOption3 = new LayoutConverterOption3("100%", "100%");
+        tTab3.setPane(layoutOption3);
 
         topTabSet.addTab(tTab1);
         topTabSet.addTab(tTab2);
+        topTabSet.addTab(tTab3);
 
         layout = new HLayout();
         layout.setWidth100();
@@ -62,6 +69,7 @@ public class N4uConverterTab extends Tab {
         layout.setMembersMargin(5);
         layout.addMember(layoutOption1);
         layout.addMember(layoutOption2);
+        layout.addMember(layoutOption3);
 
 
     }

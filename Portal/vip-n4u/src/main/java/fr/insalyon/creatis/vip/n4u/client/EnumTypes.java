@@ -12,7 +12,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * @author nouha
  */
 public enum EnumTypes implements IsSerializable {
-
+    String("string"),
     Text("text"),
     Integer("integer"),
     Float("float"),

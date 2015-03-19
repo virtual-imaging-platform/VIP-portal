@@ -10,6 +10,10 @@ package fr.insalyon.creatis.vip.n4u.client;
  */
 public enum EnumFieldTitles {
     
+    CommandLine("Command Line"),
+    DockerImage("Docker Image"),
+    DockerIndex("Docker Index"),
+    SchemaVersion("Schema Version"),
     SandboxFile("Sandbox File"),
     ApplicationName("Application Name <font color=red>(*)</font>"),
     ApplicationVersion("Version <font color=red>(*)</font>"),
@@ -17,6 +21,8 @@ public enum EnumFieldTitles {
     EnvironementFile("Environement File"),
     ExtensionFile("Extension File"),
     MainExecutable("Main Executable <font color=red>(*)</font>");
+    
+    
     
     private String name;
     EnumFieldTitles(String name) {

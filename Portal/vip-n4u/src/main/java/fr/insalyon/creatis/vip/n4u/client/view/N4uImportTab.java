@@ -45,6 +45,7 @@ import com.smartgwt.client.widgets.events.KeyPressHandler;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.n4u.client.EnumCardinalityValues;
 import java.util.List;
 
 /**
@@ -62,22 +63,23 @@ public class N4uImportTab extends Tab {
     VLayout vlayout;
     private VLayout layout;
     PickerIcon browsePicker;
-    IButton createApplicationButton;
+    
     HashMap<Integer, HashMap<String, String>> listInputs;
     HashMap<Integer, HashMap<String, String>> listOutputs;
     List<TextItem> listItems;
     int item = 0;
     int key = 0;
     int outputItems = 0;
-    String scriptFileName;
+    String scriptFileName=null;
     String applicationName;
-    String sandbox = "";
-    String environementFile = "";
-    String extensionFile = "";
+    String sandbox =null;
+    String environementFile  =null;
+    String extensionFile =null;
     String descriptionValue = null;
     String applicationLocation;
-    String version;
-
+    String version=null;
+    String dockerImage=null;
+    String commandLine=null;
     public N4uImportTab() {
 
         this.setTitle(Canvas.imgHTML(N4uConstants.ICON_EXPRESSLANE1) + " ExpressLaneImporter");
@@ -114,12 +116,20 @@ public class N4uImportTab extends Tab {
         vlayout.setOverflow(Overflow.AUTO);
 
         layoutGeneralInformation = new GeneralInformation("50%", "100%");
+        layoutGeneralInformation.setMembersMargin(2);
+        layoutGeneralInformation.setOverflow(Overflow.AUTO);
 
         layoutOutput = new LayoutOutput("50%", "100%");
+        layoutOutput.setMembersMargin(2);
+        layoutOutput.setOverflow(Overflow.AUTO);
         layoutInputs = new LayoutInputs("50%", "100%");
         layoutInputs.setBorder("1px solid #C0C0C0");
+        layoutInputs.setMembersMargin(2);
+        layoutInputs.setOverflow(Overflow.AUTO);
 
         layoutExecutable = new LayoutExecutable("50%", "100%");
+        layoutExecutable.setMembersMargin(2);
+        layoutExecutable.setOverflow(Overflow.AUTO);
         hLayout1.addMember(layoutGeneralInformation);
         hLayout1.addMember(layoutOutput);
         hLayout2.addMember(layoutInputs);
@@ -141,50 +151,12 @@ public class N4uImportTab extends Tab {
         layoutInputs.getAddButton().addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                addInputField(false, "", "", null, false);
+                addInputField(false, "", "", null, false,null,null);
             }
         });
         layoutInputs.addMember(vlayout);
 
-        createApplicationButton = WidgetUtil.getIButton("Create Application", N4uConstants.ICON_LAUNCH,
-                new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent event) {
-                        for (TextItem i : listItems) {
-                            if (!i.validate()) {
-                                Layout.getInstance().setWarningMessage("There is an invalid input");
-                                return;
-                            }
-                        }
-
-                        //verifying the application existance
-                        AsyncCallback<Boolean> callback = new AsyncCallback<Boolean>() {
-                            @Override
-                            public void onFailure(Throwable caught) {
-                                Layout.getInstance().setWarningMessage(caught.getMessage());
-                            }
-
-                            @Override
-                            public void onSuccess(Boolean result) {
-                        //application exist and will create new version 
-                                //create new application and new version
-
-                                if (result.booleanValue()) {
-                                    Layout.getInstance().setNoticeMessage("Creating the application (this can take a while)");
-                                    createScriptFile(true, false);
-                                } else {
-                                    Layout.getInstance().setNoticeMessage("Creating the application (this can take a while)");
-                                    createScriptFile(true, true);
-                                }
-                            }
-                        };
-
-                        ApplicationService.Util.getInstance().checkApplicationExistWithAnOtherOwner(applicationName, callback);
-
-                    }
-                });
-
-        createApplicationButton.setWidth("150");
+     
     }
 
     /**
@@ -243,7 +215,7 @@ public class N4uImportTab extends Tab {
      * @param newApplication
      * @param maxVersion
      */
-    private void createGwendiaFile(final boolean newVersion, final boolean newApplication) {
+    private void createGwendiaFile(final boolean newVersion, final boolean newApplication,String vo) {
         final AsyncCallback<String> callback1 = new AsyncCallback<String>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -265,7 +237,7 @@ public class N4uImportTab extends Tab {
             }
         };
 
-        FileProcessService.Util.getInstance().generateGwendiaFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, descriptionValue, callback1);
+        FileProcessService.Util.getInstance().generateGwendiaFile("vm/"+vo+"/gwendia.vm",listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, descriptionValue,vo, callback1);
 
     }
 
@@ -275,7 +247,7 @@ public class N4uImportTab extends Tab {
      * @param newApplication
      * @param maxVersion
      */
-    private void createGaswFile(final boolean newVersion, final boolean newApplication) {
+    private void createGaswFile(final boolean newVersion, final boolean newApplication,final String vo) {
 
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
@@ -287,12 +259,12 @@ public class N4uImportTab extends Tab {
             @Override
             public void onSuccess(Void result) {
                 Layout.getInstance().setNoticeMessage("Your Gasw file was successfully created");
-                createGwendiaFile(newVersion, newApplication);
+                createGwendiaFile(newVersion, newApplication,vo);
 
             }
         };
 
-        FileProcessService.Util.getInstance().generateGaswFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, descriptionValue, sandbox, environementFile, extensionFile, callback);
+        FileProcessService.Util.getInstance().generateGaswFile("vm/"+vo+"/gasw.vm",listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, descriptionValue, sandbox, environementFile, extensionFile, callback);
 
     }
 
@@ -302,7 +274,7 @@ public class N4uImportTab extends Tab {
      * @param newApplication
      * @param maxVersion
      */
-    private void createScriptFile(final boolean newVersion, final boolean newApplication) {
+    private void createScriptFile(final boolean newVersion, final boolean newApplication,final String vo) {
 
         final AsyncCallback<Void> callback2 = new AsyncCallback<Void>() {
             @Override
@@ -314,15 +286,16 @@ public class N4uImportTab extends Tab {
             @Override
             public void onSuccess(Void result) {
                 Layout.getInstance().setNoticeMessage("Your Script file was successfully created");
-                createGaswFile(newVersion, newApplication);
+                createGaswFile(newVersion, newApplication,vo);
             }
         };
 
-        FileProcessService.Util.getInstance().generateScriptFile(listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, environementFile, descriptionValue, callback2);
+        FileProcessService.Util.getInstance().generateScriptFile("vm/"+vo+"/wrapper_script.vm",listInputs, listOutputs, "", scriptFileName, applicationName, applicationLocation, environementFile, descriptionValue,dockerImage,commandLine, callback2);
     }
 
 //inputs
-    public VLayout addInputField(boolean requiredInput, String value, String descriptionValue, EnumInputTypes typeValue, boolean isFixedType) {
+    public VLayout addInputField(boolean requiredInput, String value, String descriptionValue, EnumInputTypes typeValue, boolean isFixedType, EnumCardinalityValues cardinality,String commandLineKey) {
+
         item++;
         key++;
         final int nombre = key;
@@ -330,21 +303,11 @@ public class N4uImportTab extends Tab {
         hlayout.setHeight(80);
         hlayout.setWidth100();
         hlayout.setMembersMargin(2);
-
+        
+        hlayout.setOverflow(Overflow.AUTO);
         final HashMap<String, String> map = new HashMap<String, String>();
-        final TextItem fieldItem = FieldUtil.getTextItem("30%", false, "", "[0-9.,A-Za-z-+/_(): ]", false);
-        fieldItem.setValidators(ValidatorUtil.getStringValidator("[0-9.,A-Za-z-+/_(): ]"));
-        fieldItem.setRequired(true);
-        fieldItem.setValue(value);
-
-        map.put("name", fieldItem.getValueAsString());
-        fieldItem.addEditorExitHandler(new EditorExitHandler() {
-            @Override
-            public void onEditorExit(EditorExitEvent event) {
-                map.put("name", fieldItem.getValueAsString());
-            }
-        });
-
+        final TextItem fieldItem = FieldUtil.getTextItem("80", false, "", "[0-9.,A-Za-z-+/_(): ]", false);
+        final TextItem fieldItem2 = FieldUtil.getTextItem("90", false, "", "[0-9.,A-Za-z-+/_(): ]", false);
         final TextArea description = new TextArea();
         description.setHeight("100%");
         description.setWidth("100%");
@@ -361,9 +324,7 @@ public class N4uImportTab extends Tab {
 
         SelectItem selectItem = new SelectItem();
         selectItem.setShowTitle(false);
-
         selectItem.setValue(typeValue);
-
         selectItem.setWidth("100%");
         if (!isFixedType) {
             LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
@@ -372,15 +333,18 @@ public class N4uImportTab extends Tab {
             selectItem.setValueMap(valueMap);
         } else {
             selectItem.setValueMap(typeValue.toString());
-        }
 
+        }    
         selectItem.setValue(typeValue);
-
-        if (typeValue.equals(EnumInputTypes.File)) {
-            map.put("type", "LFN");
-        } else {
-            map.put("type", typeValue.toString());
+        
+        if (typeValue != null) {
+            if (typeValue.equals(EnumInputTypes.File)) {
+                map.put("type", "LFN");
+            } else {
+                map.put("type", typeValue.toString());
+            }
         }
+
         selectItem.addChangedHandler(new ChangedHandler() {
             @Override
             public void onChanged(ChangedEvent event) {
@@ -394,34 +358,26 @@ public class N4uImportTab extends Tab {
 
             }
         });
+   
         String title;
-
         title = "<strong>" + "Input " + item + "</strong>";
-
-        DynamicForm titleItemForm = new DynamicForm();
-        titleItemForm.setHeight(20);
-        titleItemForm.setNumCols(1);
-        titleItemForm.setFields(fieldItem);
-
         DynamicForm selectItemForm = new DynamicForm();
         selectItemForm.setHeight(20);
         selectItemForm.setFields(selectItem);
-
-        Label typeLabel = new Label("<strong>" + "Type:" + "</strong>");
-        typeLabel.setHeight(20);
-        typeLabel.setWidth(20);
-
-        Label nameLabel = new Label("<strong>" + "Name:" + "</strong>");
-        nameLabel.setHeight(20);
-        nameLabel.setWidth(20);
-        Label descriptionLabel = new Label("<strong>" + "Description:" + "</strong>");
-        descriptionLabel.setHeight(20);
-        descriptionLabel.setWidth(25);
-        hlayout.addMember(nameLabel);
-        hlayout.addMember(titleItemForm);
-        hlayout.addMember(typeLabel);
+      
+        hlayout.addMember(addLabel("Name",20,20));
+        hlayout.addMember(addTextItem(fieldItem,value,map,"name"));
+        hlayout.addMember(addLabel("Type",20,20));
         hlayout.addMember(selectItemForm);
-        hlayout.addMember(descriptionLabel);
+        if(cardinality!=null){
+        hlayout.addMember(addLabel("Cardinality",20,20));
+        hlayout.addMember(addSelectItem(cardinality.toString(),map,"cardinality",EnumCardinalityValues.Single.toString(),EnumCardinalityValues.Single.toString(),20));
+         }
+        if(commandLineKey!=null){
+        hlayout.addMember(addLabel("Command-Line-Key",20,20));
+        hlayout.addMember(addTextItem(fieldItem2,commandLineKey,map,"commandLineKey"));
+         }
+        hlayout.addMember(addLabel("Description",20,25));
         hlayout.addMember(description);
 
         final SectionStack sectionStack = new SectionStack();
@@ -435,7 +391,6 @@ public class N4uImportTab extends Tab {
         removeButton.setShowFocused(false);
         removeButton.setShowRollOver(false);
         removeButton.setShowDown(false);
-
         removeButton.addClickHandler(new ClickHandler() {
             public void onClick(ClickEvent event) {
                 listItems.remove(fieldItem);
@@ -458,31 +413,23 @@ public class N4uImportTab extends Tab {
         listInputs.put(nombre, map);
         listItems.add(fieldItem);
         vlayout.addMember(sectionStack);
-
         return vlayout;
 
     }
 
-    public VLayout addOutputField(boolean fixedInput, String value, String descriptionValue, EnumInputTypes typeValue, boolean fixedType) {
+    public VLayout addOutputField(boolean fixedInput, String value, String descriptionValue, EnumInputTypes typeValue, boolean fixedType,EnumCardinalityValues cardinality,String commandLineKey,String valueTemplate) {
         outputItems++;
         HLayout hlayout = new HLayout();
         hlayout.setHeight(80);
         hlayout.setWidth100();
         hlayout.setMembersMargin(2);
+        hlayout.setOverflow(Overflow.AUTO);
 
         final HashMap<String, String> map = new HashMap<String, String>();
 
-        final TextItem fieldItem = FieldUtil.getTextItem("30%", false, "", "[0-9.,A-Za-z-+/_() ]", false);
-        fieldItem.setValidators(ValidatorUtil.getStringValidator("[0-9.,A-Za-z-+/_() ]"));
-        fieldItem.setRequired(true);
-        fieldItem.setValue(value);
-        map.put("name", fieldItem.getValueAsString());
-        fieldItem.addEditorExitHandler(new EditorExitHandler() {
-            @Override
-            public void onEditorExit(EditorExitEvent event) {
-                map.put("name", fieldItem.getValueAsString());
-            }
-        });
+        final TextItem fieldItem = FieldUtil.getTextItem("80", false, "", "[0-9.,A-Za-z-+/_() ]", false);
+        final TextItem fieldItem2 = FieldUtil.getTextItem("90", false, "", "[0-9.,A-Za-z-+/_(): ]", false);
+        final TextItem fieldItem3 = FieldUtil.getTextItem("90", false, "", "[0-9.,A-Za-z-+/_(): ]", false);
         final TextArea description = new TextArea();
         description.setHeight("100%");
         description.setWidth("100%");
@@ -535,32 +482,31 @@ public class N4uImportTab extends Tab {
         String title;
 
         title = "<strong>" + "Output" + outputItems + "</strong>";
-        DynamicForm titleItemForm = new DynamicForm();
-        titleItemForm.setHeight(20);
-        titleItemForm.setNumCols(1);
-        titleItemForm.setFields(fieldItem);
+      
 
         DynamicForm selectItemForm = new DynamicForm();
         selectItemForm.setHeight(20);
         selectItemForm.setFields(selectItem);
 
-        Label typeLabel = new Label("<strong>" + "Type:" + "</strong>");
-        typeLabel.setHeight(20);
-        typeLabel.setWidth(20);
-
-        Label nameLabel = new Label("<strong>" + "Name:" + "</strong>");
-        nameLabel.setHeight(20);
-        nameLabel.setWidth(20);
-        Label descriptionLabel = new Label("<strong>" + "Description:" + "</strong>");
-        descriptionLabel.setHeight(20);
-        descriptionLabel.setWidth(25);
-        hlayout.addMember(nameLabel);
-        hlayout.addMember(titleItemForm);
-        hlayout.addMember(typeLabel);
+        hlayout.addMember(addLabel("Name", 20, 20));
+        hlayout.addMember(addTextItem(fieldItem,value,map,"name"));
+        hlayout.addMember(addLabel("Type", 20, 20));
         hlayout.addMember(selectItemForm);
-        hlayout.addMember(descriptionLabel);
+        if(cardinality!=null){
+        hlayout.addMember(addLabel("Cardinality",20,20));
+        hlayout.addMember(addSelectItem(cardinality.toString(),map,"cardinality",EnumCardinalityValues.Single.toString(),EnumCardinalityValues.Single.toString(),20));
+        }
+        if(commandLineKey!=null){
+        hlayout.addMember(addLabel("Command-Line-Key",20,20));
+        hlayout.addMember(addTextItem(fieldItem2,commandLineKey,map,"commandLineKey"));
+         }
+        if(valueTemplate!=null){
+        hlayout.addMember(addLabel("Template Value",20,20));
+        hlayout.addMember(addTextItem(fieldItem3,valueTemplate,map,"valueTemplate"));
+         }
+        hlayout.addMember(addLabel("Description", 20, 25));
         hlayout.addMember(description);
-
+       
         final SectionStack sectionStack = new SectionStack();
 
         SectionStackSection section1 = new SectionStackSection();
@@ -572,7 +518,8 @@ public class N4uImportTab extends Tab {
 
         sectionStack.setSections(section1);
         sectionStack.setHeight(120);
-        sectionStack.setTitle("" + item);
+        sectionStack.setTitle("" + outputItems);
+        sectionStack.setShowHover(false);
 
         listOutputs.put(outputItems, map);
         listItems.add(fieldItem);
@@ -581,13 +528,14 @@ public class N4uImportTab extends Tab {
     }
 
     //Name,script, extention,env
-    public void addFields(EnumFieldTitles title, boolean addBrowseIcon, String value, String keyPressFilter, boolean disabled, boolean required) {
+    public void addFields(EnumFieldTitles title, boolean addBrowseIcon, String value, String keyPressFilter, boolean disabled, boolean required, boolean inGeneralInformation) {
 
         Label itemLabel = new Label("<strong>" + title + "</strong>");
         itemLabel.setHeight(20);
 
         final TextItem fieldItem = FieldUtil.getTextItem("*", false, "", keyPressFilter, disabled, required);
         fieldItem.setValidators(ValidatorUtil.getStringValidator(keyPressFilter));
+        fieldItem.setValidateOnChange(true);
         fieldItem.setValue(value);
         if (addBrowseIcon) {
             fieldItem.setIcons(browsePicker);
@@ -663,7 +611,10 @@ public class N4uImportTab extends Tab {
             fieldItem.addEditorExitHandler(new EditorExitHandler() {
                 @Override
                 public void onEditorExit(EditorExitEvent event) {
+
+                    fieldItem.validate();
                     applicationName = fieldItem.getValueAsString();
+
                 }
             });
 
@@ -680,8 +631,32 @@ public class N4uImportTab extends Tab {
             });
 
         }
+          if (title.equals(EnumFieldTitles.DockerImage)) {
+            if (value != null) {
+               dockerImage = value;
+            }
+            fieldItem.addEditorExitHandler(new EditorExitHandler() {
+                @Override
+                public void onEditorExit(EditorExitEvent event) {
+                    dockerImage = fieldItem.getValueAsString();
+                }
+            });
+
+        }
+          if (title.equals(EnumFieldTitles.CommandLine)) {
+            if (value != null) {
+               commandLine = value;
+            }
+            fieldItem.addEditorExitHandler(new EditorExitHandler() {
+                @Override
+                public void onEditorExit(EditorExitEvent event) {
+                     commandLine = fieldItem.getValueAsString();
+                }
+            });
+
+        }
         //add Member
-        if (title.equals(EnumFieldTitles.ApplicationName) || title.equals(EnumFieldTitles.ApplicationVersion)) {
+        if (inGeneralInformation) {
             layoutGeneralInformation.addMember(itemLabel);
             layoutGeneralInformation.addMember(titleItemForm);
         } else {
@@ -717,8 +692,118 @@ public class N4uImportTab extends Tab {
         layoutGeneralInformation.addMember(description);
     }
 
-    public void addLaunchButton() {
+    public void addLaunchButton(final String vo) {
+        IButton createApplicationButton;
+           createApplicationButton = WidgetUtil.getIButton("Create Application", N4uConstants.ICON_LAUNCH,
+                new ClickHandler() {
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        for (TextItem i : listItems) {
+                            if (!i.validate()) {
+                                Layout.getInstance().setWarningMessage("There is an invalid input");
+                                return;
+                            }
+                        }
+
+                        //verifying the application existance
+                        AsyncCallback<Boolean> callback = new AsyncCallback<Boolean>() {
+                            @Override
+                            public void onFailure(Throwable caught) {
+                                Layout.getInstance().setWarningMessage(caught.getMessage());
+                            }
+
+                            @Override
+                            public void onSuccess(Boolean result) {
+                                //application exist and will create new version 
+                                //create new application and new version
+
+                                if (result.booleanValue()) {
+                                    Layout.getInstance().setNoticeMessage("Creating the application (this can take a while)");
+                                    createScriptFile(true, false,vo);
+                                } else {
+                                    Layout.getInstance().setNoticeMessage("Creating the application (this can take a while)");
+                                    createScriptFile(true, true,vo);
+                                }
+                            }
+                        };
+
+                        ApplicationService.Util.getInstance().checkApplicationExistWithAnOtherOwner(applicationName, callback);
+
+                    }
+                });
+
+        createApplicationButton.setWidth("150");
 
         layout.addMember(createApplicationButton);
+    }
+    
+    
+    private DynamicForm addSelectItem(String cardinality,final HashMap map,final String mapValue,final String val1,final String val2,int height){
+    //enumValue, map, cardinality,EnumCardinalityValues.Single.toString(),EnumCardinalityValues.Multiple.toString()
+       SelectItem selectItem = new SelectItem();
+        selectItem.setShowTitle(false);
+        selectItem.setWidth("100%");
+        LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
+        valueMap.put(val1,val1);
+        valueMap.put(val2, val2);
+        selectItem.setValueMap(valueMap);
+        selectItem.setValue(cardinality);
+        if (cardinality != null) {
+            if (cardinality.equals(val1)) {
+                map.put(mapValue, val1);
+            } else {
+                map.put(mapValue, val2);
+            }
+        }
+        selectItem.addChangedHandler(new ChangedHandler() {
+            @Override
+            public void onChanged(ChangedEvent event) {
+                String ds = (String) event.getValue();
+                if (ds.equals(val1)) {
+
+                    map.put(mapValue,val1);
+                } else {
+                    map.put(mapValue, val2);
+                }
+
+            }
+        });
+
+        DynamicForm selectItemForm = new DynamicForm();
+        selectItemForm.setHeight(height);
+        selectItemForm.setFields(selectItem);
+        return selectItemForm;
+    
+    }
+    
+    private Label addLabel(String name,int height, int width)
+    {
+        Label label = new Label("<strong>" + name+":" + "</strong>");
+        label.setHeight(height);
+        label.setWidth(width);
+        return label;
+    }
+    
+    private  DynamicForm addTextItem(final TextItem fieldItem,String value,final HashMap map,final String mapKey){
+       
+        fieldItem.setValidators(ValidatorUtil.getStringValidator("[0-9.,A-Za-z-+/_(): ]"));
+        fieldItem.setRequired(true);
+        fieldItem.setValue(value);
+
+        map.put(mapKey, fieldItem.getValueAsString());
+        fieldItem.addEditorExitHandler(new EditorExitHandler() {
+            @Override
+            public void onEditorExit(EditorExitEvent event) {
+                map.put(mapKey, fieldItem.getValueAsString());
+            }
+        });
+        DynamicForm textItemForm = new DynamicForm();
+        textItemForm.setHeight(20);
+        
+        textItemForm.setAutoWidth();
+        textItemForm.setOverflow(Overflow.VISIBLE);
+        textItemForm.setNumCols(1);
+        textItemForm.setFields(fieldItem);
+        return textItemForm;
     }
 }
