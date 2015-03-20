@@ -21,6 +21,15 @@ PARAM${i}VALUE="$${i}"
 #set($commandLine =$commandLine.replace("$input.commandLineKey","$$i"))
 #end
 
+#foreach( $output in $outputList)
+#set($i =$i +1 )
+#if(!$output.commandLineKey.equals(""))
+PARAM${i}KEY="$output.commandLineKey"
+PARAM${i}VALUE="$${i}"
+#set($commandLine =$commandLine.replace("$output.commandLineKey","$$i"))
+#end
+#end
+
 cat << DOCKERJOB > .dockerjob.sh
 #!/bin/bash
 $commandLine
