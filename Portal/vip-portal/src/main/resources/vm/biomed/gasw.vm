@@ -32,7 +32,7 @@
           #if($input.commandLineKey==$key)
            #if($input.type=="LFN" )
          <output name="$output.name" option="$output.option"> 
-              #set ($r = "$dir${i}$na${i}")               
+              #set ($r = "$dir${i}/$na${i}")               
             <template value="$output.valueTemplate.replace($key,$r)"/>
             <access type="LFN">
             </access>
