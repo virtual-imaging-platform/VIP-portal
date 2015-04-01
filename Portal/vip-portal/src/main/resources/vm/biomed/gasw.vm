@@ -22,32 +22,27 @@
         #end
         
         #foreach( $output in $outputList )
-         #set ($index1 = $output.valueTemplate.indexOf('['))
-         #set ($index2 = $output.valueTemplate.indexOf(']'))
-         #set($index3=$index2 +1)
-         #set($key = ${output.valueTemplate.substring($index1,$index3)})
-         #set($i =$0 )
-         #foreach( $input in $inputList )
+        #set($i =0)
+         #foreach( $input in $inputList ) 
           #set($i =$i + 1  )
-          #if($input.commandLineKey==$key)
-           #if($input.type=="LFN" )
-         <output name="$output.name" option="$output.option"> 
-              #set ($r = "$dir${i}/$na${i}")               
+          #if($output.valueTemplate.contains($input.commandLineKey))
+           #set($key = $input.commandLineKey)
+            #if($input.type=="LFN" )
+             #set ($r = "$dir${i}/$na${i}") 
+            #else 
+             #set ($r = "$na${i}") 
+            #end
+          #end     
+         #end      
+        <output name="$output.name" option="$output.option">               
             <template value="$output.valueTemplate.replace($key,$r)"/>
             <access type="LFN">
             </access>
         </output>
-           #else
-         <output name="$output.name" option="$output.option">   
-             #set ($r = "$na${i}")         
-            <template value="$output.valueTemplate.replace($key,${r})"/>
-            <access type="LFN">
-            </access>
-        </output>
-           #end
-          #end
-         #end
-        #end  
+          
+        
+        #end
+      
       
         
 	
