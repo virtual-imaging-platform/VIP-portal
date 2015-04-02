@@ -185,11 +185,14 @@ public class LayoutConverterOption1 extends AbstractFormLayout {
                             }
 
                             tabImporter.addOutputField(true, "Output", "A tar.gz file containing the results", EnumInputTypes.File, true,null,null,null);
+                            tabImporter.addClassItem("VIP Class");
+                            
                             tabImporter.addFields(EnumFieldTitles.MainExecutable, true, script.getValueAsString(), "[0-9.,A-Za-z-+/_() ]", false, true,false);
                             tabImporter.addFields(EnumFieldTitles.ApplicationLocation, true, "", "[0-9.,A-Za-z-+/_() ]", false, true,false);
                             tabImporter.addFields(EnumFieldTitles.ExtensionFile, true, ext.getValueAsString(), "[0-9.,A-Za-z-+/_() ]", false, false,false);
                             tabImporter.addFields(EnumFieldTitles.EnvironementFile, true, env.getValueAsString(), "[0-9.,A-Za-z-+/_() ]", false, false,false);
                             tabImporter.addFields(EnumFieldTitles.SandboxFile, true, "", "[0-9.,A-Za-z-+/_() ]", false, false,false);
+                           
                             tabImporter.addLaunchButton("neugrid");
 
                         }

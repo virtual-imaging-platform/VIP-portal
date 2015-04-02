@@ -123,7 +123,7 @@ public class LayoutConverterOption3 extends AbstractFormLayout {
                                 
 
                     
-                            
+                            tabImporter.addClassItem("VIP Class");
                             tabImporter.addFields(EnumFieldTitles.ApplicationLocation, true, "", "[0-9.,A-Za-z-+/_(): ]", false, true,false);
                             tabImporter.addFields(EnumFieldTitles.SandboxFile, true, "", "[0-9.,A-Za-z-+/_(): ]", false, false,false);
                             tabImporter.addLaunchButton("biomed");

@@ -422,16 +422,6 @@ public class FileProcessServiceImpl extends fr.insalyon.creatis.vip.core.server.
         }
     }
 
-    /**
-     * *
-     *
-     * @return @throws N4uException
-     */
-    @Override
-    public String getApplicationClass() throws N4uException {
-        return Server.getInstance().getApplicationN4uClass();
-    }
-
     private java.sql.Timestamp getCurrentTimeStamp() {
         java.util.Date today = new java.util.Date();
         return new java.sql.Timestamp(today.getTime());
