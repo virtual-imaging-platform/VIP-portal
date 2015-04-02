@@ -8,6 +8,7 @@ import fr.insalyon.creatis.vip.n4u.client.EnumFieldTitles;
 import fr.insalyon.creatis.vip.n4u.client.EnumInputTypes;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.TextArea;
+import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
@@ -42,10 +43,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import com.smartgwt.client.widgets.events.KeyPressEvent;
 import com.smartgwt.client.widgets.events.KeyPressHandler;
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.n4u.client.EnumCardinalityValues;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -63,6 +66,7 @@ public class N4uImportTab extends Tab {
     VLayout vlayout;
     private VLayout layout;
     PickerIcon browsePicker;
+    SelectItem classesPickList;
     
     HashMap<Integer, HashMap<String, String>> listInputs;
     HashMap<Integer, HashMap<String, String>> listOutputs;
@@ -164,19 +168,7 @@ public class N4uImportTab extends Tab {
      * @param lfn
      */
     private void addApplication(final String lfn) {
-        final List<String> applicationClasses = new ArrayList<String>();
-
-        final AsyncCallback<String> classApplicationCallback = new AsyncCallback<String>() {
-            @Override
-            public void onFailure(Throwable caught) {
-
-                Layout.getInstance().setWarningMessage("Unable to get Application Class  " + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(String result) {
-
-                applicationClasses.add(result);
+                     
                 final AsyncCallback<Void> call = new AsyncCallback<Void>() {
                     @Override
                     public void onFailure(Throwable caught) {
@@ -188,12 +180,12 @@ public class N4uImportTab extends Tab {
                         ApplicationService.Util.getInstance().addVersion(new AppVersion(applicationName, version, lfn, true), getCallback("add Version"));
                     }
                 };
-                ApplicationService.Util.getInstance().add(new Application(applicationName, applicationClasses, ""), call);
+                ApplicationService.Util.getInstance().add(new Application(applicationName, Arrays.asList(classesPickList.getValues()), ""), call);
             }
-        };
+        
 
-        FileProcessService.Util.getInstance().getApplicationClass(classApplicationCallback);
-    }
+       
+    
 
     private AsyncCallback<Void> getCallback(final String text) {
 
@@ -494,7 +486,7 @@ public class N4uImportTab extends Tab {
         hlayout.addMember(selectItemForm);
         if(cardinality!=null){
         hlayout.addMember(addLabel("Cardinality",20,20));
-        hlayout.addMember(addSelectItem(cardinality.toString(),map,"cardinality",EnumCardinalityValues.Single.toString(),EnumCardinalityValues.Single.toString(),20));
+        hlayout.addMember(addSelectItem(cardinality.toString(),map,"cardinality",EnumCardinalityValues.Single.toString(),EnumCardinalityValues.Multiple.toString(),20));
         }
         if(commandLineKey!=null){
         hlayout.addMember(addLabel("Command-Line-Key",20,20));
@@ -737,7 +729,25 @@ public class N4uImportTab extends Tab {
         layout.addMember(createApplicationButton);
     }
     
-    
+    public void addClassItem(String title) {
+        Label itemLabel = new Label("<strong>" + title + "</strong>"+"<font color=red>(*)</font>");
+        itemLabel.setHeight(20);
+        classesPickList = new SelectItem();
+        classesPickList = new SelectItem();
+        classesPickList.setShowTitle(false);
+        classesPickList.setMultiple(true);
+        classesPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
+        classesPickList.setWidth(450);
+        loadClasses( classesPickList);
+        DynamicForm titleItemForm = new DynamicForm();
+        titleItemForm.setWidth100();
+        titleItemForm.setNumCols(1);
+        titleItemForm.setFields(classesPickList);
+       
+        layoutExecutable.addMember(itemLabel);
+        layoutExecutable.addMember(titleItemForm);
+    }
+
     private DynamicForm addSelectItem(String cardinality,final HashMap map,final String mapValue,final String val1,final String val2,int height){
     //enumValue, map, cardinality,EnumCardinalityValues.Single.toString(),EnumCardinalityValues.Multiple.toString()
        SelectItem selectItem = new SelectItem();
@@ -805,5 +815,25 @@ public class N4uImportTab extends Tab {
         textItemForm.setNumCols(1);
         textItemForm.setFields(fieldItem);
         return textItemForm;
+    }
+    
+      private void loadClasses(final SelectItem selectItem) {
+
+        final AsyncCallback<List<AppClass>> callback = new AsyncCallback<List<AppClass>>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to get list of classes:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(List<AppClass> result) {
+                List<String> dataList = new ArrayList<String>();
+                for (AppClass c : result) {
+                    dataList.add(c.getName());
+                }
+                selectItem.setValueMap(dataList.toArray(new String[]{}));
+            }
+        };
+        ApplicationService.Util.getInstance().getClasses(callback);
     }
 }

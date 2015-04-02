@@ -26,6 +26,5 @@ public interface FileProcessServiceAsync {
 
     public void generateGaswFile(String templateFolder,HashMap<Integer, HashMap<String, String>> listInput, HashMap<Integer, HashMap<String, String>> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String sandboxFile, String environementFile, String extensionFile, AsyncCallback<Void> callback);
 
-    public void getApplicationClass(AsyncCallback<String> callback);
 
 }
