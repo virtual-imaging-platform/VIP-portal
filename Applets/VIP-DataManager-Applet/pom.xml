@@ -6,7 +6,7 @@
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip-datamanager-applet</artifactId>
     <packaging>jar</packaging>
-    <version>1.12</version>
+    <version>1.13</version>
 
     <name>VIP-DataManager-Applet</name>
 
@@ -102,10 +102,10 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <keystore>src/main/resources/keystore.jks</keystore>
-                    <alias>1</alias>
-                    <storepass></storepass>
-                    <keypass></keypass>
+                    <keystore>${applet.keystore}</keystore>
+                    <alias>${applet.alias}</alias>
+                    <storepass>${applet.storepass}</storepass>
+                    <keypass>${applet.keypass}</keypass>
                 </configuration>
             </plugin>
         </plugins>

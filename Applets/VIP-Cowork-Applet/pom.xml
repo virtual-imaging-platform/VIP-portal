@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.insalyon.creatis.vip</groupId>
   <artifactId>VIP-Cowork-Applet</artifactId>
-  <version>1.12</version>
+  <version>1.13</version>
   <name>VIP-Cowork-Applet</name>
   <url>http://maven.apache.org</url>
   <properties>
@@ -78,10 +78,10 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <keystore>src/main/resources/keystore.jks</keystore>
-                    <alias>1</alias>
-                    <storepass></storepass>
-                    <keypass></keypass>
+                    <keystore>${applet.keystore}</keystore>
+                    <alias>${applet.alias}</alias>
+                    <storepass>${applet.storepass}</storepass>
+                    <keypass>${applet.keypass}</keypass>
                 </configuration>
             </plugin>
             <plugin>
