@@ -27,7 +27,7 @@ public class N4uConverterTab extends Tab {
      */
     public N4uConverterTab() {
         topTabSet = new TabSet();
-        this.setTitle(Canvas.imgHTML(N4uConstants.ICON_EXPRESSLANE1) + " ExpressLane2VIP");
+        this.setTitle(Canvas.imgHTML(N4uConstants.ICON_IMPORTER) + " Application Importer");
         this.setID(N4uConstants.TAB_EXPRESSLANE_1);
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
@@ -40,27 +40,28 @@ public class N4uConverterTab extends Tab {
      */
     private void configure() {
 
-        topTabSet.setTabBarPosition(Side.LEFT);
+        topTabSet.setTabBarPosition(Side.TOP);
         topTabSet.setWidth100();
         topTabSet.setHeight100();
-        Tab tTab1 = new Tab("EXPRESS,JOB... FILES", N4uConstants.ICON_FILES);
-        tTab1.setPrompt("Job, Express, Script, Extension and  Environement Files");
+        
+        Tab tTab3 = new Tab("Json File", N4uConstants.ICON_BOUTIQUE);
+        layoutOption3 = new LayoutConverterOption3("100%", "100%");
+        tTab3.setPane(layoutOption3);
+        
+        Tab tTab1 = new Tab("ExpressLane Files", N4uConstants.ICON_EXPRESSLANE);
         layoutOption1 = new LayoutConverterOption1("100%", "100%");
         tTab1.setPane(layoutOption1);
 
-        Tab tTab2 = new Tab("Xml File", N4uConstants.ICON_FILE);
-        tTab2.setPrompt("Xml File");
+        Tab tTab2 = new Tab("Xml ExpressLane File", N4uConstants.ICON_EXPRESSLANE);  
         layoutOption2 = new LayoutConverterOption2("100%", "100%");
         tTab2.setPane(layoutOption2);
         
-        Tab tTab3 = new Tab("Json File", N4uConstants.ICON_FILE);
-        tTab3.setPrompt("Json File");
-        layoutOption3 = new LayoutConverterOption3("100%", "100%");
-        tTab3.setPane(layoutOption3);
-
-        topTabSet.addTab(tTab1);
-        topTabSet.addTab(tTab2);
+       
+        
         topTabSet.addTab(tTab3);
+        topTabSet.addTab(tTab1);     
+        topTabSet.addTab(tTab2);
+        
 
         layout = new HLayout();
         layout.setWidth100();

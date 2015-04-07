@@ -19,7 +19,7 @@ public class N4uHomeParser extends ApplicationParser {
     public void loadApplications() {
 
         if (CoreModule.user.isSystemAdministrator() || CoreModule.user.hasGroupAccess(N4uConstants.N4U_GROUP)) {
-            addApplication(N4uConstants.APP_N4UCONVERTER, N4uConstants.APP_IMG_N4UCONVERTER);
+            addApplication(N4uConstants.APP_N4UCONVERTER, N4uConstants.APP_IMG_IMPORTER);
         }
     }
 
