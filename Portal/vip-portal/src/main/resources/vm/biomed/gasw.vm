@@ -22,6 +22,7 @@
         #end
         
         #foreach( $output in $outputList )
+        #set($k ="$output.valueTemplate")
         #set($i =0)
          #foreach( $input in $inputList ) 
           #set($i =$i + 1  )
@@ -32,10 +33,11 @@
             #else 
              #set ($r = "$na${i}") 
             #end
-          #end     
+          #end
+          #set ($k ="$k.replace($key,$r)")   
          #end      
         <output name="$output.name" option="$output.option">               
-            <template value="$output.valueTemplate.replace($key,$r)"/>
+            <template value="$k"/>
             <access type="LFN">
             </access>
         </output>
