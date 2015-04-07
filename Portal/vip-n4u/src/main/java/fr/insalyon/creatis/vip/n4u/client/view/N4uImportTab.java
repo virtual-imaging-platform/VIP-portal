@@ -86,7 +86,7 @@ public class N4uImportTab extends Tab {
     String commandLine=null;
     public N4uImportTab() {
 
-        this.setTitle(Canvas.imgHTML(N4uConstants.ICON_EXPRESSLANE1) + " ExpressLaneImporter");
+        this.setTitle(Canvas.imgHTML(N4uConstants.ICON_EXPRESSLANE) + " ExpressLaneImporter");
         this.setID(N4uConstants.TAB_EXPRESSLANE_2);
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
