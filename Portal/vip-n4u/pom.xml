@@ -12,7 +12,7 @@
     <version>${vip.n4u.version}</version>
     <packaging>jar</packaging>
 
-    <name>VIP-N4U</name>
+    <name>VIP-APPIMPORTER</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
