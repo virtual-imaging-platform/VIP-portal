@@ -60,6 +60,7 @@ public class UserRecord extends ListGridRecord {
         setAttribute("countryCode", user.getCountryCode().name());
         setAttribute("countryCodeIcon", "core/flags/" + user.getCountryCode().name());
         setAttribute("countryName", user.getCountryCode().getCountryName());
+        setAttribute("accountLocked",user.isAccountLocked());
     }
     
     public Date getDate() {

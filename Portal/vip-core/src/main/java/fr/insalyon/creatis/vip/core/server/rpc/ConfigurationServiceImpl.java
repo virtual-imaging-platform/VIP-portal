@@ -479,12 +479,12 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      */
     @Override
     public void updateUser(String email, UserLevel level, CountryCode countryCode,
-            int maxRunningSimulations, Map<String, GROUP_ROLE> groups) throws CoreException {
+            int maxRunningSimulations, Map<String, GROUP_ROLE> groups, boolean locked) throws CoreException {
 
         try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Updating user '" + email + "'.");
-            configurationBusiness.updateUser(email, level, countryCode, maxRunningSimulations);
+            configurationBusiness.updateUser(email, level, countryCode, maxRunningSimulations, locked);
             configurationBusiness.setUserGroups(email, groups);
 
         } catch (BusinessException ex) {
@@ -867,7 +867,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
         try {
             User user = getSessionUser();
-            if (user.isSystemAdministrator() || configurationBusiness.getpublication(id).getVipAuthor().equals(user.getEmail())) {
+            if (user.isSystemAdministrator() || configurationBusiness.getPublication(id).getVipAuthor().equals(user.getEmail())) {
                 configurationBusiness.removePublication(id);
             } else {
                 throw new CoreException("you can't remove a publication that is not yours");
@@ -900,7 +900,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
         try {
             User user = getSessionUser();
-            if (user.isSystemAdministrator() || configurationBusiness.getpublication(pub.getId()).getVipAuthor().equals(user.getEmail())) {
+            if (user.isSystemAdministrator() || configurationBusiness.getPublication(pub.getId()).getVipAuthor().equals(user.getEmail())) {
                 pub.setVipAuthor(user.getEmail());
                 configurationBusiness.updatePublication(pub);
             } else {

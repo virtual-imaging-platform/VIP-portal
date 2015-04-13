@@ -70,6 +70,7 @@ public class EditUserLayout extends AbstractFormLayout {
     private SelectItem countryPickList;
     private SpinnerItem maxRunningSimulationsItem;
     private CheckboxItem confirmedField;
+    private CheckboxItem lockedField;
     private IButton saveButton;
 
     public EditUserLayout() {
@@ -120,6 +121,11 @@ public class EditUserLayout extends AbstractFormLayout {
         confirmedField.setTitle("Confirmed");
         confirmedField.setDisabled(true);
         confirmedField.setWidth(350);
+        
+        lockedField = new CheckboxItem();
+        lockedField.setTitle("Locked");
+        lockedField.setDisabled(false);
+        lockedField.setWidth(350);
 
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
@@ -150,7 +156,7 @@ public class EditUserLayout extends AbstractFormLayout {
                             UserLevel.valueOf(levelPickList.getValueAsString()),
                             CountryCode.valueOf(countryPickList.getValueAsString()),
                             Integer.parseInt(maxRunningSimulationsItem.getValueAsString()),
-                            map);
+                            map, lockedField.getValueAsBoolean());
                 }
             }
         });
@@ -163,6 +169,7 @@ public class EditUserLayout extends AbstractFormLayout {
         addField("Country", countryPickList);
         addField("Max Running Simulations", maxRunningSimulationsItem);
         this.addMember(FieldUtil.getForm(confirmedField));
+        this.addMember(FieldUtil.getForm(lockedField));
         this.addMember(saveButton);
     }
 
@@ -175,13 +182,15 @@ public class EditUserLayout extends AbstractFormLayout {
      * @param level User's level
      * @param countryCode User's country code
      * @param maxRunningSimulations User's max running simulations
+     * @param locked True if user is locked
      */
     public void setUser(String name, String email, boolean confirmed,
-            String level, String countryCode, int maxRunningSimulations) {
+            String level, String countryCode, int maxRunningSimulations, boolean locked) {
 
         this.nameLabel.setContents(name);
         this.emailLabel.setContents(email);
         this.confirmedField.setValue(confirmed);
+        this.lockedField.setValue(locked);
         this.levelPickList.setValue(level);
         this.countryPickList.setValue(countryCode);
         this.maxRunningSimulationsItem.setValue(maxRunningSimulations);
@@ -220,7 +229,7 @@ public class EditUserLayout extends AbstractFormLayout {
      * @param groups List of groups
      */
     private void save(String email, UserLevel level, CountryCode countryCode,
-            int maxRunningSimulations, Map<String, CoreConstants.GROUP_ROLE> groups) {
+            int maxRunningSimulations, Map<String, CoreConstants.GROUP_ROLE> groups, boolean locked) {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
@@ -240,12 +249,13 @@ public class EditUserLayout extends AbstractFormLayout {
                 groupsPickList.setValues(new String[]{});
                 countryPickList.setValues(new String[]{});
                 confirmedField.setValue(false);
+                lockedField.setValue(false);
                 ((ManageUsersTab) Layout.getInstance().getTab(CoreConstants.TAB_MANAGE_USERS)).loadUsers();
                 Layout.getInstance().setNoticeMessage("User successfully updated.");
             }
         };
         WidgetUtil.setLoadingIButton(saveButton, "Updating user...");
-        service.updateUser(email, level, countryCode, maxRunningSimulations, groups, callback);
+        service.updateUser(email, level, countryCode, maxRunningSimulations, groups, locked, callback);
     }
 
     /**

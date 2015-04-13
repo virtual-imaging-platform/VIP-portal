@@ -59,13 +59,6 @@ public class UserData implements UserDAO {
         connection = PlatformConnection.getInstance().getConnection();
     }
 
-    /**
-     * Adds a user
-     *
-     * @param user
-     * @param code
-     * @return
-     */
     @Override
     public void add(User user) throws DAOException {
 
@@ -108,14 +101,6 @@ public class UserData implements UserDAO {
         }
     }
 
-
-    /**
-     *
-     * @param email
-     * @param password
-     * @return
-     * @throws DAOException
-     */
     @Override
     public boolean authenticate(String email, String password) throws DAOException {
 
@@ -141,13 +126,6 @@ public class UserData implements UserDAO {
         }
     }
 
-    /**
-     *
-     * @param email
-     * @param code
-     * @return
-     * @throws DAOException
-     */
     @Override
     public boolean activate(String email, String code) throws DAOException {
 
@@ -181,12 +159,6 @@ public class UserData implements UserDAO {
         }
     }
 
-    /**
-     *
-     * @param email
-     * @return
-     * @throws DAOException
-     */
     @Override
     public User getUser(String email) throws DAOException {
 
@@ -194,7 +166,8 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, session, registration, "
-                    + "last_login, level, country_code, max_simulations,termsUse,lastUpdatePublications "
+                    + "last_login, level, country_code, max_simulations, termsUse,"
+                    +" lastUpdatePublications,failed_authentications,account_locked "
                     + "FROM VIPUsers "
                     + "WHERE email=?");
 
@@ -212,7 +185,11 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse"),rs.getTimestamp("lastUpdatePublications"));
+                        rs.getInt("max_simulations"),
+                        rs.getTimestamp("termsUse"),
+                        rs.getTimestamp("lastUpdatePublications"),
+                        rs.getInt("failed_authentications"),
+                        rs.getBoolean("account_locked"));
 
                 ps.close();
                 return user;
@@ -227,10 +204,6 @@ public class UserData implements UserDAO {
         }
     }
 
-    /**
-     *
-     * @return @throws DAOException
-     */
     @Override
     public List<User> getUsers() throws DAOException {
 
@@ -238,7 +211,8 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, registration, last_login, "
-                    + "level, country_code, max_simulations,termsUse,lastUpdatePublications "
+                    + "level, country_code, max_simulations, termsUse, lastUpdatePublications,"
+                    + "failed_authentications,accounts_locked "
                     + "FROM VIPUsers "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
 
@@ -255,7 +229,11 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse"),rs.getTimestamp("lastUpdatePublications")));
+                        rs.getInt("max_simulations"),
+                        rs.getTimestamp("termsUse"),
+                        rs.getTimestamp("lastUpdatePublications"),
+                        rs.getInt("failed_authentications"),
+                        rs.getBoolean("account_locked")));
             }
             ps.close();
             return users;
@@ -266,11 +244,6 @@ public class UserData implements UserDAO {
         }
     }
 
-    /**
-     *
-     * @param email
-     * @throws DAOException
-     */
     @Override
     public void remove(String email) throws DAOException {
         try {
@@ -287,11 +260,6 @@ public class UserData implements UserDAO {
         }
     }
 
-    /**
-     *
-     * @param user
-     * @throws DAOException
-     */
     @Override
     public void update(User user) throws DAOException {
 
@@ -319,13 +287,6 @@ public class UserData implements UserDAO {
         }
     }
 
-    /**
-     *
-     * @param email
-     * @param currentPassword
-     * @param newPassword
-     * @throws DAOException
-     */
     @Override
     public void updatePassword(String email, String currentPassword,
             String newPassword) throws DAOException {
@@ -351,12 +312,6 @@ public class UserData implements UserDAO {
         }
     }
 
-    /**
-     *
-     * @param email
-     * @param session
-     * @throws DAOException
-     */
     @Override
     public void updateSession(String email, String session) throws DAOException {
 
@@ -376,13 +331,6 @@ public class UserData implements UserDAO {
         }
     }
 
-    /**
-     *
-     * @param email
-     * @param session
-     * @return
-     * @throws DAOException
-     */
     @Override
     public boolean verifySession(String email, String session) throws DAOException {
 
@@ -407,12 +355,6 @@ public class UserData implements UserDAO {
         }
     }
 
-    /**
-     *
-     * @param email
-     * @param lastLogin
-     * @throws DAOException
-     */
     @Override
     public void updateLastLogin(String email, Date lastLogin) throws DAOException {
 
@@ -432,12 +374,6 @@ public class UserData implements UserDAO {
         }
     }
 
-    /**
-     *
-     * @param session
-     * @return
-     * @throws DAOException
-     */
     @Override
     public User getUserBySession(String session) throws DAOException {
 
@@ -445,7 +381,8 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, session, registration, "
-                    + "last_login, level, country_code, max_simulations,termsUse,lastUpdatePublications "
+                    + "last_login, level, country_code, max_simulations, termsUse,"
+                    + "lastUpdatePublications, failed_authentications, account_locked "
                     + "FROM VIPUsers "
                     + "WHERE session = ?");
 
@@ -463,7 +400,12 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse"),rs.getTimestamp("lastUpdatePublications"));
+                        rs.getInt("max_simulations"),
+                        rs.getTimestamp("termsUse"),
+                        rs.getTimestamp("lastUpdatePublications"),
+                        rs.getInt("failed_authentications"),
+                        rs.getBoolean("account_locked")
+                );
                 ps.close();
                 return user;
             }
@@ -477,10 +419,6 @@ public class UserData implements UserDAO {
         }
     }
 
-    /**
-     *
-     * @return @throws DAOException
-     */
     @Override
     public List<User> getAdministrators() throws DAOException {
 
@@ -488,7 +426,8 @@ public class UserData implements UserDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, registration, last_login, "
-                    + "level, country_code, max_simulations,termsUse,lastUpdatePublications "
+                    + "level, country_code, max_simulations, termsUse,"
+                    + "lastUpdatePublications, failed_authentications, account_locked "
                     + "FROM VIPUsers WHERE level = ? "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
             ps.setString(1, UserLevel.Administrator.name());
@@ -506,7 +445,10 @@ public class UserData implements UserDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse"),rs.getTimestamp("lastUpdatePublications")));
+                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse"),
+                        rs.getTimestamp("lastUpdatePublications"),
+                        rs.getInt("failed_authentications"),
+                        rs.getBoolean("account_locked")));
             }
             ps.close();
             return users;
@@ -517,25 +459,19 @@ public class UserData implements UserDAO {
         }
     }
 
-    /**
-     *
-     * @param email
-     * @param level
-     * @param countryCode
-     * @throws DAOException
-     */
     @Override
-    public void update(String email, UserLevel level, CountryCode countryCode, int maxRunningSimulations)
+    public void update(String email, UserLevel level, CountryCode countryCode, int maxRunningSimulations, boolean locked)
             throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
-                    + "VIPUsers SET level = ?, country_code = ? WHERE email = ?");
+                    + "VIPUsers SET level = ?, country_code = ?, locked = ? WHERE email = ?");
             ps.setString(1, level.name());
             ps.setString(2, countryCode.name());
             ps.setInt(3, maxRunningSimulations);
-            ps.setString(4, email);
-
+            ps.setBoolean(4, locked);
+            ps.setString(5, email);
+            
             ps.executeUpdate();
             ps.close();
 
@@ -545,12 +481,6 @@ public class UserData implements UserDAO {
         }
     }
 
-    /**
-     *
-     * @param email
-     * @param code
-     * @throws DAOException
-     */
     @Override
     public void updateCode(String email, String code) throws DAOException {
 
@@ -569,12 +499,6 @@ public class UserData implements UserDAO {
         }
     }
 
-    /**
-     *
-     * @param email
-     * @param newPassword
-     * @throws DAOException
-     */
     @Override
     public void resetPassword(String email, String newPassword) throws DAOException {
 
@@ -709,4 +633,36 @@ public class UserData implements UserDAO {
         return new java.sql.Timestamp(today.getTime());
 
     }
+
+    @Override
+    public int getNFailedAuthentications(String email) throws DAOException {
+        throw new UnsupportedOperationException("Not supported yet."); 
+    }
+
+    
+    @Override
+    public boolean isLocked(String email) throws DAOException {
+        throw new UnsupportedOperationException("Not supported yet."); 
+    }
+    
+    @Override
+    public void lock(String email) throws DAOException {
+        throw new UnsupportedOperationException("Not supported yet."); 
+    }
+
+    @Override
+    public void unlock(String email) throws DAOException {
+        throw new UnsupportedOperationException("Not supported yet."); 
+    }
+
+    @Override
+    public void resetNFailedAuthentications(String email) throws DAOException {
+        throw new UnsupportedOperationException("Not supported yet."); 
+    }
+
+    @Override
+    public void incNFailedAuthentications(String email) throws DAOException {
+        throw new UnsupportedOperationException("Not supported yet."); 
+    }
+
 }

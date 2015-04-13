@@ -62,7 +62,6 @@ import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.user.publication.PublicationRecord;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import java.util.ArrayList;
 import java.util.Date;
@@ -144,7 +143,8 @@ public class UsersLayout extends VLayout {
                                     rollOverRecord.getAttributeAsBoolean("confirmed"),
                                     rollOverRecord.getAttribute("level"),
                                     rollOverRecord.getAttribute("countryCode"),
-                                    rollOverRecord.getAttributeAsInt("maxRunningSimulations"));
+                                    rollOverRecord.getAttributeAsInt("maxRunningSimulations"),
+                                    rollOverRecord.getAttributeAsBoolean("accountLocked"));
                         }
                     }));
 
@@ -211,11 +211,17 @@ public class UsersLayout extends VLayout {
         ListGridField confirmedField = new ListGridField("confirmed", "Confirmed");
         confirmedField.setType(ListGridFieldType.BOOLEAN);
 
+        ListGridField lockedField = new ListGridField("accountLocked", "Locked");
+        lockedField.setType(ListGridFieldType.BOOLEAN);
+
+        
         grid.setFields(confirmedField,
+                lockedField,
                 FieldUtil.getIconGridField("countryCodeIcon"),
                 new ListGridField("username", "Name"),
                 FieldUtil.getDateField("lastLogin", "Last Login"),
-                new ListGridField("email", "Email"));
+                new ListGridField("email", "Email")
+                );
         grid.setSortField("firstName");
         grid.setSortDirection(SortDirection.ASCENDING);
 
@@ -230,7 +236,8 @@ public class UsersLayout extends VLayout {
                         record.getAttributeAsBoolean("confirmed"),
                         record.getAttribute("level"),
                         record.getAttribute("countryCode"),
-                        record.getAttributeAsInt("maxRunningSimulations"));
+                        record.getAttributeAsInt("maxRunningSimulations"),
+                        record.getAttributeAsBoolean("accountLocked"));
             }
         });
 
@@ -304,11 +311,11 @@ public class UsersLayout extends VLayout {
      * @param countryCode
      */
     private void edit(String userName, String email, boolean confirmed,
-            String level, String countryCode, int maxRunningSimulations) {
+            String level, String countryCode, int maxRunningSimulations, boolean locked) {
 
         ManageUsersTab usersTab = (ManageUsersTab) Layout.getInstance().
                 getTab(CoreConstants.TAB_MANAGE_USERS);
-        usersTab.setUser(userName, email, confirmed, level, countryCode, maxRunningSimulations);
+        usersTab.setUser(userName, email, confirmed, level, countryCode, maxRunningSimulations, locked);
     }
     
     

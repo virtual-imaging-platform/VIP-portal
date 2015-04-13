@@ -41,7 +41,6 @@ import fr.insalyon.creatis.vip.core.client.bean.TermsOfUse;
 import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import java.sql.Timestamp;
@@ -88,7 +87,7 @@ public interface ConfigurationServiceAsync {
 
     public void getUserGroups(AsyncCallback<List<String>> asyncCallback);
 
-    public void updateUser(String email, UserLevel level, CountryCode countryCode, int maxRunningSimulations, Map<String, CoreConstants.GROUP_ROLE> groups, AsyncCallback<Void> asyncCallback);
+    public void updateUser(String email, UserLevel level, CountryCode countryCode, int maxRunningSimulations, Map<String, CoreConstants.GROUP_ROLE> groups, boolean locked, AsyncCallback<Void> asyncCallback);
 
     public void getUsers(AsyncCallback<List<User>> asyncCallback);
 

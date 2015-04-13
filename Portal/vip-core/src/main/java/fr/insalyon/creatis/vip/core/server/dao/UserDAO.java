@@ -50,8 +50,21 @@ public interface UserDAO {
 
     public void update(User user) throws DAOException;
 
+    /**
+     * This method verifies if the password is correct AND the account is not locked.
+     * @param email
+     * @param password
+     * @return
+     * @throws DAOException 
+     */
     public boolean authenticate(String email, String password) throws DAOException;
 
+    /**
+     * @param email
+     * @param code
+     * @return
+     * @throws DAOException 
+     */
     public boolean activate(String email, String code) throws DAOException;
 
     public User getUser(String email) throws DAOException;
@@ -72,7 +85,7 @@ public interface UserDAO {
 
     public List<User> getAdministrators() throws DAOException;
 
-    public void update(String email, UserLevel level, CountryCode countryCode, int maxRunningSimulations) throws DAOException;
+    public void update(String email, UserLevel level, CountryCode countryCode, int maxRunningSimulations, boolean locked) throws DAOException;
 
     public void updateCode(String email, String code) throws DAOException;
 
@@ -95,4 +108,51 @@ public interface UserDAO {
     public Timestamp getLastPublicationUpdate(String email) throws DAOException;
 
     public void updateLastUpdatePublication(String email, Timestamp lastUpdatePublication) throws DAOException;
+    
+    /**
+     * Returns the number of failed authentication since the last successful one.
+     * @param email email of the user
+     * @throws DAOException 
+     */
+    public int getNFailedAuthentications(String email) throws DAOException;
+    
+    /**
+     * Resets the number of failed authentication since the last successful one.
+     * Typically used when authentication is successful.
+     * @param email email of the user
+     * @param n value to set
+     * @throws DAOException 
+     */
+    public void resetNFailedAuthentications(String email) throws DAOException;
+    
+    /**
+     * Increments the number of failed authentications since the last successful one.
+     * @param email email of the user.
+     * @throws DAOException 
+     */
+    public void incNFailedAuthentications(String email) throws DAOException;
+    
+    /**
+     * Locks the user.
+     * A user is locked manually through the interface or when the number of failed authentications is too high. 
+     * @param email email of the user
+     * @throws DAOException 
+     */
+    public void lock(String email) throws DAOException;
+    
+    /**
+     * Unlocks the user.
+     * Only administrators should be able to unlock users. 
+     * @param email email of the user.
+     * @throws DAOException 
+     */
+    public void unlock(String email) throws DAOException;
+    
+    /**
+     * Returns true if the user account is locked.
+     * @param email email of the user.
+     * @return
+     * @throws DAOException 
+     */
+    public boolean isLocked(String email) throws DAOException;
 }

@@ -119,7 +119,7 @@ public class PersonalLayout extends AbstractFormLayout {
                                     phoneField.getValueAsString().trim(),
                                     UserLevel.valueOf(levelLabel.getContents()),
                                     CountryCode.valueOf(countryField.getValueAsString()));
-                            user.setFolder(folder);
+                                     user.setFolder(folder);
 
                             ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
                             final AsyncCallback<User> callback = new AsyncCallback<User>() {

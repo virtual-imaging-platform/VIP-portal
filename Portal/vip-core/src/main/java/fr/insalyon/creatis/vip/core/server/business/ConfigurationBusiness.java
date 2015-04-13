@@ -100,13 +100,14 @@ public class ConfigurationBusiness {
         try {
             if (email != null && session != null) {
                 UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
-
-                if (userDAO.verifySession(email, session)) {
+                if (userDAO.verifySession(email, session) && !userDAO.isLocked(email)) {
                     String newSession = UUID.randomUUID().toString();
                     userDAO.updateSession(email, newSession);
-
                     return true;
                 }
+                userDAO.incNFailedAuthentications(email); //just in case...
+                if(userDAO.getNFailedAuthentications(email) > 5)
+                    userDAO.lock(email);
             }
             return false;
 
@@ -311,11 +312,15 @@ public class ConfigurationBusiness {
 
             if (userDAO.authenticate(email, password)) {
 
+                userDAO.resetNFailedAuthentications(email);
                 return getUserWithSession(email);
 
             } else {
-                logger.error("Authentication failed to '" + email + "' (email or password incorrect).");
-                throw new BusinessException("Authentication failed (email or password incorrect).");
+                userDAO.incNFailedAuthentications(email);
+                if(userDAO.getNFailedAuthentications(email) > 5)
+                    userDAO.lock(email);
+                logger.error("Authentication failed to '" + email + "' (email or password incorrect, or user is locked).");
+                throw new BusinessException("Authentication failed (email or password incorrect, or user is locked).");
             }
         } catch (NoSuchAlgorithmException ex) {
             logger.error(ex);
@@ -350,6 +355,7 @@ public class ConfigurationBusiness {
             }
             try {
                 user = userDAO.getUser(user.getEmail());
+                userDAO.resetNFailedAuthentications(user.getEmail());
             } catch (DAOException ex) {
                 try {
                     signup(user, "Generated from CAS login", true, true, Server.getInstance().getSAMLDefaultAccountType());
@@ -463,9 +469,14 @@ public class ConfigurationBusiness {
 
         try {
             UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
+            if (userDAO.isLocked(email)){
+                logger.error("Activation failed to '" + email + "' (user is locked).");
+                throw new BusinessException("User is locked.");
+            }
             if (userDAO.activate(email, code)) {
 
                 User user = userDAO.getUser(email);
+                userDAO.resetNFailedAuthentications(email);
 
                 GRIDAClient client = CoreUtil.getGRIDAClient();
                 client.createFolder(Server.getInstance().getDataManagerUsersHome(),
@@ -477,7 +488,10 @@ public class ConfigurationBusiness {
                 return user;
 
             } else {
-                logger.error("Activation failed to '" + email + "' (wrong code).");
+                userDAO.incNFailedAuthentications(email);
+                if(userDAO.getNFailedAuthentications(email) > 5)
+                    userDAO.lock(email);
+                logger.error("Activation failed to '" + email + "' (wrong code: "+code+").");
                 throw new BusinessException("Activation failed.");
             }
 
@@ -515,6 +529,9 @@ public class ConfigurationBusiness {
         try {
             User user = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
 
+            if(CoreDAOFactory.getDAOFactory().getUserDAO().isLocked(email))
+                throw new BusinessException("User is locked.");
+            
             String emailContent = "<html>"
                     + "<head></head>"
                     + "<body>"
@@ -545,6 +562,9 @@ public class ConfigurationBusiness {
         try {
             User user = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
 
+            if(CoreDAOFactory.getDAOFactory().getUserDAO().isLocked(email))
+                throw new BusinessException("User is locked.");
+            
             String code = UUID.randomUUID().toString();
             CoreDAOFactory.getDAOFactory().getUserDAO().updateCode(email, code);
 
@@ -636,6 +656,8 @@ public class ConfigurationBusiness {
 
     /**
      *
+     * @param email
+     * @param validGroup
      * @return @throws BusinessException
      */
     public List<String> getUserNames(String email, boolean validGroup)
@@ -996,14 +1018,15 @@ public class ConfigurationBusiness {
      * @param level
      * @param countryCode
      * @param maxRunningSimulations
+     * @param locked
      * @throws BusinessException
      */
     public void updateUser(String email, UserLevel level, CountryCode countryCode,
-            int maxRunningSimulations) throws BusinessException {
+            int maxRunningSimulations, boolean locked) throws BusinessException {
 
         try {
             CoreDAOFactory.getDAOFactory().getUserDAO().update(email, level,
-                    countryCode, maxRunningSimulations);
+                    countryCode, maxRunningSimulations, locked);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -1242,7 +1265,7 @@ public class ConfigurationBusiness {
         }
     }
 
-     public Publication getpublication(Long id) throws BusinessException {
+    public Publication getPublication(Long id) throws BusinessException {
 
         try {
 

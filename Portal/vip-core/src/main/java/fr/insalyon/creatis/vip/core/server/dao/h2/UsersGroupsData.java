@@ -107,7 +107,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
                 if (role == null || role.isEmpty() || role.equals("null")) {
                     role = "None";
                 }
-                groups.put(new Group(rs.getString("groupname"), rs.getBoolean("public"),rs.getBoolean("gridfile"),rs.getBoolean("gridjobs")),
+                groups.put(new Group(rs.getString("groupname"), rs.getBoolean("public"), rs.getBoolean("gridfile"), rs.getBoolean("gridjobs")),
                         GROUP_ROLE.valueOf(role));
             }
             ps.close();
@@ -119,56 +119,50 @@ public class UsersGroupsData implements UsersGroupsDAO {
         }
     }
 
-    
-     @Override
-    public  List<Boolean> getUserPropertiesGroups(String email)
+    @Override
+    public List<Boolean> getUserPropertiesGroups(String email)
             throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement(
-                   "SELECT public, gridfile, gridjobs "
+                    "SELECT public, gridfile, gridjobs "
                     + "FROM VIPGroups g, VIPUsersGroups ug "
                     + "WHERE g.groupname = ug.groupname AND ug.email= ?");
             ps.setString(1, email);
-             logger.info("email"+email);
+            logger.info("email" + email);
             ResultSet rs = ps.executeQuery();
-          logger.info("execute query with success");
-             List<Boolean> proprties = new ArrayList<Boolean>();
-             boolean isPublic=false;
-             boolean isGridFile=false;
-             boolean isGridJobs=false;
+            logger.info("execute query with success");
+            List<Boolean> proprties = new ArrayList<Boolean>();
+            boolean isPublic = false;
+            boolean isGridFile = false;
+            boolean isGridJobs = false;
 
-            while (rs.next()) { 
-               if(rs.getInt("gridfile")==1)
-               logger.info("test 1 bon");
-               isGridFile=true;
-               if(rs.getInt("gridjobs")==1)
-               isGridJobs=true;
-                if(rs.getInt("public")==1)
-               isPublic=true;
+            while (rs.next()) {
+                if (rs.getInt("gridfile") == 1) {
+                    logger.info("test 1 bon");
+                }
+                isGridFile = true;
+                if (rs.getInt("gridjobs") == 1) {
+                    isGridJobs = true;
+                }
+                if (rs.getInt("public") == 1) {
+                    isPublic = true;
+                }
             }
             proprties.add(0, isPublic);
             proprties.add(1, isGridFile);
             proprties.add(2, isGridJobs);
-            
-            
+
             ps.close();
-            
-            
-           
+
             return proprties;
-            
+
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
         }
     }
 
-    
-    
-
-    
-    
     /**
      *
      * @param email
@@ -280,7 +274,8 @@ public class UsersGroupsData implements UsersGroupsDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "us.email AS uemail, first_name, last_name, institution, "
                     + "phone, code, confirmed, folder, registration, last_login, "
-                    + "level, country_code, max_simulations,termsUse,lastUpdatePublications  "
+                    + "level, country_code, max_simulations, termsUse, lastUpdatePublications,"
+                    + "failed_authentications, account_locked "
                     + "FROM VIPUsers us, VIPUsersGroups ug "
                     + "WHERE us.email = ug.email AND ug.groupname = ? "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
@@ -300,7 +295,11 @@ public class UsersGroupsData implements UsersGroupsDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations"),rs.getTimestamp("termsUse"),rs.getTimestamp("lastUpdatePublications")));
+                        rs.getInt("max_simulations"),
+                        rs.getTimestamp("termsUse"),
+                        rs.getTimestamp("lastUpdatePublications"),
+                        rs.getInt("failed_authentications"),
+                        rs.getBoolean("account_locked")));
             }
             ps.close();
             return users;
