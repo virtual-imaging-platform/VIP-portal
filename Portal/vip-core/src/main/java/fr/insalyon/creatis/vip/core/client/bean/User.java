@@ -66,10 +66,11 @@ public class User implements IsSerializable {
     private Map<Group, GROUP_ROLE> groups;
     private Timestamp termsOfUse;
     private Timestamp lastUpdatePublications;
-
+    private int failedAuthentications;
+    private boolean accountLocked;
     
-    private Boolean isgridfile;
-    private Boolean isgridjobs;
+    private Boolean isGridFile;
+    private Boolean isGridJob;
     
     public User() {
     }
@@ -78,22 +79,38 @@ public class User implements IsSerializable {
             String phone, UserLevel level, CountryCode countryCode) {
 
         this(firstName, lastName, email, institution, "", phone, false, "", "",
-                "", null, null, level, countryCode, 1,null,null);
-        
+                "", null, null, level, countryCode, 1,null,null,0,false);
+
     }
 
     public User(String firstName, String lastName, String email, String institution,
             String password, String phone, CountryCode countryCode,Timestamp lastUpdatePublications) {
 
         this(firstName, lastName, email, institution, password, phone, false,
-                "", "", "", new Date(), new Date(), null, countryCode, 1,null,lastUpdatePublications);
+                "", "", "", new Date(), new Date(), null, countryCode, 1,null,lastUpdatePublications,0,false);
     }
 
-    public User(String firstName, String lastName, String email,
-            String institution, String password, String phone, boolean confirmed,
-            String code, String folder, String session, Date registration,
-            Date lastLogin, UserLevel level, CountryCode countryCode, 
-            int maxRunningSimulations,Timestamp termsOfUse,Timestamp lastUpdatePublications) {
+    public User(
+            String firstName,
+            String lastName,
+            String email,
+            String institution,
+            String password,
+            String phone,
+            boolean confirmed,
+            String code,
+            String folder,
+            String session,
+            Date registration,
+            Date lastLogin,
+            UserLevel level,
+            CountryCode countryCode, 
+            int maxRunningSimulations,
+            Timestamp termsOfUse,
+            Timestamp lastUpdatePublications,
+            int failedAuthentications,
+            boolean locked
+    ) {
 
         this.firstName = firstName;
         this.lastName = lastName;
@@ -112,6 +129,8 @@ public class User implements IsSerializable {
         this.countryCode = countryCode;
         this.termsOfUse=termsOfUse;
         this.lastUpdatePublications=lastUpdatePublications;
+        this.failedAuthentications = failedAuthentications;
+        this.accountLocked = locked;
     }
 
     public boolean isConfirmed() {
@@ -218,8 +237,6 @@ public class User implements IsSerializable {
         this.groups = groups;
         
     }
-    
-     
 
     public Timestamp getTermsOfUse() {
         return termsOfUse;
@@ -230,19 +247,19 @@ public class User implements IsSerializable {
     }
 
     public Boolean getIsgridfile() {
-        return isgridfile;
+        return isGridFile;
     }
 
     public void setIsgridfile(Boolean isgridfile) {
-        this.isgridfile = isgridfile;
+        this.isGridFile = isgridfile;
     }
 
     public Boolean getIsgridjobs() {
-        return isgridjobs;
+        return isGridJob;
     }
 
     public void setIsgridjobs(Boolean isgridjobs) {
-        this.isgridjobs = isgridjobs;
+        this.isGridJob = isgridjobs;
     }
     
     public Timestamp getLastUpdatePublications() {
@@ -284,7 +301,7 @@ public class User implements IsSerializable {
         return false;
     }
     
-     public boolean hasAcceptTermsOfUse(){
+    public boolean hasAcceptTermsOfUse(){
         return getTermsOfUse()!=null;
        }
 
@@ -292,6 +309,18 @@ public class User implements IsSerializable {
         return !groups.isEmpty();
     }
     
+    public int getFailedAuthentications() {
+        return this.failedAuthentications;
+    }
+
+    public boolean isAccountLocked() {
+        return this.accountLocked;
+    }
+
+    @Override
+    public String toString() {
+       return email;
+    }
 
     
     public void getGroups() {

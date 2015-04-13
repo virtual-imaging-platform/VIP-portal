@@ -39,9 +39,7 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.common.LabelButton;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *

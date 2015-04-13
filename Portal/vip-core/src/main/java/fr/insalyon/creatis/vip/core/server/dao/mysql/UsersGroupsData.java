@@ -51,29 +51,29 @@ import org.apache.log4j.Logger;
  * @author Rafael Ferreira da Silva
  */
 public class UsersGroupsData implements UsersGroupsDAO {
-
+    
     private final static Logger logger = Logger.getLogger(UsersGroupsData.class);
     private Connection connection;
-
+    
     public UsersGroupsData() throws DAOException {
         connection = PlatformConnection.getInstance().getConnection();
     }
-
+    
     @Override
     public void add(String email, String groupname, GROUP_ROLE role)
             throws DAOException {
-
+        
         try {
             PreparedStatement ps = connection.prepareStatement(
                     "INSERT INTO VIPUsersGroups(email, groupname, role) "
                     + "VALUES(?, ?, ?)");
-
+            
             ps.setString(1, email);
             ps.setString(2, groupname);
             ps.setString(3, role.name());
             ps.execute();
             ps.close();
-
+            
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
@@ -89,7 +89,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
     @Override
     public Map<Group, GROUP_ROLE> getUserGroups(String email)
             throws DAOException {
-
+        
         try {
             PreparedStatement ps = connection.prepareStatement(
                     "SELECT g.groupname, g.public, g.gridfile, g.gridjobs, role "
@@ -97,9 +97,9 @@ public class UsersGroupsData implements UsersGroupsDAO {
                     + "ON g.groupname = ug.groupname AND email = ?");
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
-
+            
             Map<Group, GROUP_ROLE> groups = new HashMap<Group, GROUP_ROLE>();
-
+            
             while (rs.next()) {
                 String role = rs.getString("role");
                 if (role == null || role.isEmpty() || role.equals("null")) {
@@ -110,7 +110,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             }
             ps.close();
             return groups;
-
+            
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
@@ -125,23 +125,23 @@ public class UsersGroupsData implements UsersGroupsDAO {
      */
     @Override
     public List<String> getUserAdminGroups(String email) throws DAOException {
-
+        
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "groupname FROM VIPUsersGroups "
                     + "WHERE email = ? AND role = ?");
             ps.setString(1, email);
             ps.setString(2, GROUP_ROLE.Admin.name());
-
+            
             ResultSet rs = ps.executeQuery();
             List<String> groupsName = new ArrayList<String>();
-
+            
             while (rs.next()) {
                 groupsName.add(rs.getString("groupname"));
             }
             ps.close();
             return groupsName;
-
+            
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
@@ -157,20 +157,20 @@ public class UsersGroupsData implements UsersGroupsDAO {
     @Override
     public void setUserGroups(String email, Map<String, GROUP_ROLE> groups)
             throws DAOException {
-
+        
         try {
             PreparedStatement ps = connection.prepareStatement("DELETE "
                     + "FROM VIPUsersGroups "
                     + "WHERE email=?");
-
+            
             ps.setString(1, email);
             ps.execute();
             ps.close();
-
+            
             for (String group : groups.keySet()) {
                 add(email, group, groups.get(group));
             }
-
+            
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
@@ -185,10 +185,10 @@ public class UsersGroupsData implements UsersGroupsDAO {
      */
     @Override
     public List<String> getUsersFromGroups(List<String> groups) throws DAOException {
-
+        
         try {
             StringBuilder sb = new StringBuilder();
-
+            
             for (String groupName : groups) {
                 if (sb.length() > 0) {
                     sb.append(" OR ");
@@ -200,27 +200,27 @@ public class UsersGroupsData implements UsersGroupsDAO {
                     + "FROM VIPUsers vu, VIPUsersGroups vg "
                     + "WHERE vu.email = vg.email AND (" + sb.toString() + ") "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
-
+            
             ResultSet rs = ps.executeQuery();
             List<String> users = new ArrayList<String>();
-
+            
             while (rs.next()) {
                 users.add(rs.getString("first_name") + " "
                         + rs.getString("last_name"));
             }
             ps.close();
             return users;
-
+            
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
         }
     }
-
+    
     @Override
     public List<Boolean> getUserPropertiesGroups(String email)
             throws DAOException {
-
+        
         try {
             PreparedStatement ps = connection.prepareStatement(
                     "SELECT public, gridfile, gridjobs "
@@ -228,12 +228,12 @@ public class UsersGroupsData implements UsersGroupsDAO {
                     + "WHERE g.groupname = ug.groupname AND ug.email= ?");
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
-
+            
             List<Boolean> proprties = new ArrayList<Boolean>();
             boolean isPublic = false;
             boolean isGridFile = false;
             boolean isGridJobs = false;
-
+            
             while (rs.next()) {
                 if (rs.getInt("gridfile") == 1) {
                     isGridFile = true;
@@ -248,14 +248,11 @@ public class UsersGroupsData implements UsersGroupsDAO {
             proprties.add(0, isPublic);
             proprties.add(1, isGridFile);
             proprties.add(2, isGridJobs);
-
-
+            
             ps.close();
-
-
-
+            
             return proprties;
-
+            
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
@@ -268,21 +265,22 @@ public class UsersGroupsData implements UsersGroupsDAO {
      */
     @Override
     public List<User> getUsersFromGroup(String groupName) throws DAOException {
-
+        
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "us.email AS uemail, first_name, last_name, institution, "
                     + "phone, code, confirmed, folder, registration, last_login, "
-                    + "level, country_code, max_simulations,termsUse,lastUpdatePublications "
+                    + "level, country_code, max_simulations, termsUse, lastUpdatePublications "
+                    + "failed_authentications, account_locked"
                     + "FROM VIPUsers us, VIPUsersGroups ug "
                     + "WHERE us.email = ug.email AND ug.groupname = ? "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
-
+            
             ps.setString(1, groupName);
-
+            
             ResultSet rs = ps.executeQuery();
             List<User> users = new ArrayList<User>();
-
+            
             while (rs.next()) {
                 users.add(new User(
                         rs.getString("first_name"), rs.getString("last_name"),
@@ -293,11 +291,15 @@ public class UsersGroupsData implements UsersGroupsDAO {
                         new Date(rs.getTimestamp("last_login").getTime()),
                         UserLevel.valueOf(rs.getString("level")),
                         CountryCode.valueOf(rs.getString("country_code")),
-                        rs.getInt("max_simulations"), rs.getTimestamp("termsUse"),rs.getTimestamp("lastUpdatePublications")));
+                        rs.getInt("max_simulations"),
+                        rs.getTimestamp("termsUse"),
+                        rs.getTimestamp("lastUpdatePublications"),
+                        rs.getInt("failed_authentications"),
+                        rs.getBoolean("account_locked")));
             }
             ps.close();
             return users;
-
+            
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
@@ -312,7 +314,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
      */
     @Override
     public void removeUserFromGroup(String email, String groupName) throws DAOException {
-
+        
         try {
             PreparedStatement ps = connection.prepareStatement("DELETE FROM "
                     + "VIPUsersGroups WHERE email = ? AND groupname = ?");
@@ -320,7 +322,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             ps.setString(2, groupName);
             ps.executeUpdate();
             ps.close();
-
+            
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);

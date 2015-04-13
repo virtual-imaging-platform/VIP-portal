@@ -116,6 +116,8 @@ public class PlatformConnection {
                     + "max_simulations int(11), "
                     + "termsUse TIMESTAMP, "
                     + "lastUpdatePublications TIMESTAMP,"
+                    + "failed_authentications int(11),"
+                    + "account_locked BOOLEAN,"
                     + "PRIMARY KEY(email), UNIQUE KEY(first_name,last_name)")) {
 
                 Server server = Server.getInstance();
@@ -132,7 +134,7 @@ public class PlatformConnection {
                             server.getAdminPhone(), true,
                             UUID.randomUUID().toString(), folder, "",
                             new Date(), new Date(), UserLevel.Administrator,
-                            CountryCode.fr, 100, null,null));
+                            CountryCode.fr, 100, null,null,0,false));
 
                 } catch (DAOException ex) {
                     logger.error(ex);

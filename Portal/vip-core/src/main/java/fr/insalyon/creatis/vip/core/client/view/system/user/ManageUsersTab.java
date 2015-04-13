@@ -42,8 +42,8 @@ import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
  */
 public class ManageUsersTab extends AbstractManageTab {
 
-    private UsersLayout usersLayout;
-    private EditUserLayout editLayout;
+    private final UsersLayout usersLayout;
+    private final EditUserLayout editLayout;
 
     public ManageUsersTab() {
 
@@ -83,8 +83,8 @@ public class ManageUsersTab extends AbstractManageTab {
      * @param maxRunningSimulations
      */
     public void setUser(String name, String email, boolean confirmed,
-            String level, String countryCode, int maxRunningSimulations) {
+            String level, String countryCode, int maxRunningSimulations, boolean locked) {
 
-        editLayout.setUser(name, email, confirmed, level, countryCode, maxRunningSimulations);
+        editLayout.setUser(name, email, confirmed, level, countryCode, maxRunningSimulations, locked);
     }
 }
