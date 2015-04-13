@@ -44,7 +44,7 @@ public class N4uConverterTab extends Tab {
         topTabSet.setWidth100();
         topTabSet.setHeight100();
         
-        Tab tTab3 = new Tab("Json File", N4uConstants.ICON_BOUTIQUE);
+        Tab tTab3 = new Tab("Boutiques JSON File", N4uConstants.ICON_BOUTIQUE);
         layoutOption3 = new LayoutConverterOption3("100%", "100%");
         tTab3.setPane(layoutOption3);
         
@@ -52,7 +52,7 @@ public class N4uConverterTab extends Tab {
         layoutOption1 = new LayoutConverterOption1("100%", "100%");
         tTab1.setPane(layoutOption1);
 
-        Tab tTab2 = new Tab("Xml ExpressLane File", N4uConstants.ICON_EXPRESSLANE);  
+        Tab tTab2 = new Tab("XML ExpressLane File", N4uConstants.ICON_EXPRESSLANE);  
         layoutOption2 = new LayoutConverterOption2("100%", "100%");
         tTab2.setPane(layoutOption2);
         
