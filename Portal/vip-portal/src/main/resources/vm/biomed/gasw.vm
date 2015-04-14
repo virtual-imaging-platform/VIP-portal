@@ -35,9 +35,14 @@
             #end
           #end
           #set ($k ="$k.replace($key,$r)")   
-         #end      
-        <output name="$output.name" option="$output.option">               
+         #end 
+                    
+        <output name="$output.name" option="$output.option"> 
+            #if($output.cardinality=="Multiple" )              
+            <template value="$k.tgz"/>
+             #else
             <template value="$k"/>
+            #end
             <access type="LFN">
             </access>
         </output>
