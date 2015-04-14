@@ -796,7 +796,7 @@ public class N4uImportTab extends Tab {
     
     private  DynamicForm addTextItem(final TextItem fieldItem,String value,final HashMap map,final String mapKey){
        
-        fieldItem.setValidators(ValidatorUtil.getStringValidator("[0-9.,A-Za-z-+/_():[]@()$* ]"));
+        fieldItem.setValidators(ValidatorUtil.getStringValidator("[0-9.,A-Za-z-+/_() ]"));
         fieldItem.setRequired(true);
         fieldItem.setValue(value);
 
