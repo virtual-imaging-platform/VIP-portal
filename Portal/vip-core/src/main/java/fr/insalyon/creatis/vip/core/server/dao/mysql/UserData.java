@@ -842,7 +842,7 @@ public class UserData implements UserDAO {
          try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
                     + "VIPUsers SET "
-                    + "account_locked=0 "
+                    + "account_locked=0, failed_authentications=0 "
                     + "WHERE email = ?");
 
             ps.setString(1, email);

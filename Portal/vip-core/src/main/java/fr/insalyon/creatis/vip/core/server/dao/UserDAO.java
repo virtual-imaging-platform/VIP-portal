@@ -143,6 +143,7 @@ public interface UserDAO {
     /**
      * Unlocks the user.
      * Only administrators should be able to unlock users. 
+     * This method also resets the number of failed authentications since the last successful one.
      * @param email email of the user.
      * @throws DAOException 
      */
