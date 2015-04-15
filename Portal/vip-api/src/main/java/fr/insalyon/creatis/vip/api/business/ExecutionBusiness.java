@@ -6,32 +6,25 @@
 
 package fr.insalyon.creatis.vip.api.business;
 
-import fr.insalyon.creatis.vip.api.bean.PipelineExecution;
-import java.util.List;
+import fr.insalyon.creatis.vip.api.bean.Execution;
+import fr.insalyon.creatis.vip.api.bean.Execution.ExecutionStatus;
+import fr.insalyon.creatis.vip.api.bean.pairs.StringKeyParameterValuePair;
+import fr.insalyon.creatis.vip.api.bean.pairs.StringKeyValuePair;
+import java.net.URL;
+import java.util.ArrayList;
 
 /**
  *
  * @author Tristan Glatard
  */
-public class PipelineExecutionBusiness {
+public class ExecutionBusiness {
     
-    // General 
+    public static Execution getExecution(String executionId) throws ApiException { throw new ApiException("Not implemented yet");}
+    public static void updateExecution(String executionId, ArrayList<StringKeyValuePair> values) throws ApiException { throw new ApiException("Not implemented yet");};
+    public static String initExecution(String pipelineId, ArrayList<StringKeyParameterValuePair> inputValues, Integer timeoutInSeconds, String executionName, String studyId, Boolean playExecution) throws ApiException { throw new ApiException("Not implemented yet");};;
+    public static ExecutionStatus playExecution ( String executionId )throws ApiException { throw new ApiException("Not implemented yet");};
+    public static void killExecution ( String executionId ) throws ApiException { throw new ApiException("Not implemented yet");};
+    public static void deleteExecution ( String executionId, Boolean deleteFiles ) throws ApiException { throw new ApiException("Not implemented yet");};
+    public static ArrayList<URL> getExecutionResults ( String executionId, String protocol ) throws ApiException { throw new ApiException("Not implemented yet");};
     
-    public void newPipelineExecution(PipelineExecution pe) throws ApiException { throw new ApiException("Not implemented yet");}
-    
-    public void updatePipelineExecution(PipelineExecution pe) throws ApiException { throw new ApiException("Not implemented yet");}
-    
-    public void deletePipelineExecution(String peIdentifier) throws ApiException { throw new ApiException("Not implemented yet");} // i.e. clean
-    
-    public PipelineExecution getPipelineExecution(String peIdentifier) throws ApiException { throw new ApiException("Not implemented yet"); }
-    
-    public List<PipelineExecution> getPipelineExecutions() throws ApiException { throw new ApiException("Not implemented yet"); } // return all the pipeline executions accessible by the current user
-    
-    // Specific
-    
-    public void killPipelineExecution(String jobIdentifier) throws ApiException { throw new ApiException("Not implemented yet");}
-    
-    public List<PipelineExecution> getPipelineExecutionsOfPipeline(String peIdentifier) throws ApiException { throw new ApiException("Not implemented yet");}
-    
-    public List<PipelineExecution> getPipelineExecutionsOfUser(String userIdentifier) throws ApiException { throw new ApiException("Not implemented yet");}
 }
