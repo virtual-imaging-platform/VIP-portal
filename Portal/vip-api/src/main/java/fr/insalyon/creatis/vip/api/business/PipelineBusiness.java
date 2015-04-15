@@ -7,32 +7,17 @@
 package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.bean.Pipeline;
-import fr.insalyon.creatis.vip.api.bean.Study;
-import java.util.List;
+import fr.insalyon.creatis.vip.api.bean.pairs.PipelineKeyBooleanValuePair;
+import java.util.ArrayList;
 
 /**
  *
  * @author Tristan Glatard
  */
 public class PipelineBusiness {
-    
-    // General
-    
-    public void newPipeline(Pipeline pipeline) throws ApiException { throw new ApiException("Not implemented yet"); }
-    
-    public void updatePipeline(Pipeline pipeline) throws ApiException { throw new ApiException("Not implemented yet"); }
-    
-    public void deletePipeline(String pipelineIdentifier) throws ApiException { throw new ApiException("Not implemented yet"); }
-    
-    public Pipeline getPipeline(String serviceIdentifier) throws ApiException { throw new ApiException("Not implemented yet"); } 
-    
-    public List<Pipeline> getPipelines() throws ApiException { throw new ApiException("Not implemented yet"); } // returns all the pipelines that the user can access, regardless of the study
-    
-    // Specific to Pipeline
-    
-    public List<Pipeline> getPipelinesOfStudy(String studyIdentifier) throws ApiException { throw new ApiException("Not implemented yet"); }
-    
-    
-    
-    
+
+    public static Pipeline getPipeline(String pipelineId) throws ApiException { throw new ApiException("Not implemented yet");}
+
+    public static ArrayList<PipelineKeyBooleanValuePair> listPipelines(String studyIdentifier) throws ApiException { throw new ApiException("Not implemented yet");}   
+
 }
