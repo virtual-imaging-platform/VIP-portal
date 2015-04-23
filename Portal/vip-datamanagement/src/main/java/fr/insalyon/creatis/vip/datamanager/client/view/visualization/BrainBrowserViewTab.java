@@ -40,6 +40,7 @@ public class BrainBrowserViewTab extends AbstractViewTab {
         showBrainBrowser(item.getURL());
     }
 
+    
     public native void showBrainBrowser(String fileName) /*-{
            $wnd.$("#brain-browser").load("https://brainbrowser.cbrain.mcgill.ca/surface-viewer-widget?version=2.1.1&nothreejs=true&model="+fileName);         
     }-*/;

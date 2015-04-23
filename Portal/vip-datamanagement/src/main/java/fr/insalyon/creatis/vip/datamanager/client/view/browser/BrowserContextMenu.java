@@ -55,6 +55,7 @@ import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout
 import fr.insalyon.creatis.vip.datamanager.client.view.visualization.AbstractViewTab;
 import fr.insalyon.creatis.vip.datamanager.client.view.visualization.BrainBrowserViewTab;
 import fr.insalyon.creatis.vip.datamanager.client.view.visualization.ImageViewTab;
+import fr.insalyon.creatis.vip.datamanager.client.view.visualization.DicomViewTab;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -362,6 +363,7 @@ public class BrowserContextMenu extends Menu {
         ArrayList<AbstractViewTab> viewTabs = new ArrayList<AbstractViewTab>();
         viewTabs.add(new BrainBrowserViewTab(fileName));
         viewTabs.add(new ImageViewTab(fileName));
+        viewTabs.add(new DicomViewTab(fileName));
         // add your viewerTab here
         
         for(final AbstractViewTab avt : viewTabs){
