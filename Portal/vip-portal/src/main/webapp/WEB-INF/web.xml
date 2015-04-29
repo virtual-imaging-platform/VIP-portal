@@ -211,16 +211,16 @@
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/filedownload</url-pattern>
     </servlet-mapping>
     <!-- End Query Module -->
-    <!--N4U Module-->
+    <!-- Application Importer Module-->
     <servlet>
         <servlet-name>FileProcessService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.n4u.server.FileProcessServiceImpl</servlet-class>
+        <servlet-class>fr.insalyon.creatis.vip.applicationimporter.server.rpc.FileProcessServiceImpl</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>FileProcessService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/fileProcessService</url-pattern>
     </servlet-mapping>
-    <!--End N4U Module-->
+    <!--End Application Importer Module-->
     <!-- REST API -->
     <servlet>
         <servlet-name>RestAPI</servlet-name>
