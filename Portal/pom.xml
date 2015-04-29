@@ -26,7 +26,7 @@
         <vip.cardiac.version>0.9.4</vip.cardiac.version>
         <vip.physical-properties.version>0.1</vip.physical-properties.version>
         <vip.query.version>1.7</vip.query.version>
-        <vip.n4u.version>1.13</vip.n4u.version>
+        <vip.application-importer.version>1.14</vip.application-importer.version>
         <vip.api.version>1.14</vip.api.version>
     </properties>
     
@@ -41,7 +41,7 @@
         </license>
     </licenses>
     <organization>
-        <name>CREATIS-LRMN</name>
+        <name>CREATIS</name>
         <url>http://www.creatis.insa-lyon.fr/</url>
     </organization>
     
@@ -64,7 +64,7 @@
         <module>vip-datamanagement</module>
         <module>vip-gatelab</module>
         <module>vip-portal</module>
-        <module>vip-n4u</module>
+        <module>vip-application-importer</module>
         <module>vip-social</module>
         <module>vip-api</module>
     </modules>
