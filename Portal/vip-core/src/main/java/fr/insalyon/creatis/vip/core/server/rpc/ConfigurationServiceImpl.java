@@ -255,7 +255,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public void sendResetCode(String email) throws CoreException {
 
         try {
-            trace(logger, "(" + email + ") Requested to reset the password.");
+            //do not add a trace here: it should be reachable without authentication (#2632)
             configurationBusiness.sendResetCode(email);
 
         } catch (BusinessException ex) {
