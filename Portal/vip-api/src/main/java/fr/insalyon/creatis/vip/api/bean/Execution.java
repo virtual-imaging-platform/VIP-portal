@@ -18,6 +18,10 @@ import javax.xml.bind.annotation.XmlType;
 public class Execution extends Object {
 
     // mandatory arguments
+    @XmlElement(name = "identifier", required=true)
+    private String identifier;
+    @XmlElement(name = "name", required=true)
+    private String name;
     @XmlElement(name = "pipelineIdentifier", required = true)
     private String pipelineIdentifier;
     @XmlElement(name = "timeout", required = true)

@@ -17,10 +17,6 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlType(name = "Object")
 public class Object {
-    @XmlElement(name = "identifier", required=true)
-    private String identifier;
-    @XmlElement(name = "name", required=true)
-    private String name;
     public Object() {
     }
 
