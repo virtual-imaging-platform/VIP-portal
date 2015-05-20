@@ -16,7 +16,11 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlType(name = "Pipeline")
 public class Pipeline extends Object {
-
+    
+    @XmlElement(name = "identifier", required=true)
+    private String identifier;
+    @XmlElement(name = "name", required=true)
+    private String name;
     @XmlElement(name = "description", required = true)
     private String description;
     @XmlElement(name = "version", required = true)

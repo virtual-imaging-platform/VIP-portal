@@ -7,8 +7,7 @@
 package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.bean.Pipeline;
-import fr.insalyon.creatis.vip.api.bean.pairs.PipelineKeyBooleanValuePair;
-import java.util.ArrayList;
+import fr.insalyon.creatis.vip.api.bean.pairs.PairOfPipelineAndBooleanLists;
 
 /**
  *
@@ -18,6 +17,6 @@ public class PipelineBusiness {
 
     public static Pipeline getPipeline(String pipelineId) throws ApiException { throw new ApiException("Not implemented yet");}
 
-    public static ArrayList<PipelineKeyBooleanValuePair> listPipelines(String studyIdentifier) throws ApiException { throw new ApiException("Not implemented yet");}   
+    public static PairOfPipelineAndBooleanLists listPipelines(String studyIdentifier) throws ApiException { throw new ApiException("Not implemented yet");}   
 
 }

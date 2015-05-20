@@ -6,6 +6,7 @@
 package fr.insalyon.creatis.vip.api.bean;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
 /**
@@ -17,9 +18,12 @@ public class ParameterTypedValue {
 
     @XmlElement(name = "type", required = true)
     private ParameterType type;
-    @XmlElement(name = "value", required = true)
+     @XmlElements(value = {
+        @XmlElement(name = "value", type = String.class, required = true),
+        @XmlElement(name = "value", type = boolean.class, required = true),
+        @XmlElement(name = "value", type = int.class, required = true),
+        @XmlElement(name = "value", type = double.class, required = true),})
     private String value;
-
     public ParameterTypedValue() {
     }
 

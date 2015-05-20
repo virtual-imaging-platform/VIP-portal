@@ -12,6 +12,7 @@ import fr.insalyon.creatis.vip.api.bean.Pipeline;
 import fr.insalyon.creatis.vip.api.bean.pairs.StringKeyParameterValuePair;
 import fr.insalyon.creatis.vip.api.bean.pairs.StringKeyValuePair;
 import fr.insalyon.creatis.vip.api.bean.Response;
+import fr.insalyon.creatis.vip.api.bean.pairs.PairOfPipelineAndBooleanLists;
 import fr.insalyon.creatis.vip.api.bean.pairs.PipelineKeyBooleanValuePair;
 import fr.insalyon.creatis.vip.api.business.ApiException;
 import fr.insalyon.creatis.vip.api.business.AuthenticationBusiness;
@@ -26,7 +27,9 @@ import javax.annotation.Resource;
 import javax.jws.WebService;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
+import javax.jws.WebResult;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.ws.WebServiceContext;
 
 /**
@@ -41,6 +44,7 @@ public class PAF {
 
     /**
      * Execution
+     * @return 
      */
     @WebMethod(operationName = "getExecution")
     public @XmlElement(required = true)
@@ -201,8 +205,8 @@ public class PAF {
     Response listPipelines(@WebParam(name = "studyIdentifier") String studyIdentifier) {
         Response r = null;
         try {
-            ArrayList<PipelineKeyBooleanValuePair> pipelines = PipelineBusiness.listPipelines(studyIdentifier);
-            r = new Response(0, "OK", pipelines);
+            PairOfPipelineAndBooleanLists pipelinesWithRights  = PipelineBusiness.listPipelines(studyIdentifier);
+            r = new Response(0, "OK", pipelinesWithRights);
         } catch (ApiException ex) {
             Logger.getLogger(PAF.class.getName()).log(Level.SEVERE, null, ex);
             r = new Response(1, ex.getMessage(), null);
