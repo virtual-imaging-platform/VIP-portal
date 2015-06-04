@@ -6,11 +6,14 @@ package fr.insalyon.creatis.vip.datamanager.client.view.visualization;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -39,8 +42,13 @@ public class ImageViewTab extends AbstractViewTab {
     private final Canvas imageCanvas;
     private Image image;
     private final SpinnerItem spinner;
+    private final CheckboxItem checkX;
+     private final CheckboxItem checkY;
+      private final CheckboxItem checkZ;
     private final DynamicForm form;
+    private final DynamicForm formx;
     private VisualizationItem visualizationItem;
+      private  String direction;
 
     public ImageViewTab(final String imageLFN) {
         super(imageLFN);
@@ -48,35 +56,73 @@ public class ImageViewTab extends AbstractViewTab {
         imageCanvas = new Canvas();
         VLayout vLayout = new VLayout();
         form = new DynamicForm();
+        formx = new DynamicForm();
         Canvas canvas = new Canvas();
         canvas.addChild(imageCanvas);
-
+        direction ="z";
         LabelButton download = new LabelButton("Download Image", DataManagerConstants.ICON_DOWNLOAD);
         download.addClickHandler(new ClickHandler() {
-            @Override
+       
             public void onClick(ClickEvent event) {
                 downloadFile(imageLFN);
             }
         });
         ToolstripLayout toolstrip = new ToolstripLayout();
         toolstrip.addMember(download);
-        toolstrip.addMember(form);
+     toolstrip.addMember(form);
+        toolstrip.addMember(formx);
 
         spinner = new SpinnerItem();
         spinner.setName("Slice");
         spinner.setDefaultValue(0);
         spinner.addChangedHandler(new ChangedHandler() {
-
             @Override
             public void onChanged(ChangedEvent event) {
                 updateImageDisplay();
             }
         });
-        form.setWidth100();
+         checkX = new CheckboxItem();
+        checkX.setName("X");
+        checkX.setValue(false);
+        checkX.addChangedHandler(new ChangedHandler(){
+            @Override 
+            public void onChanged(    ChangedEvent event){
+                checkY.setValue(false);
+                checkZ.setValue(false);
+                updateDirectionDisplay("x");
+            }});
+        checkY = new CheckboxItem();
+        checkY.setName("Y");
+        checkY.setValue(false);
+        checkY.addChangedHandler(new ChangedHandler(){
+            @Override 
+            public void onChanged(    ChangedEvent event){
+                checkX.setValue(false);
+                checkZ.setValue(false);
+                updateDirectionDisplay("y");
+            }});
+ 
+        checkZ = new CheckboxItem();
+        checkZ.setName("Z");
+        checkZ.setValue(true);
+        checkZ.addChangedHandler(new ChangedHandler(){
+            @Override 
+            public void onChanged(    ChangedEvent event){
+                checkX.setValue(false);
+                checkY.setValue(false);
+                updateDirectionDisplay("z");
+            }});
+ 
+      //  form.setWidth100();
         form.setHeight(10);
         form.setItems(spinner);
         form.disable();
 
+        //formx.setWidth100();
+        formx.setHeight(20);
+        formx.setItems(checkX,checkY,checkZ);
+        formx.disable();
+        
         canvas.setHeight100();
 
         vLayout.setWidth100();
@@ -102,18 +148,14 @@ public class ImageViewTab extends AbstractViewTab {
             }
         }
     }
-
-    private void showSliceURL(String url) {
-        String tag = "<img src='" + url + "' border='0'>";
-        imageCanvas.setContents(tag);
-        form.enable();
-    }
-
-    private void showSlice(final String localPath, final int sliceNumber) {
-        if (image == null) {
-            DataManagerServiceAsync dmsa = DataManagerService.Util.getInstance();
+    
+    private void updateDirectionDisplay(String dir)
+    {
+        direction = dir;
+        final  String localPath = visualizationItem.getLocalPath();    
+        DataManagerServiceAsync dmsa = DataManagerService.Util.getInstance();
             modal.show("Slicing image...", true);
-            dmsa.getImageSlicesURL(localPath, new AsyncCallback<Image>() {
+            dmsa.getImageSlicesURL(localPath, direction, new AsyncCallback<Image>() {
 
                 @Override
                 public void onFailure(Throwable caught) {
@@ -125,7 +167,40 @@ public class ImageViewTab extends AbstractViewTab {
                 public void onSuccess(Image result) {
                     modal.hide();
                     image = result;
-                    showSliceURL(getURLofSlice(image, sliceNumber));
+                    spinner.setValue(image.getZdim()/2 );
+                    showSliceURL(getURLofSlice(image, image.getZdim()/2 ));
+                }
+            });
+    
+    
+    
+    }
+
+    private void showSliceURL(String url) {
+        String tag = "<img src='" + url + "' border='0'>";
+        imageCanvas.setContents(tag);
+        form.enable();
+    }
+
+    private void showSlice(final String localPath, final int sliceNumber) {
+        if (image == null) {
+            DataManagerServiceAsync dmsa = DataManagerService.Util.getInstance();
+            modal.show("Slicing image...", true);
+            dmsa.getImageSlicesURL(localPath, direction , new AsyncCallback<Image>() {
+
+                @Override
+                public void onFailure(Throwable caught) {
+                    modal.hide();
+                    Layout.getInstance().setWarningMessage("Unable to slice image " + localPath + ":<br />" + caught.getMessage());
+                }
+
+                @Override
+                public void onSuccess(Image result) {
+                    modal.hide();
+                    image = result;
+                    formx.enable();
+                     spinner.setValue(image.getZdim()/2 );
+                    showSliceURL(getURLofSlice(image, image.getZdim()/2 ));
                 }
             });
         } else {

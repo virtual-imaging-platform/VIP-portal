@@ -98,7 +98,7 @@ public interface DataManagerServiceAsync {
 
     public void deleteZombieFiles(List<String> surls, AsyncCallback<Void> asyncCallback);
 
-    public void getImageSlicesURL(String imageLocalPath, AsyncCallback<Image> asyncCallback);
+    public void getImageSlicesURL(String imageLocalPath, String direction,  AsyncCallback<Image> asyncCallback);
 
     public void getVisualizationItemFromLFN(String lfn, AsyncCallback<VisualizationItem> asyncCallback);
 
