@@ -183,11 +183,13 @@ public class DataManagerBusiness {
         }
     }
 
-    public Image getImageSlicesURL(String imageFileName) throws BusinessException {
+     
+    public Image getImageSlicesURL(String imageFileName, String dir) throws BusinessException {
 
         File imageFile = new File(imageFileName);
-        String imageDirName = imageFile.getParent() + "/" + imageFile.getName() + "-slices";
+        String imageDirName = imageFile.getParent() + "/" + imageFile.getName() + "-" + dir+ "-slices";
         File imageDir = new File(imageDirName);
+
         if (!imageDir.exists()) {
             imageDir.mkdirs();
         }
@@ -195,7 +197,7 @@ public class DataManagerBusiness {
         File sliceZero = new File(sliceZeroFileName);
         if (!sliceZero.exists()) {
             //split slices
-            ProcessBuilder builder = new ProcessBuilder("slice.sh", imageFileName, imageDirName);
+            ProcessBuilder builder = new ProcessBuilder("slice.sh", imageFileName, imageDirName,dir);
             builder.redirectErrorStream(true);
             try {
 
@@ -213,7 +215,7 @@ public class DataManagerBusiness {
             }
         }
         //get z value
-        ProcessBuilder builderZ = new ProcessBuilder("getz.sh", imageFileName);
+        ProcessBuilder builderZ = new ProcessBuilder("getz.sh", imageFileName, dir);
         builderZ.redirectErrorStream(true);
         String number = "";
         try {
@@ -244,7 +246,10 @@ public class DataManagerBusiness {
         return new Image(imageDirName, Integer.parseInt(number.trim()), imageDirName.substring(imageDirName.indexOf("/files/viewer")) + "/");
 
     }
-
+    
+    
+    
+    
     public List<SSH> getSSHConnections() throws BusinessException {
         try {
             return SSHDAOFactory.getDAOFactory().getSSHDAO().getSSHConnections();

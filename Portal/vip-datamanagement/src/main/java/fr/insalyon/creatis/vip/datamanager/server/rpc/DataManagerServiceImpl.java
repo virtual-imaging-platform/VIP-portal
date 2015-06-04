@@ -66,6 +66,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     private final DataManagerBusiness dataManagerBusiness;
     private final LFCBusiness lfcBusiness;
     private final TransferPoolBusiness transferPoolBusiness;
+  
 
     public DataManagerServiceImpl() {
 
@@ -413,13 +414,15 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
-    @Override
-    public Image getImageSlicesURL(String imageFileName) throws DataManagerException {
+  
+    
+     @Override
+    public Image getImageSlicesURL(String imageFileName, String direction) throws DataManagerException {
 
         try {
             trace(logger, "Slicing image: " + imageFileName);
             User user = getSessionUser();
-            return dataManagerBusiness.getImageSlicesURL(imageFileName);
+            return dataManagerBusiness.getImageSlicesURL(imageFileName, direction);
         } catch (CoreException ex) {
             throw new DataManagerException(ex);
         } catch (BusinessException ex) {

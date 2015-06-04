@@ -114,7 +114,7 @@ public interface DataManagerService extends RemoteService {
     
     public void deleteZombieFiles(List<String> surls) throws DataManagerException;
     
-    public Image getImageSlicesURL(String localPath) throws DataManagerException;
+    public Image getImageSlicesURL(String localPath, String direction) throws DataManagerException;
     
     public List<SSH> getSSHConnections() throws DataManagerException;
     
