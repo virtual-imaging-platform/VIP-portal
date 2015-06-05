@@ -50,7 +50,7 @@ import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 import fr.insalyon.creatis.vip.datamanager.client.view.visualization.BrainBrowserViewTab;
 import fr.insalyon.creatis.vip.datamanager.client.view.visualization.ImageViewTab;
-import fr.insalyon.creatis.vip.datamanager.client.view.visualization.DicomViewTab;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,7 +104,7 @@ public class InOutContextMenu extends Menu {
             }
         });
 
-        MenuItem viewDicomItem = new MenuItem("View DICOM");
+     /*   MenuItem viewDicomItem = new MenuItem("View DICOM");
         viewDicomItem.setIcon(DataManagerConstants.ICON_VIEW);
         viewDicomItem.addClickHandler(new ClickHandler() {
 
@@ -112,7 +112,7 @@ public class InOutContextMenu extends Menu {
             public void onClick(MenuItemClickEvent event) {
                 Layout.getInstance().addTab(new DicomViewTab(node.getName()));
             }
-        });
+        });*/
         
         MenuItem downloadFileItem = new MenuItem("Download");
         downloadFileItem.setIcon(DataManagerConstants.ICON_DOWNLOAD);
