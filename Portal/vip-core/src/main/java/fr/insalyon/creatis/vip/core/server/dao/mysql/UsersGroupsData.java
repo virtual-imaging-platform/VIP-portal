@@ -270,12 +270,12 @@ public class UsersGroupsData implements UsersGroupsDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "us.email AS uemail, first_name, last_name, institution, "
                     + "phone, code, confirmed, folder, registration, last_login, "
-                    + "level, country_code, max_simulations, termsUse, lastUpdatePublications "
-                    + "failed_authentications, account_locked"
+                    + "level, country_code, max_simulations, termsUse, lastUpdatePublications, "
+                    + "failed_authentications, account_locked "
                     + "FROM VIPUsers us, VIPUsersGroups ug "
                     + "WHERE us.email = ug.email AND ug.groupname = ? "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
-            
+                          
             ps.setString(1, groupName);
             
             ResultSet rs = ps.executeQuery();
