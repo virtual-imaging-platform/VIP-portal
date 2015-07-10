@@ -410,13 +410,18 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     /**
-     *
+     * Throws an exception if the user is not a group or system administrator.
      * @param logger
      * @param groupName
      * @throws CoreException
      */
     protected void authenticateGroupAdministrator(Logger logger, String groupName) throws CoreException {
 
+        try{
+            authenticateSystemAdministrator(logger);
+            return;
+        } catch(CoreException ex){ } // The user is not a system administrator. Ignore the exception.
+        
         User user = getSessionUser();
         Map<Group, GROUP_ROLE> userGroups = getUserGroups(null);
 
