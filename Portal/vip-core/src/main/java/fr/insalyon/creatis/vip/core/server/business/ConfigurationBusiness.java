@@ -666,16 +666,18 @@ public class ConfigurationBusiness {
         try {
             if (validGroup) {
 
-                List<String> groups = CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUserAdminGroups(email);
+                // Discarded the effect of validGroups as this has several side effects (see #2669)
+                
+                //List<String> groups = CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUserAdminGroups(email);
 
-                if (groups.isEmpty()) {
+               // if (groups.isEmpty()) {
                     List<String> userNames = new ArrayList<String>();
                     userNames.add(CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email).getFullName());
                     return userNames;
 
-                } else {
-                    return CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroups(groups);
-                }
+//                } else {
+//                    return CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroups(groups);
+//                }
 
             } else {
                 List<String> userNames = new ArrayList<String>();
