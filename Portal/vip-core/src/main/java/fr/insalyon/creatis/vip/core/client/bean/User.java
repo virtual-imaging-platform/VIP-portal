@@ -1,3 +1,5 @@
+
+
 /* Copyright CNRS-CREATIS
  *
  * Rafael Ferreira da Silva
@@ -315,26 +317,6 @@ public class User implements IsSerializable {
 
     public boolean isAccountLocked() {
         return this.accountLocked;
-    }
-
-    @Override
-    public String toString() {
-       return email;
-    }
-
-    
-    public void getGroups() {
-       
-        for (Group group : groups.keySet()) {
-           
-            if (group.isGridFile())
-              setIsgridfile(true);
-          
-            if(group.isGridJobs())
-                setIsgridjobs(true);
-        }
-       
-
     }
 
     @Override
