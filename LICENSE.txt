@@ -13,8 +13,7 @@ Kévin Moulin             - kevmoulin@wanadoo.fr
 Sorina Pop               - sorina.pop@creatis.insa-lyon.fr
 Rafael Ferreira da Silva - rafael.silva@creatis.insa-lyon.fr
 
-This software is a computer program whose purpose is to [describe
-functionalities and technical features of your software].
+This software is a web portal for pipeline execution on distributed systems.
 
 This software is governed by the CeCILL-B license under French law and
 abiding by the rules of distribution of free software.  You can use,
