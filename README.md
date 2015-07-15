@@ -1,3 +1,11 @@
+# Introduction
+
+The Virtual Imaging Platform is a web portal for pipeline execution on distributed systems. 
+
+Deployed portals: 
+
+* [http://vip.creatis.insa-lyon.fr](http://vip.creatis.insa-lyon.fr)
+
 # Installation instructions
 
 To be done.
