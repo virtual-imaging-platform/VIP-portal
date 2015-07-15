@@ -7,11 +7,11 @@ Authors
 
 Nouha Boujelben          - nouha.boujelben@creatis.insa-lyon.fr
 Frédéric Cervenansky     - frederic.cervnansky@creatis.insa-lyon.fr
+Rafael Ferreira da Silva - rafael.silva@creatis.insa-lyon.fr
 Tristan Glatard          - tristan.glatard@creatis.insa-lyon.fr
 Ibrahim  Kallel          - ibrahim.kallel@creatis.insa-lyon.frqqq
 Kévin Moulin             - kevmoulin@wanadoo.fr
 Sorina Pop               - sorina.pop@creatis.insa-lyon.fr
-Rafael Ferreira da Silva - rafael.silva@creatis.insa-lyon.fr
 
 This software is a web portal for pipeline execution on distributed systems.
 
