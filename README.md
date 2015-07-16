@@ -1,6 +1,9 @@
-# Installation instructions
+# Introduction
 
-To be done.
+The Virtual Imaging Platform is a web portal for pipeline execution on
+distributed systems. An instance of this portal deployed on the
+European Grid Infrastructure is accessible at
+[https://vip.creatis.insa-lyon.fr](https://vip.creatis.insa-lyon.fr).
 
 # Development guidelines
 
@@ -20,3 +23,9 @@ You may name your branch anything except master, develop, release-*, or hotfix-*
 3. When feature development is finished:
 * Push your commits to Github (your fork).
 * Make a pull request to merge feature branch (in your fork) to development branch (in the base repository).
+
+# Installation instructions
+
+To be done. Until this section is writte, install at your own risks or
+contact us at
+[vip-support@creatis.insa-lyon.fr](vip-support@creatis.insa-lyon.fr).
