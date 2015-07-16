@@ -3,7 +3,7 @@
 The Virtual Imaging Platform is a web portal for pipeline execution on
 distributed systems. An instance of this portal deployed on the
 European Grid Infrastructure is accessible at
-[http://vip.creatis.insa-lyon.fr](http://vip.creatis.insa-lyon.fr).
+[https://vip.creatis.insa-lyon.fr](https://vip.creatis.insa-lyon.fr).
 
 # Development guidelines
 
@@ -26,4 +26,6 @@ You may name your branch anything except master, develop, release-*, or hotfix-*
 
 # Installation instructions
 
-To be done. Install at your own risks or contact us at [vip-support@creatis.insa-lyon.fr](vip-support@creatis.insa-lyon.fr).
+To be done. Until this section is writte, install at your own risks or
+contact us at
+[vip-support@creatis.insa-lyon.fr](vip-support@creatis.insa-lyon.fr).
