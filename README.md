@@ -26,6 +26,6 @@ You may name your branch anything except master, develop, release-*, or hotfix-*
 
 # Installation instructions
 
-To be done. Until this section is writte, install at your own risks or
+To be done. Until this section is written, install at your own risks or
 contact us at
 [vip-support@creatis.insa-lyon.fr](vip-support@creatis.insa-lyon.fr).
