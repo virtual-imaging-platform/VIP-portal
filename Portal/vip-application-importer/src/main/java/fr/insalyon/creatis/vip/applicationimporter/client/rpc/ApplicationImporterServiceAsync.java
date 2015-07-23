@@ -29,22 +29,12 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.applicationimporter.client.view;
+package fr.insalyon.creatis.vip.applicationimporter.client.rpc;
 
-import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
 
-/**
- *
- * @author Nouha Boujelben
- */
-public class LayoutOutput extends AbstractFormLayout {
-/**
- * 
- * @param width
- * @param height 
- */
-    public LayoutOutput(String width, String height) {
-        super(width, height);
-        this.addTitle("Outputs", ApplicationImporterConstants.ICON_OUTPUT);
-    }
+public interface ApplicationImporterServiceAsync {
+    public void readFileAsString(String fileLFN, AsyncCallback<String> callback);
+    public void createApplication(String jsonString, String applicationLocation, String[] vipClasses, AsyncCallback<Void> callback);
 }

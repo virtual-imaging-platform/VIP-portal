@@ -31,13 +31,9 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.client;
         
-/**
- *
- * @author Nouha Boujelben
- */
 import fr.insalyon.creatis.vip.core.client.Module;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.applicationimporter.client.view.ApplicationImporterHomeParser;
+import fr.insalyon.creatis.vip.applicationimporter.client.view.HomeParser;
 /**
  * 
  * @author Nouha Boujelben
@@ -46,7 +42,7 @@ public class ApplicationImporterModule extends Module {
 
     @Override
     public void load() {
-        CoreModule.addGeneralApplicationParser(new ApplicationImporterHomeParser());
+        CoreModule.addGeneralApplicationParser(new HomeParser());
     }
 
     @Override

@@ -35,31 +35,18 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  *
- * @author nouha
+ * @author Nouha Boujelben
  */
-public enum EnumTypes implements IsSerializable {
-    String("string"),
-    Text("text"),
-    Integer("integer"),
-    Float("float"),
-    Double("double"),
-    Combo("combo"),
-    File("file"),
-    CheckBox("checkbox"),
-    Radio("radio");
-    
-    private String type;
+public class ApplicationImporterException extends Exception implements IsSerializable {
 
-    private EnumTypes() {
+    public ApplicationImporterException() {
     }
 
-    private EnumTypes(String type) {
-        this.type = type;
+    public ApplicationImporterException(String message) {
+        super(message);
     }
 
-    @Override
-    public String toString() {
-        return type;
+    public ApplicationImporterException(Throwable thrwbl) {
+        super(thrwbl);
     }
-
 }

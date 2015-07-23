@@ -128,7 +128,7 @@ PropertiesConfiguration config;
     private String mozillaPersonaValidationURL;
     //treeQuery
     private String queryTree;
-    private String N4uApplicationFilesRepository;
+    private String applicationImporterFileRepository;
     private String deleteFilesAfterUpload;
     //Publication
     private int numberMonthsToTestLastPublicationUpdates;
@@ -239,8 +239,8 @@ PropertiesConfiguration config;
             //queryTree
             queryTree = config.getString(CoreConstants.TreeQuery, "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> select * from <http://e-ginseng.org/graph/ontology/semEHR> where {?x a rdfs:Class . ?x rdfs:label ?label}");
 
-            //N4U_model  
-            N4uApplicationFilesRepository = config.getString(CoreConstants.APPLICATION_FILES_REPOSITORY, "/home/boujelben");
+            //Applicatoin importer
+            applicationImporterFileRepository = config.getString(CoreConstants.APPLICATION_FILES_REPOSITORY, "/tmp/boutiques-cache");
             deleteFilesAfterUpload = config.getString(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, "yes");
             
            //Publication
@@ -299,7 +299,7 @@ PropertiesConfiguration config;
             config.setProperty(CoreConstants.TreeQuery, queryTree);
 
            
-            config.setProperty(CoreConstants.APPLICATION_FILES_REPOSITORY, N4uApplicationFilesRepository);
+            config.setProperty(CoreConstants.APPLICATION_FILES_REPOSITORY, applicationImporterFileRepository);
             config.setProperty(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, deleteFilesAfterUpload);
             config.setProperty(CoreConstants.APPLET_GATELAB_CLASSES, appletGateLabClasses);
             config.setProperty(CoreConstants.APPLET_GATELABTEST_CLASSES, appletGateLabTestClasses);
@@ -524,8 +524,8 @@ PropertiesConfiguration config;
         return queryTree;
     }
 
-    public String getN4uApplicationFilesRepository() {
-        return N4uApplicationFilesRepository;
+    public String getApplicationImporterFileRepository() {
+        return applicationImporterFileRepository;
     }
 
     public String getDeleteFilesAfterUpload() {

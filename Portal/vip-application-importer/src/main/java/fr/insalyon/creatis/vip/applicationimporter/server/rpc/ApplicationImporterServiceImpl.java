@@ -29,48 +29,37 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.applicationimporter.client.view;
+package fr.insalyon.creatis.vip.applicationimporter.server.rpc;
 
-import com.smartgwt.client.widgets.layout.HLayout;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
-import fr.insalyon.creatis.vip.core.client.view.common.LabelButton;
-import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+import fr.insalyon.creatis.vip.applicationimporter.server.business.ApplicationImporterBusiness;
+import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
 
-/**
- *
- * @author Nouha Boujelben
- */
-public class LayoutInputs extends AbstractFormLayout {
+public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet
+        implements ApplicationImporterService {
 
-    LabelButton addButton;
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ApplicationImporterServiceImpl.class);
 
-    /**
-     *
-     * @param width
-     * @param height
-     */
-    public LayoutInputs(String width, String height) {
-        super(width, height);
-        this.addTitle("Application Inputs", ApplicationImporterConstants.ICON_INPUT);
-        HLayout toolstrip = new HLayout();
-        toolstrip.setWidth100();
-        toolstrip.setHeight(30);
-        toolstrip.setBackgroundColor("#F7F7F7");
-        toolstrip.setPadding(3);
-        toolstrip.setMembersMargin(10);
-        toolstrip.addMember(WidgetUtil.getSpaceLabel(15));
-        addButton = new LabelButton("Add Input", CoreConstants.ICON_ADD);
-        addButton.setWidth(200);
-        toolstrip.addMember(addButton);
-        this.addMember(toolstrip);
+    @Override
+    public String readFileAsString(String fileLFN) throws ApplicationImporterException {
+        try {
+            trace(logger, "Reading file "+fileLFN+" as string.");
+            return ApplicationImporterBusiness.readFileAsString(fileLFN, getSessionUser());
+        } catch (CoreException ex) {
+            logger.error(ex);
+            throw new ApplicationImporterException(ex);
+        }
     }
 
-    /**
-     *
-     * @return
-     */
-    public LabelButton getAddButton() {
-        return addButton;
+    @Override
+    public void createApplication(String jsonString, String applicationLocation, String[] vipClasses) throws ApplicationImporterException {
+        try {
+            trace(logger, "Creating application");
+            ApplicationImporterBusiness.createApplication(jsonString,applicationLocation,vipClasses, getSessionUser());
+        } catch (CoreException ex) {
+            logger.error(ex);
+            throw new ApplicationImporterException(ex);
+        }
     }
 }

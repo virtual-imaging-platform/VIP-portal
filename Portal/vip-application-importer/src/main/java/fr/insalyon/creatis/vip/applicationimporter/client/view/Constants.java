@@ -35,22 +35,19 @@ package fr.insalyon.creatis.vip.applicationimporter.client.view;
  *
  * @author Nouha boujelben
  */
-public class ApplicationImporterConstants {
+public class Constants {
     
     // Tab IDs
-    public static final String TAB_ID_EXPRESSLANE_1 = "ApplicationImporter-expresslane-1-tab";
-    public static final String TAB_ID_EXPRESSLANE_2 = "ApplicationImporter-expresslane-2-tab";
     public static final String TAB_ID_BOUTIQUES = "ApplicationImporter-boutiques-tab";
+    public static final String TAB_ID_BOUTIQUES_APPLICATION = "ApplicationImporter-boutiques-application-tab";
 
     // Tab names
-    public static final String TAB_NAME_EXPRESSLANE = "ExpressLane Importer";
     public static final String TAB_NAME_BOUTIQUES = "Boutiques Importer";
     
     // Icons
     private static final String IMG_FOLDER = "importer/";
-    public static final String ICON_EXPRESSLANE2VIP = IMG_FOLDER + "icon_expresslane2vip.png";
-    public static final String ICON_BOUTIQUES = IMG_FOLDER + "icon_boutiques.png";
-    public static final String ICON_IMPORTER = IMG_FOLDER + "icon_importer.png";
+    public static final String ICON_BOUTIQUES = IMG_FOLDER + "icon-boutiques.png";
+    public static final String ICON_IMPORTER = IMG_FOLDER + "icon-importer.png";
     public static final String ICON_PICKER_LESS = IMG_FOLDER + "icon-picker-less.png";
     public static final String ICON_PICKER_MORE = IMG_FOLDER + "icon-picker-more.png";
     public static final String ICON_PICKER_EDIT = IMG_FOLDER + "icon-picker-edit.jpg";

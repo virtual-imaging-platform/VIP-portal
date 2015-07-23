@@ -33,7 +33,6 @@ package fr.insalyon.creatis.vip.core.client.view;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.Date;
-import java.util.List;
 
 /**
  *
@@ -180,10 +179,10 @@ public class CoreConstants implements IsSerializable {
     public static String MOZILLA_PERSONA_VALIDATION_URL = "mozilla.persona.validation.url";
     //query
     public static String TreeQuery = "query.classes";
-    //N4u 
-    public static String APP_CLASS = "expressLaneToVip.application.class";
-    public static String APPLICATION_FILES_REPOSITORY = "expressLaneToVip.upload.repository";
-    public static String APP_DELETE_FILES_AFTER_UPLOAD = "expressLaneToVip.upload.deleteFile";
+    //Boutiques
+    public static String APP_CLASS = "boutiques.application.class";
+    public static String APPLICATION_FILES_REPOSITORY = "boutiques.upload.repository";
+    public static String APP_DELETE_FILES_AFTER_UPLOAD = "boutiques.upload.deleteFile";
     //Publiction
     public static final String  PUB_MONTHS_UPDATES = "last.publication.update";
 

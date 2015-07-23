@@ -29,29 +29,34 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.applicationimporter.client.rpc;
+package fr.insalyon.creatis.vip.applicationimporter.client.view;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import java.util.HashMap;
-import java.util.List;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
+
+import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 /**
  *
  * @author Nouha Boujelben
  */
-public interface FileProcessServiceAsync {
+public class HomeParser extends ApplicationParser {
 
-    public void fileJobProcess(String jobFile, String expressFile, AsyncCallback<int[]> callback);
+    @Override
+    public void loadApplications() {
 
-    public void parseXmlFile(String xmlFile, AsyncCallback<List<String[]>> callback);
-    
-    public void parseJsonFile(String jsonFile, AsyncCallback<List<List<HashMap<String,String>>>> callback);
+        if (CoreModule.user.isSystemAdministrator() || CoreModule.user.hasGroupAccess(Constants.APPLICATION_IMPORTER_GROUP)) {
+            addApplication(Constants.APP_APPLICATION_IMPORTER, Constants.APP_IMG_IMPORTER);
+        }
+    }
 
-    public void generateScriptFile(String templateFolder,HashMap<Integer, HashMap<String, String>> listInput, HashMap<Integer, HashMap<String, String>> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String environementFile, String description,String dockerImage,String commandLine, AsyncCallback<Void> callback);
+    @Override
+    public boolean parse(String applicationName, String applicationVersion) {
 
-    public void generateGwendiaFile(String templateFolder,HashMap<Integer, HashMap<String, String>> listInput, HashMap<Integer, HashMap<String, String>> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description,String vo, AsyncCallback<String> callback);
-
-    public void generateGaswFile(String templateFolder,HashMap<Integer, HashMap<String, String>> listInput, HashMap<Integer, HashMap<String, String>> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String sandboxFile, String environementFile, String extensionFile, AsyncCallback<Void> callback);
-
-
+        if (applicationName.equals(Constants.APP_APPLICATION_IMPORTER)) {
+            Layout.getInstance().addTab(new ImportTab());
+            return true;
+        }
+        return false;
+    }
 }

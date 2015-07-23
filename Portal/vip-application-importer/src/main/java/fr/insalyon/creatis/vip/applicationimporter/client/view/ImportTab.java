@@ -29,13 +29,22 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.applicationimporter.client;
+package fr.insalyon.creatis.vip.applicationimporter.client.view;
+
+import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.tab.Tab;
 
 /**
  *
  * @author Nouha Boujelben
  */
-public enum EnumInputTypes {
+public class ImportTab extends Tab {
 
-    File, Parameter;
+    public ImportTab() {           
+        this.setTitle(Canvas.imgHTML(Constants.ICON_BOUTIQUES) + " Boutiques Application Importer");
+        this.setID(Constants.TAB_ID_BOUTIQUES);
+        this.setCanClose(true);
+        this.setAttribute("paneMargin", 0);
+        setPane(new BoutiquesImportLayout("100%", "100%"));
+    }
 }

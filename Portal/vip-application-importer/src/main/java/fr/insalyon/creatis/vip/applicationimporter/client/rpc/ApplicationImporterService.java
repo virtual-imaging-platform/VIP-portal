@@ -29,23 +29,26 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.applicationimporter.client.view;
+package fr.insalyon.creatis.vip.applicationimporter.client.rpc;
 
-import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
+import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
-/**
- *
- * @author Nouha Boujelben
- */
-public class GeneralInformation extends AbstractFormLayout {
+public interface ApplicationImporterService extends RemoteService {
 
-    /**
-     *
-     * @param width the GeneralInformation layout's width 
-     * @param height the GeneralInformation layout's height 
-     */
-    public GeneralInformation(String width, String height) {
-        super(width, height);
-        this.addTitle("General Information", ApplicationImporterConstants.ICON_INFORMATION);
+    public static final String SERVICE_URI = "/applicationimporterservice";
+
+    public static class Util {
+        public static ApplicationImporterServiceAsync getInstance() {
+            ApplicationImporterServiceAsync instance = (ApplicationImporterServiceAsync) GWT.create(ApplicationImporterService.class);
+            ServiceDefTarget target = (ServiceDefTarget) instance;
+            target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
+            return instance;
+        }
     }
+
+    String readFileAsString(String fileLFN) throws ApplicationImporterException;
+    void createApplication(String jsonString, String applicationLocation, String[] vipClasses) throws ApplicationImporterException;
 }
