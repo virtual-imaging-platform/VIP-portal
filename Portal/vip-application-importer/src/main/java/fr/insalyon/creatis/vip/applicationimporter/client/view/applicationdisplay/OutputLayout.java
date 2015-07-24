@@ -31,16 +31,13 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
+import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesOutputFile;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 import java.util.List;
 
-/**
- *
- * @author Nouha Boujelben
- */
 public class OutputLayout extends InputOutputLayout {
 
     public OutputLayout(String width, String height) {
@@ -56,10 +53,10 @@ public class OutputLayout extends InputOutputLayout {
 
             String title = bof.getName();
             if (bof.isList()) {
-                title += "[]";
+                title += " []";
             }
             if (!bof.isOptional()) {
-                title += "<font color=\"red\">(*)</font>";
+                title += " <font color=\"red\">(*)</font>";
             }
             section.setTitle("<strong>" + title + "</strong>");
 
@@ -73,7 +70,7 @@ public class OutputLayout extends InputOutputLayout {
             if (bof.getCommandLineKey() != null) {
                 commandLayout.addMember(new LocalTextField("Command-line key", false, false, bof.getCommandLineKey()));
             }
-            if (bof.getCommandLineFlag() != null) {
+            if (bof.getCommandLineFlag() != null && !bof.getCommandLineFlag().equals("")) {
                 commandLayout.addMember(new LocalTextField("Command-line Flag", false, false, bof.getCommandLineFlag()));
             }
             commandLayout.setMembersMargin(membersMargin);

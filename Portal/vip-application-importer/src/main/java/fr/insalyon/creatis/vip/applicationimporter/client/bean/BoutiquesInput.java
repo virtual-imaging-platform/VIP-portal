@@ -29,37 +29,26 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
+package fr.insalyon.creatis.vip.applicationimporter.client.bean;
 
-import com.google.gwt.json.client.JSONObject;
-import fr.insalyon.creatis.vip.applicationimporter.client.view.JSONUtil;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  *
  * @author Tristan Glatard
  */
-class BoutiquesOutputFile {
+public class BoutiquesInput implements IsSerializable {
 
     private String id;
     private String name;
+    private String type;
     private String description;
     private String commandLineKey;
-    private String pathTemplate;
     private boolean list;
     private boolean optional;
     private String commandLineFlag;
-
-    public void setJSON(JSONObject jo) {
-        id = JSONUtil.getPropertyAsString(jo, "id");
-        name = JSONUtil.getPropertyAsString(jo, "name");
-        description = JSONUtil.getPropertyAsString(jo, "description");
-        commandLineKey = JSONUtil.getPropertyAsString(jo, "command-line-key");
-        pathTemplate = JSONUtil.getPropertyAsString(jo, "path-template");
-        list = JSONUtil.getPropertyAsBoolean(jo, "list");
-        optional = JSONUtil.getPropertyAsBoolean(jo, "optional");
-        commandLineFlag = JSONUtil.getPropertyAsString(jo, "command-line-flag");
-    }
-
+    private String defaultValue;
+    
     public String getId() {
         return id;
     }
@@ -68,16 +57,16 @@ class BoutiquesOutputFile {
         return name;
     }
 
+    public String getType() {
+        return type;
+    }
+
     public String getDescription() {
         return description;
     }
 
     public String getCommandLineKey() {
         return commandLineKey;
-    }
-
-    public String getPathTemplate() {
-        return pathTemplate;
     }
 
     public boolean isList() {
@@ -92,4 +81,46 @@ class BoutiquesOutputFile {
         return commandLineFlag;
     }
 
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setCommandLineKey(String commandLineKey) {
+        this.commandLineKey = commandLineKey;
+    }
+
+    public void setList(boolean list) {
+        this.list = list;
+    }
+
+    public void setOptional(boolean optional) {
+        this.optional = optional;
+    }
+
+    public void setCommandLineFlag(String commandLineFlag) {
+        this.commandLineFlag = commandLineFlag;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    
+    
 }

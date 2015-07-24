@@ -33,8 +33,10 @@ package fr.insalyon.creatis.vip.applicationimporter.server.rpc;
 
 import fr.insalyon.creatis.vip.applicationimporter.server.business.ApplicationImporterBusiness;
 import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
+import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 
 public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet
         implements ApplicationImporterService {
@@ -45,19 +47,27 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
     public String readFileAsString(String fileLFN) throws ApplicationImporterException {
         try {
             trace(logger, "Reading file "+fileLFN+" as string.");
-            return ApplicationImporterBusiness.readFileAsString(fileLFN, getSessionUser());
+            ApplicationImporterBusiness abi = new ApplicationImporterBusiness();
+            return abi.readFileAsString(fileLFN, getSessionUser());
         } catch (CoreException ex) {
+            logger.error(ex);
+            throw new ApplicationImporterException(ex);
+        } catch (BusinessException ex) {
             logger.error(ex);
             throw new ApplicationImporterException(ex);
         }
     }
 
     @Override
-    public void createApplication(String jsonString, String applicationLocation, String[] vipClasses) throws ApplicationImporterException {
+    public void createApplication(BoutiquesTool bt, boolean overwriteVersion) throws ApplicationImporterException {
         try {
             trace(logger, "Creating application");
-            ApplicationImporterBusiness.createApplication(jsonString,applicationLocation,vipClasses, getSessionUser());
+            ApplicationImporterBusiness abi = new ApplicationImporterBusiness();
+            abi.createApplication(bt, overwriteVersion, getSessionUser());
         } catch (CoreException ex) {
+            logger.error(ex);
+            throw new ApplicationImporterException(ex);
+        } catch (BusinessException ex) {
             logger.error(ex);
             throw new ApplicationImporterException(ex);
         }

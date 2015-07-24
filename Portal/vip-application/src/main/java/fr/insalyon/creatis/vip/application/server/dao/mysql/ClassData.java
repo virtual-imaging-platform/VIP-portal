@@ -175,6 +175,48 @@ public class ClassData implements ClassDAO {
             throw new DAOException(ex);
         }
     }
+    
+    /**
+     * 
+     * @param className
+     * @return
+     * @throws DAOException 
+     */
+    @Override
+    public AppClass getClass(String className) throws DAOException {
+          try {
+            
+              // Get class
+            PreparedStatement ps = connection.prepareStatement(
+                    "SELECT name FROM VIPClasses WHERE name=?");
+            ps.setString(1, className);
+            ResultSet rs = ps.executeQuery();
+            
+            if(rs.first()) {
+            
+                // Get groups associated to class
+                List<String> groups = new ArrayList<String>();
+                PreparedStatement ps2 = connection.prepareStatement(
+                        "SELECT groupname FROM VIPGroupsClasses "
+                        + "WHERE classname=? ORDER BY groupname");
+                ps2.setString(1, rs.getString("name"));
+                ResultSet r = ps2.executeQuery();
+                while (r.next()) {
+                    groups.add(r.getString("groupname"));
+                }
+                ps2.close();
+                ps.close();
+                return new AppClass(rs.getString("name"), 
+                        rs.getString("engine"), groups);
+            }
+            ps.close();
+            return null;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
 
     /**
      *

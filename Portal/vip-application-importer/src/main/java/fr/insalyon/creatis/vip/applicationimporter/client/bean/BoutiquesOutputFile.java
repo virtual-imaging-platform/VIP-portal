@@ -29,38 +29,24 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
+package fr.insalyon.creatis.vip.applicationimporter.client.bean;
 
-import com.google.gwt.json.client.JSONObject;
-import fr.insalyon.creatis.vip.applicationimporter.client.view.JSONUtil;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  *
  * @author Tristan Glatard
  */
-public class BoutiquesInput {
+public class BoutiquesOutputFile implements IsSerializable {
 
     private String id;
     private String name;
-    private String type;
     private String description;
     private String commandLineKey;
+    private String pathTemplate;
     private boolean list;
     private boolean optional;
     private String commandLineFlag;
-    private String defaultValue;
-
-    public void setJSON(JSONObject input) {
-        id = JSONUtil.getPropertyAsString(input, "id");
-        name = JSONUtil.getPropertyAsString(input, "name");
-        type = JSONUtil.getPropertyAsString(input, "type");
-        description = JSONUtil.getPropertyAsString(input, "description");
-        commandLineKey = JSONUtil.getPropertyAsString(input, "command-line-key");
-        list = JSONUtil.getPropertyAsBoolean(input, "list");
-        optional = JSONUtil.getPropertyAsBoolean(input, "optional");
-        commandLineFlag = JSONUtil.getPropertyAsString(input, "command-line-flag");
-        defaultValue = JSONUtil.getPropertyAsString(input, "default-value");
-    }
 
     public String getId() {
         return id;
@@ -70,16 +56,16 @@ public class BoutiquesInput {
         return name;
     }
 
-    public String getType() {
-        return type;
-    }
-
     public String getDescription() {
         return description;
     }
 
     public String getCommandLineKey() {
         return commandLineKey;
+    }
+
+    public String getPathTemplate() {
+        return pathTemplate;
     }
 
     public boolean isList() {
@@ -94,8 +80,36 @@ public class BoutiquesInput {
         return commandLineFlag;
     }
 
-    public String getDefaultValue() {
-        return defaultValue;
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setCommandLineKey(String commandLineKey) {
+        this.commandLineKey = commandLineKey;
+    }
+
+    public void setPathTemplate(String pathTemplate) {
+        this.pathTemplate = pathTemplate;
+    }
+
+    public void setList(boolean list) {
+        this.list = list;
+    }
+
+    public void setOptional(boolean optional) {
+        this.optional = optional;
+    }
+
+    public void setCommandLineFlag(String commandLineFlag) {
+        this.commandLineFlag = commandLineFlag;
     }
 
 }

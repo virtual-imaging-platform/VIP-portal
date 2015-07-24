@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
+import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesInput;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
@@ -53,10 +54,10 @@ public class InputLayout extends InputOutputLayout {
             SectionStackSection section = new SectionStackSection();
             String title = bi.getId();
             if (bi.isList()) {
-                title += "[]";
+                title += " []";
             }
             if (!bi.isOptional()) {
-                title += "<font color=\"red\">(*)</font>";
+                title += " <font color=\"red\">(*)</font>";
             }
             section.setTitle("<strong>" + title + "</strong>");
 
@@ -68,9 +69,15 @@ public class InputLayout extends InputOutputLayout {
             generalLayout.setMembersMargin(membersMargin);
 
             HLayout commandLineLayout = new HLayout();
-            commandLineLayout.addMember(new LocalTextField("Command-line key", false, false, bi.getCommandLineKey()));
-            commandLineLayout.addMember(new LocalTextField("Command-line flag", false, false, bi.getCommandLineFlag()));
-            commandLineLayout.addMember(new LocalTextField("Default value", false, false, bi.getDefaultValue()));
+            if (bi.getCommandLineKey() != null) {
+                commandLineLayout.addMember(new LocalTextField("Command-line key", false, false, bi.getCommandLineKey()));
+            }
+            if (bi.getCommandLineFlag() != null && !bi.getCommandLineFlag().equals("")) {
+                commandLineLayout.addMember(new LocalTextField("Command-line flag", false, false, bi.getCommandLineFlag()));
+            }
+            if (bi.getDefaultValue() != null) {
+                commandLineLayout.addMember(new LocalTextField("Default value", false, false, bi.getDefaultValue()));
+            }
             commandLineLayout.setMembersMargin(membersMargin);
 
             HLayout descriptionLayout = new HLayout();

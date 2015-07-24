@@ -76,7 +76,7 @@ public class ApplicationData implements ApplicationDAO {
             ps.setString(2, application.getCitation());
             ps.setString(3, application.getOwner());
             ps.execute();
-       
+
             for (String className : application.getApplicationClasses()) {
                 addClassToApplication(application.getName(), className);
             }
@@ -103,9 +103,9 @@ public class ApplicationData implements ApplicationDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
-                    + "VIPApplications "
-                    + "SET citation=?,owner=? "
-                    + "WHERE name=?");
+                                                               + "VIPApplications "
+                                                               + "SET citation=?,owner=? "
+                                                               + "WHERE name=?");
 
             ps.setString(1, application.getCitation());
             ps.setString(2, application.getOwner());
@@ -114,11 +114,11 @@ public class ApplicationData implements ApplicationDAO {
             ps.close();
             removeAllClassesFromApplication(application.getName());
             for (String className : application.getApplicationClasses()) {
-                if(!className.equals("")){
-                addClassToApplication(application.getName(), className);
+                if (!className.equals("")) {
+                    addClassToApplication(application.getName(), className);
                 }
             }
-            
+
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
@@ -135,7 +135,7 @@ public class ApplicationData implements ApplicationDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("DELETE "
-                    + "FROM VIPApplications WHERE name=?");
+                                                               + "FROM VIPApplications WHERE name=?");
 
             ps.setString(1, name);
             ps.execute();
@@ -159,8 +159,8 @@ public class ApplicationData implements ApplicationDAO {
         try {
             for (AppClass c : ApplicationDAOFactory.getDAOFactory().getClassDAO().getUserClasses(email, true)) {
                 PreparedStatement ps = connection.prepareStatement("DELETE "
-                        + "FROM VIPApplicationClasses "
-                        + "WHERE class=? AND application=?");
+                                                                   + "FROM VIPApplicationClasses "
+                                                                   + "WHERE class=? AND application=?");
 
                 ps.setString(1, c.getName());
                 ps.setString(2, name);
@@ -183,8 +183,8 @@ public class ApplicationData implements ApplicationDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "name, owner, citation FROM "
-                    + "VIPApplications ORDER BY name");
+                                                               + "name, owner, citation FROM "
+                                                               + "VIPApplications ORDER BY name");
 
             ResultSet rs = ps.executeQuery();
             List<Application> applications = new ArrayList<Application>();
@@ -193,7 +193,7 @@ public class ApplicationData implements ApplicationDAO {
 
                 String owner = rs.getString("owner");
                 PreparedStatement ps3 = connection.prepareStatement("SELECT "
-                        + "first_name,last_name FROM VIPUsers WHERE email=?");
+                                                                    + "first_name,last_name FROM VIPUsers WHERE email=?");
                 ps3.setString(1, owner);
                 ResultSet rs3 = ps3.executeQuery();
                 String firstName = null;
@@ -206,7 +206,7 @@ public class ApplicationData implements ApplicationDAO {
 
                 String name = rs.getString("name");
                 PreparedStatement ps2 = connection.prepareStatement("SELECT "
-                        + "class FROM VIPApplicationClasses WHERE application=?");
+                                                                    + "class FROM VIPApplicationClasses WHERE application=?");
                 ps2.setString(1, name);
 
                 ResultSet rs2 = ps2.executeQuery();
@@ -239,11 +239,11 @@ public class ApplicationData implements ApplicationDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "name, version FROM "
-                    + "VIPApplications app, VIPAppVersions ver, VIPApplicationClasses appc "
-                    + "WHERE appc.class = ? AND app.name = appc.application AND "
-                    + "app.name = ver.application AND visible = ? "
-                    + "ORDER BY app.name");
+                                                               + "name, version FROM "
+                                                               + "VIPApplications app, VIPAppVersions ver, VIPApplicationClasses appc "
+                                                               + "WHERE appc.class = ? AND app.name = appc.application AND "
+                                                               + "app.name = ver.application AND visible = ? "
+                                                               + "ORDER BY app.name");
             ps.setString(1, className);
             ps.setBoolean(2, true);
 
@@ -256,6 +256,32 @@ public class ApplicationData implements ApplicationDAO {
             ps.close();
             return applications;
 
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param applicationName
+     * @return
+     * @throws DAOException
+     */
+    @Override
+    public Application getApplication(String applicationName) throws DAOException {
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT "
+                                                               + "name, lfn, citation, owner FROM VIPApplications "
+                                                               + "WHERE name = ?");
+            ps.setString(1, applicationName);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.first()) {
+                ps.close();
+                return new Application(rs.getString("name"), null, rs.getString("owner"), rs.getString("citation"));
+            }
+            return null;
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
@@ -287,17 +313,17 @@ public class ApplicationData implements ApplicationDAO {
                 String clause = sb.length() > 0 ? " AND (" + sb.toString() + ")" : "";
 
                 PreparedStatement ps = connection.prepareStatement("SELECT DISTINCT "
-                        + "name,owner, citation FROM "
-                        + "VIPApplications app, VIPApplicationClasses appc "
-                        + "WHERE app.name = appc.application " + clause + " "
-                        + "ORDER BY name");
+                                                                   + "name,owner, citation FROM "
+                                                                   + "VIPApplications app, VIPApplicationClasses appc "
+                                                                   + "WHERE app.name = appc.application " + clause + " "
+                                                                   + "ORDER BY name");
 
                 ResultSet rs = ps.executeQuery();
 
                 while (rs.next()) {
                     String name = rs.getString("name");
                     PreparedStatement ps2 = connection.prepareStatement("SELECT "
-                            + "class FROM VIPApplicationClasses WHERE application = ?");
+                                                                        + "class FROM VIPApplicationClasses WHERE application = ?");
 
                     ps2.setString(1, name);
 
@@ -308,19 +334,19 @@ public class ApplicationData implements ApplicationDAO {
                         appClasses.add(rs2.getString("class"));
                     }
                     ps2.close();
-                    
-                     String owner = rs.getString("owner");
-                PreparedStatement ps3 = connection.prepareStatement("SELECT "
-                        + "first_name,last_name FROM VIPUsers WHERE email=?");
-                ps3.setString(1, owner);
-                ResultSet rs3 = ps3.executeQuery();
-                String firstName = null;
-                String lastName = null;
-                while (rs3.next()) {
-                    firstName = rs3.getString("first_name");
-                    lastName = rs3.getString("last_name");
-                }
-                ps3.close();
+
+                    String owner = rs.getString("owner");
+                    PreparedStatement ps3 = connection.prepareStatement("SELECT "
+                                                                        + "first_name,last_name FROM VIPUsers WHERE email=?");
+                    ps3.setString(1, owner);
+                    ResultSet rs3 = ps3.executeQuery();
+                    String firstName = null;
+                    String lastName = null;
+                    while (rs3.next()) {
+                        firstName = rs3.getString("first_name");
+                        lastName = rs3.getString("last_name");
+                    }
+                    ps3.close();
 
                     applications.add(new Application(name, appClasses,rs.getString("owner"),firstName + " " + lastName, rs.getString("citation")));
                 }
@@ -336,46 +362,6 @@ public class ApplicationData implements ApplicationDAO {
 
     /**
      *
-     * @param applicationName
-     * @return
-     * @throws DAOException
-     */
-    @Override
-    public boolean checkApplicationExistWithAnOtherOwner(String applicationName, String userEmail) throws DAOException {
-        boolean exist;
-        try {
-            PreparedStatement ps;
-            ps = connection.prepareStatement("SELECT "
-                    + "name,owner "
-                    + "FROM VIPApplications "
-                    + "WHERE name=?");
-
-            ps.setString(1, applicationName);
-
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                exist = true;
-                String owner = rs.getString("owner");
-                if (!owner.equals(userEmail) || owner == null) {
-                    throw new DAOException("this application already exist, you can't modify/overwrite application that's not yours.");
-                }
-
-            } else {
-                exist = false;
-
-            }
-
-            ps.close();
-        } catch (SQLException ex) {
-            logger.error(ex);
-            throw new DAOException(ex);
-        }
-
-        return exist;
-    }
-
-    /**
-     *
      * @param applicationClass
      * @return
      */
@@ -387,11 +373,11 @@ public class ApplicationData implements ApplicationDAO {
             PreparedStatement ps = null;
             if (applicationClass == null) {
                 ps = connection.prepareStatement("SELECT name FROM "
-                        + "WorkflowDescriptor ORDER BY name");
+                                                 + "WorkflowDescriptor ORDER BY name");
             } else {
                 ps = connection.prepareStatement("SELECT name FROM "
-                        + "WorkflowDescriptor wd, WorkflowClasses wc "
-                        + "WHERE (wc.workflow=wd.name AND class=?)");
+                                                 + "WorkflowDescriptor wd, WorkflowClasses wc "
+                                                 + "WHERE (wc.workflow=wd.name AND class=?)");
                 ps.setString(1, applicationClass);
             }
 
@@ -420,8 +406,8 @@ public class ApplicationData implements ApplicationDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("INSERT INTO "
-                    + "VIPApplicationClasses(application, class) "
-                    + "VALUES(?, ?)");
+                                                               + "VIPApplicationClasses(application, class) "
+                                                               + "VALUES(?, ?)");
 
             ps.setString(1, applicationName);
             ps.setString(2, className);
@@ -448,7 +434,7 @@ public class ApplicationData implements ApplicationDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("DELETE FROM "
-                    + "VIPApplicationClasses WHERE application=?");
+                                                               + "VIPApplicationClasses WHERE application=?");
 
             ps.setString(1, workflowName);
             ps.execute();
@@ -471,7 +457,7 @@ public class ApplicationData implements ApplicationDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT citation "
-                    + "FROM VIPApplications WHERE name = ?");
+                                                               + "FROM VIPApplications WHERE name = ?");
             ps.setString(1, name);
 
             ResultSet rs = ps.executeQuery();
@@ -492,10 +478,10 @@ public class ApplicationData implements ApplicationDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "version, lfn, visible FROM "
-                    + "VIPAppVersions "
-                    + "WHERE application = ? "
-                    + "ORDER BY version");
+                                                               + "version, lfn, visible FROM "
+                                                               + "VIPAppVersions "
+                                                               + "WHERE application = ? "
+                                                               + "ORDER BY version");
             ps.setString(1, name);
 
             ResultSet rs = ps.executeQuery();
@@ -545,10 +531,9 @@ public class ApplicationData implements ApplicationDAO {
     public void updateVersion(AppVersion version) throws DAOException {
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
-                    + "VIPAppVersions "
-                    + "SET lfn=?, visible=? "
-                    + "WHERE application=? AND version=?");
-
+                                                               + "VIPAppVersions "
+                                                               + "SET lfn=?, visible=? "
+                                                               + "WHERE application=? AND version=?");
 
             ps.setString(1, version.getLfn());
             ps.setBoolean(2, version.isVisible());
@@ -568,7 +553,7 @@ public class ApplicationData implements ApplicationDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("DELETE "
-                    + "FROM VIPAppVersions WHERE application=? AND version=?");
+                                                               + "FROM VIPAppVersions WHERE application=? AND version=?");
 
             ps.setString(1, applicationName);
             ps.setString(2, version);
@@ -586,9 +571,9 @@ public class ApplicationData implements ApplicationDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "application, version, lfn, visible "
-                    + "FROM VIPAppVersions WHERE "
-                    + "application = ? AND version = ?");
+                                                               + "application, version, lfn, visible "
+                                                               + "FROM VIPAppVersions WHERE "
+                                                               + "application = ? AND version = ?");
             ps.setString(1, applicationName);
             ps.setString(2, applicationVersion);
 
@@ -596,8 +581,8 @@ public class ApplicationData implements ApplicationDAO {
             rs.next();
 
             AppVersion version = new AppVersion(rs.getString("application"),
-                    rs.getString("version"), rs.getString("lfn"),
-                    rs.getBoolean("visible"));
+                                                rs.getString("version"), rs.getString("lfn"),
+                                                rs.getBoolean("visible"));
             ps.close();
 
             return version;

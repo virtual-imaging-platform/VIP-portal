@@ -47,22 +47,6 @@ public class ApplicationBusiness {
 
     /**
      *
-     * @param applicationName
-     * @return
-     * @throws BusinessException
-     */
-    public boolean checkApplicationExistWithAnOtherOwner(String applicationName, String userEmail) throws BusinessException {
-
-        try {
-            return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().checkApplicationExistWithAnOtherOwner(applicationName, userEmail);
-
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    /**
-     *
      * @return @throws BusinessException
      */
     public List<Application> getApplications() throws BusinessException {
@@ -91,6 +75,20 @@ public class ApplicationBusiness {
         }
     }
 
+    /**
+     *
+     * @param applicationName
+     * @return
+     * @throws BusinessException
+     */
+    public Application getApplication(String applicationName) throws BusinessException {
+        try {
+            return ApplicationDAOFactory.getDAOFactory().getApplicationDAO().getApplication(applicationName);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+    
     /**
      *
      * @param classes

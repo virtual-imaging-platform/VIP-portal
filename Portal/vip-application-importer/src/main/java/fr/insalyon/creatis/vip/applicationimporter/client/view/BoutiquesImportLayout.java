@@ -134,7 +134,7 @@ public class BoutiquesImportLayout extends AbstractFormLayout {
                 modal.hide();
                 JSONObject json = JSONParser.parseStrict(jsonFileContent).isObject();
                 DisplayTab tabImporter = new DisplayTab(Constants.ICON_BOUTIQUES, Constants.TAB_ID_BOUTIQUES_APPLICATION, Constants.TAB_NAME_BOUTIQUES); 
-                tabImporter.setJSONObject(json);
+                tabImporter.parseJSON(json);
                 Layout.getInstance().addTab(tabImporter);
             }
         };

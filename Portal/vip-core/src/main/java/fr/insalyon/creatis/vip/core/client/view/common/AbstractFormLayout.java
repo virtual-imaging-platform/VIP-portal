@@ -47,20 +47,14 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 public abstract class AbstractFormLayout extends VLayout {
 
     public AbstractFormLayout(int width, int height) {
-
         this(Integer.toString(width), Integer.toString(height));
-        
-        
     }
 
     public AbstractFormLayout(int width, String height) {
-
         this(Integer.toString(width), height);
     }
     
  public AbstractFormLayout() {
-
-       
         this.setBorder("1px solid #C0C0C0");
         this.setBackgroundColor("#F5F5F5");
         this.setPadding(10);
@@ -68,7 +62,6 @@ public abstract class AbstractFormLayout extends VLayout {
     }
 
     public AbstractFormLayout(String width, String height) {
-
         this.setWidth(width);
         this.setHeight(height);
         this.setBorder("1px solid #C0C0C0");
@@ -130,10 +123,4 @@ public abstract class AbstractFormLayout extends VLayout {
         }
         this.addMember(hLayout);
     }
-    
-    protected int getwiddh(){
-        return this.getwiddh();
-    }
-    
-    
 }

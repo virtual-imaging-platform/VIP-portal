@@ -32,9 +32,9 @@
 package fr.insalyon.creatis.vip.applicationimporter.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
+import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
 
 public interface ApplicationImporterServiceAsync {
     public void readFileAsString(String fileLFN, AsyncCallback<String> callback);
-    public void createApplication(String jsonString, String applicationLocation, String[] vipClasses, AsyncCallback<Void> callback);
+    public void createApplication(BoutiquesTool bt, boolean overwriteVersion, AsyncCallback<Void> callback);
 }

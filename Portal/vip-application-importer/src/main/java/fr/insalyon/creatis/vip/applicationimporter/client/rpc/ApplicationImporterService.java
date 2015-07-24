@@ -35,6 +35,7 @@ import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterExc
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
 
 public interface ApplicationImporterService extends RemoteService {
 
@@ -50,5 +51,5 @@ public interface ApplicationImporterService extends RemoteService {
     }
 
     String readFileAsString(String fileLFN) throws ApplicationImporterException;
-    void createApplication(String jsonString, String applicationLocation, String[] vipClasses) throws ApplicationImporterException;
+    void createApplication(BoutiquesTool bt, boolean overwriteVersion) throws ApplicationImporterException;
 }

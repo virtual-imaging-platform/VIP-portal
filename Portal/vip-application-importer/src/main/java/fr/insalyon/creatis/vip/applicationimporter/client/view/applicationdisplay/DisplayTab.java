@@ -31,11 +31,8 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
-import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -43,44 +40,26 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.applicationimporter.client.JSONUtil;
+import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
 import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
-import fr.insalyon.creatis.vip.applicationimporter.client.view.JSONUtil;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import java.util.ArrayList;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
-import java.util.List;
 
-/**
- *
- * @author Nouha Boujelben
- */
+
 public class DisplayTab extends Tab {
 
     // Layouts
-    VLayout globalLayout;
-    GeneralLayout generalLayout;
-    InputLayout inputsLayout;
-    OutputLayout outputsLayout;
-    VIPLayout vipLayout;
-
-    // JSON object representing the application.
-    JSONObject jsonObject;
-
-    // Fields in the JSON object.
-    String name;
-    String toolVersion;
-    String description;
-    String commandLine;
-    String dockerImage;
-    String dockerIndex;
-    String schemaVersion;
-    List<BoutiquesInput> inputs;
-    List<BoutiquesOutputFile> outputFiles;
-
-    // Modal
-    private ModalWindow modal;
+    private VLayout globalLayout;
+    private GeneralLayout generalLayout;
+    private InputLayout inputsLayout;
+    private OutputLayout outputsLayout;
+    private VIPLayout vipLayout;
+    private final ModalWindow modal;
+    
+    private BoutiquesTool boutiquesTool;
 
     public DisplayTab(String tabIcon, String tabId, String tabName) {
         this.setTitle(Canvas.imgHTML(tabIcon) + " " + tabName.trim());
@@ -88,8 +67,7 @@ public class DisplayTab extends Tab {
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
         configure();
-        inputs = new ArrayList<BoutiquesInput>();
-        outputFiles = new ArrayList<BoutiquesOutputFile>();
+        boutiquesTool = new BoutiquesTool();
         modal = new ModalWindow(globalLayout);
         this.setPane(globalLayout);
     }
@@ -128,9 +106,11 @@ public class DisplayTab extends Tab {
         createApplicationButton = WidgetUtil.getIButton("Create application", Constants.ICON_LAUNCH, new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                createApplication(jsonObject, vipLayout.getApplicationLocation(), vipLayout.getVIPClasses());
+                boutiquesTool.setApplicationLFN(vipLayout.getApplicationLocation()+"/"+boutiquesTool.getName());
+                createApplication();
             }
         });
+        createApplicationButton.setWidth(120);
         globalLayout.addMember(createApplicationButton);
     }
 
@@ -140,60 +120,15 @@ public class DisplayTab extends Tab {
      *
      * @param jsonObject
      */
-    public void setJSONObject(JSONObject jsonObject) {
-
-        this.jsonObject = jsonObject;
-
-        // Parses JSON object;
-        name = JSONUtil.getPropertyAsString(jsonObject, "name");
-        toolVersion = JSONUtil.getPropertyAsString(jsonObject, "tool-version");
-        description = JSONUtil.getPropertyAsString(jsonObject, "description");
-        commandLine = JSONUtil.getPropertyAsString(jsonObject, "command-line");
-        dockerImage = JSONUtil.getPropertyAsString(jsonObject, "docker-image");
-        dockerIndex = JSONUtil.getPropertyAsString(jsonObject, "docker-index");
-        schemaVersion = JSONUtil.getPropertyAsString(jsonObject, "schema-version");
-
-        JSONArray inputJSONArray = JSONUtil.getPropertyAsArray(jsonObject, "inputs");
-        if (inputJSONArray != null) {
-            for (int i = 0; i < inputJSONArray.size(); i++) {
-                BoutiquesInput bi = new BoutiquesInput();
-                bi.setJSON(inputJSONArray.get(i).isObject());
-                inputs.add(bi);
-            }
-        }
-
-        JSONArray outputJSONArray = JSONUtil.getPropertyAsArray(jsonObject, "output-files");
-        if (outputJSONArray != null) {
-            for (int i = 0; i < outputJSONArray.size(); i++) {
-                BoutiquesOutputFile bof = new BoutiquesOutputFile();
-                bof.setJSON(outputJSONArray.get(i).isObject());
-                outputFiles.add(bof);
-            }
-        }
-        updateDisplay();
+    public void parseJSON(JSONObject jsonObject) {
+        boutiquesTool = JSONUtil.parseBoutiquesTool(jsonObject);
+        this.setTitle(boutiquesTool.getName());
+        generalLayout.setTool(boutiquesTool);
+        inputsLayout.setInputs(boutiquesTool.getInputs());
+        outputsLayout.setOutputFiles(boutiquesTool.getOutputFiles());
     }
-
-    /**
-     * Updates the values of the interface fields based on the object
-     * attributes.
-     */
-    private void updateDisplay() {
-
-        // Update general information
-        generalLayout.setName(name);
-        generalLayout.setVersion(toolVersion);
-        generalLayout.setDescription(description);
-        generalLayout.setCommandLine(commandLine);
-        generalLayout.setDockerImage(dockerImage);
-        generalLayout.setDockerIndex(dockerIndex);
-        generalLayout.setSchemaVersion(schemaVersion);
-
-        // Update inputs and outputs
-        inputsLayout.setInputs(inputs);
-        outputsLayout.setOutputFiles(outputFiles);
-    }
-
-    private void createApplication(JSONObject jsonObject, String applicationLocation, String[] VIPClasses) {
+    
+    private void createApplication() {
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             @Override
@@ -209,7 +144,7 @@ public class DisplayTab extends Tab {
             }
         };
         modal.show("Creating application...", true);
-        ApplicationImporterService.Util.getInstance().createApplication(jsonObject.toString(), vipLayout.getApplicationLocation(), vipLayout.getVIPClasses(), callback);
+        ApplicationImporterService.Util.getInstance().createApplication(boutiquesTool, vipLayout.getOverwrite(), callback);
     }
 
 }

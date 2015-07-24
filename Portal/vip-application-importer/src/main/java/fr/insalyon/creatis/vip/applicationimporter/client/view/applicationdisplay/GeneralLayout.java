@@ -32,13 +32,14 @@
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
 import com.smartgwt.client.types.Overflow;
+import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 
 public class GeneralLayout extends AbstractFormLayout {
 
     
-    private final LocalTextField name,
+    private final LocalTextField         name,
                                          commandLine,
                                          dockerImage,
                                          dockerIndex,
@@ -64,33 +65,14 @@ public class GeneralLayout extends AbstractFormLayout {
         this.addMembers(name,commandLine,dockerImage,dockerIndex,version,schemaVersion,description);
     }
     
-    public void setName(String nameValue){
-        name.setValue(nameValue);
+    public void setTool(BoutiquesTool bt){
+        name.setValue(bt.getName());
+        version.setValue(bt.getToolVersion());
+        description.setValue(bt.getDescription());
+        commandLine.setValue(bt.getCommandLine());
+        dockerImage.setValue(bt.getDockerImage());
+        dockerIndex.setValue(bt.getDockerIndex());
+        schemaVersion.setValue(bt.getSchemaVersion());
     }
-    
-    public void setCommandLine(String commandLineValue){
-        commandLine.setValue(commandLineValue);
-    }
-    
-    public void setDockerImage(String div){
-        dockerImage.setValue(div);
-    }
-    
-    public void setDockerIndex(String di){
-        dockerIndex.setValue(di);
-    }
-    
-    public void setVersion(String v){
-        version.setValue(v);
-    }
-    
-    public void setSchemaVersion(String sv){
-        schemaVersion.setValue(sv);
-    }
-    
-    public void setDescription(String d){
-        description.setValue(d);
-    }
-    
     
 }

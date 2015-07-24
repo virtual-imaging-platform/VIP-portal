@@ -29,21 +29,30 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-
-
 package fr.insalyon.creatis.vip.applicationimporter.server.business;
 
+import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
-import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -53,199 +62,143 @@ public class ApplicationImporterBusiness {
 
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ApplicationImporterBusiness.class);
 
-    public static String readFileAsString(String fileLFN, User user) throws ApplicationImporterException {
+    public String readFileAsString(String fileLFN, User user) throws BusinessException {
         try {
-            String localFilePath = CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(user, fileLFN), Server.getInstance().getApplicationImporterFileRepository());
+            File localDir = new File(Server.getInstance().getApplicationImporterFileRepository()+"/"+(new File(DataManagerUtil.parseBaseDir(user, fileLFN))).getParent());
+            if(!localDir.exists() && !localDir.mkdirs()){
+                throw new BusinessException("Cannot create directory "+localDir.getCanonicalPath());
+            }
+            String localFilePath = CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(user, fileLFN), localDir.getCanonicalPath());
             String fileContent = new Scanner(new File(localFilePath)).useDelimiter("\\Z").next();
             return fileContent;
         } catch (GRIDAClientException ex) {
             logger.error(ex);
-            throw new ApplicationImporterException(ex);
+            throw new BusinessException(ex);
         } catch (DataManagerException ex) {
             logger.error(ex);
-            throw new ApplicationImporterException(ex);
+            throw new BusinessException(ex);
         } catch (FileNotFoundException ex) {
             logger.error(ex);
-            throw new ApplicationImporterException(ex);
+            throw new BusinessException(ex);
+        } catch (IOException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
         }
     }
 
-    public static void createApplication(String jsonString, String applicationLocation, String[] vipClasses, User user) throws ApplicationImporterException {
-        throw new ApplicationImporterException("Method not implemented yet");
+    public void createApplication(BoutiquesTool bt, boolean overwriteApplicationVersion, User user) throws BusinessException {
+
+        try {
+            // Will enventually be taken from the Constants.
+            String wrapperTemplate = "vm/wrapper.vm";
+            String gaswTemplate = "vm/gasw.vm";
+            String gwendiaTemplate = "vm/gwendia.vm";
+          
+            // Check rights
+            checkEditionRights(bt.getName(), bt.getToolVersion(), overwriteApplicationVersion, user);
+            bt.setApplicationLFN(DataManagerUtil.parseBaseDir(user, bt.getApplicationLFN()));
+
+            // Generate strings
+            String wrapperString = VelocityUtils.getInstance().createDocument(bt, wrapperTemplate);
+            String gaswString = VelocityUtils.getInstance().createDocument(bt, gaswTemplate);
+            String gwendiaString = VelocityUtils.getInstance().createDocument(bt, gwendiaTemplate);
+
+            // Write files
+            String wrapperFileName = Server.getInstance().getApplicationImporterFileRepository() + bt.getWrapperLFN();
+            String gaswFileName = Server.getInstance().getApplicationImporterFileRepository() + bt.getGASWLFN();
+            String gwendiaFileName = Server.getInstance().getApplicationImporterFileRepository() + bt.getGwendiaLFN();
+
+            writeString(wrapperString, wrapperFileName);
+            writeString(gaswString, gaswFileName);
+            writeString(gwendiaString, gwendiaFileName);
+ 
+            // Transfer files
+            uploadFile(wrapperFileName,bt.getWrapperLFN());
+            uploadFile(gaswFileName, bt.getGASWLFN());
+            uploadFile(gwendiaFileName, bt.getGwendiaLFN());
+            
+            // Register application
+            registerApplicationVersion(bt.getName(), bt.getToolVersion(), user.getEmail(), bt.getGwendiaLFN());
+
+        } catch (FileNotFoundException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        } catch (IOException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        } catch (DataManagerException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
+    private void uploadFile(String localFile, String lfn) throws BusinessException{
+        try {
+            GRIDAClient gc = CoreUtil.getGRIDAClient();
+            logger.info("Uploading file "+localFile+" to "+lfn);
+            if(gc.exist(lfn))
+                gc.delete(lfn);
+            gc.uploadFile(localFile, (new File(lfn)).getParent());
+        } catch (GRIDAClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
     }
     
-//    private void generateScriptFile(String templateFolder, 
-//                                    JSONObject jsonObject,
-//                                    User user) throws ApplicationImporterException {
-//        Velocity ve = new Velocity();
-//        String applicationRealLocation;
-//        try {
-//            applicationRealLocation = DataManagerUtil.parseBaseDir(user, applicationLocation);
-//            final File homeDir = new File(Server.getInstance().getApplicationImporterFileRepository());
-//            File theDir = new File(homeDir, applicationName + "/" + user.getFolder() + "/" + generateTime);
-//            theDir.mkdirs();
-//            String dir = theDir.getAbsolutePath();
-//            if (scriptFile != null) {
-//                if (!scriptFile.isEmpty()) {
-//                    scriptFile = DataManagerUtil.parseBaseDir(getSessionUser(), scriptFile);
-//                }
-//            }
-//            ve.wrapperScriptFile(templateFolder,
-//                                 listInput,
-//                                 listOutput,
-//                                 applicationName,
-//                                 scriptFile,
-//                                 applicationRealLocation,
-//                                 environementFile,
-//                                 dir,
-//                                 generateTime,
-//                                 mandatoryDir,
-//                                 dockerImage,
-//                                 commandLine);
-//        } catch (CoreException ex) {
-//            logger.error(ex);
-//            throw new ApplicationImporterException(ex);
-//        } catch (DataManagerException ex) {
-//            logger.error(ex);
-//            throw new ApplicationImporterException(ex);
-//        } catch (VelocityException ex) {
-//            logger.error(ex);
-//            throw new ApplicationImporterException(ex);
-//        }
-//    }
-//
-//    /**
-//     * method to generate the Gwendia file of the application
-//     *
-//     * @param listInput
-//     * @param listOutput
-//     * @param wrapperScriptPath
-//     * @param scriptFile
-//     * @param applicationName
-//     * @param applicationLocation
-//     * @param description
-//     * @return
-//     * @throws ApplicationImporterException
-//     */
-//    private String generateGwendiaFile(String templateFolder, HashMap<Integer, HashMap<String, String>> listInput, HashMap<Integer, HashMap<String, String>> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String vo) throws ApplicationImporterException {
-//        String applicationRealLocation;
-//        try {
-//            applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
-//            final File homeDir = new File(Server.getInstance().getApplicationImporterFileRepository());
-//            File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + generateTime);
-//            theDir.mkdirs();
-//            String dir = theDir.getAbsolutePath();
-//            return ve.gwendiaFile(templateFolder, listInput, listOutput, applicationName, description, applicationRealLocation, dir, new File(homeDir, applicationName), generateTime, mandatoryDir, vo);
-//        } catch (CoreException ex) {
-//            logger.error(ex);
-//            throw new ApplicationImporterException(ex);
-//        } catch (DataManagerException ex) {
-//            logger.error(ex);
-//            throw new ApplicationImporterException(ex);
-//        } catch (VelocityException ex) {
-//            logger.error(ex);
-//            throw new ApplicationImporterException(ex);
-//        }
-//
-//    }
-//
-//    /**
-//     * method to generate the Gasw file of the application
-//     *
-//     * @param listInput
-//     * @param listOutput
-//     * @param wrapperScriptPath
-//     * @param scriptFile
-//     * @param applicationName
-//     * @param applicationLocation
-//     * @param description
-//     * @throws ApplicationImporterException
-//     */
-//    private void generateGaswFile(String templateFolder, HashMap<Integer, HashMap<String, String>> listInput, HashMap<Integer, HashMap<String, String>> listOutput, String wrapperScriptPath, String scriptFile, String applicationName, String applicationLocation, String description, String sandboxFile, String environementFile, String extensionFile) throws ApplicationImporterException {
-//        String applicationRealLocation = null;
-//        try {
-//            applicationRealLocation = DataManagerUtil.parseBaseDir(getSessionUser(), applicationLocation);
-//            //create folder to genrate file
-//            final File homeDir = new File(Server.getInstance().getApplicationImporterFileRepository());
-//            File theDir = new File(homeDir, applicationName + "/" + getSessionUser().getFolder() + "/" + generateTime);
-//            theDir.mkdirs();
-//
-//            // if the directory does not exist, create it
-//            String dir = theDir.getAbsolutePath();
-//            String executableSandbox = null;
-//            String envF = null;
-//            String sandboxF = null;
-//            List<String> extensionFValue = null;
-//            String extensionF = "";
-//            if (extensionFile != null) {
-//                extensionFValue = new ArrayList<String>();
-//                if (!extensionFile.isEmpty()) {
-//                    try {
-//                        extensionF = CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(getSessionUser(), extensionFile), Server.getInstance().getApplicationImporterFileRepository());
-//                    } catch (GRIDAClientException ex) {
-//                        logger.error(ex);
-//                        throw new ApplicationImporterException(ex);
-//                    }
-//
-//                    try {
-//
-//                        Scanner scanner = new Scanner(new FileInputStream(extensionF));
-//                        List<String> requirements = new ArrayList<String>();
-//                        String ligne = null;
-//                        while (scanner.hasNextLine()) {
-//                            ligne = scanner.nextLine();
-//                            if (ligne.startsWith("requirements=")) {
-//                                requirements.add(ligne.substring(14));
-//                            }
-//                        }
-//                        scanner.close();
-//
-//                        for (String requirement : requirements) {
-//
-//                            extensionFValue.add(StringEscapeUtils.escapeXml(requirement.substring(0, requirement.length() - 1)));
-//
-//                        }
-//
-//                    } catch (FileNotFoundException exc) {
-//                        logger.error(exc);
-//                        throw new ApplicationImporterException("Can't find the extension file :" + extensionF);
-//
-//                    }
-//                }
-//            }
-//            if (scriptFile != null) {
-//                if (!scriptFile.isEmpty()) {
-//                    executableSandbox = DataManagerUtil.parseBaseDir(getSessionUser(), scriptFile);
-//
-//                }
-//            }
-//            if (environementFile != null) {
-//                if (!environementFile.isEmpty()) {
-//                    envF = DataManagerUtil.parseBaseDir(getSessionUser(), environementFile);
-//
-//                }
-//            }
-//            if (sandboxFile != null) {
-//                if (!sandboxFile.isEmpty()) {
-//                    sandboxF = DataManagerUtil.parseBaseDir(getSessionUser(), sandboxFile);
-//                }
-//            }
-//            ve.gaswFile(templateFolder, listInput, listOutput, applicationName, wrapperScriptPath, applicationRealLocation, dir, generateTime, sandboxF, envF, extensionFValue, executableSandbox);
-//        } catch (CoreException e) {
-//            logger.error(e);
-//            throw new ApplicationImporterException(e);
-//        } catch (DataManagerException ex) {
-//            logger.error(ex);
-//            throw new ApplicationImporterException(ex);
-//        } catch (VelocityException ex) {
-//            logger.error(ex);
-//            throw new ApplicationImporterException(ex);
-//        }
-//    }
-//
-//    private java.sql.Timestamp getCurrentTimeStamp() {
-//        java.util.Date today = new java.util.Date();
-//        return new java.sql.Timestamp(today.getTime());
-//
-//    }
+    private void writeString(String string, String fileName) throws BusinessException, FileNotFoundException, UnsupportedEncodingException{
+        // Check if base file directory exists, otherwise create it.
+        File directory = (new File(fileName)).getParentFile();
+        if(!directory.exists() && !directory.mkdirs())
+            throw new BusinessException("Cannot create directory "+directory.getAbsolutePath());
+        
+        PrintWriter writer = new PrintWriter(fileName, "UTF-8");
+        writer.write(string);
+        writer.close();
+    }
+    
+    private void registerApplicationVersion(String vipApplicationName, String vipVersion, String owner, String lfnGwendiaFile) throws BusinessException {
+        ApplicationBusiness ab = new ApplicationBusiness();
+        Application app = ab.getApplication(vipApplicationName);
+        AppVersion newVersion = new AppVersion(vipApplicationName, vipVersion, lfnGwendiaFile, true);
+        if (app == null) {
+            // If application doesn't exist, create it.
+            // New applications are not associated with any class (admins may add classes independently).
+            ab.add(new Application(vipApplicationName, new ArrayList<String>(), owner, ""));
+        }
+        // If version exists, update it
+        List<AppVersion> versions = ab.getVersions(vipApplicationName);
+        for (AppVersion existingVersion : versions) {
+            if (existingVersion.getVersion().equals(newVersion.getVersion())) {
+                ab.updateVersion(newVersion);
+                return;
+            }
+        }
+        // add new version
+        ab.addVersion(newVersion);
+    }
+
+    private void checkEditionRights(String vipApplicationName, String vipVersion, boolean overwrite, User user) throws BusinessException {
+
+        ApplicationBusiness ab = new ApplicationBusiness();
+        Application app = ab.getApplication(vipApplicationName);
+        if (app == null) {
+            return; // any user may create an application (nobody could run it unless an admin adds it to a class
+        }
+        // Only the owner of an existing application and a system administrator can modify it.
+        if (!user.isSystemAdministrator() && !app.getOwner().equals(user.getEmail())) {
+            logger.error(user.getEmail() + " tried to modify application " + app.getName() + " which belongs to " + app.getOwner());
+            throw new BusinessException("Permission denied.");
+        }
+        // Refuse to overwrite an application version silently if the version overwrite parameter is not set.
+        if (!overwrite) {
+            List<AppVersion> versions = ab.getVersions(vipApplicationName);
+            for (AppVersion v : versions) {
+                if (v.getVersion().equals(vipVersion)) {
+                    logger.error(user.getEmail() + " tried to overwrite version " + vipVersion + " of application " + vipApplicationName + " without setting the overwrite flag.");
+                    throw new BusinessException("Application version already exists.");
+                }
+            }
+        }
+
+    }
 }

@@ -53,8 +53,6 @@ public interface ApplicationServiceAsync {
     
     public void getApplications(String className, AsyncCallback<List<String[]>> asyncCallback);
     
-    public void checkApplicationExistWithAnOtherOwner(String applicationName, AsyncCallback<Boolean> asyncCallback);
-    
     public void getApplicationsByClass(String className, AsyncCallback<List<String[]>> asyncCallback);
     
     public void getVersions(String applicationName, AsyncCallback<List<AppVersion>> asyncCallback);
