@@ -89,8 +89,8 @@ knowledge of the CeCILL-B license and that you accept its terms.
 
         <dependency>
             <groupId>bouncycastle</groupId>
-            <artifactId>bcprov-jdk16</artifactId>
-            <version>1.41</version>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>152</version>
         </dependency>
                 
         <dependency>

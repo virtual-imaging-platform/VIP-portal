@@ -52,6 +52,7 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.asn1.ASN1Primitive;
 
 /**
  *
@@ -353,12 +354,19 @@ public class ProxyClient {
         out.println("-----BEGIN RSA PRIVATE KEY-----");
         ByteArrayInputStream inStream = new ByteArrayInputStream(key.getEncoded());
         ASN1InputStream derInputStream = new ASN1InputStream(inStream);
-        DERObject keyInfo = derInputStream.readObject();
+        ASN1Primitive keyInfo = derInputStream.readObject();
+        /*
         PrivateKeyInfo pkey = new PrivateKeyInfo((ASN1Sequence) keyInfo);
-        DERObject derKey = pkey.getPrivateKey();
+        ASN1Primitive derKey = pkey.getPrivateKey();
+        */
+        PrivateKeyInfo pki;
+        pki = PrivateKeyInfo.getInstance(keyInfo);
+        ASN1Primitive innerType = pki.parsePrivateKey().toASN1Primitive();
+        // build and return the actual key
+        ASN1Sequence privKey  = (ASN1Sequence)innerType;
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         DEROutputStream der = new DEROutputStream(bout);
-        der.writeObject(derKey);
+        der.writeObject(privKey);
         printB64(bout.toByteArray(), out);
         out.println("-----END RSA PRIVATE KEY-----");
     }
