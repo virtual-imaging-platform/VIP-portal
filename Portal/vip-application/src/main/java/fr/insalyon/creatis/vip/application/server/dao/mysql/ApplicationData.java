@@ -278,7 +278,6 @@ public class ApplicationData implements ApplicationDAO {
 
             ResultSet rs = ps.executeQuery();
             if (rs.first()) {
-                ps.close();
                 return new Application(rs.getString("name"), null, rs.getString("owner"), rs.getString("citation"));
             }
             return null;

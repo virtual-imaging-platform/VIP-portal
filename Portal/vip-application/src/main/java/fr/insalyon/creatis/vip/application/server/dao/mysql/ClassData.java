@@ -205,7 +205,7 @@ public class ClassData implements ClassDAO {
                     groups.add(r.getString("groupname"));
                 }
                 ps2.close();
-                ps.close();
+
                 return new AppClass(rs.getString("name"), 
                         rs.getString("engine"), groups);
             }

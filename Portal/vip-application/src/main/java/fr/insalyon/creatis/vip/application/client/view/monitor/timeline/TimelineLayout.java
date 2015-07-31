@@ -77,7 +77,7 @@ public class TimelineLayout extends VLayout {
         this.setHeight100();
         this.setMembersMargin(10);
 
-        this.addMember(WidgetUtil.getLabel("<font size=\"3\"><b>Simulations Timeline</b></font>",
+        this.addMember(WidgetUtil.getLabel("<font size=\"3\"><b>Executions Timeline</b></font>",
                 ApplicationConstants.ICON_MONITOR_TIMELINE, 20));
 
         simulationsLayout = new VLayout(5);
@@ -89,7 +89,7 @@ public class TimelineLayout extends VLayout {
         simulationsLayout.setAlign(VerticalAlignment.TOP);
         this.addMember(simulationsLayout);
 
-        loadMoreLabel = WidgetUtil.getLabel("<font color=\"#666666\">Load more Simulations</font>", 18, Cursor.HAND);
+        loadMoreLabel = WidgetUtil.getLabel("<font color=\"#666666\">Load more Execution</font>", 18, Cursor.HAND);
         loadMoreLabel.setAlign(Alignment.CENTER);
         loadMoreLabel.setBorder("1px solid #CCCCCC");
         loadMoreLabel.addClickHandler(new ClickHandler() {
@@ -114,7 +114,7 @@ public class TimelineLayout extends VLayout {
         AsyncCallback<List<Simulation>> callback = new AsyncCallback<List<Simulation>>() {
             @Override
             public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to load simulations:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to load executions:<br />" + caught.getMessage());
             }
 
             @Override
@@ -161,7 +161,7 @@ public class TimelineLayout extends VLayout {
             @Override
             public void onFailure(Throwable caught) {
                 setLoading(false);
-                Layout.getInstance().setWarningMessage("Unable to load simulations:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to load executions:<br />" + caught.getMessage());
             }
 
             @Override
@@ -195,11 +195,11 @@ public class TimelineLayout extends VLayout {
     private void setLoading(boolean loading) {
 
         if (loading) {
-            loadMoreLabel.setContents("<font color=\"#666666\">Loading simulations...</font>");
+            loadMoreLabel.setContents("<font color=\"#666666\">Loading executions...</font>");
             loadMoreLabel.setIcon(CoreConstants.ICON_LOADING);
             loadMoreLabel.setDisabled(true);
         } else {
-            loadMoreLabel.setContents("<font color=\"#666666\">Load more Simulations</font>");
+            loadMoreLabel.setContents("<font color=\"#666666\">Load more Executions</font>");
             loadMoreLabel.setIcon(null);
             loadMoreLabel.setDisabled(false);
         }

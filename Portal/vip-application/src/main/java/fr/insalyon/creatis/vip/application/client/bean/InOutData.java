@@ -51,7 +51,7 @@ public class InOutData implements IsSerializable {
         this.processor = processor;
         this.type = type;
     }
-
+    
     public String getPath() {
         return path;
     }
