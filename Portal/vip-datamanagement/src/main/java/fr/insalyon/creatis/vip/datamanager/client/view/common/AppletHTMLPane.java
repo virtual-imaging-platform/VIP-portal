@@ -64,6 +64,7 @@ public class AppletHTMLPane extends HTMLPane {
                 + "<param name=\"path\" value=\"" + path + "\"/>"
                 + "<param name=\"unzip\" value=\"" + unzip + "\"/>"
                 + "<param name=\"pool\" value=\"" + usePool + "\"/>"
+                + "<param name=\"permissions\" value=\"all-permissions\" />"     
                 + "</applet>"
                 + "</body>"
                 + "</html>");
