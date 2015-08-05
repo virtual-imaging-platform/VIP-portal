@@ -38,7 +38,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip-datamanager-applet</artifactId>
     <packaging>jar</packaging>
-    <version>1.13</version>
+    <version>1.15</version>
 
     <name>VIP-DataManager-Applet</name>
 
@@ -82,7 +82,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <dependency>
             <groupId>sun.jdk</groupId>
             <artifactId>plugin</artifactId>
-            <version>1.7.0</version>
+            <version>1.8.0</version>
             <scope>system</scope>
             <systemPath>${java.home}/lib/plugin.jar</systemPath>
         </dependency>
@@ -94,6 +94,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2-beta-5</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -138,6 +139,15 @@ knowledge of the CeCILL-B license and that you accept its terms.
                     <alias>${applet.alias}</alias>
                     <storepass>${applet.storepass}</storepass>
                     <keypass>${applet.keypass}</keypass>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.0.2</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>

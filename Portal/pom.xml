@@ -37,30 +37,30 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip</artifactId>
     <packaging>pom</packaging>
-    <version>1.14</version>
+    <version>1.15</version>
     <name>VIP</name>
     
     <properties>
-        <vip.core.version>1.14</vip.core.version>
-        <vip.portal.version>1.14</vip.portal.version>
-        <vip.docs.version>1.6</vip.docs.version>
-        <vip.application.version>1.12</vip.application.version>
-        <vip.datamanager.version>1.12</vip.datamanager.version>
-        <vip.datamanager-applet.version>1.13</vip.datamanager-applet.version>
-        <vip.gatelab.version>1.9</vip.gatelab.version>
-        <vip.gatelab-applet.version>1.13</vip.gatelab-applet.version>
+        <vip.core.version>1.15</vip.core.version>
+        <vip.portal.version>1.15</vip.portal.version>
+        <vip.docs.version>1.15</vip.docs.version>
+        <vip.application.version>1.15</vip.application.version>
+        <vip.datamanager.version>1.15</vip.datamanager.version>
+        <vip.datamanager-applet.version>1.15</vip.datamanager-applet.version>
+        <vip.gatelab.version>1.15</vip.gatelab.version>
+        <vip.gatelab-applet.version>1.15</vip.gatelab-applet.version>
         <vip.simulation-gui.version>0.4.1</vip.simulation-gui.version>
         <vip.models.version>0.9.1</vip.models.version>
         <vip.simulated-data.version>1.3.1</vip.simulated-data.version>
-        <vip.social.version>1.12</vip.social.version>
+        <vip.social.version>1.15</vip.social.version>
         <vip.provenance.version>0.1.2</vip.provenance.version>
         <vip.cowork.version>0.1</vip.cowork.version>
-        <vip.cowork-applet.version>1.13</vip.cowork-applet.version>
+        <vip.cowork-applet.version>1.15</vip.cowork-applet.version>
         <vip.cardiac.version>0.9.4</vip.cardiac.version>
         <vip.physical-properties.version>0.1</vip.physical-properties.version>
         <vip.query.version>1.7</vip.query.version>
-        <vip.application-importer.version>1.14</vip.application-importer.version>
-        <vip.api.version>1.14</vip.api.version>
+        <vip.application-importer.version>1.15</vip.application-importer.version>
+        <vip.api.version>1.15</vip.api.version>
     </properties>
     
     <description>VIP</description>
