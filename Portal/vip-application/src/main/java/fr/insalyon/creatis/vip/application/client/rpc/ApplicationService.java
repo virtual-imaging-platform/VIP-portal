@@ -110,4 +110,6 @@ public interface ApplicationService extends RemoteService {
     public List<Engine> getEngines() throws ApplicationException;
     
     public List<String> getAppletGateLabClasses() throws ApplicationException;
+    
+    public List<String> getAppletGateLabTestClasses() throws ApplicationException;
 }

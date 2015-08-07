@@ -95,4 +95,6 @@ public interface ApplicationServiceAsync {
     public void getEngines(AsyncCallback<List<Engine>> asyncCallback);
     
      public void getAppletGateLabClasses(AsyncCallback <List<String>> asyncCallback);
+     
+     public void getAppletGateLabTestClasses(AsyncCallback <List<String>> asyncCallback);
 }

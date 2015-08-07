@@ -476,6 +476,12 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         return Server.getInstance().getAppletGateLabClasses();
 
     }
+    
+    @Override
+    public List<String> getAppletGateLabTestClasses() throws ApplicationException {
+        return Server.getInstance().getAppletGateLabTestClasses();
+
+    }
 
     @Override
     public AppVersion getVersion(String applicationName, String applicationVersion) throws ApplicationException {
