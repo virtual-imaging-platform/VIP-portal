@@ -117,6 +117,7 @@ PropertiesConfiguration config;
     private String sshPublicKey;
     //application,GateLab
     private List<String> appletGateLabClasses;
+    private List<String> appletGateLabTestClasses;
     //undesired email domains
     private List<String> undesiredMailDomains;
     //third-party auth
@@ -215,6 +216,11 @@ PropertiesConfiguration config;
             appletGateLabCl.add("GateLab");
             appletGateLabClasses = config.getList(CoreConstants.APPLET_GATELAB_CLASSES, appletGateLabCl);
 
+            List<String> appletGateLabTestCl = new ArrayList<String>();
+            appletGateLabTestCl.add("GateLab");
+            appletGateLabTestClasses = config.getList(CoreConstants.APPLET_GATELABTEST_CLASSES, appletGateLabTestCl);
+
+            
             //undesired Mail Domains
             List<String> undisMailDomains = new ArrayList<String>();
             //undisMailDomains.add(".hack.rnu");
@@ -286,6 +292,7 @@ PropertiesConfiguration config;
             config.setProperty(CoreConstants.APPLICATION_FILES_REPOSITORY, N4uApplicationFilesRepository);
             config.setProperty(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, deleteFilesAfterUpload);
             config.setProperty(CoreConstants.APPLET_GATELAB_CLASSES, appletGateLabClasses);
+            config.setProperty(CoreConstants.APPLET_GATELABTEST_CLASSES, appletGateLabTestClasses);
             config.setProperty(CoreConstants.UNDESIRED_MAIL_DOMAINS, undesiredMailDomains);
             config.setProperty(CoreConstants.PUB_MONTHS_UPDATES, numberMonthsToTestLastPublicationUpdates);
             config.save();
@@ -521,6 +528,14 @@ PropertiesConfiguration config;
 
     public void setAppletGateLabClasses(List<String> appletGateLabClasses) {
         this.appletGateLabClasses = appletGateLabClasses;
+    }
+    
+    public List<String> getAppletGateLabTestClasses() {
+        return appletGateLabTestClasses;
+    }
+
+    public void setAppletGateLabTestClasses(List<String> appletGateLabTestClasses) {
+        this.appletGateLabTestClasses = appletGateLabTestClasses;
     }
 
     public List<String> getUndesiredMailDomains() {
