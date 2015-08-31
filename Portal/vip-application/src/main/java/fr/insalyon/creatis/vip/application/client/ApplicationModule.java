@@ -60,6 +60,8 @@ import java.util.List;
 public class ApplicationModule extends Module {
 
     public static List<String> reservedClasses;
+    public static List<String> reservedGateClasses;
+    public static List<String> reservedTestClasses;
 
      public ApplicationModule() {
      
@@ -72,17 +74,31 @@ public class ApplicationModule extends Module {
 
             @Override
             public void onSuccess(List<String> result) {
-             reservedClasses=result;
+             reservedGateClasses=result;
             }
         };
         ApplicationService.Util.getInstance().getAppletGateLabClasses(callback);
       
-  
+        final AsyncCallback<List<String>> callbackTest = new AsyncCallback<List<String>>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to load applet gatelab classes:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(List<String> result) {
+             reservedTestClasses=result;
+            }
+        };
+        ApplicationService.Util.getInstance().getAppletGateLabTestClasses(callbackTest);
+          
     }
 
     @Override
     public void load() {
-
+        //reservedClasses = new ArrayList<> ();
+        reservedClasses=reservedGateClasses;
+        reservedClasses.addAll(reservedTestClasses);
         CoreModule.addGeneralApplicationParser(new ApplicationHomeParser());
         CoreModule.addSystemApplicationParser(new ApplicationSystemParser());
         CoreModule.addLayoutToHomeTab(TimelineLayout.getInstance());
@@ -119,7 +135,7 @@ public class ApplicationModule extends Module {
                 }
             }
         });
-    }
+        }
 
     @Override
     public void postLoading() {

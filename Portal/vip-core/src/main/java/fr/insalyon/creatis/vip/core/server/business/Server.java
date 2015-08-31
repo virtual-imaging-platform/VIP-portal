@@ -217,7 +217,7 @@ PropertiesConfiguration config;
             appletGateLabClasses = config.getList(CoreConstants.APPLET_GATELAB_CLASSES, appletGateLabCl);
 
             List<String> appletGateLabTestCl = new ArrayList<String>();
-            appletGateLabTestCl.add("GateLab");
+            appletGateLabTestCl.add("GateLab Test");
             appletGateLabTestClasses = config.getList(CoreConstants.APPLET_GATELABTEST_CLASSES, appletGateLabTestCl);
 
             
