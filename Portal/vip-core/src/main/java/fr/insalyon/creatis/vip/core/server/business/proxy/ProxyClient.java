@@ -43,15 +43,19 @@ import java.security.cert.*;
 import java.util.*;
 import javax.net.ssl.*;
 import javax.security.auth.login.FailedLoginException;
+import javax.security.auth.x500.X500Principal;
 import org.apache.log4j.Logger;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DEROutputStream;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.x509.X509Name;
-import org.bouncycastle.jce.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
+import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 
 /**
  *
@@ -94,14 +98,15 @@ public class ProxyClient {
 
             String proxyFileName = Server.getInstance().getServerProxy();
             if (new File(proxyFileName).exists()) {
-
-                FileInputStream is = new FileInputStream(proxyFileName);
+                FileInputStream fis = new FileInputStream(proxyFileName);
                 CertificateFactory cf = CertificateFactory.getInstance("X.509");
                 boolean valid = true;
                 Date endDate = null;
-
-                while (is.available() > 0) {
-                    X509Certificate certificate = (X509Certificate) cf.generateCertificate(is);
+          
+                //Parsing the certificate while (fis.available() > 0) gives a "CertificateParsingException: signed overrun"; the same code (with the while loop) works perfectly fine in a independent JavaTest class
+                //while (fis.available() > 0) {
+                    X509Certificate certificate = (X509Certificate) cf.generateCertificate(fis);
+                    System.out.println(certificate.toString());
                     Calendar currentDate = Calendar.getInstance();
                     currentDate.setTime(new Date());
                     currentDate.add(Calendar.HOUR, Server.getInstance().getMyProxyMinHours());
@@ -114,9 +119,9 @@ public class ProxyClient {
                         }
                     } catch (Exception ex1) {
                         valid = false;
-                        break;
+                        //break;
                     }
-                }
+                //}
                 if (valid) {
                     logger.info("Server proxy still valid until: " + endDate);
                     return new Proxy(proxyFileName, endDate);
@@ -260,14 +265,11 @@ public class ProxyClient {
         KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
         keyPair = keyGenerator.generateKeyPair();
 
-        PKCS10CertificationRequest cert = new PKCS10CertificationRequest(
-                "MD5WITHRSA",
-                new X509Name("CN=irrelevant"),
-                keyPair.getPublic(),
-                null,
-                keyPair.getPrivate(),
-                "BC");
-
+        X500Principal subject = new X500Principal ("CN=irrelevant");
+        ContentSigner signGen = new JcaContentSignerBuilder("SHA1withRSA").build(keyPair.getPrivate());
+        PKCS10CertificationRequestBuilder builder = new JcaPKCS10CertificationRequestBuilder(subject, keyPair.getPublic());
+        PKCS10CertificationRequest cert = builder.build(signGen);
+       
         socketOut.write(cert.getEncoded());
         socketOut.write(0x00);
         socketOut.flush();
@@ -353,12 +355,15 @@ public class ProxyClient {
         out.println("-----BEGIN RSA PRIVATE KEY-----");
         ByteArrayInputStream inStream = new ByteArrayInputStream(key.getEncoded());
         ASN1InputStream derInputStream = new ASN1InputStream(inStream);
-        DERObject keyInfo = derInputStream.readObject();
-        PrivateKeyInfo pkey = new PrivateKeyInfo((ASN1Sequence) keyInfo);
-        DERObject derKey = pkey.getPrivateKey();
+        ASN1Primitive keyInfo = derInputStream.readObject();
+        PrivateKeyInfo pki;
+        pki = PrivateKeyInfo.getInstance(keyInfo);
+        ASN1Primitive innerType = pki.parsePrivateKey().toASN1Primitive();
+        // build and return the actual key
+        ASN1Sequence privKey  = (ASN1Sequence)innerType;
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         DEROutputStream der = new DEROutputStream(bout);
-        der.writeObject(derKey);
+        der.writeObject(privKey);
         printB64(bout.toByteArray(), out);
         out.println("-----END RSA PRIVATE KEY-----");
     }
