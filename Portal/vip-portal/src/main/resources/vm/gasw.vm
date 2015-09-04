@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<description>
+  <executable name="$tool.getWrapperName()">
+    <access type="LFN" cached="true"/> 
+    <value value="$tool.getWrapperLFN()"/>
+    <executor value="LOCAL"/>
+#foreach($input in $tool.getInputs())
+#if($input.getCommandLineFlag()!="")
+#set($option=$input.getCommandLineFlag())
+#else
+#set($option="no$input.getId()")
+#end
+  <input name="${input.getId()}" option="${option}"> 
+#if($input.getType() == "File")
+      <access type="LFN"/> 
+#end
+    </input>
+#end
+#foreach($outputFile in $tool.getOutputFiles())
+#if($outputFile.getCommandLineFlag()!="")
+#set($option=$outputFile.getCommandLineFlag())
+#else
+#set($option="no$outputFile.getId()")
+#end
+  <output name="$outputFile.getName()" option="$option">
+#set ($value=$outputFile.getPathTemplate()) 
+#set ($i=0)
+#foreach($input in $tool.getInputs())
+#set ($i=$i+1)
+#if($input.getCommandLineKey()!="")
+#set ($value=$value.replace($input.getCommandLineKey(),"$dir$i/$na$i"))
+#end
+#end
+        <template value="$value"/>
+        <access type="LFN"/>
+      </output>
+#end
+  </executable>
+</description>

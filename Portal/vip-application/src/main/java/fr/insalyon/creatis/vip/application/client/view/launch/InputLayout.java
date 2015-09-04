@@ -73,7 +73,7 @@ public class InputLayout extends AbstractSourceLayout {
     private DynamicForm stopItemForm;
     private DynamicForm stepItemForm;
 
-    public InputLayout(String name, String comment, boolean optional) {
+    public InputLayout(String name, String comment, boolean optional, String defaultValue) {
         super(name, comment,optional);
         
         configureTypeSelectItem();
@@ -91,11 +91,14 @@ public class InputLayout extends AbstractSourceLayout {
         startItemForm = FieldUtil.getForm(startItem);
         stopItemForm = FieldUtil.getForm(stopItem);
         stepItemForm = FieldUtil.getForm(stepItem);
+        
+        if(defaultValue != null)
+            setValue(defaultValue);
     }
 
     
     public InputLayout(String name, String comment) {
-        this(name,comment,false);
+        this(name,comment,false,"");
     }
 
     private void configureTypeSelectItem() {

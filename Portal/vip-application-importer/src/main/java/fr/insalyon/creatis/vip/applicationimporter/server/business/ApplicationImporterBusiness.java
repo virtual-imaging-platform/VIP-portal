@@ -103,17 +103,23 @@ public class ApplicationImporterBusiness {
 
             // Write files
             String wrapperFileName = Server.getInstance().getApplicationImporterFileRepository() + bt.getWrapperLFN();
+            String wrapperArchiveName = wrapperFileName+".tar.gz";
             String gaswFileName = Server.getInstance().getApplicationImporterFileRepository() + bt.getGASWLFN();
             String gwendiaFileName = Server.getInstance().getApplicationImporterFileRepository() + bt.getGwendiaLFN();
 
             writeString(wrapperString, wrapperFileName);
             writeString(gaswString, gaswFileName);
             writeString(gwendiaString, gwendiaFileName);
+            
+            ArrayList<File> dependencies = new ArrayList<File>();
+            dependencies.add(new File(wrapperFileName));
+            TargzUtils.createTargz(dependencies, wrapperArchiveName);
  
             // Transfer files
             uploadFile(wrapperFileName,bt.getWrapperLFN());
             uploadFile(gaswFileName, bt.getGASWLFN());
             uploadFile(gwendiaFileName, bt.getGwendiaLFN());
+            uploadFile(wrapperArchiveName, bt.getWrapperLFN()+".tar.gz");
             
             // Register application
             registerApplicationVersion(bt.getName(), bt.getToolVersion(), user.getEmail(), bt.getGwendiaLFN());

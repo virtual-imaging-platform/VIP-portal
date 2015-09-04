@@ -40,6 +40,7 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
 import fr.insalyon.creatis.vip.applicationimporter.client.JSONUtil;
 import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
 import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
@@ -120,7 +121,7 @@ public class DisplayTab extends Tab {
      *
      * @param jsonObject
      */
-    public void parseJSON(JSONObject jsonObject) {
+    public void parseJSON(JSONObject jsonObject) throws ApplicationImporterException {
         boutiquesTool = JSONUtil.parseBoutiquesTool(jsonObject);
         this.setTitle(boutiquesTool.getName());
         generalLayout.setTool(boutiquesTool);

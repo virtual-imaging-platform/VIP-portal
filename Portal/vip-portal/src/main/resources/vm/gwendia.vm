@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow name="$tool.getName()" version="$tool.getToolVersion()">
+  <description>$esc.xml($tool.getDescription())</description>
+  <interface>
+#foreach( $input in $tool.getInputs() )
+#if($input.getType()=="File")
+    <source name="$input.getId()" type="URI" optional="$input.isOptional()">
+#else
+    <source name="$input.getId()" type="string" optional="$input.isOptional()" default="$input.getDefaultValue()">
+#end
+      <source-comment>$esc.xml($input.getDescription())</source-comment>
+    </source>
+#end
+#foreach($output in $tool.getOutputFiles())
+    <sink name="$output.getId()" type="string" />
+#end
+  </interface>
+  <processors>
+    <processor name="$tool.getName()" >
+#foreach($input in $tool.getInputs())
+#if($input.getType()=="File" )
+        <in name="$input.getId()" type="URI" depth="0"/>
+#else
+        <in name="$input.getId()" type="string" depth="0"/>
+#end
+#end
+#foreach( $output in $tool.getOutputFiles() )
+        <out name="$output.getId()" type="URI" depth="0"/>
+#end
+        <iterationstrategy>
+          <cross>
+#foreach($input in $tool.getInputs()) 
+            <port name="$input.getId()"/>
+#end
+          </cross>
+        </iterationstrategy>
+        <gasw descriptor="$tool.getGASWLFN()"/>
+    </processor>
+  </processors>
+  <links>
+#foreach( $input in $tool.getInputs() )
+    <link from="$input.getId()" to="$tool.getName():$input.getId()" />
+#end
+#foreach($output in $tool.getOutputFiles())
+    <link from="$tool.getName():$output.getId()" to="$output.getId()" />
+#end
+  </links>
+</workflow>

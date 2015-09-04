@@ -32,7 +32,6 @@
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
 import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesInput;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;

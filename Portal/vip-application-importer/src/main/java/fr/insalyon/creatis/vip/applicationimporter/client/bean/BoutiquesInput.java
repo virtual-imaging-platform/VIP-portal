@@ -121,6 +121,4 @@ public class BoutiquesInput implements IsSerializable {
         this.defaultValue = defaultValue;
     }
 
-    
-    
 }

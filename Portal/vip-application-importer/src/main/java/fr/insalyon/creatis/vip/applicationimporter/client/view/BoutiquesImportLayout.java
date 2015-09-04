@@ -51,6 +51,7 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.selection.PathSelectionWindow;
 import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
 import com.google.gwt.json.client.JSONParser;
+import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 
 
@@ -119,13 +120,13 @@ public class BoutiquesImportLayout extends AbstractFormLayout {
 
     /**
      * Calls the service method to read the content of a file, and sets it in the application import tab.
-     * 
+     *                                                                                                                                                                                                                                                                  
      * @param fileLFN the LFN of the JSON file to parse.
      */
     private void loadJSONFile(String fileLFN) {
         final AsyncCallback<String> callback = new AsyncCallback<String>() {
             @Override
-            public void onFailure(Throwable caught) {
+            public void onFailure(Throwable caught) {                                                                                                                                                                                                                                                                                                                                                                           
                 modal.hide();
                 Layout.getInstance().setWarningMessage("Unable to read JSON file :" + caught.getMessage());
             }
@@ -134,8 +135,12 @@ public class BoutiquesImportLayout extends AbstractFormLayout {
                 modal.hide();
                 JSONObject json = JSONParser.parseStrict(jsonFileContent).isObject();
                 DisplayTab tabImporter = new DisplayTab(Constants.ICON_BOUTIQUES, Constants.TAB_ID_BOUTIQUES_APPLICATION, Constants.TAB_NAME_BOUTIQUES); 
-                tabImporter.parseJSON(json);
-                Layout.getInstance().addTab(tabImporter);
+                try {
+                    tabImporter.parseJSON(json);
+                    Layout.getInstance().addTab(tabImporter);
+                } catch (ApplicationImporterException ex) {
+                    Layout.getInstance().setWarningMessage("Unable to parse JSON file :" + ex.getMessage());
+                }
             }
         };
         modal.show("Getting JSON file...", true);

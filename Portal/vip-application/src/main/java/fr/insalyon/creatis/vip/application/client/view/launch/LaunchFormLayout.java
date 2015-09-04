@@ -97,7 +97,6 @@ public class LaunchFormLayout extends AbstractFormLayout {
      * @param sourceLayout
      */
     public void addSource(AbstractSourceLayout sourceLayout, boolean disabled) {
-
         if (disabled) {
             sourceLayout.setDisabled(true);
         }
@@ -151,7 +150,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
         for (Canvas canvas : sourcesLayout.getMembers()) {
             if (canvas instanceof AbstractSourceLayout) {
                 AbstractSourceLayout source = (AbstractSourceLayout) canvas;
-                if (source.isOptional() && (source.getValue() == null || source.getValue().equals(""))) {
+                if (source.isOptional() && (source.getValue() == null || source.getValue().equals("") || source.getValue().equals("null"))) {
                     source.setValue("no");
                 } else if (!source.validate()) {
                     valid = false;

@@ -121,7 +121,8 @@ public class LaunchTab extends AbstractLaunchTab {
                             disabled = true;
                         }
                     }
-                    launchFormLayout.addSource(new InputLayout(source.getName(), source.getDescription(),source.isOptional()), disabled);
+                    modal.show("Adding source "+source.getName()+"...", true);
+                    launchFormLayout.addSource(new InputLayout(source.getName(), source.getDescription(),source.isOptional(),source.getDefaultValue()), disabled);
                 }
 
                 configureLaunchButton();

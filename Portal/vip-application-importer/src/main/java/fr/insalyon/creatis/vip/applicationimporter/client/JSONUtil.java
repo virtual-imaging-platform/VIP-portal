@@ -45,7 +45,7 @@ import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
  */
 public class JSONUtil {
 
-    public static BoutiquesTool parseBoutiquesTool(JSONObject jsonObject){
+    public static BoutiquesTool parseBoutiquesTool(JSONObject jsonObject) throws ApplicationImporterException{
         
         BoutiquesTool bt = new BoutiquesTool();
         bt.setName(getPropertyAsString(jsonObject, "name"));
@@ -72,28 +72,23 @@ public class JSONUtil {
         return bt;
     }
     
-    public static BoutiquesInput parseBoutiquesInput(JSONObject input){
+    public static BoutiquesInput parseBoutiquesInput(JSONObject input) throws ApplicationImporterException{
         
         BoutiquesInput bi = new BoutiquesInput();
-        
         bi.setId(getPropertyAsString(input, "id"));
         bi.setName(getPropertyAsString(input, "name"));
         bi.setType(getPropertyAsString(input, "type"));
-        bi.setDescription(getPropertyAsString(input, "description"));
+        bi.setDescription(getPropertyAsString(input, "description",""));
         bi.setCommandLineKey(getPropertyAsString(input, "command-line-key"));
         bi.setList(getPropertyAsBoolean(input, "list"));
         bi.setOptional(getPropertyAsBoolean(input, "optional"));
-        
-        String commandLineFlag = getPropertyAsString(input, "command-line-flag");
-        commandLineFlag = commandLineFlag == null ? "" : commandLineFlag;
-        bi.setCommandLineFlag(commandLineFlag);
-        
-        bi.setDefaultValue(getPropertyAsString(input,"default-value"));
+        bi.setCommandLineFlag(getPropertyAsString(input, "command-line-flag",""));
+        bi.setDefaultValue(getPropertyAsString(input,"default-value",""));
         
         return bi;
     }
     
-    public static BoutiquesOutputFile parseBoutiquesOutputFile(JSONObject outputFile){
+    public static BoutiquesOutputFile parseBoutiquesOutputFile(JSONObject outputFile) throws ApplicationImporterException{
         
         BoutiquesOutputFile bof = new BoutiquesOutputFile();
         
@@ -112,28 +107,35 @@ public class JSONUtil {
         return bof;
     }
     
-    public static boolean getPropertyAsBoolean(JSONObject jo, String property) {
+    public static boolean getPropertyAsBoolean(JSONObject jo, String property) throws ApplicationImporterException {
         JSONValue value = jo.get(property);
-        if (value != null) {
-            return value.isBoolean().booleanValue();
-        }
-        return false;
+        if (value == null)
+            return false;
+        if(value.isBoolean() == null)
+            throw new ApplicationImporterException(value.toString()+" is not a boolean value!");
+        return value.isBoolean().booleanValue();    
     }
 
-    public static JSONArray getPropertyAsArray(JSONObject jo, String property) {
+    public static JSONArray getPropertyAsArray(JSONObject jo, String property) throws ApplicationImporterException {
         JSONValue value = jo.get(property);
-        if (value != null) {
-            return value.isArray();
-        }
-        return null;
+        if(value == null)
+            return null;
+        if(value.isArray()== null)
+            throw new ApplicationImporterException(value.toString()+" is not an array!");
+        return value.isArray();
     }
 
-    public static String getPropertyAsString(JSONObject jo, String property) {
+    public static String getPropertyAsString(JSONObject jo, String property, String valueIfAbsent) throws ApplicationImporterException {
         JSONValue value = jo.get(property);
-        if (value != null) {
-            return value.isString().stringValue();
-        }
-        return null;
+        if (value == null)
+            return valueIfAbsent;
+        if(value.isString() == null)
+            return value.toString();
+        return value.isString().stringValue();
+    }
+    
+    public static String getPropertyAsString(JSONObject jo, String property) throws ApplicationImporterException {
+        return getPropertyAsString(jo, property, null);
     }
 
 }

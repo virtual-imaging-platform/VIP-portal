@@ -39,21 +39,22 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class Source implements IsSerializable {
 
-    private String name, userLevel, description;
+    private String name, userLevel, description, defaultValue;
     private boolean optional;
 
     public Source() {
     }
 
-    public Source(String name, String userLevel, String description, String optional) {
+    public Source(String name, String userLevel, String description, String optional, String defaultValue) {
         this.name = name;
         this.userLevel = userLevel;
         this.description = description;
         this.optional = Boolean.parseBoolean(optional);
+        this.defaultValue = defaultValue;
     }
 
     public Source(String name, String userLevel, String description) {
-        this(name, userLevel, description, "false");
+        this(name, userLevel, description, "false","");
     }
 
     public String getDescription() {
@@ -75,5 +76,11 @@ public class Source implements IsSerializable {
     public boolean isOptional() {
         return optional;
     }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+    
+    
     
 }

@@ -49,6 +49,7 @@ public abstract class AbstractSourceLayout extends VLayout {
 
     public AbstractSourceLayout(String name, String comment, boolean optional) {
         this.name = name;
+        this.optional = optional;
         String labelText = "<b>" + name;
         if(!optional)
             labelText += "<font color=\"red\">*</font>";
