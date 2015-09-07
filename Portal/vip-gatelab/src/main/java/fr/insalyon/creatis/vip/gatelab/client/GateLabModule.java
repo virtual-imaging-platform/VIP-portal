@@ -52,7 +52,7 @@ public class GateLabModule extends Module {
 
     @Override
     public void load() {
-
+        
         if (CoreModule.user.isSystemAdministrator()
                 || CoreModule.user.hasGroupAccess(GateLabConstants.GROUP_GATELAB)) {
             for(String GateLabClass:ApplicationModule.reservedGateClasses){

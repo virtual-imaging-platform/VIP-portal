@@ -96,8 +96,8 @@ public class ApplicationModule extends Module {
 
     @Override
     public void load() {
-        //reservedClasses = new ArrayList<> ();
-        reservedClasses=reservedGateClasses;
+        reservedClasses = new ArrayList<String>();
+        reservedClasses.addAll(reservedGateClasses);
         reservedClasses.addAll(reservedTestClasses);
         CoreModule.addGeneralApplicationParser(new ApplicationHomeParser());
         CoreModule.addSystemApplicationParser(new ApplicationSystemParser());
