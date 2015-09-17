@@ -38,6 +38,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -94,7 +95,6 @@ public interface ApplicationServiceAsync {
     
     public void getEngines(AsyncCallback<List<Engine>> asyncCallback);
     
-     public void getAppletGateLabClasses(AsyncCallback <List<String>> asyncCallback);
+    public void getReservedClasses(AsyncCallback <HashMap<String, Integer>> asyncCallback);
      
-     public void getAppletGateLabTestClasses(AsyncCallback <List<String>> asyncCallback);
 }
