@@ -34,6 +34,7 @@ package fr.insalyon.creatis.vip.core.server.business;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -118,6 +119,8 @@ PropertiesConfiguration config;
     //application,GateLab
     private List<String> appletGateLabClasses;
     private List<String> appletGateLabTestClasses;
+    //Integer=0 for GateLab Prod Class and Integer=1 for GateLab Prod Class
+    private HashMap<String, Integer> reservedClasses;
     //undesired email domains
     private List<String> undesiredMailDomains;
     //third-party auth
@@ -215,12 +218,19 @@ PropertiesConfiguration config;
             List<String> appletGateLabCl = new ArrayList<String>();
             appletGateLabCl.add("GateLab");
             appletGateLabClasses = config.getList(CoreConstants.APPLET_GATELAB_CLASSES, appletGateLabCl);
-
+            
             List<String> appletGateLabTestCl = new ArrayList<String>();
             appletGateLabTestCl.add("GateLab Test");
             appletGateLabTestClasses = config.getList(CoreConstants.APPLET_GATELABTEST_CLASSES, appletGateLabTestCl);
-
-            
+           
+            reservedClasses = new HashMap<String, Integer>();
+            for (final String gateClass : appletGateLabClasses) {
+                this.reservedClasses.put(gateClass, 0);
+            }
+            for (final String gateTestClass : appletGateLabTestClasses) {
+                this.reservedClasses.put(gateTestClass, 1);
+            }
+           
             //undesired Mail Domains
             List<String> undisMailDomains = new ArrayList<String>();
             //undisMailDomains.add(".hack.rnu");
@@ -529,13 +539,17 @@ PropertiesConfiguration config;
     public void setAppletGateLabClasses(List<String> appletGateLabClasses) {
         this.appletGateLabClasses = appletGateLabClasses;
     }
-    
+   
     public List<String> getAppletGateLabTestClasses() {
         return appletGateLabTestClasses;
     }
-
+   
     public void setAppletGateLabTestClasses(List<String> appletGateLabTestClasses) {
         this.appletGateLabTestClasses = appletGateLabTestClasses;
+    }
+    
+    public HashMap<String, Integer> getReservedClasses() {
+        return reservedClasses;
     }
 
     public List<String> getUndesiredMailDomains() {
