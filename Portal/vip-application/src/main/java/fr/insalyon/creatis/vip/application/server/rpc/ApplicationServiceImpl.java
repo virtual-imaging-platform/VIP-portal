@@ -50,6 +50,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
+import java.util.HashMap;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
@@ -472,8 +473,8 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public List<String> getAppletGateLabClasses() throws ApplicationException {
-        return Server.getInstance().getAppletGateLabClasses();
+    public HashMap<String, Integer> getReservedClasses() throws ApplicationException {
+        return Server.getInstance().getReservedClasses();
 
     }
 

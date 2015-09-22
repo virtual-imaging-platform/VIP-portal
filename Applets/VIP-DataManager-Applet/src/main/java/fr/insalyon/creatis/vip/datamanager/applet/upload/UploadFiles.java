@@ -448,6 +448,6 @@ private void jButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 
     public void complete() {
         JSObject win = JSObject.getWindow(this);
-        win.call("dataManagerUploadComplete", new String[]{business.getResult()});
+        win.eval("dataManagerUploadComplete('"+business.getResult()+"')");
     }
 }
