@@ -254,7 +254,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
     </servlet-mapping>
     <!--End Application Importer Module-->
     <!-- REST API -->
-    <servlet>
+<!--    <servlet>
         <servlet-name>RestAPI</servlet-name>
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
         <init-param>
@@ -268,7 +268,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <servlet-mapping>
         <servlet-name>RestAPI</servlet-name>
         <url-pattern>/rest/*</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping>-->
     <!-- END REST API -->
     <!-- SOAP API -->
     <!-- END SOAP API -->
