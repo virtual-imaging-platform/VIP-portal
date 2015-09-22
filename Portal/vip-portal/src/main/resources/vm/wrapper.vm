@@ -7,7 +7,7 @@
 
 # Substitutes $1 with $2 in $3,
 # assuming that $1 and $2 don't contain any ','
-function substitute{
+function substitute {
     local ELEMENT=$1
     local NEW_ELEMENT=$2
     local TARGET=$3
@@ -23,16 +23,22 @@ do
 key="$1"
 case $key in
     #foreach($input in $tool.getInputs())
-$input.getCommandLineFlag())
+--$input.getId().toLowerCase())
     $input.getId().toUpperCase()="$2"
+    ;;
+    #end
+    #foreach($outputFile in $tool.getOutputFiles())
+--$outputFile.getId().toLowerCase())
+    $outputFile.getId().toUpperCase()="$2"
     ;;
     #end
 *) # unknown option
     echo "Unknown option: $1"
-    exit 1   
+    exit 1
     ;;
 esac
 shift # past argument or value
+shift
 done
 
 #############################
@@ -53,7 +59,7 @@ BOUTIQUES_COMMAND_LINE=$(substitute $outputFile.getCommandLineKey() $newValue ${
 
 #foreach($input in $tool.getInputs())
 #if($input.isOptional())
-if [ "$input.getId().toUpperCase()" != "no" ]
+if [ "$$input.getId().toUpperCase()" != "no" ]
 then
   # Optional input is active.
 #end
@@ -61,7 +67,7 @@ then
 #set($newValue="""$input.getCommandLineFlag() $$input.getId().toUpperCase()""")
   BOUTIQUES_COMMAND_LINE=$(substitute $input.getCommandLineKey() $newValue ${BOUTIQUES_COMMAND_LINE})
 #else
-if [ "$input.getId().toUpperCase()" = "yes" ]
+if [ "$$input.getId().toUpperCase()" = "yes" ]
 then
   BOUTIQUES_COMMAND_LINE=$(substitute $input.getCommandLineKey() $input.getCommandLineFlag() ${BOUTIQUES_COMMAND_LINE})
 fi
