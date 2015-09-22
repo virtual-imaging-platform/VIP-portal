@@ -106,7 +106,6 @@ public class ProxyClient {
                 //Parsing the certificate while (fis.available() > 0) gives a "CertificateParsingException: signed overrun"; the same code (with the while loop) works perfectly fine in a independent JavaTest class
                 //while (fis.available() > 0) {
                     X509Certificate certificate = (X509Certificate) cf.generateCertificate(fis);
-                    System.out.println(certificate.toString());
                     Calendar currentDate = Calendar.getInstance();
                     currentDate.setTime(new Date());
                     currentDate.add(Calendar.HOUR, Server.getInstance().getMyProxyMinHours());
