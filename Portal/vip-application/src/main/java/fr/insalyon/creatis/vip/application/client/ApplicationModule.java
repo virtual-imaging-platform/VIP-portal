@@ -51,6 +51,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.CenterTabSet;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -59,30 +60,28 @@ import java.util.List;
  */
 public class ApplicationModule extends Module {
 
-    public static List<String> reservedClasses;
+    public static HashMap<String, Integer> reservedClasses;
 
      public ApplicationModule() {
      
        
-        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+        final AsyncCallback<HashMap<String, Integer>> callback = new AsyncCallback<HashMap<String, Integer>>() {
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to load applet gatelab classes:<br />" + caught.getMessage());
             }
 
             @Override
-            public void onSuccess(List<String> result) {
+            public void onSuccess(HashMap<String, Integer> result) {
              reservedClasses=result;
             }
         };
-        ApplicationService.Util.getInstance().getAppletGateLabClasses(callback);
-      
-  
+        ApplicationService.Util.getInstance().getReservedClasses(callback);
+          
     }
 
     @Override
     public void load() {
-
         CoreModule.addGeneralApplicationParser(new ApplicationHomeParser());
         CoreModule.addSystemApplicationParser(new ApplicationSystemParser());
         CoreModule.addLayoutToHomeTab(TimelineLayout.getInstance());
@@ -98,7 +97,7 @@ public class ApplicationModule extends Module {
             public void onSuccess(List<AppClass> result) {
 
                 for (AppClass appClass : result) {
-                    if (!reservedClasses.contains(appClass.getName())) {
+                    if (!reservedClasses.keySet().contains(appClass.getName())) {
                         CoreModule.addApplicationsTileGrid(
                                 new ApplicationTileGrid(appClass.getName()));
                     }
@@ -119,7 +118,7 @@ public class ApplicationModule extends Module {
                 }
             }
         });
-    }
+        }
 
     @Override
     public void postLoading() {

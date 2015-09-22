@@ -38,7 +38,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>1.14</version>
+        <version>1.15</version>
         <relativePath>..</relativePath>
     </parent>
     <groupId>fr.insalyon.creatis</groupId>
@@ -89,6 +89,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-datamanager-applet</artifactId>
             <version>${vip.datamanager-applet.version}</version>
+            <classifier>jar-with-dependencies</classifier>
         </dependency>
 
         <dependency>
@@ -107,55 +108,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-gatelab-applet</artifactId>
             <version>${vip.gatelab-applet.version}</version>
+            <classifier>jar-with-dependencies</classifier>
         </dependency>
-        <dependency>
-            <groupId>fr.insalyon.creatis.vip</groupId>
-            <artifactId>VIP-Cowork-Applet</artifactId>
-            <version>${vip.cowork-applet.version}</version>
-          <exclusions>
-            <exclusion>  
-              <groupId>org.apache.httpcomponents</groupId>
-              <artifactId>httpclient</artifactId>
-            </exclusion>
-          </exclusions> 
-        </dependency>
-        <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-cowork</artifactId>
-            <version>${vip.cowork.version}</version>
-        </dependency>
-        <!--        <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-provenance</artifactId>
-            <version>${vip.provenance.version}</version>
-        </dependency>-->
-
-
-                
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-cardiac</artifactId>
             <version>${vip.cardiac.version}</version>
         </dependency>
-        
-        <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-simulation-gui</artifactId>
-            <version>${vip.simulation-gui.version}</version>
-        </dependency>
-       
-        <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-models</artifactId>
-            <version>${vip.models.version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-simulated-data</artifactId>
-            <version>${vip.simulated-data.version}</version>
-        </dependency>
-        
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-social</artifactId>
@@ -167,13 +126,12 @@ knowledge of the CeCILL-B license and that you accept its terms.
              <artifactId>vip-query</artifactId>
             <version>${vip.query.version}</version>
         </dependency>
-        
         <dependency>
              <groupId>fr.insalyon.creatis</groupId>
              <artifactId>vip-api</artifactId>
-            <version>${vip.api.version}</version>
+             <version>${vip.api.version}</version>
         </dependency>
-
+   
         <!-- END VIP MODULES -->
         <dependency>
             <groupId>org.glassfish.metro</groupId>
@@ -189,8 +147,8 @@ knowledge of the CeCILL-B license and that you accept its terms.
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             
@@ -242,30 +200,22 @@ knowledge of the CeCILL-B license and that you accept its terms.
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            
                             <artifactItems>
-                                
                                 <artifactItem>
                                     <groupId>fr.insalyon.creatis</groupId>
                                     <artifactId>vip-datamanager-applet</artifactId>
                                     <overWrite>true</overWrite>
+                                    <classifier>jar-with-dependencies</classifier>
                                     <destFileName>vip-datamanager-applet.jar</destFileName>
                                 </artifactItem>
-                                
                                 <artifactItem>
                                     <groupId>fr.insalyon.creatis</groupId>
                                     <artifactId>vip-gatelab-applet</artifactId>
                                     <overWrite>true</overWrite>
+                                    <classifier>jar-with-dependencies</classifier>
                                     <destFileName>vip-gatelab-applet.jar</destFileName>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>fr.insalyon.creatis.vip</groupId>
-                                    <artifactId>VIP-Cowork-Applet</artifactId>
-                                    <overWrite>true</overWrite>
-                                    <destFileName>vip-cowork-applet.jar</destFileName>
-                                </artifactItem>
                             </artifactItems>
-                            
                             <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/applets</outputDirectory>
                         </configuration>
                     </execution>
