@@ -174,6 +174,7 @@ public class CoreConstants implements IsSerializable {
     public static final String SSH_PUBLIC_KEY = "ssh.publickey";
     //application,Gatelab
     public static final String APPLET_GATELAB_CLASSES = "appletGatelab.classes";
+    public static final String APPLET_GATELABTEST_CLASSES = "appletGatelabTest.classes";
     public static final String UNDESIRED_MAIL_DOMAINS = "emails.prohibitDomainsList";
     public static final String SAML_TRUSTED_CERTIFICATE = "saml.trusted.certificates";
     public static String MOZILLA_PERSONA_VALIDATION_URL = "mozilla.persona.validation.url";

@@ -52,4 +52,5 @@ public class GateLabConstants {
     // Configuration
     public final static String GROUP_GATELAB = "GateLab";
     public final static String GATELAB_CLASS = "GateLab"; 
+    public final static String GROUP_GATELABTEST = "GateLabTest"; 
 }
