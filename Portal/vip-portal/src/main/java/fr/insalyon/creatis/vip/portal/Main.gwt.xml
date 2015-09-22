@@ -41,11 +41,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <inherits name="fr.insalyon.creatis.vip.docs.Docs" />
     <inherits name="fr.insalyon.creatis.vip.datamanager.DataManager" />
     <inherits name="fr.insalyon.creatis.vip.application.Application" />
-    <inherits name="fr.insalyon.creatis.vip.simulatedata.SimulatedData" />
     <inherits name="fr.insalyon.creatis.vip.gatelab.GateLab" />
-    <inherits name="fr.insalyon.creatis.vip.cowork.Cowork" />
-    <inherits name="fr.insalyon.creatis.vip.simulationgui.SimulationGUI" />
-    <inherits name="fr.insalyon.creatis.vip.models.Models" />
     <inherits name="fr.insalyon.creatis.vip.social.Social" />
     <inherits name="fr.insalyon.creatis.vip.cardiac.Cardiac" />
     <inherits name="fr.insalyon.creatis.vip.query.Query" />
