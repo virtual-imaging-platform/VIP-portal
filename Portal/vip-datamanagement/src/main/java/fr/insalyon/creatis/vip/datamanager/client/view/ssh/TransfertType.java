@@ -5,13 +5,13 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.ssh;
 
-import java.io.Serializable;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  *
  * @author Nouha Boujelben
  */
-public enum TransfertType implements Serializable{
+public enum TransfertType implements IsSerializable{
     LFCToDevice,
     DeviceToLFC,
     Synchronization

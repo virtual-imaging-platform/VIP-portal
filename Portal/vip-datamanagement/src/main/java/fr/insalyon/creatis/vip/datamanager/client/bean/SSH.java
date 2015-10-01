@@ -17,15 +17,16 @@ public class SSH implements IsSerializable {
     private String host;
     private String port;
     private String transfertType;
-
     private String directory;
     private String status;
+    private String numberSynchronizationFailed;
+    private boolean deleteFilesFromSource;
 
 
     public SSH() {
     }
 
-    public SSH(String email, String name, String user, String host, String port, String transfertType,String  directory , String status) {
+    public SSH(String email, String name, String user, String host, String port, String transfertType,String  directory ,String status,String numberSynchronizationFailed, boolean deleteFilesFromSource) {
         this.email = email;
         this.name = name;
         this.user = user;
@@ -34,6 +35,8 @@ public class SSH implements IsSerializable {
         this.transfertType=transfertType;
         this.directory = directory;
         this.status = status;
+        this.numberSynchronizationFailed=numberSynchronizationFailed;
+        this.deleteFilesFromSource=deleteFilesFromSource;
     }
 
     public String getName() {
@@ -68,6 +71,20 @@ public class SSH implements IsSerializable {
         return email;
     }
     
-            
+    public String getNumberSynchronizationFailes() {
+        return numberSynchronizationFailed;
+    }
+
+    public void setNumberSynchronizationFailes(String numberSynchronizationFailed) {
+        this.numberSynchronizationFailed = numberSynchronizationFailed;
+    }
+
+    public boolean isDeleteFilesFromSource() {
+        return deleteFilesFromSource;
+    }
+
+    public void setDeleteFilesFromSource(boolean deleteFilesFromSource) {
+        this.deleteFilesFromSource = deleteFilesFromSource;
+    }         
     
 }
