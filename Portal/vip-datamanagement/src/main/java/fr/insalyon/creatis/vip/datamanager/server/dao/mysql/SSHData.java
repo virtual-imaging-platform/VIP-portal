@@ -21,7 +21,7 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author glatard
+ * @author glatard, Nouha Boujelben
  */
 public class SSHData implements SSHDAO {
 
@@ -53,6 +53,8 @@ public class SSHData implements SSHDAO {
                 String sshPort = "" + rs.getInt("sshPort");
                 boolean validated = rs.getBoolean("validated");
                 boolean auth_failed = rs.getBoolean("auth_failed");
+                String numberSynchronizationFailed="" + rs.getInt("numberSynchronizationFailed");
+                boolean deleteFilesFromSource=rs.getBoolean("deleteFilesFromSource");
 
                 String status = "ok";
                 if (auth_failed) {
@@ -62,7 +64,7 @@ public class SSHData implements SSHDAO {
                     status = "waiting for validation";
                 }
 
-                ssh.add(new SSH(email, name, sshUser, sshHost, sshPort,sshTransfertType, sshDir, status));
+                ssh.add(new SSH(email, name, sshUser, sshHost, sshPort,sshTransfertType, sshDir, status,numberSynchronizationFailed,deleteFilesFromSource));
             }
             ps.close();
             return ssh;
@@ -79,8 +81,8 @@ public class SSHData implements SSHDAO {
     public void addSSH(SSH ssh) throws DAOException {
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO VIPSSHAccounts(email,LFCDir,sshUser,sshHost,transfertType,sshDir,sshPort,validated,auth_failed) "
-                    + "VALUES (?,?,?,?,?,?,?,?,?)");
+                    "INSERT INTO VIPSSHAccounts(email,LFCDir,sshUser,sshHost,transfertType,sshDir,sshPort,validated,auth_failed,numberSynchronizationFailed,deleteFilesFromSource) "
+                    + "VALUES (?,?,?,?,?,?,?,?,?,?,?)");
 
             ps.setString(1, ssh.getEmail());
             try {
@@ -97,6 +99,8 @@ public class SSHData implements SSHDAO {
             ps.setString(7, ssh.getPort());
             ps.setString(8, "1");
             ps.setString(9, "0");
+            ps.setString(10,ssh.getNumberSynchronizationFailes());
+            ps.setBoolean(11,ssh.isDeleteFilesFromSource());
             ps.execute();
             ps.close();
 
@@ -116,7 +120,7 @@ public class SSHData implements SSHDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
                     + "VIPSSHAccounts "
-                    + "SET sshUser=?, sshHost=?,transfertType=?, sshDir=?, sshPort=?, auth_failed='0' "
+                    + "SET sshUser=?, sshHost=?,transfertType=?, sshDir=?, sshPort=?, auth_failed='0', numberSynchronizationFailed=?, deleteFilesFromSource=? "
                     + "WHERE email=? AND LFCDir=?");
 
             ps.setString(1, ssh.getUser());
@@ -125,6 +129,7 @@ public class SSHData implements SSHDAO {
             ps.setString(4, ssh.getDirectory());
             ps.setString(5, ssh.getPort());
             ps.setString(6, ssh.getEmail());
+            
             try {
                 ps.setString(7, DataManagerBusiness.generateLFCDir(ssh.getName(),ssh.getEmail()));
             } catch (DataManagerException ex) {
@@ -133,6 +138,8 @@ public class SSHData implements SSHDAO {
             } catch (BusinessException ex) {
                    throw new DAOException(ex);
                 }
+            ps.setString(8, ssh.getNumberSynchronizationFailes());
+            ps.setBoolean(9, ssh.isDeleteFilesFromSource());
             ps.executeUpdate();
             ps.close();
 

@@ -12,7 +12,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class SSHRecord extends ListGridRecord {
 
-    public SSHRecord(String name, String email, String user, String host, String port,String transfertType, String directory, String status) {
+    public SSHRecord(String name, String email, String user, String host, String port,String transfertType, String directory, String status,String numberSynchronizationFailed,boolean deleteFilesFromSource) {
 
         setAttribute("name", name);
         setAttribute("email", email);
@@ -22,6 +22,8 @@ public class SSHRecord extends ListGridRecord {
         setAttribute("transfertType",transfertType);
         setAttribute("directory",directory);
         setAttribute("status",status);
+        setAttribute("numberSynchronizationFailed",numberSynchronizationFailed);
+        setAttribute("deleteFilesFromSource",deleteFilesFromSource);
     }
     
 }
