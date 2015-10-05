@@ -14,6 +14,7 @@ import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.client.bean.TransfertType;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 
 /**
@@ -96,7 +97,7 @@ public class ManageSSHTab extends AbstractManageTab {
         sshLayout.loadData();
     }
     
-    public void setSSH(String name, String email,String user,String host,String port,String transfertType,String directory,String status,String numberSynchronizationFailed,boolean deleteFilesFromSourceField) {
+    public void setSSH(String name, String email,String user,String host,String port,TransfertType transfertType,String directory,String status,String numberSynchronizationFailed,boolean deleteFilesFromSourceField) {
         editLayout.setSSH(email,name,user,host,port,transfertType,directory,status,numberSynchronizationFailed,deleteFilesFromSourceField);
     }
     
