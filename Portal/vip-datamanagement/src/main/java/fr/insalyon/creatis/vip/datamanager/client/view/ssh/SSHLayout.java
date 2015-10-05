@@ -30,6 +30,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
+import fr.insalyon.creatis.vip.datamanager.client.bean.TransfertType;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import java.util.ArrayList;
 import java.util.List;
@@ -224,7 +225,7 @@ public class SSHLayout extends VLayout {
                 getTab(DataManagerConstants.TAB_MANAGE_SSH);
         
         
-        sshTab.setSSH(name, email,user,host,port,transfertType,directory,status,numberSynchronizationFailed,deleteFilesFromSource);
+        sshTab.setSSH(name, email,user,host,port,TransfertType.valueOf(transfertType),directory,status,numberSynchronizationFailed,deleteFilesFromSource);
     }   
     
      public void loadData() {

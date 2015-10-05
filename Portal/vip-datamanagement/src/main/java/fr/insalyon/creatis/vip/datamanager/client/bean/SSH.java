@@ -11,32 +11,32 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * @author glatard, Nouha Boujelben
  */
 public class SSH implements IsSerializable {
+
     private String email;
     private String name;
     private String user;
     private String host;
-    private String port;
-    private String transfertType;
+    private int port;
+    private TransfertType transfertType;
     private String directory;
     private String status;
-    private String numberSynchronizationFailed;
+    private long numberSynchronizationFailed;
     private boolean deleteFilesFromSource;
-
 
     public SSH() {
     }
 
-    public SSH(String email, String name, String user, String host, String port, String transfertType,String  directory ,String status,String numberSynchronizationFailed, boolean deleteFilesFromSource) {
+    public SSH(String email, String name, String user, String host, int port, TransfertType transfertType, String directory, String status, long numberSynchronizationFailed, boolean deleteFilesFromSource) {
         this.email = email;
         this.name = name;
         this.user = user;
         this.host = host;
         this.port = port;
-        this.transfertType=transfertType;
+        this.transfertType = transfertType;
         this.directory = directory;
         this.status = status;
-        this.numberSynchronizationFailed=numberSynchronizationFailed;
-        this.deleteFilesFromSource=deleteFilesFromSource;
+        this.numberSynchronizationFailed = numberSynchronizationFailed;
+        this.deleteFilesFromSource = deleteFilesFromSource;
     }
 
     public String getName() {
@@ -51,31 +51,31 @@ public class SSH implements IsSerializable {
         return host;
     }
 
-    public String getPort() {
+    public int getPort() {
         return port;
     }
 
     public String getDirectory() {
         return directory;
     }
-    
-    public String getTransfertType() {
+
+    public TransfertType getTransfertType() {
         return transfertType;
     }
 
     public String getStatus() {
         return status;
     }
-    
-    public String getEmail(){
+
+    public String getEmail() {
         return email;
     }
-    
-    public String getNumberSynchronizationFailes() {
+
+    public long getNumberSynchronizationFailes() {
         return numberSynchronizationFailed;
     }
 
-    public void setNumberSynchronizationFailes(String numberSynchronizationFailed) {
+    public void setNumberSynchronizationFailes(long numberSynchronizationFailed) {
         this.numberSynchronizationFailed = numberSynchronizationFailed;
     }
 
@@ -85,6 +85,6 @@ public class SSH implements IsSerializable {
 
     public void setDeleteFilesFromSource(boolean deleteFilesFromSource) {
         this.deleteFilesFromSource = deleteFilesFromSource;
-    }         
-    
+    }
+
 }
