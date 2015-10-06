@@ -52,6 +52,20 @@ public class SSH implements IsSerializable {
 
     public SSH() {
     }
+    /**
+     * Adds an SSH connection.
+     *
+     * @param email the user mail
+     * @param name the connection name
+     * @param user the ssh user name
+     * @param host the ssh host name
+     * @param port the ssh port 
+     * @param transfertType specifying a type to transfert data
+     * @param directory the full path of the synchronization folder
+     * @param status the connection status
+     * @param numberSynchronizationFailed the number of times the synchronization failed   
+     * @param deleteFilesFromSource enbale delete files from source location
+     */
 
     public SSH(String email, String name, String user, String host, int port, TransfertType transfertType, String directory, String status, long numberSynchronizationFailed, boolean deleteFilesFromSource) {
         this.email = email;
