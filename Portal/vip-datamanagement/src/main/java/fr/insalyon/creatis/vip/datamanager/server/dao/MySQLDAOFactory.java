@@ -58,7 +58,9 @@ class MySQLDAOFactory extends SSHDAOFactory {
              logger.info("Configuring VIP SSH database.");
              PlatformConnection.getInstance().createTable("VIPSSHAccounts","email VARCHAR(255), LFCDir VARCHAR(255), "
                      + "sshUser VARCHAR(255), sshHost VARCHAR(255), sshDir VARCHAR(255), sshPort INT, validated BOOLEAN, "
-                     + "auth_failed BOOLEAN, theEarliestNextSynchronistation TIMESTAMP, numberSynchronizationFailed BIGINT, transfertType VARCHAR(255), deleteFilesFromSource BOOLEAN DEFAULT 0, PRIMARY KEY(email,LFCDir), FOREIGN KEY (email) REFERENCES VIPUsers(email) "
+                     + "auth_failed BOOLEAN, theEarliestNextSynchronistation TIMESTAMP, numberSynchronizationFailed BIGINT, "
+                     + "transfertType VARCHAR(255), deleteFilesFromSource BOOLEAN DEFAULT 0, PRIMARY KEY(email,LFCDir), "
+                     + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
                      + "ON DELETE CASCADE ON UPDATE CASCADE");
          } catch (DAOException ex) {
               logger.error(ex);

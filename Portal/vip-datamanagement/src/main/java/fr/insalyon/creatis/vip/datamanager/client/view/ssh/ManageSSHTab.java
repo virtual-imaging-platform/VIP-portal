@@ -124,8 +124,8 @@ public class ManageSSHTab extends AbstractManageTab {
         sshLayout.loadData();
     }
     
-    public void setSSH(String name, String email,String user,String host,String port,TransfertType transfertType,String directory,String status,String numberSynchronizationFailed,boolean deleteFilesFromSourceField) {
-        editLayout.setSSH(email,name,user,host,port,transfertType,directory,status,numberSynchronizationFailed,deleteFilesFromSourceField);
+    public void setSSH(String name, String email,String user,String host,String port,TransfertType transfertType,String directory,String status,boolean deleteFilesFromSourceField) {
+        editLayout.setSSH(email,name,user,host,port,transfertType,directory,status,deleteFilesFromSourceField);
     }
     
 }

@@ -43,6 +43,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -81,6 +82,7 @@ public class SSHData implements SSHDAO {
                 int sshPort = rs.getInt("sshPort");
                 boolean validated = rs.getBoolean("validated");
                 boolean auth_failed = rs.getBoolean("auth_failed");
+                Timestamp theEarliestNextSynchronistation=rs.getTimestamp("theEarliestNextSynchronistation");
                 long numberSynchronizationFailed = rs.getLong("numberSynchronizationFailed");
                 boolean deleteFilesFromSource = rs.getBoolean("deleteFilesFromSource");
 
@@ -92,7 +94,7 @@ public class SSHData implements SSHDAO {
                     status = "waiting for validation";
                 }
 
-                ssh.add(new SSH(email, name, sshUser, sshHost, sshPort, sshTransfertType, sshDir, status, numberSynchronizationFailed, deleteFilesFromSource));
+                ssh.add(new SSH(email, name, sshUser, sshHost, sshPort, sshTransfertType, sshDir, status,theEarliestNextSynchronistation, numberSynchronizationFailed, deleteFilesFromSource));
             }
             ps.close();
             return ssh;
@@ -125,7 +127,7 @@ public class SSHData implements SSHDAO {
             ps.setInt(7, ssh.getPort());
             ps.setString(8, "1");
             ps.setString(9, "0");
-            ps.setLong(10, ssh.getNumberSynchronizationFailes());
+            ps.setLong(10,0);
             ps.setBoolean(11, ssh.isDeleteFilesFromSource());
             ps.execute();
             ps.close();
@@ -146,19 +148,18 @@ public class SSHData implements SSHDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
                     + "VIPSSHAccounts "
-                    + "SET sshUser=?, sshHost=?, transfertType=?, sshDir=?, sshPort=?, auth_failed='0', numberSynchronizationFailed=?, deleteFilesFromSource=? "
+                    + "SET sshUser=?, sshHost=?, transfertType=?, sshDir=?, sshPort=?, auth_failed='0', deleteFilesFromSource=? "
                     + "WHERE email=? AND LFCDir=?");
             ps.setString(1, ssh.getUser());
             ps.setString(2, ssh.getHost());
             ps.setString(3, ssh.getTransfertType().toString());
             ps.setString(4, ssh.getDirectory());
             ps.setInt(5, ssh.getPort());
-            ps.setLong(6, ssh.getNumberSynchronizationFailes());
-            ps.setBoolean(7, ssh.isDeleteFilesFromSource());
-            ps.setString(8, ssh.getEmail());
+            ps.setBoolean(6, ssh.isDeleteFilesFromSource());
+            ps.setString(7, ssh.getEmail());
 
             try {
-                ps.setString(9, DataManagerBusiness.generateLFCDir(ssh.getName(), ssh.getEmail()));
+                ps.setString(8, DataManagerBusiness.generateLFCDir(ssh.getName(), ssh.getEmail()));
             } catch (DataManagerException ex) {
                 logger.error(ex);
                 throw new DAOException(ex);

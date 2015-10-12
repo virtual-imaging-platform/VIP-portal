@@ -34,13 +34,14 @@ package fr.insalyon.creatis.vip.datamanager.client.view.ssh;
 import fr.insalyon.creatis.vip.datamanager.client.bean.TransfertType;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
+
 /**
  *
  * @author glatard, Nouha Boujelben
  */
 public class SSHRecord extends ListGridRecord {
 
-    public SSHRecord(String name, String email, String user, String host, int port, TransfertType transfertType, String directory, String status, long numberSynchronizationFailed, boolean deleteFilesFromSource) {
+    public SSHRecord(String name, String email, String user, String host, int port, TransfertType transfertType, String directory, String status,String theEarliestNextSynchronistation,long numberSynchronizationFailed, boolean deleteFilesFromSource) {
 
         setAttribute("name", name);
         setAttribute("email", email);
@@ -50,6 +51,7 @@ public class SSHRecord extends ListGridRecord {
         setAttribute("transfertType", transfertType);
         setAttribute("directory", directory);
         setAttribute("status", status);
+        setAttribute("theEarliestNextSynchronistation", theEarliestNextSynchronistation); 
         setAttribute("numberSynchronizationFailed", numberSynchronizationFailed);
         setAttribute("deleteFilesFromSource", deleteFilesFromSource);
     }
