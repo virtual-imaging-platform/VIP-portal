@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.datamanager.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import java.util.Date;
 
 /**
  *
@@ -47,11 +48,13 @@ public class SSH implements IsSerializable {
     private TransfertType transfertType;
     private String directory;
     private String status;
+    private Date theEarliestNextSynchronistation;
     private long numberSynchronizationFailed;
     private boolean deleteFilesFromSource;
 
     public SSH() {
     }
+
     /**
      * Adds an SSH connection.
      *
@@ -59,15 +62,17 @@ public class SSH implements IsSerializable {
      * @param name the connection name
      * @param user the ssh user name
      * @param host the ssh host name
-     * @param port the ssh port 
+     * @param port the ssh port
      * @param transfertType specifying a type to transfert data
      * @param directory the full path of the synchronization folder
      * @param status the connection status
-     * @param numberSynchronizationFailed the number of times the synchronization failed   
+     * @param theEarliestNextSynchronistation
+     * @param numberSynchronizationFailed the number of times the
+     * synchronization failed
      * @param deleteFilesFromSource enbale delete files from source location
      */
 
-    public SSH(String email, String name, String user, String host, int port, TransfertType transfertType, String directory, String status, long numberSynchronizationFailed, boolean deleteFilesFromSource) {
+    public SSH(String email, String name, String user, String host, int port, TransfertType transfertType, String directory, String status, Date theEarliestNextSynchronistation, long numberSynchronizationFailed, boolean deleteFilesFromSource) {
         this.email = email;
         this.name = name;
         this.user = user;
@@ -76,7 +81,20 @@ public class SSH implements IsSerializable {
         this.transfertType = transfertType;
         this.directory = directory;
         this.status = status;
+        this.theEarliestNextSynchronistation = theEarliestNextSynchronistation;
         this.numberSynchronizationFailed = numberSynchronizationFailed;
+        this.deleteFilesFromSource = deleteFilesFromSource;
+    }
+
+    public SSH(String email, String name, String user, String host, int port, TransfertType transfertType, String directory, String status, boolean deleteFilesFromSource) {
+        this.email = email;
+        this.name = name;
+        this.user = user;
+        this.host = host;
+        this.port = port;
+        this.transfertType = transfertType;
+        this.directory = directory;
+        this.status = status;
         this.deleteFilesFromSource = deleteFilesFromSource;
     }
 
@@ -108,15 +126,23 @@ public class SSH implements IsSerializable {
         return status;
     }
 
+    public Date getTheEarliestNextSynchronistation() {
+        return theEarliestNextSynchronistation;
+    }
+
+    public void setTheEarliestNextSynchronistation(Date theEarliestNextSynchronistation) {
+        this.theEarliestNextSynchronistation = theEarliestNextSynchronistation;
+    }
+
     public String getEmail() {
         return email;
     }
 
-    public long getNumberSynchronizationFailes() {
+    public long getNumberSynchronizationFailed() {
         return numberSynchronizationFailed;
     }
 
-    public void setNumberSynchronizationFailes(long numberSynchronizationFailed) {
+    public void setNumberSynchronizationFailed(long numberSynchronizationFailed) {
         this.numberSynchronizationFailed = numberSynchronizationFailed;
     }
 
