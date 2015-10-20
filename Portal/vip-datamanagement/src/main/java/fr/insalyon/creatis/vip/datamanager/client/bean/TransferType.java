@@ -37,7 +37,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  *
  * @author Nouha Boujelben
  */
-public enum TransfertType implements IsSerializable {
+public enum TransferType implements IsSerializable {
 
     LFCToDevice,
     DeviceToLFC,
