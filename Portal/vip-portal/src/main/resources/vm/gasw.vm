@@ -5,6 +5,8 @@
     <retrycount value="1"/>
     <value value="$tool.getWrapperLFN()"/>
     <executor value="LOCAL"/>
+    <input name="results-directory" option="no1"> 
+    </input>
 #foreach($input in $tool.getInputs())
 #set($option="--$input.getId().toLowerCase()")
     <input name="${input.getId()}" option="${option}"> 
@@ -17,14 +19,14 @@
 #set($option="--$outputFile.getId().toLowerCase()")
     <output name="$outputFile.getName()" option="$option">
 #set ($value=$outputFile.getPathTemplate()) 
-#set ($i=0)
+#set ($i=1)
 #foreach($input in $tool.getInputs())
 #set ($i=$i+1)
 #if($input.getCommandLineKey()!="")
-#set ($value=$value.replace($input.getCommandLineKey(),"$dir$i/$na$i"))
+#set ($value=$value.replace($input.getCommandLineKey(),"$na$i"))
 #end
 #end
-      <template value="$value"/>
+      <template value="$dir1/$na1/$value"/>
       <access type="LFN"/>
     </output>
 #end

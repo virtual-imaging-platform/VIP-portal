@@ -5,6 +5,8 @@
 # Arguments parsing #
 #####################
 
+shift # first parameter is always results directory
+
 while [[ $# > 0 ]]
 do
 key="$1"
@@ -54,9 +56,13 @@ then
 #set($newValue="""$input.getCommandLineFlag() $$input.getId().toUpperCase()""")
   BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/$newValue}
 #else
-if [ "$$input.getId().toUpperCase()" = "yes" ]
+if [ "$$input.getId().toUpperCase()" = "true" ]
 then
+  # flag is set: replace command-line key by flag value
   BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/$input.getCommandLineFlag()}
+else
+  # flag is unset: remove command-line key from command-line. 
+  BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/""}
 fi
 #end
 #if($input.isOptional())
