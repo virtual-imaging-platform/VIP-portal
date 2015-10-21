@@ -2,19 +2,6 @@
 
 
 #####################
-#     Functions     #
-#####################
-
-# Substitutes $1 with $2 in $3,
-# assuming that $1 and $2 don't contain any ','
-function substitute {
-    local ELEMENT=$1
-    local NEW_ELEMENT=$2
-    local TARGET=$3
-    echo ${TARGET} | sed s,${ELEMENT},${NEW_ELEMENT},g
-}    
-
-#####################
 # Arguments parsing #
 #####################
 
@@ -48,12 +35,12 @@ done
 BOUTIQUES_COMMAND_LINE='$tool.getCommandLine()'
 
 ## Start with outputs so that input command line keys are replaced in path templates.
-
+#set($ob="{")
 #foreach($outputFile in $tool.getOutputFiles())
 ## Replace command-line keys
 #if($outputFile.getCommandLineKey())
 #set($newValue="""$outputFile.getCommandLineFlag() $$outputFile.getId().toUpperCase()""")
-BOUTIQUES_COMMAND_LINE=$(substitute $outputFile.getCommandLineKey() $newValue ${BOUTIQUES_COMMAND_LINE})
+BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$outputFile.getCommandLineKey()'/$newValue}
 #end
 #end 
 
@@ -65,17 +52,17 @@ then
 #end
 #if($input.getType() != "Flag")
 #set($newValue="""$input.getCommandLineFlag() $$input.getId().toUpperCase()""")
-  BOUTIQUES_COMMAND_LINE=$(substitute $input.getCommandLineKey() $newValue ${BOUTIQUES_COMMAND_LINE})
+  BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/$newValue}
 #else
 if [ "$$input.getId().toUpperCase()" = "yes" ]
 then
-  BOUTIQUES_COMMAND_LINE=$(substitute $input.getCommandLineKey() $input.getCommandLineFlag() ${BOUTIQUES_COMMAND_LINE})
+  BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/$input.getCommandLineFlag()}
 fi
 #end
 #if($input.isOptional())
 else
   # Optional input is not active: remove command-line key from command-line. 
-  BOUTIQUES_COMMAND_LINE=$(substitute $input.getCommandLineKey() "" ${BOUTIQUES_COMMAND_LINE})
+  BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/""}
 fi
 #end
 #end
@@ -86,7 +73,7 @@ fi
 
 #if($tool.getDockerImage())
 cat << DOCKERJOB > .dockerjob.sh
-#!/bin/bash
+#!/bin/bash -l
 ${BOUTIQUES_COMMAND_LINE}
 DOCKERJOB
 
