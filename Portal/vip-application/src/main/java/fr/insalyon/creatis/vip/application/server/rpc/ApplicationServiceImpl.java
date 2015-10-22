@@ -61,10 +61,10 @@ import org.jsoup.Jsoup;
  */
 public class ApplicationServiceImpl extends AbstractRemoteServiceServlet implements ApplicationService {
 
-    private static Logger logger = Logger.getLogger(ApplicationServiceImpl.class);
-    private ClassBusiness classBusiness;
-    private ApplicationBusiness applicationBusiness;
-    private EngineBusiness engineBusiness;
+    private static final Logger logger = Logger.getLogger(ApplicationServiceImpl.class);
+    private final ClassBusiness classBusiness;
+    private final ApplicationBusiness applicationBusiness;
+    private final EngineBusiness engineBusiness;
 
     public ApplicationServiceImpl() {
 
@@ -219,18 +219,6 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
-    @Override
-    public boolean checkApplicationExistWithAnOtherOwner(String applicationName) throws ApplicationException {
-
-        try {
-            return applicationBusiness.checkApplicationExistWithAnOtherOwner(applicationName, getSessionUser().getEmail());
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
     /**
      *
      * @param applicationClass
@@ -275,6 +263,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
+    @Override
     public void removeClass(String name) throws ApplicationException {
 
         try {

@@ -66,8 +66,6 @@ public interface ApplicationService extends RemoteService {
     
     public List<Application> getApplications() throws ApplicationException;
     
-    public boolean checkApplicationExistWithAnOtherOwner(String applicationName) throws ApplicationException;
-    
     public List<String[]> getApplications(String className) throws ApplicationException;
     
     public List<String[]> getApplicationsByClass(String className) throws ApplicationException;

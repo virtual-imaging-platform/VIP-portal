@@ -52,7 +52,7 @@ public class LogsLayout extends AbstractFormLayout {
     public LogsLayout(String simulationID) {
 
         super("100%", "145px");
-        addTitle("Simulation Logs", ApplicationConstants.ICON_LOG);
+        addTitle("Execution Logs", ApplicationConstants.ICON_LOG);
 
         this.simulationID = simulationID;
         configureTileGrid();
@@ -97,11 +97,11 @@ public class LogsLayout extends AbstractFormLayout {
     private void parse(String applicationName) {
 
         if (applicationName.equals(ApplicationConstants.APP_SIMULATION_OUT)) {
-            new ViewerWindow("Simulation Output File", simulationID,
+            new ViewerWindow("Execution Output File", simulationID,
                     "", "workflow", ".out").show();
 
         } else if (applicationName.equals(ApplicationConstants.APP_SIMULATION_ERROR)) {
-            new ViewerWindow("Simulation Error File", simulationID,
+            new ViewerWindow("Execution Error File", simulationID,
                     "", "workflow", ".err").show();
         }
     }

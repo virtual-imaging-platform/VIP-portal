@@ -245,12 +245,12 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <!-- End Query Module -->
     <!-- Application Importer Module-->
     <servlet>
-        <servlet-name>FileProcessService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.applicationimporter.server.rpc.FileProcessServiceImpl</servlet-class>
+        <servlet-name>ApplicationImporterService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.applicationimporter.server.rpc.ApplicationImporterServiceImpl</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>FileProcessService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/fileProcessService</url-pattern>
+        <servlet-name>ApplicationImporterService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/applicationimporterservice</url-pattern>
     </servlet-mapping>
     <!--End Application Importer Module-->
     <!-- REST API -->

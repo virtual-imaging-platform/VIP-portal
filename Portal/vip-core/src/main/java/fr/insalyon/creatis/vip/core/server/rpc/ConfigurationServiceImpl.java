@@ -205,7 +205,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     /**
      *
-     * @param email
      * @param code
      * @return
      * @throws CoreException
@@ -227,7 +226,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     /**
      *
-     * @param email
+     * @return 
      * @throws CoreException
      */
     @Override

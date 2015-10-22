@@ -134,18 +134,18 @@ public class WorkflowBusiness {
             long runningWorkflows = workflowDAO.getNumberOfRunning(user.getFullName());
             long runningSimulations=workflowDAO.getRunning().size();
             if(runningSimulations >= Server.getInstance().getMaxPlatformRunningSimulations()){
-            logger.warn("Unable to launch simulation '" + simulationName + "': max "
+            logger.warn("Unable to launch execution '" + simulationName + "': max "
                         + "number of running workflows reached in the platform.");
                 throw new fr.insalyon.creatis.vip.core.server.business.BusinessException(
-                        "Max number of running simulations reached.");
+                        "Max number of running executions reached.");
             }
             if (runningWorkflows >= user.getMaxRunningSimulations()) {
 
-                logger.warn("Unable to launch simulation '" + simulationName + "': max "
+                logger.warn("Unable to launch execution '" + simulationName + "': max "
                         + "number of running workflows reached for user '" + user + "'.");
                 throw new fr.insalyon.creatis.vip.core.server.business.BusinessException(
-                        "Max number of running simulations reached.<br />You already have "
-                        + runningWorkflows + " running simulations.");
+                        "Max number of running executions reached.<br />You already have "
+                        + runningWorkflows + " running executions.");
             }
 
             List<ParameterSweep> parameters = new ArrayList<ParameterSweep>();
@@ -445,7 +445,7 @@ public class WorkflowBusiness {
         try {
             Workflow workflow = workflowDAO.get(simulationID);
             if (workflow == null) {
-                throw new BusinessException("Cannot find simulation with id " + simulationID);
+                throw new BusinessException("Cannot find execution with id " + simulationID);
             }
             simulation = new Simulation(
                     workflow.getApplication(),
@@ -597,7 +597,7 @@ public class WorkflowBusiness {
                 workflowIDList.add(simulationIDList.get(i).getID());
             }
         } else {
-            throw new BusinessException("Simulation list is null!");
+            throw new BusinessException("Execution list is null!");
         }
 
         if (workflowIDList != null && !workflowIDList.isEmpty()) {

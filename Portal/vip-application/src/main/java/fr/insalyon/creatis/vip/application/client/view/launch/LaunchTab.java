@@ -101,15 +101,28 @@ public class LaunchTab extends AbstractLaunchTab {
 
                 launchFormLayout = new LaunchFormLayout(applicationName + " " + applicationVersion, null, descriptor.getDescription());
                 layout.addMember(launchFormLayout);
-
+                
+                // Put mandatory sources first
+                List<Source> mandatorySources = new ArrayList<Source>();
+                List<Source> optionalSources = new ArrayList<Source>();
                 for (Source source : descriptor.getSources()) {
+                    if (source.isOptional()) {
+                        optionalSources.add(source);
+                    } else {
+                        mandatorySources.add(source);
+                    }
+                }
+                mandatorySources.addAll(optionalSources);
+                
+                for (Source source : mandatorySources) {
                     boolean disabled = false;
                     for (String name : disabledSources) {
                         if (source.getName().equals(name)) {
                             disabled = true;
                         }
                     }
-                    launchFormLayout.addSource(new InputLayout(source.getName(), source.getDescription()), disabled);
+                    modal.show("Adding source "+source.getName()+"...", true);
+                    launchFormLayout.addSource(new InputLayout(source.getName(), source.getDescription(),source.isOptional(),source.getDefaultValue()), disabled);
                 }
 
                 configureLaunchButton();
@@ -186,13 +199,13 @@ public class LaunchTab extends AbstractLaunchTab {
             @Override
             public void onFailure(Throwable caught) {
                 resetLaunchButton();
-                Layout.getInstance().setWarningMessage("Unable to launch the simulation:<br />" + caught.getMessage(), 10);
+                Layout.getInstance().setWarningMessage("Unable to launch the execution:<br />" + caught.getMessage(), 10);
             }
 
             @Override
             public void onSuccess(Void result) {
                 resetLaunchButton();
-                Layout.getInstance().setNoticeMessage("Simulation '<b>" + getSimulationName() + "</b>' successfully launched.", 10);
+                Layout.getInstance().setNoticeMessage("Execution '<b>" + getSimulationName() + "</b>' successfully launched.", 10);
                 TimelineLayout.getInstance().update();
             }
         };

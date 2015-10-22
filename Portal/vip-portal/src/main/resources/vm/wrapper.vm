@@ -1,0 +1,99 @@
+#!/bin/bash
+
+
+#####################
+# Arguments parsing #
+#####################
+
+shift # first parameter is always results directory
+
+while [[ $# > 0 ]]
+do
+key="$1"
+case $key in
+    #foreach($input in $tool.getInputs())
+--$input.getId().toLowerCase())
+    $input.getId().toUpperCase()="$2"
+    ;;
+    #end
+    #foreach($outputFile in $tool.getOutputFiles())
+--$outputFile.getId().toLowerCase())
+    $outputFile.getId().toUpperCase()="$2"
+    ;;
+    #end
+*) # unknown option
+    echo "Unknown option: $1"
+    exit 1
+    ;;
+esac
+shift # past argument or value
+shift
+done
+
+#############################
+# Command-line construction #
+#############################
+
+BOUTIQUES_COMMAND_LINE='$tool.getCommandLine()'
+
+## Start with outputs so that input command line keys are replaced in path templates.
+#set($ob="{")
+#foreach($outputFile in $tool.getOutputFiles())
+## Replace command-line keys
+#if($outputFile.getCommandLineKey())
+#set($newValue="""$outputFile.getCommandLineFlag() $$outputFile.getId().toUpperCase()""")
+BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$outputFile.getCommandLineKey()'/$newValue}
+#end
+#end 
+
+#foreach($input in $tool.getInputs())
+#if($input.isOptional())
+if [ "$$input.getId().toUpperCase()" != "no" ]
+then
+  # Optional input is active.
+#end
+#if($input.getType() != "Flag")
+#set($newValue="""$input.getCommandLineFlag() $$input.getId().toUpperCase()""")
+  BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/$newValue}
+#else
+if [ "$$input.getId().toUpperCase()" = "true" ]
+then
+  # flag is set: replace command-line key by flag value
+  BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/$input.getCommandLineFlag()}
+else
+  # flag is unset: remove command-line key from command-line. 
+  BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/""}
+fi
+#end
+#if($input.isOptional())
+else
+  # Optional input is not active: remove command-line key from command-line. 
+  BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/""}
+fi
+#end
+#end
+
+##########################
+# Command-line execution #
+##########################
+
+#if($tool.getDockerImage())
+cat << DOCKERJOB > .dockerjob.sh
+#!/bin/bash -l
+${BOUTIQUES_COMMAND_LINE}
+DOCKERJOB
+
+chmod 755 .dockerjob.sh 
+docker run --rm -v $PWD:/gasw-execution-dir -v $PWD/../cache:$PWD/../cache -w /gasw-execution-dir $tool.getDockerImage()  ./.dockerjob.sh 
+#else
+${BOUTIQUES_COMMAND_LINE}
+#end
+
+if [ $? != 0 ]
+then
+    echo "$tool.name execution failed!"
+    exit 1
+fi
+
+echo "Execution of $tool.getName() completed."
+

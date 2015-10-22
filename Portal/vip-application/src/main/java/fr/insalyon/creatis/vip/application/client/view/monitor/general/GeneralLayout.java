@@ -64,7 +64,7 @@ public class GeneralLayout extends AbstractFormLayout {
         generalLabel.setCanSelectText(true);
         this.addMember(generalLabel);
 
-        addTitle("<font color=\"#333333\">Simulation Progress</font>", null);
+        addTitle("<font color=\"#333333\">Execution Progress</font>", null);
         progressLayout = new ProgressLayout(simulationID, status);
         this.addMember(progressLayout);
         

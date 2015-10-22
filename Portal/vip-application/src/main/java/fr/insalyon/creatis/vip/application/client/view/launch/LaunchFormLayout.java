@@ -70,7 +70,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
         addTitle(title, icon);
 
         Label docLabel = WidgetUtil.getLabel("Documentation and Terms of Use",
-                CoreConstants.ICON_INFORMATION, 30, Cursor.HAND);
+                                             CoreConstants.ICON_INFORMATION, 30, Cursor.HAND);
         docLabel.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
@@ -81,7 +81,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
 
         simulationNameItem = FieldUtil.getTextItem(400, "[0-9A-Za-z-_ ]");
         simulationNameItem.setValidators(ValidatorUtil.getStringValidator());
-        addField("Simulation Name", simulationNameItem);
+        addField("Execution Name", simulationNameItem);
 
         sourcesLayout = new VLayout(5);
         sourcesLayout.setAutoHeight();
@@ -97,7 +97,6 @@ public class LaunchFormLayout extends AbstractFormLayout {
      * @param sourceLayout
      */
     public void addSource(AbstractSourceLayout sourceLayout, boolean disabled) {
-
         if (disabled) {
             sourceLayout.setDisabled(true);
         }
@@ -151,7 +150,9 @@ public class LaunchFormLayout extends AbstractFormLayout {
         for (Canvas canvas : sourcesLayout.getMembers()) {
             if (canvas instanceof AbstractSourceLayout) {
                 AbstractSourceLayout source = (AbstractSourceLayout) canvas;
-                if (!source.validate()) {
+                if (source.isOptional() && (source.getValue() == null || source.getValue().equals("") || source.getValue().equals("null"))) {
+                    source.setValue("no");
+                } else if (!source.validate()) {
                     valid = false;
                 }
             }
@@ -188,20 +189,20 @@ public class LaunchFormLayout extends AbstractFormLayout {
         }
         if (!conflictMap.isEmpty()) {
             SC.ask("The following fields already have a value.<br />"
-                    + "Do you want to replace them?<br />"
-                    + "Fields: " + conflictMap.keySet(), new BooleanCallback() {
-                @Override
-                public void execute(Boolean value) {
-                    if (value) {
-                        for (Canvas canvas : sourcesLayout.getMembers()) {
-                            if (canvas instanceof AbstractSourceLayout) {
-                                AbstractSourceLayout source = (AbstractSourceLayout) canvas;
-                                source.setValue(conflictMap.get(source.getName()));
+                   + "Do you want to replace them?<br />"
+                   + "Fields: " + conflictMap.keySet(), new BooleanCallback() {
+                        @Override
+                        public void execute(Boolean value) {
+                            if (value) {
+                                for (Canvas canvas : sourcesLayout.getMembers()) {
+                                    if (canvas instanceof AbstractSourceLayout) {
+                                        AbstractSourceLayout source = (AbstractSourceLayout) canvas;
+                                        source.setValue(conflictMap.get(source.getName()));
+                                    }
+                                }
                             }
                         }
-                    }
-                }
-            });
+                    });
         }
         if (sb.length() > 0) {
             Layout.getInstance().setWarningMessage(sb.toString());
@@ -272,7 +273,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
 
             @Override
             public void onSuccess(String result) {
-                if (result != null || !result.isEmpty() ||!result.equals("")) {
+                if (result != null || !result.isEmpty() || !result.equals("")) {
 
                     VLayout citationLayout = new VLayout(5);
                     citationLayout.addMember(WidgetUtil.getLabel("<b>Please refer to the following publication:</b>", 20));
