@@ -41,36 +41,36 @@ import org.apache.log4j.Logger;
  * @author glatard
  */
 class MySQLDAOFactory extends SSHDAOFactory {
-    
-     private final static Logger logger = Logger.getLogger(MySQLDAOFactory.class);
+
+    private final static Logger logger = Logger.getLogger(MySQLDAOFactory.class);
     private static MySQLDAOFactory instance;
 
     // Singleton
-    protected static MySQLDAOFactory getInstance()  {
+    protected static MySQLDAOFactory getInstance() {
         if (instance == null) {
             instance = new MySQLDAOFactory();
         }
         return instance;
     }
 
-    private MySQLDAOFactory()  {
-         try {
-             logger.info("Configuring VIP SSH database.");
-             PlatformConnection.getInstance().createTable("VIPSSHAccounts","email VARCHAR(255), LFCDir VARCHAR(255), "
-                     + "sshUser VARCHAR(255), sshHost VARCHAR(255), sshDir VARCHAR(255), sshPort INT, validated BOOLEAN, "
-                     + "auth_failed BOOLEAN, theEarliestNextSynchronistation TIMESTAMP, numberSynchronizationFailed BIGINT, "
-                     + "transfertType VARCHAR(255), deleteFilesFromSource BOOLEAN DEFAULT 0, PRIMARY KEY(email,LFCDir), "
-                     + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
-                     + "ON DELETE CASCADE ON UPDATE CASCADE");
-         } catch (DAOException ex) {
-              logger.error(ex);
-         }
-       
+    private MySQLDAOFactory() {
+        try {
+            logger.info("Configuring VIP SSH database.");
+            PlatformConnection.getInstance().createTable("VIPSSHAccounts", "email VARCHAR(255), LFCDir VARCHAR(255), "
+                    + "sshUser VARCHAR(255), sshHost VARCHAR(255), sshDir VARCHAR(255), sshPort INT, validated BOOLEAN, "
+                    + "auth_failed BOOLEAN, theEarliestNextSynchronistation TIMESTAMP, numberSynchronizationFailed BIGINT, "
+                    + "transfertType VARCHAR(255), deleteFilesFromSource BOOLEAN DEFAULT 0, activate BOOLEAN DEFAULT 1, PRIMARY KEY(email,LFCDir), "
+                    + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
+                    + "ON DELETE CASCADE ON UPDATE CASCADE");
+        } catch (DAOException ex) {
+            logger.error(ex);
+        }
+
     }
 
     @Override
     public SSHDAO getSSHDAO() throws DAOException {
         return new SSHData();
     }
-    
+
 }

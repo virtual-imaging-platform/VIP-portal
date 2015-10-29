@@ -57,6 +57,7 @@ import java.util.LinkedHashMap;
 /**
  *
  * @author glatard
+ * @author Nouha Boujelben
  */
 public class EditSSHLayout extends AbstractFormLayout {
 
@@ -72,6 +73,7 @@ public class EditSSHLayout extends AbstractFormLayout {
     private IButton saveButton;
     private IButton removeButton;
     private CheckboxItem deleteFilesFromSourceField;
+    private CheckboxItem activateField;
 
     public EditSSHLayout() {
 
@@ -102,7 +104,12 @@ public class EditSSHLayout extends AbstractFormLayout {
         deleteFilesFromSourceField.setTitle("Delete files from Source");
         deleteFilesFromSourceField.setDisabled(false);
         deleteFilesFromSourceField.setWidth(350);
-      
+
+        activateField = new CheckboxItem();
+        activateField.setTitle("Activate the SSH connection");
+        activateField.setDisabled(false);
+        activateField.setWidth(350);
+
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
                     @Override
@@ -118,7 +125,8 @@ public class EditSSHLayout extends AbstractFormLayout {
                                             TransfertType.valueOf(transfertTypeField.getValueAsString()),
                                             directoryField.getValueAsString().trim(),
                                             statusField.getValueAsString(),
-                                            deleteFilesFromSourceField.getValueAsBoolean()
+                                            deleteFilesFromSourceField.getValueAsBoolean(),
+                                            activateField.getValueAsBoolean()
                                     ));
                         }
                     }
@@ -148,11 +156,12 @@ public class EditSSHLayout extends AbstractFormLayout {
         addField("Transfert Type", transfertTypeField);
         addField("SSH Directory (absolute path)", directoryField);
         this.addMember(FieldUtil.getForm(deleteFilesFromSourceField));
+        this.addMember(FieldUtil.getForm(activateField));
 
         addButtons(saveButton, removeButton);
     }
 
-    public void setSSH(String email, String name, String user, String host, String port, TransfertType transferType, String directory, String status, boolean deleteFilesFromSourceField) {
+    public void setSSH(String email, String name, String user, String host, String port, TransfertType transferType, String directory, String status, boolean deleteFilesFromSourceField, boolean activate) {
 
         if (name != null & email != null & user != null & host != null & transferType != null & directory != null & status != null & port != null) {
             this.emailField.setValue(email);
@@ -166,6 +175,7 @@ public class EditSSHLayout extends AbstractFormLayout {
             this.directoryField.setValue(directory);
             this.statusField.setValue(status);
             this.deleteFilesFromSourceField.setValue(deleteFilesFromSourceField);
+            this.activateField.setValue(activate);
             this.newSSH = false;
             this.removeButton.setDisabled(false);
 
@@ -185,6 +195,7 @@ public class EditSSHLayout extends AbstractFormLayout {
             this.directoryField.setValue("");
             this.statusField.setValue("");
             this.deleteFilesFromSourceField.setValue(false);
+            this.activateField.setValue(true);
             this.newSSH = true;
             this.removeButton.setDisabled(true);
         }
@@ -222,7 +233,7 @@ public class EditSSHLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setSSH(null, null, null, null, null, null, null, null, false);
+                setSSH(null, null, null, null, null, null, null, null, false, true);
                 ManageSSHTab tab = (ManageSSHTab) Layout.getInstance().
                         getTab(DataManagerConstants.TAB_MANAGE_SSH);
                 tab.loadSSHConnections();

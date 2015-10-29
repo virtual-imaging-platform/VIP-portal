@@ -54,6 +54,7 @@ import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.common.LabelButton;
 import fr.insalyon.creatis.vip.core.client.view.common.ToolstripLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
@@ -72,8 +73,8 @@ public class SSHLayout extends VLayout {
     private ListGrid grid;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
-    
-       public SSHLayout() {
+
+    public SSHLayout() {
 
         this.setWidth100();
         this.setHeight100();
@@ -85,8 +86,8 @@ public class SSHLayout extends VLayout {
 
         loadData();
     }
-    
-       private void configureActions() {
+
+    private void configureActions() {
 
         ToolstripLayout toolstrip = new ToolstripLayout();
 
@@ -99,7 +100,7 @@ public class SSHLayout extends VLayout {
             public void onClick(ClickEvent event) {
                 ManageSSHTab sshTab = (ManageSSHTab) Layout.getInstance().
                         getTab(DataManagerConstants.TAB_MANAGE_SSH);
-                sshTab.setSSH(null, null, null,null,null,null,null,null,false);
+                sshTab.setSSH(null, null, null, null, null, null, null, null, false, true);
             }
         });
         toolstrip.addMember(addButton);
@@ -113,11 +114,11 @@ public class SSHLayout extends VLayout {
             }
         });
         toolstrip.addMember(refreshButton);
+        
 
         this.addMember(toolstrip);
     }
-       
-       
+
     private void configureGrid() {
 
         grid = new ListGrid() {
@@ -143,8 +144,9 @@ public class SSHLayout extends VLayout {
                                     rollOverRecord.getAttribute("transfertType"),
                                     rollOverRecord.getAttribute("directory"),
                                     rollOverRecord.getAttribute("status"),
-                                    rollOverRecord.getAttributeAsBoolean("deleteFilesFromSource")
-                                    );
+                                    rollOverRecord.getAttributeAsBoolean("deleteFilesFromSource"),
+                                    rollOverRecord.getAttributeAsBoolean("activate")
+                            );
                         }
                     });
                     ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
@@ -152,16 +154,16 @@ public class SSHLayout extends VLayout {
                         @Override
                         public void onClick(ClickEvent event) {
                             final String name = rollOverRecord.getAttribute("name");
-                             final String email = rollOverRecord.getAttribute("email");
+                            final String email = rollOverRecord.getAttribute("email");
                             SC.ask("Do you really want to remove the SSH connection \""
                                     + name + "\"?", new BooleanCallback() {
-                                @Override
-                                public void execute(Boolean value) {
-                                    if (value) {
-                                        remove(name,email);
-                                    }
-                                }
-                            });
+                                        @Override
+                                        public void execute(Boolean value) {
+                                            if (value) {
+                                                remove(name, email);
+                                            }
+                                        }
+                                    });
                         }
                     });
                     rollOverCanvas.addMember(loadImg);
@@ -189,22 +191,22 @@ public class SSHLayout extends VLayout {
         grid.setShowEmptyMessage(true);
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
-        
-        
+
         ListGridField deleteFilesFromSourceField = new ListGridField("deleteFilesFromSource", "Delete Files From Source");
         deleteFilesFromSourceField.setType(ListGridFieldType.BOOLEAN);
-        grid.setFields(new ListGridField("name", "Connection Name"),
+        grid.setFields(FieldUtil.getIconGridField("activate"),
+                new ListGridField("name", "Connection Name"),
                 new ListGridField("email", "VIP User"),
-                new ListGridField("user","SSH user"),
-                new ListGridField("host","SSH host name"),
-                new ListGridField("port","SSH port"),
-                new ListGridField("transfertType","Transfert Type"),
-                new ListGridField("directory","SSH directory"),
-                new ListGridField("status","Connection Status"),
-                new ListGridField("theEarliestNextSynchronistation","The Earliest Next Synchronistation"),
-                new ListGridField("numberSynchronizationFailed","Number Synchronization Failed"),
-        deleteFilesFromSourceField);
-              
+                new ListGridField("user", "SSH user"),
+                new ListGridField("host", "SSH host name"),
+                new ListGridField("port", "SSH port"),
+                new ListGridField("transfertType", "Transfert Type"),
+                new ListGridField("directory", "SSH directory"),
+                new ListGridField("status", "Connection Status"),
+                new ListGridField("theEarliestNextSynchronistation", "The Earliest Next Synchronistation"),
+                new ListGridField("numberSynchronizationFailed", "Number Synchronization Failed"),
+                deleteFilesFromSourceField);
+
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellClickHandler(new CellClickHandler() {
@@ -220,13 +222,15 @@ public class SSHLayout extends VLayout {
                         event.getRecord().getAttribute("directory"),
                         event.getRecord().getAttribute("status"),
                         //event.getRecord().getAttribute("numberSynchronizationFailed"),
-                        event.getRecord().getAttributeAsBoolean("deleteFilesFromSource"));
+                        event.getRecord().getAttributeAsBoolean("deleteFilesFromSource"),
+                        event.getRecord().getAttributeAsBoolean("activate")
+                );
             }
         });
         this.addMember(grid);
     }
-    
-     private void remove(String name, String email) {
+
+    private void remove(String name, String email) {
 
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
@@ -246,16 +250,15 @@ public class SSHLayout extends VLayout {
         DataManagerService.Util.getInstance().removeSSH(email, name, callback);
     }
 
-    private void edit(String name, String email, String user, String host, String port,String transfertType, String directory, String status, boolean deleteFilesFromSource) {
+    private void edit(String name, String email, String user, String host, String port, String transfertType, String directory, String status, boolean deleteFilesFromSource, boolean activate) {
 
         ManageSSHTab sshTab = (ManageSSHTab) Layout.getInstance().
                 getTab(DataManagerConstants.TAB_MANAGE_SSH);
-        
-        
-        sshTab.setSSH(name, email,user,host,port,TransfertType.valueOf(transfertType),directory,status,deleteFilesFromSource);
-    }   
-    
-     public void loadData() {
+
+        sshTab.setSSH(name, email, user, host, port, TransfertType.valueOf(transfertType), directory, status, deleteFilesFromSource, activate);
+    }
+
+    public void loadData() {
 
         final AsyncCallback<List<SSH>> callback = new AsyncCallback<List<SSH>>() {
             @Override
@@ -270,7 +273,7 @@ public class SSHLayout extends VLayout {
                 List<SSHRecord> dataList = new ArrayList<SSHRecord>();
 
                 for (SSH ssh : result) {
-                    dataList.add(new SSHRecord(ssh.getName(),ssh.getEmail(),ssh.getUser(),ssh.getHost(),ssh.getPort(),ssh.getTransfertType(),ssh.getDirectory(),ssh.getStatus(),String.valueOf(ssh.getTheEarliestNextSynchronistation()).split("\\.")[0],ssh.getNumberSynchronizationFailed(),ssh.isDeleteFilesFromSource()));
+                    dataList.add(new SSHRecord(ssh.getName(), ssh.getEmail(), ssh.getUser(), ssh.getHost(), ssh.getPort(), ssh.getTransfertType(), ssh.getDirectory(), ssh.getStatus(), String.valueOf(ssh.getTheEarliestNextSynchronistation()).split("\\.")[0], ssh.getNumberSynchronizationFailed(), ssh.isDeleteFilesFromSource(), ssh.isActivate()));
                 }
                 grid.setData(dataList.toArray(new SSHRecord[]{}));
             }

@@ -51,6 +51,7 @@ public class SSH implements IsSerializable {
     private Date theEarliestNextSynchronistation;
     private long numberSynchronizationFailed;
     private boolean deleteFilesFromSource;
+    private boolean activate;
 
     public SSH() {
     }
@@ -71,8 +72,7 @@ public class SSH implements IsSerializable {
      * synchronization failed
      * @param deleteFilesFromSource enbale delete files from source location
      */
-
-    public SSH(String email, String name, String user, String host, int port, TransfertType transfertType, String directory, String status, Date theEarliestNextSynchronistation, long numberSynchronizationFailed, boolean deleteFilesFromSource) {
+    public SSH(String email, String name, String user, String host, int port, TransfertType transfertType, String directory, String status, Date theEarliestNextSynchronistation, long numberSynchronizationFailed, boolean deleteFilesFromSource, boolean activate) {
         this.email = email;
         this.name = name;
         this.user = user;
@@ -84,9 +84,10 @@ public class SSH implements IsSerializable {
         this.theEarliestNextSynchronistation = theEarliestNextSynchronistation;
         this.numberSynchronizationFailed = numberSynchronizationFailed;
         this.deleteFilesFromSource = deleteFilesFromSource;
+        this.activate = activate;
     }
 
-    public SSH(String email, String name, String user, String host, int port, TransfertType transfertType, String directory, String status, boolean deleteFilesFromSource) {
+    public SSH(String email, String name, String user, String host, int port, TransfertType transfertType, String directory, String status, boolean deleteFilesFromSource, boolean activate) {
         this.email = email;
         this.name = name;
         this.user = user;
@@ -96,6 +97,7 @@ public class SSH implements IsSerializable {
         this.directory = directory;
         this.status = status;
         this.deleteFilesFromSource = deleteFilesFromSource;
+        this.activate = activate;
     }
 
     public String getName() {
@@ -152,6 +154,14 @@ public class SSH implements IsSerializable {
 
     public void setDeleteFilesFromSource(boolean deleteFilesFromSource) {
         this.deleteFilesFromSource = deleteFilesFromSource;
+    }
+
+    public boolean isActivate() {
+        return activate;
+    }
+
+    public void setActivate(boolean activate) {
+        this.activate = activate;
     }
 
 }

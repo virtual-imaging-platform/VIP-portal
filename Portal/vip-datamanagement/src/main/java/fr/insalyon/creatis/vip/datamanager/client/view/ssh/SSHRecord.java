@@ -33,7 +33,7 @@ package fr.insalyon.creatis.vip.datamanager.client.view.ssh;
 
 import fr.insalyon.creatis.vip.datamanager.client.bean.TransfertType;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 
 /**
  *
@@ -41,8 +41,13 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class SSHRecord extends ListGridRecord {
 
-    public SSHRecord(String name, String email, String user, String host, int port, TransfertType transfertType, String directory, String status,String theEarliestNextSynchronistation,long numberSynchronizationFailed, boolean deleteFilesFromSource) {
+    public SSHRecord(String name, String email, String user, String host, int port, TransfertType transfertType, String directory, String status, String theEarliestNextSynchronistation, long numberSynchronizationFailed, boolean deleteFilesFromSource, boolean activate) {
 
+        if (activate) {
+            setAttribute("activate", DataManagerConstants.ICON_ACTIVATE_SSH);
+        } else {
+            setAttribute("activate", DataManagerConstants.ICON_DEACTIVATE_SSH);
+        }
         setAttribute("name", name);
         setAttribute("email", email);
         setAttribute("user", user);
@@ -51,9 +56,10 @@ public class SSHRecord extends ListGridRecord {
         setAttribute("transfertType", transfertType);
         setAttribute("directory", directory);
         setAttribute("status", status);
-        setAttribute("theEarliestNextSynchronistation", theEarliestNextSynchronistation); 
+        setAttribute("theEarliestNextSynchronistation", theEarliestNextSynchronistation);
         setAttribute("numberSynchronizationFailed", numberSynchronizationFailed);
         setAttribute("deleteFilesFromSource", deleteFilesFromSource);
+
     }
 
 }
