@@ -41,6 +41,8 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangeHandler;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
@@ -99,10 +101,20 @@ public class EditSSHLayout extends AbstractFormLayout {
         valueMap.put(TransferType.DeviceToLFC.toString(), TransferType.DeviceToLFC.toString());
         valueMap.put(TransferType.LFCToDevice.toString(), TransferType.LFCToDevice.toString());
         transferTypeField.setValueMap(valueMap);
+        transferTypeField.addChangeHandler(new ChangeHandler() {
+            public void onChange(ChangeEvent event) {
+                if (event.getValue().equals(TransferType.Synchronization.toString())) {
+                    deleteFilesFromSourceField.setDisabled(true);
+                } else {
+                    deleteFilesFromSourceField.setDisabled(false);
+                }
+
+            }
+        });
 
         deleteFilesFromSourceField = new CheckboxItem();
         deleteFilesFromSourceField.setTitle("Delete files from Source");
-        deleteFilesFromSourceField.setDisabled(false);
+        deleteFilesFromSourceField.setDisabled(true);
         deleteFilesFromSourceField.setWidth(350);
 
         activateField = new CheckboxItem();
@@ -153,8 +165,8 @@ public class EditSSHLayout extends AbstractFormLayout {
         addField("SSH User", userField);
         addField("SSH Host", hostField);
         addField("SSH Port", portField);
-        addField("Transfer Type", transferTypeField);
         addField("SSH Directory (absolute path)", directoryField);
+        addField("Transfer Type", transferTypeField);
         this.addMember(FieldUtil.getForm(deleteFilesFromSourceField));
         this.addMember(FieldUtil.getForm(activateField));
 
