@@ -45,7 +45,7 @@ public class SSH implements IsSerializable {
     private String user;
     private String host;
     private int port;
-    private TransfertType transfertType;
+    private TransferType transferType;
     private String directory;
     private String status;
     private Date theEarliestNextSynchronistation;
@@ -64,7 +64,7 @@ public class SSH implements IsSerializable {
      * @param user the ssh user name
      * @param host the ssh host name
      * @param port the ssh port
-     * @param transfertType specifying a type to transfert data
+     * @param transferType specifying a type to transfer data
      * @param directory the full path of the synchronization folder
      * @param status the connection status
      * @param theEarliestNextSynchronistation
@@ -72,13 +72,13 @@ public class SSH implements IsSerializable {
      * synchronization failed
      * @param deleteFilesFromSource enbale delete files from source location
      */
-    public SSH(String email, String name, String user, String host, int port, TransfertType transfertType, String directory, String status, Date theEarliestNextSynchronistation, long numberSynchronizationFailed, boolean deleteFilesFromSource, boolean activate) {
+    public SSH(String email, String name, String user, String host, int port, TransferType transferType, String directory, String status, Date theEarliestNextSynchronistation, long numberSynchronizationFailed, boolean deleteFilesFromSource, boolean activate) {
         this.email = email;
         this.name = name;
         this.user = user;
         this.host = host;
         this.port = port;
-        this.transfertType = transfertType;
+        this.transferType = transferType;
         this.directory = directory;
         this.status = status;
         this.theEarliestNextSynchronistation = theEarliestNextSynchronistation;
@@ -87,13 +87,13 @@ public class SSH implements IsSerializable {
         this.activate = activate;
     }
 
-    public SSH(String email, String name, String user, String host, int port, TransfertType transfertType, String directory, String status, boolean deleteFilesFromSource, boolean activate) {
+    public SSH(String email, String name, String user, String host, int port, TransferType transferType, String directory, String status, boolean deleteFilesFromSource, boolean activate) {
         this.email = email;
         this.name = name;
         this.user = user;
         this.host = host;
         this.port = port;
-        this.transfertType = transfertType;
+        this.transferType = transferType;
         this.directory = directory;
         this.status = status;
         this.deleteFilesFromSource = deleteFilesFromSource;
@@ -120,8 +120,8 @@ public class SSH implements IsSerializable {
         return directory;
     }
 
-    public TransfertType getTransfertType() {
-        return transfertType;
+    public TransferType getTransferType() {
+        return transferType;
     }
 
     public String getStatus() {

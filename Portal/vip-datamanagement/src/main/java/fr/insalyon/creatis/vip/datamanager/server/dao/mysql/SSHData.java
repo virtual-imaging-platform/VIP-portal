@@ -35,7 +35,7 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
-import fr.insalyon.creatis.vip.datamanager.client.bean.TransfertType;
+import fr.insalyon.creatis.vip.datamanager.client.bean.TransferType;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.dao.SSHDAO;
@@ -79,7 +79,7 @@ public class SSHData implements SSHDAO {
                 String name = DataManagerBusiness.extractName(rs.getString("LFCDir"));
                 String sshUser = rs.getString("sshUser");
                 String sshHost = rs.getString("sshHost");
-                TransfertType sshTransfertType = TransfertType.valueOf(rs.getString("transfertType"));
+                TransferType sshTransferType = TransferType.valueOf(rs.getString("transferType"));
                 String sshDir = rs.getString("sshDir");
                 int sshPort = rs.getInt("sshPort");
                 boolean validated = rs.getBoolean("validated");
@@ -97,7 +97,7 @@ public class SSHData implements SSHDAO {
                     status = "waiting for validation";
                 }
 
-                ssh.add(new SSH(email, name, sshUser, sshHost, sshPort, sshTransfertType, sshDir, status, theEarliestNextSynchronistation, numberSynchronizationFailed, deleteFilesFromSource, activate));
+                ssh.add(new SSH(email, name, sshUser, sshHost, sshPort, sshTransferType, sshDir, status, theEarliestNextSynchronistation, numberSynchronizationFailed, deleteFilesFromSource, activate));
             }
             ps.close();
             return ssh;
@@ -112,7 +112,7 @@ public class SSHData implements SSHDAO {
     public void addSSH(SSH ssh) throws DAOException {
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO VIPSSHAccounts(email,LFCDir,sshUser,sshHost,transfertType,sshDir,sshPort,validated,auth_failed,numberSynchronizationFailed,deleteFilesFromSource) "
+                    "INSERT INTO VIPSSHAccounts(email,LFCDir,sshUser,sshHost,transferType,sshDir,sshPort,validated,auth_failed,numberSynchronizationFailed,deleteFilesFromSource) "
                     + "VALUES (?,?,?,?,?,?,?,?,?,?,?)");
 
             ps.setString(1, ssh.getEmail());
@@ -125,7 +125,7 @@ public class SSHData implements SSHDAO {
             }
             ps.setString(3, ssh.getUser());
             ps.setString(4, ssh.getHost());
-            ps.setString(5, ssh.getTransfertType().name());
+            ps.setString(5, ssh.getTransferType().name());
             ps.setString(6, ssh.getDirectory());
             ps.setInt(7, ssh.getPort());
             ps.setString(8, "1");
@@ -151,11 +151,11 @@ public class SSHData implements SSHDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
                     + "VIPSSHAccounts "
-                    + "SET sshUser=?, sshHost=?, transfertType=?, sshDir=?, sshPort=?, deleteFilesFromSource=?, activate=? "
+                    + "SET sshUser=?, sshHost=?, transferType=?, sshDir=?, sshPort=?, deleteFilesFromSource=?, activate=? "
                     + "WHERE email=? AND LFCDir=?");
             ps.setString(1, ssh.getUser());
             ps.setString(2, ssh.getHost());
-            ps.setString(3, ssh.getTransfertType().toString());
+            ps.setString(3, ssh.getTransferType().toString());
             ps.setString(4, ssh.getDirectory());
             ps.setInt(5, ssh.getPort());
             ps.setBoolean(6, ssh.isDeleteFilesFromSource());
