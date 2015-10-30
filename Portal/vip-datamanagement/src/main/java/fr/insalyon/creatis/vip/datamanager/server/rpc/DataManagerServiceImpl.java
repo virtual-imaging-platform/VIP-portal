@@ -63,7 +63,6 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     private final DataManagerBusiness dataManagerBusiness;
     private final LFCBusiness lfcBusiness;
     private final TransferPoolBusiness transferPoolBusiness;
-  
 
     public DataManagerServiceImpl() {
 
@@ -411,9 +410,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
-  
-    
-     @Override
+    @Override
     public Image getImageSlicesURL(String imageFileName, String direction) throws DataManagerException {
 
         try {
@@ -472,6 +469,20 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             trace(logger, "Removing ssh connection " + email + " ; " + name);
             dataManagerBusiness.removeSSH(email, name);
+        } catch (CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (BusinessException ex) {
+            throw new DataManagerException(ex);
+        }
+    }
+
+    @Override
+    public void resetSSHs(List<List<String>> sshConnections) throws DataManagerException {
+        try {
+            for (List<String> sshC : sshConnections) {
+                trace(logger, "Removing ssh connection " + sshC.get(0) + " ; " + sshC.get(1));
+            }
+            dataManagerBusiness.resetSSHs(sshConnections);
         } catch (CoreException ex) {
             throw new DataManagerException(ex);
         } catch (BusinessException ex) {

@@ -125,6 +125,7 @@ public class CoreConstants implements IsSerializable {
     public static final String ICON_PERSONAL = IMG_FOLDER + "icon-personal.png";
     public static final String ICON_PICKER_QUESTION = IMG_FOLDER + "icon-picker-question.png";
     public static final String ICON_REFRESH = IMG_FOLDER + "icon-refresh.png";
+    public static final String ICON_RESET = IMG_FOLDER + "icon-reset.png";
     public static final String ICON_SAVE = IMG_FOLDER + "icon-save.png";
     public static final String ICON_SAVED = IMG_FOLDER + "icon-saved.png";
     public static final String ICON_SIGNOUT = IMG_FOLDER + "icon-signout.png";

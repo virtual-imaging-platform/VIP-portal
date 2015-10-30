@@ -35,6 +35,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.types.SelectionAppearance;
+import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
@@ -61,7 +63,9 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
 import fr.insalyon.creatis.vip.datamanager.client.bean.TransfertType;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -93,6 +97,16 @@ public class SSHLayout extends VLayout {
 
         toolstrip.addMember(WidgetUtil.getSpaceLabel(15));
 
+        LabelButton resetButton = new LabelButton("Reset", CoreConstants.ICON_RESET);
+        resetButton.setWidth(150);
+        resetButton.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                resetSSHConnections();
+            }
+        });
+        toolstrip.addMember(resetButton);
+
         LabelButton addButton = new LabelButton("Add SSH Connection", CoreConstants.ICON_ADD);
         addButton.setWidth(150);
         addButton.addClickHandler(new ClickHandler() {
@@ -114,7 +128,6 @@ public class SSHLayout extends VLayout {
             }
         });
         toolstrip.addMember(refreshButton);
-        
 
         this.addMember(toolstrip);
     }
@@ -190,11 +203,14 @@ public class SSHLayout extends VLayout {
         grid.setShowAllRecords(false);
         grid.setShowEmptyMessage(true);
         grid.setShowRowNumbers(true);
+        grid.setSelectionType(SelectionStyle.SIMPLE);
+        grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
         grid.setEmptyMessage("<br>No data available.");
 
         ListGridField deleteFilesFromSourceField = new ListGridField("deleteFilesFromSource", "Delete Files From Source");
         deleteFilesFromSourceField.setType(ListGridFieldType.BOOLEAN);
-        grid.setFields(FieldUtil.getIconGridField("activate"),
+        ListGridField activate = new ListGridField("activate", "activate");
+        grid.setFields(FieldUtil.getIconGridField("activateIcon"),
                 new ListGridField("name", "Connection Name"),
                 new ListGridField("email", "VIP User"),
                 new ListGridField("user", "SSH user"),
@@ -205,8 +221,9 @@ public class SSHLayout extends VLayout {
                 new ListGridField("status", "Connection Status"),
                 new ListGridField("theEarliestNextSynchronistation", "The Earliest Next Synchronistation"),
                 new ListGridField("numberSynchronizationFailed", "Number Synchronization Failed"),
+                activate,
                 deleteFilesFromSourceField);
-
+        activate.setHidden(true);
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellClickHandler(new CellClickHandler() {
@@ -280,5 +297,35 @@ public class SSHLayout extends VLayout {
         };
         modal.show("Loading ssh connections...", true);
         DataManagerService.Util.getInstance().getSSHConnections(callback);
+    }
+
+    private void resetSSHConnections() {
+        ListGridRecord[] records = grid.getSelectedRecords();
+        List<List<String>> sshConnections = new ArrayList<List<String>>();
+
+        for (ListGridRecord record : records) {
+            List<String> inputt = new ArrayList<String>();
+            SSHRecord sshRecord = (SSHRecord) record;
+            inputt.add(sshRecord.getAttribute("email"));
+            inputt.add(sshRecord.getAttribute("name"));
+            sshConnections.add(inputt);
+        }
+
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                Layout.getInstance().setWarningMessage("Unable to reset SSH connection:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                modal.hide();
+                loadData();
+            }
+        };
+        modal.show("Reset ssh connections...", true);
+        DataManagerService.Util.getInstance().resetSSHs(sshConnections, callback);
+
     }
 }

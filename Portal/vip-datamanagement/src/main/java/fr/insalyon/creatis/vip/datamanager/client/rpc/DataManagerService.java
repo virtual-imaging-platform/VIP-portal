@@ -108,20 +108,22 @@ public interface DataManagerService extends RemoteService {
     public boolean exists(String remoteFile) throws DataManagerException;
 
     public List<DMZombieFile> getZombieFiles() throws DataManagerException;
-    
+
     public void deleteZombieFiles(List<String> surls) throws DataManagerException;
-    
+
     public Image getImageSlicesURL(String localPath, String direction) throws DataManagerException;
-    
+
     public List<SSH> getSSHConnections() throws DataManagerException;
-    
+
     public void addSSH(SSH ssh) throws DataManagerException;
-    
+
     public void updateSSH(SSH ssh) throws DataManagerException;
-    
-    public void removeSSH(String email, String name) throws DataManagerException; 
-    
+
+    public void removeSSH(String email, String name) throws DataManagerException;
+
+    public void resetSSHs(List<List<String>> sshConnections) throws DataManagerException;
+
     public String getSSHPublicKey();
-    
+
     public VisualizationItem getVisualizationItemFromLFN(String lfn) throws DataManagerException;
 }

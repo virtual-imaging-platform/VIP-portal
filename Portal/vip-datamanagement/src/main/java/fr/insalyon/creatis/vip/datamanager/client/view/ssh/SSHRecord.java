@@ -44,10 +44,11 @@ public class SSHRecord extends ListGridRecord {
     public SSHRecord(String name, String email, String user, String host, int port, TransfertType transfertType, String directory, String status, String theEarliestNextSynchronistation, long numberSynchronizationFailed, boolean deleteFilesFromSource, boolean activate) {
 
         if (activate) {
-            setAttribute("activate", DataManagerConstants.ICON_ACTIVATE_SSH);
+            setAttribute("activateIcon", DataManagerConstants.ICON_ACTIVATE_SSH);
         } else {
-            setAttribute("activate", DataManagerConstants.ICON_DEACTIVATE_SSH);
+            setAttribute("activateIcon", DataManagerConstants.ICON_DEACTIVATE_SSH);
         }
+        setAttribute("activate", activate);
         setAttribute("name", name);
         setAttribute("email", email);
         setAttribute("user", user);

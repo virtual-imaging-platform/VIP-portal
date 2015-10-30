@@ -45,6 +45,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import org.apache.log4j.Logger;
 
@@ -201,6 +203,38 @@ public class SSHData implements SSHDAO {
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
+        }
+    }
+
+    @Override
+    public void resetSSHs(List<List<String>> sshConnections) throws DAOException {
+
+        for (List<String> sshC : sshConnections) {
+            try {
+                PreparedStatement ps = connection.prepareStatement("UPDATE "
+                        + "VIPSSHAccounts "
+                        + "SET auth_failed='1', numberSynchronizationFailed='0', theEarliestNextSynchronistation=? "
+                        + "WHERE email=? AND LFCDir=?");
+                ps.setTimestamp(1, new Timestamp(Calendar.getInstance().getTime().getTime()));
+                ps.setString(2, sshC.get(0));
+                try {
+                    ps.setString(3, DataManagerBusiness.generateLFCDir(sshC.get(1), sshC.get(0)));
+                    logger.info("Reset connection " + sshC.get(0) + " " + DataManagerBusiness.generateLFCDir(sshC.get(1), sshC.get(0)));
+                } catch (DataManagerException ex) {
+                    logger.error(ex);
+                    throw new DAOException(ex);
+                } catch (BusinessException ex) {
+                    throw new DAOException(ex);
+                }
+
+                ps.execute();
+                ps.close();
+
+            } catch (SQLException ex) {
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
+
         }
     }
 }
