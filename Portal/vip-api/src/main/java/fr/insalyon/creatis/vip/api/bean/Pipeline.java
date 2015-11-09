@@ -34,6 +34,7 @@ package fr.insalyon.creatis.vip.api.bean;
 import fr.insalyon.creatis.vip.api.bean.pairs.IntKeyStringValuePair;
 import java.util.ArrayList;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 /**
@@ -75,6 +76,7 @@ public class Pipeline extends Object {
         return name;
     }
 
+    @XmlTransient
     public String getDescription() {
         return description;
     }
@@ -90,5 +92,9 @@ public class Pipeline extends Object {
     public ArrayList<IntKeyStringValuePair> getErrorCodesAndMessages() {
         return errorCodesAndMessages;
     }
-    
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+   
 }

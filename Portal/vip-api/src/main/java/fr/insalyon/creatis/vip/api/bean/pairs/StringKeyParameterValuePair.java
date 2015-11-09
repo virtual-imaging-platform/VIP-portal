@@ -42,9 +42,16 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "StringKeyParameterValuePair")
 public class StringKeyParameterValuePair {
 
-    @XmlElement(name = "key", required = true)
+    @XmlElement(name = "name", required = true)
     public String key;
     @XmlElement(name = "value", required = true)
     public ParameterTypedValue value;
+
+    public StringKeyParameterValuePair(){}
+    
+    public StringKeyParameterValuePair(String key, ParameterTypedValue value) {
+        this.key = key;
+        this.value = value;
+    }
 
 }

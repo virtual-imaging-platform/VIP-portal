@@ -64,14 +64,14 @@ public class Execution extends Object {
     String studyIdentifier;
     @XmlElement(name = "errorCode")
     Integer errorCode;
-    @XmlElement(name = "stdout")
+    @XmlElement(name = "stdoutlog")
     String stdout;
-    @XmlElement(name = "stderr")
+    @XmlElement(name = "stderrlog")
     String stderr;
     @XmlElement(name = "startDate")
-    Integer startDate;
+    Long startDate;
     @XmlElement(name = "endDate")
-    Integer endDate;
+    Long endDate;
 
     @XmlType(name = "ExecutionStatus")
     public static enum ExecutionStatus {
@@ -80,6 +80,87 @@ public class Execution extends Object {
     }
     
     public Execution() {
+        inputValues = new ArrayList<>();
+        returnedFiles = new ArrayList<>();
     }
+
+    public Execution(String identifier,
+                     String name,
+                     String pipelineIdentifier,
+                     int timeout,
+                     ExecutionStatus status,
+                     String studyIdentifier,
+                     Integer errorCode,
+                     String stdout,
+                     String stderr,
+                     Long startDate,
+                     Long endDate) {
+        this();
+        this.identifier = identifier;
+        this.name = name;
+        this.pipelineIdentifier = pipelineIdentifier;
+        this.timeout = timeout;
+        this.status = status;
+        this.studyIdentifier = studyIdentifier;
+        this.errorCode = errorCode;
+        this.stdout = stdout;
+        this.stderr = stderr;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPipelineIdentifier() {
+        return pipelineIdentifier;
+    }
+
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public ExecutionStatus getStatus() {
+        return status;
+    }
+
+    public ArrayList<StringKeyParameterValuePair> getInputValues() {
+        return inputValues;
+    }
+
+    public ArrayList<StringKeyParameterValuePair> getReturnedFiles() {
+        return returnedFiles;
+    }
+
+    public String getStudyIdentifier() {
+        return studyIdentifier;
+    }
+
+    public Integer getErrorCode() {
+        return errorCode;
+    }
+
+    public String getStdout() {
+        return stdout;
+    }
+
+    public String getStderr() {
+        return stderr;
+    }
+
+    public Long getStartDate() {
+        return startDate;
+    }
+
+    public Long getEndDate() {
+        return endDate;
+    }
+    
+    
 
 }

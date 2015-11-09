@@ -31,13 +31,19 @@
  */
 package fr.insalyon.creatis.vip.api.business;
 
+import fr.insalyon.creatis.vip.api.bean.ParameterType;
+import fr.insalyon.creatis.vip.api.bean.ParameterTypedValue;
 import fr.insalyon.creatis.vip.api.bean.Pipeline;
+import fr.insalyon.creatis.vip.api.bean.PipelineParameter;
 import fr.insalyon.creatis.vip.api.bean.pairs.PairOfPipelineAndBooleanLists;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
+import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
+import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,34 +58,59 @@ public class PipelineBusiness extends AuthenticatedApiBusiness {
 
     private final static Logger logger = Logger.getLogger(PipelineBusiness.class);
 
-    
     public PipelineBusiness(WebServiceContext wsContext) throws ApiException {
         super(wsContext);
     }
-        
+
     public Pipeline getPipeline(String pipelineId) throws ApiException {
-        throw new ApiException("Not implemented yet");
+        try {
+            logger.info("Calling API method getPipeline(" + pipelineId + ")");
+            String applicationName = getApplicationName(pipelineId);
+            String applicationVersion = getApplicationVersion(pipelineId);
+            Pipeline p = getPipelineWithPermissions(applicationName,applicationVersion);
+            
+            
+            WorkflowBusiness wb = new WorkflowBusiness();
+            Descriptor d = wb.getApplicationDescriptor(getUser(), p.getName(), p.getVersion()); // Be careful, this copies the Gwendia file from LFC. 
+            p.setDescription(d.getDescription());
+            
+            for(Source s : d.getSources()){
+                ParameterType sourceType = getCarminType(s.getType());
+                ParameterTypedValue defaultValue = s.getDefaultValue() == null ? null : new ParameterTypedValue(sourceType,s.getDefaultValue());
+                PipelineParameter pp = new PipelineParameter(s.getName(),
+                        sourceType,
+                        s.isOptional(),
+                        false,
+                        defaultValue,
+                        s.getDescription());
+                p.getParameters().add(pp);
+            }
+            return p;
+        } catch (BusinessException ex) {
+            throw new ApiException(ex);
+        }
+
     }
 
     public PairOfPipelineAndBooleanLists listPipelines(String studyIdentifier) throws ApiException {
 
         try {
-
-            logger.info("Calling API method listPipelines");
+            logger.info("Calling API method listPipelines(" + studyIdentifier + ")");
             ApplicationBusiness ab = new ApplicationBusiness();
             PairOfPipelineAndBooleanLists response = new PairOfPipelineAndBooleanLists();
-            
+
             ClassBusiness classBusiness = new ClassBusiness();
             List<AppClass> classes = classBusiness.getUserClasses(getUser().getEmail(), false);
             List<String> classNames = new ArrayList<>();
-            for(AppClass c : classes)
+            for (AppClass c : classes) {
                 classNames.add(c.getName());
+            }
 
-            List<Application> applications = ab.getApplications(classNames);            
+            List<Application> applications = ab.getApplications(classNames);
             for (Application a : applications) {
                 List<AppVersion> versions = ab.getVersions(a.getName());
                 for (AppVersion av : versions) {
-                    Pipeline p = new Pipeline(a.getName()+"/"+av.getVersion(), a.getName(), av.getVersion());
+                    Pipeline p = new Pipeline(getPipelineIdentifier(a.getName(), av.getVersion()), a.getName(), av.getVersion());
                     response.getPipelines().add(p);
                     response.getCanExecute().add(new Boolean(true));
                 }
@@ -89,5 +120,52 @@ public class PipelineBusiness extends AuthenticatedApiBusiness {
             logger.error(ex);
             throw new ApiException(ex);
         }
+    }
+
+    // static methods
+    
+    /**
+     * Returns a unique identifier from the VIP application name and version. 
+     * @param applicationName
+     * @param applicationVersion
+     * @return 
+     */
+    public static String getPipelineIdentifier(String applicationName, String applicationVersion) {
+        return applicationName + "/" + applicationVersion;
+    }
+    
+    /**
+     * Returns the Carmin type from Gwendia type
+     * @param vipType
+     * @return 
+     */
+    public static ParameterType getCarminType(String vipType){
+        return vipType.equals("URI") ? ParameterType.File : ParameterType.String;
+    }
+    
+    // private methods
+    
+    private void checkIfValidIdentifier(String identifier) throws ApiException {
+        if (!identifier.contains("/")) {
+            throw new ApiException("Invalid pipeline identifier: " + identifier);
+        }
+    }
+
+    private String getApplicationName(String identifier) {
+        return identifier.substring(0, identifier.lastIndexOf("/"));
+    }
+
+    private String getApplicationVersion(String identifier) {
+        return identifier.substring(identifier.lastIndexOf("/")+1);
+    }
+
+    private Pipeline getPipelineWithPermissions(String applicationName, String applicationVersion) throws ApiException {
+        PairOfPipelineAndBooleanLists popabl = listPipelines("");
+        for (Pipeline p : popabl.pipelines) {
+            if (p.getName().equals(applicationName) && p.getVersion().equals(applicationVersion)) {
+                return p;
+            }
+        }
+        throw new ApiException("Pipeline '" + applicationName + "' (version '"+applicationVersion+"') doesn't exist or user '" + getUser().getEmail() + "' cannot access it");
     }
 }

@@ -7,6 +7,7 @@ package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.server.auth.AbstractAuthenticationService;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import java.io.UnsupportedEncodingException;
@@ -23,6 +24,7 @@ import org.apache.log4j.Logger;
 public class AuthenticatedApiBusiness extends ApiBusiness {
 
     private final static Logger logger = Logger.getLogger(AuthenticatedApiBusiness.class);
+    private final String authFailedMessage = "API user is not logged in.";
 
     private User user;
         
@@ -41,15 +43,18 @@ public class AuthenticatedApiBusiness extends ApiBusiness {
             ConfigurationBusiness configurationBusiness = new ConfigurationBusiness();
             HttpServletRequest request = getRequest(); 
             String email = getCookieValue(request, CoreConstants.COOKIES_USER);
-            email = URLDecoder.decode(email, "UTF-8");
             String sessionId = getCookieValue(getRequest(), CoreConstants.COOKIES_SESSION);
+            if(email == null || sessionId == null)
+                throw new ApiException(this.authFailedMessage);
+            email = URLDecoder.decode(email, "UTF-8");
             if (configurationBusiness.validateSession(email, sessionId)) {
                 logger.info("API successfully authenticated user "+email);
                 user = configurationBusiness.getUser(email);
+                AbstractAuthenticationService.setVIPSession(getRequest(), getResponse(), user);             
                 configurationBusiness.updateUserLastLogin(email);
                 return user;
             }
-            throw new ApiException("API user is not logged in.");
+            throw new ApiException(authFailedMessage);
         } catch (BusinessException | UnsupportedEncodingException ex) {
             throw new ApiException(ex);
         }
@@ -60,18 +65,13 @@ public class AuthenticatedApiBusiness extends ApiBusiness {
             return null;
         }
         Cookie[] cookies = req.getCookies();
-        if(cookies == null){
-            logger.info("Request has no cookie!");
+        if(cookies == null)
             return null;
-        }
-        logger.info("Request has "+cookies.length+" cookies.");
         for (Cookie c : cookies) {
-            logger.info("Testing cookie "+c.getName());
             if (c.getName().equals(name)) {
                 return c.getValue();
             }
         }
         return null;
     }
-
 }

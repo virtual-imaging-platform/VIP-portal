@@ -241,7 +241,7 @@ public class Carmin {
         try {
             PipelineBusiness pb = new PipelineBusiness(wsContext);
             PairOfPipelineAndBooleanLists pipelinesWithRights = pb.listPipelines(studyIdentifier);
-            r = new Response(0, "OK", pipelinesWithRights);
+            r = new Response(0, "Warning: studyIdentifier is currently ignored.", pipelinesWithRights);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);

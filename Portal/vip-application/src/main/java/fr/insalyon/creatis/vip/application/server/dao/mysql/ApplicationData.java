@@ -286,7 +286,7 @@ public class ApplicationData implements ApplicationDAO {
             throw new DAOException(ex);
         }
     }
-
+    
     /**
      *
      * @param classes
@@ -591,4 +591,5 @@ public class ApplicationData implements ApplicationDAO {
             throw new DAOException(ex);
         }
     }
+
 }
