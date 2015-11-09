@@ -33,15 +33,61 @@ package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.bean.Pipeline;
 import fr.insalyon.creatis.vip.api.bean.pairs.PairOfPipelineAndBooleanLists;
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.ws.WebServiceContext;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author Tristan Glatard
  */
-public class PipelineBusiness {
+public class PipelineBusiness extends AuthenticatedApiBusiness {
 
-    public static Pipeline getPipeline(String pipelineId) throws ApiException { throw new ApiException("Not implemented yet");}
+    private final static Logger logger = Logger.getLogger(PipelineBusiness.class);
 
-    public static PairOfPipelineAndBooleanLists listPipelines(String studyIdentifier) throws ApiException { throw new ApiException("Not implemented yet");}   
+    
+    public PipelineBusiness(WebServiceContext wsContext) throws ApiException {
+        super(wsContext);
+    }
+        
+    public Pipeline getPipeline(String pipelineId) throws ApiException {
+        throw new ApiException("Not implemented yet");
+    }
 
+    public PairOfPipelineAndBooleanLists listPipelines(String studyIdentifier) throws ApiException {
+
+        try {
+
+            logger.info("Calling API method listPipelines");
+            ApplicationBusiness ab = new ApplicationBusiness();
+            PairOfPipelineAndBooleanLists response = new PairOfPipelineAndBooleanLists();
+            
+            ClassBusiness classBusiness = new ClassBusiness();
+            List<AppClass> classes = classBusiness.getUserClasses(getUser().getEmail(), false);
+            List<String> classNames = new ArrayList<>();
+            for(AppClass c : classes)
+                classNames.add(c.getName());
+
+            List<Application> applications = ab.getApplications(classNames);            
+            for (Application a : applications) {
+                List<AppVersion> versions = ab.getVersions(a.getName());
+                for (AppVersion av : versions) {
+                    Pipeline p = new Pipeline(a.getName()+"/"+av.getVersion(), a.getName(), av.getVersion());
+                    response.getPipelines().add(p);
+                    response.getCanExecute().add(new Boolean(true));
+                }
+            }
+            return response;
+        } catch (BusinessException ex) {
+            logger.error(ex);
+            throw new ApiException(ex);
+        }
+    }
 }

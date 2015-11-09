@@ -53,4 +53,17 @@ public class PipelineParameter {
     private ParameterTypedValue defaultValue;
     @XmlElement(name = "description")
     private String description;
+
+    public PipelineParameter(){}
+    
+    public PipelineParameter(String name, ParameterType type, Boolean isOptional, Boolean isReturnedValue, ParameterTypedValue defaultValue, String description) {
+        this.name = name;
+        this.type = type;
+        this.isOptional = isOptional;
+        this.isReturnedValue = isReturnedValue;
+        this.defaultValue = defaultValue;
+        this.description = description;
+    }
+    
+    
 }

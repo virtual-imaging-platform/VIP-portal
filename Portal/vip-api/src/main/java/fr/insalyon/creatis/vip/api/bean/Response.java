@@ -51,13 +51,13 @@ public class Response {
     @XmlElement(name = "errorMessage")
     String errorMessage;
     @XmlElements(value = { 
-        @XmlElement(name = "returnedValue", type=Pipeline.class),
-        @XmlElement(name = "returnedValue", type=Execution.class),
-        @XmlElement(name = "returnedValue", type=GlobalProperties.class),
-        @XmlElement(name = "returnedValue", type=String.class),
-        @XmlElement(name = "returnedValue", type=Execution.ExecutionStatus.class),
-        @XmlElement(name = "returnedValue", type=PipelineKeyBooleanValuePair.class),
-        @XmlElement(name = "returnedValue", type=PairOfPipelineAndBooleanLists.class),
+        @XmlElement(name = "returnedValuePipeline", type=Pipeline.class),
+        @XmlElement(name = "returnedValueExecution", type=Execution.class),
+        @XmlElement(name = "returnedValueGlobalProp", type=GlobalProperties.class),
+        @XmlElement(name = "returnedValueStr", type=String.class),
+        @XmlElement(name = "returnedValueStatus", type=Execution.ExecutionStatus.class),
+        @XmlElement(name = "returnedValuePairKey", type=PipelineKeyBooleanValuePair.class),
+        @XmlElement(name = "returnedValuePairPipeline", type=PairOfPipelineAndBooleanLists.class),
     } )         
     java.lang.Object returnedValue; // java.lang.Object so that Strings can be returned to
 

@@ -47,15 +47,48 @@ public class Pipeline extends Object {
     private String identifier;
     @XmlElement(name = "name", required=true)
     private String name;
-    @XmlElement(name = "description", required = true)
+    @XmlElement(name = "description")
     private String description;
-    @XmlElement(name = "version", required = true)
+    @XmlElement(name = "version")
     private String version;
-    @XmlElement(name = "parameters", required = true)
+    @XmlElement(name = "parameters")
     ArrayList<PipelineParameter> parameters;
     @XmlElement(name = "errorCodesAndMessages")
     private ArrayList<IntKeyStringValuePair> errorCodesAndMessages;
 
     public Pipeline() {
     }
+    
+     public Pipeline(String identifier, String name, String version) {
+        this.identifier = identifier;
+        this.name = name;       
+        this.version = version;
+        parameters = new ArrayList<>();
+        errorCodesAndMessages = new ArrayList<>();
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public ArrayList<PipelineParameter> getParameters() {
+        return parameters;
+    }
+
+    public ArrayList<IntKeyStringValuePair> getErrorCodesAndMessages() {
+        return errorCodesAndMessages;
+    }
+    
 }

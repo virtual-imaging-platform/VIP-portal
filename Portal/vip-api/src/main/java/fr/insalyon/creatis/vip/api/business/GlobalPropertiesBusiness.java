@@ -32,13 +32,18 @@
 package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.bean.GlobalProperties;
+import javax.xml.ws.WebServiceContext;
 
 /**
  *
  * @author Tristan Glatard
  */
-public class GlobalPropertiesBusiness {
+public class GlobalPropertiesBusiness extends AuthenticatedApiBusiness {
 
-    public static GlobalProperties getGlobalProperties() throws ApiException { throw new ApiException("Not implemented yet");}
+    public GlobalPropertiesBusiness(WebServiceContext wsContext) throws ApiException {
+        super(wsContext);
+    }
+
+    public GlobalProperties getGlobalProperties() throws ApiException { throw new ApiException("Not implemented yet");}
 
 }

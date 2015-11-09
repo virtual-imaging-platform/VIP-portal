@@ -39,7 +39,6 @@ import fr.insalyon.creatis.vip.api.bean.pairs.StringKeyParameterValuePair;
 import fr.insalyon.creatis.vip.api.bean.pairs.StringKeyValuePair;
 import fr.insalyon.creatis.vip.api.bean.Response;
 import fr.insalyon.creatis.vip.api.bean.pairs.PairOfPipelineAndBooleanLists;
-import fr.insalyon.creatis.vip.api.bean.pairs.PipelineKeyBooleanValuePair;
 import fr.insalyon.creatis.vip.api.business.ApiException;
 import fr.insalyon.creatis.vip.api.business.AuthenticationBusiness;
 import fr.insalyon.creatis.vip.api.business.ExecutionBusiness;
@@ -47,30 +46,30 @@ import fr.insalyon.creatis.vip.api.business.GlobalPropertiesBusiness;
 import fr.insalyon.creatis.vip.api.business.PipelineBusiness;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Resource;
 import javax.jws.WebService;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
-import javax.jws.WebResult;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 import javax.xml.ws.WebServiceContext;
 
 /**
  *
  * @author Tristan Glatard
  */
-@WebService(serviceName = "PAF", targetNamespace="http://france-life-imaging.fr/api")
-public class PAF {
+@WebService(serviceName = "api", targetNamespace = "http://france-life-imaging.fr/api")
+public class Carmin {
+
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Carmin.class);
 
     @Resource
     private WebServiceContext wsContext;
 
+
     /**
      * Execution
-     * @return 
+     *
+     * @return
      */
     @WebMethod(operationName = "getExecution")
     public @XmlElement(required = true)
@@ -78,10 +77,11 @@ public class PAF {
             @XmlElement(required = true) @WebParam(name = "executionId") String executionId) {
         Response r = null;
         try {
-            Execution e = ExecutionBusiness.getExecution(executionId);
+            ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            Execution e = eb.getExecution(executionId);
             r = new Response(0, "OK", e);
         } catch (ApiException ex) {
-            Logger.getLogger(PAF.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         } finally {
             return r;
@@ -95,10 +95,11 @@ public class PAF {
             @XmlElement(required = true) @WebParam(name = "keyValuePairs") ArrayList<StringKeyValuePair> keyValuePairs) {
         Response r = null;
         try {
-            ExecutionBusiness.updateExecution(executionId, keyValuePairs);
+            ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            eb.updateExecution(executionId, keyValuePairs);
             r = new Response(0, "OK", null);
         } catch (ApiException ex) {
-            Logger.getLogger(PAF.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         } finally {
             return r;
@@ -116,10 +117,11 @@ public class PAF {
             @WebParam(name = "playExecution") Boolean playExecution) {
         Response r = null;
         try {
-            String id = ExecutionBusiness.initExecution(pipelineId, inputValues, timeout, executionName, studyId, playExecution);
+            ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            String id = eb.initExecution(pipelineId, inputValues, timeout, executionName, studyId, playExecution);
             r = new Response(0, "OK", id);
         } catch (ApiException ex) {
-            Logger.getLogger(PAF.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         } finally {
             return r;
@@ -131,10 +133,11 @@ public class PAF {
     Response playExecution(@XmlElement(required = true) @WebParam(name = "executionId") String executionId) {
         Response r = null;
         try {
-            ExecutionStatus s = ExecutionBusiness.playExecution(executionId);
+            ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            ExecutionStatus s = eb.playExecution(executionId);
             r = new Response(0, "OK", s);
         } catch (ApiException ex) {
-            Logger.getLogger(PAF.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         } finally {
             return r;
@@ -146,10 +149,11 @@ public class PAF {
     Response killExecution(@XmlElement(required = true) @WebParam(name = "executionId") String executionId) {
         Response r = null;
         try {
-            ExecutionBusiness.killExecution(executionId);
+            ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            eb.killExecution(executionId);
             r = new Response(0, "OK", null);
         } catch (ApiException ex) {
-            Logger.getLogger(PAF.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         } finally {
             return r;
@@ -163,10 +167,11 @@ public class PAF {
             @XmlElement(required = true) @WebParam(name = "deleteFiles") Boolean deleteFiles) {
         Response r = null;
         try {
-            ExecutionBusiness.deleteExecution(executionId, deleteFiles);
+            ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            eb.deleteExecution(executionId, deleteFiles);
             r = new Response(0, "OK", null);
         } catch (ApiException ex) {
-            Logger.getLogger(PAF.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         } finally {
             return r;
@@ -180,16 +185,17 @@ public class PAF {
             @WebParam(name = "protocol") String protocol) {
         Response r = null;
         try {
-            ArrayList<URL> results = ExecutionBusiness.getExecutionResults(executionId, protocol);
+            ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            ArrayList<URL> results = eb.getExecutionResults(executionId, protocol);
             r = new Response(0, "OK", results);
         } catch (ApiException ex) {
-            Logger.getLogger(PAF.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         } finally {
             return r;
         }
     }
-    
+
     /**
      * Global Properties
      */
@@ -198,16 +204,17 @@ public class PAF {
     Response getGlobalProperties() {
         Response r = null;
         try {
-            GlobalProperties gp = GlobalPropertiesBusiness.getGlobalProperties();
+            GlobalPropertiesBusiness bpb = new GlobalPropertiesBusiness(wsContext);
+            GlobalProperties gp = bpb.getGlobalProperties();
             r = new Response(0, "OK", gp);
         } catch (ApiException ex) {
-            Logger.getLogger(PAF.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         } finally {
             return r;
         }
     }
-    
+
     /**
      * Pipeline
      */
@@ -216,31 +223,33 @@ public class PAF {
     Response getPipeline(@XmlElement(required = true) @WebParam(name = "pipelineId") String pipelineId) {
         Response r = null;
         try {
-            Pipeline p = PipelineBusiness.getPipeline(pipelineId);
+            PipelineBusiness pb = new PipelineBusiness(wsContext);
+            Pipeline p = pb.getPipeline(pipelineId);
             r = new Response(0, "OK", p);
         } catch (ApiException ex) {
-            Logger.getLogger(PAF.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         } finally {
             return r;
         }
     }
-    
+
     @WebMethod(operationName = "listPipelines")
     public @XmlElement(required = true)
     Response listPipelines(@WebParam(name = "studyIdentifier") String studyIdentifier) {
         Response r = null;
         try {
-            PairOfPipelineAndBooleanLists pipelinesWithRights  = PipelineBusiness.listPipelines(studyIdentifier);
+            PipelineBusiness pb = new PipelineBusiness(wsContext);
+            PairOfPipelineAndBooleanLists pipelinesWithRights = pb.listPipelines(studyIdentifier);
             r = new Response(0, "OK", pipelinesWithRights);
         } catch (ApiException ex) {
-            Logger.getLogger(PAF.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         } finally {
             return r;
         }
     }
-    
+
     /**
      * Authentication
      */
@@ -249,40 +258,43 @@ public class PAF {
     Response authenticateSession(@XmlElement(required = true) @WebParam(name = "userName") String userName, @XmlElement(required = true) @WebParam(name = "password") String password) {
         Response r = null;
         try {
-            AuthenticationBusiness.authenticateSession(userName, password);
+            AuthenticationBusiness ab = new AuthenticationBusiness(wsContext);
+            ab.authenticateSession(userName, password);
             r = new Response(0, "OK", null);
         } catch (ApiException ex) {
-            Logger.getLogger(PAF.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         } finally {
             return r;
         }
     }
-    
+
     @WebMethod(operationName = "authenticateHTTP")
     public @XmlElement(required = true)
     Response authenticateHTTP(@XmlElement(required = true) @WebParam(name = "userName") String userName) {
         Response r = null;
         try {
-            AuthenticationBusiness.authenticateHTTP(userName);
+            AuthenticationBusiness ab = new AuthenticationBusiness(wsContext);
+            ab.authenticateHTTP(userName);
             r = new Response(0, "OK", null);
         } catch (ApiException ex) {
-            Logger.getLogger(PAF.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         } finally {
             return r;
         }
     }
-    
+
     @WebMethod(operationName = "logout")
     public @XmlElement(required = true)
     Response logout() {
         Response r = null;
         try {
-            AuthenticationBusiness.logout();
+            AuthenticationBusiness ab = new AuthenticationBusiness(wsContext);
+            ab.logout();
             r = new Response(0, "OK", null);
         } catch (ApiException ex) {
-            Logger.getLogger(PAF.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         } finally {
             return r;

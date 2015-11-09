@@ -37,19 +37,24 @@ import fr.insalyon.creatis.vip.api.bean.pairs.StringKeyParameterValuePair;
 import fr.insalyon.creatis.vip.api.bean.pairs.StringKeyValuePair;
 import java.net.URL;
 import java.util.ArrayList;
+import javax.xml.ws.WebServiceContext;
 
 /**
  *
  * @author Tristan Glatard
  */
-public class ExecutionBusiness {
+public class ExecutionBusiness extends AuthenticatedApiBusiness {
     
-    public static Execution getExecution(String executionId) throws ApiException { throw new ApiException("Not implemented yet");}
-    public static void updateExecution(String executionId, ArrayList<StringKeyValuePair> values) throws ApiException { throw new ApiException("Not implemented yet");};
-    public static String initExecution(String pipelineId, ArrayList<StringKeyParameterValuePair> inputValues, Integer timeoutInSeconds, String executionName, String studyId, Boolean playExecution) throws ApiException { throw new ApiException("Not implemented yet");};;
-    public static ExecutionStatus playExecution ( String executionId )throws ApiException { throw new ApiException("Not implemented yet");};
-    public static void killExecution ( String executionId ) throws ApiException { throw new ApiException("Not implemented yet");};
-    public static void deleteExecution ( String executionId, Boolean deleteFiles ) throws ApiException { throw new ApiException("Not implemented yet");};
-    public static ArrayList<URL> getExecutionResults ( String executionId, String protocol ) throws ApiException { throw new ApiException("Not implemented yet");};
+    public ExecutionBusiness(WebServiceContext wsContext) throws ApiException {
+        super(wsContext);
+    }
+    
+    public Execution getExecution(String executionId) throws ApiException { throw new ApiException("Not implemented yet");}
+    public void updateExecution(String executionId, ArrayList<StringKeyValuePair> values) throws ApiException { throw new ApiException("Not implemented yet");};
+    public String initExecution(String pipelineId, ArrayList<StringKeyParameterValuePair> inputValues, Integer timeoutInSeconds, String executionName, String studyId, Boolean playExecution) throws ApiException { throw new ApiException("Not implemented yet");};;
+    public ExecutionStatus playExecution ( String executionId )throws ApiException { throw new ApiException("Not implemented yet");};
+    public void killExecution ( String executionId ) throws ApiException { throw new ApiException("Not implemented yet");};
+    public void deleteExecution ( String executionId, Boolean deleteFiles ) throws ApiException { throw new ApiException("Not implemented yet");};
+    public ArrayList<URL> getExecutionResults ( String executionId, String protocol ) throws ApiException { throw new ApiException("Not implemented yet");};
     
 }
