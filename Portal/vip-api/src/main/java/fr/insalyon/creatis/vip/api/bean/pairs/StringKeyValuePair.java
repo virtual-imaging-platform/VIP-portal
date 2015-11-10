@@ -44,12 +44,14 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "StringKeyValuePair")
 public class StringKeyValuePair {
     @XmlElement(name = "name", required = true)
-    public String key;   
+    private String name;   
     @XmlElements(value = { 
         @XmlElement(name = "value", type=String.class, required=true),
         @XmlElement(name = "value", type=int.class, required=true),
         @XmlElement(name = "value", type=Execution.ExecutionStatus.class, required=true),
         @XmlElement(name = "value", type=ParameterTypedValue.class, required=true)
     } )
-    public java.lang.Object value;
+    private java.lang.Object value;
+    public String getName(){ return name; } ;
+    public java.lang.Object getValue(){ return value; }
 }

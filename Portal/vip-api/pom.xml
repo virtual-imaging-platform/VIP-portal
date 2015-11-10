@@ -107,6 +107,12 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-datamanager</artifactId>
+            <version>${vip.datamanager.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
             <version>1.18.1</version>

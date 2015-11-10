@@ -47,7 +47,7 @@ public class AuthenticationBusiness extends ApiBusiness {
      private final static Logger logger = Logger.getLogger(AuthenticationBusiness.class);
     
     public AuthenticationBusiness(WebServiceContext wsContext) throws ApiException {
-        super(wsContext);
+        super(wsContext,false);
     }
     
     public void authenticateSession(String userName, String password) throws ApiException {
@@ -68,11 +68,18 @@ public class AuthenticationBusiness extends ApiBusiness {
     }
 
     public void authenticateHTTP(String userName) throws ApiException {
-        throw new ApiException("Not implemented yet");
+        throw new ApiException("Not supported."); // will *not* be supported soon. This doesn't violate the API specification.
     }
 
     public void logout() throws ApiException {
-        throw new ApiException("Not implemented yet");
+         try {
+             ConfigurationBusiness cb = new ConfigurationBusiness();
+             authenticateSession(); // not done in constructor for obvious reasons but needed here,
+                                    // otherwise getUser() is null and we don't know which user should be logged out.
+             cb.signout(getUser().getEmail());
+         } catch (BusinessException ex) {
+             throw new ApiException(ex);
+         }
     }
 
 }

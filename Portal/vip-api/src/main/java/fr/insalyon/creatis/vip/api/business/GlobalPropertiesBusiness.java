@@ -32,18 +32,35 @@
 package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.bean.GlobalProperties;
+import fr.insalyon.creatis.vip.api.bean.Module;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import javax.xml.ws.WebServiceContext;
 
 /**
  *
  * @author Tristan Glatard
  */
-public class GlobalPropertiesBusiness extends AuthenticatedApiBusiness {
+public class GlobalPropertiesBusiness extends ApiBusiness {
 
     public GlobalPropertiesBusiness(WebServiceContext wsContext) throws ApiException {
-        super(wsContext);
+        super(wsContext,false);
     }
 
-    public GlobalProperties getGlobalProperties() throws ApiException { throw new ApiException("Not implemented yet");}
+    public GlobalProperties getGlobalProperties() throws ApiException {
+        GlobalProperties gp = new GlobalProperties(
+                CoreConstants.LAB_ADMIN_EMAIL, // email
+                "Virtual Imaging Platform",    // description
+                0, // min, max, and default timeout
+                0,
+                0,
+                true, // is kill supported?
+                null, // default study
+                "0.1" // api version
+        );
+        gp.getSupportedTransferProtocols().add("http");
+        gp.getSupportedTransferProtocols().add("https");
+        gp.getSupportedModules().add(Module.Processing);
+        return gp;
+    }
 
 }

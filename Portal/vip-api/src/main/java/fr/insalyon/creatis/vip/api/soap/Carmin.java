@@ -46,6 +46,7 @@ import fr.insalyon.creatis.vip.api.business.GlobalPropertiesBusiness;
 import fr.insalyon.creatis.vip.api.business.PipelineBusiness;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Resource;
 import javax.jws.WebService;
 import javax.jws.WebMethod;
@@ -186,7 +187,7 @@ public class Carmin {
         Response r = null;
         try {
             ExecutionBusiness eb = new ExecutionBusiness(wsContext);
-            ArrayList<URL> results = eb.getExecutionResults(executionId, protocol);
+            List<URL> results = eb.getExecutionResults(executionId, protocol);
             r = new Response(0, "OK", results);
         } catch (ApiException ex) {
             logger.error(ex);

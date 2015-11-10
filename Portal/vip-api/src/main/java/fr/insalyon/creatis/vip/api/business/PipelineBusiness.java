@@ -54,12 +54,12 @@ import org.apache.log4j.Logger;
  *
  * @author Tristan Glatard
  */
-public class PipelineBusiness extends AuthenticatedApiBusiness {
+public class PipelineBusiness extends ApiBusiness {
 
     private final static Logger logger = Logger.getLogger(PipelineBusiness.class);
 
     public PipelineBusiness(WebServiceContext wsContext) throws ApiException {
-        super(wsContext);
+        super(wsContext,true);
     }
 
     public Pipeline getPipeline(String pipelineId) throws ApiException {
@@ -112,7 +112,7 @@ public class PipelineBusiness extends AuthenticatedApiBusiness {
                 for (AppVersion av : versions) {
                     Pipeline p = new Pipeline(getPipelineIdentifier(a.getName(), av.getVersion()), a.getName(), av.getVersion());
                     response.getPipelines().add(p);
-                    response.getCanExecute().add(new Boolean(true));
+                    response.getCanExecute().add(true);
                 }
             }
             return response;
@@ -143,20 +143,20 @@ public class PipelineBusiness extends AuthenticatedApiBusiness {
         return vipType.equals("URI") ? ParameterType.File : ParameterType.String;
     }
     
+    public static String getApplicationName(String identifier) {
+        return identifier.substring(0, identifier.lastIndexOf("/"));
+    }
+
+    public static String getApplicationVersion(String identifier) {
+        return identifier.substring(identifier.lastIndexOf("/")+1);
+    }
+    
     // private methods
     
     private void checkIfValidIdentifier(String identifier) throws ApiException {
         if (!identifier.contains("/")) {
             throw new ApiException("Invalid pipeline identifier: " + identifier);
         }
-    }
-
-    private String getApplicationName(String identifier) {
-        return identifier.substring(0, identifier.lastIndexOf("/"));
-    }
-
-    private String getApplicationVersion(String identifier) {
-        return identifier.substring(identifier.lastIndexOf("/")+1);
     }
 
     private Pipeline getPipelineWithPermissions(String applicationName, String applicationVersion) throws ApiException {

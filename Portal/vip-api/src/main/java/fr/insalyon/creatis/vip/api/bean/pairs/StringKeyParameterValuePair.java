@@ -43,15 +43,23 @@ import javax.xml.bind.annotation.XmlType;
 public class StringKeyParameterValuePair {
 
     @XmlElement(name = "name", required = true)
-    public String key;
+    private String name;
     @XmlElement(name = "value", required = true)
-    public ParameterTypedValue value;
+    private ParameterTypedValue value;
 
     public StringKeyParameterValuePair(){}
     
-    public StringKeyParameterValuePair(String key, ParameterTypedValue value) {
-        this.key = key;
+    public StringKeyParameterValuePair(String name, ParameterTypedValue value) {
+        this.name = name;
         this.value = value;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public ParameterTypedValue getValue() {
+        return value;
     }
 
 }

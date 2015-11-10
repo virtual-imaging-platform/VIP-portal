@@ -51,6 +51,7 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Activity;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.progress.ProcessorStatus;
@@ -369,17 +370,20 @@ public class WorkflowBusiness {
      *
      * @param simulationID
      * @param email
+     * @param deleteFiles
      * @throws BusinessException
      */
-    public void clean(String simulationID, String email) throws BusinessException {
+    public void clean(String simulationID, String email, boolean deleteFiles) throws BusinessException {
 
         try {
             Workflow workflow = workflowDAO.get(simulationID);
             workflow.setStatus(WorkflowStatus.Cleaned);
             workflowDAO.update(workflow);
-            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
-            for (Output output : outputDAO.get(simulationID)) {
-                client.delete(output.getOutputID().getPath(), email);
+            if(deleteFiles){
+                GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
+                for (Output output : outputDAO.get(simulationID)) {
+                    client.delete(output.getOutputID().getPath(), email);
+                }
             }
             inputDAO.removeById(simulationID);
             outputDAO.removeById(simulationID);
@@ -391,6 +395,16 @@ public class WorkflowBusiness {
             logger.error(ex);
             throw new BusinessException(ex);
         }
+    }
+    
+    /**
+     *
+     * @param simulationId
+     * @param email
+     * @throws BusinessException
+     */
+    public void clean(String simulationId, String email) throws BusinessException{
+        clean(simulationId,email,true);
     }
 
     /**

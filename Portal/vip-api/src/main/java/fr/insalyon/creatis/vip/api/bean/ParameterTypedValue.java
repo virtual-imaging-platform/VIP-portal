@@ -56,4 +56,13 @@ public class ParameterTypedValue {
         this.type = type;
         this.value = value;
     }
+
+    public ParameterType getType() {
+        return type;
+    }
+
+    public String getValue() {
+        return value;
+    }
+    
 }
