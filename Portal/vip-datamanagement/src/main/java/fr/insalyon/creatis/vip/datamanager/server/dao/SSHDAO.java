@@ -40,12 +40,15 @@ import java.util.List;
  * @author glatard
  */
 public interface SSHDAO {
+
     public List<SSH> getSSHConnections() throws DAOException;
-    
+
     public void addSSH(SSH ssh) throws DAOException;
-    
+
     public void updateSSH(SSH ssh) throws DAOException;
-    
+
     public void removeSSH(String email, String name) throws DAOException;
-    
+
+    public void resetSSHConnections(List<List<String>> sshConnections) throws DAOException;
+
 }

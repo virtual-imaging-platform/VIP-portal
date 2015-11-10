@@ -140,7 +140,7 @@ public class PathSelectionWindow extends Window {
         bottomLayout.setPadding(2);
         
         IButton selectButton = new IButton("Select");
-        selectButton.setIcon(CoreConstants.ICON_ACTIVATE);
+        selectButton.setIcon(CoreConstants.ICON_ACTIVE);
         selectButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
 
             public void onClick(ClickEvent event) {
@@ -171,7 +171,7 @@ public class PathSelectionWindow extends Window {
         contextMenu.setWidth(90);
 
         MenuItem selectItem = new MenuItem("Select this path");
-        selectItem.setIcon(CoreConstants.ICON_ACTIVATE);
+        selectItem.setIcon(CoreConstants.ICON_ACTIVE);
         selectItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
