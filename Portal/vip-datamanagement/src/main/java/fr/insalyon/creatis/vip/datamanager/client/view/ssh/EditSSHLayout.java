@@ -104,6 +104,7 @@ public class EditSSHLayout extends AbstractFormLayout {
         transferTypeField.addChangeHandler(new ChangeHandler() {
             public void onChange(ChangeEvent event) {
                 if (event.getValue().equals(TransferType.Synchronization.toString())) {
+                    deleteFilesFromSourceField.setValue(false);
                     deleteFilesFromSourceField.setDisabled(true);
                 } else {
                     deleteFilesFromSourceField.setDisabled(false);
@@ -173,7 +174,7 @@ public class EditSSHLayout extends AbstractFormLayout {
         addButtons(saveButton, removeButton);
     }
 
-    public void setSSH(String email, String name, String user, String host, String port, TransferType transferType, String directory, String status, boolean deleteFilesFromSourceField, boolean activate) {
+    public void setSSH(String email, String name, String user, String host, String port, TransferType transferType, String directory, String status, boolean deleteFilesFromSourceField, boolean active) {
 
         if (name != null & email != null & user != null & host != null & transferType != null & directory != null & status != null & port != null) {
             this.emailField.setValue(email);
@@ -183,11 +184,17 @@ public class EditSSHLayout extends AbstractFormLayout {
             this.userField.setValue(user);
             this.hostField.setValue(host);
             this.portField.setValue(port);
-            this.transferTypeField.setValue(transferType.Synchronization);
+            this.transferTypeField.setValue(transferType);
             this.directoryField.setValue(directory);
             this.statusField.setValue(status);
-            this.deleteFilesFromSourceField.setValue(deleteFilesFromSourceField);
-            this.activateField.setValue(activate);
+            if (transferType.equals(transferType.Synchronization)) {
+                this.deleteFilesFromSourceField.setValue(false);
+                this.deleteFilesFromSourceField.setDisabled(true);
+            } else {
+                this.deleteFilesFromSourceField.setDisabled(false);
+                this.deleteFilesFromSourceField.setValue(deleteFilesFromSourceField);
+            }
+            this.activateField.setValue(active);
             this.newSSH = false;
             this.removeButton.setDisabled(false);
 
@@ -207,6 +214,7 @@ public class EditSSHLayout extends AbstractFormLayout {
             this.directoryField.setValue("");
             this.statusField.setValue("");
             this.deleteFilesFromSourceField.setValue(false);
+            this.deleteFilesFromSourceField.setDisabled(true);
             this.activateField.setValue(true);
             this.newSSH = true;
             this.removeButton.setDisabled(true);
