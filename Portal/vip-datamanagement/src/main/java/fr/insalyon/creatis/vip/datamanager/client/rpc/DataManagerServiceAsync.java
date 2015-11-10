@@ -108,7 +108,7 @@ public interface DataManagerServiceAsync {
 
     public void removeSSH(String email, String name, AsyncCallback<Void> asyncCallback);
 
-    public void resetSSHs(List<List<String>> sshConnections, AsyncCallback<Void> asyncCallback);
+    public void resetSSHConnections(List<List<String>> sshConnections, AsyncCallback<Void> asyncCallback);
 
     public void getSSHPublicKey(AsyncCallback<String> asycCallback);
 }

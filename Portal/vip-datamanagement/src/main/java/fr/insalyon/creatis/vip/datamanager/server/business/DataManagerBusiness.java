@@ -287,7 +287,7 @@ public class DataManagerBusiness {
     public void resetSSHs(List<List<String>> sshConnections) throws BusinessException {
         try {
 
-            SSHDAOFactory.getDAOFactory().getSSHDAO().resetSSHs(sshConnections);
+            SSHDAOFactory.getDAOFactory().getSSHDAO().resetSSHConnections(sshConnections);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

@@ -87,7 +87,7 @@ public class SSHData implements SSHDAO {
                 Timestamp theEarliestNextSynchronistation = rs.getTimestamp("theEarliestNextSynchronistation");
                 long numberSynchronizationFailed = rs.getLong("numberSynchronizationFailed");
                 boolean deleteFilesFromSource = rs.getBoolean("deleteFilesFromSource");
-                boolean activate = rs.getBoolean("activate");
+                boolean active = rs.getBoolean("active");
 
                 String status = "ok";
                 if (auth_failed) {
@@ -97,7 +97,7 @@ public class SSHData implements SSHDAO {
                     status = "waiting for validation";
                 }
 
-                ssh.add(new SSH(email, name, sshUser, sshHost, sshPort, sshTransferType, sshDir, status, theEarliestNextSynchronistation, numberSynchronizationFailed, deleteFilesFromSource, activate));
+                ssh.add(new SSH(email, name, sshUser, sshHost, sshPort, sshTransferType, sshDir, status, theEarliestNextSynchronistation, numberSynchronizationFailed, deleteFilesFromSource, active));
             }
             ps.close();
             return ssh;
@@ -151,7 +151,7 @@ public class SSHData implements SSHDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
                     + "VIPSSHAccounts "
-                    + "SET sshUser=?, sshHost=?, transferType=?, sshDir=?, sshPort=?, deleteFilesFromSource=?, activate=? "
+                    + "SET sshUser=?, sshHost=?, transferType=?, sshDir=?, sshPort=?, deleteFilesFromSource=?, active=? "
                     + "WHERE email=? AND LFCDir=?");
             ps.setString(1, ssh.getUser());
             ps.setString(2, ssh.getHost());
@@ -159,7 +159,7 @@ public class SSHData implements SSHDAO {
             ps.setString(4, ssh.getDirectory());
             ps.setInt(5, ssh.getPort());
             ps.setBoolean(6, ssh.isDeleteFilesFromSource());
-            ps.setBoolean(7, ssh.isActivate());
+            ps.setBoolean(7, ssh.isActive());
             ps.setString(8, ssh.getEmail());
 
             try {
@@ -207,7 +207,7 @@ public class SSHData implements SSHDAO {
     }
 
     @Override
-    public void resetSSHs(List<List<String>> sshConnections) throws DAOException {
+    public void resetSSHConnections(List<List<String>> sshConnections) throws DAOException {
 
         for (List<String> sshC : sshConnections) {
             try {

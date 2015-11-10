@@ -477,7 +477,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public void resetSSHs(List<List<String>> sshConnections) throws DataManagerException {
+    public void resetSSHConnections(List<List<String>> sshConnections) throws DataManagerException {
         try {
             for (List<String> sshC : sshConnections) {
                 trace(logger, "Removing ssh connection " + sshC.get(0) + " ; " + sshC.get(1));

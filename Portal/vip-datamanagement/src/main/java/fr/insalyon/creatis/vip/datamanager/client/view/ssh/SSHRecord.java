@@ -41,14 +41,14 @@ import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
  */
 public class SSHRecord extends ListGridRecord {
 
-    public SSHRecord(String name, String email, String user, String host, int port, TransferType transferType, String directory, String status, String theEarliestNextSynchronistation, long numberSynchronizationFailed, boolean deleteFilesFromSource, boolean activate) {
+    public SSHRecord(String name, String email, String user, String host, int port, TransferType transferType, String directory, String status, String theEarliestNextSynchronistation, long numberSynchronizationFailed, boolean deleteFilesFromSource, boolean active) {
 
-        if (activate) {
-            setAttribute("activateIcon", DataManagerConstants.ICON_ACTIVATE_SSH);
+        if (active) {
+            setAttribute("activeIcon", DataManagerConstants.ICON_ACTIVATE_SSH);
         } else {
-            setAttribute("activateIcon", DataManagerConstants.ICON_DEACTIVATE_SSH);
+            setAttribute("activeIcon", DataManagerConstants.ICON_DEACTIVATE_SSH);
         }
-        setAttribute("activate", activate);
+        setAttribute("active", active);
         setAttribute("name", name);
         setAttribute("email", email);
         setAttribute("user", user);

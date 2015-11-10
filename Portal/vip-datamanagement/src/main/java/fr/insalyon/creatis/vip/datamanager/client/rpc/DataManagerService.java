@@ -121,7 +121,7 @@ public interface DataManagerService extends RemoteService {
 
     public void removeSSH(String email, String name) throws DataManagerException;
 
-    public void resetSSHs(List<List<String>> sshConnections) throws DataManagerException;
+    public void resetSSHConnections(List<List<String>> sshConnections) throws DataManagerException;
 
     public String getSSHPublicKey();
 
