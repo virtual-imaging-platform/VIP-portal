@@ -106,7 +106,7 @@ public class CoreConstants implements IsSerializable {
     public static final String ICON_SEARCH = "icon-search.png";
     public static final String ICON_ACCOUNT = IMG_FOLDER + "icon-account.png";
     public static final String ICON_ACCOUNT_REMOVE = IMG_FOLDER + "icon-account-remove.png";
-    public static final String ICON_ACTIVATE = IMG_FOLDER + "icon-select.png";
+    public static final String ICON_ACTIVE = IMG_FOLDER + "icon-select.png";
     public static final String ICON_ADD = IMG_FOLDER + "icon-add.png";
     public static final String ICON_CLEAR = IMG_FOLDER + "icon-clear.png";
     public static final String ICON_CLOSE = IMG_FOLDER + "icon-close.png";

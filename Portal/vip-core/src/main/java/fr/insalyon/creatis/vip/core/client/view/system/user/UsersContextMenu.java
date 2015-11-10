@@ -64,7 +64,7 @@ public class UsersContextMenu extends Menu {
         this.setWidth(90);
 
         MenuItem activateItem = new MenuItem("Activate");
-        activateItem.setIcon(CoreConstants.ICON_ACTIVATE);
+        activateItem.setIcon(CoreConstants.ICON_ACTIVE);
         activateItem.addClickHandler(new ClickHandler() {
 
             @Override
