@@ -38,14 +38,14 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOFactory;
 import fr.insalyon.creatis.vip.api.bean.Execution;
 import fr.insalyon.creatis.vip.api.bean.Execution.ExecutionStatus;
 import fr.insalyon.creatis.vip.api.bean.ParameterTypedValue;
+import fr.insalyon.creatis.vip.api.bean.Pipeline;
+import fr.insalyon.creatis.vip.api.bean.PipelineParameter;
 import fr.insalyon.creatis.vip.api.bean.pairs.StringKeyParameterValuePair;
 import fr.insalyon.creatis.vip.api.bean.pairs.StringKeyValuePair;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
-import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
 import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
@@ -69,14 +69,18 @@ import javax.xml.ws.WebServiceContext;
  */
 public class ExecutionBusiness extends ApiBusiness {
 
+    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ExecutionBusiness.class);
+
     public ExecutionBusiness(WebServiceContext wsContext) throws ApiException {
-        super(wsContext,true);
+        super(wsContext, true);
+    }
+
+    public ExecutionBusiness(ApiBusiness ab) {
+        super(ab);
     }
 
     public Execution getExecution(String executionId) throws ApiException {
         try {
-            checkIfUserIsOwnerOrAdmin(executionId);
-
             WorkflowBusiness wb = new WorkflowBusiness();
             SimulationBusiness sb = new SimulationBusiness();
 
@@ -95,7 +99,7 @@ public class ExecutionBusiness extends ApiBusiness {
             Execution e = new Execution(
                     s.getID(),
                     s.getSimulationName(),
-                    PipelineBusiness.getPipelineIdentifier(s.getApplicationName(), s.getApplicationVersion()),
+                    ApiUtils.getPipelineIdentifier(s.getApplicationName(), s.getApplicationVersion()),
                     0, // timeout (no timeout set in VIP)
                     VIPtoCarminStatus(s.getStatus()),
                     null, // study identifier (not available in VIP yet)
@@ -108,16 +112,18 @@ public class ExecutionBusiness extends ApiBusiness {
 
             // Inputs
             List<InOutData> inputs = wb.getInputData(executionId, getUser().getFolder());
+            logger.info("Execution has "+inputs.size()+" inputs ");
             for (InOutData iod : inputs) {
-                ParameterTypedValue value = new ParameterTypedValue(PipelineBusiness.getCarminType(iod.getType()), iod.getPath());
+                ParameterTypedValue value = new ParameterTypedValue(ApiUtils.getCarminType(iod.getType()), iod.getPath());
                 StringKeyParameterValuePair skpv = new StringKeyParameterValuePair(iod.getProcessor(), value);
+                logger.info("Adding input "+skpv.toString());
                 e.getInputValues().add(skpv);
             }
 
             // Outputs
             List<InOutData> outputs = wb.getOutputData(executionId, getUser().getFolder());
             for (InOutData iod : outputs) {
-                ParameterTypedValue value = new ParameterTypedValue(PipelineBusiness.getCarminType(iod.getType()), iod.getPath());
+                ParameterTypedValue value = new ParameterTypedValue(ApiUtils.getCarminType(iod.getType()), iod.getPath());
                 StringKeyParameterValuePair skpv = new StringKeyParameterValuePair(iod.getProcessor(), value);
                 e.getReturnedFiles().add(skpv);
             }
@@ -132,14 +138,19 @@ public class ExecutionBusiness extends ApiBusiness {
 
     public void updateExecution(String executionId, ArrayList<StringKeyValuePair> values) throws ApiException {
         try {
-            checkIfUserIsOwnerOrAdmin(executionId);
             WorkflowDAO wd = WorkflowsDBDAOFactory.getInstance().getWorkflowDAO();
             Workflow w = wd.get(executionId);
-            for(StringKeyValuePair skvp : values)
-                if(!skvp.getName().equals("name")) // in the current spec, update can only deal with the timeout (unsupported here) or the name.
-                    throw new ApiException("Update of parameter "+skvp.getName()+" is not supported.");
-                else
+            for (StringKeyValuePair skvp : values) {
+                if (!skvp.getName().equals("name")) // in the current spec, update can only deal with the timeout (unsupported here) or the name.
+                {
+                    throw new ApiException("Update of parameter " + skvp.getName() + " is not supported.");
+                } else {
+                    if(skvp.getValue() == null)
+                        throw new ApiException("Value of parameter "+skvp.getName()+" is empty.");
+                    logger.info("Updating parameter "+skvp.getName()+" with value \""+skvp.getValue().toString()+"\"");
                     w.setDescription(skvp.getValue().toString());
+                }
+            }
             wd.update(w);
         } catch (WorkflowsDBDAOException ex) {
             Logger.getLogger(ExecutionBusiness.class.getName()).log(Level.SEVERE, null, ex);
@@ -153,34 +164,84 @@ public class ExecutionBusiness extends ApiBusiness {
                                 String studyId,
                                 Boolean playExecution) throws ApiException {
         try {
+
             // We cannot easily initialize an execution without starting it.
             // So we will just launch the execution, and launch an error in case playExecution is not true.
-
-            if (!playExecution) {
-                throw new ApiException("Cannot initialize an execution without starting it.");
+            // Set warnings
+            if(studyId != null)
+                getWarnings().add("Study identifier was ignored.");
+            if (timeoutInSeconds != null && timeoutInSeconds != 0) {
+                getWarnings().add("Timeout value (" + timeoutInSeconds.toString() + ") was ignored.");
             }
 
-            checkIfUserCanLaunch(pipelineId);
-
+            // Build input parameter map
             WorkflowBusiness wb = new WorkflowBusiness();
             Map<String, String> pm = new HashMap<>();
             for (StringKeyParameterValuePair skpvp : inputValues) {
+                logger.info("Adding value " + skpvp.getValue().getValue() + " to input " + skpvp.getName());
                 pm.put(skpvp.getName(), skpvp.getValue().getValue());
             }
 
+            // Check that all pipeline inputs are present
+            PipelineBusiness pb = new PipelineBusiness(this);
+            Pipeline p = pb.getPipeline(pipelineId);
+            for (PipelineParameter pp : p.getParameters()) {
+                if (pp.isReturnedValue()) {
+                    continue;
+                }
+                // pp is an input
+                if (!(pm.get(pp.getName()) == null)) {
+                    continue;
+                }
+                // pp is an empty input
+                if (pp.getDefaultValue() != null) {
+                    pm.put(pp.getName(), pp.getDefaultValue().getValue());
+                    continue;
+                }
+                // pp is an empty input with no default value
+                if (pp.isOptional()) {
+                    pm.put("no", pp.getDefaultValue().getValue());//that's how optional values are handled in VIP
+                    continue;
+                }
+                // pp is an empty input with no default value and it is not optional
+                throw new ApiException("Parameter " + pp.getName() + " is empty while it is not optional and it has no default value.");
+            }
+
+            // Get user groups
             ConfigurationBusiness cb = new ConfigurationBusiness();
             List<String> groupNames = new ArrayList<>();
             for (Group g : cb.getUserGroups(getUser().getEmail()).keySet()) {
                 groupNames.add(g.getName());
             }
-            String executionId = wb.launch(
-                    getUser(),
-                    groupNames,
-                    pm,
-                    PipelineBusiness.getApplicationName(pipelineId),
-                    PipelineBusiness.getApplicationVersion(pipelineId),
-                    studyId, // application class
-                    executionName
+
+            // Get application name and version
+            String applicationName = ApiUtils.getApplicationName(pipelineId);
+            String applicationVersion = ApiUtils.getApplicationVersion(pipelineId);
+
+            // Get application classes
+            ApplicationBusiness ab = new ApplicationBusiness();
+            List<String> classes = ab.getApplication(applicationName).getApplicationClasses();
+            if (classes.isEmpty()) {
+                throw new ApiException("Application " + applicationName + " cannot be launched because it doesn't belong to any VIP class.");
+            }
+
+            logger.info("Launching workflow with the following parameters: ");
+            logger.info(getUser());
+            logger.info(groupNames);
+            logger.info(pm);
+            logger.info(applicationName);
+            logger.info(applicationVersion);
+            logger.info(classes.get(0));
+            logger.info(executionName);
+
+            // Launch the workflow
+            String executionId = wb.launch(getUser(),
+                                           groupNames,
+                                           pm,
+                                           applicationName,
+                                           applicationVersion,
+                                           classes.get(0),
+                                           executionName
             );
             return executionId;
         } catch (BusinessException ex) {
@@ -190,10 +251,10 @@ public class ExecutionBusiness extends ApiBusiness {
 
     public ExecutionStatus playExecution(String executionId) throws ApiException {
         try {
-            checkIfUserIsOwnerOrAdmin(executionId);
             // Execution cannot be "played" (i.e. started) because it was already started in initExecution method.
             // So we just return the execution status.
             WorkflowBusiness wb = new WorkflowBusiness();
+            getWarnings().add("In VIP, playExecution only returns the status of the execution.");
             return VIPtoCarminStatus(wb.getSimulation(executionId).getStatus());
         } catch (BusinessException ex) {
             throw new ApiException(ex);
@@ -201,7 +262,6 @@ public class ExecutionBusiness extends ApiBusiness {
     }
 
     public void killExecution(String executionId) throws ApiException {
-        checkIfUserIsOwnerOrAdmin(executionId);
         WorkflowBusiness wb = new WorkflowBusiness();
         try {
             wb.kill(executionId);
@@ -211,7 +271,7 @@ public class ExecutionBusiness extends ApiBusiness {
     }
 
     public void deleteExecution(String executionId, Boolean deleteFiles) throws ApiException {
-        checkIfUserIsOwnerOrAdmin(executionId);
+        checkIfUserCanAccessExecution(executionId);
         WorkflowBusiness wb = new WorkflowBusiness();
         try {
             Simulation s = wb.getSimulation(executionId);
@@ -224,25 +284,26 @@ public class ExecutionBusiness extends ApiBusiness {
         } catch (BusinessException ex) {
             throw new ApiException(ex);
         }
-
     }
 
     ;
     public List<URL> getExecutionResults(String executionId, String protocol) throws ApiException {
         try {
-            if(!protocol.equals("https") && !protocol.equals("http"))
-                throw new ApiException("Unsupported protocol: "+protocol);
-            
-            checkIfUserIsOwnerOrAdmin(executionId);
-            
+            ApiUtils.throwIfNull(executionId, "Execution id");
+            ApiUtils.throwIfNull(protocol, "Protocol");
+
+            if (!protocol.equals("https") && !protocol.equals("http")) {
+                throw new ApiException("Unsupported protocol: " + protocol);
+            }
+
             List<URL> urls = new ArrayList<>();
-            
+
             TransferPoolBusiness tpb = new TransferPoolBusiness();
             WorkflowBusiness wb = new WorkflowBusiness();
             List<InOutData> outputs = wb.getOutputData(executionId, getUser().getFolder());
-            for(InOutData output : outputs){
+            for (InOutData output : outputs) {
                 String operationId = tpb.downloadFile(getUser(), output.getPath());
-                String url = getRequest().getRequestURI() + "../filedownloadservice?operationid="+operationId; // assuming that the api is deployed at /api
+                String url = getRequest().getRequestURI() + "../filedownloadservice?operationid=" + operationId; // assuming that the api is deployed at /api
                 urls.add(new URL(url));
             }
             return urls;
@@ -250,9 +311,8 @@ public class ExecutionBusiness extends ApiBusiness {
             throw new ApiException(ex);
         }
     }
-    
+
     // static methods
-    
     public static ExecutionStatus VIPtoCarminStatus(SimulationStatus s) {
 
         switch (s) {
@@ -273,9 +333,7 @@ public class ExecutionBusiness extends ApiBusiness {
         }
     }
 
-    // private methods
-    
-    private void checkIfUserIsOwnerOrAdmin(String executionId) throws ApiException {
+    public void checkIfUserCanAccessExecution(String executionId) throws ApiException {
         try {
             User user = getUser();
             if (user.isSystemAdministrator()) {
@@ -291,26 +349,6 @@ public class ExecutionBusiness extends ApiBusiness {
             throw new ApiException(ex);
         }
 
-    }
-
-    private void checkIfUserCanLaunch(String pipelineId) throws ApiException {
-        try {
-            ClassBusiness cb = new ClassBusiness();
-            ApplicationBusiness ab = new ApplicationBusiness();
-            
-            String applicationName = PipelineBusiness.getApplicationName(pipelineId);
-            List<String> userClassNames = cb.getUserClassesName(getUser().getEmail(), false);
-            
-            Application a = ab.getApplication(applicationName);
-            for (String applicationClassName : a.getApplicationClasses()) {
-                if (userClassNames.contains(applicationClassName)) {
-                    return;
-                }
-            }
-            throw new ApiException("User " + getUser().getEmail() + " not allowed to launch application " + a.getName());
-        } catch (BusinessException ex) {
-            throw new ApiException(ex);
-        }
     }
 
 }

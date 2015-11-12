@@ -40,6 +40,7 @@ import fr.insalyon.creatis.vip.api.bean.pairs.StringKeyValuePair;
 import fr.insalyon.creatis.vip.api.bean.Response;
 import fr.insalyon.creatis.vip.api.bean.pairs.PairOfPipelineAndBooleanLists;
 import fr.insalyon.creatis.vip.api.business.ApiException;
+import fr.insalyon.creatis.vip.api.business.ApiUtils;
 import fr.insalyon.creatis.vip.api.business.AuthenticationBusiness;
 import fr.insalyon.creatis.vip.api.business.ExecutionBusiness;
 import fr.insalyon.creatis.vip.api.business.GlobalPropertiesBusiness;
@@ -66,27 +67,29 @@ public class Carmin {
     @Resource
     private WebServiceContext wsContext;
 
-
     /**
      * Execution
      *
+     * @param executionId
      * @return
      */
     @WebMethod(operationName = "getExecution")
     public @XmlElement(required = true)
     Response getExecution(
             @XmlElement(required = true) @WebParam(name = "executionId") String executionId) {
-        Response r = null;
+        Response r;
         try {
+            ApiUtils.methodInvocationLog("getExecution", executionId);
+            ApiUtils.throwIfNull(executionId, "Execution id");
             ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            eb.checkIfUserCanAccessExecution(executionId);
             Execution e = eb.getExecution(executionId);
-            r = new Response(0, "OK", e);
+            r = new Response(0, ApiUtils.getMessage(eb), e);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
-        } finally {
-            return r;
-        }
+        } 
+        return r;
     }
 
     @WebMethod(operationName = "updateExecution")
@@ -94,71 +97,87 @@ public class Carmin {
     Response updateExecution(
             @XmlElement(required = true) @WebParam(name = "executionId") String executionId,
             @XmlElement(required = true) @WebParam(name = "keyValuePairs") ArrayList<StringKeyValuePair> keyValuePairs) {
-        Response r = null;
+        Response r;
         try {
+            ApiUtils.methodInvocationLog("updateExecution", executionId, keyValuePairs);
+            ApiUtils.throwIfNull(executionId, "Execution id"); 
+            ApiUtils.throwIfNull(keyValuePairs, "Values");
             ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            eb.checkIfUserCanAccessExecution(executionId);
             eb.updateExecution(executionId, keyValuePairs);
-            r = new Response(0, "OK", null);
+            r = new Response(0, ApiUtils.getMessage(eb), null);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
-        } finally {
-            return r;
-        }
+        } 
+        return r;
     }
 
     @WebMethod(operationName = "initExecution")
     public @XmlElement(required = true)
     Response initExecution(
             @XmlElement(required = true) @WebParam(name = "pipelineId") String pipelineId,
-            @XmlElement(required = true) @WebParam(name = "inputValues") ArrayList<StringKeyParameterValuePair> inputValues,
+            @XmlElement(required = true) @WebParam(name = "inputValue") ArrayList<StringKeyParameterValuePair> inputValues,
             @WebParam(name = "timeout") Integer timeout,
             @WebParam(name = "executionName") String executionName,
             @WebParam(name = "studyId") String studyId,
             @WebParam(name = "playExecution") Boolean playExecution) {
-        Response r = null;
+        Response r;
         try {
-            ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            ApiUtils.methodInvocationLog("initExecution", pipelineId, inputValues, timeout, executionName, studyId, playExecution);
+            ApiUtils.throwIfNull(pipelineId, "Pipeline id");
+            ApiUtils.throwIfNull(inputValues, "Input values");
+            if (playExecution == null || !playExecution) {
+                throw new ApiException("Cannot initialize an execution in VIP without starting it (we know it breaks the specification). Please set playExecution to 'true'");
+            }
+            if(executionName == null)
+                executionName = "Untitled";
+            PipelineBusiness pb = new PipelineBusiness(wsContext);
+            pb.checkIfUserCanAccessPipeline(pipelineId);
+            ExecutionBusiness eb = new ExecutionBusiness(pb);
             String id = eb.initExecution(pipelineId, inputValues, timeout, executionName, studyId, playExecution);
-            r = new Response(0, "OK", id);
+            r = new Response(0, ApiUtils.getMessage(eb), id);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
-        } finally {
-            return r;
-        }
+        } 
+        return r;
     }
 
     @WebMethod(operationName = "playExecution")
     public @XmlElement(required = true)
     Response playExecution(@XmlElement(required = true) @WebParam(name = "executionId") String executionId) {
-        Response r = null;
+        Response r;
         try {
+            ApiUtils.methodInvocationLog("playExecution", executionId);
+            ApiUtils.throwIfNull(executionId, "Execution id");
             ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            eb.checkIfUserCanAccessExecution(executionId);
             ExecutionStatus s = eb.playExecution(executionId);
-            r = new Response(0, "OK", s);
+            r = new Response(0, ApiUtils.getMessage(eb), s);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
-        } finally {
-            return r;
-        }
+        } 
+        return r;
     }
 
     @WebMethod(operationName = "killExecution")
     public @XmlElement(required = true)
     Response killExecution(@XmlElement(required = true) @WebParam(name = "executionId") String executionId) {
-        Response r = null;
+        Response r;
         try {
+            ApiUtils.methodInvocationLog("killExecution", executionId);
+            ApiUtils.throwIfNull(executionId, "Execution id");
             ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            eb.checkIfUserCanAccessExecution(executionId);
             eb.killExecution(executionId);
-            r = new Response(0, "OK", null);
+            r = new Response(0, ApiUtils.getMessage(eb), null);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
-        } finally {
-            return r;
-        }
+        } 
+        return r;
     }
 
     @WebMethod(operationName = "deleteExecution")
@@ -166,17 +185,19 @@ public class Carmin {
     Response deleteExecution(
             @XmlElement(required = true) @WebParam(name = "executionId") String executionId,
             @XmlElement(required = true) @WebParam(name = "deleteFiles") Boolean deleteFiles) {
-        Response r = null;
+        Response r;
         try {
+            ApiUtils.methodInvocationLog("deleteExecution", executionId, deleteFiles);
+            ApiUtils.throwIfNull(executionId, "Execution id");
             ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            eb.checkIfUserCanAccessExecution(executionId);
             eb.deleteExecution(executionId, deleteFiles);
-            r = new Response(0, "OK", null);
+            r = new Response(0, ApiUtils.getMessage(eb), null);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
-        } finally {
-            return r;
-        }
+        } 
+        return r;
     }
 
     @WebMethod(operationName = "getExecutionResults")
@@ -184,122 +205,134 @@ public class Carmin {
     Response getExecutionResults(
             @XmlElement(required = true) @WebParam(name = "executionId") String executionId,
             @WebParam(name = "protocol") String protocol) {
-        Response r = null;
+        Response r;
         try {
+            ApiUtils.methodInvocationLog("getExecutionResults", executionId, protocol);
+            ApiUtils.throwIfNull(executionId, "Execution id");
+            ApiUtils.throwIfNull(protocol, "Protocol");
             ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            eb.checkIfUserCanAccessExecution(executionId);
             List<URL> results = eb.getExecutionResults(executionId, protocol);
-            r = new Response(0, "OK", results);
+            r = new Response(0, ApiUtils.getMessage(eb), results);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
-        } finally {
-            return r;
-        }
+        } 
+        return r;
     }
 
     /**
      * Global Properties
+     * @return 
      */
     @WebMethod(operationName = "getGlobalProperties")
     public @XmlElement(required = true)
     Response getGlobalProperties() {
-        Response r = null;
+        Response r;
         try {
+            ApiUtils.methodInvocationLog("getGlobalProperties");
             GlobalPropertiesBusiness bpb = new GlobalPropertiesBusiness(wsContext);
             GlobalProperties gp = bpb.getGlobalProperties();
-            r = new Response(0, "OK", gp);
+            r = new Response(0, ApiUtils.getMessage(bpb), gp);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
-        } finally {
-            return r;
         }
+        return r;
     }
 
     /**
      * Pipeline
+     * @param pipelineId
+     * @return 
      */
     @WebMethod(operationName = "getPipeline")
     public @XmlElement(required = true)
     Response getPipeline(@XmlElement(required = true) @WebParam(name = "pipelineId") String pipelineId) {
-        Response r = null;
+        Response r;
         try {
+            ApiUtils.methodInvocationLog("getPipeline", pipelineId); 
+            ApiUtils.throwIfNull(pipelineId, "Pipeline id");
             PipelineBusiness pb = new PipelineBusiness(wsContext);
+            pb.checkIfUserCanAccessPipeline(pipelineId);
             Pipeline p = pb.getPipeline(pipelineId);
-            r = new Response(0, "OK", p);
+            r = new Response(0, ApiUtils.getMessage(pb), p);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
-        } finally {
-            return r;
-        }
+        } 
+        return r;
     }
 
     @WebMethod(operationName = "listPipelines")
     public @XmlElement(required = true)
     Response listPipelines(@WebParam(name = "studyIdentifier") String studyIdentifier) {
-        Response r = null;
+        Response r;
         try {
+            ApiUtils.methodInvocationLog("listPipelines", studyIdentifier);   
             PipelineBusiness pb = new PipelineBusiness(wsContext);
             PairOfPipelineAndBooleanLists pipelinesWithRights = pb.listPipelines(studyIdentifier);
-            r = new Response(0, "Warning: studyIdentifier is currently ignored.", pipelinesWithRights);
+            r = new Response(0, ApiUtils.getMessage(pb), pipelinesWithRights);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
-        } finally {
-            return r;
-        }
+        } 
+        return r;
     }
 
     /**
      * Authentication
+     * @param userName
+     * @param password
+     * @return 
      */
     @WebMethod(operationName = "authenticateSession")
     public @XmlElement(required = true)
     Response authenticateSession(@XmlElement(required = true) @WebParam(name = "userName") String userName, @XmlElement(required = true) @WebParam(name = "password") String password) {
-        Response r = null;
+        Response r;
         try {
+            ApiUtils.methodInvocationLog("authenticateSession", userName, "*****");
+            ApiUtils.throwIfNull(userName, "User name");
+            ApiUtils.throwIfNull(password, "Password");
             AuthenticationBusiness ab = new AuthenticationBusiness(wsContext);
             ab.authenticateSession(userName, password);
-            r = new Response(0, "OK", null);
+            r = new Response(0, ApiUtils.getMessage(ab), null);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
-        } finally {
-            return r;
-        }
+        } 
+        return r;
     }
 
     @WebMethod(operationName = "authenticateHTTP")
     public @XmlElement(required = true)
     Response authenticateHTTP(@XmlElement(required = true) @WebParam(name = "userName") String userName) {
-        Response r = null;
+        Response r;
         try {
             AuthenticationBusiness ab = new AuthenticationBusiness(wsContext);
             ab.authenticateHTTP(userName);
-            r = new Response(0, "OK", null);
+            r = new Response(0, ApiUtils.getMessage(ab), null);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
-        } finally {
-            return r;
-        }
+        } 
+        return r;
     }
 
     @WebMethod(operationName = "logout")
     public @XmlElement(required = true)
     Response logout() {
-        Response r = null;
+        Response r;
         try {
+            ApiUtils.methodInvocationLog("logout");
             AuthenticationBusiness ab = new AuthenticationBusiness(wsContext);
             ab.logout();
-            r = new Response(0, "OK", null);
+            r = new Response(0, ApiUtils.getMessage(ab), null);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
-        } finally {
-            return r;
-        }
+        } 
+        return r;
     }
 
 }

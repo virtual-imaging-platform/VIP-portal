@@ -44,7 +44,7 @@ import org.apache.log4j.Logger;
  */
 public class AuthenticationBusiness extends ApiBusiness {
 
-     private final static Logger logger = Logger.getLogger(AuthenticationBusiness.class);
+    private final static Logger logger = Logger.getLogger(AuthenticationBusiness.class);
     
     public AuthenticationBusiness(WebServiceContext wsContext) throws ApiException {
         super(wsContext,false);
@@ -55,12 +55,11 @@ public class AuthenticationBusiness extends ApiBusiness {
          try {
              //verify userName and password
              ConfigurationBusiness configurationBusiness = new ConfigurationBusiness();
-             logger.info("API authenticating '" + userName + "'.");
+             configurationBusiness.configure();
              User user = configurationBusiness.signin(userName, password);
              
              AbstractAuthenticationService.setVIPSession(getRequest(), getResponse(), user);             
              configurationBusiness.updateUserLastLogin(userName);
-             logger.info("Connected.");
              
          } catch (BusinessException ex) {
              throw new ApiException(ex);

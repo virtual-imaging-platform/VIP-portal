@@ -61,5 +61,10 @@ public class StringKeyParameterValuePair {
     public ParameterTypedValue getValue() {
         return value;
     }
+    
+    @Override
+    public String toString(){
+        return name+": \""+value.getValue()+"\" ("+value.getType()+")";
+    }
 
 }

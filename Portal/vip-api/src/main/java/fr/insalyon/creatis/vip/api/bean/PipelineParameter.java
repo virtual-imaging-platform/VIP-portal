@@ -64,6 +64,30 @@ public class PipelineParameter {
         this.defaultValue = defaultValue;
         this.description = description;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public ParameterType getType() {
+        return type;
+    }
+
+    public Boolean isOptional() {
+        return isOptional;
+    }
+
+    public Boolean isReturnedValue() {
+        return isReturnedValue;
+    }
+
+    public ParameterTypedValue getDefaultValue() {
+        return defaultValue;
+    }
+
+    public String getDescription() {
+        return description;
+    }
     
     
 }

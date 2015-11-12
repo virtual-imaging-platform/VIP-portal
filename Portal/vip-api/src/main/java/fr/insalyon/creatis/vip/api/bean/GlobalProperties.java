@@ -46,10 +46,10 @@ public class GlobalProperties extends Object {
     @XmlElement(name = "APIErrorCodesAndMessages")
     private ArrayList<IntKeyStringValuePair> APIErrorCodesAndMessages;
 
-    @XmlElement(name = "supportedTransferProtocols", required=true)
+    @XmlElement(name = "supportedTransferProtocol", required=true)
     private ArrayList<String> supportedTransferProtocols;
 
-    @XmlElement(name = "supportedModules", required=true)
+    @XmlElement(name = "supportedModule", required=true)
     private ArrayList<Module> supportedModules;
     
     @XmlElement(name = "email")
@@ -84,7 +84,7 @@ public class GlobalProperties extends Object {
     
 
     public GlobalProperties(String email, String platformDescription, Integer minAuthorizedExecutionTimeout, Integer maxAuthorizedExecutionTimeout, Integer defaultExecutionTimeout, Boolean isKillExecutionSupported, String defaultStudy, String supportedAPIVersion) {
-        super();
+        this();
         this.email = email;
         this.platformDescription = platformDescription;
         this.minAuthorizedExecutionTimeout = minAuthorizedExecutionTimeout;

@@ -51,7 +51,6 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Activity;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.progress.ProcessorStatus;
@@ -200,18 +199,16 @@ public class WorkflowBusiness {
             Workflow workflow = executionBusiness.launch(applicationName,
                     applicationVersion, applicationClass, user, simulationName,
                     workflowPath, parameters);
-
+            if(workflow == null)
+                throw new BusinessException("Workflow is null");
+            logger.info("Launched workflow "+workflow.toString());
             workflowDAO.add(workflow);
             return workflow.getId();
 
-        } catch (WorkflowsDBDAOException ex) {
+        } catch (WorkflowsDBDAOException | DAOException | DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        } catch (DataManagerException ex) {
-            throw new BusinessException(ex);
-        }
+        } 
     }
 
     /**

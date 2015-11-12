@@ -61,21 +61,24 @@ public class PipelineBusiness extends ApiBusiness {
     public PipelineBusiness(WebServiceContext wsContext) throws ApiException {
         super(wsContext,true);
     }
+    
+    public PipelineBusiness(ApiBusiness ab){
+        super(ab);
+    }
 
     public Pipeline getPipeline(String pipelineId) throws ApiException {
         try {
-            logger.info("Calling API method getPipeline(" + pipelineId + ")");
-            String applicationName = getApplicationName(pipelineId);
-            String applicationVersion = getApplicationVersion(pipelineId);
-            Pipeline p = getPipelineWithPermissions(applicationName,applicationVersion);
             
+            String applicationName = ApiUtils.getApplicationName(pipelineId);
+            String applicationVersion = ApiUtils.getApplicationVersion(pipelineId);
+            Pipeline p = getPipelineWithPermissions(applicationName,applicationVersion);
             
             WorkflowBusiness wb = new WorkflowBusiness();
             Descriptor d = wb.getApplicationDescriptor(getUser(), p.getName(), p.getVersion()); // Be careful, this copies the Gwendia file from LFC. 
             p.setDescription(d.getDescription());
             
             for(Source s : d.getSources()){
-                ParameterType sourceType = getCarminType(s.getType());
+                ParameterType sourceType = ApiUtils.getCarminType(s.getType());
                 ParameterTypedValue defaultValue = s.getDefaultValue() == null ? null : new ParameterTypedValue(sourceType,s.getDefaultValue());
                 PipelineParameter pp = new PipelineParameter(s.getName(),
                         sourceType,
@@ -89,13 +92,13 @@ public class PipelineBusiness extends ApiBusiness {
         } catch (BusinessException ex) {
             throw new ApiException(ex);
         }
-
     }
 
     public PairOfPipelineAndBooleanLists listPipelines(String studyIdentifier) throws ApiException {
 
         try {
-            logger.info("Calling API method listPipelines(" + studyIdentifier + ")");
+            if(studyIdentifier!=null)
+                getWarnings().add("Study identifier was ignored.");
             ApplicationBusiness ab = new ApplicationBusiness();
             PairOfPipelineAndBooleanLists response = new PairOfPipelineAndBooleanLists();
 
@@ -110,7 +113,7 @@ public class PipelineBusiness extends ApiBusiness {
             for (Application a : applications) {
                 List<AppVersion> versions = ab.getVersions(a.getName());
                 for (AppVersion av : versions) {
-                    Pipeline p = new Pipeline(getPipelineIdentifier(a.getName(), av.getVersion()), a.getName(), av.getVersion());
+                    Pipeline p = new Pipeline(ApiUtils.getPipelineIdentifier(a.getName(), av.getVersion()), a.getName(), av.getVersion());
                     response.getPipelines().add(p);
                     response.getCanExecute().add(true);
                 }
@@ -122,42 +125,29 @@ public class PipelineBusiness extends ApiBusiness {
         }
     }
 
-    // static methods
     
-    /**
-     * Returns a unique identifier from the VIP application name and version. 
-     * @param applicationName
-     * @param applicationVersion
-     * @return 
-     */
-    public static String getPipelineIdentifier(String applicationName, String applicationVersion) {
-        return applicationName + "/" + applicationVersion;
-    }
-    
-    /**
-     * Returns the Carmin type from Gwendia type
-     * @param vipType
-     * @return 
-     */
-    public static ParameterType getCarminType(String vipType){
-        return vipType.equals("URI") ? ParameterType.File : ParameterType.String;
-    }
-    
-    public static String getApplicationName(String identifier) {
-        return identifier.substring(0, identifier.lastIndexOf("/"));
-    }
-
-    public static String getApplicationVersion(String identifier) {
-        return identifier.substring(identifier.lastIndexOf("/")+1);
-    }
-    
-    // private methods
-    
-    private void checkIfValidIdentifier(String identifier) throws ApiException {
-        if (!identifier.contains("/")) {
-            throw new ApiException("Invalid pipeline identifier: " + identifier);
+    public void checkIfUserCanAccessPipeline(String pipelineId) throws ApiException {
+        try {
+            ClassBusiness cb = new ClassBusiness();
+            ApplicationBusiness ab = new ApplicationBusiness();
+            
+            String applicationName = ApiUtils.getApplicationName(pipelineId);
+            List<String> userClassNames = cb.getUserClassesName(getUser().getEmail(), false);
+            
+            Application a = ab.getApplication(applicationName);
+            if(a==null)
+                throw new ApiException("Cannot find application "+applicationName);
+            for (String applicationClassName : a.getApplicationClasses()) {
+                if (userClassNames.contains(applicationClassName)) {
+                    return;
+                }
+            }
+            throw new ApiException("User " + getUser().getEmail() + " not allowed to access application " + a.getName());
+        } catch (BusinessException ex) {
+            throw new ApiException(ex);
         }
     }
+    
 
     private Pipeline getPipelineWithPermissions(String applicationName, String applicationVersion) throws ApiException {
         PairOfPipelineAndBooleanLists popabl = listPipelines("");

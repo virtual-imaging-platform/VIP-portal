@@ -54,9 +54,9 @@ public class Execution extends Object {
     int timeout;
     @XmlElement(name = "status", required = true)
     ExecutionStatus status;
-    @XmlElement(name = "inputValues", required = true)
+    @XmlElement(name = "inputValue", required = true)
     ArrayList<StringKeyParameterValuePair> inputValues; // TODO minOccur shouldn't be 0;
-    @XmlElement(name = "returnedFiles", required = true)
+    @XmlElement(name = "returnedFile", required = true)
     ArrayList<StringKeyParameterValuePair> returnedFiles;
 
     // optional arguments

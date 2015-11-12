@@ -14,6 +14,8 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,13 +38,17 @@ public class ApiBusiness {
     private final HttpServletRequest request;
     private final HttpServletResponse response;
     private User user;
+    
+    private List<String> warnings;
 
     public ApiBusiness(WebServiceContext wsContext, boolean authenticate) throws ApiException {
 
         try {
+            
+            warnings = new ArrayList<>();
+            
             // set logging properties and DB connection
             PropertyConfigurator.configure(ConfigurationBusiness.class.getClassLoader().getResource("vipLog4j.properties"));
-            logger.info("Calling API method");
             PlatformConnection.getInstance();
 
             //set request and response
@@ -65,6 +71,14 @@ public class ApiBusiness {
         }
     }
 
+    public ApiBusiness(ApiBusiness ab){
+        this.session = ab.getSession();
+        this.request = ab.getRequest();
+        this.response = ab.getResponse();
+        this.user = ab.getUser();
+        this.warnings = ab.getWarnings();
+    }
+    
     public HttpSession getSession() {
         return session;
     }
@@ -79,6 +93,10 @@ public class ApiBusiness {
 
     public User getUser() {
         return user;
+    }
+    
+    public List<String> getWarnings(){
+        return warnings;
     }
 
     protected final User authenticateSession() throws ApiException {

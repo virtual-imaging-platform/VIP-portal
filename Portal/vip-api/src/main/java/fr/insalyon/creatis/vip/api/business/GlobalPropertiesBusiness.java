@@ -33,8 +33,9 @@ package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.bean.GlobalProperties;
 import fr.insalyon.creatis.vip.api.bean.Module;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import javax.xml.ws.WebServiceContext;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -42,13 +43,15 @@ import javax.xml.ws.WebServiceContext;
  */
 public class GlobalPropertiesBusiness extends ApiBusiness {
 
+    private final static Logger logger = Logger.getLogger(GlobalPropertiesBusiness.class);
+    
     public GlobalPropertiesBusiness(WebServiceContext wsContext) throws ApiException {
         super(wsContext,false);
     }
 
     public GlobalProperties getGlobalProperties() throws ApiException {
         GlobalProperties gp = new GlobalProperties(
-                CoreConstants.LAB_ADMIN_EMAIL, // email
+                Server.getInstance().getAdminEmail(), // email
                 "Virtual Imaging Platform",    // description
                 0, // min, max, and default timeout
                 0,
