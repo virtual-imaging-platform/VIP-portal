@@ -97,7 +97,7 @@ public class SSHLayout extends VLayout {
 
         toolstrip.addMember(WidgetUtil.getSpaceLabel(15));
 
-        LabelButton resetButton = new LabelButton("Reset", CoreConstants.ICON_RESET);
+        LabelButton resetButton = new LabelButton("Reset connections", CoreConstants.ICON_RESET);
         resetButton.setWidth(150);
         resetButton.addClickHandler(new ClickHandler() {
             @Override
