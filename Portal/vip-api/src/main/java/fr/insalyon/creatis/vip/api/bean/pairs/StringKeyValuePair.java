@@ -46,12 +46,20 @@ public class StringKeyValuePair {
     @XmlElement(name = "name", required = true)
     private String name;   
     @XmlElements(value = { 
-        @XmlElement(name = "value", type=String.class, required=true),
-        @XmlElement(name = "value", type=int.class, required=true),
-        @XmlElement(name = "value", type=Execution.ExecutionStatus.class, required=true),
-        @XmlElement(name = "value", type=ParameterTypedValue.class, required=true)
+        @XmlElement(name = "valueStr", type=String.class, required=true),
+        @XmlElement(name = "valueInt", type=int.class, required=true),
+        @XmlElement(name = "valueStatus", type=Execution.ExecutionStatus.class, required=true),
+        @XmlElement(name = "valueParamType", type=ParameterTypedValue.class, required=true)
     } )
     private java.lang.Object value;
     public String getName(){ return name; } ;
     public java.lang.Object getValue(){ return value; }
+    public String toString(){
+        String string = "name: "+name;
+        if(value != null)
+            string+=" ; object: "+value.toString();
+        else
+            string+=" ; object: null";
+        return string;
+    }
 }

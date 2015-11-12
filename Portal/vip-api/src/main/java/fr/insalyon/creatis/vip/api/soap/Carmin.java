@@ -96,7 +96,7 @@ public class Carmin {
     public @XmlElement(required = true)
     Response updateExecution(
             @XmlElement(required = true) @WebParam(name = "executionId") String executionId,
-            @XmlElement(required = true) @WebParam(name = "keyValuePairs") ArrayList<StringKeyValuePair> keyValuePairs) {
+            @XmlElement(required = true) @WebParam(name = "keyValuePair") ArrayList<StringKeyValuePair> keyValuePairs) {
         Response r;
         try {
             ApiUtils.methodInvocationLog("updateExecution", executionId, keyValuePairs);
@@ -209,10 +209,9 @@ public class Carmin {
         try {
             ApiUtils.methodInvocationLog("getExecutionResults", executionId, protocol);
             ApiUtils.throwIfNull(executionId, "Execution id");
-            ApiUtils.throwIfNull(protocol, "Protocol");
             ExecutionBusiness eb = new ExecutionBusiness(wsContext);
             eb.checkIfUserCanAccessExecution(executionId);
-            List<URL> results = eb.getExecutionResults(executionId, protocol);
+            String[] results = eb.getExecutionResults(executionId, protocol);
             r = new Response(0, ApiUtils.getMessage(eb), results);
         } catch (ApiException ex) {
             logger.error(ex);

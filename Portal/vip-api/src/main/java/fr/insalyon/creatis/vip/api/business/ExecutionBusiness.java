@@ -287,26 +287,31 @@ public class ExecutionBusiness extends ApiBusiness {
     }
 
     ;
-    public List<URL> getExecutionResults(String executionId, String protocol) throws ApiException {
+    public String[] getExecutionResults(String executionId, String protocol) throws ApiException {
         try {
-            ApiUtils.throwIfNull(executionId, "Execution id");
-            ApiUtils.throwIfNull(protocol, "Protocol");
+            if(protocol == null)
+                protocol = "https";
 
             if (!protocol.equals("https") && !protocol.equals("http")) {
                 throw new ApiException("Unsupported protocol: " + protocol);
             }
 
-            List<URL> urls = new ArrayList<>();
+            ArrayList<String> urls = new ArrayList<>();
 
             TransferPoolBusiness tpb = new TransferPoolBusiness();
             WorkflowBusiness wb = new WorkflowBusiness();
             List<InOutData> outputs = wb.getOutputData(executionId, getUser().getFolder());
             for (InOutData output : outputs) {
+                
                 String operationId = tpb.downloadFile(getUser(), output.getPath());
-                String url = getRequest().getRequestURI() + "../filedownloadservice?operationid=" + operationId; // assuming that the api is deployed at /api
-                urls.add(new URL(url));
+                
+                String url = getRequest().getRequestURL() + "/../fr.insalyon.creatis.vip.portal.Main/filedownloadservice?operationid=" + operationId; 
+                URL u = new URL(url); // just to check that it is a well-formed URL
+                urls.add(url);
             }
-            return urls;
+            
+            String[] array_urls = new String[urls.size()];
+            return urls.toArray(array_urls);
         } catch (BusinessException | MalformedURLException ex) {
             throw new ApiException(ex);
         }
