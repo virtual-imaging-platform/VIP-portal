@@ -40,14 +40,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
-import javax.net.ssl.X509TrustManager;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
@@ -151,7 +146,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
         }
     }
 
-    private void setVIPSession(HttpServletRequest request, HttpServletResponse response, User user) throws BusinessException {
+    public static void setVIPSession(HttpServletRequest request, HttpServletResponse response, User user) throws BusinessException {
         try {
             ConfigurationServiceImpl csi = new ConfigurationServiceImpl();
             user = csi.setUserSession(user, request.getSession());
@@ -184,43 +179,5 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             result = false;
         }
         return result;
-    }
-
-    private final char[] HEXDIGITS = "0123456789abcdef".toCharArray();
-
-    private String toHexString(byte[] bytes) {
-        StringBuilder sb = new StringBuilder(bytes.length * 3);
-        for (int b : bytes) {
-            b &= 0xff;
-            sb.append(HEXDIGITS[b >> 4]);
-            sb.append(HEXDIGITS[b & 15]);
-            sb.append(' ');
-        }
-        return sb.toString();
-    }
-
-    private class SavingTrustManager implements X509TrustManager {
-
-        private final X509TrustManager tm;
-        private X509Certificate[] chain;
-
-        SavingTrustManager(X509TrustManager tm) {
-            this.tm = tm;
-        }
-
-        public X509Certificate[] getAcceptedIssuers() {
-            throw new UnsupportedOperationException();
-        }
-
-        public void checkClientTrusted(X509Certificate[] chain, String authType)
-                throws CertificateException {
-            throw new UnsupportedOperationException();
-        }
-
-        public void checkServerTrusted(X509Certificate[] chain, String authType)
-                throws CertificateException {
-            this.chain = chain;
-            tm.checkServerTrusted(chain, authType);
-        }
     }
 }

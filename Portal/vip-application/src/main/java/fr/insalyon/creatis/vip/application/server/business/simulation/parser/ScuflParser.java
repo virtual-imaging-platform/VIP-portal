@@ -45,7 +45,7 @@ public class ScuflParser extends AbstractWorkflowParser {
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         if (localName.equals("s:source")) {
             String sourceName = attributes.getValue("name");
-            sources.add(new Source(sourceName,"",""));
+            sources.add(new Source(sourceName,"unknown","",""));
             return;
         }
     }

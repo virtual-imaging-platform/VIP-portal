@@ -32,13 +32,38 @@
 package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.bean.GlobalProperties;
+import fr.insalyon.creatis.vip.api.bean.Module;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import javax.xml.ws.WebServiceContext;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author Tristan Glatard
  */
-public class GlobalPropertiesBusiness {
+public class GlobalPropertiesBusiness extends ApiBusiness {
 
-    public static GlobalProperties getGlobalProperties() throws ApiException { throw new ApiException("Not implemented yet");}
+    private final static Logger logger = Logger.getLogger(GlobalPropertiesBusiness.class);
+    
+    public GlobalPropertiesBusiness(WebServiceContext wsContext) throws ApiException {
+        super(wsContext,false);
+    }
+
+    public GlobalProperties getGlobalProperties() throws ApiException {
+        GlobalProperties gp = new GlobalProperties(
+                Server.getInstance().getAdminEmail(), // email
+                "Virtual Imaging Platform",    // description
+                0, // min, max, and default timeout
+                0,
+                0,
+                true, // is kill supported?
+                null, // default study
+                "0.1" // api version
+        );
+        gp.getSupportedTransferProtocols().add("http");
+        gp.getSupportedTransferProtocols().add("https");
+        gp.getSupportedModules().add(Module.Processing);
+        return gp;
+    }
 
 }

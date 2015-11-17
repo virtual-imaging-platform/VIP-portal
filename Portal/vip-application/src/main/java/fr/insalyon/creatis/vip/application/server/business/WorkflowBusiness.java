@@ -199,18 +199,16 @@ public class WorkflowBusiness {
             Workflow workflow = executionBusiness.launch(applicationName,
                     applicationVersion, applicationClass, user, simulationName,
                     workflowPath, parameters);
-
+            if(workflow == null)
+                throw new BusinessException("Workflow is null");
+            logger.info("Launched workflow "+workflow.toString());
             workflowDAO.add(workflow);
             return workflow.getId();
 
-        } catch (WorkflowsDBDAOException ex) {
+        } catch (WorkflowsDBDAOException | DAOException | DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        } catch (DataManagerException ex) {
-            throw new BusinessException(ex);
-        }
+        } 
     }
 
     /**
@@ -369,17 +367,20 @@ public class WorkflowBusiness {
      *
      * @param simulationID
      * @param email
+     * @param deleteFiles
      * @throws BusinessException
      */
-    public void clean(String simulationID, String email) throws BusinessException {
+    public void clean(String simulationID, String email, boolean deleteFiles) throws BusinessException {
 
         try {
             Workflow workflow = workflowDAO.get(simulationID);
             workflow.setStatus(WorkflowStatus.Cleaned);
             workflowDAO.update(workflow);
-            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
-            for (Output output : outputDAO.get(simulationID)) {
-                client.delete(output.getOutputID().getPath(), email);
+            if(deleteFiles){
+                GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
+                for (Output output : outputDAO.get(simulationID)) {
+                    client.delete(output.getOutputID().getPath(), email);
+                }
             }
             inputDAO.removeById(simulationID);
             outputDAO.removeById(simulationID);
@@ -391,6 +392,16 @@ public class WorkflowBusiness {
             logger.error(ex);
             throw new BusinessException(ex);
         }
+    }
+    
+    /**
+     *
+     * @param simulationId
+     * @param email
+     * @throws BusinessException
+     */
+    public void clean(String simulationId, String email) throws BusinessException{
+        clean(simulationId,email,true);
     }
 
     /**

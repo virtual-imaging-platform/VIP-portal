@@ -46,10 +46,10 @@ public class GlobalProperties extends Object {
     @XmlElement(name = "APIErrorCodesAndMessages")
     private ArrayList<IntKeyStringValuePair> APIErrorCodesAndMessages;
 
-    @XmlElement(name = "supportedTransferProtocols", required=true)
+    @XmlElement(name = "supportedTransferProtocol", required=true)
     private ArrayList<String> supportedTransferProtocols;
 
-    @XmlElement(name = "supportedModules", required=true)
+    @XmlElement(name = "supportedModule", required=true)
     private ArrayList<Module> supportedModules;
     
     @XmlElement(name = "email")
@@ -72,11 +72,39 @@ public class GlobalProperties extends Object {
     
     @XmlElement(name = "defaultStudy")
     private String defaultStudy;
-    
+   
     @XmlElement(name = "supportedAPIVersion", required=true)
     private String supportedAPIVersion;
     
     public GlobalProperties() {
+        this.APIErrorCodesAndMessages = new ArrayList<>();
+        this.supportedModules = new ArrayList<>();
+        this.supportedTransferProtocols = new ArrayList();
+    }
+    
+
+    public GlobalProperties(String email, String platformDescription, Integer minAuthorizedExecutionTimeout, Integer maxAuthorizedExecutionTimeout, Integer defaultExecutionTimeout, Boolean isKillExecutionSupported, String defaultStudy, String supportedAPIVersion) {
+        this();
+        this.email = email;
+        this.platformDescription = platformDescription;
+        this.minAuthorizedExecutionTimeout = minAuthorizedExecutionTimeout;
+        this.maxAuthorizedExecutionTimeout = maxAuthorizedExecutionTimeout;
+        this.defaultExecutionTimeout = defaultExecutionTimeout;
+        this.isKillExecutionSupported = isKillExecutionSupported;
+        this.defaultStudy = defaultStudy;
+        this.supportedAPIVersion = supportedAPIVersion;
+    }
+
+    public ArrayList<IntKeyStringValuePair> getAPIErrorCodesAndMessages() {
+        return APIErrorCodesAndMessages;
+    }
+
+    public ArrayList<String> getSupportedTransferProtocols() {
+        return supportedTransferProtocols;
+    }
+
+    public ArrayList<Module> getSupportedModules() {
+        return supportedModules;
     }
 
 }

@@ -278,7 +278,20 @@ public class ApplicationData implements ApplicationDAO {
 
             ResultSet rs = ps.executeQuery();
             if (rs.first()) {
-                return new Application(rs.getString("name"), null, rs.getString("owner"), rs.getString("citation"));
+
+                PreparedStatement ps2 = connection.prepareStatement("SELECT "
+                                                                    + "class FROM VIPApplicationClasses WHERE application = ?");
+
+                ps2.setString(1, applicationName);
+
+                ResultSet rs2 = ps2.executeQuery();
+                List<String> appClasses = new ArrayList<String>();
+
+                while (rs2.next()) {
+                    appClasses.add(rs2.getString("class"));
+                }
+                ps2.close();
+                return new Application(rs.getString("name"), appClasses, rs.getString("owner"), rs.getString("citation"));
             }
             return null;
         } catch (SQLException ex) {
@@ -347,7 +360,7 @@ public class ApplicationData implements ApplicationDAO {
                     }
                     ps3.close();
 
-                    applications.add(new Application(name, appClasses,rs.getString("owner"),firstName + " " + lastName, rs.getString("citation")));
+                    applications.add(new Application(name, appClasses, rs.getString("owner"), firstName + " " + lastName, rs.getString("citation")));
                 }
                 ps.close();
             }
@@ -591,4 +604,5 @@ public class ApplicationData implements ApplicationDAO {
             throw new DAOException(ex);
         }
     }
+
 }

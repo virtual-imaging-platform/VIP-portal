@@ -33,7 +33,6 @@ package fr.insalyon.creatis.vip.api.bean;
 
 import fr.insalyon.creatis.vip.api.bean.pairs.PairOfPipelineAndBooleanLists;
 import fr.insalyon.creatis.vip.api.bean.pairs.PipelineKeyBooleanValuePair;
-import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlSeeAlso;
@@ -43,7 +42,7 @@ import javax.xml.bind.annotation.XmlType;
  *
  * @author Tristan Glatard
  */
-@XmlSeeAlso({Object.class, Execution.class, GlobalProperties.class, Pipeline.class})
+@XmlSeeAlso({Object.class, Execution.class, GlobalProperties.class, Pipeline.class,String[].class})
 @XmlType(name = "Response")
 public class Response {
     @XmlElement(name = "statusCode", required=true)
@@ -51,15 +50,16 @@ public class Response {
     @XmlElement(name = "errorMessage")
     String errorMessage;
     @XmlElements(value = { 
-        @XmlElement(name = "returnedValue", type=Pipeline.class),
-        @XmlElement(name = "returnedValue", type=Execution.class),
-        @XmlElement(name = "returnedValue", type=GlobalProperties.class),
-        @XmlElement(name = "returnedValue", type=String.class),
-        @XmlElement(name = "returnedValue", type=Execution.ExecutionStatus.class),
-        @XmlElement(name = "returnedValue", type=PipelineKeyBooleanValuePair.class),
-        @XmlElement(name = "returnedValue", type=PairOfPipelineAndBooleanLists.class),
+        @XmlElement(name = "returnedValuePipeline", type=Pipeline.class),
+        @XmlElement(name = "returnedValueExecution", type=Execution.class),
+        @XmlElement(name = "returnedValueGlobalProp", type=GlobalProperties.class),
+        @XmlElement(name = "returnedValueStr", type=String.class),
+        @XmlElement(name = "returnedValueListString", type=String[].class),
+        @XmlElement(name = "returnedValueStatus", type=Execution.ExecutionStatus.class),
+        @XmlElement(name = "returnedValuePairKey", type=PipelineKeyBooleanValuePair.class),
+        @XmlElement(name = "returnedValuePairPipeline", type=PairOfPipelineAndBooleanLists.class),
     } )         
-    java.lang.Object returnedValue; // java.lang.Object so that Strings can be returned to
+    java.lang.Object returnedValue; // java.lang.Object so that Strings can be returned too
 
     public Response() {} // needed for SOAP serialization
     

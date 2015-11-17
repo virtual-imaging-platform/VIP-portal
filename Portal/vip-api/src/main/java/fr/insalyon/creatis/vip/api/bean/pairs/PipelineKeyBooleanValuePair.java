@@ -42,7 +42,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "PipelineKeyBooleanValuePair")
 public class PipelineKeyBooleanValuePair {
 
-    @XmlElement(name = "key", required = true)
+    @XmlElement(name = "name", required = true)
     public Pipeline key;
     @XmlElement(name = "value", required = true)
     public Boolean value;

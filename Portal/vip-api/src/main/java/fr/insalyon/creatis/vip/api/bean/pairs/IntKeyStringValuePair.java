@@ -41,7 +41,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "IntKeyStringValuePair")
 public class IntKeyStringValuePair {
 
-    @XmlElement(name = "key", required = true)
+    @XmlElement(name = "name", required = true)
     public Integer key;
     @XmlElement(name = "value", required = true)
     public String value;
