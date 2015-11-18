@@ -50,13 +50,13 @@ public class Execution extends Object {
     private String name;
     @XmlElement(name = "pipelineIdentifier", required = true)
     private String pipelineIdentifier;
-    @XmlElement(name = "timeout", required = true)
+    @XmlElement(name = "timeout")
     int timeout;
     @XmlElement(name = "status", required = true)
     ExecutionStatus status;
     @XmlElement(name = "inputValue", required = true)
     ArrayList<StringKeyParameterValuePair> inputValues; // TODO minOccur shouldn't be 0;
-    @XmlElement(name = "returnedFile", required = true)
+    @XmlElement(name = "returnedFile")
     ArrayList<StringKeyParameterValuePair> returnedFiles;
 
     // optional arguments
@@ -64,10 +64,6 @@ public class Execution extends Object {
     String studyIdentifier;
     @XmlElement(name = "errorCode")
     Integer errorCode;
-    @XmlElement(name = "stdoutlog")
-    String stdout;
-    @XmlElement(name = "stderrlog")
-    String stderr;
     @XmlElement(name = "startDate")
     Long startDate;
     @XmlElement(name = "endDate")
@@ -75,7 +71,6 @@ public class Execution extends Object {
 
     @XmlType(name = "ExecutionStatus")
     public static enum ExecutionStatus {
-
         Initializing, Ready, Running, Finished, InitializationFailed, ExecutionFailed, Unknown, Killed
     }
     
@@ -91,20 +86,16 @@ public class Execution extends Object {
                      ExecutionStatus status,
                      String studyIdentifier,
                      Integer errorCode,
-                     String stdout,
-                     String stderr,
                      Long startDate,
                      Long endDate) {
         this();
         this.identifier = identifier;
-        this.name = name;
+        this.name = name == null ? identifier : name; // null names sometimes happen due to a race condition in VIP.
         this.pipelineIdentifier = pipelineIdentifier;
         this.timeout = timeout;
         this.status = status;
         this.studyIdentifier = studyIdentifier;
         this.errorCode = errorCode;
-        this.stdout = stdout;
-        this.stderr = stderr;
         this.startDate = startDate;
         this.endDate = endDate;
     }
@@ -145,14 +136,6 @@ public class Execution extends Object {
         return errorCode;
     }
 
-    public String getStdout() {
-        return stdout;
-    }
-
-    public String getStderr() {
-        return stderr;
-    }
-
     public Long getStartDate() {
         return startDate;
     }
@@ -161,6 +144,8 @@ public class Execution extends Object {
         return endDate;
     }
     
-    
+    public void clearReturnedFiles() {
+        returnedFiles = null;
+    }
 
 }

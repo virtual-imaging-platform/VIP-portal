@@ -56,14 +56,17 @@ public class Pipeline extends Object {
     ArrayList<PipelineParameter> parameters;
     @XmlElement(name = "errorCodesAndMessages")
     private ArrayList<IntKeyStringValuePair> errorCodesAndMessages;
+    @XmlElement(name = "canExecute")
+    private boolean canExecute;
 
     public Pipeline() {
     }
     
-     public Pipeline(String identifier, String name, String version) {
+     public Pipeline(String identifier, String name, String version, boolean canExecute) {
         this.identifier = identifier;
         this.name = name;       
         this.version = version;
+        this.canExecute = canExecute;
         parameters = new ArrayList<>();
         errorCodesAndMessages = new ArrayList<>();
     }
@@ -95,6 +98,10 @@ public class Pipeline extends Object {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+    
+    public boolean canExecute(){
+        return canExecute;
     }
    
 }

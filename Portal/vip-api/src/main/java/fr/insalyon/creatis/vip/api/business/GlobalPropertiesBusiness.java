@@ -53,9 +53,9 @@ public class GlobalPropertiesBusiness extends ApiBusiness {
         GlobalProperties gp = new GlobalProperties(
                 Server.getInstance().getAdminEmail(), // email
                 "Virtual Imaging Platform",    // description
-                0, // min, max, and default timeout
-                0,
-                0,
+                null, // min, max, and default timeout
+                null,
+                null,
                 true, // is kill supported?
                 null, // default study
                 "0.1" // api version

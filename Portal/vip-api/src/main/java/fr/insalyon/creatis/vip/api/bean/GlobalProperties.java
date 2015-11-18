@@ -58,16 +58,16 @@ public class GlobalProperties extends Object {
     @XmlElement(name = "platformDescription")
     private String platformDescription;
     
-    @XmlElement(name = "minAuthorizedExecutionTimeout", required=true)
+    @XmlElement(name = "minAuthorizedExecutionTimeout")
     private Integer minAuthorizedExecutionTimeout;
     
-    @XmlElement(name = "maxAuthorizedExecutionTimeout", required=true)
+    @XmlElement(name = "maxAuthorizedExecutionTimeout")
     private Integer maxAuthorizedExecutionTimeout;
     
-    @XmlElement(name = "defaultExecutionTimeout", required=true)
+    @XmlElement(name = "defaultExecutionTimeout")
     private Integer defaultExecutionTimeout;
     
-    @XmlElement(name = "isKillExecutionSupported", required=true)
+    @XmlElement(name = "isKillExecutionSupported")
     private Boolean isKillExecutionSupported;
     
     @XmlElement(name = "defaultStudy")
