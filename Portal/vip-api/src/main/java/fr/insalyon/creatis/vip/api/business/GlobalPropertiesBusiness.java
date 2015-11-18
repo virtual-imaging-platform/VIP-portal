@@ -58,7 +58,7 @@ public class GlobalPropertiesBusiness extends ApiBusiness {
                 null,
                 true, // is kill supported?
                 null, // default study
-                "0.1" // api version
+                "0.2" // api version
         );
         gp.getSupportedTransferProtocols().add("http");
         gp.getSupportedTransferProtocols().add("https");

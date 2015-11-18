@@ -180,8 +180,10 @@ public class ExecutionBusiness extends ApiBusiness {
                 if (!(s == null) && !(s.getStatus() == SimulationStatus.Cleaned)) {
                     count++;
                     executions.add(getExecution(s.getID(),true));
-                    if(count >= maxReturned)
+                    if(count >= maxReturned){
+                        getWarnings().add("Only the "+maxReturned+" most recent pipelines were returned.");
                         break;
+                    }
                 }
             }
             logger.info("Returning " + executions.size() + " executions");
