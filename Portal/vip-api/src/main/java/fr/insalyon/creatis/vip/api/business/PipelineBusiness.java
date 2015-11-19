@@ -59,33 +59,33 @@ public class PipelineBusiness extends ApiBusiness {
     private final static Logger logger = Logger.getLogger(PipelineBusiness.class);
 
     public PipelineBusiness(WebServiceContext wsContext) throws ApiException {
-        super(wsContext,true);
+        super(wsContext, true);
     }
-    
-    public PipelineBusiness(ApiBusiness ab){
+
+    public PipelineBusiness(ApiBusiness ab) {
         super(ab);
     }
 
     public Pipeline getPipeline(String pipelineId) throws ApiException {
         try {
-            
+
             String applicationName = ApiUtils.getApplicationName(pipelineId);
             String applicationVersion = ApiUtils.getApplicationVersion(pipelineId);
-            Pipeline p = getPipelineWithPermissions(applicationName,applicationVersion);
-            
+            Pipeline p = getPipelineWithPermissions(applicationName, applicationVersion);
+
             WorkflowBusiness wb = new WorkflowBusiness();
             Descriptor d = wb.getApplicationDescriptor(getUser(), p.getName(), p.getVersion()); // Be careful, this copies the Gwendia file from LFC. 
             p.setDescription(d.getDescription());
-            
-            for(Source s : d.getSources()){
+
+            for (Source s : d.getSources()) {
                 ParameterType sourceType = ApiUtils.getCarminType(s.getType());
-                ParameterTypedValue defaultValue = s.getDefaultValue() == null ? null : new ParameterTypedValue(sourceType,s.getDefaultValue());
+                ParameterTypedValue defaultValue = s.getDefaultValue() == null ? null : new ParameterTypedValue(sourceType, s.getDefaultValue());
                 PipelineParameter pp = new PipelineParameter(s.getName(),
-                        sourceType,
-                        s.isOptional(),
-                        false,
-                        defaultValue,
-                        s.getDescription());
+                                                             sourceType,
+                                                             s.isOptional(),
+                                                             false,
+                                                             defaultValue,
+                                                             s.getDescription());
                 p.getParameters().add(pp);
             }
             return p;
@@ -94,13 +94,14 @@ public class PipelineBusiness extends ApiBusiness {
         }
     }
 
-    public PairOfPipelineAndBooleanLists listPipelines(String studyIdentifier) throws ApiException {
+    public Pipeline[] listPipelines(String studyIdentifier) throws ApiException {
 
         try {
-            if(studyIdentifier!=null)
+            if (studyIdentifier != null) {
                 getWarnings().add("Study identifier was ignored.");
+            }
             ApplicationBusiness ab = new ApplicationBusiness();
-            PairOfPipelineAndBooleanLists response = new PairOfPipelineAndBooleanLists();
+            ArrayList<Pipeline> pipelines = new ArrayList<>();
 
             ClassBusiness classBusiness = new ClassBusiness();
             List<AppClass> classes = classBusiness.getUserClasses(getUser().getEmail(), false);
@@ -113,30 +114,31 @@ public class PipelineBusiness extends ApiBusiness {
             for (Application a : applications) {
                 List<AppVersion> versions = ab.getVersions(a.getName());
                 for (AppVersion av : versions) {
-                    Pipeline p = new Pipeline(ApiUtils.getPipelineIdentifier(a.getName(), av.getVersion()), a.getName(), av.getVersion());
-                    response.getPipelines().add(p);
-                    response.getCanExecute().add(true);
+                    pipelines.add(
+                            new Pipeline(ApiUtils.getPipelineIdentifier(a.getName(), av.getVersion()), a.getName(), av.getVersion(), true)
+                    );
                 }
             }
-            return response;
+            Pipeline[] array_pipelines = new Pipeline[pipelines.size()];
+            return pipelines.toArray(array_pipelines);
         } catch (BusinessException ex) {
             logger.error(ex);
             throw new ApiException(ex);
         }
     }
 
-    
     public void checkIfUserCanAccessPipeline(String pipelineId) throws ApiException {
         try {
             ClassBusiness cb = new ClassBusiness();
             ApplicationBusiness ab = new ApplicationBusiness();
-            
+
             String applicationName = ApiUtils.getApplicationName(pipelineId);
             List<String> userClassNames = cb.getUserClassesName(getUser().getEmail(), false);
-            
+
             Application a = ab.getApplication(applicationName);
-            if(a==null)
-                throw new ApiException("Cannot find application "+applicationName);
+            if (a == null) {
+                throw new ApiException("Cannot find application " + applicationName);
+            }
             for (String applicationClassName : a.getApplicationClasses()) {
                 if (userClassNames.contains(applicationClassName)) {
                     return;
@@ -147,15 +149,14 @@ public class PipelineBusiness extends ApiBusiness {
             throw new ApiException(ex);
         }
     }
-    
 
     private Pipeline getPipelineWithPermissions(String applicationName, String applicationVersion) throws ApiException {
-        PairOfPipelineAndBooleanLists popabl = listPipelines("");
-        for (Pipeline p : popabl.pipelines) {
+        Pipeline[] pipelines = listPipelines("");
+        for (Pipeline p : pipelines) {
             if (p.getName().equals(applicationName) && p.getVersion().equals(applicationVersion)) {
                 return p;
             }
         }
-        throw new ApiException("Pipeline '" + applicationName + "' (version '"+applicationVersion+"') doesn't exist or user '" + getUser().getEmail() + "' cannot access it");
+        throw new ApiException("Pipeline '" + applicationName + "' (version '" + applicationVersion + "') doesn't exist or user '" + getUser().getEmail() + "' cannot access it");
     }
 }

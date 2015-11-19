@@ -79,21 +79,41 @@ public class ExecutionBusiness extends ApiBusiness {
         super(ab);
     }
 
-    public Execution getExecution(String executionId) throws ApiException {
+    public String getStdOut(String executionId) throws ApiException {
         try {
             WorkflowBusiness wb = new WorkflowBusiness();
             SimulationBusiness sb = new SimulationBusiness();
+            Simulation s = wb.getSimulation(executionId);
+            String stdout = sb.readFile(s.getID(), "", "workflow", ".out");
+            return stdout;
+        } catch (BusinessException ex) {
+            throw new ApiException(ex);
+        }
+    }
+
+    public String getStdErr(String executionId) throws ApiException {
+        try {
+            WorkflowBusiness wb = new WorkflowBusiness();
+            SimulationBusiness sb = new SimulationBusiness();
+            Simulation s = wb.getSimulation(executionId);
+            String stderr = sb.readFile(s.getID(), "", "workflow", ".err");
+            return stderr;
+        } catch (BusinessException ex) {
+            throw new ApiException(ex);
+        }
+    }
+
+    public Execution getExecution(String executionId, boolean summarize) throws ApiException {
+        try {
+            WorkflowBusiness wb = new WorkflowBusiness();
 
             // Get main execution object
             Simulation s = wb.getSimulation(executionId);
-            if (!s.getUserName().equals(getUser().getEmail()) && !getUser().isSystemAdministrator()) {
-                throw new ApiException("Execution id '" + executionId + "' is not available or user '" + getUser().getEmail() + "' cannot access it.");
-            }
 
-            // Retrieve stdout and stderr.
-            // Would be nice if stdout and stderr are requested through another call since reading these files can be costly.
-            String stdout = sb.readFile(s.getID(), "", "workflow", ".out");
-            String stderr = sb.readFile(s.getID(), "", "workflow", ".err");
+            // Return null if execution doesn't exist or is cleaned (cleaned status is not supported in Carmin)
+            if (s == null || s.getStatus() == SimulationStatus.Cleaned) {
+                return null;
+            }
 
             // Build Carmin's execution object
             Execution e = new Execution(
@@ -104,19 +124,20 @@ public class ExecutionBusiness extends ApiBusiness {
                     VIPtoCarminStatus(s.getStatus()),
                     null, // study identifier (not available in VIP yet)
                     null, // error codes and mesasges (not available in VIP yet)
-                    stdout,
-                    stderr,
                     s.getDate().getTime(),
                     null // last status modification date (not available in VIP yet)
             );
 
+            if(summarize) // don't look into inputs and outputs
+                return e;
+            
             // Inputs
             List<InOutData> inputs = wb.getInputData(executionId, getUser().getFolder());
-            logger.info("Execution has "+inputs.size()+" inputs ");
+            logger.info("Execution has " + inputs.size() + " inputs ");
             for (InOutData iod : inputs) {
                 ParameterTypedValue value = new ParameterTypedValue(ApiUtils.getCarminType(iod.getType()), iod.getPath());
                 StringKeyParameterValuePair skpv = new StringKeyParameterValuePair(iod.getProcessor(), value);
-                logger.info("Adding input "+skpv.toString());
+                logger.info("Adding input " + skpv.toString());
                 e.getInputValues().add(skpv);
             }
 
@@ -128,12 +149,49 @@ public class ExecutionBusiness extends ApiBusiness {
                 e.getReturnedFiles().add(skpv);
             }
 
+            if (!(e.getStatus() == Execution.ExecutionStatus.Finished) && !(e.getStatus() == Execution.ExecutionStatus.Killed) && e.getReturnedFiles().isEmpty()) {
+                e.clearReturnedFiles();
+            }
+
             return e;
 
         } catch (BusinessException ex) {
             throw new ApiException(ex);
         }
 
+    }
+
+    public Execution[] listExecutions(int maxReturned) throws ApiException {
+        try {
+            
+            WorkflowBusiness wb = new WorkflowBusiness();
+            List<Simulation> simulations = wb.getSimulations(
+                    getUser().getFullName(),
+                    null, // application
+                    null, // status
+                    null, // class
+                    null, // startDate
+                    null // endDate
+            );
+            logger.info("Found "+simulations.size()+" simulations.");
+            ArrayList<Execution> executions = new ArrayList<>();
+            int count = 0;
+            for (Simulation s : simulations) {
+                if (!(s == null) && !(s.getStatus() == SimulationStatus.Cleaned)) {
+                    count++;
+                    executions.add(getExecution(s.getID(),true));
+                    if(count >= maxReturned){
+                        getWarnings().add("Only the "+maxReturned+" most recent pipelines were returned.");
+                        break;
+                    }
+                }
+            }
+            logger.info("Returning " + executions.size() + " executions");
+            Execution[] array_executions = new Execution[executions.size()];
+            return executions.toArray(array_executions);
+        } catch (BusinessException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     public void updateExecution(String executionId, ArrayList<StringKeyValuePair> values) throws ApiException {
@@ -145,9 +203,10 @@ public class ExecutionBusiness extends ApiBusiness {
                 {
                     throw new ApiException("Update of parameter " + skvp.getName() + " is not supported.");
                 } else {
-                    if(skvp.getValue() == null)
-                        throw new ApiException("Value of parameter "+skvp.getName()+" is empty.");
-                    logger.info("Updating parameter "+skvp.getName()+" with value \""+skvp.getValue().toString()+"\"");
+                    if (skvp.getValue() == null) {
+                        throw new ApiException("Value of parameter " + skvp.getName() + " is empty.");
+                    }
+                    logger.info("Updating parameter " + skvp.getName() + " with value \"" + skvp.getValue().toString() + "\"");
                     w.setDescription(skvp.getValue().toString());
                 }
             }
@@ -168,8 +227,9 @@ public class ExecutionBusiness extends ApiBusiness {
             // We cannot easily initialize an execution without starting it.
             // So we will just launch the execution, and launch an error in case playExecution is not true.
             // Set warnings
-            if(studyId != null)
+            if (studyId != null) {
                 getWarnings().add("Study identifier was ignored.");
+            }
             if (timeoutInSeconds != null && timeoutInSeconds != 0) {
                 getWarnings().add("Timeout value (" + timeoutInSeconds.toString() + ") was ignored.");
             }
@@ -289,8 +349,9 @@ public class ExecutionBusiness extends ApiBusiness {
     ;
     public String[] getExecutionResults(String executionId, String protocol) throws ApiException {
         try {
-            if(protocol == null)
+            if (protocol == null) {
                 protocol = "https";
+            }
 
             if (!protocol.equals("https") && !protocol.equals("http")) {
                 throw new ApiException("Unsupported protocol: " + protocol);
@@ -302,14 +363,14 @@ public class ExecutionBusiness extends ApiBusiness {
             WorkflowBusiness wb = new WorkflowBusiness();
             List<InOutData> outputs = wb.getOutputData(executionId, getUser().getFolder());
             for (InOutData output : outputs) {
-                
+
                 String operationId = tpb.downloadFile(getUser(), output.getPath());
-                
-                String url = getRequest().getRequestURL() + "/../fr.insalyon.creatis.vip.portal.Main/filedownloadservice?operationid=" + operationId; 
+
+                String url = getRequest().getRequestURL() + "/../fr.insalyon.creatis.vip.portal.Main/filedownloadservice?operationid=" + operationId;
                 URL u = new URL(url); // just to check that it is a well-formed URL
                 urls.add(url);
             }
-            
+
             String[] array_urls = new String[urls.size()];
             return urls.toArray(array_urls);
         } catch (BusinessException | MalformedURLException ex) {
