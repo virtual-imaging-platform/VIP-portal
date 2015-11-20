@@ -54,8 +54,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <vip.simulated-data.version>1.3.1</vip.simulated-data.version>
         <vip.social.version>1.15</vip.social.version>
         <vip.provenance.version>0.1.2</vip.provenance.version>
-        <vip.cowork.version>0.1</vip.cowork.version>
-        <vip.cowork-applet.version>1.15</vip.cowork-applet.version>
         <vip.cardiac.version>0.9.4</vip.cardiac.version>
         <vip.physical-properties.version>0.1</vip.physical-properties.version>
         <vip.query.version>1.7</vip.query.version>
