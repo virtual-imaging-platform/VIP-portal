@@ -116,6 +116,12 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <groupId>fr.cnrs.i3s</groupId>
             <artifactId>moteur2-client</artifactId>
             <version>0.9.21</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>jce-jdk13</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
