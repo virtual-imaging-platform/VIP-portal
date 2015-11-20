@@ -134,6 +134,12 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <groupId>fr.insalyon.creatis.shiwapool</groupId>
             <artifactId>shiwa-pool-client</artifactId>
             <version>0.9</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>bouncycastle</groupId>
+                    <artifactId>bcprov-jdk14</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         
         <dependency>
