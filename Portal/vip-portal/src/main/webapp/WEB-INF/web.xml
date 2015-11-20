@@ -67,16 +67,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/personaauthenticationservice</url-pattern>
     </servlet-mapping>
     <!-- End Core Module -->
-    <!-- Provenance Module -->
-    <servlet>
-        <servlet-name>ProvenanceService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.provenance.server.rpc.ProvenanceServiceImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ProvenanceService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/provenanceservice</url-pattern>
-    </servlet-mapping>
-    <!-- End Provenance Module -->
     <!-- Data Manager Module -->
     <servlet>
         <servlet-name>DataManagerService</servlet-name>
@@ -147,46 +137,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/gatelabservice</url-pattern>
     </servlet-mapping>
     <!-- End GateLab Module -->
-    <!-- Physical Properties Module -->
-    <servlet>
-        <servlet-name>TissueService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.physicalproperties.server.rpc.TissueServiceImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>TissueService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/tissueservice</url-pattern>
-    </servlet-mapping>
-    <!-- End Physical Properties Module -->
-    <!-- Models Module -->
-    <servlet>
-        <servlet-name>ModelService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.models.server.rpc.ModelServiceImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ModelService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/modelservice</url-pattern>
-    </servlet-mapping>
-    <!-- End Models Module -->
-    <!-- SimulatedData Module -->
-    <servlet>
-        <servlet-name>SimulatedDataService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.simulatedata.server.rpc.SimulatedDataServiceImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>SimulatedDataService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/simulateddataservice</url-pattern>
-    </servlet-mapping>
-    <!-- End SimulatedData Module -->
-    <!-- Models Module -->
-    <servlet>
-        <servlet-name>VTKController</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.simulationgui.server.rpc.VTKControllerImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>VTKController</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/vtkcontroller</url-pattern>
-    </servlet-mapping>
-    <!-- End Models Module -->
     <!-- Social Module -->
     <servlet>
         <servlet-name>SocialService</servlet-name>
@@ -197,16 +147,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/socialservice</url-pattern>
     </servlet-mapping>
     <!-- End Social Module -->
-    <!-- Cowork Module -->
-    <servlet>
-        <servlet-name>CoworkService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.cowork.server.rpc.CoworkServiceImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>CoworkService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/coworkservice</url-pattern>
-    </servlet-mapping>
-    <!-- End Cowork Module -->
     <!-- Cardiac Module -->
     <servlet>
         <servlet-name>CardiacService</servlet-name>

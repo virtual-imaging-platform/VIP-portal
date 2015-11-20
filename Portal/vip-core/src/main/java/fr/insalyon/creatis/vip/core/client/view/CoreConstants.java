@@ -40,7 +40,7 @@ import java.util.Date;
  */
 public class CoreConstants implements IsSerializable {
 
-    public static final String VERSION = "v1.15";
+    public static final String VERSION = "v1.16";
     // Configuration Labels
     public static final String VO_BIOMED = "biomed";
     public static final String VO_NEUGRID = "vo.neugrid.eu";
@@ -74,9 +74,6 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_SMA_PORT = "sma.port";
     public static final String LAB_TRUSTSTORE_FILE = "truststore.file";
     public static final String LAB_TRUSTSTORE_PASS = "truststore.password";
-    public static final String LAB_SIMULATED_DATA_DB_USER = "simulated-data.db.user";
-    public static final String LAB_SIMULATED_DATA_DB_PASSWORD = "simulated-data.db.pass";
-    public static final String LAB_SIMULATED_DATA_DB_URL = "simulated-data.db.url";
     public static final String LAB_SIMULATION_ADVANCED_MAX = "simulation.max.advanced";
     public static final String LAB_SIMULATION_PLATFORM_MAX = "simulation.max.platfrom";
     public static final String LAB_SIMULATION_BEGINNER_MAX = "simulation.max.beginner";

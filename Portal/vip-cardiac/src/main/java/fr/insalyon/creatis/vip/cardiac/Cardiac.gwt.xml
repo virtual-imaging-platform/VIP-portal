@@ -35,9 +35,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
 <!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 1.7.0//EN" "http://google-web-toolkit.googlecode.com/svn/tags/1.7.0/distro-source/core/src/gwt-module.dtd">
 <module>
     <inherits name='fr.insalyon.creatis.vip.core.Core'/>
-    <inherits name='fr.insalyon.creatis.vip.datamanager.DataManager'/>
-<!--    <inherits name='fr.insalyon.creatis.vip.provenance.Provenance'/>-->
-   
+    <inherits name='fr.insalyon.creatis.vip.datamanager.DataManager'/> 
 
     <!-- Servlets -->
     <servlet class="fr.insalyon.creatis.vip.cardiac.server.rpc.CardiacServiceImpl" path="/applicationservice"/>

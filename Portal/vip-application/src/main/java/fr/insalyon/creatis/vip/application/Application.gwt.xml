@@ -36,7 +36,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
 <module>
     <inherits name='fr.insalyon.creatis.vip.core.Core'/>
     <inherits name='fr.insalyon.creatis.vip.datamanager.DataManager'/>
-<!--    <inherits name='fr.insalyon.creatis.vip.provenance.Provenance'/>-->
     <inherits name='com.googlecode.gflot.GFlot'/>
 
     <!-- Servlets -->
