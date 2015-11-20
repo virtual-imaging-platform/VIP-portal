@@ -49,13 +49,8 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <vip.datamanager-applet.version>1.15</vip.datamanager-applet.version>
         <vip.gatelab.version>1.15</vip.gatelab.version>
         <vip.gatelab-applet.version>1.15</vip.gatelab-applet.version>
-        <vip.simulation-gui.version>0.4.1</vip.simulation-gui.version>
-        <vip.models.version>0.9.1</vip.models.version>
-        <vip.simulated-data.version>1.3.1</vip.simulated-data.version>
         <vip.social.version>1.15</vip.social.version>
-        <vip.provenance.version>0.1.2</vip.provenance.version>
         <vip.cardiac.version>0.9.4</vip.cardiac.version>
-        <vip.physical-properties.version>0.1</vip.physical-properties.version>
         <vip.query.version>1.7</vip.query.version>
         <vip.application-importer.version>1.15</vip.application-importer.version>
         <vip.api.version>1.15</vip.api.version>
