@@ -32,7 +32,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
 
 -->
 
-<Context antiResourceLocking="true" path="/vip-portal-0.9">
+<Context antiResourceLocking="false" path="/vip-portal">
     <ResourceLink
         name="jdbc/vip"
         global="jdbc/vip"
