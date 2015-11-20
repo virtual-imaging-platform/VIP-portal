@@ -103,14 +103,6 @@ PropertiesConfiguration config;
     // Apache
     private String apacheHost = "localhost";
     private int apacheSSLPort = 80;
-    // Provenance
-    private String provenanceDBUser = "vip";
-    private String provenanceDBPass = "";
-    private String provenanceDBURL = "jdbc:mysql://localhost:3306/SDB2";
-    //Simulated data
-    private String simulatedDataDBUser = "vip";
-    private String simulatedDataDBPass = "vip2011";
-    private String simulatedDataDBURL = "jdbc:mysql://localhost:3306vip_simulated_data";
     //cas
     private String casURL;
     private String SAMLDefaultAccountType;
@@ -200,14 +192,6 @@ PropertiesConfiguration config;
             apacheHost = config.getString("apache.host", apacheHost);
             apacheSSLPort = config.getInt("apache.ssl.port", apacheSSLPort);
 
-            provenanceDBUser = config.getString("provenance.db.user", provenanceDBUser);
-            provenanceDBPass = config.getString("provenance.db.pass", provenanceDBPass);
-            provenanceDBURL = config.getString("provenance.db.url", provenanceDBURL);
-
-            simulatedDataDBUser = config.getString(CoreConstants.LAB_SIMULATED_DATA_DB_USER, simulatedDataDBUser);
-            simulatedDataDBPass = config.getString(CoreConstants.LAB_SIMULATED_DATA_DB_PASSWORD, simulatedDataDBPass);
-            simulatedDataDBURL = config.getString(CoreConstants.LAB_SIMULATED_DATA_DB_URL, simulatedDataDBURL);
-
             casURL = config.getString(CoreConstants.LAB_CAS_URL, "https://ng-cas.maatg.fr/pandora-gateway-sl-cas");
             SAMLDefaultAccountType = config.getString(CoreConstants.LAB_SAML_ACCOUNT_TYPE, "Neuroimaging");
 
@@ -285,12 +269,6 @@ PropertiesConfiguration config;
             config.setProperty(CoreConstants.LAB_SIMULATION_EXEC_MODE, workflowsExecuctionMode);
             config.setProperty("apache.host", apacheHost);
             config.setProperty("apache.ssl.port", apacheSSLPort);
-            config.setProperty("provenance.db.user", provenanceDBUser);
-            config.setProperty("provenance.db.pass", provenanceDBPass);
-            config.setProperty("provenance.db.url", provenanceDBURL);
-            config.setProperty(CoreConstants.LAB_SIMULATED_DATA_DB_URL, simulatedDataDBUser);
-            config.setProperty(CoreConstants.LAB_SIMULATED_DATA_DB_PASSWORD, simulatedDataDBPass);
-            config.setProperty(CoreConstants.LAB_SIMULATED_DATA_DB_URL, simulatedDataDBURL);
             config.setProperty(CoreConstants.LAB_CAS_URL, casURL);
             config.setProperty(CoreConstants.LAB_SAML_ACCOUNT_TYPE, SAMLDefaultAccountType);
             config.setProperty(CoreConstants.SSH_PUBLIC_KEY, sshPublicKey);
@@ -444,18 +422,6 @@ PropertiesConfiguration config;
         return dataManagerGroupsHome;
     }
 
-    public String getProvenanceDBPass() {
-        return provenanceDBPass;
-    }
-
-    public String getProvenanceDBURL() {
-        return provenanceDBURL;
-    }
-
-    public String getProvenanceDBUser() {
-        return provenanceDBUser;
-    }
-
     public String getTruststoreFile() {
         return truststoreFile;
     }
@@ -494,18 +460,6 @@ PropertiesConfiguration config;
 
     public String getSAMLDefaultAccountType() {
         return SAMLDefaultAccountType;
-    }
-
-    public String getSimulatedDataDBPass() {
-        return simulatedDataDBPass;
-    }
-
-    public String getSimulatedDataDBURL() {
-        return simulatedDataDBURL;
-    }
-
-    public String getSimulatedDataDBUser() {
-        return simulatedDataDBUser;
     }
 
     public String getSshPublicKey() {

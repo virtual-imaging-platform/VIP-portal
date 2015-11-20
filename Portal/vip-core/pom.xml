@@ -37,7 +37,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>1.15</version>
+        <version>1.16</version>
         <relativePath>..</relativePath>
     </parent>
     <groupId>fr.insalyon.creatis</groupId>
@@ -175,6 +175,16 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <artifactId>opensaml</artifactId>
             <version>2.6.0</version>
             <type>jar</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk15</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcmail-jdk14</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
      <dependency>
             <groupId>org.apache.httpcomponents</groupId>
