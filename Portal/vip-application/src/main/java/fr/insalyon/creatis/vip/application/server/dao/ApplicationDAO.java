@@ -57,14 +57,14 @@ public interface ApplicationDAO {
     public void removeVersion(String applicationName, String version) throws DAOException;
 
     public List<Application> getApplications() throws DAOException;
+    
+    public Application getApplication(String applicationName) throws DAOException;
 
     public List<String[]> getApplications(String className) throws DAOException;
 
     public List<Application> getApplications(List<String> classes) throws DAOException;
 
     public List<String> getApplicationsName(String applicationClass) throws DAOException;
-
-    public boolean checkApplicationExistWithAnOtherOwner(String name, String userEmail) throws DAOException;
 
     public String getCitation(String name) throws DAOException;
 

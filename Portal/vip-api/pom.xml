@@ -37,7 +37,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>1.15</version>
+        <version>1.16</version>
     </parent>
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip-api</artifactId>
@@ -77,7 +77,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
                         <id>process-classes</id>
                         <phase>process-classes</phase>
                         <configuration>
-                            <className>fr.insalyon.creatis.vip.api.soap.PAF</className>
+                            <className>fr.insalyon.creatis.vip.api.soap.Carmin</className>
                             <genWsdl>true</genWsdl>
                             <verbose>true</verbose>
                         </configuration>
@@ -94,6 +94,24 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <cxf.version>2.2.3</cxf.version>
     </properties>
     <dependencies> 
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-application</artifactId>
+            <version>${vip.application.version}</version>
+            <scope>provided</scope>
+        </dependency>
+         <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-core</artifactId>
+            <version>${vip.core.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-datamanager</artifactId>
+            <version>${vip.datamanager.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>

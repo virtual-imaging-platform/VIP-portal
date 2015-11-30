@@ -33,7 +33,6 @@ package fr.insalyon.creatis.vip.core.client.view;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.Date;
-import java.util.List;
 
 /**
  *
@@ -41,7 +40,7 @@ import java.util.List;
  */
 public class CoreConstants implements IsSerializable {
 
-    public static final String VERSION = "v1.15";
+    public static final String VERSION = "v1.16";
     // Configuration Labels
     public static final String VO_BIOMED = "biomed";
     public static final String VO_NEUGRID = "vo.neugrid.eu";
@@ -75,9 +74,6 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_SMA_PORT = "sma.port";
     public static final String LAB_TRUSTSTORE_FILE = "truststore.file";
     public static final String LAB_TRUSTSTORE_PASS = "truststore.password";
-    public static final String LAB_SIMULATED_DATA_DB_USER = "simulated-data.db.user";
-    public static final String LAB_SIMULATED_DATA_DB_PASSWORD = "simulated-data.db.pass";
-    public static final String LAB_SIMULATED_DATA_DB_URL = "simulated-data.db.url";
     public static final String LAB_SIMULATION_ADVANCED_MAX = "simulation.max.advanced";
     public static final String LAB_SIMULATION_PLATFORM_MAX = "simulation.max.platfrom";
     public static final String LAB_SIMULATION_BEGINNER_MAX = "simulation.max.beginner";
@@ -106,7 +102,7 @@ public class CoreConstants implements IsSerializable {
     public static final String ICON_SEARCH = "icon-search.png";
     public static final String ICON_ACCOUNT = IMG_FOLDER + "icon-account.png";
     public static final String ICON_ACCOUNT_REMOVE = IMG_FOLDER + "icon-account-remove.png";
-    public static final String ICON_ACTIVATE = IMG_FOLDER + "icon-select.png";
+    public static final String ICON_ACTIVE = IMG_FOLDER + "icon-select.png";
     public static final String ICON_ADD = IMG_FOLDER + "icon-add.png";
     public static final String ICON_CLEAR = IMG_FOLDER + "icon-clear.png";
     public static final String ICON_CLOSE = IMG_FOLDER + "icon-close.png";
@@ -125,6 +121,7 @@ public class CoreConstants implements IsSerializable {
     public static final String ICON_PERSONAL = IMG_FOLDER + "icon-personal.png";
     public static final String ICON_PICKER_QUESTION = IMG_FOLDER + "icon-picker-question.png";
     public static final String ICON_REFRESH = IMG_FOLDER + "icon-refresh.png";
+    public static final String ICON_RESET = IMG_FOLDER + "icon-reset.png";
     public static final String ICON_SAVE = IMG_FOLDER + "icon-save.png";
     public static final String ICON_SAVED = IMG_FOLDER + "icon-saved.png";
     public static final String ICON_SIGNOUT = IMG_FOLDER + "icon-signout.png";
@@ -180,10 +177,10 @@ public class CoreConstants implements IsSerializable {
     public static String MOZILLA_PERSONA_VALIDATION_URL = "mozilla.persona.validation.url";
     //query
     public static String TreeQuery = "query.classes";
-    //N4u 
-    public static String APP_CLASS = "expressLaneToVip.application.class";
-    public static String APPLICATION_FILES_REPOSITORY = "expressLaneToVip.upload.repository";
-    public static String APP_DELETE_FILES_AFTER_UPLOAD = "expressLaneToVip.upload.deleteFile";
+    //Boutiques
+    public static String APP_CLASS = "boutiques.application.class";
+    public static String APPLICATION_FILES_REPOSITORY = "boutiques.upload.repository";
+    public static String APP_DELETE_FILES_AFTER_UPLOAD = "boutiques.upload.deleteFile";
     //Publiction
     public static final String  PUB_MONTHS_UPDATES = "last.publication.update";
 

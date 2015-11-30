@@ -38,7 +38,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>1.15</version>
+        <version>1.16</version>
         <relativePath>..</relativePath>
     </parent>
     
@@ -111,7 +111,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>vip-simulation-gui</finalName>
         <resources>
             <resource>
                 <directory>src/main/java</directory>

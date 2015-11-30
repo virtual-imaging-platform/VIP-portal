@@ -134,18 +134,18 @@ public class WorkflowBusiness {
             long runningWorkflows = workflowDAO.getNumberOfRunning(user.getFullName());
             long runningSimulations=workflowDAO.getRunning().size();
             if(runningSimulations >= Server.getInstance().getMaxPlatformRunningSimulations()){
-            logger.warn("Unable to launch simulation '" + simulationName + "': max "
+            logger.warn("Unable to launch execution '" + simulationName + "': max "
                         + "number of running workflows reached in the platform.");
                 throw new fr.insalyon.creatis.vip.core.server.business.BusinessException(
-                        "Max number of running simulations reached.");
+                        "Max number of running executions reached.");
             }
             if (runningWorkflows >= user.getMaxRunningSimulations()) {
 
-                logger.warn("Unable to launch simulation '" + simulationName + "': max "
+                logger.warn("Unable to launch execution '" + simulationName + "': max "
                         + "number of running workflows reached for user '" + user + "'.");
                 throw new fr.insalyon.creatis.vip.core.server.business.BusinessException(
-                        "Max number of running simulations reached.<br />You already have "
-                        + runningWorkflows + " running simulations.");
+                        "Max number of running executions reached.<br />You already have "
+                        + runningWorkflows + " running executions.");
             }
 
             List<ParameterSweep> parameters = new ArrayList<ParameterSweep>();
@@ -199,18 +199,16 @@ public class WorkflowBusiness {
             Workflow workflow = executionBusiness.launch(applicationName,
                     applicationVersion, applicationClass, user, simulationName,
                     workflowPath, parameters);
-
+            if(workflow == null)
+                throw new BusinessException("Workflow is null");
+            logger.info("Launched workflow "+workflow.toString());
             workflowDAO.add(workflow);
             return workflow.getId();
 
-        } catch (WorkflowsDBDAOException ex) {
+        } catch (WorkflowsDBDAOException | DAOException | DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        } catch (DataManagerException ex) {
-            throw new BusinessException(ex);
-        }
+        } 
     }
 
     /**
@@ -369,17 +367,20 @@ public class WorkflowBusiness {
      *
      * @param simulationID
      * @param email
+     * @param deleteFiles
      * @throws BusinessException
      */
-    public void clean(String simulationID, String email) throws BusinessException {
+    public void clean(String simulationID, String email, boolean deleteFiles) throws BusinessException {
 
         try {
             Workflow workflow = workflowDAO.get(simulationID);
             workflow.setStatus(WorkflowStatus.Cleaned);
             workflowDAO.update(workflow);
-            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
-            for (Output output : outputDAO.get(simulationID)) {
-                client.delete(output.getOutputID().getPath(), email);
+            if(deleteFiles){
+                GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
+                for (Output output : outputDAO.get(simulationID)) {
+                    client.delete(output.getOutputID().getPath(), email);
+                }
             }
             inputDAO.removeById(simulationID);
             outputDAO.removeById(simulationID);
@@ -391,6 +392,16 @@ public class WorkflowBusiness {
             logger.error(ex);
             throw new BusinessException(ex);
         }
+    }
+    
+    /**
+     *
+     * @param simulationId
+     * @param email
+     * @throws BusinessException
+     */
+    public void clean(String simulationId, String email) throws BusinessException{
+        clean(simulationId,email,true);
     }
 
     /**
@@ -445,7 +456,7 @@ public class WorkflowBusiness {
         try {
             Workflow workflow = workflowDAO.get(simulationID);
             if (workflow == null) {
-                throw new BusinessException("Cannot find simulation with id " + simulationID);
+                throw new BusinessException("Cannot find execution with id " + simulationID);
             }
             simulation = new Simulation(
                     workflow.getApplication(),
@@ -597,7 +608,7 @@ public class WorkflowBusiness {
                 workflowIDList.add(simulationIDList.get(i).getID());
             }
         } else {
-            throw new BusinessException("Simulation list is null!");
+            throw new BusinessException("Execution list is null!");
         }
 
         if (workflowIDList != null && !workflowIDList.isEmpty()) {

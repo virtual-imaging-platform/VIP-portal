@@ -38,7 +38,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>1.15</version>
+        <version>1.16</version>
         <relativePath>..</relativePath>
     </parent>
     
@@ -73,7 +73,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>moteur2-workflowsdb-common</artifactId>
-            <version>1.1</version>
+            <version>1.2</version>
         </dependency>
         
         <dependency>
@@ -116,6 +116,12 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <groupId>fr.cnrs.i3s</groupId>
             <artifactId>moteur2-client</artifactId>
             <version>0.9.21</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>jce-jdk13</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -128,6 +134,12 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <groupId>fr.insalyon.creatis.shiwapool</groupId>
             <artifactId>shiwa-pool-client</artifactId>
             <version>0.9</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>bouncycastle</groupId>
+                    <artifactId>bcprov-jdk14</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         
         <dependency>

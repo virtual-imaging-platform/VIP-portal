@@ -31,16 +31,54 @@
  */
 package fr.insalyon.creatis.vip.api.business;
 
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.server.auth.AbstractAuthenticationService;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import javax.xml.ws.WebServiceContext;
+import org.apache.log4j.Logger;
+
 /**
  *
  * @author Tristan Glatard
  */
-public class AuthenticationBusiness {
+public class AuthenticationBusiness extends ApiBusiness {
 
-    public static void authenticateSession(String userName, String password) throws ApiException { throw new ApiException("Not implemented yet");}   
+    private final static Logger logger = Logger.getLogger(AuthenticationBusiness.class);
+    
+    public AuthenticationBusiness(WebServiceContext wsContext) throws ApiException {
+        super(wsContext,false);
+    }
+    
+    public void authenticateSession(String userName, String password) throws ApiException {
+        
+         try {
+             //verify userName and password
+             ConfigurationBusiness configurationBusiness = new ConfigurationBusiness();
+             configurationBusiness.configure();
+             User user = configurationBusiness.signin(userName, password);
+             
+             AbstractAuthenticationService.setVIPSession(getRequest(), getResponse(), user);             
+             configurationBusiness.updateUserLastLogin(userName);
+             
+         } catch (BusinessException ex) {
+             throw new ApiException(ex);
+         }
+    }
 
-    public static void authenticateHTTP(String userName) throws ApiException { throw new ApiException("Not implemented yet");}   
+    public void authenticateHTTP(String userName) throws ApiException {
+        throw new ApiException("Not supported."); // will *not* be supported soon. This doesn't violate the API specification.
+    }
 
-    public static void logout() throws ApiException { throw new ApiException("Not implemented yet");}   
+    public void logout() throws ApiException {
+         try {
+             ConfigurationBusiness cb = new ConfigurationBusiness();
+             authenticateSession(); // not done in constructor for obvious reasons but needed here,
+                                    // otherwise getUser() is null and we don't know which user should be logged out.
+             cb.signout(getUser().getEmail());
+         } catch (BusinessException ex) {
+             throw new ApiException(ex);
+         }
+    }
 
 }

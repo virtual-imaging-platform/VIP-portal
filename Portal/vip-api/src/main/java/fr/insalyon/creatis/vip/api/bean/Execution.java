@@ -50,13 +50,13 @@ public class Execution extends Object {
     private String name;
     @XmlElement(name = "pipelineIdentifier", required = true)
     private String pipelineIdentifier;
-    @XmlElement(name = "timeout", required = true)
+    @XmlElement(name = "timeout")
     int timeout;
     @XmlElement(name = "status", required = true)
     ExecutionStatus status;
-    @XmlElement(name = "inputValues", required = true)
+    @XmlElement(name = "inputValue", required = true)
     ArrayList<StringKeyParameterValuePair> inputValues; // TODO minOccur shouldn't be 0;
-    @XmlElement(name = "returnedFiles", required = true)
+    @XmlElement(name = "returnedFile")
     ArrayList<StringKeyParameterValuePair> returnedFiles;
 
     // optional arguments
@@ -64,22 +64,88 @@ public class Execution extends Object {
     String studyIdentifier;
     @XmlElement(name = "errorCode")
     Integer errorCode;
-    @XmlElement(name = "stdout")
-    String stdout;
-    @XmlElement(name = "stderr")
-    String stderr;
     @XmlElement(name = "startDate")
-    Integer startDate;
+    Long startDate;
     @XmlElement(name = "endDate")
-    Integer endDate;
+    Long endDate;
 
     @XmlType(name = "ExecutionStatus")
     public static enum ExecutionStatus {
-
         Initializing, Ready, Running, Finished, InitializationFailed, ExecutionFailed, Unknown, Killed
     }
     
     public Execution() {
+        inputValues = new ArrayList<>();
+        returnedFiles = new ArrayList<>();
+    }
+
+    public Execution(String identifier,
+                     String name,
+                     String pipelineIdentifier,
+                     int timeout,
+                     ExecutionStatus status,
+                     String studyIdentifier,
+                     Integer errorCode,
+                     Long startDate,
+                     Long endDate) {
+        this();
+        this.identifier = identifier;
+        this.name = name == null ? identifier : name; // null names sometimes happen due to a race condition in VIP.
+        this.pipelineIdentifier = pipelineIdentifier;
+        this.timeout = timeout;
+        this.status = status;
+        this.studyIdentifier = studyIdentifier;
+        this.errorCode = errorCode;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPipelineIdentifier() {
+        return pipelineIdentifier;
+    }
+
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public ExecutionStatus getStatus() {
+        return status;
+    }
+
+    public ArrayList<StringKeyParameterValuePair> getInputValues() {
+        return inputValues;
+    }
+
+    public ArrayList<StringKeyParameterValuePair> getReturnedFiles() {
+        return returnedFiles;
+    }
+
+    public String getStudyIdentifier() {
+        return studyIdentifier;
+    }
+
+    public Integer getErrorCode() {
+        return errorCode;
+    }
+
+    public Long getStartDate() {
+        return startDate;
+    }
+
+    public Long getEndDate() {
+        return endDate;
+    }
+    
+    public void clearReturnedFiles() {
+        returnedFiles = null;
     }
 
 }

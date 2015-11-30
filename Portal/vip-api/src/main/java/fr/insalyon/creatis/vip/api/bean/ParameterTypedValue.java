@@ -45,12 +45,24 @@ public class ParameterTypedValue {
     @XmlElement(name = "type", required = true)
     private ParameterType type;
      @XmlElements(value = {
-        @XmlElement(name = "value", type = String.class, required = true),
-        @XmlElement(name = "value", type = boolean.class, required = true),
-        @XmlElement(name = "value", type = int.class, required = true),
-        @XmlElement(name = "value", type = double.class, required = true),})
+        @XmlElement(name = "valueStr", type = String.class, required = true),
+        @XmlElement(name = "valueBool", type = boolean.class, required = true),
+        @XmlElement(name = "valueInt", type = int.class, required = true),
+        @XmlElement(name = "valueDouble", type = double.class, required = true),})
     private String value;
     public ParameterTypedValue() {
     }
+    public ParameterTypedValue(ParameterType type, String value){
+        this.type = type;
+        this.value = value;
+    }
 
+    public ParameterType getType() {
+        return type;
+    }
+
+    public String getValue() {
+        return value;
+    }
+    
 }

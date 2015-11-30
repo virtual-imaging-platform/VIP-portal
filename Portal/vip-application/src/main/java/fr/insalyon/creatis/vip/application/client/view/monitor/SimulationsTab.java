@@ -125,7 +125,7 @@ public class SimulationsTab extends Tab {
         grid.setEmptyMessage("<br>No data available.");
         grid.setFields(
                 FieldUtil.getIconGridField("statusIco"),
-                new ListGridField("simulationName", "Simulation Name"),
+                new ListGridField("simulationName", "Execution Name"),
                 new ListGridField("status", "Status"),
                 new ListGridField("application", "Application"),
                 new ListGridField("applicationVersion", "Version"),
@@ -199,7 +199,7 @@ public class SimulationsTab extends Tab {
                 modal.hide();
             }
         };
-        modal.show("Loading Simulations...", true);
+        modal.show("Loading Executions...", true);
         WorkflowService.Util.getInstance().getSimulations(user, app, status, appClass, startDate, endDate, callback);
         Layout.getInstance().setActiveCenterTab(ApplicationConstants.TAB_MONITOR);
     }

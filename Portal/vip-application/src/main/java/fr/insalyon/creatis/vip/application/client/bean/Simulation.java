@@ -107,4 +107,9 @@ public class Simulation implements IsSerializable {
     public String toString() {
         return applicationName + "\n" + id + "\n" + userName + "\n" + date;
     }
+
+    public void setSimulationName(String simulationName) {
+        this.simulationName = simulationName;
+    }
+    
 }

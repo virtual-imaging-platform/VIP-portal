@@ -82,7 +82,7 @@ public class SimulationsContextMenu extends Menu {
         this.setShadowDepth(10);
         this.setWidth(90);
 
-        MenuItem viewItem = new MenuItem("View Simulation");
+        MenuItem viewItem = new MenuItem("View Execution");
         viewItem.setIcon(ApplicationConstants.ICON_SIMULATION_VIEW);
         viewItem.addClickHandler(new ClickHandler() {
             @Override
@@ -92,12 +92,12 @@ public class SimulationsContextMenu extends Menu {
             }
         });
 
-        MenuItem killItem = new MenuItem("Kill Simulation");
+        MenuItem killItem = new MenuItem("Kill Execution");
         killItem.setIcon(ApplicationConstants.ICON_KILL);
         killItem.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(MenuItemClickEvent event) {
-                SC.ask("Do you really want to kill this simulation ("
+                SC.ask("Do you really want to kill this execution ("
                         + title + ")?", new BooleanCallback() {
                     @Override
                     public void execute(Boolean value) {
@@ -109,12 +109,12 @@ public class SimulationsContextMenu extends Menu {
             }
         });
 
-        MenuItem cleanItem = new MenuItem("Clean Simulation");
+        MenuItem cleanItem = new MenuItem("Clean Execution");
         cleanItem.setIcon(ApplicationConstants.ICON_CLEAN);
         cleanItem.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(MenuItemClickEvent event) {
-                SC.ask("Do you really want to clean this simulation ("
+                SC.ask("Do you really want to clean this execution ("
                         + title + ")?", new BooleanCallback() {
                     @Override
                     public void execute(Boolean value) {
@@ -126,12 +126,12 @@ public class SimulationsContextMenu extends Menu {
             }
         });
 
-        MenuItem purgeItem = new MenuItem("Purge Simulation");
+        MenuItem purgeItem = new MenuItem("Purge Execution");
         purgeItem.setIcon(CoreConstants.ICON_CLEAR);
         purgeItem.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(MenuItemClickEvent event) {
-                SC.ask("Do you really want to purge this simulation ("
+                SC.ask("Do you really want to purge this execution ("
                         + title + ")?", new BooleanCallback() {
                     @Override
                     public void execute(Boolean value) {
@@ -143,12 +143,12 @@ public class SimulationsContextMenu extends Menu {
             }
         });
 
-        MenuItem markCompletedItem = new MenuItem("Mark Simulation Completed");
+        MenuItem markCompletedItem = new MenuItem("Mark Execution Completed");
         markCompletedItem.setIcon(ApplicationConstants.ICON_MARK_COMPLETED);
         markCompletedItem.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(MenuItemClickEvent event) {
-                SC.ask("Do you really want to mark this simulation as completed ("
+                SC.ask("Do you really want to mark this execution as completed ("
                         + title + ")?", new BooleanCallback() {
                     @Override
                     public void execute(Boolean value) {
@@ -160,7 +160,7 @@ public class SimulationsContextMenu extends Menu {
             }
         });
 
-        MenuItem relauchItem = new MenuItem("Relaunch Simulation");
+        MenuItem relauchItem = new MenuItem("Relaunch Execution");
         relauchItem.setIcon(ApplicationConstants.ICON_RELAUNCH);
         relauchItem.addClickHandler(new ClickHandler() {
             @Override
@@ -169,7 +169,7 @@ public class SimulationsContextMenu extends Menu {
             }
         });
 
-        MenuItem changeUserItem = new MenuItem("Change Simulation User");
+        MenuItem changeUserItem = new MenuItem("Change Execution User");
         changeUserItem.setIcon(ApplicationConstants.ICON_USER);
         changeUserItem.addClickHandler(new ClickHandler() {
             @Override
@@ -223,7 +223,7 @@ public class SimulationsContextMenu extends Menu {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to kill simulation:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to kill execution:<br />" + caught.getMessage());
             }
 
             @Override
@@ -245,7 +245,7 @@ public class SimulationsContextMenu extends Menu {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to clean simulation:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to clean execution:<br />" + caught.getMessage());
             }
 
             @Override
@@ -255,7 +255,7 @@ public class SimulationsContextMenu extends Menu {
             }
         };
         WorkflowService.Util.getInstance().cleanWorkflow(simulationID, callback);
-        modal.show("Cleaning simulation " + simulationName + "...", true);
+        modal.show("Cleaning execution " + simulationName + "...", true);
     }
 
     /**
@@ -267,7 +267,7 @@ public class SimulationsContextMenu extends Menu {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to purge simulation:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to purge execution:<br />" + caught.getMessage());
             }
 
             @Override
@@ -277,7 +277,7 @@ public class SimulationsContextMenu extends Menu {
             }
         };
         WorkflowService.Util.getInstance().purgeWorkflow(simulationID, callback);
-        modal.show("Purging simulation " + simulationName + "...", true);
+        modal.show("Purging execution " + simulationName + "...", true);
     }
 
     private void markCompleted() {
@@ -285,7 +285,7 @@ public class SimulationsContextMenu extends Menu {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to mark simulation completed:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to mark execution completed:<br />" + caught.getMessage());
             }
 
             @Override
@@ -295,7 +295,7 @@ public class SimulationsContextMenu extends Menu {
             }
         };
         WorkflowService.Util.getInstance().markWorkflowCompleted(simulationID, callback);
-        modal.show("Marking simulation " + simulationName + " cmopleted...", true);
+        modal.show("Marking execution " + simulationName + " cmopleted...", true);
     }
 
     /**
@@ -307,7 +307,7 @@ public class SimulationsContextMenu extends Menu {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to relauch simulation:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to relauch execution:<br />" + caught.getMessage());
             }
 
             @Override
@@ -320,7 +320,7 @@ public class SimulationsContextMenu extends Menu {
             }
         };
         WorkflowService.Util.getInstance().relaunchSimulation(simulationID, callback);
-        modal.show("Relaunching simulation " + simulationName + "...", true);
+        modal.show("Relaunching execution " + simulationName + "...", true);
     }
 
     private void changeUser() {

@@ -92,7 +92,7 @@ public class ChangeSimulationUserLayout extends VLayout {
         titleLayout.setWidth100();
         titleLayout.setHeight(20);
 
-        Label titleLabel = WidgetUtil.getLabel("<b>Change simulation user</b>",
+        Label titleLabel = WidgetUtil.getLabel("<b>Change execution user</b>",
                 CoreConstants.ICON_PERSONAL, 30);
         titleLabel.setWidth100();
         titleLayout.addMember(titleLabel);
@@ -137,7 +137,7 @@ public class ChangeSimulationUserLayout extends VLayout {
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to change simulation user:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to change execution user:<br />" + caught.getMessage());
             }
 
             @Override
@@ -149,7 +149,7 @@ public class ChangeSimulationUserLayout extends VLayout {
         if (!user.equals(currentUser)) {
             modal.hide();
             destroy();
-            modal.show("Changing user of simulation" + simulationName + " to '" + user + "'...", true);
+            modal.show("Changing user of execution " + simulationName + " to '" + user + "'...", true);
             WorkflowService.Util.getInstance().changeSimulationUser(simulationID, user, callback);
         } else {
             modal.hide();

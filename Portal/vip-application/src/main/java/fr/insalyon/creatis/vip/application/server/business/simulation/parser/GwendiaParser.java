@@ -32,6 +32,8 @@
 package fr.insalyon.creatis.vip.application.server.business.simulation.parser;
 
 import fr.insalyon.creatis.vip.application.client.bean.Source;
+import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
+import org.apache.log4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -44,6 +46,7 @@ public class GwendiaParser extends AbstractWorkflowParser {
     private Source currentSource = null;
     private String text = null;
     
+    private static final Logger logger = Logger.getLogger(GwendiaParser.class);
     
     public GwendiaParser() {
         super();
@@ -53,7 +56,7 @@ public class GwendiaParser extends AbstractWorkflowParser {
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
         if (localName.equals("source")) {
-            Source s = new Source(attributes.getValue("name"),attributes.getValue("user-level"),attributes.getValue("description"));
+            Source s = new Source(attributes.getValue("name"),attributes.getValue("type"),attributes.getValue("user-level"),attributes.getValue("description"),attributes.getValue("optional"),attributes.getValue("default"));
             sources.add(s);
             currentSource = s;
             return;
