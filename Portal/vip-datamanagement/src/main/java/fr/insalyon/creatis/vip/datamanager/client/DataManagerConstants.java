@@ -68,6 +68,8 @@ public class DataManagerConstants {
     public static final String ICON_SSH = IMG_FOLDER + "icon-ssh.png";
     public static final String ICON_ACTIVATE_SSH = IMG_FOLDER + "icon-activate";
     public static final String ICON_DEACTIVATE_SSH = IMG_FOLDER + "icon-deactivate";
+    public static final String ICON_STATUS_OK_SSH = IMG_FOLDER + "icon-ok";
+    public static final String ICON_STATUS_FAILED_SSH = IMG_FOLDER + "icon-failed";
     // Application Names
     public final static String APP_CACHED_FILES = "Cached Files";
     public final static String APP_FILE_TRANSFER = "File Transfer";

@@ -46,35 +46,28 @@ import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 
 /**
  *
- * @author glatard
+ * @author glatard, 
+ * @author Nouha Boujelben
  */
 public class ManageSSHTab extends AbstractManageTab {
 
     private SSHLayout sshLayout;
     private EditSSHLayout editLayout;
-    private Label keyLabel;
-    private VLayout keyLayout1;
-
+    
     public ManageSSHTab() {
 
         super(DataManagerConstants.ICON_SSH, DataManagerConstants.APP_SSH, DataManagerConstants.TAB_MANAGE_SSH);
-        vLayout.setWidth100();
         sshLayout = new SSHLayout();
-        editLayout = new EditSSHLayout();
-
-        keyLayout1 = new VLayout(5);
-        keyLayout1.setSize("480", "*");
+        editLayout = new EditSSHLayout("25%","100%");
 
         loadKey();
-
+          
         HLayout sshLayout = new HLayout(5);
-        sshLayout.setHeight("50%");
+        sshLayout.setHeight100();
         sshLayout.setWidth100();
         sshLayout.addMember(this.sshLayout);
-
         sshLayout.addMember(editLayout);
-        vLayout.addMember(sshLayout);
-
+        this.vLayout.addMember(sshLayout);
     }
 
     private void loadKey() {
@@ -89,9 +82,10 @@ public class ManageSSHTab extends AbstractManageTab {
             public void onSuccess(String result) {
 
                 editLayout.addMember(WidgetUtil.getLabel("<b>VIP's public ssh key (add it to user@host)", 50));
-                Label l = WidgetUtil.getLabel(result, 20);
+                Label l = WidgetUtil.getLabel(result,20);
+                
                 l.setCanSelectText(true);
-                l.setWidth(480);
+                l.setWidth(350);
                 l.setOverflow(Overflow.CLIP_H);
                 editLayout.addMember(l);
 //                VLayout keyLayout = new VLayout(5);
@@ -117,8 +111,8 @@ public class ManageSSHTab extends AbstractManageTab {
         sshLayout.loadData();
     }
 
-    public void setSSH(String name, String email, String user, String host, String port, TransferType transferType, String directory, String status, boolean deleteFilesFromSource, boolean activate) {
-        editLayout.setSSH(email, name, user, host, port, transferType, directory, status, deleteFilesFromSource, activate);
+    public void setSSH(String name, String email, String user, String host, String port, TransferType transferType, String directory, String status,boolean checkFilesContent, boolean deleteFilesFromSource, boolean activate) {
+        editLayout.setSSH(email, name, user, host, port, transferType, directory, status,checkFilesContent, deleteFilesFromSource, activate);
     }
 
 }
