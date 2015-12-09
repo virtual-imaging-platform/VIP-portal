@@ -44,6 +44,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -89,11 +90,13 @@ public class SSHData implements SSHDAO {
                 boolean deleteFilesFromSource = rs.getBoolean("deleteFilesFromSource");
                 boolean active = rs.getBoolean("active");
                 boolean checkFilesContent=rs.getBoolean("checkFilesContent");
-                String lfcFiles="+"+String.valueOf(rs.getInt("numberOfFilesTransferredToLFC"))+" ("+String.valueOf(rs.getLong("sizeOfFilesTransferredToLFC"))+") "
-                                 +"-"+String.valueOf(rs.getInt("numberOfFilesDeletedInLFC"))+" ("+String.valueOf(rs.getLong("sizeOfFilesDeletedInLFC"))+")";
                 
-                String sshFiles="+"+String.valueOf(rs.getInt("numberOfFilesTransferredToDevice"))+" ("+String.valueOf(rs.getLong("sizeOfFilesTransferredToDevice"))+") "
-                                 +"-"+String.valueOf(rs.getInt("numberOfFilesDeletedInDevice"))+" ("+String.valueOf(rs.getLong("sizeOfFilesDeletedInDevice"))+")";
+                
+                String lfcFiles="+"+String.valueOf(rs.getInt("numberOfFilesTransferredToLFC"))+" ("+readableUnitFileSize(rs.getLong("sizeOfFilesTransferredToLFC"))+") "
+                                 +"-"+String.valueOf(rs.getInt("numberOfFilesDeletedInLFC"))+" ("+readableUnitFileSize(rs.getLong("sizeOfFilesDeletedInLFC"))+")";
+                
+                String sshFiles="+"+String.valueOf(rs.getInt("numberOfFilesTransferredToDevice"))+" ("+readableUnitFileSize(rs.getLong("sizeOfFilesTransferredToDevice"))+") "
+                                 +"-"+String.valueOf(rs.getInt("numberOfFilesDeletedInDevice"))+" ("+readableUnitFileSize(rs.getLong("sizeOfFilesDeletedInDevice"))+")";
 
                 String status = "ok";
                 if (auth_failed) {
@@ -245,4 +248,11 @@ public class SSHData implements SSHDAO {
 
         }
     }
+    
+    public static String readableUnitFileSize(long size) {
+    if(size <= 0) return "0";
+    final String[] units = new String[] { "B", "kB", "MB", "GB", "TB" };
+    int digitGroups = (int) (Math.log10(size)/Math.log10(1024));
+    return new DecimalFormat("#,##0.#").format(size/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+}
 }
