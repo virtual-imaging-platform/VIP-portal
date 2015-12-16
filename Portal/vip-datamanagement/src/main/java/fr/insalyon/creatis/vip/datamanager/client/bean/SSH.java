@@ -50,8 +50,11 @@ public class SSH implements IsSerializable {
     private String status;
     private Date theEarliestNextSynchronistation;
     private long numberSynchronizationFailed;
+    private boolean checkFilesContent;
     private boolean deleteFilesFromSource;
     private boolean active;
+    private String sshFiles;
+    private String lfcFiles;
 
     public SSH() {
     }
@@ -72,7 +75,7 @@ public class SSH implements IsSerializable {
      * synchronization failed
      * @param deleteFilesFromSource enbale delete files from source location
      */
-    public SSH(String email, String name, String user, String host, int port, TransferType transferType, String directory, String status, Date theEarliestNextSynchronistation, long numberSynchronizationFailed, boolean deleteFilesFromSource, boolean active) {
+    public SSH(String email, String name, String user, String host, int port, TransferType transferType, String directory, String status, Date theEarliestNextSynchronistation, long numberSynchronizationFailed, boolean checkFilesContent, boolean deleteFilesFromSource, boolean active, String sshFiles, String lfcFiles) {
         this.email = email;
         this.name = name;
         this.user = user;
@@ -83,11 +86,14 @@ public class SSH implements IsSerializable {
         this.status = status;
         this.theEarliestNextSynchronistation = theEarliestNextSynchronistation;
         this.numberSynchronizationFailed = numberSynchronizationFailed;
+        this.checkFilesContent = checkFilesContent;
         this.deleteFilesFromSource = deleteFilesFromSource;
         this.active = active;
+        this.sshFiles = sshFiles;
+        this.lfcFiles = lfcFiles;
     }
 
-    public SSH(String email, String name, String user, String host, int port, TransferType transferType, String directory, String status, boolean deleteFilesFromSource, boolean active) {
+    public SSH(String email, String name, String user, String host, int port, TransferType transferType, String directory, String status, boolean checkFilesContent, boolean deleteFilesFromSource, boolean active) {
         this.email = email;
         this.name = name;
         this.user = user;
@@ -96,6 +102,7 @@ public class SSH implements IsSerializable {
         this.transferType = transferType;
         this.directory = directory;
         this.status = status;
+        this.checkFilesContent = checkFilesContent;
         this.deleteFilesFromSource = deleteFilesFromSource;
         this.active = active;
     }
@@ -162,6 +169,30 @@ public class SSH implements IsSerializable {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public boolean isCheckFilesContent() {
+        return checkFilesContent;
+    }
+
+    public void setCheckFilesContent(boolean checkFilesContent) {
+        this.checkFilesContent = checkFilesContent;
+    }
+
+    public String getSshFiles() {
+        return sshFiles;
+    }
+
+    public void setSshFiles(String sshFiles) {
+        this.sshFiles = sshFiles;
+    }
+
+    public String getLfcFiles() {
+        return lfcFiles;
+    }
+
+    public void setLfcFiles(String lfcFiles) {
+        this.lfcFiles = lfcFiles;
     }
 
 }

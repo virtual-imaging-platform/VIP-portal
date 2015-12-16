@@ -37,16 +37,22 @@ import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 
 /**
  *
- * @author glatard, Nouha Boujelben
+ * @author glatard,
+ * @author Nouha Boujelben
  */
 public class SSHRecord extends ListGridRecord {
 
-    public SSHRecord(String name, String email, String user, String host, int port, TransferType transferType, String directory, String status, String theEarliestNextSynchronistation, long numberSynchronizationFailed, boolean deleteFilesFromSource, boolean active) {
+    public SSHRecord(String name, String email, String user, String host, int port, TransferType transferType, String directory, String status, String theEarliestNextSynchronistation, long numberSynchronizationFailed, boolean checkFilesContent, boolean deleteFilesFromSource, boolean active, String sshFiles, String lfcFiles) {
 
         if (active) {
             setAttribute("activeIcon", DataManagerConstants.ICON_ACTIVATE_SSH);
         } else {
             setAttribute("activeIcon", DataManagerConstants.ICON_DEACTIVATE_SSH);
+        }
+        if (status.equals("ok")) {
+            setAttribute("statusIcon", DataManagerConstants.ICON_STATUS_OK_SSH);
+        } else {
+            setAttribute("statusIcon", DataManagerConstants.ICON_STATUS_FAILED_SSH);
         }
         setAttribute("active", active);
         setAttribute("name", name);
@@ -59,7 +65,10 @@ public class SSHRecord extends ListGridRecord {
         setAttribute("status", status);
         setAttribute("theEarliestNextSynchronistation", theEarliestNextSynchronistation);
         setAttribute("numberSynchronizationFailed", numberSynchronizationFailed);
+        setAttribute("checkFilesContent", checkFilesContent);
         setAttribute("deleteFilesFromSource", deleteFilesFromSource);
+        setAttribute("sshFiles", sshFiles);
+        setAttribute("lfcFiles", lfcFiles);
 
     }
 
