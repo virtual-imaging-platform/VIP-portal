@@ -207,7 +207,7 @@ public class SSHLayout extends VLayout {
         grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
         grid.setEmptyMessage("<br>No data available.");
         
-        ListGridField checkFilesContentField = new ListGridField("checkFilesContent", "check Files Content");
+        ListGridField checkFilesContentField = new ListGridField("checkFilesContent", "Check File Content");
         checkFilesContentField.setType(ListGridFieldType.BOOLEAN);
   
         ListGridField deleteFilesFromSourceField = new ListGridField("deleteFilesFromSource", "Delete Files");
