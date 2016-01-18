@@ -163,7 +163,7 @@ ${BOUTIQUES_COMMAND_LINE}
 DOCKERJOB
 
 chmod 755 .dockerjob.sh 
-docker run --rm -v $PWD:/gasw-execution-dir -v $PWD/../cache:$PWD/../cache -w /gasw-execution-dir $tool.getDockerImage()  ./.dockerjob.sh 
+docker run --rm -v $PWD:/gasw-execution-dir -v $PWD/../cache:$PWD/../cache -w /gasw-execution-dir -u `id -u`:`id -g` $tool.getDockerImage()  ./.dockerjob.sh 
 #else
 ${BOUTIQUES_COMMAND_LINE}
 #end
