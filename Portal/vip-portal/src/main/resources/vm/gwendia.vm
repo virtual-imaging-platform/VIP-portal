@@ -36,10 +36,23 @@
     </source>
 #end
 #foreach($output in $tool.getOutputFiles())
-    <sink name="$output.getId()" type="string" />
+    <sink name="$output.getId()" type="URI" />
 #end
   </interface>
   <processors>
+    <processor name="append-date" >
+      <in name="dir" type="string" depth="0" />
+      <out name="result" type="string" depth="0" />
+      <beanshell>/*----------Beginning of Beanshell------------*/
+                        import java.text.DateFormat;
+                        import java.text.SimpleDateFormat;
+                        import java.util.Date;
+
+DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HH:mm:ss");
+String result = dir+"/"+(dateFormat.format(System.currentTimeMillis()));
+/*------------End of Beanshell------------*/
+      </beanshell>
+    </processor>
     <processor name="$tool.getName()" >
         <in name="results-directory" type="string" depth="0"/>
 #foreach($input in $tool.getInputs())
@@ -64,7 +77,8 @@
     </processor>
   </processors>
   <links>
-    <link from="results-directory" to="$tool.getName():results-directory" />
+    <link from="results-directory" to="append-date:dir" />
+    <link from="append-date:result" to="$tool.getName():results-directory" />
 #foreach( $input in $tool.getInputs() )
     <link from="$input.getId()" to="$tool.getName():$input.getId()" />
 #end

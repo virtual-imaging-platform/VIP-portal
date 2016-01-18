@@ -17,7 +17,7 @@
 #end
 #foreach($outputFile in $tool.getOutputFiles())
 #set($option="--$outputFile.getId().toLowerCase()")
-    <output name="$outputFile.getName()" option="$option">
+    <output name="$output.getId()" option="$option">
 #set ($value=$outputFile.getPathTemplate()) 
 #set ($i=1)
 #foreach($input in $tool.getInputs())
