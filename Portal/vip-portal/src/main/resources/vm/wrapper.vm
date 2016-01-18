@@ -1,5 +1,77 @@
 #!/bin/bash
 
+#####################
+#     Functions     #
+#####################
+
+function info {
+  local D=`date`
+  echo [ INFO - $D ] $*
+}
+
+function warning {
+  local D=`date`
+  echo [ WARN - $D ] $*
+}
+
+function error {
+  local D=`date`
+  echo [ ERROR - $D ] $* >&2
+}
+
+function downloadLFN {
+
+  local LFN=$1
+  local LOCAL=${PWD}/`basename ${LFN}`
+
+  info "getting file size and computing sendReceiveTimeout"
+  size=`lfc-ls -l ${LFN} | awk -F' ' '{print $5}'`
+  sendReceiveTimeout=`echo $[${size}/150/1024]`
+  if [ "$sendReceiveTimeout" = "" ] || [ $sendReceiveTimeout -le 900 ]; then echo "sendReceiveTimeout empty or too small, setting it to 900s"; sendReceiveTimeout=900; else echo "sendReceiveTimeout is $sendReceiveTimeout"; fi;
+  info "Removing file ${LOCAL} in case it is already here"
+  \rm -f ${LOCAL}
+
+  info "Checking if the file is on local SE ${VO_BIOMED_DEFAULT_SE}"
+  local closeSURL=`lcg-lr lfn:${LFN} | grep ${VO_BIOMED_DEFAULT_SE}`
+  if [ "${closeSURL}" != "" ]
+  then
+    info "It is. Trying to download the file from there"
+    LINE="lcg-cp -v --connect-timeout 10 --sendreceive-timeout $sendReceiveTimeout --bdii-timeout 10 --srm-timeout 30 ${closeSURL} file:${LOCAL}"
+    info ${LINE}
+    ${LINE} &> lcg-log
+    if [ $? = 0 ]
+    then
+      info "lcg-cp worked fine"
+      lcg_source=`cat lcg-log | awk -F"://" '/Trying SURL srm/ {print $2}' | awk -F"/" '{print $1}'|awk -F":" '{print $1}'`;
+      lcg_destination=`hostname`;
+      lcg_time=`cat lcg-log | awk '/Transfer took/ {print $3$4}'`;
+      info "DownloadCommand=lcg-cp Source=$lcg_source Destination=$lcg_destination Size=$size Time=$lcg_time";
+      return 0
+    else
+      error "It failed, falling back on regular lcg-cp"
+    fi
+  else
+    info "It's not, falling back on regular lcg-cp"
+  fi
+
+info "Downloading file ${LFN}..."
+LINE="lcg-cp -v --connect-timeout 10 --sendreceive-timeout $sendReceiveTimeout --bdii-timeout 10 --srm-timeout 30 lfn:${LFN} file:${LOCAL}"
+info ${LINE}
+${LINE} &> lcg-log
+if [ $? = 0 ]
+then
+  info "lcg-cp worked fine"
+  lcg_source=`cat lcg-log | awk -F"://" '/Trying SURL srm/ {print $2}' | awk -F"/" '{print $1}'|awk -F":" '{print $1}'`;
+  lcg_destination=`hostname`;
+  lcg_time=`cat lcg-log | awk '/Transfer took/ {print $3$4}'`;
+  info "DownloadCommand=lcg-cp Source=$lcg_source Destination=$lcg_destination Size=$size Time=$lcg_time";
+else
+  error "lcg-cp failed"
+  error "`cat lcg-log`"
+  return 1
+fi
+\rm lcg-log 
+}
 
 #####################
 # Arguments parsing #
@@ -47,15 +119,22 @@ BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$outputFile.getCommandLine
 #end 
 
 #foreach($input in $tool.getInputs())
-#if($input.isOptional())
+  #if($input.isOptional())
 if [ "$$input.getId().toUpperCase()" != "no" ]
 then
   # Optional input is active.
-#end
-#if($input.getType() != "Flag")
-#set($newValue="""$input.getCommandLineFlag() $$input.getId().toUpperCase()""")
+  #end
+  #if($input.getType() != "Flag")
+    #set($newValue="""$input.getCommandLineFlag() $$input.getId().toUpperCase()""")
+    #if($input.getType() == "File" && $input.isOptional())
+  # Optional input is active and it is a file. The file needs to be downloaded (optional files are not handled by GASW).
+  downloadLFN $$input.getId().toUpperCase()
+  LOCAL_FILE_NAME=`basename $$input.getId().toUpperCase()`
+  BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/"$input.getCommandLineFlag() ${LOCAL_FILE_NAME}"}
+    #else
   BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/$newValue}
-#else
+    #end
+  #else
 if [ "$$input.getId().toUpperCase()" = "true" ]
 then
   # flag is set: replace command-line key by flag value

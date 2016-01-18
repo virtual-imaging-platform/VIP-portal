@@ -6,32 +6,32 @@
         <source-comment>$esc.xml("<b><font color=blue>results-directory</font></b> (<b><font color=green>Directory</font></b>):") Directory where the results will be stored.</source-comment>
     </source>
 #foreach( $input in $tool.getInputs() )
-#if($input.getType()=="File")
-    <source name="$input.getId()" type="URI" optional="$input.isOptional()">
-#else
-#if($input.getType()=="Flag")
+  #set($type="string")
+  #if($input.getType()=="File")
+    #set($type="URI")
+  #end
+  #if($input.getType()=="Flag")
     <source name="$input.getId()" type="string" optional="$input.isOptional()" default="false">
-#set($extraComment="Put '<b>true</b>' to activate the flag and '<b>false</b>' to disable it.")
-#else
-#if($input.getDefaultValue()!="null")
-    <source name="$input.getId()" type="string" optional="$input.isOptional()" default="$input.getDefaultValue()">
-#if($input.isOptional()==true)
-    <source name="$input.getId()" type="string" optional="$input.isOptional()" default="no">
-#set($extraComment="Put '<b>no</b>' to ignore this optional input.")
-#else
-#set($extraComment="")
-#end    
-#else
-#if($input.isOptional()==true)
-    <source name="$input.getId()" type="string" optional="$input.isOptional()" default="no">
-#set($extraComment="Put '<b>no</b>' to ignore this optional input.")
-#else
-    <source name="$input.getId()" type="string" optional="$input.isOptional()">
-#set($extraComment="")
-#end
-#end
-#end
-#end
+    #set($extraComment="Put '<b>true</b>' to activate the flag and '<b>false</b>' to disable it.")
+  #else
+    #if($input.getDefaultValue()!="null")
+    <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="$input.getDefaultValue()">
+      #if($input.isOptional()==true)
+    <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="no">
+        #set($extraComment="Put '<b>no</b>' to ignore this optional input.")
+      #else
+        #set($extraComment="")
+      #end    
+    #else
+      #if($input.isOptional()==true)
+    <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="no">
+        #set($extraComment="Put '<b>no</b>' to ignore this optional input.")
+      #else
+    <source name="$input.getId()" type="$type" optional="$input.isOptional()">
+        #set($extraComment="")
+      #end
+    #end
+  #end
       <source-comment>$esc.xml("<b><font color=blue>$input.getId()</font></b> (<b><font color=green>$input.getType()</font></b>):") $esc.xml($input.getDescription()) $esc.xml(${extraComment})</source-comment>
     </source>
 #end
@@ -43,11 +43,11 @@
     <processor name="$tool.getName()" >
         <in name="results-directory" type="string" depth="0"/>
 #foreach($input in $tool.getInputs())
-#if($input.getType()=="File" )
+  #if($input.getType()=="File" )
         <in name="$input.getId()" type="URI" depth="0"/>
-#else
+  #else
         <in name="$input.getId()" type="string" depth="0"/>
-#end
+  #end
 #end
 #foreach( $output in $tool.getOutputFiles() )
         <out name="$output.getId()" type="URI" depth="0"/>

@@ -10,7 +10,7 @@
 #foreach($input in $tool.getInputs())
 #set($option="--$input.getId().toLowerCase()")
     <input name="${input.getId()}" option="${option}"> 
-#if($input.getType() == "File")
+#if($input.getType() == "File" && !$input.isOptional())
       <access type="LFN"/> 
 #end
     </input>
