@@ -55,6 +55,7 @@ public class ClassData implements ClassDAO {
 
     public ClassData() throws DAOException {
         connection = PlatformConnection.getInstance().getConnection();
+        logger.info("******************Loading CalssData*************" );
     }
 
     /**
@@ -65,26 +66,8 @@ public class ClassData implements ClassDAO {
     @Override
     public void add(AppClass appClass) throws DAOException {
 
-        try {
-            PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO VIPClasses(name, engine) "
-                    + "VALUES (?, ?)");
-
-            ps.setString(1, appClass.getName());
-            ps.setString(2, appClass.getEngine());
-            ps.execute();
-            ps.close();
-
-            addGroupsToClass(appClass.getName(), appClass.getGroups());
-
-        } catch (SQLException ex) {
-            if (ex.getMessage().contains("Duplicate entry")) {
-                throw new DAOException("A class named \"" + appClass.getName() + "\" already exists.");
-            } else {
-                logger.error(ex);
-                throw new DAOException(ex);
-            }
-        }
+        addToClass(appClass.getName(), appClass.getEngines(), "engine");
+        addToClass(appClass.getName(), appClass.getGroups(), "group");
     }
 
     /**
@@ -95,23 +78,12 @@ public class ClassData implements ClassDAO {
     @Override
     public void update(AppClass appClass) throws DAOException {
 
-        try {
-            PreparedStatement ps = connection.prepareStatement(
-                    "UPDATE VIPClasses SET engine = ? "
-                    + "WHERE name = ?");
+        removeFromClass(appClass.getName(), "engine");
+        addToClass(appClass.getName(), appClass.getGroups(), "engine");
 
-            ps.setString(1, appClass.getEngine());
-            ps.setString(2, appClass.getName());
-            ps.executeUpdate();
-            ps.close();
+        removeFromClass(appClass.getName(), "group");
+        addToClass(appClass.getName(), appClass.getGroups(), "group");
 
-            removeGroupsFromClass(appClass.getName());
-            addGroupsToClass(appClass.getName(), appClass.getGroups());
-
-        } catch (SQLException ex) {
-            logger.error(ex);
-            throw new DAOException(ex);
-        }
     }
 
     /**
@@ -146,7 +118,7 @@ public class ClassData implements ClassDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "SELECT name, engine FROM VIPClasses ORDER BY name");
+                    "SELECT distinct name FROM VIPClasses ORDER BY name");
 
             ResultSet rs = ps.executeQuery();
             List<AppClass> classes = new ArrayList<AppClass>();
@@ -157,14 +129,27 @@ public class ClassData implements ClassDAO {
                         "SELECT groupname FROM VIPGroupsClasses "
                         + "WHERE classname=? ORDER BY groupname");
                 ps2.setString(1, rs.getString("name"));
-                ResultSet r = ps2.executeQuery();
+                ResultSet rg = ps2.executeQuery();
 
-                while (r.next()) {
-                    groups.add(r.getString("groupname"));
+                while (rg.next()) {
+                    groups.add(rg.getString("groupname"));
                 }
                 ps2.close();
+
+                List<String> engines = new ArrayList<String>();
+                PreparedStatement ps3 = connection.prepareStatement(
+                        "SELECT engine FROM VIPClasses "
+                        + "WHERE name=? ORDER BY engine");
+                ps3.setString(1, rs.getString("name"));
+                ResultSet re = ps3.executeQuery();
+                while (re.next()) {
+                    engines.add(re.getString("engine"));
+                }
+                ps3.close();
+                
                 classes.add(new AppClass(rs.getString("name"), 
-                        rs.getString("engine"), groups));
+                        engines, groups));
+                logger.info("getClasses: added  class "+rs.getString("name")+" with groups "+groups.toString() + " and engines "+engines.toString());
             }
 
             ps.close();
@@ -205,9 +190,20 @@ public class ClassData implements ClassDAO {
                     groups.add(r.getString("groupname"));
                 }
                 ps2.close();
-
+                // Get engines associated to class
+                List<String> engines = new ArrayList<String>();
+                PreparedStatement ps3 = connection.prepareStatement(
+                        "SELECT engine FROM VIPClasses "
+                        + "WHERE name=? ORDER BY engine");
+                ps3.setString(1, rs.getString("name"));
+                ResultSet re = ps3.executeQuery();
+                while (re.next()) {
+                    engines.add(re.getString("engine"));
+                }
+                ps3.close();
+                
                 return new AppClass(rs.getString("name"), 
-                        rs.getString("engine"), groups);
+                        engines, groups);
             }
             ps.close();
             return null;
@@ -269,26 +265,38 @@ public class ClassData implements ClassDAO {
     /**
      *
      * @param className
-     * @param groups
+     * @param objectList
+     * @param objectType (group or engine)
      * @throws DAOException
      */
-    private void addGroupsToClass(String className, List<String> groups) throws DAOException {
+    private void addToClass(String className, List<String> objectList, String objectType) throws DAOException {
 
-        for (String groupName : groups) {
+        for (String name : objectList) {
             try {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO "
+                PreparedStatement ps;
+                switch (objectType) {
+                    case "group":
+                        ps = connection.prepareStatement("INSERT INTO "
                         + "VIPGroupsClasses(classname, groupname) "
                         + "VALUES(?, ?)");
-
+                        break;
+                    case "engine":
+                        ps = connection.prepareStatement("INSERT INTO "
+                        + "VIPClasses(name, engine) "
+                        + "VALUES(?, ?)");
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Invalid objectType: " + objectType);
+                }
                 ps.setString(1, className);
-                ps.setString(2, groupName);
+                ps.setString(2, name);
                 ps.execute();
                 ps.close();
 
             } catch (SQLException ex) {
                 if (ex.getMessage().contains("Duplicate entry")) {
-                    logger.error("a group named \"" + groupName + "\" is already associated with the class.");
-                    throw new DAOException("a group named \"" + groupName + "\" is already associated with the class.");
+                    logger.error("a "+objectType+" named \"" + name + "\" is already associated with the class.");
+                    throw new DAOException("a "+objectType+" named \"" + name + "\" is already associated with the class.");
                 } else {
                     logger.error(ex);
                     throw new DAOException(ex);
@@ -300,14 +308,26 @@ public class ClassData implements ClassDAO {
     /**
      *
      * @param className
+     * @param objectType (group or engine)
      * @throws DAOException
      */
-    private void removeGroupsFromClass(String className) throws DAOException {
+    private void removeFromClass(String className, String objectType) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("DELETE FROM "
+            PreparedStatement ps;
+            switch (objectType) {
+                case "group":
+                    ps = connection.prepareStatement("DELETE FROM "
                     + "VIPGroupsClasses WHERE className=?");
-
+                    break;
+                case "engine":
+                    ps = connection.prepareStatement("DELETE FROM "
+                    + "VIPClasses WHERE name=?");
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid objectType: " + objectType);
+            }
+            
             ps.setString(1, className);
             ps.execute();
             ps.close();

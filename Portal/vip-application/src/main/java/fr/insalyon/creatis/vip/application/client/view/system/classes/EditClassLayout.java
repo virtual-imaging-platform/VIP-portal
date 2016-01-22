@@ -72,8 +72,8 @@ public class EditClassLayout extends AbstractFormLayout {
     public EditClassLayout() {
 
         super(380, 200);
-        addTitle("Add/Edit Class", ApplicationConstants.ICON_CLASSES);
-
+        addTitle("Sorina Add/Edit Class", ApplicationConstants.ICON_CLASSES);
+        
         configure();
         loadData();
     }
@@ -84,6 +84,8 @@ public class EditClassLayout extends AbstractFormLayout {
 
         enginesPickList = new SelectItem();
         enginesPickList.setShowTitle(false);
+        enginesPickList.setMultiple(true);
+        enginesPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
         enginesPickList.setWidth(350);
         
         groupsPickList = new SelectItem();
@@ -98,7 +100,7 @@ public class EditClassLayout extends AbstractFormLayout {
                     public void onClick(ClickEvent event) {
                         if (nameField.validate()) {
                             save(new AppClass(nameField.getValueAsString().trim(),
-                                    enginesPickList.getValueAsString(),
+                                    Arrays.asList(enginesPickList.getValues()),
                                     Arrays.asList(groupsPickList.getValues())));
                         }
                     }
@@ -121,7 +123,7 @@ public class EditClassLayout extends AbstractFormLayout {
         removeButton.setDisabled(true);
 
         addField("Name", nameField);
-        addField("Engine", enginesPickList);
+        addField("Engines", enginesPickList);
         addField("Groups", groupsPickList);
         addButtons(saveButton, removeButton);
     }
@@ -131,14 +133,14 @@ public class EditClassLayout extends AbstractFormLayout {
      *
      * @param name Class name
      * @param groups Class groups
-     * @param engine Class engine
+     * @param engines Class engines
      */
-    public void setClass(String name, String groups, String engine) {
+    public void setClass(String name, String groups, String engines) {
 
         if (name != null) {
             this.nameField.setValue(name);
             this.nameField.setDisabled(true);
-            this.enginesPickList.setValue(engine);
+            this.enginesPickList.setValue(engines.split(", "));
             this.groupsPickList.setValues(groups.split(", "));
             this.newClass = false;
             this.removeButton.setDisabled(false);
@@ -146,7 +148,7 @@ public class EditClassLayout extends AbstractFormLayout {
         } else {
             this.nameField.setValue("");
             this.nameField.setDisabled(false);
-            this.enginesPickList.setValue("");
+            this.enginesPickList.setValues(new String[]{});
             this.groupsPickList.setValues(new String[]{});
             this.newClass = true;
             this.removeButton.setDisabled(true);
