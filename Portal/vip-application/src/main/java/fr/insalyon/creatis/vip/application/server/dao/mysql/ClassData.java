@@ -55,7 +55,6 @@ public class ClassData implements ClassDAO {
 
     public ClassData() throws DAOException {
         connection = PlatformConnection.getInstance().getConnection();
-        logger.info("******************Loading CalssData*************" );
     }
 
     /**
@@ -77,9 +76,9 @@ public class ClassData implements ClassDAO {
      */
     @Override
     public void update(AppClass appClass) throws DAOException {
-
+        
         removeFromClass(appClass.getName(), "engine");
-        addToClass(appClass.getName(), appClass.getGroups(), "engine");
+        addToClass(appClass.getName(), appClass.getEngines(), "engine");
 
         removeFromClass(appClass.getName(), "group");
         addToClass(appClass.getName(), appClass.getGroups(), "group");
@@ -149,7 +148,7 @@ public class ClassData implements ClassDAO {
                 
                 classes.add(new AppClass(rs.getString("name"), 
                         engines, groups));
-                logger.info("getClasses: added  class "+rs.getString("name")+" with groups "+groups.toString() + " and engines "+engines.toString());
+                //logger.info("getClasses: added  class "+rs.getString("name")+" with groups "+groups.toString() + " and engines "+engines.toString());
             }
 
             ps.close();
@@ -290,6 +289,7 @@ public class ClassData implements ClassDAO {
                 }
                 ps.setString(1, className);
                 ps.setString(2, name);
+                logger.info("addToClass " +className+" "+objectType+". PS is "+ps.toString());
                 ps.execute();
                 ps.close();
 
