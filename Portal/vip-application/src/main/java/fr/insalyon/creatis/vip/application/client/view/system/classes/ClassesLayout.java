@@ -61,7 +61,6 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -69,7 +68,6 @@ import org.apache.log4j.Logger;
  */
 public class ClassesLayout extends VLayout {
 
-    private final static Logger logger = Logger.getLogger(ClassesLayout.class);
     private ModalWindow modal;
     private ListGrid grid;
     private HLayout rollOverCanvas;
@@ -80,7 +78,6 @@ public class ClassesLayout extends VLayout {
         this.setWidth100();
         this.setHeight100();
         this.setOverflow(Overflow.AUTO);
-        logger.info("******************ClassesLayout*************" );
         configureToolStrip();
         configureGrid();
         modal = new ModalWindow(grid);
@@ -94,7 +91,7 @@ public class ClassesLayout extends VLayout {
         
         toolstrip.addMember(WidgetUtil.getSpaceLabel(15));
         
-        LabelButton addButton = new LabelButton("Sorina Add Class", CoreConstants.ICON_ADD);
+        LabelButton addButton = new LabelButton("Add Class", CoreConstants.ICON_ADD);
         addButton.setWidth(150);
         addButton.addClickHandler(new ClickHandler() {
             @Override
@@ -106,7 +103,7 @@ public class ClassesLayout extends VLayout {
         });
         toolstrip.addMember(addButton);
         
-        LabelButton refreshButton = new LabelButton("Sorina Refresh", CoreConstants.ICON_REFRESH);
+        LabelButton refreshButton = new LabelButton("Refresh", CoreConstants.ICON_REFRESH);
         refreshButton.setWidth(150);
         refreshButton.addClickHandler(new ClickHandler() {
             @Override
@@ -210,14 +207,12 @@ public class ClassesLayout extends VLayout {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                logger.error("***********getClasses: failure because "+caught.getCause());
-                SC.warn("ClassesLayout : unable to get list of classes:<br />" + caught.getMessage() + " because <br />" +caught.getCause());
+                SC.warn("Unable to get list of classes:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(List<AppClass> result) {
                 List<ClassRecord> dataList = new ArrayList<ClassRecord>();
-                logger.warn("************Getting into loadData");
                 for (AppClass c : result) {
                     StringBuilder sb = new StringBuilder();
                     StringBuilder sbe = new StringBuilder();
@@ -233,7 +228,6 @@ public class ClassesLayout extends VLayout {
                         }
                         sbe.append(engine);
                     }
-                    logger.warn("************Adding "+sb.toString()+sbe.toString()+" to class "+c.getName());
                     dataList.add(new ClassRecord(c.getName(), sb.toString(), sbe.toString()));
                 }
                 grid.setData(dataList.toArray(new ClassRecord[]{}));

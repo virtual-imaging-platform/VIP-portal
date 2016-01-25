@@ -241,7 +241,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
         final AsyncCallback<List<AppClass>> callback = new AsyncCallback<List<AppClass>>() {
             @Override
             public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("EditApplicationLayout : unable to get list of classes:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get list of classes:<br />" + caught.getMessage());
             }
 
             @Override

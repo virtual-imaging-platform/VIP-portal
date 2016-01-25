@@ -72,7 +72,7 @@ public class EditClassLayout extends AbstractFormLayout {
     public EditClassLayout() {
 
         super(380, 200);
-        addTitle("Sorina Add/Edit Class", ApplicationConstants.ICON_CLASSES);
+        addTitle("Add/Edit Class", ApplicationConstants.ICON_CLASSES);
         
         configure();
         loadData();
