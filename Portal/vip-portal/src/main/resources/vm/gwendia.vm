@@ -41,7 +41,7 @@
   </interface>
   <processors>
     <processor name="append-date" >
-      <in name="dir" type="string" depth="0" />
+      <in name="dir" type="URI" depth="0" />
       <out name="result" type="string" depth="0" />
       <beanshell>/*----------Beginning of Beanshell------------*/
                         import java.text.DateFormat;
@@ -49,7 +49,7 @@
                         import java.util.Date;
 
 DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HH:mm:ss");
-String result = dir+"/"+(dateFormat.format(System.currentTimeMillis()));
+String result = dir.toString()+"/"+(dateFormat.format(System.currentTimeMillis()));
 /*------------End of Beanshell------------*/
       </beanshell>
     </processor>
