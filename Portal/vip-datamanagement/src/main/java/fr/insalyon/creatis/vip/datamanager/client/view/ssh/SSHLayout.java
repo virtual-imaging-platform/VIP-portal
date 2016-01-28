@@ -63,13 +63,12 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
 import fr.insalyon.creatis.vip.datamanager.client.bean.TransferType;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
- * @author glatard
+ * @author glatard, 
+ * @author Nouha Boujelben
  */
 public class SSHLayout extends VLayout {
 
@@ -114,7 +113,7 @@ public class SSHLayout extends VLayout {
             public void onClick(ClickEvent event) {
                 ManageSSHTab sshTab = (ManageSSHTab) Layout.getInstance().
                         getTab(DataManagerConstants.TAB_MANAGE_SSH);
-                sshTab.setSSH(null, null, null, null, null, null, null, null, false, true);
+                sshTab.setSSH(null, null, null, null, null, null, null, null,false, false, true);
             }
         });
         toolstrip.addMember(addButton);
@@ -157,6 +156,7 @@ public class SSHLayout extends VLayout {
                                     rollOverRecord.getAttribute("transferType"),
                                     rollOverRecord.getAttribute("directory"),
                                     rollOverRecord.getAttribute("status"),
+                                    rollOverRecord.getAttributeAsBoolean("checkFilesContent"),
                                     rollOverRecord.getAttributeAsBoolean("deleteFilesFromSource"),
                                     rollOverRecord.getAttributeAsBoolean("active")
                             );
@@ -206,25 +206,34 @@ public class SSHLayout extends VLayout {
         grid.setSelectionType(SelectionStyle.SIMPLE);
         grid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
         grid.setEmptyMessage("<br>No data available.");
-
-        ListGridField deleteFilesFromSourceField = new ListGridField("deleteFilesFromSource", "Delete Files From Source");
+        
+        ListGridField checkFilesContentField = new ListGridField("checkFilesContent", "Check File Content");
+        checkFilesContentField.setType(ListGridFieldType.BOOLEAN);
+  
+        ListGridField deleteFilesFromSourceField = new ListGridField("deleteFilesFromSource", "Delete Files");
         deleteFilesFromSourceField.setType(ListGridFieldType.BOOLEAN);
         ListGridField active = new ListGridField("active", "active");
-        grid.setFields(FieldUtil.getIconGridField("activeIcon"),
-                new ListGridField("name", "Connection Name"),
+        ListGridField status = new ListGridField("status", "Status");
+        grid.setFields(FieldUtil.getIconGridField("activeIcon","Active"),
+                FieldUtil.getIconGridField("statusIcon","Status"),
+                new ListGridField("name", "Name"),
                 new ListGridField("email", "VIP User"),
                 new ListGridField("user", "SSH user"),
-                new ListGridField("host", "SSH host name"),
+                new ListGridField("host", "SSH host"),
                 new ListGridField("port", "SSH port"),
                 new ListGridField("directory", "SSH directory"),
                 new ListGridField("transferType", "Transfer Type"),
+                checkFilesContentField,
                 deleteFilesFromSourceField,
-                new ListGridField("status", "Connection Status"),
-                new ListGridField("theEarliestNextSynchronistation", "The Earliest Next Synchronistation"),
-                new ListGridField("numberSynchronizationFailed", "Number Synchronization Failed"),
-                active
+                status,
+                new ListGridField("theEarliestNextSynchronistation", "Earliest Next Synchronization"),
+                new ListGridField("numberSynchronizationFailed", "Failed Synchronization"),
+                active,
+                new ListGridField("sshFiles", "SSH Files"),
+                new ListGridField("lfcFiles", "LFC Files")
         );
         active.setHidden(true);
+        status.setHidden(true);
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellClickHandler(new CellClickHandler() {
@@ -239,7 +248,7 @@ public class SSHLayout extends VLayout {
                         event.getRecord().getAttribute("transferType"),
                         event.getRecord().getAttribute("directory"),
                         event.getRecord().getAttribute("status"),
-                        //event.getRecord().getAttribute("numberSynchronizationFailed"),
+                        event.getRecord().getAttributeAsBoolean("checkFilesContent"),
                         event.getRecord().getAttributeAsBoolean("deleteFilesFromSource"),
                         event.getRecord().getAttributeAsBoolean("active")
                 );
@@ -268,12 +277,12 @@ public class SSHLayout extends VLayout {
         DataManagerService.Util.getInstance().removeSSH(email, name, callback);
     }
 
-    private void edit(String name, String email, String user, String host, String port, String transferType, String directory, String status, boolean deleteFilesFromSource, boolean active) {
+    private void edit(String name, String email, String user, String host, String port, String transferType, String directory, String status,boolean checkFilesContent, boolean deleteFilesFromSource, boolean active) {
 
         ManageSSHTab sshTab = (ManageSSHTab) Layout.getInstance().
                 getTab(DataManagerConstants.TAB_MANAGE_SSH);
 
-        sshTab.setSSH(name, email, user, host, port, TransferType.valueOf(transferType), directory, status, deleteFilesFromSource, active);
+        sshTab.setSSH(name, email, user, host, port, TransferType.valueOf(transferType), directory, status,checkFilesContent, deleteFilesFromSource, active);
     }
 
     public void loadData() {
@@ -291,7 +300,7 @@ public class SSHLayout extends VLayout {
                 List<SSHRecord> dataList = new ArrayList<SSHRecord>();
 
                 for (SSH ssh : result) {
-                    dataList.add(new SSHRecord(ssh.getName(), ssh.getEmail(), ssh.getUser(), ssh.getHost(), ssh.getPort(), ssh.getTransferType(), ssh.getDirectory(), ssh.getStatus(), String.valueOf(ssh.getTheEarliestNextSynchronistation()).split("\\.")[0], ssh.getNumberSynchronizationFailed(), ssh.isDeleteFilesFromSource(), ssh.isActive()));
+                    dataList.add(new SSHRecord(ssh.getName(), ssh.getEmail(), ssh.getUser(), ssh.getHost(), ssh.getPort(), ssh.getTransferType(), ssh.getDirectory(), ssh.getStatus(), String.valueOf(ssh.getTheEarliestNextSynchronistation()).split("\\.")[0], ssh.getNumberSynchronizationFailed(),ssh.isCheckFilesContent(), ssh.isDeleteFilesFromSource(), ssh.isActive(),ssh.getSshFiles(),ssh.getLfcFiles()));
                 }
                 grid.setData(dataList.toArray(new SSHRecord[]{}));
             }

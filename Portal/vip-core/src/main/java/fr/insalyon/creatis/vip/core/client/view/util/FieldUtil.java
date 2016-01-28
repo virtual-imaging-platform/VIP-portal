@@ -71,6 +71,17 @@ public class FieldUtil {
         return iconField;
 
     }
+    public static ListGridField getIconGridField(String name,String title) {
+
+        ListGridField iconField = new ListGridField(name, title, 30);
+        iconField.setAlign(Alignment.CENTER);
+        iconField.setType(ListGridFieldType.IMAGE);
+        iconField.setImageURLSuffix(".png");
+        iconField.setImageWidth(12);
+        iconField.setImageHeight(12);
+        return iconField;
+
+    }
 
     /**
      * Gets a ListGridField configured to display dates.

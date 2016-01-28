@@ -38,7 +38,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>1.16</version>
+        <version>1.16.1</version>
         <relativePath>..</relativePath>
     </parent>
     
