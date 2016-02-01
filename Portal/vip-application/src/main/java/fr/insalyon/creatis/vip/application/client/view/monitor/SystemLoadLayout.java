@@ -74,7 +74,7 @@ public class SystemLoadLayout extends VLayout {
 
         this.addMember(titleLabel);
 
-        workflowsLabel = new Label("Loading Simulations...");
+        workflowsLabel = new Label("Loading Executions...");
         workflowsLabel.setHeight(18);
         this.addMember(workflowsLabel);
 
@@ -124,7 +124,7 @@ public class SystemLoadLayout extends VLayout {
             @Override
             public void onSuccess(ApplicationStatus result) {
 
-                workflowsLabel.setContents("Running Simulations: " + result.getRunningWorkflows());
+                workflowsLabel.setContents("Running Executions: " + result.getRunningWorkflows());
                 runningTasksLabel.setContents("Running Tasks: " + result.getRunningTasks());
                 waitingTasksLabel.setContents("Waiting Tasks: " + result.getWaitingTasks());
             }

@@ -64,8 +64,12 @@ public class DataManagerConstants {
     public static final String ICON_UPLOAD = IMG_FOLDER + "icon-upload.png";
     public static final String ICON_UPLOAD_MULTIPLE = IMG_FOLDER + "icon-upload-multiple.png";
     public static final String ICON_WARNING = IMG_FOLDER + "icon-warning.png";
-    public static final String ICON_VIEW = IMG_FOLDER+"icon-view.png";
-         public static final String ICON_SSH = IMG_FOLDER+"icon-ssh.png";
+    public static final String ICON_VIEW = IMG_FOLDER + "icon-view.png";
+    public static final String ICON_SSH = IMG_FOLDER + "icon-ssh.png";
+    public static final String ICON_ACTIVATE_SSH = IMG_FOLDER + "icon-activate";
+    public static final String ICON_DEACTIVATE_SSH = IMG_FOLDER + "icon-deactivate";
+    public static final String ICON_STATUS_OK_SSH = IMG_FOLDER + "icon-ok";
+    public static final String ICON_STATUS_FAILED_SSH = IMG_FOLDER + "icon-failed";
     // Application Names
     public final static String APP_CACHED_FILES = "Cached Files";
     public final static String APP_FILE_TRANSFER = "File Transfer";
@@ -93,5 +97,5 @@ public class DataManagerConstants {
     public static final String GROUP_APPEND = " (group)";
     public static final int MAX_OPERATIONS_LIMIT = 10;
     public static final String SSH_APPEND = "_ssh"; //dont' change that otherwise existing connections will not work any more
-   
+
 }

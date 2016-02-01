@@ -31,14 +31,18 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.ssh;
 
+import fr.insalyon.creatis.vip.datamanager.client.bean.TransferType;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangeHandler;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
@@ -50,14 +54,15 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedHashMap;
 
 /**
  *
  * @author glatard
+ * @author Nouha Boujelben
  */
 public class EditSSHLayout extends AbstractFormLayout {
-    
-    
+
     private boolean newSSH = true;
     private TextItem emailField;
     private TextItem nameField;
@@ -66,28 +71,64 @@ public class EditSSHLayout extends AbstractFormLayout {
     private TextItem portField;
     private TextItem directoryField;
     private TextItem statusField;
-    
+    private SelectItem transferTypeField;
     private IButton saveButton;
     private IButton removeButton;
+    private CheckboxItem deleteFilesFromSourceField;
+    private CheckboxItem activateField;
+    private CheckboxItem checkFilesContentField;
 
-    public EditSSHLayout() {
+    public EditSSHLayout(String width, String height) {
 
-        super(480, 200);
+        super(width, height);
         addTitle("Add/Edit SSH Connection", DataManagerConstants.ICON_SSH);
 
         configure();
     }
 
     private void configure() {
-        
-        emailField = FieldUtil.getTextItem(450, null);
-        nameField = FieldUtil.getTextItem(450, null);
-        userField = FieldUtil.getTextItem(450, null);
-        hostField = FieldUtil.getTextItem(450, null);
-        portField = FieldUtil.getTextItem(450, null);
-        directoryField = FieldUtil.getTextItem(450, null);
-        statusField = FieldUtil.getTextItem(450, null);
-        
+        emailField = FieldUtil.getTextItem(350, null);
+        nameField = FieldUtil.getTextItem(350, null);
+        userField = FieldUtil.getTextItem(350, null);
+        hostField = FieldUtil.getTextItem(350, null);
+        portField = FieldUtil.getTextItem(350, null);
+        directoryField = FieldUtil.getTextItem(350, null);
+        statusField = FieldUtil.getTextItem(350, null);
+        transferTypeField = new SelectItem();
+        transferTypeField.setShowTitle(false);
+        transferTypeField.setWidth(350);
+        LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
+        valueMap.put(TransferType.Synchronization.toString(), TransferType.Synchronization.toString());
+        valueMap.put(TransferType.DeviceToLFC.toString(), TransferType.DeviceToLFC.toString());
+        valueMap.put(TransferType.LFCToDevice.toString(), TransferType.LFCToDevice.toString());
+        transferTypeField.setValueMap(valueMap);
+        transferTypeField.addChangeHandler(new ChangeHandler() {
+            public void onChange(ChangeEvent event) {
+                if (event.getValue().equals(TransferType.Synchronization.toString())) {
+                    deleteFilesFromSourceField.setValue(false);
+                    deleteFilesFromSourceField.setDisabled(true);
+                } else {
+                    deleteFilesFromSourceField.setDisabled(false);
+                }
+
+            }
+        });
+
+        deleteFilesFromSourceField = new CheckboxItem();
+        deleteFilesFromSourceField.setTitle("Delete files from Source");
+        deleteFilesFromSourceField.setDisabled(true);
+        deleteFilesFromSourceField.setWidth(350);
+
+        activateField = new CheckboxItem();
+        activateField.setTitle("Activate the SSH connection");
+        activateField.setDisabled(false);
+        activateField.setWidth(350);
+
+        checkFilesContentField = new CheckboxItem();
+        checkFilesContentField.setTitle("Check File Content");
+        checkFilesContentField.setDisabled(false);
+        checkFilesContentField.setWidth(350);
+
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
                     @Override
@@ -95,14 +136,17 @@ public class EditSSHLayout extends AbstractFormLayout {
                         if (emailField.validate() & nameField.validate() & userField.validate() & hostField.validate() & portField.validate() & directoryField.validate()) {
 
                             List<String> values = new ArrayList<String>();
-                            
                             save(new SSH(emailField.getValueAsString().trim(),
-                                    nameField.getValueAsString().trim(),
-                                    userField.getValueAsString().trim(),
-                                    hostField.getValueAsString().trim(),
-                                    portField.getValueAsString().trim(),
-                                    directoryField.getValueAsString().trim(),
-                                    statusField.getValueAsString()
+                                            nameField.getValueAsString().trim(),
+                                            userField.getValueAsString().trim(),
+                                            hostField.getValueAsString().trim(),
+                                            Integer.parseInt(portField.getValueAsString()),
+                                            TransferType.valueOf(transferTypeField.getValueAsString()),
+                                            directoryField.getValueAsString().trim(),
+                                            statusField.getValueAsString(),
+                                            checkFilesContentField.getValueAsBoolean(),
+                                            deleteFilesFromSourceField.getValueAsBoolean(),
+                                            activateField.getValueAsBoolean()
                                     ));
                         }
                     }
@@ -116,7 +160,7 @@ public class EditSSHLayout extends AbstractFormLayout {
                             @Override
                             public void execute(Boolean value) {
                                 if (value) {
-                                    remove(nameField.getValueAsString().trim(),emailField.getValueAsString().trim());
+                                    remove(nameField.getValueAsString().trim(), emailField.getValueAsString().trim());
                                 }
                             }
                         });
@@ -127,18 +171,21 @@ public class EditSSHLayout extends AbstractFormLayout {
         addField("VIP User", emailField);
         addField("Connection Name", nameField);
         addField("SSH User", userField);
-        addField("SSH Host",hostField);
-        addField("SSH Port",portField);
-        addField("SSH Directory (absolute path)",directoryField);
-        //addField("Connection Status",statusField);
-               
+        addField("SSH Host", hostField);
+        addField("SSH Port", portField);
+        addField("SSH Directory (absolute path)", directoryField);
+        addField("Transfer Type", transferTypeField);
+
+        this.addMember(FieldUtil.getForm(checkFilesContentField));
+        this.addMember(FieldUtil.getForm(deleteFilesFromSourceField));
+        this.addMember(FieldUtil.getForm(activateField));
+
         addButtons(saveButton, removeButton);
     }
 
-    public void setSSH(String email, String name, String user, String host, String port, String directory,String status) {
-        
-        
-        if (name != null & email != null & user != null & host != null  & directory != null & status != null & port != null) {
+    public void setSSH(String email, String name, String user, String host, String port, TransferType transferType, String directory, String status, boolean checkFilesContent, boolean deleteFilesFromSourceField, boolean active) {
+
+        if (name != null & email != null & user != null & host != null & transferType != null & directory != null & status != null & port != null) {
             this.emailField.setValue(email);
             this.emailField.setDisabled(true);
             this.nameField.setValue(name);
@@ -146,31 +193,46 @@ public class EditSSHLayout extends AbstractFormLayout {
             this.userField.setValue(user);
             this.hostField.setValue(host);
             this.portField.setValue(port);
+            this.transferTypeField.setValue(transferType);
             this.directoryField.setValue(directory);
             this.statusField.setValue(status);
+            this.checkFilesContentField.setValue(checkFilesContent);
+            if (transferType.equals(transferType.Synchronization)) {
+                this.deleteFilesFromSourceField.setValue(false);
+                this.deleteFilesFromSourceField.setDisabled(true);
+            } else {
+                this.deleteFilesFromSourceField.setDisabled(false);
+                this.deleteFilesFromSourceField.setValue(deleteFilesFromSourceField);
+            }
+            this.activateField.setValue(active);
             this.newSSH = false;
             this.removeButton.setDisabled(false);
 
         } else {
             this.emailField.setValue(CoreModule.user.getEmail());
-            if(!CoreModule.user.isSystemAdministrator())
+            if (!CoreModule.user.isSystemAdministrator()) {
                 this.emailField.setDisabled(true);
-            else
+            } else {
                 this.emailField.setDisabled(false);
+            }
             this.nameField.setValue("");
             this.nameField.setDisabled(false);
             this.userField.setValue("");
             this.hostField.setValue("");
             this.portField.setValue("22");
+            this.transferTypeField.setValue(transferType.Synchronization);
             this.directoryField.setValue("");
             this.statusField.setValue("");
+            this.checkFilesContentField.setValue(false);
+            this.deleteFilesFromSourceField.setValue(false);
+            this.deleteFilesFromSourceField.setDisabled(true);
+            this.activateField.setValue(true);
             this.newSSH = true;
             this.removeButton.setDisabled(true);
         }
-        
+
     }
 
-  
     private void save(SSH ssh) {
 
         WidgetUtil.setLoadingIButton(saveButton, "Saving...");
@@ -202,11 +264,11 @@ public class EditSSHLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setSSH(null, null, null, null, null, null, null);
+                setSSH(null, null, null, null, null, null, null, null, false, false, true);
                 ManageSSHTab tab = (ManageSSHTab) Layout.getInstance().
                         getTab(DataManagerConstants.TAB_MANAGE_SSH);
                 tab.loadSSHConnections();
-               
+
             }
         };
     }

@@ -231,7 +231,7 @@ public class SavedInputsLayout extends AbstractInputsLayout {
                 loadData();
             }
         };
-        modal.show("Removing simulation input...", true);
+        modal.show("Removing execution input...", true);
         WorkflowService.Util.getInstance().removeSimulationInput(name, applicationName, callback);
     }
 }

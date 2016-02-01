@@ -85,12 +85,9 @@ public class WorkflowExecutionBusiness {
                     engine.getMode().equalsIgnoreCase("pool") ? WorkflowStatus.Queued : WorkflowStatus.Running,
                     new Date(), null, simulationName, applicationName, applicationVersion, applicationClass);
 
-        } catch (javax.xml.rpc.ServiceException ex) {
+        } catch (javax.xml.rpc.ServiceException | java.rmi.RemoteException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
-        } catch (java.rmi.RemoteException ex) {
-            // do nothing!
-            return null;
         }
     }
 

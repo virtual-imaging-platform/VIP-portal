@@ -50,4 +50,6 @@ public interface ClassDAO {
     public List<AppClass> getClasses() throws DAOException;
    
     public List<AppClass> getUserClasses(String email, boolean validAdmin) throws DAOException;
+    
+    public AppClass getClass(String className) throws DAOException;
 }

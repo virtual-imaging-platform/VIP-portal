@@ -263,7 +263,6 @@ public abstract class AbstractLaunchTab extends Tab {
      * @return Result of the validation
      */
     protected boolean validate() {
-
         return launchFormLayout.validate();
     }
 
@@ -280,7 +279,7 @@ public abstract class AbstractLaunchTab extends Tab {
                 if (!caught.getMessage().contains("No data is available")
                         && !caught.getMessage().contains("empty result set")) {
                     resetSaveInputsButton();
-                    Layout.getInstance().setWarningMessage("Unable to verify simulation name:<br />" + caught.getMessage(), 10);
+                    Layout.getInstance().setWarningMessage("Unable to verify execution name:<br />" + caught.getMessage(), 10);
                 } else {
                     saveInputs(false);
                 }

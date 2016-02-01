@@ -45,9 +45,8 @@ import java.util.List;
 public class ClassBusiness {
 
     /**
-     * 
-     * @return
-     * @throws BusinessException 
+     *
+     * @return @throws BusinessException
      */
     public List<AppClass> getClasses() throws BusinessException {
 
@@ -60,9 +59,8 @@ public class ClassBusiness {
     }
 
     /**
-     * 
-     * @return
-     * @throws BusinessException 
+     *
+     * @return @throws BusinessException
      */
     public List<String> getClassesName() throws BusinessException {
 
@@ -73,11 +71,26 @@ public class ClassBusiness {
 
         return classesName;
     }
-    
+
     /**
      * 
-     * @param c
+     * @param className
+     * @return
      * @throws BusinessException 
+     */
+    public AppClass getClass(String className) throws BusinessException {
+        try {
+            return ApplicationDAOFactory.getDAOFactory().getClassDAO().getClass(className);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param c
+     * @throws BusinessException
      */
     public void addClass(AppClass c) throws BusinessException {
 
@@ -90,9 +103,9 @@ public class ClassBusiness {
     }
 
     /**
-     * 
+     *
      * @param c
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void updateClass(AppClass c) throws BusinessException {
 
@@ -105,9 +118,9 @@ public class ClassBusiness {
     }
 
     /**
-     * 
+     *
      * @param name
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public void removeClass(String name) throws BusinessException {
 
@@ -120,11 +133,11 @@ public class ClassBusiness {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param validAdmin
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public List<String> getUserClassesName(String email, boolean validAdmin)
             throws BusinessException {
@@ -138,11 +151,11 @@ public class ClassBusiness {
     }
 
     /**
-     * 
+     *
      * @param email
      * @param validAdmin
      * @return
-     * @throws BusinessException 
+     * @throws BusinessException
      */
     public List<AppClass> getUserClasses(String email, boolean validAdmin)
             throws BusinessException {

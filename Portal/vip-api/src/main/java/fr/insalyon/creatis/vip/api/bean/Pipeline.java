@@ -34,6 +34,7 @@ package fr.insalyon.creatis.vip.api.bean;
 import fr.insalyon.creatis.vip.api.bean.pairs.IntKeyStringValuePair;
 import java.util.ArrayList;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 /**
@@ -47,15 +48,60 @@ public class Pipeline extends Object {
     private String identifier;
     @XmlElement(name = "name", required=true)
     private String name;
-    @XmlElement(name = "description", required = true)
+    @XmlElement(name = "description")
     private String description;
-    @XmlElement(name = "version", required = true)
+    @XmlElement(name = "version")
     private String version;
-    @XmlElement(name = "parameters", required = true)
+    @XmlElement(name = "parameters")
     ArrayList<PipelineParameter> parameters;
     @XmlElement(name = "errorCodesAndMessages")
     private ArrayList<IntKeyStringValuePair> errorCodesAndMessages;
+    @XmlElement(name = "canExecute")
+    private boolean canExecute;
 
     public Pipeline() {
     }
+    
+     public Pipeline(String identifier, String name, String version, boolean canExecute) {
+        this.identifier = identifier;
+        this.name = name;       
+        this.version = version;
+        this.canExecute = canExecute;
+        parameters = new ArrayList<>();
+        errorCodesAndMessages = new ArrayList<>();
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @XmlTransient
+    public String getDescription() {
+        return description;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public ArrayList<PipelineParameter> getParameters() {
+        return parameters;
+    }
+
+    public ArrayList<IntKeyStringValuePair> getErrorCodesAndMessages() {
+        return errorCodesAndMessages;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
+    public boolean canExecute(){
+        return canExecute;
+    }
+   
 }

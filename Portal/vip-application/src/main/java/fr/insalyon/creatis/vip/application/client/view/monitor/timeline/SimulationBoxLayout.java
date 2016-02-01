@@ -221,7 +221,7 @@ public class SimulationBoxLayout extends HLayout {
             default:
                 question = "clean";
         }
-        SC.ask("Do you really want to " + question + " '" + simulationName + "' simulation?", new BooleanCallback() {
+        SC.ask("Do you really want to " + question + " '" + simulationName + "' execution?", new BooleanCallback() {
             @Override
             public void execute(Boolean value) {
                 if (value) {
@@ -248,7 +248,7 @@ public class SimulationBoxLayout extends HLayout {
             @Override
             public void onFailure(Throwable caught) {
                 setLoading(false, null);
-                Layout.getInstance().setWarningMessage("Unable to kill simulation:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to kill execution:<br />" + caught.getMessage());
             }
 
             @Override
@@ -269,7 +269,7 @@ public class SimulationBoxLayout extends HLayout {
             @Override
             public void onFailure(Throwable caught) {
                 setLoading(false, null);
-                Layout.getInstance().setWarningMessage("Unable to clean simulation:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to clean execution:<br />" + caught.getMessage());
             }
 
             @Override

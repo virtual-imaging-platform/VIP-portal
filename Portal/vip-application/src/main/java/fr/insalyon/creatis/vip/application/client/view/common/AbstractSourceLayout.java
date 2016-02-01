@@ -45,11 +45,16 @@ public abstract class AbstractSourceLayout extends VLayout {
     protected String name;
     protected Label sourceLabel;
     protected HLayout hLayout;
+    protected boolean optional;
 
-    public AbstractSourceLayout(String name, String comment) {
-
+    public AbstractSourceLayout(String name, String comment, boolean optional) {
         this.name = name;
-        this.sourceLabel = WidgetUtil.getLabel("<b>" + name + "</b>", 15);
+        this.optional = optional;
+        String labelText = "<b>" + name;
+        if(!optional)
+            labelText += "<font color=\"red\">*</font>";
+        labelText += "</b>";
+        this.sourceLabel = WidgetUtil.getLabel(labelText, 15);
         this.sourceLabel.setWidth(300);
         if (comment != null) {
             this.sourceLabel.setTooltip(comment);
@@ -60,13 +65,21 @@ public abstract class AbstractSourceLayout extends VLayout {
         
         this.hLayout = new HLayout(3);
         this.hLayout.setAutoWidth();
-        this.addMember(hLayout);
+        this.addMember(hLayout);        
+    }
+        
+    public AbstractSourceLayout(String name, String comment) {
+        this(name,comment,false);
     }
 
     public String getName() {
         return name;
     }
-   
+
+    public boolean isOptional() {
+        return optional;
+    }
+    
     public abstract String getValue();
     
     public abstract void setValue(String value);

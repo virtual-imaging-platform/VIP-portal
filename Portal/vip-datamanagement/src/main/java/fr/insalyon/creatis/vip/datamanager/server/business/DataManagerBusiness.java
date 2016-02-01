@@ -180,11 +180,10 @@ public class DataManagerBusiness {
         }
     }
 
-     
     public Image getImageSlicesURL(String imageFileName, String dir) throws BusinessException {
 
         File imageFile = new File(imageFileName);
-        String imageDirName = imageFile.getParent() + "/" + imageFile.getName() + "-" + dir+ "-slices";
+        String imageDirName = imageFile.getParent() + "/" + imageFile.getName() + "-" + dir + "-slices";
         File imageDir = new File(imageDirName);
 
         if (!imageDir.exists()) {
@@ -194,7 +193,7 @@ public class DataManagerBusiness {
         File sliceZero = new File(sliceZeroFileName);
         if (!sliceZero.exists()) {
             //split slices
-            ProcessBuilder builder = new ProcessBuilder("slice.sh", imageFileName, imageDirName,dir);
+            ProcessBuilder builder = new ProcessBuilder("slice.sh", imageFileName, imageDirName, dir);
             builder.redirectErrorStream(true);
             try {
 
@@ -243,10 +242,7 @@ public class DataManagerBusiness {
         return new Image(imageDirName, Integer.parseInt(number.trim()), imageDirName.substring(imageDirName.indexOf("/files/viewer")) + "/");
 
     }
-    
-    
-    
-    
+
     public List<SSH> getSSHConnections() throws BusinessException {
         try {
             return SSHDAOFactory.getDAOFactory().getSSHDAO().getSSHConnections();
@@ -283,6 +279,15 @@ public class DataManagerBusiness {
     public void removeSSH(String email, String name) throws BusinessException {
         try {
             SSHDAOFactory.getDAOFactory().getSSHDAO().removeSSH(email, name);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    public void resetSSHs(List<List<String>> sshConnections) throws BusinessException {
+        try {
+
+            SSHDAOFactory.getDAOFactory().getSSHDAO().resetSSHConnections(sshConnections);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

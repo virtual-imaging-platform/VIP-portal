@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao;
 
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Stats;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.util.List;

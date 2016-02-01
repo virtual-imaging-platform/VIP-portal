@@ -99,7 +99,7 @@ public class ApplicationConstants {
     // Application Names
     public static final String APP_APPLICATION = "Applications";
     public static final String APP_CLASSES = "Classes";
-    public static final String APP_MONITOR = "Simulation Monitor";
+    public static final String APP_MONITOR = "Execution Monitor";
     public static final String APP_ENGINE = "Engines";
     public static final String APP_SIMULATION_ERROR = "Error File";
     public static final String APP_SIMULATION_OUT = "Output File";

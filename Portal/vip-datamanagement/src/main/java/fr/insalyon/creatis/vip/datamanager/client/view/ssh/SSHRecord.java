@@ -31,23 +31,45 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.ssh;
 
+import fr.insalyon.creatis.vip.datamanager.client.bean.TransferType;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 
 /**
  *
- * @author glatard
+ * @author glatard,
+ * @author Nouha Boujelben
  */
 public class SSHRecord extends ListGridRecord {
 
-    public SSHRecord(String name, String email, String user, String host, String port, String directory, String status) {
+    public SSHRecord(String name, String email, String user, String host, int port, TransferType transferType, String directory, String status, String theEarliestNextSynchronistation, long numberSynchronizationFailed, boolean checkFilesContent, boolean deleteFilesFromSource, boolean active, String sshFiles, String lfcFiles) {
 
+        if (active) {
+            setAttribute("activeIcon", DataManagerConstants.ICON_ACTIVATE_SSH);
+        } else {
+            setAttribute("activeIcon", DataManagerConstants.ICON_DEACTIVATE_SSH);
+        }
+        if (status.equals("ok")) {
+            setAttribute("statusIcon", DataManagerConstants.ICON_STATUS_OK_SSH);
+        } else {
+            setAttribute("statusIcon", DataManagerConstants.ICON_STATUS_FAILED_SSH);
+        }
+        setAttribute("active", active);
         setAttribute("name", name);
         setAttribute("email", email);
         setAttribute("user", user);
-        setAttribute("host",host);
-        setAttribute("port",port);
-        setAttribute("directory",directory);
-        setAttribute("status",status);
+        setAttribute("host", host);
+        setAttribute("port", port);
+        setAttribute("transferType", transferType);
+        setAttribute("directory", directory);
+        setAttribute("status", status);
+        setAttribute("theEarliestNextSynchronistation", theEarliestNextSynchronistation);
+        setAttribute("numberSynchronizationFailed", numberSynchronizationFailed);
+        setAttribute("checkFilesContent", checkFilesContent);
+        setAttribute("deleteFilesFromSource", deleteFilesFromSource);
+        setAttribute("sshFiles", sshFiles);
+        setAttribute("lfcFiles", lfcFiles);
+
     }
-    
+
 }

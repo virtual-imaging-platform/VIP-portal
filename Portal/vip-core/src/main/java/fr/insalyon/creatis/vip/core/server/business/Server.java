@@ -103,14 +103,6 @@ PropertiesConfiguration config;
     // Apache
     private String apacheHost = "localhost";
     private int apacheSSLPort = 80;
-    // Provenance
-    private String provenanceDBUser = "vip";
-    private String provenanceDBPass = "";
-    private String provenanceDBURL = "jdbc:mysql://localhost:3306/SDB2";
-    //Simulated data
-    private String simulatedDataDBUser = "vip";
-    private String simulatedDataDBPass = "vip2011";
-    private String simulatedDataDBURL = "jdbc:mysql://localhost:3306vip_simulated_data";
     //cas
     private String casURL;
     private String SAMLDefaultAccountType;
@@ -128,7 +120,7 @@ PropertiesConfiguration config;
     private String mozillaPersonaValidationURL;
     //treeQuery
     private String queryTree;
-    private String N4uApplicationFilesRepository;
+    private String applicationImporterFileRepository;
     private String deleteFilesAfterUpload;
     //Publication
     private int numberMonthsToTestLastPublicationUpdates;
@@ -200,14 +192,6 @@ PropertiesConfiguration config;
             apacheHost = config.getString("apache.host", apacheHost);
             apacheSSLPort = config.getInt("apache.ssl.port", apacheSSLPort);
 
-            provenanceDBUser = config.getString("provenance.db.user", provenanceDBUser);
-            provenanceDBPass = config.getString("provenance.db.pass", provenanceDBPass);
-            provenanceDBURL = config.getString("provenance.db.url", provenanceDBURL);
-
-            simulatedDataDBUser = config.getString(CoreConstants.LAB_SIMULATED_DATA_DB_USER, simulatedDataDBUser);
-            simulatedDataDBPass = config.getString(CoreConstants.LAB_SIMULATED_DATA_DB_PASSWORD, simulatedDataDBPass);
-            simulatedDataDBURL = config.getString(CoreConstants.LAB_SIMULATED_DATA_DB_URL, simulatedDataDBURL);
-
             casURL = config.getString(CoreConstants.LAB_CAS_URL, "https://ng-cas.maatg.fr/pandora-gateway-sl-cas");
             SAMLDefaultAccountType = config.getString(CoreConstants.LAB_SAML_ACCOUNT_TYPE, "Neuroimaging");
 
@@ -239,8 +223,8 @@ PropertiesConfiguration config;
             //queryTree
             queryTree = config.getString(CoreConstants.TreeQuery, "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> select * from <http://e-ginseng.org/graph/ontology/semEHR> where {?x a rdfs:Class . ?x rdfs:label ?label}");
 
-            //N4U_model  
-            N4uApplicationFilesRepository = config.getString(CoreConstants.APPLICATION_FILES_REPOSITORY, "/home/boujelben");
+            //Applicatoin importer
+            applicationImporterFileRepository = config.getString(CoreConstants.APPLICATION_FILES_REPOSITORY, "/tmp/boutiques-cache");
             deleteFilesAfterUpload = config.getString(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, "yes");
             
            //Publication
@@ -285,12 +269,6 @@ PropertiesConfiguration config;
             config.setProperty(CoreConstants.LAB_SIMULATION_EXEC_MODE, workflowsExecuctionMode);
             config.setProperty("apache.host", apacheHost);
             config.setProperty("apache.ssl.port", apacheSSLPort);
-            config.setProperty("provenance.db.user", provenanceDBUser);
-            config.setProperty("provenance.db.pass", provenanceDBPass);
-            config.setProperty("provenance.db.url", provenanceDBURL);
-            config.setProperty(CoreConstants.LAB_SIMULATED_DATA_DB_URL, simulatedDataDBUser);
-            config.setProperty(CoreConstants.LAB_SIMULATED_DATA_DB_PASSWORD, simulatedDataDBPass);
-            config.setProperty(CoreConstants.LAB_SIMULATED_DATA_DB_URL, simulatedDataDBURL);
             config.setProperty(CoreConstants.LAB_CAS_URL, casURL);
             config.setProperty(CoreConstants.LAB_SAML_ACCOUNT_TYPE, SAMLDefaultAccountType);
             config.setProperty(CoreConstants.SSH_PUBLIC_KEY, sshPublicKey);
@@ -299,7 +277,7 @@ PropertiesConfiguration config;
             config.setProperty(CoreConstants.TreeQuery, queryTree);
 
            
-            config.setProperty(CoreConstants.APPLICATION_FILES_REPOSITORY, N4uApplicationFilesRepository);
+            config.setProperty(CoreConstants.APPLICATION_FILES_REPOSITORY, applicationImporterFileRepository);
             config.setProperty(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, deleteFilesAfterUpload);
             config.setProperty(CoreConstants.APPLET_GATELAB_CLASSES, appletGateLabClasses);
             config.setProperty(CoreConstants.APPLET_GATELABTEST_CLASSES, appletGateLabTestClasses);
@@ -444,18 +422,6 @@ PropertiesConfiguration config;
         return dataManagerGroupsHome;
     }
 
-    public String getProvenanceDBPass() {
-        return provenanceDBPass;
-    }
-
-    public String getProvenanceDBURL() {
-        return provenanceDBURL;
-    }
-
-    public String getProvenanceDBUser() {
-        return provenanceDBUser;
-    }
-
     public String getTruststoreFile() {
         return truststoreFile;
     }
@@ -496,18 +462,6 @@ PropertiesConfiguration config;
         return SAMLDefaultAccountType;
     }
 
-    public String getSimulatedDataDBPass() {
-        return simulatedDataDBPass;
-    }
-
-    public String getSimulatedDataDBURL() {
-        return simulatedDataDBURL;
-    }
-
-    public String getSimulatedDataDBUser() {
-        return simulatedDataDBUser;
-    }
-
     public String getSshPublicKey() {
         return sshPublicKey;
     }
@@ -524,8 +478,8 @@ PropertiesConfiguration config;
         return queryTree;
     }
 
-    public String getN4uApplicationFilesRepository() {
-        return N4uApplicationFilesRepository;
+    public String getApplicationImporterFileRepository() {
+        return applicationImporterFileRepository;
     }
 
     public String getDeleteFilesAfterUpload() {

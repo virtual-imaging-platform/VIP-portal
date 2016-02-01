@@ -43,8 +43,22 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "PairOfPipelineAndBooleanLists")
 public class PairOfPipelineAndBooleanLists {
 
-    @XmlElement(name = "pipelines", required = true)
+    @XmlElement(name = "pipeline", required = true)
     public ArrayList<Pipeline> pipelines;
     @XmlElement(name = "canExecute", required = true)
     public ArrayList<Boolean> canExecute;
+    
+    public PairOfPipelineAndBooleanLists(){
+        pipelines = new ArrayList<>();
+        canExecute = new ArrayList<>();
+    }
+
+    public ArrayList<Pipeline> getPipelines() {
+        return pipelines;
+    }
+
+    public ArrayList<Boolean> getCanExecute() {
+        return canExecute;
+    }
+    
 }
