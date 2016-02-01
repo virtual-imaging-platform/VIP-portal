@@ -10,14 +10,14 @@
 #foreach($input in $tool.getInputs())
 #set($option="--$input.getId().toLowerCase()")
     <input name="${input.getId()}" option="${option}"> 
-#if($input.getType() == "File")
+#if($input.getType() == "File" && !$input.isOptional())
       <access type="LFN"/> 
 #end
     </input>
 #end
 #foreach($outputFile in $tool.getOutputFiles())
 #set($option="--$outputFile.getId().toLowerCase()")
-    <output name="$outputFile.getName()" option="$option">
+    <output name="$outputFile.getId()" option="$option">
 #set ($value=$outputFile.getPathTemplate()) 
 #set ($i=1)
 #foreach($input in $tool.getInputs())
