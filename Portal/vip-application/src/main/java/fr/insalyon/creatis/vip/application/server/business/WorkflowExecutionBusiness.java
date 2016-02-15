@@ -33,8 +33,10 @@ package fr.insalyon.creatis.vip.application.server.business;
 
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
+import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
+import fr.insalyon.creatis.vip.application.server.business.simulation.WebServiceEngine;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -54,11 +56,11 @@ public class WorkflowExecutionBusiness {
     private static final Logger logger = Logger.getLogger(WorkflowExecutionBusiness.class);
     private WorkflowEngineInstantiator engine;
 
-    public WorkflowExecutionBusiness(String applicationClass) throws BusinessException {
+    public WorkflowExecutionBusiness(String engineEndpoint) throws BusinessException {
 
-        engine = WorkflowEngineInstantiator.create(applicationClass);
+        engine = WorkflowEngineInstantiator.create(engineEndpoint);
     }
-
+ 
     /**
      * 
      * @param applicationName
@@ -83,7 +85,8 @@ public class WorkflowExecutionBusiness {
 
             return new Workflow(workflowID, user.getFullName(), 
                     engine.getMode().equalsIgnoreCase("pool") ? WorkflowStatus.Queued : WorkflowStatus.Running,
-                    new Date(), null, simulationName, applicationName, applicationVersion, applicationClass);
+                    new Date(), null, simulationName, applicationName, applicationVersion, applicationClass, 
+                    engine.getMode().equalsIgnoreCase("pool") ? "ShiwaPool" : ((WebServiceEngine)engine).getAddressWS());
 
         } catch (javax.xml.rpc.ServiceException | java.rmi.RemoteException ex) {
             logger.error(ex);

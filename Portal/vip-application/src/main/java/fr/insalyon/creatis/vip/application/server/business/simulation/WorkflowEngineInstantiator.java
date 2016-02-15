@@ -53,7 +53,7 @@ public abstract class WorkflowEngineInstantiator {
 
     private static Logger logger = Logger.getLogger(WorkflowEngineInstantiator.class);
 
-    public static WorkflowEngineInstantiator create(String className) throws BusinessException {
+    public static WorkflowEngineInstantiator create(String engineEndpoint) throws BusinessException {
 
         WorkflowEngineInstantiator engine = null;
         if (Server.getInstance().getWorflowsExecMode().equalsIgnoreCase("pool")) {
@@ -80,24 +80,14 @@ public abstract class WorkflowEngineInstantiator {
 
         } else {
 
-            try {
-                engine = new WebServiceEngine();
-                Engine engineBean = ApplicationDAOFactory.getDAOFactory().getEngineDAO().getByClass(className);
-
-                String endpoint = engineBean == null || engineBean.getEndpoint().isEmpty()
-                        ? Server.getInstance().getMoteurServer()
-                        : engineBean.getEndpoint();
-                ((WebServiceEngine) engine).setAddressWS(endpoint);
-                String settings = "GRID=DIRAC\n"
-                        + "SE=ccsrm02.in2p3.fr\n"
-                        + "TIMEOUT=100000\n"
-                        + "RETRYCOUNT=3\n"
-                        + "MULTIJOB=1";
-                ((WebServiceEngine) engine).setSettings(settings);
-
-            } catch (DAOException ex) {
-                throw new BusinessException(ex);
-            }
+            engine = new WebServiceEngine();
+            ((WebServiceEngine) engine).setAddressWS(engineEndpoint);
+            String settings = "GRID=DIRAC\n"
+                    + "SE=ccsrm02.in2p3.fr\n"
+                    + "TIMEOUT=100000\n"
+                    + "RETRYCOUNT=3\n"
+                    + "MULTIJOB=1";
+            ((WebServiceEngine) engine).setSettings(settings);
         }
 
         return engine;

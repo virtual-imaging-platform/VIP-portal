@@ -49,6 +49,7 @@ public class Simulation implements IsSerializable {
     private String userName;
     private Date date;
     private SimulationStatus status;
+    private String engine;
 
     public Simulation() {
     }
@@ -98,7 +99,14 @@ public class Simulation implements IsSerializable {
     public void setStatus(SimulationStatus status) {
         this.status = status;
     }
+    
+    public String getEngine() {
+        return engine;
+    }
 
+    public void setEngine(String engine) {
+        this.engine = engine;
+    }
     public String getSimulationName() {
         return simulationName;
     }

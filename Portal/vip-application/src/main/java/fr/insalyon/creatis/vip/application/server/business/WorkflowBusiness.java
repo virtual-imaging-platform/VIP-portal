@@ -51,6 +51,7 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Activity;
+import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.progress.ProcessorStatus;
@@ -76,6 +77,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
@@ -113,6 +115,31 @@ public class WorkflowBusiness {
         }
     }
 
+    private String selectEngineEndpoint(String applicationClass) throws BusinessException {
+        long min = 100000;
+        long tmp;
+        Engine engineBean = null;
+        String endpoint = "";
+        try {
+            List<Engine> availableEngines = ApplicationDAOFactory.getDAOFactory().getEngineDAO().getByClass(applicationClass);
+            for (Engine engine : availableEngines) {
+                tmp = workflowDAO.getNumberOfRunningPerEngine(engine.getEndpoint());
+                if (tmp < min) {
+                    min = tmp;
+                    engineBean = engine;
+                }
+            }
+            endpoint = engineBean == null || engineBean.getEndpoint().isEmpty()
+                    ? Server.getInstance().getMoteurServer()
+                    : engineBean.getEndpoint();
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        } catch (WorkflowsDBDAOException ex) {
+            java.util.logging.Logger.getLogger(WorkflowBusiness.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return endpoint;
+    }
+    
     /**
      *
      * @param user
@@ -195,7 +222,8 @@ public class WorkflowBusiness {
                     Server.getInstance().getConfigurationFolder() + "workflows/"
                     + FilenameUtils.getName(version.getLfn()));
 
-            WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(applicationClass);
+            String endpoint = selectEngineEndpoint(applicationClass);
+            WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(endpoint);
             Workflow workflow = executionBusiness.launch(applicationName,
                     applicationVersion, applicationClass, user, simulationName,
                     workflowPath, parameters);
@@ -354,7 +382,7 @@ public class WorkflowBusiness {
             Workflow workflow = workflowDAO.get(simulationID);
             workflow.setStatus(WorkflowStatus.Killed);
             workflowDAO.update(workflow);
-            WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(workflow.getApplicationClass());
+            WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(workflow.getEngine());
             executionBusiness.kill(simulationID);
 
         } catch (WorkflowsDBDAOException ex) {
@@ -780,7 +808,7 @@ public class WorkflowBusiness {
 
             if (simulation.getStatus() == SimulationStatus.Running
                     || simulation.getStatus() == SimulationStatus.Unknown) {
-                WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(simulation.getApplicationClass());
+                WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(simulation.getEngine());
                 SimulationStatus simulationStatus = executionBusiness.getStatus(simulation.getID());
 
                 if (simulationStatus != SimulationStatus.Running 

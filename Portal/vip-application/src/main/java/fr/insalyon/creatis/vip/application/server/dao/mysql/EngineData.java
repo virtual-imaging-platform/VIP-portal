@@ -138,7 +138,7 @@ public class EngineData implements EngineDAO {
     }
 
     @Override
-    public Engine getByClass(String className) throws DAOException {
+    public List<Engine> getByClass(String className) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
@@ -149,16 +149,13 @@ public class EngineData implements EngineDAO {
             ps.setString(1, className);
 
             ResultSet rs = ps.executeQuery();
-
-            Engine engine = null;
-            if (rs.next()) {
-                engine = new Engine(rs.getString("engineName"),
-                        rs.getString("endpoint"));
+            
+            List<Engine> list = new ArrayList<Engine>();
+            while (rs.next()) {
+                list.add(new Engine(rs.getString("name"), rs.getString("endpoint")));
             }
-
             ps.close();
-
-            return engine;
+            return list;
 
         } catch (SQLException ex) {
             logger.error(ex);
