@@ -152,7 +152,7 @@ public class EngineData implements EngineDAO {
             
             List<Engine> list = new ArrayList<Engine>();
             while (rs.next()) {
-                list.add(new Engine(rs.getString("name"), rs.getString("endpoint")));
+                list.add(new Engine(rs.getString("engineName"), rs.getString("endpoint")));
             }
             ps.close();
             return list;
