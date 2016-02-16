@@ -137,8 +137,8 @@ public class ClassData implements ClassDAO {
 
                 List<String> engines = new ArrayList<String>();
                 PreparedStatement ps3 = connection.prepareStatement(
-                        "SELECT engine FROM VIPClasses "
-                        + "WHERE name=? ORDER BY engine");
+                        "SELECT engine FROM VIPClassesEngines "
+                        + "WHERE class=? ORDER BY engine");
                 ps3.setString(1, rs.getString("name"));
                 ResultSet re = ps3.executeQuery();
                 while (re.next()) {
@@ -148,7 +148,6 @@ public class ClassData implements ClassDAO {
                 
                 classes.add(new AppClass(rs.getString("name"), 
                         engines, groups));
-                //logger.info("getClasses: added  class "+rs.getString("name")+" with groups "+groups.toString() + " and engines "+engines.toString());
             }
 
             ps.close();
@@ -192,8 +191,8 @@ public class ClassData implements ClassDAO {
                 // Get engines associated to class
                 List<String> engines = new ArrayList<String>();
                 PreparedStatement ps3 = connection.prepareStatement(
-                        "SELECT engine FROM VIPClasses "
-                        + "WHERE name=? ORDER BY engine");
+                        "SELECT engine FROM VIPClassesEngines "
+                        + "WHERE class=? ORDER BY engine");
                 ps3.setString(1, rs.getString("name"));
                 ResultSet re = ps3.executeQuery();
                 while (re.next()) {
@@ -281,7 +280,7 @@ public class ClassData implements ClassDAO {
                         break;
                     case "engine":
                         ps = connection.prepareStatement("INSERT INTO "
-                        + "VIPClasses(name, engine) "
+                        + "VIPClassesEngines(class, engine) "
                         + "VALUES(?, ?)");
                         break;
                     default:
@@ -289,7 +288,6 @@ public class ClassData implements ClassDAO {
                 }
                 ps.setString(1, className);
                 ps.setString(2, name);
-                logger.info("addToClass " +className+" "+objectType+". PS is "+ps.toString());
                 ps.execute();
                 ps.close();
 
@@ -322,7 +320,7 @@ public class ClassData implements ClassDAO {
                     break;
                 case "engine":
                     ps = connection.prepareStatement("DELETE FROM "
-                    + "VIPClasses WHERE name=?");
+                    + "VIPClassesEngines WHERE class=?");
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid objectType: " + objectType);

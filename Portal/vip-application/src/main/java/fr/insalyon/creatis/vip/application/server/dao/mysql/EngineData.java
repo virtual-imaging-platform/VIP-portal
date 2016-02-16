@@ -143,9 +143,9 @@ public class EngineData implements EngineDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
                     + "e.name AS engineName, endpoint "
-                    + "FROM VIPEngines e, VIPClasses c "
+                    + "FROM VIPEngines e, VIPClassesEngines c "
                     + "WHERE e.name = c.engine AND "
-                    + "c.name = ?");
+                    + "c.class = ?");
             ps.setString(1, className);
 
             ResultSet rs = ps.executeQuery();

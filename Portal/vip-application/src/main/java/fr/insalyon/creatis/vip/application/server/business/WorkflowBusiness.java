@@ -122,7 +122,7 @@ public class WorkflowBusiness {
         String endpoint = "";
         try {
             List<Engine> availableEngines = ApplicationDAOFactory.getDAOFactory().getEngineDAO().getByClass(applicationClass);
-            for (Engine engine : availableEngines) {
+            for (Engine engine : availableEngines) {                
                 tmp = workflowDAO.getNumberOfRunningPerEngine(engine.getEndpoint());
                 if (tmp < min) {
                     min = tmp;
@@ -229,7 +229,7 @@ public class WorkflowBusiness {
                     workflowPath, parameters);
             if(workflow == null)
                 throw new BusinessException("Workflow is null");
-            logger.info("Launched workflow "+workflow.toString());
+
             workflowDAO.add(workflow);
             return workflow.getId();
 
@@ -494,7 +494,8 @@ public class WorkflowBusiness {
                     workflow.getUsername(),
                     workflow.getStartedTime(),
                     workflow.getDescription(),
-                    workflow.getStatus().name());
+                    workflow.getStatus().name(),
+                    workflow.getEngine());
 
         } catch (WorkflowsDBDAOException ex) {
             logger.error(ex);
@@ -790,7 +791,8 @@ public class WorkflowBusiness {
                     workflow.getUsername(),
                     workflow.getStartedTime(),
                     workflow.getDescription(),
-                    workflow.getStatus().name()));
+                    workflow.getStatus().name(),
+                    workflow.getEngine()));
         }
         return simulationsList;
     }

@@ -70,10 +70,16 @@ public class MySQLDAOFactory extends ApplicationDAOFactory {
 
             PlatformConnection.getInstance().createTable("VIPClasses",
                     "name VARCHAR(255), "
+                    + "PRIMARY KEY (name)");
+            
+            PlatformConnection.getInstance().createTable("VIPClassesEngines",
+                    "class VARCHAR(255), "
                     + "engine VARCHAR(255), "
-                    + "PRIMARY KEY (name), "
+                    + "PRIMARY KEY (class, engine), "
+                    + "FOREIGN KEY (class) REFERENCES VIPClasses(name) "
+                    + "ON DELETE CASCADE ON UPDATE CASCADE, "
                     + "FOREIGN KEY (engine) REFERENCES VIPEngines(name) "
-                    + "ON DELETE CASCADE ON UPDATE RESTRICT");
+                    + "ON DELETE CASCADE ON UPDATE CASCADE");
 
             PlatformConnection.getInstance().createTable("VIPGroupsClasses",
                     "classname VARCHAR(255), "

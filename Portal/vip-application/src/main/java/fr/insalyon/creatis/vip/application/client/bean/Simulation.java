@@ -56,7 +56,7 @@ public class Simulation implements IsSerializable {
 
     public Simulation(String application, String applicationVersion,
             String applicationClass, String id, String userName, Date date, 
-            String simulationName, String status) {
+            String simulationName, String status, String engine) {
 
         this.applicationName = application;
         this.applicationVersion = applicationVersion;
@@ -66,6 +66,7 @@ public class Simulation implements IsSerializable {
         this.date = date;
         this.simulationName = simulationName;
         this.status = SimulationStatus.valueOf(status);
+        this.engine = engine;
     }
 
     public String getApplicationName() {
