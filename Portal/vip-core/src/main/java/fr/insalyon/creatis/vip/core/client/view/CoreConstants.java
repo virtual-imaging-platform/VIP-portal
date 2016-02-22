@@ -40,7 +40,7 @@ import java.util.Date;
  */
 public class CoreConstants implements IsSerializable {
 
-    public static final String VERSION = "v1.16.1";
+    public static final String VERSION = "v1.16.2";
     // Configuration Labels
     public static final String VO_BIOMED = "biomed";
     public static final String VO_NEUGRID = "vo.neugrid.eu";
