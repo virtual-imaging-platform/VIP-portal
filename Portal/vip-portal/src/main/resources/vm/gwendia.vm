@@ -14,14 +14,8 @@
     <source name="$input.getId()" type="string" optional="$input.isOptional()" default="false">
     #set($extraComment="Put '<b>true</b>' to activate the flag and '<b>false</b>' to disable it.")
   #else
-    #if($input.getDefaultValue()!="null")
+    #if($input.getDefaultValue()!="null" && $input.getDefaultValue()!="")
     <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="$input.getDefaultValue()">
-      #if($input.isOptional()==true)
-    <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="no">
-        #set($extraComment="Put '<b>no</b>' to ignore this optional input.")
-      #else
-        #set($extraComment="")
-      #end    
     #else
       #if($input.isOptional()==true)
     <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="no">
