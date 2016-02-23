@@ -97,9 +97,11 @@ public class WorkflowBusiness {
     private static OutputDAO outputDAO;
     private static InputDAO inputDAO;
     private static StatsDAO statsDAO;
+    private final EngineBusiness engineBusiness;
 
     public WorkflowBusiness() {
 
+        engineBusiness = new EngineBusiness();
         try {
             applicationDB = ApplicationDAOFactory.getDAOFactory().getApplicationDAO();
             simulationStatsDAO = SimulationStatsDAOFactory.getInstance().getSimulationStatsDAO();
@@ -249,6 +251,7 @@ public class WorkflowBusiness {
                     workflowPath, parameters);
             if(workflow == null){
                 engine.setStatus("disabled");
+                this.engineBusiness.update(engine);
                 throw new BusinessException("Workflow is null, disabling engine "+engine.getName());
             }
 
