@@ -77,6 +77,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Level;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -115,29 +116,47 @@ public class WorkflowBusiness {
         }
     }
 
-    private String selectEngineEndpoint(String applicationClass) throws BusinessException {
-        long min = 100000;
-        long tmp;
+    private Engine selectEngine(String applicationClass) throws BusinessException {
+        long min = Integer.MAX_VALUE;
         Engine engineBean = null;
-        String endpoint = "";
         try {
             List<Engine> availableEngines = ApplicationDAOFactory.getDAOFactory().getEngineDAO().getByClass(applicationClass);
             for (Engine engine : availableEngines) {                
-                tmp = workflowDAO.getNumberOfRunningPerEngine(engine.getEndpoint());
-                if (tmp < min) {
-                    min = tmp;
+                long runningWorkflows = workflowDAO.getNumberOfRunningPerEngine(engine.getEndpoint());
+                if (runningWorkflows < min) {
+                    min = runningWorkflows;
                     engineBean = engine;
                 }
             }
-            endpoint = engineBean == null || engineBean.getEndpoint().isEmpty()
-                    ? Server.getInstance().getMoteurServer()
-                    : engineBean.getEndpoint();
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (WorkflowsDBDAOException ex) {
             java.util.logging.Logger.getLogger(WorkflowBusiness.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return endpoint;
+        if (engineBean == null || engineBean.getEndpoint().isEmpty()) {
+            throw new BusinessException("No available engines for class " + applicationClass);
+        } else {
+            return engineBean;
+        }      
+    }
+    
+    private Engine selectRandomEngine(String applicationClass) throws BusinessException {
+        
+        Engine engineBean = null;
+        try {
+            List<Engine> availableEngines = ApplicationDAOFactory.getDAOFactory().getEngineDAO().getByClass(applicationClass);
+            Random randomizer = new Random();
+            engineBean = availableEngines.get(randomizer.nextInt(availableEngines.size()));
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+        if (engineBean == null || engineBean.getEndpoint().isEmpty()) {
+            throw new BusinessException("No available engines for class " + applicationClass);
+        } else {
+            return engineBean;
+        }      
     }
     
     /**
@@ -222,13 +241,16 @@ public class WorkflowBusiness {
                     Server.getInstance().getConfigurationFolder() + "workflows/"
                     + FilenameUtils.getName(version.getLfn()));
 
-            String endpoint = selectEngineEndpoint(applicationClass);
-            WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(endpoint);
+            //selectRandomEngine could also be used; TODO: make this choice configurable
+            Engine engine = selectEngine(applicationClass);
+            WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(engine.getEndpoint());
             Workflow workflow = executionBusiness.launch(applicationName,
                     applicationVersion, applicationClass, user, simulationName,
                     workflowPath, parameters);
-            if(workflow == null)
-                throw new BusinessException("Workflow is null");
+            if(workflow == null){
+                engine.setStatus("disabled");
+                throw new BusinessException("Workflow is null, disabling engine "+engine.getName());
+            }
 
             workflowDAO.add(workflow);
             return workflow.getId();

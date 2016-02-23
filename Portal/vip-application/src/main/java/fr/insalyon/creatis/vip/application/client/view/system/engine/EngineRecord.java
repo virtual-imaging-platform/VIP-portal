@@ -39,9 +39,10 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class EngineRecord extends ListGridRecord {
 
-    public EngineRecord(String name, String endpoint) {
+    public EngineRecord(String name, String endpoint, String status) {
 
         setAttribute("name", name);
         setAttribute("endpoint", endpoint);
+        setAttribute("status", status);
     }
 }

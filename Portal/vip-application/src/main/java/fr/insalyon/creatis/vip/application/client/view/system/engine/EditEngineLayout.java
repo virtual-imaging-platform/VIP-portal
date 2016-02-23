@@ -37,6 +37,7 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
@@ -58,6 +59,8 @@ public class EditEngineLayout extends AbstractFormLayout {
     private TextItem endpointField;
     private IButton saveButton;
     private IButton removeButton;
+    private SelectItem statusPickList;
+    private String[] statusList = {"enabled", "disabled"};
 
     public EditEngineLayout() {
 
@@ -71,6 +74,9 @@ public class EditEngineLayout extends AbstractFormLayout {
 
         nameField = FieldUtil.getTextItem(450, null);
         endpointField = FieldUtil.getTextItem(450, null);
+        statusPickList = new SelectItem();
+        statusPickList.setShowTitle(false);
+        statusPickList.setWidth(350);
 
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
@@ -79,7 +85,8 @@ public class EditEngineLayout extends AbstractFormLayout {
                         if (nameField.validate() & endpointField.validate()) {
 
                             save(new Engine(nameField.getValueAsString().trim(),
-                                    endpointField.getValueAsString().trim()));
+                                    endpointField.getValueAsString().trim(), 
+                                    statusPickList.getValueAsString()));
                         }
                     }
                 });
@@ -102,7 +109,10 @@ public class EditEngineLayout extends AbstractFormLayout {
 
         addField("Name", nameField);
         addField("End-Point", endpointField);
+        addField("Status", statusPickList);
         addButtons(saveButton, removeButton);
+        
+        statusPickList.setValueMap(statusList);
     }
 
     /**
@@ -111,12 +121,13 @@ public class EditEngineLayout extends AbstractFormLayout {
      * @param name Engine name
      * @param endpoint Engine endpoint
      */
-    public void setEngine(String name, String endpoint) {
+    public void setEngine(String name, String endpoint, String status) {
 
         if (name != null) {
             this.nameField.setValue(name);
             this.nameField.setDisabled(true);
             this.endpointField.setValue(endpoint);
+            this.statusPickList.setValue(status);
             this.newEngine = false;
             this.removeButton.setDisabled(false);
 
@@ -124,6 +135,7 @@ public class EditEngineLayout extends AbstractFormLayout {
             this.nameField.setValue("");
             this.nameField.setDisabled(false);
             this.endpointField.setValue("");
+            this.statusPickList.setValue("");
             this.newEngine = true;
             this.removeButton.setDisabled(true);
         }
@@ -175,7 +187,7 @@ public class EditEngineLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setEngine(null, null);
+                setEngine(null, null, null);
                 ManageEnginesTab tab = (ManageEnginesTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_ENGINE);
                 tab.loadEngines();

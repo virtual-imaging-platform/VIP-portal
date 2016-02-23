@@ -140,8 +140,8 @@ public class EditClassLayout extends AbstractFormLayout {
         if (name != null) {
             this.nameField.setValue(name);
             this.nameField.setDisabled(true);
-            this.enginesPickList.setValues(engines.split(", "));
-            this.groupsPickList.setValues(groups.split(", "));
+            this.enginesPickList.setValues(engines.split("\\s*,\\s*"));
+            this.groupsPickList.setValues(groups.split("\\s*,\\s*"));
             this.newClass = false;
             this.removeButton.setDisabled(false);
 
