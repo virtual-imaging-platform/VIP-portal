@@ -156,9 +156,9 @@ public class WorkflowBusiness {
         }
         if (engineBean == null || engineBean.getEndpoint().isEmpty()) {
             throw new BusinessException("No available engines for class " + applicationClass);
-        } else {
-            return engineBean;
-        }      
+        } 
+        
+        return engineBean;   
     }
     
     /**
