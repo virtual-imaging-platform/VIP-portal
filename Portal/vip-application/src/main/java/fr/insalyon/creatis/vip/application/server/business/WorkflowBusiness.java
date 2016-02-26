@@ -51,6 +51,7 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Activity;
+import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.progress.ProcessorStatus;
@@ -76,6 +77,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.logging.Level;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
@@ -94,9 +97,11 @@ public class WorkflowBusiness {
     private static OutputDAO outputDAO;
     private static InputDAO inputDAO;
     private static StatsDAO statsDAO;
+    private final EngineBusiness engineBusiness;
 
     public WorkflowBusiness() {
 
+        engineBusiness = new EngineBusiness();
         try {
             applicationDB = ApplicationDAOFactory.getDAOFactory().getApplicationDAO();
             simulationStatsDAO = SimulationStatsDAOFactory.getInstance().getSimulationStatsDAO();
@@ -113,6 +118,49 @@ public class WorkflowBusiness {
         }
     }
 
+    private Engine selectEngine(String applicationClass) throws BusinessException {
+        long min = Integer.MAX_VALUE;
+        Engine engineBean = null;
+        try {
+            List<Engine> availableEngines = ApplicationDAOFactory.getDAOFactory().getEngineDAO().getByClass(applicationClass);
+            for (Engine engine : availableEngines) {                
+                long runningWorkflows = workflowDAO.getNumberOfRunningPerEngine(engine.getEndpoint());
+                if (runningWorkflows < min) {
+                    min = runningWorkflows;
+                    engineBean = engine;
+                }
+            }
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        } catch (WorkflowsDBDAOException ex) {
+            java.util.logging.Logger.getLogger(WorkflowBusiness.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if (engineBean == null || engineBean.getEndpoint().isEmpty()) {
+            throw new BusinessException("No available engines for class " + applicationClass);
+        } else {
+            return engineBean;
+        }      
+    }
+    
+    private Engine selectRandomEngine(String applicationClass) throws BusinessException {
+        
+        Engine engineBean = null;
+        try {
+            List<Engine> availableEngines = ApplicationDAOFactory.getDAOFactory().getEngineDAO().getByClass(applicationClass);
+            Random randomizer = new Random();
+            engineBean = availableEngines.get(randomizer.nextInt(availableEngines.size()));
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+        if (engineBean == null || engineBean.getEndpoint().isEmpty()) {
+            throw new BusinessException("No available engines for class " + applicationClass);
+        } 
+        
+        return engineBean;   
+    }
+    
     /**
      *
      * @param user
@@ -195,13 +243,18 @@ public class WorkflowBusiness {
                     Server.getInstance().getConfigurationFolder() + "workflows/"
                     + FilenameUtils.getName(version.getLfn()));
 
-            WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(applicationClass);
+            //selectRandomEngine could also be used; TODO: make this choice configurable
+            Engine engine = selectEngine(applicationClass);
+            WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(engine.getEndpoint());
             Workflow workflow = executionBusiness.launch(applicationName,
                     applicationVersion, applicationClass, user, simulationName,
                     workflowPath, parameters);
-            if(workflow == null)
-                throw new BusinessException("Workflow is null");
-            logger.info("Launched workflow "+workflow.toString());
+            if(workflow == null){
+                engine.setStatus("disabled");
+                this.engineBusiness.update(engine);
+                throw new BusinessException("Workflow is null, disabling engine "+engine.getName());
+            }
+
             workflowDAO.add(workflow);
             return workflow.getId();
 
@@ -354,7 +407,7 @@ public class WorkflowBusiness {
             Workflow workflow = workflowDAO.get(simulationID);
             workflow.setStatus(WorkflowStatus.Killed);
             workflowDAO.update(workflow);
-            WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(workflow.getApplicationClass());
+            WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(workflow.getEngine());
             executionBusiness.kill(simulationID);
 
         } catch (WorkflowsDBDAOException ex) {
@@ -466,7 +519,8 @@ public class WorkflowBusiness {
                     workflow.getUsername(),
                     workflow.getStartedTime(),
                     workflow.getDescription(),
-                    workflow.getStatus().name());
+                    workflow.getStatus().name(),
+                    workflow.getEngine());
 
         } catch (WorkflowsDBDAOException ex) {
             logger.error(ex);
@@ -762,7 +816,8 @@ public class WorkflowBusiness {
                     workflow.getUsername(),
                     workflow.getStartedTime(),
                     workflow.getDescription(),
-                    workflow.getStatus().name()));
+                    workflow.getStatus().name(),
+                    workflow.getEngine()));
         }
         return simulationsList;
     }
@@ -780,7 +835,7 @@ public class WorkflowBusiness {
 
             if (simulation.getStatus() == SimulationStatus.Running
                     || simulation.getStatus() == SimulationStatus.Unknown) {
-                WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(simulation.getApplicationClass());
+                WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(simulation.getEngine());
                 SimulationStatus simulationStatus = executionBusiness.getStatus(simulation.getID());
 
                 if (simulationStatus != SimulationStatus.Running 

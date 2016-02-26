@@ -84,11 +84,13 @@ public class EngineData implements EngineDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "UPDATE VIPEngines SET endpoint = ? "
+                    "UPDATE VIPEngines SET endpoint = ?, "
+                    + "status = ? "
                     + "WHERE name = ?");
 
             ps.setString(1, engine.getEndpoint());
-            ps.setString(2, engine.getName());
+            ps.setString(2, engine.getStatus());
+            ps.setString(3, engine.getName());
             ps.executeUpdate();
             ps.close();
 
@@ -120,14 +122,14 @@ public class EngineData implements EngineDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "name, endpoint FROM VIPEngines "
+                    + "name, endpoint, status FROM VIPEngines "
                     + "ORDER BY name");
 
             ResultSet rs = ps.executeQuery();
             List<Engine> list = new ArrayList<Engine>();
 
             while (rs.next()) {
-                list.add(new Engine(rs.getString("name"), rs.getString("endpoint")));
+                list.add(new Engine(rs.getString("name"), rs.getString("endpoint"), rs.getString("status")));
             }
             return list;
 
@@ -138,27 +140,27 @@ public class EngineData implements EngineDAO {
     }
 
     @Override
-    public Engine getByClass(String className) throws DAOException {
-
+    public List<Engine> getByClass(String className) throws DAOException {
+        
+        String status= "enabled";
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "e.name AS engineName, endpoint "
-                    + "FROM VIPEngines e, VIPClasses c "
+                    + "e.name AS engineName, endpoint, status "
+                    + "FROM VIPEngines e, VIPClassesEngines c "
                     + "WHERE e.name = c.engine AND "
-                    + "c.name = ?");
-            ps.setString(1, className);
+                    + "e.status = ? AND "
+                    + "c.class = ?");
+            ps.setString(1, status);
+            ps.setString(2, className);
 
             ResultSet rs = ps.executeQuery();
-
-            Engine engine = null;
-            if (rs.next()) {
-                engine = new Engine(rs.getString("engineName"),
-                        rs.getString("endpoint"));
+            
+            List<Engine> list = new ArrayList<Engine>();
+            while (rs.next()) {
+                list.add(new Engine(rs.getString("engineName"), rs.getString("endpoint"), rs.getString("status")));
             }
-
             ps.close();
-
-            return engine;
+            return list;
 
         } catch (SQLException ex) {
             logger.error(ex);

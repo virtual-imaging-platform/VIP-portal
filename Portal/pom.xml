@@ -37,14 +37,14 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip</artifactId>
     <packaging>pom</packaging>
-    <version>1.16.2</version>
+    <version>1.17</version>
     <name>VIP</name>
     
     <properties>
-        <vip.core.version>1.16.2</vip.core.version>
-        <vip.portal.version>1.16.2</vip.portal.version>
+        <vip.core.version>1.17</vip.core.version>
+        <vip.portal.version>1.17</vip.portal.version>
         <vip.docs.version>1.15</vip.docs.version>
-        <vip.application.version>1.16.1</vip.application.version>
+        <vip.application.version>1.17</vip.application.version>
         <vip.datamanager.version>1.16.1</vip.datamanager.version>
         <vip.datamanager-applet.version>1.16.2</vip.datamanager-applet.version>
         <vip.gatelab.version>1.15</vip.gatelab.version>

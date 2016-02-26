@@ -62,7 +62,7 @@ public class ManageEnginesTab extends AbstractManageTab {
         enginesLayout.loadData();
     }
 
-    public void setEngine(String name, String endpoint) {
-        editLayout.setEngine(name, endpoint);
+    public void setEngine(String name, String endpoint, String status) {
+        editLayout.setEngine(name, endpoint, status);
     }
 }

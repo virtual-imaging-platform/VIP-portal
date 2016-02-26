@@ -52,6 +52,7 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
+import fr.insalyon.creatis.vip.application.server.dao.mysql.ClassData;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.common.LabelButton;
@@ -77,11 +78,10 @@ public class ClassesLayout extends VLayout {
         this.setWidth100();
         this.setHeight100();
         this.setOverflow(Overflow.AUTO);
-
         configureToolStrip();
         configureGrid();
         modal = new ModalWindow(grid);
-
+        
         loadData();
     }
 
@@ -213,16 +213,22 @@ public class ClassesLayout extends VLayout {
             @Override
             public void onSuccess(List<AppClass> result) {
                 List<ClassRecord> dataList = new ArrayList<ClassRecord>();
-
                 for (AppClass c : result) {
                     StringBuilder sb = new StringBuilder();
+                    StringBuilder sbe = new StringBuilder();
                     for (String group : c.getGroups()) {
                         if (sb.length() > 0) {
                             sb.append(", ");
                         }
                         sb.append(group);
                     }
-                    dataList.add(new ClassRecord(c.getName(), sb.toString(), c.getEngine()));
+                    for (String engine : c.getEngines()) {
+                        if (sbe.length() > 0) {
+                            sbe.append(", ");
+                        }
+                        sbe.append(engine);
+                    }
+                    dataList.add(new ClassRecord(c.getName(), sb.toString(), sbe.toString()));
                 }
                 grid.setData(dataList.toArray(new ClassRecord[]{}));
                 modal.hide();

@@ -42,7 +42,7 @@ public class AppClass implements IsSerializable {
 
     private String name;
     private List<String> groups;
-    private String engine;
+    private List<String> engine;
 
     public AppClass() {
     }
@@ -52,7 +52,7 @@ public class AppClass implements IsSerializable {
         this(name, null, groups);
     }
 
-    public AppClass(String name, String engine, List<String> groups) {
+    public AppClass(String name, List<String> engine, List<String> groups) {
 
         this.name = name;
         this.engine = engine;
@@ -67,7 +67,7 @@ public class AppClass implements IsSerializable {
         return name;
     }
 
-    public String getEngine() {
+    public List<String> getEngines() {
         return engine;
     }
 }

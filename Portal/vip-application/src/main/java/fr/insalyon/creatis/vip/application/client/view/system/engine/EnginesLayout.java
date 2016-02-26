@@ -97,7 +97,7 @@ public class EnginesLayout extends VLayout {
             public void onClick(ClickEvent event) {
                 ManageEnginesTab enginesTab = (ManageEnginesTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_ENGINE);
-                enginesTab.setEngine(null, null);
+                enginesTab.setEngine(null, null, null);
             }
         });
         toolstrip.addMember(addButton);
@@ -133,7 +133,8 @@ public class EnginesLayout extends VLayout {
                         @Override
                         public void onClick(ClickEvent event) {
                             edit(rollOverRecord.getAttribute("name"),
-                                    rollOverRecord.getAttribute("endpoint"));
+                                    rollOverRecord.getAttribute("endpoint"),
+                                    rollOverRecord.getAttribute("status"));
                         }
                     });
                     ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
@@ -178,14 +179,16 @@ public class EnginesLayout extends VLayout {
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
         grid.setFields(new ListGridField("name", "Engine Name"),
-                new ListGridField("endpoint", "End-Point"));
+                new ListGridField("endpoint", "End-Point"),
+                new ListGridField("status", "Status"));
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
             @Override
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 edit(event.getRecord().getAttribute("name"),
-                        event.getRecord().getAttribute("endpoint"));
+                        event.getRecord().getAttribute("endpoint"),
+                        event.getRecord().getAttribute("status"));
             }
         });
         this.addMember(grid);
@@ -206,7 +209,7 @@ public class EnginesLayout extends VLayout {
                 List<EngineRecord> dataList = new ArrayList<EngineRecord>();
 
                 for (Engine engine : result) {
-                    dataList.add(new EngineRecord(engine.getName(), engine.getEndpoint()));
+                    dataList.add(new EngineRecord(engine.getName(), engine.getEndpoint(), engine.getStatus()));
                 }
                 grid.setData(dataList.toArray(new EngineRecord[]{}));
             }
@@ -235,10 +238,10 @@ public class EnginesLayout extends VLayout {
         ApplicationService.Util.getInstance().removeEngine(name, callback);
     }
 
-    private void edit(String name, String endpoint) {
+    private void edit(String name, String endpoint, String status) {
 
         ManageEnginesTab appsTab = (ManageEnginesTab) Layout.getInstance().
                 getTab(ApplicationConstants.TAB_MANAGE_ENGINE);
-        appsTab.setEngine(name, endpoint);
+        appsTab.setEngine(name, endpoint, status);
     }
 }

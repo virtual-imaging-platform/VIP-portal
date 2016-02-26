@@ -41,14 +41,16 @@ public class Engine implements IsSerializable {
 
     private String name;
     private String endpoint;
+    private String status;
 
     public Engine() {
     }
 
-    public Engine(String name, String endpoint) {
+    public Engine(String name, String endpoint, String status) {
 
         this.name = name;
         this.endpoint = endpoint;
+        this.status = status ;
     }
 
     public String getName() {
@@ -57,5 +59,13 @@ public class Engine implements IsSerializable {
 
     public String getEndpoint() {
         return endpoint;
+    }
+    
+    public String getStatus(){
+        return status;
+    }
+    
+    public void setStatus(String status){
+        this.status = status;
     }
 }
