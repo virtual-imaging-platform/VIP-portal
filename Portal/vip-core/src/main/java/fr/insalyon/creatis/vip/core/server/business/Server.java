@@ -116,7 +116,6 @@ PropertiesConfiguration config;
     //undesired email domains
     private List<String> undesiredMailDomains;
     //third-party auth
-    private String samlTrustedCertificate;
     private String mozillaPersonaValidationURL;
     //treeQuery
     private String queryTree;
@@ -196,7 +195,6 @@ PropertiesConfiguration config;
             SAMLDefaultAccountType = config.getString(CoreConstants.LAB_SAML_ACCOUNT_TYPE, "Neuroimaging");
 
             sshPublicKey = config.getString(CoreConstants.SSH_PUBLIC_KEY, "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAuNjIXlgjuBR+WfjGtkieecZfe/ZL6EyNJTbL14bn3/Soof0kFSshDJvFgSH1hNwMMU1hynLbzcEbLTyVMoGQKfQkq7mJPajy9g8878WCKxCRbXv3W1/HT9iab/qqt2dcRYnDEruHwgyELBhQuMAe2W2/mgjd7Y5PxE01bwDcenYl3cU3iJk1sAOHao6P+3xU6Ov+TD8K9aC0LzZpM+rzAmS9HOZ9nvzERExd7k4TUpyffQV9Dpb5jEnEViF3VHqplB8AbWDdcJbiVkUBUe4hQb7nmWP0kHl1+v5SQJ1B4mWCZ+35Rc/9b1GsmPnXg3qqhjeKbrim/NbcUwKr9NPWjQ== vip-services@kingkong.grid.creatis.insa-lyon.fr");
-            samlTrustedCertificate = config.getString(CoreConstants.SAML_TRUSTED_CERTIFICATE, System.getProperty("user.home") + File.separator + ".vip" + File.separator + "trusted_saml_cert.pem");
             mozillaPersonaValidationURL = config.getString(CoreConstants.MOZILLA_PERSONA_VALIDATION_URL, "https://verifier.login.persona.org/verify");
             //
             List<String> appletGateLabCl = new ArrayList<String>();
@@ -272,11 +270,9 @@ PropertiesConfiguration config;
             config.setProperty(CoreConstants.LAB_CAS_URL, casURL);
             config.setProperty(CoreConstants.LAB_SAML_ACCOUNT_TYPE, SAMLDefaultAccountType);
             config.setProperty(CoreConstants.SSH_PUBLIC_KEY, sshPublicKey);
-            config.setProperty(CoreConstants.SAML_TRUSTED_CERTIFICATE, samlTrustedCertificate);
             config.setProperty(CoreConstants.MOZILLA_PERSONA_VALIDATION_URL, mozillaPersonaValidationURL);
             config.setProperty(CoreConstants.TreeQuery, queryTree);
-
-           
+       
             config.setProperty(CoreConstants.APPLICATION_FILES_REPOSITORY, applicationImporterFileRepository);
             config.setProperty(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, deleteFilesAfterUpload);
             config.setProperty(CoreConstants.APPLET_GATELAB_CLASSES, appletGateLabClasses);
@@ -466,8 +462,11 @@ PropertiesConfiguration config;
         return sshPublicKey;
     }
 
-    public String getSamlTrustedCertificate() {
-        return samlTrustedCertificate;
+    public String getSamlTrustedCertificate(String issuer) {
+        logger.info("Getting trusted certificate for issuer "+issuer);
+        String result = config.getString(CoreConstants.SAML_TRUSTED_CERTIFICATE+"."+issuer);
+        logger.info("Returning "+result);
+        return result;
     }
 
     public String getMozillaPersonaValidationURL() {

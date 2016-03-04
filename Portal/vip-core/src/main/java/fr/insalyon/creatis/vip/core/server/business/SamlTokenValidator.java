@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.core.server.business;
 
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -53,11 +52,14 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.joda.time.DateTime;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.saml2.core.Audience;
 import org.opensaml.saml2.core.AudienceRestriction;
 import org.opensaml.saml2.core.impl.AssertionImpl;
+import org.opensaml.saml2.core.impl.IssuerImpl;
 import org.opensaml.xml.Configuration;
 import org.opensaml.xml.ConfigurationException;
 import org.opensaml.xml.io.Unmarshaller;
@@ -83,60 +85,26 @@ public class SamlTokenValidator {
     public SamlTokenValidator() {
     }
 
-    public static String getEmailIfValid(String token, String trustedCertificate, String server) throws CoreException {
-   
-        String decodedToken;
+    public static String getEmailIfValid(AssertionImpl assertion, String trustedCertificate, String server) throws CoreException {
         try {
-            decodedToken = URLDecoder.decode(token, "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            throw new CoreException(ex);
-        }
+            //Check time validity
+            if (!isTimeValid(assertion)) {
+                throw new CoreException("SAML token is not time valid");
+            } else {
+                logger.info("SAML token is time valid");
+            }
 
-        //Get the assertion
-        AssertionImpl assertion;
-        try {
-            assertion = getSAMLAssertion(decodedToken);
-        } catch (UnsupportedEncodingException ex) {
-            throw new CoreException(ex);
-        } catch (ConfigurationException ex) {
-            throw new CoreException(ex);
-        } catch (XMLParserException ex) {
-            throw new CoreException(ex);
-        } catch (UnmarshallingException ex) {
-            throw new CoreException(ex);
-        }
-
-        //Check time validity
-        if (!isTimeValid(assertion)) {
-            throw new CoreException("SAML token is not time valid");
-        } else {
-            logger.info("SAML token is time valid");
-        }
-
-        //Check audience validity
-        try {
+            //Check audience validity
             if (!isAudienceValid(server, assertion)) {
                 throw new CoreException("SAML token audience is not valid");
             } else {
                 logger.info("SAML token audience is valid");
             }
-        } catch (MalformedURLException ex) {
-            throw new CoreException(ex);
-        }
-        try {
+
             //Check signature validity
-            if (!isSignatureValid(trustedCertificate, assertion)) {
-                throw new CoreException("SAML token signature is not valid");
-            } else {
-                logger.info("SAML token signature is valid");
-            }
-        } catch (CertificateException ex) {
-            throw new CoreException(ex);
-        } catch (IOException ex) {
-            throw new CoreException(ex);
-        } catch (NoSuchAlgorithmException ex) {
-            throw new CoreException(ex);
-        } catch (InvalidKeySpecException ex) {
+            isSignatureValid(trustedCertificate, assertion);
+            logger.info("SAML token signature is valid");
+        } catch (IOException | CertificateException | NoSuchAlgorithmException | InvalidKeySpecException | ValidationException ex) {
             throw new CoreException(ex);
         }
 
@@ -145,30 +113,44 @@ public class SamlTokenValidator {
         return email;
     }
 
-    private static AssertionImpl getSAMLAssertion(String token) throws UnsupportedEncodingException, ConfigurationException, XMLParserException, UnmarshallingException {
+    public static AssertionImpl getSAMLAssertion(String token) throws CoreException {
 
-        //See https://wiki.shibboleth.net/confluence/display/OpenSAML/OSTwoUsrManJavaCreateFromXML
-        InputStream in = new ByteArrayInputStream(token.getBytes("UTF-8"));
+        try {
+            String decodedToken;
+            decodedToken = URLDecoder.decode(token, "UTF-8");
 
-        // Initialize the library
-        DefaultBootstrap.bootstrap();
+            //See https://wiki.shibboleth.net/confluence/display/OpenSAML/OSTwoUsrManJavaCreateFromXML
+            InputStream in = new ByteArrayInputStream(decodedToken.getBytes("UTF-8"));
 
-        // Get parser pool manager
-        BasicParserPool ppMgr = new BasicParserPool();
-        ppMgr.setNamespaceAware(true);
+            // Initialize the library
+            DefaultBootstrap.bootstrap();
 
-        // Parse metadata file
-        Document inCommonMDDoc = ppMgr.parse(in);
-        Element metadataRoot = inCommonMDDoc.getDocumentElement();
+            // Get parser pool manager
+            BasicParserPool ppMgr = new BasicParserPool();
+            ppMgr.setNamespaceAware(true);
 
-        // Get apropriate unmarshaller
-        UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
-        Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(metadataRoot);
+            // Parse metadata file
+            Document inCommonMDDoc = ppMgr.parse(in);
+            Element metadataRoot = inCommonMDDoc.getDocumentElement();
 
-        // Unmarshall using the document root element, an EntitiesDescriptor in this case
-        AssertionImpl inCommonMD = (AssertionImpl) unmarshaller.unmarshall(metadataRoot);
+            // Get apropriate unmarshaller
+            UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+            Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(metadataRoot);
 
-        return inCommonMD;
+            // Unmarshall using the document root element, an EntitiesDescriptor in this case
+            AssertionImpl assertion = null;
+            IssuerImpl issuer = null;
+            for (Object o : unmarshaller.unmarshall(metadataRoot).getOrderedChildren()) {
+                try {
+                    assertion = (AssertionImpl) o;
+                    issuer = (IssuerImpl) o;
+                } catch (ClassCastException ex) {
+                }
+            }
+            return assertion;
+        } catch (UnsupportedEncodingException | ConfigurationException | XMLParserException | UnmarshallingException ex) {
+            throw new CoreException(ex);
+        }
     }
 
     private static String getUserEmail(AssertionImpl assertion) {
@@ -177,11 +159,23 @@ public class SamlTokenValidator {
 
     private static boolean isTimeValid(AssertionImpl assertion) {
         DateTime date = new DateTime();
-        return assertion.getConditions().getNotBefore().isBefore(date) && assertion.getConditions().getNotOnOrAfter().isAfter(date);
+        if (assertion.getConditions() == null) {
+            return true;
+        }
+        if (assertion.getConditions().getNotBefore() != null && !assertion.getConditions().getNotBefore().isBefore(date)) {
+            return false;
+        }
+        if (assertion.getConditions().getNotOnOrAfter() != null && !assertion.getConditions().getNotOnOrAfter().isAfter(date)) {
+            return false;
+        }
+        return true;
     }
 
     private static boolean isAudienceValid(String server, AssertionImpl assertion) throws MalformedURLException {
         String serverHost = getHost(server);
+        if (assertion.getConditions() == null) {
+            return true;
+        }
         for (AudienceRestriction ar : assertion.getConditions().getAudienceRestrictions()) {
             for (Audience a : ar.getAudiences()) {
                 if (getHost(a.getAudienceURI()).equals(serverHost)) {
@@ -196,7 +190,7 @@ public class SamlTokenValidator {
         return new URL(serverURL).getHost();
     }
 
-    private static boolean isSignatureValid(String certFile, AssertionImpl assertion) throws FileNotFoundException, CertificateException, IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+    private static boolean isSignatureValid(String certFile, AssertionImpl assertion) throws FileNotFoundException, CertificateException, IOException, NoSuchAlgorithmException, InvalidKeySpecException, ValidationException {
         // see http://kevnls.blogspot.ca/2009/07/processing-saml-in-java-using-opensaml.html
 
         File certificateFile = new File(certFile);
@@ -232,12 +226,7 @@ public class SamlTokenValidator {
         SignatureValidator signatureValidator = new SignatureValidator(publicCredential);
 
         //try to validate
-        try {
-            signatureValidator.validate(signature);
-        } catch (ValidationException ve) {
-            ve.printStackTrace();
-            return false;
-        }
+        signatureValidator.validate(signature);
 
         //no validation exception was thrown
         return true;

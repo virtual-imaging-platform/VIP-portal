@@ -37,10 +37,11 @@ import fr.insalyon.creatis.vip.core.server.business.SamlTokenValidator;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
+import org.opensaml.saml2.core.impl.AssertionImpl;
 
 /**
  *
- * @author glatard
+ * @author Tristan Glatard
  */
 public class SamlAuthenticationService extends AbstractAuthenticationService {
 
@@ -57,7 +58,14 @@ public class SamlAuthenticationService extends AbstractAuthenticationService {
 
         String email;
         try {
-            email = SamlTokenValidator.getEmailIfValid(token, Server.getInstance().getSamlTrustedCertificate(), request.getRequestURL().toString());
+            AssertionImpl assertion = SamlTokenValidator.getSAMLAssertion(token);
+            String assertionIssuer = assertion.getIssuer().toString();
+            if(assertionIssuer == null)
+                throw new BusinessException("SAML issuer is null");
+            String trustedCertificate = Server.getInstance().getSamlTrustedCertificate(assertionIssuer);
+            if(trustedCertificate == null)
+                throw new BusinessException("Cannot find trusted certificate for this issuer");
+            email = SamlTokenValidator.getEmailIfValid(assertion, trustedCertificate, request.getRequestURL().toString());
         } catch (CoreException ex) {
             logger.info(ex.getMessage());
             throw new BusinessException(ex);
