@@ -113,7 +113,7 @@ public class SSHLayout extends VLayout {
             public void onClick(ClickEvent event) {
                 ManageSSHTab sshTab = (ManageSSHTab) Layout.getInstance().
                         getTab(DataManagerConstants.TAB_MANAGE_SSH);
-                sshTab.setSSH(null, null, null, null, null, null, null, null,false, false, true);
+                sshTab.setSSH(null,null, null, null, null, null, null, null, null,false, false, true);
             }
         });
         toolstrip.addMember(addButton);
@@ -149,6 +149,7 @@ public class SSHLayout extends VLayout {
                         @Override
                         public void onClick(ClickEvent event) {
                             edit(rollOverRecord.getAttribute("name"),
+                                    rollOverRecord.getAttribute("lfcDir"),
                                     rollOverRecord.getAttribute("email"),
                                     rollOverRecord.getAttribute("user"),
                                     rollOverRecord.getAttribute("host"),
@@ -211,6 +212,7 @@ public class SSHLayout extends VLayout {
         checkFilesContentField.setType(ListGridFieldType.BOOLEAN);
   
         ListGridField deleteFilesFromSourceField = new ListGridField("deleteFilesFromSource", "Delete Files");
+        ListGridField lfcDir = new ListGridField("lfcDir", "LFC Dir");
         deleteFilesFromSourceField.setType(ListGridFieldType.BOOLEAN);
         ListGridField active = new ListGridField("active", "active");
         ListGridField status = new ListGridField("status", "Status");
@@ -218,6 +220,7 @@ public class SSHLayout extends VLayout {
                 FieldUtil.getIconGridField("statusIcon","Status"),
                 new ListGridField("name", "Name"),
                 new ListGridField("email", "VIP User"),
+                lfcDir,
                 new ListGridField("user", "SSH user"),
                 new ListGridField("host", "SSH host"),
                 new ListGridField("port", "SSH port"),
@@ -232,6 +235,8 @@ public class SSHLayout extends VLayout {
                 new ListGridField("sshFiles", "SSH Files"),
                 new ListGridField("lfcFiles", "LFC Files")
         );
+        
+        lfcDir.setHidden(true);
         active.setHidden(true);
         status.setHidden(true);
         grid.setSortField("name");
@@ -241,6 +246,7 @@ public class SSHLayout extends VLayout {
             public void onCellClick(CellClickEvent event) {
 
                 edit(event.getRecord().getAttribute("name"),
+                        event.getRecord().getAttribute("lfcDir"),
                         event.getRecord().getAttribute("email"),
                         event.getRecord().getAttribute("user"),
                         event.getRecord().getAttribute("host"),
@@ -277,12 +283,12 @@ public class SSHLayout extends VLayout {
         DataManagerService.Util.getInstance().removeSSH(email, name, callback);
     }
 
-    private void edit(String name, String email, String user, String host, String port, String transferType, String directory, String status,boolean checkFilesContent, boolean deleteFilesFromSource, boolean active) {
+    private void edit(String name,String lfcDir, String email, String user, String host, String port, String transferType, String directory, String status,boolean checkFilesContent, boolean deleteFilesFromSource, boolean active) {
 
         ManageSSHTab sshTab = (ManageSSHTab) Layout.getInstance().
                 getTab(DataManagerConstants.TAB_MANAGE_SSH);
 
-        sshTab.setSSH(name, email, user, host, port, TransferType.valueOf(transferType), directory, status,checkFilesContent, deleteFilesFromSource, active);
+        sshTab.setSSH(name,lfcDir, email, user, host, port, TransferType.valueOf(transferType), directory, status,checkFilesContent, deleteFilesFromSource, active);
     }
 
     public void loadData() {
@@ -300,7 +306,7 @@ public class SSHLayout extends VLayout {
                 List<SSHRecord> dataList = new ArrayList<SSHRecord>();
 
                 for (SSH ssh : result) {
-                    dataList.add(new SSHRecord(ssh.getName(), ssh.getEmail(), ssh.getUser(), ssh.getHost(), ssh.getPort(), ssh.getTransferType(), ssh.getDirectory(), ssh.getStatus(), String.valueOf(ssh.getTheEarliestNextSynchronistation()).split("\\.")[0], ssh.getNumberSynchronizationFailed(),ssh.isCheckFilesContent(), ssh.isDeleteFilesFromSource(), ssh.isActive(),ssh.getSshFiles(),ssh.getLfcFiles()));
+                    dataList.add(new SSHRecord(ssh.getName(),ssh.getLfcDir(), ssh.getEmail(), ssh.getUser(), ssh.getHost(), ssh.getPort(), ssh.getTransferType(), ssh.getDirectory(), ssh.getStatus(), String.valueOf(ssh.getTheEarliestNextSynchronistation()).split("\\.")[0], ssh.getNumberSynchronizationFailed(),ssh.isCheckFilesContent(), ssh.isDeleteFilesFromSource(), ssh.isActive(),ssh.getSshFiles(),ssh.getLfcFiles()));
                 }
                 grid.setData(dataList.toArray(new SSHRecord[]{}));
             }

@@ -32,11 +32,9 @@
 package fr.insalyon.creatis.vip.datamanager.client.view.ssh;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;
-import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
@@ -46,22 +44,22 @@ import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 
 /**
  *
- * @author glatard, 
+ * @author glatard,
  * @author Nouha Boujelben
  */
 public class ManageSSHTab extends AbstractManageTab {
 
     private SSHLayout sshLayout;
     private EditSSHLayout editLayout;
-    
+
     public ManageSSHTab() {
 
         super(DataManagerConstants.ICON_SSH, DataManagerConstants.APP_SSH, DataManagerConstants.TAB_MANAGE_SSH);
         sshLayout = new SSHLayout();
-        editLayout = new EditSSHLayout("25%","100%");
+        editLayout = new EditSSHLayout("25%", "100%");
 
         loadKey();
-          
+
         HLayout sshLayout = new HLayout(5);
         sshLayout.setHeight100();
         sshLayout.setWidth100();
@@ -82,27 +80,12 @@ public class ManageSSHTab extends AbstractManageTab {
             public void onSuccess(String result) {
 
                 editLayout.addMember(WidgetUtil.getLabel("<b>VIP's public ssh key (add it to user@host)", 50));
-                Label l = WidgetUtil.getLabel(result,20);
-                
+                Label l = WidgetUtil.getLabel(result, 20);
                 l.setCanSelectText(true);
                 l.setWidth(350);
                 l.setOverflow(Overflow.CLIP_H);
                 editLayout.addMember(l);
-//                VLayout keyLayout = new VLayout(5);
-//                keyLayout.addMember(WidgetUtil.getLabel("<b>VIP's public ssh key (add it to user@host)", 20));
-//                
-//                keyLabel = new Label(result);
-//                keyLabel.setWidth100();
-//                keyLabel.setHeight100();
-//                keyLabel.setAutoHeight();
-//                keyLabel.setCanSelectText(true);
-//                keyLabel.setPadding(5);
-//                keyLabel.setBackgroundColor("#FFFFFF");
-//                keyLabel.setBorder("1px solid #CCCCCC");
-//                
-//                keyLayout.addMember(keyLabel);
-//                
-//                keyLayout1.addMember(keyLayout);
+
             }
         });
     }
@@ -111,8 +94,8 @@ public class ManageSSHTab extends AbstractManageTab {
         sshLayout.loadData();
     }
 
-    public void setSSH(String name, String email, String user, String host, String port, TransferType transferType, String directory, String status,boolean checkFilesContent, boolean deleteFilesFromSource, boolean activate) {
-        editLayout.setSSH(email, name, user, host, port, transferType, directory, status,checkFilesContent, deleteFilesFromSource, activate);
+    public void setSSH(String name, String lfcDir, String email, String user, String host, String port, TransferType transferType, String directory, String status, boolean checkFilesContent, boolean deleteFilesFromSource, boolean activate) {
+        editLayout.setSSH(email, lfcDir, name, user, host, port, transferType, directory, status, checkFilesContent, deleteFilesFromSource, activate);
     }
 
 }

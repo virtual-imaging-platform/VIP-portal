@@ -256,21 +256,11 @@ public class DataManagerBusiness {
             //create LFC dir
             ConfigurationBusiness conf = new ConfigurationBusiness();
             User user = conf.getUser(ssh.getEmail());
-
-            String lfcDir = generateLFCDir(ssh.getName(), ssh.getEmail());
-            String name = lfcDir.substring(lfcDir.lastIndexOf("/") + 1);
-            String dir = Server.getInstance().getDataManagerUsersHome() + "/" + user.getFolder();
-            logger.info("Creating directory " + name + " in folder " + dir);
-
-            CoreUtil.getGRIDAClient().createFolder(dir, name);
-
-//            CoreUtil.getGRIDAClient().createFolder(dir, name);
+            ssh.setLfcDir(DataManagerUtil.parseBaseDir(user, ssh.getLfcDir()));
             SSHDAOFactory.getDAOFactory().getSSHDAO().addSSH(ssh);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (DataManagerException ex) {
-            throw new BusinessException(ex);
-        } catch (GRIDAClientException ex) {
             throw new BusinessException(ex);
         }
 

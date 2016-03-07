@@ -55,6 +55,7 @@ public class SSH implements IsSerializable {
     private boolean active;
     private String sshFiles;
     private String lfcFiles;
+    private String lfcDir;
 
     public SSH() {
     }
@@ -75,26 +76,17 @@ public class SSH implements IsSerializable {
      * synchronization failed
      * @param deleteFilesFromSource enbale delete files from source location
      */
-    public SSH(String email, String name, String user, String host, int port, TransferType transferType, String directory, String status, Date theEarliestNextSynchronistation, long numberSynchronizationFailed, boolean checkFilesContent, boolean deleteFilesFromSource, boolean active, String sshFiles, String lfcFiles) {
-        this.email = email;
-        this.name = name;
-        this.user = user;
-        this.host = host;
-        this.port = port;
-        this.transferType = transferType;
-        this.directory = directory;
-        this.status = status;
+    public SSH(String email, String lfcDir, String name, String user, String host, int port, TransferType transferType, String directory, String status, Date theEarliestNextSynchronistation, long numberSynchronizationFailed, boolean checkFilesContent, boolean deleteFilesFromSource, boolean active, String sshFiles, String lfcFiles) {
+        this(email, lfcDir, name, user, host, port, transferType, directory, status, checkFilesContent, deleteFilesFromSource, active);
         this.theEarliestNextSynchronistation = theEarliestNextSynchronistation;
         this.numberSynchronizationFailed = numberSynchronizationFailed;
-        this.checkFilesContent = checkFilesContent;
-        this.deleteFilesFromSource = deleteFilesFromSource;
-        this.active = active;
         this.sshFiles = sshFiles;
         this.lfcFiles = lfcFiles;
     }
 
-    public SSH(String email, String name, String user, String host, int port, TransferType transferType, String directory, String status, boolean checkFilesContent, boolean deleteFilesFromSource, boolean active) {
+    public SSH(String email, String lfcDir, String name, String user, String host, int port, TransferType transferType, String directory, String status, boolean checkFilesContent, boolean deleteFilesFromSource, boolean active) {
         this.email = email;
+        this.lfcDir = lfcDir;
         this.name = name;
         this.user = user;
         this.host = host;
@@ -193,6 +185,14 @@ public class SSH implements IsSerializable {
 
     public void setLfcFiles(String lfcFiles) {
         this.lfcFiles = lfcFiles;
+    }
+
+    public String getLfcDir() {
+        return lfcDir;
+    }
+
+    public void setLfcDir(String lfcDir) {
+        this.lfcDir = lfcDir;
     }
 
 }
