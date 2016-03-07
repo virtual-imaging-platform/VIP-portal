@@ -71,31 +71,31 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         this.addSeparator();
         this.addButton(WidgetUtil.getToolStripButton(
                 DataManagerConstants.ICON_CUT, "Cut", new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                String path = pathItem.getValueAsString();
-                if (ValidatorUtil.validateRootPath(path, "cut from")
-                        && ValidatorUtil.validateUserLevel(path, "cut from") 
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        String path = pathItem.getValueAsString();
+                        if (ValidatorUtil.validateRootPath(path, "cut from")
+                        && ValidatorUtil.validateUserLevel(path, "cut from")
                         && ValidatorUtil.validateDropboxDir(path, "cut from")) {
 
-                    cut();
-                }
-            }
-        }));
+                            cut();
+                        }
+                    }
+                }));
 
         // Paste Button
         pasteButton = WidgetUtil.getToolStripButton(
                 DataManagerConstants.ICON_PASTE, "Paste", new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                String path = pathItem.getValueAsString();
-                if (ValidatorUtil.validateRootPath(path, "paste in")
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        String path = pathItem.getValueAsString();
+                        if (ValidatorUtil.validateRootPath(path, "paste in")
                         && ValidatorUtil.validateUserLevel(path, "paste to")) {
 
-                    paste(modal, path);
-                }
-            }
-        });
+                            paste(modal, path);
+                        }
+                    }
+                });
         pasteButton.setDisabled(true);
         this.addButton(pasteButton);
 
@@ -103,76 +103,76 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
         this.addSeparator();
         this.addButton(WidgetUtil.getToolStripButton(
                 DataManagerConstants.ICON_UPLOAD, "Upload a File", new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                String path = pathItem.getValueAsString();
-                if (ValidatorUtil.validateRootPath(path, "upload a file in")
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        String path = pathItem.getValueAsString();
+                        if (ValidatorUtil.validateRootPath(path, "upload a file in")
                         && ValidatorUtil.validateUserLevel(path, "upload a file to")) {
 
-                    new FileUploadWindow(modal, path, "dataManagerUploadComplete").show();
-                }
-            }
-        }));
+                            new FileUploadWindow(modal, path, "dataManagerUploadComplete").show();
+                        }
+                    }
+                }));
 
         // Upload Multiple Data Button
         this.addButton(WidgetUtil.getToolStripButton(
                 DataManagerConstants.ICON_UPLOAD_MULTIPLE, "Upload Multiple Data", new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                String path = pathItem.getValueAsString();
-                if (ValidatorUtil.validateRootPath(path, "upload data in")
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        String path = pathItem.getValueAsString();
+                        if (ValidatorUtil.validateRootPath(path, "upload data in")
                         && ValidatorUtil.validateUserLevel(path, "upload data to")) {
 
-                    DataUploadWindow window = new DataUploadWindow(modal, path);
-                    BrowserLayout.getInstance().setDataUploadWindow(window);
-                    window.show();
-                }
-            }
-        }));
+                            DataUploadWindow window = new DataUploadWindow(modal, path);
+                            BrowserLayout.getInstance().setDataUploadWindow(window);
+                            window.show();
+                        }
+                    }
+                }));
 
         // Download Button
         this.addButton(WidgetUtil.getToolStripButton(
                 DataManagerConstants.ICON_DOWNLOAD, "Download Selected Data", new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                download();
-            }
-        }));
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        download();
+                    }
+                }));
 
         // Delete Button
         this.addButton(WidgetUtil.getToolStripButton(
                 CoreConstants.ICON_DELETE, "Delete Selected Files/Folders", new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                String path = pathItem.getValueAsString();
-                if (ValidatorUtil.validateRootPath(path, "delete from")
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        String path = pathItem.getValueAsString();
+                        if (ValidatorUtil.validateRootPath(path, "delete from")
                         && ValidatorUtil.validateUserLevel(path, "delete from")
                         && ValidatorUtil.validateDropboxDir(path, "delete from")) {
 
-                    delete();
-                }
-            }
-        }));
+                            delete();
+                        }
+                    }
+                }));
 
         // Trash Button
         this.addSeparator();
         this.addButton(WidgetUtil.getToolStripButton(
                 DataManagerConstants.ICON_TRASH, "Trash", new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                BrowserLayout.getInstance().loadData(DataManagerConstants.ROOT
-                        + "/" + DataManagerConstants.TRASH_HOME, false);
-            }
-        }));
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        BrowserLayout.getInstance().loadData(DataManagerConstants.ROOT
+                                + "/" + DataManagerConstants.TRASH_HOME, false);
+                    }
+                }));
 
         // Empty Trash Button
         this.addButton(WidgetUtil.getToolStripButton(
                 DataManagerConstants.ICON_EMPTY_TRASH, "Empty Trash", new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                emptyTrash();
-            }
-        }));
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        emptyTrash();
+                    }
+                }));
     }
 
     private void download() {
@@ -320,26 +320,31 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
 
                         for (ListGridRecord record : BrowserLayout.getInstance().getGridSelection()) {
                             DataRecord data = (DataRecord) record;
-                            paths.add(data.getName());
+                            if (data.getType().equals(Data.Type.folderSync) || data.getType().equals(Data.Type.fileSync)) {
+                                Layout.getInstance().setWarningMessage("could not delete a synchronized files/folders <br />");
+                            } else {
+                                paths.add(data.getName());
+                            }
                         }
+                        if (!paths.isEmpty()) {
+                            final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+                                @Override
+                                public void onFailure(Throwable caught) {
+                                    modal.hide();
+                                    Layout.getInstance().setWarningMessage("Unable to delete files/folders:<br />" + caught.getMessage());
+                                }
 
-                        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-                            @Override
-                            public void onFailure(Throwable caught) {
-                                modal.hide();
-                                Layout.getInstance().setWarningMessage("Unable to delete files/folders:<br />" + caught.getMessage());
-                            }
-
-                            @Override
-                            public void onSuccess(Void result) {
-                                modal.hide();
-                                BrowserLayout.getInstance().loadData(baseDir, true);
-                            }
-                        };
-                        modal.show("Moving files/folders to Trash...", true);
-                        service.rename(baseDir, paths,
-                                DataManagerConstants.ROOT + "/"
-                                + DataManagerConstants.TRASH_HOME, true, callback);
+                                @Override
+                                public void onSuccess(Void result) {
+                                    modal.hide();
+                                    BrowserLayout.getInstance().loadData(baseDir, true);
+                                }
+                            };
+                            modal.show("Moving files/folders to Trash...", true);
+                            service.rename(baseDir, paths,
+                                    DataManagerConstants.ROOT + "/"
+                                    + DataManagerConstants.TRASH_HOME, true, callback);
+                        }
                     }
                 }
             });

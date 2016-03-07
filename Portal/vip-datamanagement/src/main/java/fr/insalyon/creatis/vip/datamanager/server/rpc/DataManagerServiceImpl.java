@@ -42,13 +42,16 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Image;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
+import fr.insalyon.creatis.vip.datamanager.client.bean.TransferType;
 import fr.insalyon.creatis.vip.datamanager.client.bean.VisualizationItem;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -75,7 +78,29 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     public List<Data> listDir(String baseDir, boolean refresh) throws DataManagerException {
 
         try {
-            return lfcBusiness.listDir(getSessionUser(), baseDir, refresh);
+            List<SSH> sshs = dataManagerBusiness.getSSHConnections();
+            List<String> SSHSynchronization = new ArrayList<String>();
+            for (SSH ssh : sshs) {
+                if (ssh.getTransferType().equals(TransferType.Synchronization)) {
+                    SSHSynchronization.add(ssh.getLfcDir());
+                }
+            }
+            List<Data> data = lfcBusiness.listDir(getSessionUser(), baseDir, refresh);
+
+            String lfcBaseDir = DataManagerUtil.parseBaseDir(getSessionUser(), baseDir);
+            for (Data d : data) {
+                String dataPath = lfcBaseDir + "/" + d.getName();
+                for (String s : SSHSynchronization) {
+                    if (s.equals(dataPath)) {
+                        d.setType(Data.Type.folderSync);
+                    } else if (dataPath.contains(s) && d.getType().equals(Data.Type.file)) {
+                        d.setType(Data.Type.fileSync);
+                    } else if (dataPath.contains(s) && d.getType().equals(Data.Type.folder)) {
+                        d.setType(Data.Type.folderSync);
+                    }
+                }
+            }
+            return data;
 
         } catch (CoreException ex) {
             throw new DataManagerException(ex);

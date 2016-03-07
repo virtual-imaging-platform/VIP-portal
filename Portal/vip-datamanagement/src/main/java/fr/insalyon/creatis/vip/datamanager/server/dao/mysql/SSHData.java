@@ -47,7 +47,6 @@ import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import org.apache.log4j.Logger;
 
@@ -78,6 +77,7 @@ public class SSHData implements SSHDAO {
 
                 String email = rs.getString("email");
                 String name = DataManagerBusiness.extractName(rs.getString("LFCDir"));
+                String lfcDir = rs.getString("LFCDir");
                 String sshUser = rs.getString("sshUser");
                 String sshHost = rs.getString("sshHost");
                 TransferType sshTransferType = TransferType.valueOf(rs.getString("transferType"));
@@ -89,14 +89,13 @@ public class SSHData implements SSHDAO {
                 long numberSynchronizationFailed = rs.getLong("numberSynchronizationFailed");
                 boolean deleteFilesFromSource = rs.getBoolean("deleteFilesFromSource");
                 boolean active = rs.getBoolean("active");
-                boolean checkFilesContent=rs.getBoolean("checkFilesContent");
-                
-                
-                String lfcFiles="+"+String.valueOf(rs.getInt("numberOfFilesTransferredToLFC"))+" ("+readableUnitFileSize(rs.getLong("sizeOfFilesTransferredToLFC"))+") "
-                                 +"-"+String.valueOf(rs.getInt("numberOfFilesDeletedInLFC"))+" ("+readableUnitFileSize(rs.getLong("sizeOfFilesDeletedInLFC"))+")";
-                
-                String sshFiles="+"+String.valueOf(rs.getInt("numberOfFilesTransferredToDevice"))+" ("+readableUnitFileSize(rs.getLong("sizeOfFilesTransferredToDevice"))+") "
-                                 +"-"+String.valueOf(rs.getInt("numberOfFilesDeletedInDevice"))+" ("+readableUnitFileSize(rs.getLong("sizeOfFilesDeletedInDevice"))+")";
+                boolean checkFilesContent = rs.getBoolean("checkFilesContent");
+
+                String lfcFiles = "+" + String.valueOf(rs.getInt("numberOfFilesTransferredToLFC")) + " (" + readableUnitFileSize(rs.getLong("sizeOfFilesTransferredToLFC")) + ") "
+                        + "-" + String.valueOf(rs.getInt("numberOfFilesDeletedInLFC")) + " (" + readableUnitFileSize(rs.getLong("sizeOfFilesDeletedInLFC")) + ")";
+
+                String sshFiles = "+" + String.valueOf(rs.getInt("numberOfFilesTransferredToDevice")) + " (" + readableUnitFileSize(rs.getLong("sizeOfFilesTransferredToDevice")) + ") "
+                        + "-" + String.valueOf(rs.getInt("numberOfFilesDeletedInDevice")) + " (" + readableUnitFileSize(rs.getLong("sizeOfFilesDeletedInDevice")) + ")";
 
                 String status = "ok";
                 if (auth_failed) {
@@ -106,7 +105,7 @@ public class SSHData implements SSHDAO {
                     status = "waiting for validation";
                 }
 
-                ssh.add(new SSH(email, name, sshUser, sshHost, sshPort, sshTransferType, sshDir, status, theEarliestNextSynchronistation, numberSynchronizationFailed,checkFilesContent, deleteFilesFromSource, active,sshFiles,lfcFiles));
+                ssh.add(new SSH(email, lfcDir, name, sshUser, sshHost, sshPort, sshTransferType, sshDir, status, theEarliestNextSynchronistation, numberSynchronizationFailed, checkFilesContent, deleteFilesFromSource, active, sshFiles, lfcFiles));
             }
             ps.close();
             return ssh;
@@ -125,13 +124,7 @@ public class SSHData implements SSHDAO {
                     + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
 
             ps.setString(1, ssh.getEmail());
-            try {
-                ps.setString(2, DataManagerBusiness.generateLFCDir(ssh.getName(), ssh.getEmail()));
-            } catch (DataManagerException ex) {
-                throw new DAOException(ex);
-            } catch (BusinessException ex) {
-                throw new DAOException(ex);
-            }
+            ps.setString(2, ssh.getLfcDir());
             ps.setString(3, ssh.getUser());
             ps.setString(4, ssh.getHost());
             ps.setString(5, ssh.getTransferType().name());
@@ -139,7 +132,7 @@ public class SSHData implements SSHDAO {
             ps.setInt(7, ssh.getPort());
             ps.setString(8, "1");
             ps.setString(9, "0");
-            ps.setBoolean(10,ssh.isCheckFilesContent());
+            ps.setBoolean(10, ssh.isCheckFilesContent());
             ps.setLong(11, 0);
             ps.setBoolean(12, ssh.isDeleteFilesFromSource());
             ps.execute();
@@ -248,11 +241,13 @@ public class SSHData implements SSHDAO {
 
         }
     }
-    
+
     public static String readableUnitFileSize(long size) {
-    if(size <= 0) return "0";
-    final String[] units = new String[] { "B", "kB", "MB", "GB", "TB" };
-    int digitGroups = (int) (Math.log10(size)/Math.log10(1024));
-    return new DecimalFormat("#,##0.#").format(size/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
-}
+        if (size <= 0) {
+            return "0";
+        }
+        final String[] units = new String[]{"B", "kB", "MB", "GB", "TB"};
+        int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
+        return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+    }
 }

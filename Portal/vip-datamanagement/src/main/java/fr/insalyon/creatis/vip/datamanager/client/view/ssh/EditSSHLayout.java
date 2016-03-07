@@ -39,19 +39,24 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangeHandler;
+import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
+import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.ValidatorUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
+import fr.insalyon.creatis.vip.datamanager.client.view.selection.PathSelectionWindow;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedHashMap;
@@ -77,6 +82,8 @@ public class EditSSHLayout extends AbstractFormLayout {
     private CheckboxItem deleteFilesFromSourceField;
     private CheckboxItem activateField;
     private CheckboxItem checkFilesContentField;
+    PickerIcon browsePicker;
+    private TextItem lfcDirItem;
 
     public EditSSHLayout(String width, String height) {
 
@@ -97,6 +104,18 @@ public class EditSSHLayout extends AbstractFormLayout {
         transferTypeField = new SelectItem();
         transferTypeField.setShowTitle(false);
         transferTypeField.setWidth(350);
+        lfcDirItem = FieldUtil.getTextItem(350, false, "", "[0-9.,A-Za-z-+/_(){} ]");
+        lfcDirItem.setValue("");
+        lfcDirItem.setValidators(ValidatorUtil.getStringValidator());
+        browsePicker = new PickerIcon(PickerIcon.SEARCH, new FormItemClickHandler() {
+
+            @Override
+            public void onFormItemClick(FormItemIconClickEvent event) {
+                new PathSelectionWindow(lfcDirItem).show();
+            }
+        });
+        browsePicker.setPrompt("Browse on the Grid");
+        lfcDirItem.setIcons(browsePicker);
         LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
         valueMap.put(TransferType.Synchronization.toString(), TransferType.Synchronization.toString());
         valueMap.put(TransferType.DeviceToLFC.toString(), TransferType.DeviceToLFC.toString());
@@ -137,6 +156,7 @@ public class EditSSHLayout extends AbstractFormLayout {
 
                             List<String> values = new ArrayList<String>();
                             save(new SSH(emailField.getValueAsString().trim(),
+                                            lfcDirItem.getValueAsString().trim(),
                                             nameField.getValueAsString().trim(),
                                             userField.getValueAsString().trim(),
                                             hostField.getValueAsString().trim(),
@@ -175,6 +195,7 @@ public class EditSSHLayout extends AbstractFormLayout {
         addField("SSH Port", portField);
         addField("SSH Directory (absolute path)", directoryField);
         addField("Transfer Type", transferTypeField);
+        addField("VIP Directory", lfcDirItem);
 
         this.addMember(FieldUtil.getForm(checkFilesContentField));
         this.addMember(FieldUtil.getForm(deleteFilesFromSourceField));
@@ -183,10 +204,12 @@ public class EditSSHLayout extends AbstractFormLayout {
         addButtons(saveButton, removeButton);
     }
 
-    public void setSSH(String email, String name, String user, String host, String port, TransferType transferType, String directory, String status, boolean checkFilesContent, boolean deleteFilesFromSourceField, boolean active) {
+    public void setSSH(String email, String lfcDir, String name, String user, String host, String port, TransferType transferType, String directory, String status, boolean checkFilesContent, boolean deleteFilesFromSourceField, boolean active) {
 
         if (name != null & email != null & user != null & host != null & transferType != null & directory != null & status != null & port != null) {
             this.emailField.setValue(email);
+            this.lfcDirItem.setValue(lfcDir);
+            this.lfcDirItem.setDisabled(true);
             this.emailField.setDisabled(true);
             this.nameField.setValue(name);
             this.nameField.setDisabled(true);
@@ -197,6 +220,7 @@ public class EditSSHLayout extends AbstractFormLayout {
             this.directoryField.setValue(directory);
             this.statusField.setValue(status);
             this.checkFilesContentField.setValue(checkFilesContent);
+
             if (transferType.equals(transferType.Synchronization)) {
                 this.deleteFilesFromSourceField.setValue(false);
                 this.deleteFilesFromSourceField.setDisabled(true);
@@ -218,6 +242,8 @@ public class EditSSHLayout extends AbstractFormLayout {
             this.nameField.setValue("");
             this.nameField.setDisabled(false);
             this.userField.setValue("");
+            this.lfcDirItem.setValue("");
+            this.lfcDirItem.setDisabled(false);
             this.hostField.setValue("");
             this.portField.setValue("22");
             this.transferTypeField.setValue(transferType.Synchronization);
@@ -264,7 +290,7 @@ public class EditSSHLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setSSH(null, null, null, null, null, null, null, null, false, false, true);
+                setSSH(null, null, null, null, null, null, null, null, null, false, false, true);
                 ManageSSHTab tab = (ManageSSHTab) Layout.getInstance().
                         getTab(DataManagerConstants.TAB_MANAGE_SSH);
                 tab.loadSSHConnections();
