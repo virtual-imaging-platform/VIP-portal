@@ -37,6 +37,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -59,71 +60,87 @@ import org.json.JSONObject;
 public class PersonaAuthenticationService extends AbstractAuthenticationService {
 
     private static final Logger logger = Logger.getLogger(PersonaAuthenticationService.class);
+    private JSONObject jsonObj;
 
     @Override
-    protected String getEmailIfValidRequest(HttpServletRequest request) throws BusinessException {
-        logger.info("Mozilla Persona authentication request");
-
-        String verifyURL = Server.getInstance().getMozillaPersonaValidationURL();
-        String audience = request.getScheme()+ "://"+ request.getServerName();
-        String assertion = request.getParameter("assertion");
-
-        if(assertion == null){
-            throw new BusinessException("Assertion string is null");
-        }
-
-        String email;
+    protected void checkValidRequest(HttpServletRequest request) throws BusinessException {
         try {
-            email = getEmailFromAssertionIfValid(assertion, audience, verifyURL);
-        } catch (Exception ex) {
-            throw new BusinessException(ex.getMessage());
+            logger.info("Mozilla Persona authentication request");
+
+            String verifyURL = Server.getInstance().getMozillaPersonaValidationURL();
+            String audience = request.getScheme() + "://" + request.getServerName();
+            String assertion = request.getParameter("assertion");
+
+            CloseableHttpClient httpclient = HttpClients.createDefault();
+            HttpPost httppost = new HttpPost(verifyURL);
+
+            // Request parameters and other properties.
+            List<NameValuePair> params = new ArrayList<NameValuePair>(2);
+            params.add(new BasicNameValuePair("assertion", assertion));
+            params.add(new BasicNameValuePair("audience", audience));
+            try {
+                httppost.setEntity(new UrlEncodedFormEntity(params));
+            } catch (UnsupportedEncodingException ex) {
+                throw new BusinessException(ex);
+            }
+
+            //Execute and get the response.
+            CloseableHttpResponse response;
+            try {
+                response = httpclient.execute(httppost);
+            } catch (IOException ex) {
+                throw new BusinessException(ex);
+            }
+            HttpEntity entity = response.getEntity();
+
+            BufferedReader br = null;
+            String json = "";
+            if (entity != null) {
+                InputStream instream = null;
+                try {
+                    instream = entity.getContent();
+                    try {
+                        br = new BufferedReader(new InputStreamReader(instream));
+                        while (br.ready()) {
+                            json += br.readLine();
+                        }
+                    } finally {
+                        instream.close();
+                        br.close();
+                        response.close();
+                    }
+                } catch (IOException | IllegalStateException ex) {
+                    throw new BusinessException(ex);
+                } finally {
+                    try {
+                        instream.close();
+                    } catch (IOException ex) {
+                        throw new BusinessException(ex);
+                    }
+                }
+            }
+
+            jsonObj = new JSONObject(json);
+            String status = jsonObj.getString("status");
+
+            logger.info("status: " + status);
+
+            if (!status.equals("okay")) {
+                throw new BusinessException("Persona assertion is not valid!");
+            }
+
+        } catch (JSONException ex) {
+            throw new BusinessException(ex);
         }
-        return email;
 
     }
 
-    private String getEmailFromAssertionIfValid(String assertion, String audience, String verifyURL) throws IOException, JSONException, BusinessException {
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        HttpPost httppost = new HttpPost(verifyURL);
-
-// Request parameters and other properties.
-        List<NameValuePair> params = new ArrayList<NameValuePair>(2);
-        params.add(new BasicNameValuePair("assertion", assertion));
-        params.add(new BasicNameValuePair("audience", audience));
-        httppost.setEntity(new UrlEncodedFormEntity(params));
-
-//Execute and get the response.
-        CloseableHttpResponse response = httpclient.execute(httppost);
-        HttpEntity entity = response.getEntity();
-
-        BufferedReader br = null;
-        String json = "";
-        if (entity != null) {
-            InputStream instream = entity.getContent();
-            try {
-                // do something useful
-                br = new BufferedReader(new InputStreamReader(instream));
-                while (br.ready()) {
-                    json += br.readLine();
-                }
-            } finally {
-                instream.close();
-                br.close();
-                response.close();
-            }
-        }
-
-        JSONObject jsonObj = new JSONObject(json);
-        String status = jsonObj.getString("status");
-
-        logger.info("status: " + status);
-
-        if (status.equals("okay")) {
-            String email = jsonObj.getString("email");
-            return email;
-        } else {
-            logger.info(jsonObj.toString());
-            throw new BusinessException("Invalid assertion (status was " + status + ")");
+    @Override
+    protected String getEmail() throws BusinessException {
+        try {
+            return jsonObj.getString("email");
+        } catch (JSONException ex) {
+            throw new BusinessException(ex);
         }
     }
 
@@ -132,5 +149,4 @@ public class PersonaAuthenticationService extends AbstractAuthenticationService 
         return null;
     }
 
-  
 }

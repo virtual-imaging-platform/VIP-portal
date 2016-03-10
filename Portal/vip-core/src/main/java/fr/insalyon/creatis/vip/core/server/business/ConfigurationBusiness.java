@@ -332,52 +332,6 @@ public class ConfigurationBusiness {
         }
     }
 
-    /**
-     *
-     * @param ticket
-     * @param password
-     * @return
-     * @throws BusinessException
-     */
-    public User signin(String ticket, URL serviceURL) throws BusinessException {
-
-        //validate ticket
-        User user = getCASUser(ticket, serviceURL);
-
-        if (user != null) {
-
-            UserDAO userDAO;
-            try {
-                userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
-            } catch (DAOException ex) {
-                throw new BusinessException(ex);
-            }
-            try {
-                user = userDAO.getUser(user.getEmail());
-                userDAO.resetNFailedAuthentications(user.getEmail());
-            } catch (DAOException ex) {
-                try {
-                    signup(user, "Generated from CAS login", true, true, Server.getInstance().getSAMLDefaultAccountType());
-                    this.activateUser(user.getEmail());
-                    user = userDAO.getUser(user.getEmail());
-
-                } catch (DAOException ex1) {
-                    throw new BusinessException(ex1);
-                }
-            }
-            try {
-                return getUserWithSession(user.getEmail());
-            } catch (DAOException e) {
-                throw new BusinessException(e);
-            }
-
-        } else {
-            logger.error("Authentication failed to CAS ticket '" + ticket + "' (invalid ticket, cannot get user email or cannot contact server).");
-            throw new BusinessException("Authentication failed (invalid CAS ticket, cannot get user email or cannot contact server).");
-        }
-
-    }
-
     public User getNewUser(String email, String firstName, String lastName) {
         CountryCode cc = CountryCode.aq;
 

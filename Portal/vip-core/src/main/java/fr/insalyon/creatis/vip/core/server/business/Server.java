@@ -39,6 +39,7 @@ import java.util.List;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
+import org.opensaml.saml2.core.Issuer;
 
 /**
  *
@@ -105,7 +106,6 @@ PropertiesConfiguration config;
     private int apacheSSLPort = 80;
     //cas
     private String casURL;
-    private String SAMLDefaultAccountType;
     //ssh
     private String sshPublicKey;
     //application,GateLab
@@ -192,7 +192,6 @@ PropertiesConfiguration config;
             apacheSSLPort = config.getInt("apache.ssl.port", apacheSSLPort);
 
             casURL = config.getString(CoreConstants.LAB_CAS_URL, "https://ng-cas.maatg.fr/pandora-gateway-sl-cas");
-            SAMLDefaultAccountType = config.getString(CoreConstants.LAB_SAML_ACCOUNT_TYPE, "Neuroimaging");
 
             sshPublicKey = config.getString(CoreConstants.SSH_PUBLIC_KEY, "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAuNjIXlgjuBR+WfjGtkieecZfe/ZL6EyNJTbL14bn3/Soof0kFSshDJvFgSH1hNwMMU1hynLbzcEbLTyVMoGQKfQkq7mJPajy9g8878WCKxCRbXv3W1/HT9iab/qqt2dcRYnDEruHwgyELBhQuMAe2W2/mgjd7Y5PxE01bwDcenYl3cU3iJk1sAOHao6P+3xU6Ov+TD8K9aC0LzZpM+rzAmS9HOZ9nvzERExd7k4TUpyffQV9Dpb5jEnEViF3VHqplB8AbWDdcJbiVkUBUe4hQb7nmWP0kHl1+v5SQJ1B4mWCZ+35Rc/9b1GsmPnXg3qqhjeKbrim/NbcUwKr9NPWjQ== vip-services@kingkong.grid.creatis.insa-lyon.fr");
             mozillaPersonaValidationURL = config.getString(CoreConstants.MOZILLA_PERSONA_VALIDATION_URL, "https://verifier.login.persona.org/verify");
@@ -268,7 +267,6 @@ PropertiesConfiguration config;
             config.setProperty("apache.host", apacheHost);
             config.setProperty("apache.ssl.port", apacheSSLPort);
             config.setProperty(CoreConstants.LAB_CAS_URL, casURL);
-            config.setProperty(CoreConstants.LAB_SAML_ACCOUNT_TYPE, SAMLDefaultAccountType);
             config.setProperty(CoreConstants.SSH_PUBLIC_KEY, sshPublicKey);
             config.setProperty(CoreConstants.MOZILLA_PERSONA_VALIDATION_URL, mozillaPersonaValidationURL);
             config.setProperty(CoreConstants.TreeQuery, queryTree);
@@ -454,10 +452,6 @@ PropertiesConfiguration config;
         return casURL;
     }
 
-    public String getSAMLDefaultAccountType() {
-        return SAMLDefaultAccountType;
-    }
-
     public String getSshPublicKey() {
         return sshPublicKey;
     }
@@ -465,6 +459,13 @@ PropertiesConfiguration config;
     public String getSamlTrustedCertificate(String issuer) {
         logger.info("Getting trusted certificate for issuer "+issuer);
         String result = config.getString(CoreConstants.SAML_TRUSTED_CERTIFICATE+"."+issuer);
+        logger.info("Returning "+result);
+        return result;
+    }
+    
+    public String getSAMLAccountType(Issuer issuer) {
+        logger.info("Getting account type for issuer "+issuer);
+        String result = config.getString(CoreConstants.SAML_ACCOUNT_TYPE+"."+issuer);
         logger.info("Returning "+result);
         return result;
     }
@@ -527,4 +528,5 @@ PropertiesConfiguration config;
         config.setProperty(CoreConstants.LAB_SIMULATION_PLATFORM_MAX, maxPlatformRunningSimulations);
         config.save();
     }
+
 }

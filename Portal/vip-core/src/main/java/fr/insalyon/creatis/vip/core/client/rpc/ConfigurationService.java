@@ -74,8 +74,6 @@ public interface ConfigurationService extends RemoteService {
 
     public User signin(String email, String password) throws CoreException;
 
-    public User signin(String ticket) throws CoreException;
-
     public void signout() throws CoreException;
 
     public User activate(String code) throws CoreException;

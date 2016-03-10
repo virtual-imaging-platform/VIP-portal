@@ -58,8 +58,6 @@ public interface ConfigurationServiceAsync {
 
     public void signin(String email, String password, AsyncCallback<User> asyncCallback);
 
-    public void signin(String ticket, AsyncCallback<User> asyncCallback);
-
     public void signout(AsyncCallback<Void> asyncCallback);
 
     public void activate(String code, AsyncCallback<User> asyncCallback);
