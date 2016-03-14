@@ -113,7 +113,6 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
     private void authSuccessResponse(HttpServletRequest request, HttpServletResponse response, String email) throws BusinessException {
         //   try {
         ConfigurationBusiness cb = new ConfigurationBusiness();
-        String message = "";
         String accountType = getDefaultAccountType();
         User user = cb.getOrCreateUser(email, accountType);
         //third-party authentication services will *not* be trusted to let admins in

@@ -463,7 +463,7 @@ PropertiesConfiguration config;
         return result;
     }
     
-    public String getSAMLAccountType(Issuer issuer) {
+    public String getSAMLAccountType(String issuer) {
         logger.info("Getting account type for issuer "+issuer);
         String result = config.getString(CoreConstants.SAML_ACCOUNT_TYPE+"."+issuer);
         logger.info("Returning "+result);

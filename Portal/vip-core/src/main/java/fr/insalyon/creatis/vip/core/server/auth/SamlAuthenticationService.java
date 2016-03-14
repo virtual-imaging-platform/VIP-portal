@@ -127,7 +127,7 @@ public class SamlAuthenticationService extends AbstractAuthenticationService {
 
     @Override
     public String getDefaultAccountType() {
-        return Server.getInstance().getSAMLAccountType(issuer);
+        return Server.getInstance().getSAMLAccountType(issuer.getValue());
     }
 
     @Override
