@@ -31,23 +31,40 @@
  */
 package fr.insalyon.creatis.vip.core.server.auth;
 
-import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.SamlTokenValidator;
 import fr.insalyon.creatis.vip.core.server.business.Server;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.List;
+import java.util.logging.Level;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
+import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml2.core.Issuer;
+import org.opensaml.saml2.core.Response;
+import org.opensaml.xml.ConfigurationException;
+import org.opensaml.xml.io.UnmarshallingException;
+import org.opensaml.xml.parse.XMLParserException;
+import org.opensaml.xml.validation.ValidationException;
 
 /**
  *
- * @author glatard
+ * @author Tristan Glatard
  */
 public class SamlAuthenticationService extends AbstractAuthenticationService {
 
     private static final Logger logger = Logger.getLogger(SamlAuthenticationService.class);
+    private Assertion assertion;
+    private Issuer issuer;
 
     @Override
-    protected String getEmailIfValidRequest(HttpServletRequest request) throws BusinessException {
+    protected void checkValidRequest(HttpServletRequest request) throws BusinessException {
         logger.info("SAML authentication request");
 
         String token = request.getParameter("_saml_token");
@@ -55,18 +72,67 @@ public class SamlAuthenticationService extends AbstractAuthenticationService {
             throw new BusinessException("SAML token is null");
         }
 
-        String email;
+        // Get the SAML assertion in XML form
+        // SAML assertion might be encoded in base64 (happens in FLI)
+        byte[] xmlAssertion = token.getBytes();
+        if (Base64.isBase64(xmlAssertion)) {
+            xmlAssertion = Base64.decodeBase64(xmlAssertion);
+        }
+
+        // Get an Assertion object from XML assertion
+        assertion = null;
         try {
-            email = SamlTokenValidator.getEmailIfValid(token, Server.getInstance().getSamlTrustedCertificate(), request.getRequestURL().toString());
-        } catch (CoreException ex) {
-            logger.info(ex.getMessage());
+            try {
+                // XML object might be a saml response. In this case, take the first assertion found
+                // (happens in FLI)
+                Response samlResponse = (Response) SamlTokenValidator.getSAMLObject(xmlAssertion);
+                List<Assertion> assertions = samlResponse.getAssertions();
+                assertion = assertions.get(0);
+            } catch (ClassCastException ex) {
+                // Otherwise, try to cast directly the XML object to Assertion (happens in Neugrid).
+                assertion = (Assertion) SamlTokenValidator.getSAMLObject(xmlAssertion);
+            }
+        } catch (UnsupportedEncodingException | ConfigurationException | XMLParserException | UnmarshallingException ex) {
+            java.util.logging.Logger.getLogger(SamlAuthenticationService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if (assertion == null) {
+            throw new BusinessException("Cannot get assertion!");
+        }
+
+        // Find public key certificate to use from issuer
+        issuer = assertion.getIssuer();
+        if (issuer == null) {
+            throw new BusinessException("Cannot find assertion issuer!");
+        }
+        logger.info("Received SAML assertion from issuer " + issuer.getValue());
+        String certFile = Server.getInstance().getSamlTrustedCertificate(issuer.getValue());
+
+        // Check validity of assertion
+        try {
+            SamlTokenValidator.isSignatureValid(certFile, assertion);
+        } catch (CertificateException | IOException | NoSuchAlgorithmException | InvalidKeySpecException | ValidationException ex) {
+            throw new BusinessException("Assertion signature is not valid!");
+        }
+        if (!SamlTokenValidator.isTimeValid(assertion)) {
+            throw new BusinessException("Assertion is not time valid!");
+        }
+        try {
+            if (!SamlTokenValidator.isAudienceValid(request.getRequestURL().toString(), assertion)) {
+                throw new BusinessException("Assertion audience is not valid!");
+            }
+        } catch (MalformedURLException ex) {
             throw new BusinessException(ex);
         }
-        return email;
     }
 
     @Override
     public String getDefaultAccountType() {
-        return Server.getInstance().getSAMLDefaultAccountType();
+        return Server.getInstance().getSAMLAccountType(issuer.getValue());
     }
+
+    @Override
+    protected String getEmail() throws BusinessException {
+        return SamlTokenValidator.getEmail(assertion);
+    }
+
 }

@@ -82,7 +82,7 @@ public class SimulationsTab extends Tab {
 
     public SimulationsTab() {
 
-        this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_MONITOR) + " Simulations");
+        this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_MONITOR) + " Executions");
         this.setID(ApplicationConstants.TAB_MONITOR);
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);

@@ -52,7 +52,6 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_ADMIN_INSTITUTION = "admin.institution";
     public static final String LAB_ADMIN_PHONE = "admin.phone";
     public static final String LAB_ADMIN_PASS = "admin.pass";
-    public static final String LAB_SAML_ACCOUNT_TYPE = "saml.accounttype";
     public static final String LAB_CAS_URL = "cas.url";
     public static final String LAB_MYPROXY_HOST = "myproxy.host";
     public static final String LAB_MYPROXY_PORT = "myproxy.port";
@@ -173,7 +172,8 @@ public class CoreConstants implements IsSerializable {
     public static final String APPLET_GATELAB_CLASSES = "appletGatelab.classes";
     public static final String APPLET_GATELABTEST_CLASSES = "appletGatelabTest.classes";
     public static final String UNDESIRED_MAIL_DOMAINS = "emails.prohibitDomainsList";
-    public static final String SAML_TRUSTED_CERTIFICATE = "saml.trusted.certificates";
+    public static final String SAML_TRUSTED_CERTIFICATE = "saml.trustedcertificate";
+    public static final String SAML_ACCOUNT_TYPE = "saml.accounttype";
     public static String MOZILLA_PERSONA_VALIDATION_URL = "mozilla.persona.validation.url";
     //query
     public static String TreeQuery = "query.classes";

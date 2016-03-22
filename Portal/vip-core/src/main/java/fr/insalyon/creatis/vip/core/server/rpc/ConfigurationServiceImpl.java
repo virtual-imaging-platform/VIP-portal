@@ -162,31 +162,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     /**
      *
-     * @param ticket
-     * @throws CoreException
-     * @return
-     */
-    @Override
-    public User signin(String ticket) throws CoreException {
-
-        try {
-            logger.info("Authenticating CAS ticket '" + ticket + "'.");
-            User user = configurationBusiness.signin(ticket, getBaseURL());
-            user = setUserSession(user);
-            configurationBusiness.updateUserLastLogin(user.getEmail());
-            trace(logger, "Connected.");
-
-            return user;
-
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (MalformedURLException e) {
-            throw new CoreException(e);
-        }
-    }
-
-    /**
-     *
      * @throws CoreException
      */
     @Override

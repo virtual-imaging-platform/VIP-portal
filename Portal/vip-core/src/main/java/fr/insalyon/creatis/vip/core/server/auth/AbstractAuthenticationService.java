@@ -41,6 +41,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Date;
+import java.util.List;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.servlet.ServletException;
@@ -58,8 +59,10 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
 
     private static Logger logger = Logger.getLogger(AbstractAuthenticationService.class);
 
-    protected abstract String getEmailIfValidRequest(HttpServletRequest request) throws BusinessException;
+    protected abstract void checkValidRequest(HttpServletRequest request) throws BusinessException;
 
+    protected abstract String getEmail() throws BusinessException;
+    
     public abstract String getDefaultAccountType();
 
     @Override
@@ -85,8 +88,9 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
     private void processRequest(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
         logger.info("Third-party authentication request.");
         String email = null;
-        try {
-            email = getEmailIfValidRequest(request);
+        try { 
+            checkValidRequest(request);
+            email = getEmail();
         } catch (BusinessException ex) {
             logger.info(ex.getMessage());
             authFailedResponse(request, response);
@@ -109,7 +113,6 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
     private void authSuccessResponse(HttpServletRequest request, HttpServletResponse response, String email) throws BusinessException {
         //   try {
         ConfigurationBusiness cb = new ConfigurationBusiness();
-        String message = "";
         String accountType = getDefaultAccountType();
         User user = cb.getOrCreateUser(email, accountType);
         //third-party authentication services will *not* be trusted to let admins in

@@ -65,7 +65,6 @@ public class Main implements EntryPoint {
     @Override
     public void onModuleLoad() {
 
-        final String ticket = Window.Location.getParameter("ticket");
         String login = Window.Location.getParameter("login");
 
         if (login.equals("stats")) {
@@ -86,12 +85,7 @@ public class Main implements EntryPoint {
         modulesInit.add(new CardiacModule());
         modulesInit.add(new ApplicationImporterModule());
 
-        if (ticket == null && (login == null || !login.equals("CASN4U"))) {
-            //regular VIP authentication
-            configureVIP();
-        } else {
-            configureN4U(ticket);
-        }
+        configureVIP();
     }
 
     //redirect to N4U CAS authentication
@@ -154,45 +148,6 @@ public class Main implements EntryPoint {
             }
         };
         service.configure(email, session, callback);
-    }
-
-    private void configureN4U(String ticket) {
-        //N4U authentication
-        if (ticket == null) {
-            //if the user has no ticket, get one
-            displayLoginView();
-        } else {
-            //sign in with N4U ticket
-            ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-
-            final AsyncCallback<User> callback = new AsyncCallback<User>() {
-                @Override
-                public void onFailure(Throwable caught) {
-                    Layout.getInstance().getModal().hide();
-                    if (caught.getMessage().contains("Authentication failed")) {
-                        displayLoginView();
-                    } else {
-                        configureVIP();
-                    }
-                }
-
-                @Override
-                public void onSuccess(User user) {
-                    Layout.getInstance().getModal().hide();
-
-                    Cookies.setCookie(CoreConstants.COOKIES_USER,
-                            user.getEmail(), CoreConstants.COOKIES_EXPIRATION_DATE,
-                            null, "/", false);
-                    Cookies.setCookie(CoreConstants.COOKIES_SESSION,
-                            user.getSession(), CoreConstants.COOKIES_EXPIRATION_DATE,
-                            null, "/", false);
-
-                    Layout.getInstance().authenticate(user);
-                }
-            };
-            Layout.getInstance().getModal().show("Signing in with CAS...", true);
-            service.signin(ticket, callback);
-        }
     }
 
     private void configureStats() {
