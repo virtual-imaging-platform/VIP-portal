@@ -165,7 +165,7 @@ public class SSHData implements SSHDAO {
             ps.setBoolean(7, ssh.isDeleteFilesFromSource());
             ps.setBoolean(8, ssh.isActive());
             ps.setString(9, ssh.getEmail());
-
+             
             try {
                 ps.setString(10, DataManagerBusiness.generateLFCDir(ssh.getName(), ssh.getEmail()));
             } catch (DataManagerException ex) {

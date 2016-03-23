@@ -96,6 +96,5 @@ public class DataManagerConstants {
     public static final String BIOMED_HOME = "Biomed";
     public static final String GROUP_APPEND = " (group)";
     public static final int MAX_OPERATIONS_LIMIT = 10;
-    public static final String SSH_APPEND = "_ssh"; //dont' change that otherwise existing connections will not work any more
 
 }
