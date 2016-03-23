@@ -239,8 +239,8 @@ public class EditSSHLayout extends AbstractFormLayout {
             } else {
                 this.emailField.setDisabled(false);
             }
-            this.nameField.setValue("");
-            this.nameField.setDisabled(false);
+            this.nameField.setValue("This is an automatically generated field");
+            this.nameField.setDisabled(true);
             this.userField.setValue("");
             this.lfcDirItem.setValue("");
             this.lfcDirItem.setDisabled(false);
