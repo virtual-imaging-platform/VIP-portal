@@ -157,7 +157,6 @@ public class EditSSHLayout extends AbstractFormLayout {
                             List<String> values = new ArrayList<String>();
                             save(new SSH(emailField.getValueAsString().trim(),
                                             lfcDirItem.getValueAsString().trim(),
-                                            nameField.getValueAsString().trim(),
                                             userField.getValueAsString().trim(),
                                             hostField.getValueAsString().trim(),
                                             Integer.parseInt(portField.getValueAsString()),
