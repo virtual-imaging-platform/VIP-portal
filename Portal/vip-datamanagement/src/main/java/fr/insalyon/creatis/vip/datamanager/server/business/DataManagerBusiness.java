@@ -293,8 +293,7 @@ public class DataManagerBusiness {
 
     public static String extractName(String lfcDir) {
         String bruteName = lfcDir.substring(lfcDir.lastIndexOf("/") + 1);
-        String shortName = bruteName.replace(DataManagerConstants.SSH_APPEND, "");
-        return shortName;
+        return bruteName;
     }
 
     public static String generateLFCDir(String name, String email) throws DataManagerException, BusinessException {
@@ -303,7 +302,7 @@ public class DataManagerBusiness {
         User user = conf.getUser(email);
         String homeDir = Server.getInstance().getDataManagerUsersHome() + "/" + user.getFolder();
 
-        return (homeDir + "/" + name + DataManagerConstants.SSH_APPEND);
+        return (homeDir + "/" + name);
     }
 
     public VisualizationItem getVisualizationItemFromLFN(String lfn, String localDir, User user) throws BusinessException {

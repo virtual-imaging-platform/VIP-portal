@@ -79,10 +79,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
 
         try {
             List<SSH> sshs = dataManagerBusiness.getSSHConnections();
-            List<String> SSHSynchronization = new ArrayList<String>();
+            List<String> LfcDirSSHSynchronization = new ArrayList<String>();
             for (SSH ssh : sshs) {
                 if (ssh.getTransferType().equals(TransferType.Synchronization)) {
-                    SSHSynchronization.add(ssh.getLfcDir());
+                    LfcDirSSHSynchronization.add(ssh.getLfcDir());
                 }
             }
             List<Data> data = lfcBusiness.listDir(getSessionUser(), baseDir, refresh);
@@ -90,12 +90,12 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             String lfcBaseDir = DataManagerUtil.parseBaseDir(getSessionUser(), baseDir);
             for (Data d : data) {
                 String dataPath = lfcBaseDir + "/" + d.getName();
-                for (String s : SSHSynchronization) {
+                for (String s : LfcDirSSHSynchronization) {
                     if (s.equals(dataPath)) {
                         d.setType(Data.Type.folderSync);
-                    } else if (dataPath.contains(s) && d.getType().equals(Data.Type.file)) {
+                    } else if (dataPath.contains(s+"/") && d.getType().equals(Data.Type.file)) {
                         d.setType(Data.Type.fileSync);
-                    } else if (dataPath.contains(s) && d.getType().equals(Data.Type.folder)) {
+                    } else if (dataPath.contains(s+"/") && d.getType().equals(Data.Type.folder)) {
                         d.setType(Data.Type.folderSync);
                     }
                 }

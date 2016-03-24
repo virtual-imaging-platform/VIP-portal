@@ -76,18 +76,18 @@ public class SSH implements IsSerializable {
      * synchronization failed
      * @param deleteFilesFromSource enbale delete files from source location
      */
-    public SSH(String email, String lfcDir, String name, String user, String host, int port, TransferType transferType, String directory, String status, Date theEarliestNextSynchronistation, long numberSynchronizationFailed, boolean checkFilesContent, boolean deleteFilesFromSource, boolean active, String sshFiles, String lfcFiles) {
-        this(email, lfcDir, name, user, host, port, transferType, directory, status, checkFilesContent, deleteFilesFromSource, active);
+    public SSH(String email, String lfcDir,String name, String user, String host, int port, TransferType transferType, String directory, String status, Date theEarliestNextSynchronistation, long numberSynchronizationFailed, boolean checkFilesContent, boolean deleteFilesFromSource, boolean active, String sshFiles, String lfcFiles) {
+        this(email, lfcDir, user, host, port, transferType, directory, status, checkFilesContent, deleteFilesFromSource, active);
+        this.name=name;
         this.theEarliestNextSynchronistation = theEarliestNextSynchronistation;
         this.numberSynchronizationFailed = numberSynchronizationFailed;
         this.sshFiles = sshFiles;
         this.lfcFiles = lfcFiles;
     }
 
-    public SSH(String email, String lfcDir, String name, String user, String host, int port, TransferType transferType, String directory, String status, boolean checkFilesContent, boolean deleteFilesFromSource, boolean active) {
+    public SSH(String email, String lfcDir, String user, String host, int port, TransferType transferType, String directory, String status, boolean checkFilesContent, boolean deleteFilesFromSource, boolean active) {
         this.email = email;
         this.lfcDir = lfcDir;
-        this.name = name;
         this.user = user;
         this.host = host;
         this.port = port;
