@@ -64,9 +64,11 @@ import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAO;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAOFactory;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
@@ -246,13 +248,28 @@ public class WorkflowBusiness {
             //selectRandomEngine could also be used; TODO: make this choice configurable
             Engine engine = selectEngine(applicationClass);
             WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(engine.getEndpoint());
-            Workflow workflow = executionBusiness.launch(applicationName,
-                    applicationVersion, applicationClass, user, simulationName,
-                    workflowPath, parameters);
-            if(workflow == null){
-                engine.setStatus("disabled");
-                this.engineBusiness.update(engine);
-                throw new BusinessException("Workflow is null, disabling engine "+engine.getName());
+            Workflow workflow = null;
+            try {
+                workflow = executionBusiness.launch(applicationName,
+                        applicationVersion, applicationClass, user, simulationName,
+                        workflowPath, parameters);
+            } catch (BusinessException be) {
+                be.printStackTrace();
+                logger.error("BusinessException caught on launch workflow, engine " + engine.getName() + " will be disabled");
+            } finally {
+                if (workflow == null) {
+                    engine.setStatus("disabled");
+                    this.engineBusiness.update(engine);
+                    for (User u : CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
+                        logger.info("Sending warning email to user " + u.toString() + " having email address " + u.getEmail());
+                        CoreUtil.sendEmail("Urgent: VIP engine disabled",
+                                "Engine " + engine.getName() + " has just been disabled. Please check that there is at least one active engine left.",
+                                new String[]{u.getEmail()}, true, user.getEmail());
+                    }
+                    throw new BusinessException("Workflow is null, engine " + engine.getName() + " has been disabled");
+                }else{
+                    logger.info("Launched workflow "+workflow.toString());
+                }
             }
 
             workflowDAO.add(workflow);
