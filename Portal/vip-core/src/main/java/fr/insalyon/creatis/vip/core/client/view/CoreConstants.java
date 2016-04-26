@@ -171,7 +171,7 @@ public class CoreConstants implements IsSerializable {
     //application,Gatelab
     public static final String APPLET_GATELAB_CLASSES = "appletGatelab.classes";
     public static final String APPLET_GATELABTEST_CLASSES = "appletGatelabTest.classes";
-    public static final String UNDESIRED_MAIL_DOMAINS = "account.undesiredEmailDomain";
+    public static final String UNDESIRED_MAIL_DOMAINS = "account.undesiredEmailDomains";
     public static final String UNDESIRED_COUNTRIES = "account.undesiredCountries";
     public static final String SAML_TRUSTED_CERTIFICATE = "saml.trustedcertificate";
     public static final String SAML_ACCOUNT_TYPE = "saml.accounttype";
