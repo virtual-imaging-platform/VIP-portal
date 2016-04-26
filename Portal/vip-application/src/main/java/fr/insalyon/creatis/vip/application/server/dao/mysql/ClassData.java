@@ -64,7 +64,24 @@ public class ClassData implements ClassDAO {
      */
     @Override
     public void add(AppClass appClass) throws DAOException {
+        try {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO VIPClasses(name) "
+                    + "VALUES (?)");
 
+            ps.setString(1, appClass.getName());
+            ps.execute();
+            ps.close();
+
+        } catch (SQLException ex) {
+            if (ex.getMessage().contains("Duplicate entry")) {
+                throw new DAOException("A class named \"" + appClass.getName() + "\" already exists.");
+            } else {
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
+        }
+        
         addToClass(appClass.getName(), appClass.getEngines(), "engine");
         addToClass(appClass.getName(), appClass.getGroups(), "group");
     }
