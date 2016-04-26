@@ -113,8 +113,9 @@ PropertiesConfiguration config;
     private List<String> appletGateLabTestClasses;
     //Integer=0 for GateLab Prod Class and Integer=1 for GateLab Prod Class
     private HashMap<String, Integer> reservedClasses;
-    //undesired email domains
+    //undesired email domains and countries
     private List<String> undesiredMailDomains;
+    private List<String> undesiredCountries;
     //third-party auth
     private String mozillaPersonaValidationURL;
     //treeQuery
@@ -213,10 +214,13 @@ PropertiesConfiguration config;
             }
            
             //undesired Mail Domains
-            List<String> undisMailDomains = new ArrayList<String>();
-            //undisMailDomains.add(".hack.rnu");
-            undesiredMailDomains = config.getList(CoreConstants.UNDESIRED_MAIL_DOMAINS, undisMailDomains);
+            List<String> listUndesiredEmailDomains = new ArrayList<>();
+            undesiredMailDomains = config.getList(CoreConstants.UNDESIRED_MAIL_DOMAINS, listUndesiredEmailDomains);
 
+            //undesired countries
+            List<String> listUndesiredCountries = new ArrayList<>();
+            undesiredCountries = config.getList(CoreConstants.UNDESIRED_COUNTRIES, listUndesiredCountries);
+            
             //queryTree
             queryTree = config.getString(CoreConstants.TreeQuery, "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> select * from <http://e-ginseng.org/graph/ontology/semEHR> where {?x a rdfs:Class . ?x rdfs:label ?label}");
 
@@ -276,6 +280,7 @@ PropertiesConfiguration config;
             config.setProperty(CoreConstants.APPLET_GATELAB_CLASSES, appletGateLabClasses);
             config.setProperty(CoreConstants.APPLET_GATELABTEST_CLASSES, appletGateLabTestClasses);
             config.setProperty(CoreConstants.UNDESIRED_MAIL_DOMAINS, undesiredMailDomains);
+            config.setProperty(CoreConstants.UNDESIRED_COUNTRIES, undesiredCountries);
             config.setProperty(CoreConstants.PUB_MONTHS_UPDATES, numberMonthsToTestLastPublicationUpdates);
             config.save();
 
@@ -510,8 +515,8 @@ PropertiesConfiguration config;
         return undesiredMailDomains;
     }
 
-    public void setUndesiredMailDomains(List<String> undesiredMailDomainsConfig) {
-        this.undesiredMailDomains = undesiredMailDomainsConfig;
+    public List<String> getUndesiredCountries() {
+        return undesiredCountries;
     }
     
     public int getMaxPlatformRunningSimulations() {

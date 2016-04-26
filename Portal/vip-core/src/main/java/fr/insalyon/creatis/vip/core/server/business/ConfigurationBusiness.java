@@ -105,8 +105,9 @@ public class ConfigurationBusiness {
                     return true;
                 }
                 userDAO.incNFailedAuthentications(email); //just in case...
-                if(userDAO.getNFailedAuthentications(email) > 5)
+                if (userDAO.getNFailedAuthentications(email) > 5) {
                     userDAO.lock(email);
+                }
             }
             return false;
 
@@ -133,155 +134,169 @@ public class ConfigurationBusiness {
 
     public void signup(User user, String comments, boolean automaticCreation, boolean mapPrivateGroups, String... accountType) throws BusinessException {
 
-        boolean existUndesiredMailDomain = false;
-        String message = "Signing up " + user.getEmail() + " (list of undesired mail domains: ";
+        // Build log message
+        StringBuilder message = new StringBuilder("Signing up ");
+        message.append(user.getEmail());
+        message.append(". List of undesired mail domains: ");
         for (String s : Server.getInstance().getUndesiredMailDomains()) {
-            message += " " + s;
+            message.append(" ");
+            message.append(s);
         }
-        message += ")";
-        logger.info(message);
+        message.append(". ");
+        message.append("List of undesired countries: ");
+        for (String s : Server.getInstance().getUndesiredCountries()) {
+            message.append(" ");
+            message.append(s);
+        }
+        message.append(".");
+        logger.info(message.toString());
+
+        // Check if email domain is undesired
         for (String udm : Server.getInstance().getUndesiredMailDomains()) {
             if (user.getEmail().endsWith(udm)) {
-                existUndesiredMailDomain = true;
+                logger.info("Undesired Mail Domain for " + user.getEmail());
+                throw new BusinessException("Error");
             }
         }
-        if (existUndesiredMailDomain) {
-            logger.info("Undesired Mail Domain for " + user.getEmail());
-            throw new BusinessException("Undesired Mail Domain");
-        } else {
-
-            try {
-                if (!automaticCreation) {
-                    user.setTermsOfUse(getCurrentTimeStamp());
-                }
-                user.setLastUpdatePublications(getCurrentTimeStamp());
-                user.setCode(UUID.randomUUID().toString());
-                user.setPassword(MD5.get(user.getPassword()));
-                String folder = user.getFirstName().replaceAll(" ", "_").toLowerCase() + "_"
-                        + user.getLastName().replaceAll(" ", "_").toLowerCase();
-                folder = Normalizer.normalize(folder, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-
-                GRIDAClient client = CoreUtil.getGRIDAClient();
-                while (client.exist(Server.getInstance().getDataManagerUsersHome() + "/" + folder)) {
-                    folder += "_" + new Random().nextInt(10000);
-                }
-
-                user.setFolder(folder);
-                user.setLevel(UserLevel.Beginner);
-
-                CoreDAOFactory.getDAOFactory().getUserDAO().add(user);
-
-                // Adding user to groups
-                List<Group> groups = null;
-                if (accountType != null) {
-                    groups = CoreDAOFactory.getDAOFactory().getAccountDAO().getGroups(accountType);
-                    for (Group group : groups) {
-                        if (mapPrivateGroups || automaticCreation || group.isPublicGroup()) {
-                            CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().add(user.getEmail(), group.getName(), GROUP_ROLE.User);
-                        } else {
-                            logger.info("Don't map user " + user.getEmail() + " to private group " + group.getName());
-                        }
-                    }
-                } else {
-                    groups = new ArrayList<Group>();
-                }
-
-                if (!automaticCreation) {
-                    String emailContent = "<html>"
-                            + "<head></head>"
-                            + "<body>"
-                            + "<p>Dear " + user.getFirstName() + " " + user.getLastName() + ",</p>"
-                            + "<p>We have successfully received your membership registration "
-                            + "and your personal profile has been created.</p>"
-                            + "<p>Please confirm your registration using the following activation "
-                            + "code on your first login:</p>"
-                            + "<p><b>" + user.getCode() + "</b></p>"
-                            + "<p>Best Regards,</p>"
-                            + "<p>VIP Team</p>"
-                            + "</body>"
-                            + "</html>";
-
-                    logger.info("Sending confirmation email to '" + user.getEmail() + "'.");
-                    CoreUtil.sendEmail("VIP account details", emailContent,
-                            new String[]{user.getEmail()}, true, user.getEmail());
-
-                    StringBuilder accounts = new StringBuilder();
-                    for (String account : accountType) {
-                        if (accounts.length() > 0) {
-                            accounts.append(", ");
-                        }
-                        accounts.append(account);
-                    }
-
-                    String adminsEmailContents = "<html>"
-                            + "<head></head>"
-                            + "<body>"
-                            + "<p>Dear Administrator,</p>"
-                            + "<p>A new user requested an account:</p>"
-                            + "<p><b>First Name:</b> " + user.getFirstName() + "</p>"
-                            + "<p><b>Last Name:</b> " + user.getLastName() + "</p>"
-                            + "<p><b>Email:</b> " + user.getEmail() + "</p>"
-                            + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
-                            + "<p><b>Phone:</b> " + user.getPhone() + "</p>"
-                            + "<p><b>Country:</b> " + user.getCountryCode().getCountryName() + "</p>"
-                            + "<p><b>Accounts:</b> " + accounts.toString() + "</p>"
-                            + "<p><b>Comments:</b><br />" + comments + "</p>"
-                            + "<p>&nbsp;</p>"
-                            + "<p>Best Regards,</p>"
-                            + "<p>VIP Team</p>"
-                            + "</body>"
-                            + "</html>";
-
-                    for (String email : getAdministratorsEmails()) {
-                        CoreUtil.sendEmail("[VIP Admin] Account Requested", adminsEmailContents,
-                                new String[]{email}, true, user.getEmail());
-                    }
-                } else {
-                    StringBuilder groupNames = new StringBuilder();
-                    for (Group group : groups) {
-                        if (groupNames.length() > 0) {
-                            groupNames.append(", ");
-                        }
-                        groupNames.append(group.getName());
-                    }
-                    String adminsEmailContents = "<html>"
-                            + "<head></head>"
-                            + "<body>"
-                            + "<p>Dear Administrators,</p>"
-                            + "<p>The following account was automatically created:</p>"
-                            + "<p><b>First Name:</b> " + user.getFirstName() + "</p>"
-                            + "<p><b>Last Name:</b> " + user.getLastName() + "</p>"
-                            + "<p><b>Email:</b> " + user.getEmail() + "</p>"
-                            + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
-                            + "<p><b>Phone:</b> " + user.getPhone() + "</p>"
-                            + "<p><b>Country:</b> " + user.getCountryCode().getCountryName() + "</p>"
-                            + "<p><b>Groups:</b> " + groupNames + "</p>"
-                            + "<p><b>Comments:</b><br />" + comments + "</p>"
-                            + "<p>&nbsp;</p>"
-                            + "<p>Best Regards,</p>"
-                            + "<p>VIP Team</p>"
-                            + "</body>"
-                            + "</html>";
-
-                    for (String email : getAdministratorsEmails()) {
-                        CoreUtil.sendEmail("[VIP Admin] Automatic Account Creation", adminsEmailContents,
-                                new String[]{email}, false, user.getEmail());
-                    }
-                }
-            } catch (GRIDAClientException ex) {
-                logger.error(ex);
-                throw new BusinessException(ex);
-            } catch (DAOException ex) {
-                throw new BusinessException(ex);
-            } catch (NoSuchAlgorithmException ex) {
-                logger.error(ex);
-                throw new BusinessException(ex);
-            } catch (UnsupportedEncodingException ex) {
-                logger.error(ex);
-                throw new BusinessException(ex);
+        
+        // Check if country is undesired
+        for (String udc : Server.getInstance().getUndesiredCountries()){
+            if(user.getCountryCode().toString().equals(udc)){
+                logger.info("Undesired country for " + user.getEmail());
+                throw new BusinessException("Error");
             }
         }
 
+        try {
+            if (!automaticCreation) {
+                user.setTermsOfUse(getCurrentTimeStamp());
+            }
+            user.setLastUpdatePublications(getCurrentTimeStamp());
+            user.setCode(UUID.randomUUID().toString());
+            user.setPassword(MD5.get(user.getPassword()));
+            String folder = user.getFirstName().replaceAll(" ", "_").toLowerCase() + "_"
+                            + user.getLastName().replaceAll(" ", "_").toLowerCase();
+            folder = Normalizer.normalize(folder, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+
+            GRIDAClient client = CoreUtil.getGRIDAClient();
+            while (client.exist(Server.getInstance().getDataManagerUsersHome() + "/" + folder)) {
+                folder += "_" + new Random().nextInt(10000);
+            }
+
+            user.setFolder(folder);
+            user.setLevel(UserLevel.Beginner);
+
+            CoreDAOFactory.getDAOFactory().getUserDAO().add(user);
+
+            // Adding user to groups
+            List<Group> groups = null;
+            if (accountType != null) {
+                groups = CoreDAOFactory.getDAOFactory().getAccountDAO().getGroups(accountType);
+                for (Group group : groups) {
+                    if (mapPrivateGroups || automaticCreation || group.isPublicGroup()) {
+                        CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().add(user.getEmail(), group.getName(), GROUP_ROLE.User);
+                    } else {
+                        logger.info("Don't map user " + user.getEmail() + " to private group " + group.getName());
+                    }
+                }
+            } else {
+                groups = new ArrayList<Group>();
+            }
+
+            if (!automaticCreation) {
+                String emailContent = "<html>"
+                                      + "<head></head>"
+                                      + "<body>"
+                                      + "<p>Dear " + user.getFirstName() + " " + user.getLastName() + ",</p>"
+                                      + "<p>We have successfully received your membership registration "
+                                      + "and your personal profile has been created.</p>"
+                                      + "<p>Please confirm your registration using the following activation "
+                                      + "code on your first login:</p>"
+                                      + "<p><b>" + user.getCode() + "</b></p>"
+                                      + "<p>Best Regards,</p>"
+                                      + "<p>VIP Team</p>"
+                                      + "</body>"
+                                      + "</html>";
+
+                logger.info("Sending confirmation email to '" + user.getEmail() + "'.");
+                CoreUtil.sendEmail("VIP account details", emailContent,
+                                   new String[]{user.getEmail()}, true, user.getEmail());
+
+                StringBuilder accounts = new StringBuilder();
+                for (String account : accountType) {
+                    if (accounts.length() > 0) {
+                        accounts.append(", ");
+                    }
+                    accounts.append(account);
+                }
+
+                String adminsEmailContents = "<html>"
+                                             + "<head></head>"
+                                             + "<body>"
+                                             + "<p>Dear Administrator,</p>"
+                                             + "<p>A new user requested an account:</p>"
+                                             + "<p><b>First Name:</b> " + user.getFirstName() + "</p>"
+                                             + "<p><b>Last Name:</b> " + user.getLastName() + "</p>"
+                                             + "<p><b>Email:</b> " + user.getEmail() + "</p>"
+                                             + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
+                                             + "<p><b>Phone:</b> " + user.getPhone() + "</p>"
+                                             + "<p><b>Country:</b> " + user.getCountryCode().getCountryName() + "</p>"
+                                             + "<p><b>Accounts:</b> " + accounts.toString() + "</p>"
+                                             + "<p><b>Comments:</b><br />" + comments + "</p>"
+                                             + "<p>&nbsp;</p>"
+                                             + "<p>Best Regards,</p>"
+                                             + "<p>VIP Team</p>"
+                                             + "</body>"
+                                             + "</html>";
+
+                for (String email : getAdministratorsEmails()) {
+                    CoreUtil.sendEmail("[VIP Admin] Account Requested", adminsEmailContents,
+                                       new String[]{email}, true, user.getEmail());
+                }
+            } else {
+                StringBuilder groupNames = new StringBuilder();
+                for (Group group : groups) {
+                    if (groupNames.length() > 0) {
+                        groupNames.append(", ");
+                    }
+                    groupNames.append(group.getName());
+                }
+                String adminsEmailContents = "<html>"
+                                             + "<head></head>"
+                                             + "<body>"
+                                             + "<p>Dear Administrators,</p>"
+                                             + "<p>The following account was automatically created:</p>"
+                                             + "<p><b>First Name:</b> " + user.getFirstName() + "</p>"
+                                             + "<p><b>Last Name:</b> " + user.getLastName() + "</p>"
+                                             + "<p><b>Email:</b> " + user.getEmail() + "</p>"
+                                             + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
+                                             + "<p><b>Phone:</b> " + user.getPhone() + "</p>"
+                                             + "<p><b>Country:</b> " + user.getCountryCode().getCountryName() + "</p>"
+                                             + "<p><b>Groups:</b> " + groupNames + "</p>"
+                                             + "<p><b>Comments:</b><br />" + comments + "</p>"
+                                             + "<p>&nbsp;</p>"
+                                             + "<p>Best Regards,</p>"
+                                             + "<p>VIP Team</p>"
+                                             + "</body>"
+                                             + "</html>";
+
+                for (String email : getAdministratorsEmails()) {
+                    CoreUtil.sendEmail("[VIP Admin] Automatic Account Creation", adminsEmailContents,
+                                       new String[]{email}, false, user.getEmail());
+                }
+            }
+        } catch (GRIDAClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        } catch (NoSuchAlgorithmException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        } catch (UnsupportedEncodingException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
     }
 
     /**
@@ -316,8 +331,9 @@ public class ConfigurationBusiness {
 
             } else {
                 userDAO.incNFailedAuthentications(email);
-                if(userDAO.getNFailedAuthentications(email) > 5)
+                if (userDAO.getNFailedAuthentications(email) > 5) {
                     userDAO.lock(email);
+                }
                 logger.error("Authentication failed to '" + email + "' (email or password incorrect, or user is locked).");
                 throw new BusinessException("Authentication failed (email or password incorrect, or user is locked).");
             }
@@ -357,8 +373,8 @@ public class ConfigurationBusiness {
                 "Unknown",
                 UUID.randomUUID().toString(),
                 "0000",
-                cc,getCurrentTimeStamp());
-  
+                cc, getCurrentTimeStamp());
+
         return u;
     }
 
@@ -422,7 +438,7 @@ public class ConfigurationBusiness {
 
         try {
             UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
-            if (userDAO.isLocked(email)){
+            if (userDAO.isLocked(email)) {
                 logger.error("Activation failed to '" + email + "' (user is locked).");
                 throw new BusinessException("User is locked.");
             }
@@ -433,18 +449,19 @@ public class ConfigurationBusiness {
 
                 GRIDAClient client = CoreUtil.getGRIDAClient();
                 client.createFolder(Server.getInstance().getDataManagerUsersHome(),
-                        user.getFolder());
+                                    user.getFolder());
 
                 client.createFolder(Server.getInstance().getDataManagerUsersHome(),
-                        user.getFolder() + "_" + CoreConstants.FOLDER_TRASH);
+                                    user.getFolder() + "_" + CoreConstants.FOLDER_TRASH);
 
                 return user;
 
             } else {
                 userDAO.incNFailedAuthentications(email);
-                if(userDAO.getNFailedAuthentications(email) > 5)
+                if (userDAO.getNFailedAuthentications(email) > 5) {
                     userDAO.lock(email);
-                logger.error("Activation failed to '" + email + "' (wrong code: "+code+").");
+                }
+                logger.error("Activation failed to '" + email + "' (wrong code: " + code + ").");
                 throw new BusinessException("Activation failed.");
             }
 
@@ -482,23 +499,24 @@ public class ConfigurationBusiness {
         try {
             User user = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
 
-            if(CoreDAOFactory.getDAOFactory().getUserDAO().isLocked(email))
+            if (CoreDAOFactory.getDAOFactory().getUserDAO().isLocked(email)) {
                 throw new BusinessException("User is locked.");
-            
+            }
+
             String emailContent = "<html>"
-                    + "<head></head>"
-                    + "<body>"
-                    + "<p>Dear " + user.getFullName() + ",</p>"
-                    + "<p>You requested us to send you your personal activation code.</p>"
-                    + "<p>Please use the following code to activate your account:</p>"
-                    + "<p><b>" + user.getCode() + "</b></p>"
-                    + "<p>Best Regards,</p>"
-                    + "<p>VIP Team</p>"
-                    + "</body>"
-                    + "</html>";
+                                  + "<head></head>"
+                                  + "<body>"
+                                  + "<p>Dear " + user.getFullName() + ",</p>"
+                                  + "<p>You requested us to send you your personal activation code.</p>"
+                                  + "<p>Please use the following code to activate your account:</p>"
+                                  + "<p><b>" + user.getCode() + "</b></p>"
+                                  + "<p>Best Regards,</p>"
+                                  + "<p>VIP Team</p>"
+                                  + "</body>"
+                                  + "</html>";
 
             CoreUtil.sendEmail("VIP activation code (reminder)", emailContent,
-                    new String[]{user.getEmail()}, true, user.getEmail());
+                               new String[]{user.getEmail()}, true, user.getEmail());
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -515,26 +533,27 @@ public class ConfigurationBusiness {
         try {
             User user = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
 
-            if(CoreDAOFactory.getDAOFactory().getUserDAO().isLocked(email))
+            if (CoreDAOFactory.getDAOFactory().getUserDAO().isLocked(email)) {
                 throw new BusinessException("User is locked.");
-            
+            }
+
             String code = UUID.randomUUID().toString();
             CoreDAOFactory.getDAOFactory().getUserDAO().updateCode(email, code);
 
             String emailContent = "<html>"
-                    + "<head></head>"
-                    + "<body>"
-                    + "<p>Dear " + user.getFullName() + ",</p>"
-                    + "<p>You recently requested a new password to sign in to your VIP account.</p>"
-                    + "<p>Please use the following code to reset your password:</p>"
-                    + "<p><b>" + code + "</b></p>"
-                    + "<p>Best Regards,</p>"
-                    + "<p>VIP Team</p>"
-                    + "</body>"
-                    + "</html>";
+                                  + "<head></head>"
+                                  + "<body>"
+                                  + "<p>Dear " + user.getFullName() + ",</p>"
+                                  + "<p>You recently requested a new password to sign in to your VIP account.</p>"
+                                  + "<p>Please use the following code to reset your password:</p>"
+                                  + "<p><b>" + code + "</b></p>"
+                                  + "<p>Best Regards,</p>"
+                                  + "<p>VIP Team</p>"
+                                  + "</body>"
+                                  + "</html>";
 
             CoreUtil.sendEmail("Code to reset your VIP password", emailContent,
-                    new String[]{user.getEmail()}, true, user.getEmail());
+                               new String[]{user.getEmail()}, true, user.getEmail());
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -556,33 +575,33 @@ public class ConfigurationBusiness {
             client.removeOperationsByUser(email);
 
             client.delete(Server.getInstance().getDataManagerUsersHome() + "/"
-                    + user.getFolder(), user.getEmail());
+                          + user.getFolder(), user.getEmail());
             client.delete(Server.getInstance().getDataManagerUsersHome() + "/"
-                    + user.getFolder() + "_" + CoreConstants.FOLDER_TRASH, user.getEmail());
+                          + user.getFolder() + "_" + CoreConstants.FOLDER_TRASH, user.getEmail());
 
             CoreDAOFactory.getDAOFactory().getUserDAO().remove(email);
 
             if (sendNotificationEmail) {
 
                 String adminsEmailContents = "<html>"
-                        + "<head></head>"
-                        + "<body>"
-                        + "<p>Dear Administrators,</p>"
-                        + "<p>The following user removed her/his account:</p>"
-                        + "<p><b>First Name:</b> " + user.getFirstName() + "</p>"
-                        + "<p><b>Last Name:</b> " + user.getLastName() + "</p>"
-                        + "<p><b>Email:</b> " + user.getEmail() + "</p>"
-                        + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
-                        + "<p><b>Phone:</b> " + user.getPhone() + "</p>"
-                        + "<p>&nbsp;</p>"
-                        + "<p>Best Regards,</p>"
-                        + "<p>VIP Team</p>"
-                        + "</body>"
-                        + "</html>";
+                                             + "<head></head>"
+                                             + "<body>"
+                                             + "<p>Dear Administrators,</p>"
+                                             + "<p>The following user removed her/his account:</p>"
+                                             + "<p><b>First Name:</b> " + user.getFirstName() + "</p>"
+                                             + "<p><b>Last Name:</b> " + user.getLastName() + "</p>"
+                                             + "<p><b>Email:</b> " + user.getEmail() + "</p>"
+                                             + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
+                                             + "<p><b>Phone:</b> " + user.getPhone() + "</p>"
+                                             + "<p>&nbsp;</p>"
+                                             + "<p>Best Regards,</p>"
+                                             + "<p>VIP Team</p>"
+                                             + "</body>"
+                                             + "</html>";
 
                 for (String adminEmail : getAdministratorsEmails()) {
                     CoreUtil.sendEmail("[VIP Admin] Account Removed", adminsEmailContents,
-                            new String[]{adminEmail}, true, user.getEmail());
+                                       new String[]{adminEmail}, true, user.getEmail());
                 }
             }
         } catch (DAOException ex) {
@@ -620,18 +639,15 @@ public class ConfigurationBusiness {
             if (validGroup) {
 
                 // Discarded the effect of validGroups as this has several side effects (see #2669)
-                
                 //List<String> groups = CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUserAdminGroups(email);
-
-               // if (groups.isEmpty()) {
-                    List<String> userNames = new ArrayList<String>();
-                    userNames.add(CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email).getFullName());
-                    return userNames;
+                // if (groups.isEmpty()) {
+                List<String> userNames = new ArrayList<String>();
+                userNames.add(CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email).getFullName());
+                return userNames;
 
 //                } else {
 //                    return CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroups(groups);
 //                }
-
             } else {
                 List<String> userNames = new ArrayList<String>();
                 for (User user : getUsers()) {
@@ -656,7 +672,7 @@ public class ConfigurationBusiness {
         try {
             GRIDAClient client = CoreUtil.getGRIDAClient();
             client.createFolder(Server.getInstance().getDataManagerGroupsHome(),
-                    group.getName().replaceAll(" ", "_"));
+                                group.getName().replaceAll(" ", "_"));
 
             CoreDAOFactory.getDAOFactory().getGroupDAO().add(group);
 
@@ -679,7 +695,7 @@ public class ConfigurationBusiness {
         try {
             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
             client.delete(Server.getInstance().getDataManagerGroupsHome() + "/"
-                    + groupName.replaceAll(" ", "_"), user);
+                          + groupName.replaceAll(" ", "_"), user);
             CoreDAOFactory.getDAOFactory().getGroupDAO().remove(groupName);
 
         } catch (DAOException ex) {
@@ -827,7 +843,7 @@ public class ConfigurationBusiness {
         try {
 
             user.setFolder(user.getFirstName().replaceAll(" ", "_").toLowerCase() + "_"
-                    + user.getLastName().replaceAll(" ", "_").toLowerCase());
+                           + user.getLastName().replaceAll(" ", "_").toLowerCase());
 
             CoreDAOFactory.getDAOFactory().getUserDAO().update(user);
 
@@ -860,7 +876,7 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public void updateUserPassword(String email, String currentPassword,
-            String newPassword) throws BusinessException {
+                                   String newPassword) throws BusinessException {
 
         try {
             currentPassword = MD5.get(currentPassword);
@@ -889,7 +905,6 @@ public class ConfigurationBusiness {
         }
     }
 
-    
     public void updateLastUpdatePublication(String email) throws BusinessException {
         try {
             CoreDAOFactory.getDAOFactory().getUserDAO().updateLastUpdatePublication(email, getCurrentTimeStamp());
@@ -909,27 +924,27 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public void sendContactMail(User user, String category, String subject,
-            String comment) throws BusinessException {
+                                String comment) throws BusinessException {
 
         try {
             String emailContent = "<html>"
-                    + "<head></head>"
-                    + "<body>"
-                    + "<p><b>VIP Contact</b></p>"
-                    + "<p><b>User:</b> " + user.getFullName() + "</p>"
-                    + "<p><b>Email:</b> <a href=\"mailto:" + user.getEmail() + "\">" + user.getEmail() + "</a></p>"
-                    + "<p>&nbsp;</p>"
-                    + "<p><b>Category:</b> " + category + "</p>"
-                    + "<p><b>Subject:</b> " + subject + "</p>"
-                    + "<p>&nbsp;</p>"
-                    + "<p><b>Comments:</b></p>"
-                    + "<p>" + comment + "</p>"
-                    + "</body>"
-                    + "</html>";
+                                  + "<head></head>"
+                                  + "<body>"
+                                  + "<p><b>VIP Contact</b></p>"
+                                  + "<p><b>User:</b> " + user.getFullName() + "</p>"
+                                  + "<p><b>Email:</b> <a href=\"mailto:" + user.getEmail() + "\">" + user.getEmail() + "</a></p>"
+                                  + "<p>&nbsp;</p>"
+                                  + "<p><b>Category:</b> " + category + "</p>"
+                                  + "<p><b>Subject:</b> " + subject + "</p>"
+                                  + "<p>&nbsp;</p>"
+                                  + "<p><b>Comments:</b></p>"
+                                  + "<p>" + comment + "</p>"
+                                  + "</body>"
+                                  + "</html>";
 
             for (User u : CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
                 CoreUtil.sendEmail("[VIP Contact] " + category, emailContent,
-                        new String[]{u.getEmail()}, true, user.getEmail());
+                                   new String[]{u.getEmail()}, true, user.getEmail());
             }
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -977,11 +992,11 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public void updateUser(String email, UserLevel level, CountryCode countryCode,
-            int maxRunningSimulations, boolean locked) throws BusinessException {
+                           int maxRunningSimulations, boolean locked) throws BusinessException {
 
         try {
             CoreDAOFactory.getDAOFactory().getUserDAO().update(email, level,
-                    countryCode, maxRunningSimulations, locked);
+                                                               countryCode, maxRunningSimulations, locked);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -1253,8 +1268,7 @@ public class ConfigurationBusiness {
             throw new BusinessException(ex);
         }
     }
-    
-   
+
     public boolean testLastUpdatePublication(String email) throws BusinessException {
 
         try {
