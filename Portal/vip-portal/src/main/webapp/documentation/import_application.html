@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>VIP Documentation - How to import an application</title>
+        <link rel="StyleSheet" href="../css/doc_main.css" type="text/css" />
+        <link rel="StyleSheet" href="../css/import_application.css" type="text/css" />
+    </head>
+    <body>
+        <h1>How to import an application</h1>
+        Here we detail the steps required to port a new application to
+        VIP. Please
+        contact <a href="mailto:vip-support@creatis.insa-lyon.fr">vip-support@creatis.insa-lyon.fr</a>
+        if anything is unclear or does not work as expected.       
+        <br><a name="contents"></a>
+        Contents:
+        <ul><li><a href="#chart">Main steps</a> to import an application in VIP</li>
+            <li><a href="#boutiques_json_editor">Boutiques JSON editor:</a> brief description (home page)</li>
+          <li><a href="#docker">Guidelines</a> about Docker</li>
+          <li><a href="#troubleshooting">Troubleshooting</a> tips</li>
+        </ul>
+        
+        <h2><a name="chart">Main steps to import an application in VIP</h2>
+        <embed src="./import_application/chart.svg" type="image/svg+xml" width="1300">
+        <!-- SVG document is exported from https://docs.google.com/drawings/d/1iH9JNiby3qJG11UPNNt8wIUoUXFhMy-wleGN2-VbD5M/edit?usp=sharing -->
+        <br/>
+        <a href="#contents">Back to top</a>
+          
+        <h2><a name="boutiques_json_editor">Boutiques JSON editor</a>: brief description (home page)</h2>
+        <embed src="./import_application/boutiques_json_editor_doc.svg" type="image/svg+xml">
+          <!-- SVG document is exported from https://docs.google.com/drawings/d/1lMndpQRe1bTlhddOouN9uqA8DnmIGgOHbIPtRgR5_8s/edit?usp=sharing -->
+        <br/>
+        <a href="#contents">Back to top</a>
+            
+        <h2><a name="docker">Docker </a> guidelines</h2>
+        <ul>
+          <li>If you are not familiar with Docker, <a href="https://docs.docker.com/linux">read the docs</a> on the Docker website.</li>
+          <li>We recommend to build containers from a <a href="https://docs.docker.com/engine/reference/builder">Dockerfile</a>.</li>
+          <li>For efficient management of containers in VIP, we recommend that containers use the following images if possible:
+            <ul>
+              <li>Linux distribution: <a href="https://hub.docker.com/r/_/centos/">centos7</a> (official).</li>
+              <li>Compiled Matlab applications: <a href="https://hub.docker.com/r/glatard/matlab-compiler-runtime-docker">glatard/matlab-compiler-runtime-docker</a> (unofficial).</li>
+              <li>Applications using <a href="https://github.com/MRtrix3/mrtrix3">MRtrix3</a>: <a href="https://hub.docker.com/r/glatard/mrtrix3/">glatard/mrtrix3</a> (unofficial).</li>
+            </ul>
+          </li>
+          <li>Compiled applications: avoid using architecture-specific
+          compilation flags as it will produce non-portable code
+          (<code>Illegal instruction</code> error messages).</li>
+          </ul>
+        <br/>
+        <a href="#contents">Back to top</a>
+
+        <h2><a name="troubleshooting">Troubleshooting </a>tips</h2>
+        <h3>Compiled Matlab functions</h3>
+        <ul>
+          Arguments of compiled Matlab
+          functions will be passed as strings, which may create nasty
+          bugs at runtime. We recommend that numerical arguments are
+          handled using code such as:
+            <pre><code>
+            if ~isnumeric(parameter)
+              parameter = str2double(parameter);
+              if isnan(parameter)
+                disp('The parameter value is not a number')
+                return
+              end
+            end
+            </pre></code>
+          </li>
+          </ul>
+        <br/>
+        <a href="#contents">Back to top</a>
+
+    </body>
+</html>
