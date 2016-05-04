@@ -11,8 +11,9 @@ html {
     background-color: #36454F;
 }
 body { 
-    font: 75% georgia, sans-serif;
-    line-height: 1.88889;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    line-height: 20px;
     color: #FFFFFF;
     margin: 0; 
     padding: 10px;
