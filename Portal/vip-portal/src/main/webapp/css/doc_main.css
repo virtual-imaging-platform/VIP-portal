@@ -67,3 +67,20 @@ em {
     font-size: 11px;
     font-style: normal;
 }
+
+table {
+    border-width:1px; 
+    border-style:solid; 
+    border-color:black;
+    width:50%;
+    border-collapse:collapse
+ }
+ 
+th, td { 
+    border-width:1px;
+    border-style:solid; 
+    border-color:black;
+    padding-left: 20px;
+    margin-left: 50px;
+    width:50%;
+ }

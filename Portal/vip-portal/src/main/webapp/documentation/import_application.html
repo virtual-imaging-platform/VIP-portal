@@ -5,19 +5,26 @@
         <link rel="StyleSheet" href="../css/doc_main.css" type="text/css" />
     </head>
     <body>
-        <h1>How to import an application</h1>
+        <a name="contents"></a><h1>How to import an application</h1>
         Here we detail the steps required to port a new application to
         VIP. Please
         contact us if anything is unclear or does not work as expected.       
-        <br><a name="contents"></a>
+        <br>
         Contents:
-        <ul><li><a href="#chart">Main steps</a> to import an application in VIP</li>
+        <ul>
+            <li><a href="#chart">Main steps</a> to import an application in VIP</li>
             <li><a href="#boutiques_json_editor">Boutiques JSON editor:</a> brief description (home page)</li>
-          <li><a href="#docker">Guidelines</a> about Docker</li>
-          <li><a href="#troubleshooting">Troubleshooting</a> tips</li>
+            <li>Recommendations regarding JSON descriptor
+                <ul>
+                  <li><a href="#recommendations_json_descriptor_MSSEG">For MSSEG challengers</a></li>
+                  <li><a href="#recommendations_json_descriptor_PETSEG">For PETSEG challengers</a></li>
+                </ul>
+            </li>
+            <li><a href="#docker">Guidelines</a> about Docker</li>
+            <li><a href="#troubleshooting">Troubleshooting</a> tips</li>
         </ul>
         
-        <h2><a name="chart">Main steps to import an application in VIP</a> </h2>
+        <h2><a name="chart"></a>Main steps to import an application in VIP</h2>
         "An application" means that your application is supposed to be implemented as a single executable (script, binary, etc). Of course, this executable can contain a full pipeline that will call scripts or other executables.
         <br/>
         <br/>
@@ -26,21 +33,111 @@
         <br/>
         <a href="#contents">Back to top</a>
           
-        <h2><a name="boutiques_json_editor">Boutiques JSON editor</a>: brief description (home page)</h2>
+        <h2><a name="boutiques_json_editor"></a>Boutiques JSON editor : brief description (home page)</h2>
         <embed src="./import_application/boutiques_json_editor_doc.svg" type="image/svg+xml" width="1600">
           <!-- SVG document is exported from https://docs.google.com/drawings/d/1lMndpQRe1bTlhddOouN9uqA8DnmIGgOHbIPtRgR5_8s/edit?usp=sharing -->
         <br/>
         <a href="#contents">Back to top</a>
-            
-        <h2><a name="docker">Docker </a> guidelines</h2>
+        
+        <h2><a name="recommendations_json_descriptor_MSSEG"></a>Recommendations regarding JSON descriptor : for MSSEG challengers</h2>
+        
+        Please find <strong><a href="https://raw.githubusercontent.com/glatard/vip-boutiques-generator/master/json/tool.json" target="_blank">here a JSON descriptor template for MSSEG Challenge</a></strong>.
+        <br/>
+        You can use it to make you own JSON descriptor. To do so, in your web browser click on "File" menu and on "Save as". Check that the file extension is <strong>.json</strong>.
         <ul>
-          <li>If you are not familiar with Docker, <a href="https://docs.docker.com/linux">read the docs</a> on the Docker website.</li>
-          <li>We recommend to build containers from a <a href="https://docs.docker.com/engine/reference/builder">Dockerfile</a>.</li>
+          <li>In the command-line attribute : a character string like "[PARAM]" or "[T2_RAW]" corresponds to an input or output (in fact it is the command-line key of an input or output)
+              Each input or ouput (so input or output key) must be defined in "inputs" or "output-files" sections with <strong>exactly the same command-line key, WITH "[" and "]" character</strong>.
+            <ul>
+                  <li>For example "[FLAIR_RAW]" in the command-line attribute is mapped (in "inputs" section) to the input which "command-line-key" is "[FLAIR_RAW]". In this JSON template descriptor there is only one output which "command-line-key" is "[OUTPUT_FILE]".</li>
+            </ul>
+          </li>
+        </ul>
+        <ul>
+          <li>An entire input is contained between "{" and "}" character, knowing that all inputs are contained between "[" and "]" character of the "inputs" section. This is the same principle for the outputs.</li>
+          <li>You can delete inputs you don't need : in that case, you have to delete the input "command-line-key" (for example "[FLAIR_RAW]") in the "command-line" attribute <strong>AND the corresponding input in "inputs" section</strong>.</li>
+          <li>If you choose to keep some inputs from this template, you can modify characterism of these inputs <strong>EXPECT the "command-line-key"</strong>.</li>
+          <li>You can add inputs and outputs : in that case you have to describe them in the corresponding section and declare them in the command-line attribute with their "command-line-key".</li>
+          <li>These following attributes are <strong>required</strong>. Please fill in them.
+            <ul>
+              <li>"vip:miccai-challenger-email"</li>
+              <li>"vip:miccai-challenge-team-name"</li>
+            </ul>
+          </li>
+        </ul>
+        <br/>
+        <strong>A mapping table</strong>
+        <br/>
+        <br/>
+        <table>
+            <thead>
+                <tr>
+                    <th>Command line key</th>
+                    <th>Corresponding image type</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>[FLAIR_RAW]</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>[T1_RAW]</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>[T2_RAW]</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>[GADO_RAW]</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>[PD_RAW]</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>[FLAIR_PREPROCESSED]</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>[T1_PREPROCESSED]</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>[T2_PREPROCESSED]</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>[GADO_PREPROCESSED]</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>[PD_PREPROCESSED]</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>[MASK]</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+        <br/>
+        <a href="#contents">Back to top</a>
+        
+        <h2><a name="recommendations_json_descriptor_PETSEG"></a>Recommendations regarding JSON descriptor : for PETSEG challengers</h2>
+        <a href="#contents">Back to top</a>
+          
+            
+        <h2><a name="docker"></a>Docker guidelines</h2>
+        <ul>
+          <li>If you are not familiar with Docker, <a href="https://docs.docker.com/linux" target="_blank">read the docs</a> on the Docker website.</li>
+          <li>We recommend to build containers from a <a href="https://docs.docker.com/engine/reference/builder" target="_blank">Dockerfile</a>.</li>
           <li>For efficient management of containers in VIP, we recommend that containers use the following images if possible:
             <ul>
-              <li>Linux distribution: <a href="https://hub.docker.com/r/_/centos/">centos7</a> (official).</li>
-              <li>Compiled Matlab applications: <a href="https://hub.docker.com/r/glatard/matlab-compiler-runtime-docker">glatard/matlab-compiler-runtime-docker</a> (unofficial).</li>
-              <li>Applications using <a href="https://github.com/MRtrix3/mrtrix3">MRtrix3</a>: <a href="https://hub.docker.com/r/glatard/mrtrix3/">glatard/mrtrix3</a> (unofficial).</li>
+              <li>Linux distribution: <a href="https://hub.docker.com/r/_/centos/" target="_blank">centos7</a> (official).</li>
+              <li>Compiled Matlab applications: <a href="https://hub.docker.com/r/glatard/matlab-compiler-runtime-docker" target="_blank">glatard/matlab-compiler-runtime-docker</a> (unofficial).</li>
+              <li>Applications using <a href="https://github.com/MRtrix3/mrtrix3" target="_blank">MRtrix3</a>: <a href="https://hub.docker.com/r/glatard/mrtrix3/" target="_blank">glatard/mrtrix3</a> (unofficial).</li>
             </ul>
           </li>
           <li>Compiled applications: avoid using architecture-specific
@@ -51,22 +148,24 @@
         <br/>
         <a href="#contents">Back to top</a>
 
-        <h2><a name="troubleshooting">Troubleshooting </a>tips</h2>
+        <h2><a name="troubleshooting"></a>Troubleshooting tips</h2>
         <h3>Compiled Matlab functions</h3>
         <ul>
           Arguments of compiled Matlab
           functions will be passed as strings, which may create nasty
           bugs at runtime. We recommend that numerical arguments are
           handled using code such as:
-            <pre><code>
-            if ~isnumeric(parameter)
-              parameter = str2double(parameter);
-              if isnan(parameter)
-                disp('The parameter value is not a number')
-                return
-              end
-            end
-            </pre></code>
+            <pre>
+                <code>
+                if ~isnumeric(parameter)
+                  parameter = str2double(parameter);
+                  if isnan(parameter)
+                    disp('The parameter value is not a number')
+                    return
+                  end
+                end
+                </code>
+            </pre>
           </li>
           </ul>
         <br/>
