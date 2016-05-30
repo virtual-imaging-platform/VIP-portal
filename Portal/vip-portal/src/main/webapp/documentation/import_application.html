@@ -16,8 +16,8 @@
             <li><a href="#boutiques_json_editor">Boutiques JSON editor:</a> brief description (home page)</li>
             <li>Recommendations regarding JSON descriptor
                 <ul>
-                  <li><a href="#recommendations_json_descriptor_MSSEG">For MSSEG challengers</a></li>
-                  <li><a href="#recommendations_json_descriptor_PETSEG">For PETSEG challengers</a></li>
+                  <li><a href="#recommendations_json_descriptor_MSSEG">For MICCAI 2016 MSSEG challengers</a></li>
+                  <li><a href="#recommendations_json_descriptor_PETSEG">For MICCAI 2016 PETSEG challengers</a></li>
                 </ul>
             </li>
             <li><a href="#docker">Guidelines</a> about Docker</li>
@@ -39,13 +39,13 @@
         <br/>
         <a href="#contents">Back to top</a>
         
-        <h2><a name="recommendations_json_descriptor_MSSEG"></a>Recommendations regarding JSON descriptor : for MSSEG challengers</h2>
+        <h2><a name="recommendations_json_descriptor_MSSEG"></a>Recommendations regarding JSON descriptor: for MSSEG challengers</h2>
         
         Please find <strong><a href="https://raw.githubusercontent.com/glatard/vip-boutiques-generator/master/json/tool.json" target="_blank">here a JSON descriptor template for MSSEG Challenge</a></strong>.
         <br/>
         You can use it to make you own JSON descriptor. To do so, in your web browser click on "File" menu and on "Save as". Check that the file extension is <strong>.json</strong>.
         <ul>
-          <li>In the command-line attribute : a character string like "[PARAM]" or "[T2_RAW]" corresponds to an input or output (in fact it is the command-line key of an input or output)
+          <li>In the command-line attribute: a character string like "[PARAM]" or "[T2_RAW]" corresponds to an input or output (in fact it is the command-line key of an input or output)
               Each input or ouput (so input or output key) must be defined in "inputs" or "output-files" sections with <strong>exactly the same command-line key, WITH "[" and "]" character</strong>.
             <ul>
                   <li>For example "[FLAIR_RAW]" in the command-line attribute is mapped (in "inputs" section) to the input which "command-line-key" is "[FLAIR_RAW]". In this JSON template descriptor there is only one output which "command-line-key" is "[OUTPUT_FILE]".</li>
@@ -54,7 +54,7 @@
         </ul>
         <ul>
           <li>You can delete inputs you don't need : in that case, you have to delete the input "command-line-key" (for example "[FLAIR_RAW]") in the "command-line" attribute <strong>AND the corresponding input in "inputs" section</strong>.</li>
-          <li>If you choose to keep some inputs from this template, you can modify characterism of these inputs <strong>EXPECT the "id"</strong>.</li>
+          <li>If you choose to keep some inputs from this template, you can modify the properties of these inputs <strong>EXCEPT the "id"</strong>.</li>
           <li>You can add inputs and outputs : in that case you have to describe them in the corresponding section and declare them in the command-line attribute with their "command-line-key".</li>
           <li>If you modify command-line keys, make sure to do it consistently in the command line.</li>
           <li>These following attributes are <strong>required</strong>.
