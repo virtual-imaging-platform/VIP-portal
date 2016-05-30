@@ -53,11 +53,11 @@
           </li>
         </ul>
         <ul>
-          <li>An entire input is contained between "{" and "}" character, knowing that all inputs are contained between "[" and "]" character of the "inputs" section. This is the same principle for the outputs.</li>
           <li>You can delete inputs you don't need : in that case, you have to delete the input "command-line-key" (for example "[FLAIR_RAW]") in the "command-line" attribute <strong>AND the corresponding input in "inputs" section</strong>.</li>
-          <li>If you choose to keep some inputs from this template, you can modify characterism of these inputs <strong>EXPECT the "command-line-key"</strong>.</li>
+          <li>If you choose to keep some inputs from this template, you can modify characterism of these inputs <strong>EXPECT the "id"</strong>.</li>
           <li>You can add inputs and outputs : in that case you have to describe them in the corresponding section and declare them in the command-line attribute with their "command-line-key".</li>
-          <li>These following attributes are <strong>required</strong>. Please fill in them.
+          <li>If you modify command-line keys, make sure to do it consistently in the command line.</li>
+          <li>These following attributes are <strong>required</strong>.
             <ul>
               <li>"vip:miccai-challenger-email"</li>
               <li>"vip:miccai-challenge-team-name"</li>
@@ -65,63 +65,66 @@
           </li>
         </ul>
         <br/>
-        <strong>A mapping table</strong>
+        <strong>A mapping table between modality image you want to use and input (ID) you will need to build the JSON file :</strong>
         <br/>
-        <br/>
-        <table>
-            <thead>
-                <tr>
-                    <th>Command line key</th>
-                    <th>Corresponding image type</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>[FLAIR_RAW]</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>[T1_RAW]</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>[T2_RAW]</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>[GADO_RAW]</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>[PD_RAW]</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>[FLAIR_PREPROCESSED]</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>[T1_PREPROCESSED]</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>[T2_PREPROCESSED]</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>[GADO_PREPROCESSED]</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>[PD_PREPROCESSED]</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>[MASK]</td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
+        <ul>
+            <li class="list_without_style">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Modality image used</th>
+                            <th>Input ID to use for JSON file</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>3D FLAIR</td>
+                            <td>flair_raw</td>
+                        </tr>
+                        <tr>
+                            <td>3D T1-w</td>
+                            <td>t1_raw</td>
+                        </tr>
+                        <tr>
+                            <td>2D DP/T2</td>
+                            <td>t2_raw</td>
+                        </tr>
+                        <tr>
+                            <td>3D T1-w GADO</td>
+                            <td>gado_raw</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>pd_raw</td>
+                        </tr>
+                        <tr>
+                            <td>3D FLAIR preprocessed</td>
+                            <td>flair_preprocessed</td>
+                        </tr>
+                        <tr>
+                            <td>3D T1-w preprocessed</td>
+                            <td>t1_preprocessed</td>
+                        </tr>
+                        <tr>
+                            <td>2D DP/T2 preprocessed</td>
+                            <td>t2_preprocessed</td>
+                        </tr>
+                        <tr>
+                            <td>3D T1-w GADO preprocessed</td>
+                            <td>gado_preprocessed</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>pd_preprocessed</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>mask</td>
+                        </tr>
+                    </tbody>
+                </table>
+             </li>
+        </ul>
         <br/>
         <a href="#contents">Back to top</a>
         

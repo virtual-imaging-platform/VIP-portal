@@ -72,7 +72,6 @@ table {
     border-width:1px; 
     border-style:solid; 
     border-color:black;
-    width:50%;
     border-collapse:collapse
  }
  
@@ -81,6 +80,18 @@ th, td {
     border-style:solid; 
     border-color:black;
     padding-left: 20px;
-    margin-left: 50px;
+    padding-right: 20px;
     width:50%;
  }
+ 
+ th {
+     background-color: #A9A9A9;
+ }
+ 
+tr:nth-child(2n) {
+     background-color: #DCDCDC;
+}
+ 
+ .list_without_style {
+    list-style-type: none;
+}
