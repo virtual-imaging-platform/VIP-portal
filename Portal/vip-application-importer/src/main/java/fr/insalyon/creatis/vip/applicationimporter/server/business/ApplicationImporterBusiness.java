@@ -31,11 +31,14 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.server.business;
 
+import org.json.JSONObject;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
+import fr.insalyon.creatis.vip.applicationimporter.client.JSONUtil;
 import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -49,8 +52,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import org.json.JSONException;
 
 /**
  *
@@ -62,11 +68,14 @@ public class ApplicationImporterBusiness {
 
     public String readFileAsString(String fileLFN, User user) throws BusinessException {
         try {
+              
             File localDir = new File(Server.getInstance().getApplicationImporterFileRepository()+"/"+(new File(DataManagerUtil.parseBaseDir(user, fileLFN))).getParent());
+          
             if(!localDir.exists() && !localDir.mkdirs()){
                 throw new BusinessException("Cannot create directory "+localDir.getCanonicalPath());
             }
             String localFilePath = CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(user, fileLFN), localDir.getCanonicalPath());
+             System.out.print("\n"+localDir);
             String fileContent = new Scanner(new File(localFilePath)).useDelimiter("\\Z").next();
             return fileContent;
         } catch (GRIDAClientException ex) {
@@ -84,32 +93,54 @@ public class ApplicationImporterBusiness {
         }
     }
 
-    public void createApplication(BoutiquesTool bt, boolean overwriteApplicationVersion, User user) throws BusinessException {
+    public void createApplication(BoutiquesTool bt, String type, HashMap<String, BoutiquesTool> bts, boolean overwriteApplicationVersion, User user, boolean challenge) throws BusinessException, ApplicationImporterException, JSONException {
 
         try {
+            
+            HashMap<String, BoutiquesTool> btMaps = new HashMap<String, BoutiquesTool>();
+            btMaps.put("tool", bt);
             // Will enventually be taken from the Constants.
             String wrapperTemplate = "vm/wrapper.vm";
             String gaswTemplate = "vm/gasw.vm";
             String gwendiaTemplate = "vm/gwendia.vm";
-          
+            // following the type of application, we have to load others descriptors and take specific wrapper
+            System.out.print("c bon? \n");
+            if (type.contains("challenge"))
+                 btMaps.putAll(bts);
+            System.out.print("c bon?");
+            if(type.contains("msseg"))
+                 wrapperTemplate = "vm/gwendia_challenge_msseg.vm";
+            else if (type.contains("petseg"))
+                wrapperTemplate = "vm/gwendia_challenge_petseg.vm";
+            else    {}
             // Check rights
             checkEditionRights(bt.getName(), bt.getToolVersion(), overwriteApplicationVersion, user);
             bt.setApplicationLFN(DataManagerUtil.parseBaseDir(user, bt.getApplicationLFN()));
 
             // Generate strings
-            String wrapperString = VelocityUtils.getInstance().createDocument(bt, wrapperTemplate);
-            String gaswString = VelocityUtils.getInstance().createDocument(bt, gaswTemplate);
-            String gwendiaString = VelocityUtils.getInstance().createDocument(bt, gwendiaTemplate);
+            String wrapperString = VelocityUtils.getInstance().createDocument(btMaps, wrapperTemplate);
+            HashMap<String, String> gaswString = new HashMap();
+            HashMap<String, String> gwendiaString = new HashMap();
+            HashMap<String, String> gaswFileName = new HashMap();
+            HashMap<String, String> gwendiaFileName = new HashMap();
+                    
+            for (Map.Entry<String, BoutiquesTool> e  : btMaps.entrySet()) 
+            {
+              gaswString.put(e.getKey(),VelocityUtils.getInstance().createDocument(btMaps, gaswTemplate));
+              gwendiaString.put(e.getKey(), VelocityUtils.getInstance().createDocument(btMaps, gwendiaTemplate));
+              gaswFileName.put(e.getKey(), Server.getInstance().getApplicationImporterFileRepository() + e.getValue().getGASWLFN());
+              gwendiaFileName.put(e.getKey(), Server.getInstance().getApplicationImporterFileRepository() + bt.getGwendiaLFN());
+            }
 
             // Write files
             String wrapperFileName = Server.getInstance().getApplicationImporterFileRepository() + bt.getWrapperLFN();
             String wrapperArchiveName = wrapperFileName+".tar.gz";
-            String gaswFileName = Server.getInstance().getApplicationImporterFileRepository() + bt.getGASWLFN();
-            String gwendiaFileName = Server.getInstance().getApplicationImporterFileRepository() + bt.getGwendiaLFN();
-
             writeString(wrapperString, wrapperFileName);
-            writeString(gaswString, gaswFileName);
-            writeString(gwendiaString, gwendiaFileName);
+            for (Map.Entry<String, BoutiquesTool> e  : btMaps.entrySet()) 
+            {      
+                writeString(gaswString.get(e.getKey()), gaswFileName.get(e.getKey()));
+                writeString(gwendiaString.get(e.getKey()), gwendiaFileName.get(e.getKey()));
+            }
             
             ArrayList<File> dependencies = new ArrayList<File>();
             dependencies.add(new File(wrapperFileName));
@@ -117,8 +148,11 @@ public class ApplicationImporterBusiness {
  
             // Transfer files
             uploadFile(wrapperFileName,bt.getWrapperLFN());
-            uploadFile(gaswFileName, bt.getGASWLFN());
-            uploadFile(gwendiaFileName, bt.getGwendiaLFN());
+            for (Map.Entry<String, BoutiquesTool> e  : btMaps.entrySet()) 
+            { 
+                uploadFile(gaswFileName.get(e.getKey()), e.getValue().getGASWLFN());
+                uploadFile(gwendiaFileName.get(e.getKey()), e.getValue().getGwendiaLFN());
+            }
             uploadFile(wrapperArchiveName, bt.getWrapperLFN()+".tar.gz");
             
             // Register application

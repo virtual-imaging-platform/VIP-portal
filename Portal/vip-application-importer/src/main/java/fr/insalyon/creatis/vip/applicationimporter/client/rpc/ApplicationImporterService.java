@@ -36,6 +36,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
+import java.util.HashMap;
 
 public interface ApplicationImporterService extends RemoteService {
 
@@ -51,5 +52,5 @@ public interface ApplicationImporterService extends RemoteService {
     }
 
     String readFileAsString(String fileLFN) throws ApplicationImporterException;
-    void createApplication(BoutiquesTool bt, boolean overwriteVersion) throws ApplicationImporterException;
+    void createApplication(BoutiquesTool bt, String type,HashMap<String, BoutiquesTool> bts, boolean overwriteVersion, boolean challenge) throws ApplicationImporterException;
 }

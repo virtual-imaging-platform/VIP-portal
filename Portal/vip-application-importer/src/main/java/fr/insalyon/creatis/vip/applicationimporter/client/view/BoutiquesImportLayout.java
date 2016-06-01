@@ -51,8 +51,12 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.selection.PathSelectionWindow;
 import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
 import com.google.gwt.json.client.JSONParser;
+import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
 import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import java.util.LinkedHashMap;
 
 
 /**
@@ -66,7 +70,7 @@ public class BoutiquesImportLayout extends AbstractFormLayout {
     private DynamicForm jsonFileForm;
     private IButton importButton;
     private ModalWindow modal;
-
+ 
     public BoutiquesImportLayout(int width, String height) {
         super(width, height);
         configure();
@@ -113,9 +117,12 @@ public class BoutiquesImportLayout extends AbstractFormLayout {
         
         modal = new ModalWindow(this);
         
+      
+        
         this.addMember(jsonFileLabel);
         this.addMember(jsonFileForm);
         this.addMember(importButton);
+
     }
 
     /**

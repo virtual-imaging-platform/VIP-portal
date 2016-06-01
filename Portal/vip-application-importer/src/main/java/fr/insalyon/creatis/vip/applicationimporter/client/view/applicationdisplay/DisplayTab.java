@@ -32,7 +32,9 @@
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
 import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.TextBox;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -40,6 +42,7 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+
 import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
 import fr.insalyon.creatis.vip.applicationimporter.client.JSONUtil;
 import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
@@ -48,6 +51,11 @@ import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class DisplayTab extends Tab {
@@ -59,8 +67,8 @@ public class DisplayTab extends Tab {
     private OutputLayout outputsLayout;
     private VIPLayout vipLayout;
     private final ModalWindow modal;
-    
     private BoutiquesTool boutiquesTool;
+    private HashMap<String, BoutiquesTool> bts = null;
 
     public DisplayTab(String tabIcon, String tabId, String tabName) {
         this.setTitle(Canvas.imgHTML(tabIcon) + " " + tabName.trim());
@@ -102,19 +110,61 @@ public class DisplayTab extends Tab {
         hLayout2.addMember(inputsLayout);
         hLayout2.addMember(vipLayout);
         globalLayout.addMember(hLayout2);
-
+        
+        globalLayout.addMember(hLayout2);
         IButton createApplicationButton;
         createApplicationButton = WidgetUtil.getIButton("Create application", Constants.ICON_LAUNCH, new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                boutiquesTool.setApplicationLFN(vipLayout.getApplicationLocation()+"/"+boutiquesTool.getName()+"/"+boutiquesTool.getToolVersion());
-                createApplication();
+                boutiquesTool.setApplicationLFN(vipLayout.getApplicationLocation()+"/"+boutiquesTool.getName());
+                if(vipLayout.getApplicationType().contains("none"))
+                      createApplicationWithAddDesc();
+                else
+                   createApplication(); 
+                
             }
         });
         createApplicationButton.setWidth(120);
         globalLayout.addMember(createApplicationButton);
     }
 
+     public void createApplicationWithAddDesc(){
+         bts = new HashMap<String, BoutiquesTool>();
+    final AsyncCallback<String> callback = new AsyncCallback<String>() {
+            @Override
+            public void onFailure(Throwable caught) {                                                                                                                                                                                                                                                                                                                                                                           
+                       Layout.getInstance().setWarningMessage("Unable to read JSON file :" + caught.getMessage());
+            }
+            @Override
+            public void onSuccess(String jsonFileContent) {
+                try {
+                    bts.put("metric", JSONUtil.parseBoutiquesTool(JSONParser.parseStrict(jsonFileContent).isObject()));
+                    final AsyncCallback<String> callback2 = new AsyncCallback<String>() {
+            @Override
+            public void onFailure(Throwable caught) {                                                                                                                                                                                                                                                                                                                                                                           
+                       Layout.getInstance().setWarningMessage("Unable to read JSON file :" + caught.getMessage());
+            }
+            @Override
+            public void onSuccess(String jsonFileContent) {
+                try {
+                    bts.put("adaptater", JSONUtil.parseBoutiquesTool(JSONParser.parseStrict(jsonFileContent).isObject()));
+                    createApplication();
+                } catch (ApplicationImporterException ex) {
+                    Logger.getLogger(DisplayTab.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+            }
+        };      
+                  ApplicationImporterService.Util.getInstance().readFileAsString(vipLayout.getDescriptorLocation()+"/"+"metric-adaptater.json", callback2);
+                } catch (ApplicationImporterException ex) {
+                    Logger.getLogger(DisplayTab.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+            }
+        };
+        ApplicationImporterService.Util.getInstance().readFileAsString(vipLayout.getDescriptorLocation()+"/"+"SegPerfAnalyzer.json", callback);
+     }
+                
     /**
      * Populates the class with instance variables containing values in the JSON
      * object, and refreshes the display.
@@ -145,7 +195,7 @@ public class DisplayTab extends Tab {
             }
         };
         modal.show("Creating application...", true);
-        ApplicationImporterService.Util.getInstance().createApplication(boutiquesTool, vipLayout.getOverwrite(), callback);
+        ApplicationImporterService.Util.getInstance().createApplication(boutiquesTool, vipLayout.getApplicationType(), bts, vipLayout.getOverwrite(),false, callback);
     }
 
 }

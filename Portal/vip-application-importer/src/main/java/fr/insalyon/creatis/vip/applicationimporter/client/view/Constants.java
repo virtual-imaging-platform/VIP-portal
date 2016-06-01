@@ -72,4 +72,10 @@ public class Constants {
     public static final String APPLICATION_IMPORTER_GROUP = "Application Importer";
     //vm files
     public static final String VM_GASW = "gasw.vm";
+    //LFN access to SegPerfAnalyzer
+    public static final String LNF_PATH = "";
+     // Application Importer Additional Descriptor
+     public static final String APP_IMPORTER_CHALLENGE_MSSEG = "/vip/MSEG-admin/applications/templates" ;
+     public static final String APP_IMPORTER_CHALLENGE_PETSEG = "/vip/PETSEG-admin/applications/templates" ;
+    
 }

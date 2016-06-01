@@ -31,18 +31,38 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
+
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
+import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
+import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.applicationimporter.client.JSONUtil;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class VIPLayout extends AbstractFormLayout {
 
     private final LocalTextField applicationLocation;
     private final CheckboxItem overwriteIfexists;
+   private final TextItem tbAddDescriptor;
+   private final SelectItem appCbItem;
     
     public VIPLayout(String width, String height) {
         super(width, height);
@@ -56,7 +76,43 @@ public class VIPLayout extends AbstractFormLayout {
         
         overwriteIfexists = new CheckboxItem("ckbox_over","Overwrite application version if it exists");
         overwriteIfexists.setAlign(Alignment.LEFT);
-
+        
+          appCbItem = new SelectItem();
+        appCbItem.setTitle("<b>Select type of applicatioN</b>");
+       // appCbItem.setHint("<nobr>select type of application</nobr>");
+        appCbItem.setType("comboBox");
+        LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();  
+        valueMap.put("none", "none");  
+        valueMap.put("challenge_msseg", "Challenge MSSEG");
+        valueMap.put("challenge_petseg", "Challenge PETSEG");
+        appCbItem.setValueMap(valueMap);
+        //appCbItem.setsetDefaultValue("none");
+        appCbItem.addChangeHandler( new com.smartgwt.client.widgets.form.fields.events.ChangeHandler() {
+            @Override
+            public void onChange(ChangeEvent event) {
+                SC.say(event.getValue().toString());
+                if (event.getValue().toString().contains("none")) {
+                    tbAddDescriptor.setValue("");
+                    tbAddDescriptor.setDisabled(true);
+                }
+                else if (event.getValue().toString().contains("msseg")) {
+                    tbAddDescriptor.setValue(Constants.APP_IMPORTER_CHALLENGE_MSSEG);
+                    tbAddDescriptor.setDisabled(false);
+                }
+                else if (event.getValue().toString().contains("petseg")) {
+                    tbAddDescriptor.setValue(Constants.APP_IMPORTER_CHALLENGE_PETSEG);
+                    tbAddDescriptor.setDisabled(false);
+                }
+            }
+            
+             });
+        tbAddDescriptor = new TextItem();
+        tbAddDescriptor.setTitle("<b>location of additional descriptor(s)</b>");
+        tbAddDescriptor.setValue("");
+        tbAddDescriptor.setDisabled(false);
+        
+        this.addMember(FieldUtil.getForm(appCbItem));
+        this.addMember(FieldUtil.getForm(tbAddDescriptor));
         this.addMember(FieldUtil.getForm(overwriteIfexists));
     }
     
@@ -69,4 +125,12 @@ public class VIPLayout extends AbstractFormLayout {
         return this.overwriteIfexists.getValueAsBoolean();
     }
     
-}
+    public String getDescriptorLocation() {
+        return tbAddDescriptor.getValueAsString();
+    }
+    
+    public String getApplicationType()
+    {
+        return appCbItem._getValue().toString();
+    }
+}   
