@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow name="$tool.getName()" version="$tool.getToolVersion()">
+  <description>$esc.xml($tool.getDescription())</description>
+  <interface>
+       <source name="Subject directory" type="string">
+      <source-comment>&lt;b&gt;&lt;font color="blue"&gt;new input&lt;/font&gt;&lt;/b&gt;: add description here...
+      </source-comment>
+    </source>
+#foreach( $input in $adaptater.getInputs() )
+#if( $input.getId() != "json_file")
+      <source name="$input.getId()" type="string" >
+      <source-comment>&lt;b&gt;&lt;font color="blue"&gt;new input&lt;/font&gt;&lt;/b&gt;: add description here...
+      </source-comment>
+    </source>
+#end
+#end
+    <source name="results-directory" type="string" optional="false" default="/vip/Home">
+        <source-comment>$esc.xml("<b><font color=blue>results-directory</font></b> (<b><font color=green>Directory</font></b>):") Directory where the results will be stored.</source-comment>
+    </source>
+#foreach( $input in $tool.getInputs() )
+#if ($input.getId() != "flair_raw" && $input.getId() != "flair_preprocessed"
+  && $input.getId() != "t1_raw" && $input.getId() != "t1_preprocessed"
+  && $input.getId() != "t2_raw" && $input.getId() != "t2_preprocessed"
+  && $input.getId() != "gado_raw" && $input.getId() != "gado_preprocessed"
+  && $input.getId() != "pd_raw" && $input.getId() != "pd_preprocessed"
+  && $input.getId() != "mask")
+#if($input.getType()=="File"   )
+      <source name="$input.getId()" type="string" optional="$input.isOptional()">
+  
+#else
+#if($input.getType()=="Flag" )
+        <source name="$input.getId()" type="string" optional="$input.isOptional()" default="false">
+#set($extraComment="Put '<b>true</b>' to activate the flag and '<b>false</b>' to disable it.")
+#else
+#if($input.getDefaultValue()!="null" )
+            <source name="$input.getId()" type="string" optional="$input.isOptional()" default="$input.getDefaultValue()">
+#else
+#if($input.isOptional()==true )
+                <source name="$input.getId()" type="string" optional="$input.isOptional()" default="no">
+#set($extraComment="Put '<b>no</b>' to ignore this optional input.")
+#else
+#set($extraComment="")
+#end
+#if($input.isOptional()==true)
+                <source name="$input.getId()" type="string" optional="$input.isOptional()" default="no">
+#set($extraComment="Put '<b>no</b>' to ignore this optional input.")
+#else
+                <source name="$input.getId()" type="string" optional="$input.isOptional()">
+#set($extraComment="")
+#end
+#end    
+#end
+#end
+      <source-comment>$esc.xml("<b><font color=blue>$input.getId()</font></b> (<b><font color=green>$input.getType()</font></b>):") $esc.xml($input.getDescription()) $esc.xml(${extraComment})</source-comment>
+         </source>
+#else
+#end
+#end
+#foreach($output in $tool.getOutputFiles())
+    <sink name="$output.getId()" type="string" />
+#end
+#foreach($output in $metric.getOutputFiles())
+    <sink name="$output.getId()" type="string" />
+#end
+    <sink name="metadata" type="string" />
+  </interface>
+  <processors>
+    <processor name="$tool.getName()" >
+     <in name="results-directory" type="string" depth="0"/>
+#foreach($input in $tool.getInputs())
+#if($input.getType()=="File" )
+        <in name="$input.getId()" type="string" depth="0"/>
+#else
+        <in name="$input.getId()" type="string" depth="0"/>
+#end
+#end
+#foreach( $output in $tool.getOutputFiles() )
+        <out name="$output.getId()" type="string" depth="0"/>
+#end
+        <iterationstrategy>
+          <cross>
+#foreach($input in $tool.getInputs())
+#if ($input.getId() != "flair_raw" && $input.getId() != "flair_preprocessed"
+  && $input.getId() != "t1_raw" && $input.getId() != "t1_preprocessed"
+  && $input.getId() != "t2_raw" && $input.getId() != "t2_preprocessed"
+  && $input.getId() != "gado_raw" && $input.getId() != "gado_preprocessed"
+  && $input.getId() != "pd_raw" && $input.getId() != "pd_preprocessed"
+  && $input.getId() != "mask")
+                 <port name="$input.getId()"/>
+#end
+#end
+                 <port name="results-directory" />
+           <dot>
+            <port name="flair_raw"/>
+            <port name="flair_preprocessed"/>
+            <port name="t1_raw"/>
+            <port name="t1_preprocessed"/>
+            <port name="t2_raw"/>
+            <port name="t2_preprocessed"/>
+            <port name="gado_raw"/>
+            <port name="gado_preprocessed"/>
+            <port name="pd_raw"/>
+            <port name="pd_preprocessed"/>
+            <port name="mask"/>
+            </dot>
+          </cross>
+        </iterationstrategy>
+        <gasw descriptor="$tool.getGASWLFN()"/>
+    </processor>
+      <processor name="$metric.getName()" >
+          <in name="results-directory" type="string" depth="0" />
+          <in name="input-image" type ="string" depth="0" />
+          <in name="reference_image" type ="string" depth="0" />
+#foreach($output in $metric.getOutputFiles())
+            <out name="$output.getId()" type="string" depth="0"/>
+#end
+           <iterationstrategy>
+             <cross>
+               <port name="results-directory" />
+               <dot>
+                 <port name="input-image"/>
+                 <port name="reference_image"/>
+               </dot>
+             </cross>
+        </iterationstrategy>
+        <gasw descriptor="$metric.getGASWLFN()"/>
+      </processor>
+      <processor name="$adaptater.getName()" >
+          <in name="results-directory" type="string" depth="0" />
+#foreach($input in $adaptater.getInputs())
+            <in name="$input.getId()" type="string" depth="0" />
+#end
+#foreach($output in $adaptater.getOutputFiles())
+            <out name="$output.getId()" type="string" depth="0"/>
+#end
+           <iterationstrategy>
+          <cross>
+#foreach($input in $adaptater.getInputs())
+            <port name="$input.getId()"  />
+#end
+            <port name="results-directory" />
+          </cross>
+        </iterationstrategy>
+        <gasw descriptor="$adaptater.getGASWLFN()"/>
+      </processor>
+      <processor name="appendDate" >
+        <in name="dir" type="string" depth="0" />
+        <out name="result" type="string" depth="0" />
+        <beanshell>
+                import java.text.DateFormat;
+                import java.text.SimpleDateFormat;
+                import java.util.Date;
+                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HH:mm:ss");
+                String result = dir+"/"+(dateFormat.format(System.currentTimeMillis()));
+        </beanshell>
+      </processor>
+      <processor name="appendDirAndImage" >
+        <in name="dir" type="string" depth="0" />
+        <in name="image" type="string" depth="0" />
+        <out name="result" type="string" depth="0" />
+        <beanshell>
+                String result = dir+"/"+(new File(image)).getName();
+        </beanshell>
+      </processor>
+    <processor name="listSubjectDirectory" >
+      <in name="in" type="string" depth="0" />
+      <out name="fullPaths" type="string" depth="1" />
+      <out name="baseNames" type="string" depth="1" />
+      <out name="reference" type="string" depth="0" />
+      <out name="flair_raw" type="string" depth="0" />
+      <out name="flair_preprocessed" type="string" depth="0" />
+      <out name="t1_raw" type="string" depth="0" />
+      <out name="t1_preprocessed" type="string" depth="0" />
+      <out name="t2_raw" type="string" depth="0" />
+      <out name="t2_preprocessed" type="string" depth="0" />
+      <out name="gado_raw" type="string" depth="0" />
+      <out name="gado_preprocessed" type="string" depth="0" />
+      <out name="pd_raw" type="string" depth="0" />
+      <out name="pd_preprocessed" type="string" depth="0" />
+      <out name="mask" type="string" depth="0" />
+      <out name="metadata" type="string" depth="0" />
+      <beanshell>import fr.insalyon.creatis.grida.client.GRIDAClient;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.grida.common.bean.GridData;
+import java.util.ArrayList;
+import java.util.List;
+
+
+        fullPaths = new ArrayList();
+        baseNames = new ArrayList();
+       
+        metadata = null;
+        reference = null;
+        flair_raw = null;
+        flair_preprocessed = null;
+        t1_raw = null;
+        t1_preprocessed = null;
+        t2_raw = null;
+        t2_preprocessed = null;
+        gado_raw = null;
+        gado_preprocessed = null;
+        pd_raw = null;
+        pd_preprocessed = null;
+        mask = null;
+            try {
+                String proxyPath = "/var/www/.vip/proxies/x509up_server";
+                GRIDAClient vc = new GRIDAClient("kingkong.grid.creatis.insa-lyon.fr", 9006, proxyPath);
+                System.out.println("making call");
+                System.out.println("call done");
+                for (GridData s : vc.getFolderData(in, true)) {
+                    String name = s.getName();
+                    String type = s.getType().name();
+                    if (type.equals("File")) {
+                        String fullPath = in + "/" + name;
+                        fullPaths.add(fullPath);
+                        baseNames.add(name);
+                        if(name.equals("input.json")){
+                          if(metadata != null )
+                            throw new  Exception("[ERROR] Found file input.json but metadata was already present "+"("+metadata+")");
+                          metadata=fullPath;
+                          continue;
+                        }
+                        if(name.equals("reference.nii.gz")){
+                          if(reference != null )
+                        throw new Exception("[ERROR] Found file reference.nii.gz but reference image was already present "+"("+reference+")");
+                        reference=fullPath;
+                        continue;
+                        }
+                        if(name.equals("3DFLAIR.nii.gz")){
+                          if(flair_raw != null )
+                            throw new Exception("[ERROR] Found file 3DFLAIR.nii.gz but image was already present "+"("+flair_raw+")");
+                          flair_raw=fullPath;
+                          continue;
+                        }
+                        if(name.equals("FLAIR_preprocessed.nii.gz")){
+                          if(flair_preprocessed != null )
+                            throw new Exception("[ERROR] Found file FLAIR_preprocessed.nii.gz but image was already present "+"("+flair_preprocessed+")");
+                          flair_preprocessed=fullPath;
+                          continue;
+                        }
+                        if(name.equals("3DT1.nii.gz")){
+                          if(t1_raw != null )
+                            throw new Exception("[ERROR] Found file 3DT1.nii.gz but image was already present "+"("+t1_raw+")");
+                          t1_raw=fullPath;
+                          continue;
+                        }
+                        if(name.equals("T1_preprocessed.nii.gz")){
+                          if(t1_preprocessed != null )
+                            throw new Exception("[ERROR] Found file T1_preprocessed.nii.gz but image was already present "+"("+t1_preprocessed+")");
+                          t1_preprocessed=fullPath;
+                          continue;
+                        }
+                        if(name.equals("T2.nii.gz")){
+                          if(t2_raw != null )
+                            throw new Exception("[ERROR] Found file T2.nii.gz but image was already present "+"("+t2_raw+")");
+                          t2_raw=fullPath;
+                          continue;
+                        }
+                        if(name.equals("T2_preprocessed.nii.gz")){
+                          if(t2_preprocessed != null )
+                            throw new Exception("[ERROR] Found file T2_preprocessed.nii.gz but image was already present "+"("+t2_preprocessed+")");
+                          t2_preprocessed=fullPath;
+                          continue;
+                        }
+                        if(name.equals("3DT1GADO.nii.gz")){
+                          if(gado_raw != null )
+                            throw new Exception("[ERROR] Found file 3DT1GADO.nii.gz but image was already present "+"("+gado_raw+")");
+                          gado_raw=fullPath;
+                          continue;
+                        }
+                        if(name.equals("GADO_preprocessed.nii.gz")){
+                          if(gado_preprocessed != null )
+                            throw new Exception("[ERROR] Found file GADO_preprocessed.nii.gz but image was already present "+"("+gado_preprocessed+")");
+                          gado_preprocessed=fullPath;
+                          continue;
+                        }
+                         if(name.equals("DP.nii.gz")){
+                          if(pd_raw != null )
+                            throw new Exception("[ERROR] Found file DP.nii.gz but image was already present "+"("+pd_raw+")");
+                          pd_raw=fullPath;
+                          continue;
+                        }
+                        if(name.equals("DP_preprocessed.nii.gz")){
+                          if(pd_preprocessed != null )
+                            throw new Exception("[ERROR] Found file DP_preprocessed.nii.gz but image was already present "+"("+pd_preprocessed+")");
+                          pd_preprocessed=fullPath;
+                          continue;
+                        }
+                        if(name.equals("Mask_registered.nii.gz")){
+                          if(mask != null )
+                            throw new Exception("[ERROR] Found file Mask_registered.nii.gz but image was already present "+"("+mask+")");
+                          mask=fullPath;
+                          continue;
+                        }
+                        System.out.println("[WARNING] unknown file found in "+in+": "+name);
+                      }
+                  }
+                } catch (GRIDAClientException ex) {
+                  ex.printStackTrace();
+                }
+
+    if(flair_raw == null)
+        throw new Exception("[ERROR] Couldn't find flair_raw file in "+baseNames);
+    if(flair_preprocessed == null)
+        throw new Exception("[ERROR] Couldn't find flair_preprocessed file in "+baseNames);
+    if(t1_raw == null)
+        throw new Exception("[ERROR] Couldn't find t1_raw file in "+baseNames);
+    if(t1_preprocessed == null)
+        throw new Exception("[ERROR] Couldn't find t1_preprocessed file in "+baseNames);
+    if(t2_raw == null)
+        throw new Exception("[ERROR] Couldn't find t2_raw file in "+baseNames);
+    if(t2_preprocessed == null)
+        throw new Exception("[ERROR] Couldn't find t2_preprocessed file in "+baseNames);
+    if(gado_raw == null)
+        throw new Exception("[ERROR] Couldn't find gado_raw file in "+baseNames);
+    if(gado_preprocessed == null)
+        throw new Exception("[ERROR] Couldn't find gado_preprocessed file in "+baseNames);
+    if(pd_raw == null)
+        throw new Exception("[ERROR] Couldn't find pd_raw file in "+baseNames);
+    if(pd_preprocessed == null)
+        throw new Exception("[ERROR] Couldn't find pd_preprocessed file in "+baseNames);
+    if(mask == null)
+        throw new Exception("[ERROR] Couldn't find mask file in "+baseNames);  
+    if(reference == null)
+        throw new Exception("[ERROR] Couldn't find reference file in "+baseNames);
+    if(metadata == null)
+        throw new Exception("[ERROR] Couldn't find metadata file in "+baseNames);
+      </beanshell>
+    </processor>
+
+</processors>
+  <links>
+    <link from="results-directory" to="appendDirAndImage:dir" />
+    <link from="listSubjectDirectory:image" to="appendDirAndImage:image" />
+    <link from="appendDirAndImage:result" to="appendDate:dir" />
+    <link from="appendDate:result" to="$tool.getName():results-directory" />
+    <link from="appendDate:result" to="$adaptater.getName():results-directory" />
+    <link from="appendDate:result" to="$metric.getName():results-directory" />
+    <link from="listSubjectDirectory:flair_raw" to="$tool.getName():flair_raw" />
+    <link from="listSubjectDirectory:flair_preprocessed" to="$tool.getName():flair_preprocessed" />
+    <link from="listSubjectDirectory:t1_raw" to="$tool.getName():t1_raw" />
+    <link from="listSubjectDirectory:t1_preprocessed" to="$tool.getName():t1_preprocessed" />
+    <link from="listSubjectDirectory:t2_raw" to="$tool.getName():t2_raw" />
+    <link from="listSubjectDirectory:t2_preprocessed" to="$tool.getName():t2_preprocessed" />
+    <link from="listSubjectDirectory:gado_raw" to="$tool.getName():gado_raw" />
+    <link from="listSubjectDirectory:gado_preprocessed" to="$tool.getName():gado_preprocessed" />
+    <link from="listSubjectDirectory:pd_raw" to="$tool.getName():pd_raw" />
+    <link from="listSubjectDirectory:pd_preprocessed" to="$tool.getName():pd_preprocessed" />
+    <link from="listSubjectDirectory:mask" to="$tool.getName():mask" />
+    <link from="listSubjectDirectory:reference" to="$metric.getName():reference_image" />
+    <link from="listSubjectDirectory:metadata" to="$adaptater.getName():json_file" />
+#foreach( $input in $tool.getInputs() )
+#if ($input.getId() != "flair_raw" && $input.getId() != "flair_preprocessed"
+  && $input.getId() != "t1_raw" && $input.getId() != "t1_preprocessed"
+  && $input.getId() != "t2_raw" && $input.getId() != "t2_preprocessed"
+  && $input.getId() != "gado_raw" && $input.getId() != "gado_preprocessed"
+  && $input.getId() != "pd_raw" && $input.getId() != "pd_preprocessed"
+  && $input.getId() != "mask")
+    <link from="$input.getId()" to="$tool.getName():$input.getId()" />
+#end
+#end
+#foreach($output in $tool.getOutputFiles())
+    <link from="$tool.getName():$output.getId()" to="$output.getId()" />
+#end
+#foreach($output in $metric.getOutputFiles())
+    <link from="$metric.getName():$output.getId()" to="$output.getId()" />
+#end
+#foreach($output in $tool.getOutputFiles())
+#if($output.getId() == "segmentation_result_challenge")
+    <link from="$tool.getName():$output.getId()" to="$metric.getName():input-image" />
+#end
+#end
+#foreach( $input in $adaptater.getInputs() )
+#if( $input.getId() != "json_file")
+    <link from="$input.getId()" to="$adaptater.getName():$input.getId()" />
+#end
+#end
+      <link from="Subject directory" to="listSubjectDirectory:in" />
+      <link from="Subject directory" to="appendDirAndImage:image" />
+      <link from="$adaptater.getName():output_file" to="metadata" />
+  </links>
+</workflow>
