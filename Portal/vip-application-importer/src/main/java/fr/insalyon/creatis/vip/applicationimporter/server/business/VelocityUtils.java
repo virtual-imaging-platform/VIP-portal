@@ -78,4 +78,17 @@ public class VelocityUtils {
 
         return stringWriter.toString();
     }
+    
+     public String createDocument( BoutiquesTool bt, String vmTemplate) {
+        VelocityContext context = new VelocityContext();
+        context.put("tool", bt);
+        context.put("esc", new EscapeTool());
+
+        StringWriter stringWriter = new StringWriter();
+
+        Template template = velocityEngine.getTemplate(vmTemplate);
+        template.merge(context, stringWriter);
+
+        return stringWriter.toString();
+    }
 }

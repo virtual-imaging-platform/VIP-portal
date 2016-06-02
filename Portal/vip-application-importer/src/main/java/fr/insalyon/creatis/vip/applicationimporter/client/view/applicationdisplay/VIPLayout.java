@@ -78,7 +78,7 @@ public class VIPLayout extends AbstractFormLayout {
         overwriteIfexists.setAlign(Alignment.LEFT);
         
           appCbItem = new SelectItem();
-        appCbItem.setTitle("<b>Select type of applicatioN</b>");
+        appCbItem.setTitle("<b>Select type of application</b>");
        // appCbItem.setHint("<nobr>select type of application</nobr>");
         appCbItem.setType("comboBox");
         LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();  

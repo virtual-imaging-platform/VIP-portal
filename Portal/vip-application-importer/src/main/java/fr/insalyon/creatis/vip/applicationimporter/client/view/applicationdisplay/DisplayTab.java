@@ -131,7 +131,6 @@ public class DisplayTab extends Tab {
 
     public void createApplicationWithAddDesc() {
         bts = new HashMap<String, BoutiquesTool>();
-        SC.say("coucou");
         final AsyncCallback<String> callback = new AsyncCallback<String>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -142,7 +141,7 @@ public class DisplayTab extends Tab {
             public void onSuccess(String jsonFileContent) {
                 try {
                     bts.put("metric", JSONUtil.parseBoutiquesTool(JSONParser.parseStrict(jsonFileContent).isObject()));
-                    bts.get("metric").setApplicationLFN(vipLayout.getApplicationLocation()+"/"+"SegPerfAnalyzer");
+                    bts.get("metric").setApplicationLFN(vipLayout.getApplicationLocation()+"/"+boutiquesTool.getName());
                     final AsyncCallback<String> callback2 = new AsyncCallback<String>() {
                         @Override
                         public void onFailure(Throwable caught) {
@@ -152,9 +151,8 @@ public class DisplayTab extends Tab {
                         @Override
                         public void onSuccess(String jsonFileContent) {
                             try {
-                                      SC.say("coucou2");
                                 bts.put("adaptater", JSONUtil.parseBoutiquesTool(JSONParser.parseStrict(jsonFileContent).isObject()));
-                                bts.get("adaptater").setApplicationLFN(vipLayout.getApplicationLocation()+"/"+"metadata-updater");
+                                bts.get("adaptater").setApplicationLFN(vipLayout.getApplicationLocation()+"/"+boutiquesTool.getName());
                                 createApplication();
                             } catch (ApplicationImporterException ex) {
                                 Logger.getLogger(DisplayTab.class.getName()).log(Level.SEVERE, null, ex);
