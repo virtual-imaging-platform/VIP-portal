@@ -90,7 +90,6 @@ public class VIPLayout extends AbstractFormLayout {
         appCbItem.addChangeHandler( new com.smartgwt.client.widgets.form.fields.events.ChangeHandler() {
             @Override
             public void onChange(ChangeEvent event) {
-                SC.say(event.getValue().toString());
                 if (event.getValue().toString().contains("none")) {
                     tbAddDescriptor.setValue("");
                     tbAddDescriptor.setDisabled(true);

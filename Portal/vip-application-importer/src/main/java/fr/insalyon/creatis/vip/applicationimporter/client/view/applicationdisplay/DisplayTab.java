@@ -35,6 +35,7 @@ import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.TextBox;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -117,7 +118,7 @@ public class DisplayTab extends Tab {
             @Override
             public void onClick(ClickEvent event) {
                 boutiquesTool.setApplicationLFN(vipLayout.getApplicationLocation()+"/"+boutiquesTool.getName());
-                if(vipLayout.getApplicationType().contains("none"))
+                if(!vipLayout.getApplicationType().contains("none"))
                       createApplicationWithAddDesc();
                 else
                    createApplication(); 
@@ -128,43 +129,49 @@ public class DisplayTab extends Tab {
         globalLayout.addMember(createApplicationButton);
     }
 
-     public void createApplicationWithAddDesc(){
-         bts = new HashMap<String, BoutiquesTool>();
-    final AsyncCallback<String> callback = new AsyncCallback<String>() {
+    public void createApplicationWithAddDesc() {
+        bts = new HashMap<String, BoutiquesTool>();
+        SC.say("coucou");
+        final AsyncCallback<String> callback = new AsyncCallback<String>() {
             @Override
-            public void onFailure(Throwable caught) {                                                                                                                                                                                                                                                                                                                                                                           
-                       Layout.getInstance().setWarningMessage("Unable to read JSON file :" + caught.getMessage());
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to read JSON file :" + caught.getMessage());
             }
+
             @Override
             public void onSuccess(String jsonFileContent) {
                 try {
                     bts.put("metric", JSONUtil.parseBoutiquesTool(JSONParser.parseStrict(jsonFileContent).isObject()));
+                    bts.get("metric").setApplicationLFN(vipLayout.getApplicationLocation()+"/"+"SegPerfAnalyzer");
                     final AsyncCallback<String> callback2 = new AsyncCallback<String>() {
-            @Override
-            public void onFailure(Throwable caught) {                                                                                                                                                                                                                                                                                                                                                                           
-                       Layout.getInstance().setWarningMessage("Unable to read JSON file :" + caught.getMessage());
-            }
-            @Override
-            public void onSuccess(String jsonFileContent) {
-                try {
-                    bts.put("adaptater", JSONUtil.parseBoutiquesTool(JSONParser.parseStrict(jsonFileContent).isObject()));
-                    createApplication();
+                        @Override
+                        public void onFailure(Throwable caught) {
+                            Layout.getInstance().setWarningMessage("Unable to read JSON file :" + caught.getMessage());
+                        }
+
+                        @Override
+                        public void onSuccess(String jsonFileContent) {
+                            try {
+                                      SC.say("coucou2");
+                                bts.put("adaptater", JSONUtil.parseBoutiquesTool(JSONParser.parseStrict(jsonFileContent).isObject()));
+                                bts.get("adaptater").setApplicationLFN(vipLayout.getApplicationLocation()+"/"+"metric-adaptater");
+                                createApplication();
+                            } catch (ApplicationImporterException ex) {
+                                Logger.getLogger(DisplayTab.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+
+                        }
+                    };
+                    ApplicationImporterService.Util.getInstance().readFileAsString(vipLayout.getDescriptorLocation() + "/" + "metric-adaptater.json", callback2);
                 } catch (ApplicationImporterException ex) {
                     Logger.getLogger(DisplayTab.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
-            }
-        };      
-                  ApplicationImporterService.Util.getInstance().readFileAsString(vipLayout.getDescriptorLocation()+"/"+"metric-adaptater.json", callback2);
-                } catch (ApplicationImporterException ex) {
-                    Logger.getLogger(DisplayTab.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
+
             }
         };
-        ApplicationImporterService.Util.getInstance().readFileAsString(vipLayout.getDescriptorLocation()+"/"+"SegPerfAnalyzer.json", callback);
-     }
-                
+        ApplicationImporterService.Util.getInstance().readFileAsString(vipLayout.getDescriptorLocation() + "/" + "SegPerfAnalyzer.json", callback);
+    }
+
     /**
      * Populates the class with instance variables containing values in the JSON
      * object, and refreshes the display.
