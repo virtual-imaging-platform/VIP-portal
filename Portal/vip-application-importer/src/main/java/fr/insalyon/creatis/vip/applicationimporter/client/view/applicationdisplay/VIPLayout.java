@@ -95,11 +95,11 @@ public class VIPLayout extends AbstractFormLayout {
                     tbAddDescriptor.setDisabled(true);
                 }
                 else if (event.getValue().toString().contains("msseg")) {
-                    tbAddDescriptor.setValue(Constants.APP_IMPORTER_CHALLENGE_MSSEG);
+                    tbAddDescriptor.setValue(Constants.APP_IMPORTER_CHALLENGE_PATH_MSSEG);
                     tbAddDescriptor.setDisabled(false);
                 }
                 else if (event.getValue().toString().contains("petseg")) {
-                    tbAddDescriptor.setValue(Constants.APP_IMPORTER_CHALLENGE_PETSEG);
+                    tbAddDescriptor.setValue(Constants.APP_IMPORTER_CHALLENGE_PATH_PETSEG);
                     tbAddDescriptor.setDisabled(false);
                 }
             }

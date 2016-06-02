@@ -154,7 +154,7 @@ public class DisplayTab extends Tab {
                             try {
                                       SC.say("coucou2");
                                 bts.put("adaptater", JSONUtil.parseBoutiquesTool(JSONParser.parseStrict(jsonFileContent).isObject()));
-                                bts.get("adaptater").setApplicationLFN(vipLayout.getApplicationLocation()+"/"+"metric-adaptater");
+                                bts.get("adaptater").setApplicationLFN(vipLayout.getApplicationLocation()+"/"+"metadata-updater");
                                 createApplication();
                             } catch (ApplicationImporterException ex) {
                                 Logger.getLogger(DisplayTab.class.getName()).log(Level.SEVERE, null, ex);
@@ -162,14 +162,15 @@ public class DisplayTab extends Tab {
 
                         }
                     };
-                    ApplicationImporterService.Util.getInstance().readFileAsString(vipLayout.getDescriptorLocation() + "/" + "metric-adaptater.json", callback2);
+                    ApplicationImporterService.Util.getInstance().readFileAsString(vipLayout.getDescriptorLocation() + "/" + Constants.APP_IMPORTER_CHALLENGE_METADATA,
+                            callback2);
                 } catch (ApplicationImporterException ex) {
                     Logger.getLogger(DisplayTab.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
             }
         };
-        ApplicationImporterService.Util.getInstance().readFileAsString(vipLayout.getDescriptorLocation() + "/" + "SegPerfAnalyzer.json", callback);
+        ApplicationImporterService.Util.getInstance().readFileAsString(vipLayout.getDescriptorLocation() + "/" + Constants.APP_IMPORTER_CHALLENGE_METRIC, callback);
     }
 
     /**

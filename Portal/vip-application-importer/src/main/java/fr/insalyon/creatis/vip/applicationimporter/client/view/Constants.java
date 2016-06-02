@@ -74,8 +74,11 @@ public class Constants {
     public static final String VM_GASW = "gasw.vm";
     //LFN access to SegPerfAnalyzer
     public static final String LNF_PATH = "";
-     // Application Importer Additional Descriptor
-     public static final String APP_IMPORTER_CHALLENGE_MSSEG = "/vip/MSEG-admin/applications/templates" ;
-     public static final String APP_IMPORTER_CHALLENGE_PETSEG = "/vip/PETSEG-admin/applications/templates" ;
+     // Application Importer Challenge Descriptor Path
+     public static final String APP_IMPORTER_CHALLENGE_PATH_MSSEG = "/vip/MSEG-admin/applications/templates" ;
+     public static final String APP_IMPORTER_CHALLENGE_PATH_PETSEG = "/vip/PETSEG-admin/applications/templates" ;
+     // Application Importer Challenge Descriptor
+     public static final String APP_IMPORTER_CHALLENGE_METRIC = "SegPerfAnalyzer.json" ;
+     public static final String APP_IMPORTER_CHALLENGE_METADATA = "metadata-updater.json" ;
     
 }
