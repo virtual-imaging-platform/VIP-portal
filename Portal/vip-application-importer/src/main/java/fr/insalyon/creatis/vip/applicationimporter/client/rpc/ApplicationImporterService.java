@@ -43,6 +43,7 @@ public interface ApplicationImporterService extends RemoteService {
     public static final String SERVICE_URI = "/applicationimporterservice";
 
     public static class Util {
+
         public static ApplicationImporterServiceAsync getInstance() {
             ApplicationImporterServiceAsync instance = (ApplicationImporterServiceAsync) GWT.create(ApplicationImporterService.class);
             ServiceDefTarget target = (ServiceDefTarget) instance;
@@ -52,5 +53,6 @@ public interface ApplicationImporterService extends RemoteService {
     }
 
     String readFileAsString(String fileLFN) throws ApplicationImporterException;
-    void createApplication(BoutiquesTool bt, String type,HashMap<String, BoutiquesTool> bts, boolean overwriteVersion, boolean challenge) throws ApplicationImporterException;
+
+    void createApplication(BoutiquesTool bt, String type, HashMap<String, BoutiquesTool> bts, boolean overwriteVersion, boolean challenge) throws ApplicationImporterException;
 }
