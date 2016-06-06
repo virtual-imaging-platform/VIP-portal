@@ -38,18 +38,17 @@ import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 
 public class GeneralLayout extends AbstractFormLayout {
 
-    
-    private final LocalTextField         name,
-                                         commandLine,
-                                         dockerImage,
-                                         dockerIndex,
-                                         version,
-                                         schemaVersion,
-                                         description;
-    
+    private final LocalTextField name,
+            commandLine,
+            dockerImage,
+            dockerIndex,
+            version,
+            schemaVersion,
+            description;
+
     public GeneralLayout(String width, String height) {
         super(width, height);
-        
+
         addTitle("General Information", Constants.ICON_INFORMATION);
         setMembersMargin(2);
         setOverflow(Overflow.AUTO);
@@ -61,11 +60,11 @@ public class GeneralLayout extends AbstractFormLayout {
         version = new LocalTextField("Version", false, false);
         schemaVersion = new LocalTextField("Schema Version", false, false);
         description = new LocalTextField("Description", false, false);
-        
-        this.addMembers(name,commandLine,dockerImage,dockerIndex,version,schemaVersion,description);
+
+        this.addMembers(name, commandLine, dockerImage, dockerIndex, version, schemaVersion, description);
     }
-    
-    public void setTool(BoutiquesTool bt){
+
+    public void setTool(BoutiquesTool bt) {
         name.setValue(bt.getName());
         version.setValue(bt.getToolVersion());
         description.setValue(bt.getDescription());
@@ -74,5 +73,5 @@ public class GeneralLayout extends AbstractFormLayout {
         dockerIndex.setValue(bt.getDockerIndex());
         schemaVersion.setValue(bt.getSchemaVersion());
     }
-    
+
 }

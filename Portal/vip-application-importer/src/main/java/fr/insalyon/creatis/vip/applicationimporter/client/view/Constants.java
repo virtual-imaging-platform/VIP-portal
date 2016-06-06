@@ -36,14 +36,14 @@ package fr.insalyon.creatis.vip.applicationimporter.client.view;
  * @author Nouha boujelben
  */
 public class Constants {
-    
+
     // Tab IDs
     public static final String TAB_ID_BOUTIQUES = "ApplicationImporter-boutiques-tab";
     public static final String TAB_ID_BOUTIQUES_APPLICATION = "ApplicationImporter-boutiques-application-tab";
 
     // Tab names
     public static final String TAB_NAME_BOUTIQUES = "Boutiques Importer";
-    
+
     // Icons
     private static final String IMG_FOLDER = "importer/";
     public static final String ICON_BOUTIQUES = IMG_FOLDER + "icon-boutiques.png";
@@ -55,7 +55,7 @@ public class Constants {
     public static final String ICON_IMPORT = IMG_FOLDER + "icon-import.png";
     public static final String ICON_FILE = IMG_FOLDER + "icon-file.png";
     public static final String ICON_FILES = IMG_FOLDER + "icon-files.png";
-    
+
     //Icons confirm
     public static final String ICON_ADD = IMG_FOLDER + "add.png";
     public static final String ICON_CANCEL = IMG_FOLDER + "cancel.png";
@@ -72,4 +72,13 @@ public class Constants {
     public static final String APPLICATION_IMPORTER_GROUP = "Application Importer";
     //vm files
     public static final String VM_GASW = "gasw.vm";
+    //LFN access to SegPerfAnalyzer
+    public static final String LNF_PATH = "";
+    // Application Importer Challenge Descriptor Path
+    public static final String APP_IMPORTER_CHALLENGE_PATH_MSSEG = "/vip/MSEG-admin/applications/templates";
+    public static final String APP_IMPORTER_CHALLENGE_PATH_PETSEG = "/vip/PETSEG-admin/applications/templates";
+    // Application Importer Challenge Descriptor
+    public static final String APP_IMPORTER_CHALLENGE_METRIC = "SegPerfAnalyzer.json";
+    public static final String APP_IMPORTER_CHALLENGE_METADATA = "metadata-updater.json";
+
 }

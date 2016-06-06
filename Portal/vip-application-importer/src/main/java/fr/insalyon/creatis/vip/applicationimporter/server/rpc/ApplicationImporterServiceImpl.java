@@ -37,6 +37,10 @@ import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.json.JSONException;
 
 public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet
         implements ApplicationImporterService {
@@ -59,17 +63,16 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
     }
 
     @Override
-    public void createApplication(BoutiquesTool bt, boolean overwriteVersion) throws ApplicationImporterException {
+    public void createApplication(BoutiquesTool bt, String type, HashMap<String, BoutiquesTool> bts, boolean overwriteVersion, boolean challenge) throws ApplicationImporterException {
         try {
             trace(logger, "Creating application");
             ApplicationImporterBusiness abi = new ApplicationImporterBusiness();
-            abi.createApplication(bt, overwriteVersion, getSessionUser());
-        } catch (CoreException ex) {
+            abi.createApplication(bt, type, bts, overwriteVersion, getSessionUser(), challenge);
+        } catch (CoreException | BusinessException ex) {
             logger.error(ex);
             throw new ApplicationImporterException(ex);
-        } catch (BusinessException ex) {
-            logger.error(ex);
-            throw new ApplicationImporterException(ex);
+        } catch (JSONException ex) {
+            Logger.getLogger(ApplicationImporterServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
