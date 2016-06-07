@@ -58,7 +58,6 @@ import java.util.LinkedHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 public class DisplayTab extends Tab {
 
     // Layouts
@@ -111,26 +110,34 @@ public class DisplayTab extends Tab {
         hLayout2.addMember(inputsLayout);
         hLayout2.addMember(vipLayout);
         globalLayout.addMember(hLayout2);
-        
+
         globalLayout.addMember(hLayout2);
         IButton createApplicationButton;
         createApplicationButton = WidgetUtil.getIButton("Create application", Constants.ICON_LAUNCH, new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                boutiquesTool.setApplicationLFN(vipLayout.getApplicationLocation()+"/"+boutiquesTool.getName());
-                if(!vipLayout.getApplicationType().contains("none"))
-                      createApplicationWithAddDesc();
-                else
-                   createApplication(); 
-                
+                boutiquesTool.setApplicationLFN(vipLayout.getApplicationLocation() + "/" + boutiquesTool.getName());
+                if (!vipLayout.getApplicationType().contains("standalone")) {
+                    createApplicationWithAddDesc();
+                } else {
+                    createApplication();
+                }
+
             }
         });
         createApplicationButton.setWidth(120);
         globalLayout.addMember(createApplicationButton);
     }
 
+    /**
+     * Creates an application depending on other descriptors for the MICCAI
+     * challenge. The results of application should be evaluated to different
+     * metric methods.
+     *
+     */
     public void createApplicationWithAddDesc() {
         bts = new HashMap<String, BoutiquesTool>();
+        // Fisrt callback to get mectric descriptor
         final AsyncCallback<String> callback = new AsyncCallback<String>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -141,7 +148,8 @@ public class DisplayTab extends Tab {
             public void onSuccess(String jsonFileContent) {
                 try {
                     bts.put("metric", JSONUtil.parseBoutiquesTool(JSONParser.parseStrict(jsonFileContent).isObject()));
-                    bts.get("metric").setApplicationLFN(vipLayout.getApplicationLocation()+"/"+boutiquesTool.getName());
+                    bts.get("metric").setApplicationLFN(vipLayout.getApplicationLocation() + "/" + boutiquesTool.getName());
+                    //second callback to get metadata descripotr
                     final AsyncCallback<String> callback2 = new AsyncCallback<String>() {
                         @Override
                         public void onFailure(Throwable caught) {
@@ -152,7 +160,8 @@ public class DisplayTab extends Tab {
                         public void onSuccess(String jsonFileContent) {
                             try {
                                 bts.put("adaptater", JSONUtil.parseBoutiquesTool(JSONParser.parseStrict(jsonFileContent).isObject()));
-                                bts.get("adaptater").setApplicationLFN(vipLayout.getApplicationLocation()+"/"+boutiquesTool.getName());
+                                bts.get("adaptater").setApplicationLFN(vipLayout.getApplicationLocation() + "/" + boutiquesTool.getName());
+                                //Finally, launch
                                 createApplication();
                             } catch (ApplicationImporterException ex) {
                                 Logger.getLogger(DisplayTab.class.getName()).log(Level.SEVERE, null, ex);
@@ -184,7 +193,11 @@ public class DisplayTab extends Tab {
         inputsLayout.setInputs(boutiquesTool.getInputs());
         outputsLayout.setOutputFiles(boutiquesTool.getOutputFiles());
     }
-    
+
+    /**
+     * Creates a standalone application
+     *
+     */
     private void createApplication() {
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
@@ -201,7 +214,7 @@ public class DisplayTab extends Tab {
             }
         };
         modal.show("Creating application...", true);
-        ApplicationImporterService.Util.getInstance().createApplication(boutiquesTool, vipLayout.getApplicationType(), bts, vipLayout.getOverwrite(),false, callback);
+        ApplicationImporterService.Util.getInstance().createApplication(boutiquesTool, vipLayout.getApplicationType(), bts, vipLayout.getOverwrite(), false, callback);
     }
 
 }

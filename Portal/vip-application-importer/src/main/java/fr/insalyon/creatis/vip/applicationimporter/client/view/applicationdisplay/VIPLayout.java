@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
-
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -61,9 +60,9 @@ public class VIPLayout extends AbstractFormLayout {
 
     private final LocalTextField applicationLocation;
     private final CheckboxItem overwriteIfexists;
-   private final TextItem tbAddDescriptor;
-   private final SelectItem appCbItem;
-    
+    private final TextItem tbAddDescriptor;
+    private final SelectItem appCbItem;
+
     public VIPLayout(String width, String height) {
         super(width, height);
         addTitle("Executable", Constants.ICON_EXECUTABLE);
@@ -73,63 +72,74 @@ public class VIPLayout extends AbstractFormLayout {
         applicationLocation = new LocalTextField("Application file location", true, true);
         applicationLocation.setValue("/vip/Home");
         this.addMember(applicationLocation);
-        
-        overwriteIfexists = new CheckboxItem("ckbox_over","Overwrite application version if it exists");
+
+        overwriteIfexists = new CheckboxItem("ckbox_over", "Overwrite application version if it exists");
         overwriteIfexists.setAlign(Alignment.LEFT);
-        
-          appCbItem = new SelectItem();
+
+        //ComboBox to select type of application
+        appCbItem = new SelectItem();
         appCbItem.setTitle("<b>Select type of application</b>");
-       // appCbItem.setHint("<nobr>select type of application</nobr>");
         appCbItem.setType("comboBox");
-        LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();  
-        valueMap.put("none", "none");  
+        LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
+        valueMap.put("standalone", "standalone");
         valueMap.put("challenge_msseg", "Challenge MSSEG");
         valueMap.put("challenge_petseg", "Challenge PETSEG");
         appCbItem.setValueMap(valueMap);
-        //appCbItem.setsetDefaultValue("none");
-        appCbItem.addChangeHandler( new com.smartgwt.client.widgets.form.fields.events.ChangeHandler() {
+        appCbItem.addChangeHandler(new com.smartgwt.client.widgets.form.fields.events.ChangeHandler() {
             @Override
             public void onChange(ChangeEvent event) {
-                if (event.getValue().toString().contains("none")) {
+                if (event.getValue().toString().contains("standalone")) {
                     tbAddDescriptor.setValue("");
                     tbAddDescriptor.setDisabled(true);
-                }
-                else if (event.getValue().toString().contains("msseg")) {
+                } else if (event.getValue().toString().contains("msseg")) {
                     tbAddDescriptor.setValue(Constants.APP_IMPORTER_CHALLENGE_PATH_MSSEG);
                     tbAddDescriptor.setDisabled(false);
-                }
-                else if (event.getValue().toString().contains("petseg")) {
+                } else if (event.getValue().toString().contains("petseg")) {
                     tbAddDescriptor.setValue(Constants.APP_IMPORTER_CHALLENGE_PATH_PETSEG);
                     tbAddDescriptor.setDisabled(false);
                 }
             }
-            
-             });
+
+        });
+        // TextItem to select if needed the repository path to additional descriptors
         tbAddDescriptor = new TextItem();
         tbAddDescriptor.setTitle("<b>location of additional descriptor(s)</b>");
         tbAddDescriptor.setValue("");
         tbAddDescriptor.setDisabled(false);
-        
+
         this.addMember(FieldUtil.getForm(appCbItem));
         this.addMember(FieldUtil.getForm(tbAddDescriptor));
         this.addMember(FieldUtil.getForm(overwriteIfexists));
     }
-    
-    
-    public String getApplicationLocation(){
+
+    /**
+     * Get the location where to create the application
+     *
+     * @return the location
+     */
+    public String getApplicationLocation() {
         return applicationLocation.getValue();
     }
-    
-    public boolean getOverwrite(){
+
+    public boolean getOverwrite() {
         return this.overwriteIfexists.getValueAsBoolean();
     }
-    
+
+    /**
+     * Get the path to repository path for additional descriptors
+     *
+     * @return the path
+     */
     public String getDescriptorLocation() {
         return tbAddDescriptor.getValueAsString();
     }
-    
-    public String getApplicationType()
-    {
+
+    /**
+     * Get the type of application (standalone or challenge)
+     *
+     * @return the type
+     */
+    public String getApplicationType() {
         return appCbItem._getValue().toString();
     }
-}   
+}

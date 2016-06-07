@@ -30,12 +30,13 @@
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
 package fr.insalyon.creatis.vip.applicationimporter.client;
-        
+
 import fr.insalyon.creatis.vip.core.client.Module;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.HomeParser;
+
 /**
- * 
+ *
  * @author Nouha Boujelben
  */
 public class ApplicationImporterModule extends Module {

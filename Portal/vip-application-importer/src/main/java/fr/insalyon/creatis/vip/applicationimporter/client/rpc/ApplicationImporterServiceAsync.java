@@ -36,6 +36,8 @@ import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
 import java.util.HashMap;
 
 public interface ApplicationImporterServiceAsync {
+
     public void readFileAsString(String fileLFN, AsyncCallback<String> callback);
-    public void createApplication(BoutiquesTool bt, String type, HashMap<String, BoutiquesTool> bts, boolean overwriteVersion, boolean challenge,  AsyncCallback<Void> callback);
+
+    public void createApplication(BoutiquesTool bt, String type, HashMap<String, BoutiquesTool> bts, boolean overwriteVersion, boolean challenge, AsyncCallback<Void> callback);
 }

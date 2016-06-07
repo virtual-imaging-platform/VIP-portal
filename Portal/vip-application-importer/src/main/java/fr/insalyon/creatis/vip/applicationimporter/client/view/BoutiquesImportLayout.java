@@ -58,7 +58,6 @@ import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterExc
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import java.util.LinkedHashMap;
 
-
 /**
  *
  * @author Nouha Boujelben
@@ -70,7 +69,7 @@ public class BoutiquesImportLayout extends AbstractFormLayout {
     private DynamicForm jsonFileForm;
     private IButton importButton;
     private ModalWindow modal;
- 
+
     public BoutiquesImportLayout(int width, String height) {
         super(width, height);
         configure();
@@ -98,7 +97,7 @@ public class BoutiquesImportLayout extends AbstractFormLayout {
         jsonFileItem.setValidators(ValidatorUtil.getStringValidator());
         jsonFileItem.setIcons(browsePicker);
         jsonFileItem.setRequired(Boolean.TRUE);
-        
+
         jsonFileForm = new DynamicForm();
         jsonFileForm.setFields(jsonFileItem);
 
@@ -114,11 +113,9 @@ public class BoutiquesImportLayout extends AbstractFormLayout {
                         loadJSONFile(jsonFileItem.getValueAsString());
                     }
                 });
-        
+
         modal = new ModalWindow(this);
-        
-      
-        
+
         this.addMember(jsonFileLabel);
         this.addMember(jsonFileForm);
         this.addMember(importButton);
@@ -126,22 +123,24 @@ public class BoutiquesImportLayout extends AbstractFormLayout {
     }
 
     /**
-     * Calls the service method to read the content of a file, and sets it in the application import tab.
-     *                                                                                                                                                                                                                                                                  
+     * Calls the service method to read the content of a file, and sets it in
+     * the application import tab.
+     *
      * @param fileLFN the LFN of the JSON file to parse.
      */
     private void loadJSONFile(String fileLFN) {
         final AsyncCallback<String> callback = new AsyncCallback<String>() {
             @Override
-            public void onFailure(Throwable caught) {                                                                                                                                                                                                                                                                                                                                                                           
+            public void onFailure(Throwable caught) {
                 modal.hide();
                 Layout.getInstance().setWarningMessage("Unable to read JSON file :" + caught.getMessage());
             }
+
             @Override
             public void onSuccess(String jsonFileContent) {
                 modal.hide();
                 JSONObject json = JSONParser.parseStrict(jsonFileContent).isObject();
-                DisplayTab tabImporter = new DisplayTab(Constants.ICON_BOUTIQUES, Constants.TAB_ID_BOUTIQUES_APPLICATION, Constants.TAB_NAME_BOUTIQUES); 
+                DisplayTab tabImporter = new DisplayTab(Constants.ICON_BOUTIQUES, Constants.TAB_ID_BOUTIQUES_APPLICATION, Constants.TAB_NAME_BOUTIQUES);
                 try {
                     tabImporter.parseJSON(json);
                     Layout.getInstance().addTab(tabImporter);
