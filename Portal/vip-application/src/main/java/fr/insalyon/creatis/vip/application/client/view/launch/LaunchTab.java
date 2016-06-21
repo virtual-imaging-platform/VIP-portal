@@ -98,7 +98,6 @@ public class LaunchTab extends AbstractLaunchTab {
 
             @Override
             public void onSuccess(Descriptor descriptor) {
-
                 launchFormLayout = new LaunchFormLayout(applicationName + " " + applicationVersion, null, descriptor.getDescription());
                 layout.addMember(launchFormLayout);
                 
@@ -113,7 +112,7 @@ public class LaunchTab extends AbstractLaunchTab {
                     }
                 }
                 mandatorySources.addAll(optionalSources);
-                
+                                                
                 for (Source source : mandatorySources) {
                     boolean disabled = false;
                     for (String name : disabledSources) {
@@ -122,7 +121,14 @@ public class LaunchTab extends AbstractLaunchTab {
                         }
                     }
                     modal.show("Adding source "+source.getName()+"...", true);
-                    launchFormLayout.addSource(new InputLayout(source.getName(), source.getDescription(),source.isOptional(),source.getDefaultValue()), disabled);
+                    
+                    // If the source type is an flag type (one of the boutiques types), InputFlagLayout creation instead of InputLayout.
+                    if (source.getVipTypeRestriction() != null && source.getVipTypeRestriction().equals("flag")) {
+                        launchFormLayout.addSource(new InputFlagLayout(source.getName(), source.getDescription(),source.isOptional(),source.getDefaultValue(), source.getVipTypeRestriction(), source.getPrettyName()), disabled);
+                    }
+                    else {
+                        launchFormLayout.addSource(new InputLayout(source.getName(), source.getDescription(),source.isOptional(),source.getDefaultValue()), disabled);
+                    }
                 }
 
                 configureLaunchButton();
@@ -141,7 +147,7 @@ public class LaunchTab extends AbstractLaunchTab {
                 modal.hide();
 
                 configureInputsLayout(true);
-
+                
                 if (simulationName != null) {
                     launchFormLayout.loadInputs(simulationName, inputs);
                 }

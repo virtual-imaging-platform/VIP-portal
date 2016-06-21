@@ -56,7 +56,7 @@ public class GwendiaParser extends AbstractWorkflowParser {
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
         if (localName.equals("source")) {
-            Source s = new Source(attributes.getValue("name"),attributes.getValue("type"),attributes.getValue("user-level"),attributes.getValue("description"),attributes.getValue("optional"),attributes.getValue("default"));
+            Source s = new Source(attributes.getValue("name"),attributes.getValue("type"),attributes.getValue("user-level"),attributes.getValue("description"),attributes.getValue("optional"),attributes.getValue("default"), attributes.getValue("vip-type-restriction"),attributes.getValue("pretty-name"));
             sources.add(s);
             currentSource = s;
             return;

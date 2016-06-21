@@ -11,8 +11,8 @@
     #set($type="URI")
   #end
   #if($input.getType()=="Flag")
-    <source name="$input.getId()" type="string" optional="$input.isOptional()" default="false">
-    #set($extraComment="Put '<b>true</b>' to activate the flag and '<b>false</b>' to disable it.")
+    <source name="$input.getId()" type="string" optional="$input.isOptional()" default="$input.getCommandLineFlag()" vip-type-restriction="flag" pretty-name="$input.getName()">
+    #set($extraComment="Select the check box to activate the flag " + "<b><font color=green>" + $input.getCommandLineFlag() +  "</font></b>."))
   #else
     #if($input.getDefaultValue()!="null" && $input.getDefaultValue()!="")
     <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="$input.getDefaultValue()">
