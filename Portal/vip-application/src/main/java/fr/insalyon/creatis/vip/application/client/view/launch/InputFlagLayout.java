@@ -62,7 +62,7 @@ public class InputFlagLayout extends AbstractSourceLayout{
     private CheckboxItem cbFlagInputItem ;
             
     public InputFlagLayout(String name, String comment, boolean optional, String defaultValue, String vipTypeRestriction, String prettyName) {
-        super(prettyName, comment,optional);
+        super(name, comment, optional, prettyName);
         cbFlagInputItem = new CheckboxItem(defaultValue);
         cbFlagInputItem.setValue(false);
         cbFlagInputItem.setValueField(defaultValue);
