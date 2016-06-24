@@ -39,7 +39,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class Source implements IsSerializable {
 
-    private String name, type, userLevel, description, defaultValue,vipTypeRestriction, prettyName ;
+    private String name, type, userLevel, description, defaultValue, vipTypeRestriction, prettyName ;
 
     private boolean optional;
 

@@ -37,6 +37,9 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangeHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSourceLayout;
@@ -72,13 +75,18 @@ public class InputLayout extends AbstractSourceLayout {
     private DynamicForm startItemForm;
     private DynamicForm stopItemForm;
     private DynamicForm stepItemForm;
+    private CheckboxItem cbOptionalInputItem;
 
     public InputLayout(String name, String comment, boolean optional, String defaultValue) {
         super(name, comment,optional);
         
+        if (optional == true) {
+            configureOptionalInputCheckbox();
+        }
+        
         configureTypeSelectItem();
         hLayout.addMember(FieldUtil.getForm(selectItem));
-
+        
         // List
         listLayout = new VLayout();
         listLayout.addMember(new ListHLayout(listLayout, true));
@@ -119,6 +127,32 @@ public class InputLayout extends AbstractSourceLayout {
                 }
             }
         });
+    }
+    
+    private void configureOptionalInputCheckbox() {
+        cbOptionalInputItem = new CheckboxItem("Activate this optional field");
+        cbOptionalInputItem.setValue(true);
+        cbOptionalInputItem.addChangeHandler(new ChangeHandler() {  
+
+            @Override
+            public void onChange(ChangeEvent event) {  
+                boolean selected = cbOptionalInputItem.getValueAsBoolean();  
+                cbOptionalInputItem.setValue(!selected);  
+                selectItem.setDisabled(selected);
+                // List
+                listLayout.setDisabled(selected);
+                listLayout.removeMembers(listLayout.getMembers());
+                listLayout.addMember(new ListHLayout(listLayout, true, "no"));
+                
+                // Range
+                // TODO reset item values when Redmine feature 2980 will be realize.
+                startItem.setDisabled(selected);        
+                stopItem.setDisabled(selected);
+                stepItem.setDisabled(selected);
+            }  
+        });
+
+        hLayout.addMember(FieldUtil.getForm(cbOptionalInputItem));
     }
 
     private void setList() {
