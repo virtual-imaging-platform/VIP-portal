@@ -109,7 +109,7 @@
     </processor>
       <processor name="$metric.getName()" >
           <in name="results-directory" type="string" depth="0" />
-          <in name="input-image" type ="string" depth="0" />
+          <in name="segmented_image" type ="string" depth="0" />
           <in name="reference_image" type ="string" depth="0" />
 #foreach($output in $metric.getOutputFiles())
             <out name="$output.getId()" type="string" depth="0"/>
@@ -117,10 +117,10 @@
            <iterationstrategy>
              <cross>
                <port name="results-directory" />
-               <dot>
-                 <port name="input-image"/>
+               
+                 <port name="segmented_image"/>
                  <port name="reference_image"/>
-               </dot>
+               
              </cross>
         </iterationstrategy>
         <gasw descriptor="$metric.getGASWLFN()"/>
@@ -367,7 +367,7 @@ import java.util.List;
 #end
 #foreach($output in $tool.getOutputFiles())
 #if($output.getId() == "segmentation_result_challenge")
-    <link from="$tool.getName():$output.getId()" to="$metric.getName():input-image" />
+    <link from="$tool.getName():$output.getId()" to="$metric.getName():segmented_image" />
 #end
 #end
 #foreach( $input in $adaptater.getInputs() )
