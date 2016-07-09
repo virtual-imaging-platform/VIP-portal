@@ -91,17 +91,16 @@
 #end
                  <port name="results-directory" />
            <dot>
-            <port name="flair_raw"/>
-            <port name="flair_preprocessed"/>
-            <port name="t1_raw"/>
-            <port name="t1_preprocessed"/>
-            <port name="t2_raw"/>
-            <port name="t2_preprocessed"/>
-            <port name="gado_raw"/>
-            <port name="gado_preprocessed"/>
-            <port name="pd_raw"/>
-            <port name="pd_preprocessed"/>
-            <port name="mask"/>
+               #foreach($input in $tool.getInputs())
+#if ($input.getId() == "flair_raw" || $input.getId() == "flair_preprocessed"
+  || $input.getId() == "t1_raw" || $input.getId() == "t1_preprocessed"
+  || $input.getId() == "t2_raw" || $input.getId() == "t2_preprocessed"
+  || $input.getId() == "gado_raw" || $input.getId() == "gado_preprocessed"
+  || $input.getId() == "pd_raw" || $input.getId() == "pd_preprocessed"
+  || $input.getId() == "mask")
+            <port name="$input.getId()"/>
+            #end
+            #end
             </dot>
           </cross>
         </iterationstrategy>
@@ -336,19 +335,21 @@ import java.util.List;
     <link from="appendDate:result" to="$tool.getName():results-directory" />
     <link from="appendDate:result" to="$adaptater.getName():results-directory" />
     <link from="appendDate:result" to="$metric.getName():results-directory" />
-    <link from="listSubjectDirectory:flair_raw" to="$tool.getName():flair_raw" />
-    <link from="listSubjectDirectory:flair_preprocessed" to="$tool.getName():flair_preprocessed" />
-    <link from="listSubjectDirectory:t1_raw" to="$tool.getName():t1_raw" />
-    <link from="listSubjectDirectory:t1_preprocessed" to="$tool.getName():t1_preprocessed" />
-    <link from="listSubjectDirectory:t2_raw" to="$tool.getName():t2_raw" />
-    <link from="listSubjectDirectory:t2_preprocessed" to="$tool.getName():t2_preprocessed" />
-    <link from="listSubjectDirectory:gado_raw" to="$tool.getName():gado_raw" />
-    <link from="listSubjectDirectory:gado_preprocessed" to="$tool.getName():gado_preprocessed" />
-    <link from="listSubjectDirectory:pd_raw" to="$tool.getName():pd_raw" />
-    <link from="listSubjectDirectory:pd_preprocessed" to="$tool.getName():pd_preprocessed" />
-    <link from="listSubjectDirectory:mask" to="$tool.getName():mask" />
     <link from="listSubjectDirectory:reference" to="$metric.getName():reference_image" />
     <link from="listSubjectDirectory:metadata" to="$adaptater.getName():json_file" />
+    #foreach( $input in $tool.getInputs() )
+#if ($input.getId() == "flair_raw" || $input.getId() == "flair_preprocessed"
+  || $input.getId() == "t1_raw" || $input.getId() == "t1_preprocessed"
+  || $input.getId() == "t2_raw" || $input.getId() == "t2_preprocessed"
+  || $input.getId() == "gado_raw" || $input.getId() == "gado_preprocessed"
+  || $input.getId() == "pd_raw" || $input.getId() == "pd_preprocessed"
+  || $input.getId() == "mask")
+  <link from="listSubjectDirectory:$input.getId()" to="$tool.getName():$input.getId()" />
+  #end
+  #end
+    
+    
+    
 #foreach( $input in $tool.getInputs() )
 #if ($input.getId() != "flair_raw" && $input.getId() != "flair_preprocessed"
   && $input.getId() != "t1_raw" && $input.getId() != "t1_preprocessed"
