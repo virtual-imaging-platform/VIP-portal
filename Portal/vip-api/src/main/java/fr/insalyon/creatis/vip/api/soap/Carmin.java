@@ -38,15 +38,9 @@ import fr.insalyon.creatis.vip.api.bean.Pipeline;
 import fr.insalyon.creatis.vip.api.bean.pairs.StringKeyParameterValuePair;
 import fr.insalyon.creatis.vip.api.bean.pairs.StringKeyValuePair;
 import fr.insalyon.creatis.vip.api.bean.Response;
-import fr.insalyon.creatis.vip.api.bean.pairs.PairOfPipelineAndBooleanLists;
-import fr.insalyon.creatis.vip.api.business.ApiException;
-import fr.insalyon.creatis.vip.api.business.ApiUtils;
-import fr.insalyon.creatis.vip.api.business.AuthenticationBusiness;
-import fr.insalyon.creatis.vip.api.business.ExecutionBusiness;
-import fr.insalyon.creatis.vip.api.business.GlobalPropertiesBusiness;
-import fr.insalyon.creatis.vip.api.business.PipelineBusiness;
+import fr.insalyon.creatis.vip.api.business.*;
+
 import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.Resource;
 import javax.jws.WebService;
 import javax.jws.WebMethod;
@@ -89,10 +83,11 @@ public class Carmin {
         try {
             ApiUtils.methodInvocationLog("getExecution", executionId);
             ApiUtils.throwIfNull(executionId, "Execution id");
-            ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            ApiContext apiContext = new ApiBusiness().getApiContext(wsContext, true);
+            ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             eb.checkIfUserCanAccessExecution(executionId);
             Execution e = eb.getExecution(executionId,false);
-            r = new Response(0, ApiUtils.getMessage(eb), e);
+            r = new Response(0, ApiUtils.getMessage(apiContext), e);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
@@ -106,9 +101,10 @@ public class Carmin {
         Response r;
         try {
             ApiUtils.methodInvocationLog("listExecutions");
-            ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            ApiContext apiContext = new ApiBusiness().getApiContext(wsContext, true);
+            ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             Execution[] executions = eb.listExecutions(500); // will not return more than 500 executions.
-            r = new Response(0, ApiUtils.getMessage(eb), executions);
+            r = new Response(0, ApiUtils.getMessage(apiContext), executions);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
@@ -122,9 +118,10 @@ public class Carmin {
         Response r;
         try {
             ApiUtils.methodInvocationLog("getStdOut",executionId);
-            ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            ApiContext apiContext = new ApiBusiness().getApiContext(wsContext, true);
+            ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             String stdout = eb.getStdOut(executionId);
-            r = new Response(0, ApiUtils.getMessage(eb), stdout);
+            r = new Response(0, ApiUtils.getMessage(apiContext), stdout);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
@@ -138,9 +135,10 @@ public class Carmin {
         Response r;
         try {
             ApiUtils.methodInvocationLog("getStdErr",executionId);
-            ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            ApiContext apiContext = new ApiBusiness().getApiContext(wsContext, true);
+            ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             String stderr = eb.getStdErr(executionId);
-            r = new Response(0, ApiUtils.getMessage(eb), stderr);
+            r = new Response(0, ApiUtils.getMessage(apiContext), stderr);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
@@ -158,10 +156,11 @@ public class Carmin {
             ApiUtils.methodInvocationLog("updateExecution", executionId, keyValuePairs);
             ApiUtils.throwIfNull(executionId, "Execution id"); 
             ApiUtils.throwIfNull(keyValuePairs, "Values");
-            ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            ApiContext apiContext = new ApiBusiness().getApiContext(wsContext, true);
+            ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             eb.checkIfUserCanAccessExecution(executionId);
             eb.updateExecution(executionId, keyValuePairs);
-            r = new Response(0, ApiUtils.getMessage(eb), null);
+            r = new Response(0, ApiUtils.getMessage(apiContext), null);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
@@ -188,11 +187,12 @@ public class Carmin {
             }
             if(executionName == null)
                 executionName = "Untitled";
-            PipelineBusiness pb = new PipelineBusiness(wsContext);
+            ApiContext apiContext = new ApiBusiness().getApiContext(wsContext, true);
+            PipelineBusiness pb = new PipelineBusiness(apiContext);
             pb.checkIfUserCanAccessPipeline(pipelineId);
-            ExecutionBusiness eb = new ExecutionBusiness(pb);
+            ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             String id = eb.initExecution(pipelineId, inputValues, timeout, executionName, studyId, playExecution);
-            r = new Response(0, ApiUtils.getMessage(eb), id);
+            r = new Response(0, ApiUtils.getMessage(apiContext), id);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
@@ -207,10 +207,11 @@ public class Carmin {
         try {
             ApiUtils.methodInvocationLog("playExecution", executionId);
             ApiUtils.throwIfNull(executionId, "Execution id");
-            ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            ApiContext apiContext = new ApiBusiness().getApiContext(wsContext, true);
+            ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             eb.checkIfUserCanAccessExecution(executionId);
             ExecutionStatus s = eb.playExecution(executionId);
-            r = new Response(0, ApiUtils.getMessage(eb), s);
+            r = new Response(0, ApiUtils.getMessage(apiContext), s);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
@@ -225,10 +226,11 @@ public class Carmin {
         try {
             ApiUtils.methodInvocationLog("killExecution", executionId);
             ApiUtils.throwIfNull(executionId, "Execution id");
-            ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            ApiContext apiContext = new ApiBusiness().getApiContext(wsContext, true);
+            ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             eb.checkIfUserCanAccessExecution(executionId);
             eb.killExecution(executionId);
-            r = new Response(0, ApiUtils.getMessage(eb), null);
+            r = new Response(0, ApiUtils.getMessage(apiContext), null);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
@@ -245,10 +247,11 @@ public class Carmin {
         try {
             ApiUtils.methodInvocationLog("deleteExecution", executionId, deleteFiles);
             ApiUtils.throwIfNull(executionId, "Execution id");
-            ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            ApiContext apiContext = new ApiBusiness().getApiContext(wsContext, true);
+            ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             eb.checkIfUserCanAccessExecution(executionId);
             eb.deleteExecution(executionId, deleteFiles);
-            r = new Response(0, ApiUtils.getMessage(eb), null);
+            r = new Response(0, ApiUtils.getMessage(apiContext), null);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
@@ -265,10 +268,11 @@ public class Carmin {
         try {
             ApiUtils.methodInvocationLog("getExecutionResults", executionId, protocol);
             ApiUtils.throwIfNull(executionId, "Execution id");
-            ExecutionBusiness eb = new ExecutionBusiness(wsContext);
+            ApiContext apiContext = new ApiBusiness().getApiContext(wsContext, true);
+            ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             eb.checkIfUserCanAccessExecution(executionId);
             String[] results = eb.getExecutionResults(executionId, protocol);
-            r = new Response(0, ApiUtils.getMessage(eb), results);
+            r = new Response(0, ApiUtils.getMessage(apiContext), results);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
@@ -287,9 +291,10 @@ public class Carmin {
         Response r;
         try {
             ApiUtils.methodInvocationLog("getGlobalProperties");
-            GlobalPropertiesBusiness bpb = new GlobalPropertiesBusiness(wsContext);
+            ApiContext apiContext = new ApiBusiness().getApiContext(wsContext, false);
+            GlobalPropertiesBusiness bpb = new GlobalPropertiesBusiness(apiContext);
             GlobalProperties gp = bpb.getGlobalProperties();
-            r = new Response(0, ApiUtils.getMessage(bpb), gp);
+            r = new Response(0, ApiUtils.getMessage(apiContext), gp);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
@@ -309,10 +314,11 @@ public class Carmin {
         try {
             ApiUtils.methodInvocationLog("getPipeline", pipelineId); 
             ApiUtils.throwIfNull(pipelineId, "Pipeline id");
-            PipelineBusiness pb = new PipelineBusiness(wsContext);
+            ApiContext apiContext = new ApiBusiness().getApiContext(wsContext, true);
+            PipelineBusiness pb = new PipelineBusiness(apiContext);
             pb.checkIfUserCanAccessPipeline(pipelineId);
             Pipeline p = pb.getPipeline(pipelineId);
-            r = new Response(0, ApiUtils.getMessage(pb), p);
+            r = new Response(0, ApiUtils.getMessage(apiContext), p);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
@@ -325,10 +331,11 @@ public class Carmin {
     Response listPipelines(@WebParam(name = "studyIdentifier") String studyIdentifier) {
         Response r;
         try {
-            ApiUtils.methodInvocationLog("listPipelines", studyIdentifier);   
-            PipelineBusiness pb = new PipelineBusiness(wsContext);
+            ApiUtils.methodInvocationLog("listPipelines", studyIdentifier);
+            ApiContext apiContext = new ApiBusiness().getApiContext(wsContext, true);
+            PipelineBusiness pb = new PipelineBusiness(apiContext);
             Pipeline[] pipelines = pb.listPipelines(studyIdentifier);
-            r = new Response(0, ApiUtils.getMessage(pb),pipelines);
+            r = new Response(0, ApiUtils.getMessage(apiContext),pipelines);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
@@ -349,9 +356,10 @@ public class Carmin {
             ApiUtils.methodInvocationLog("authenticateSession", userName, "*****");
             ApiUtils.throwIfNull(userName, "User name");
             ApiUtils.throwIfNull(password, "Password");
-            AuthenticationBusiness ab = new AuthenticationBusiness(wsContext);
+            ApiContext apiContext = new ApiBusiness().getApiContext(wsContext, false);
+            AuthenticationBusiness ab = new AuthenticationBusiness(apiContext);
             ab.authenticateSession(userName, password);
-            r = new Response(0, ApiUtils.getMessage(ab), null);
+            r = new Response(0, ApiUtils.getMessage(apiContext), null);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
@@ -364,9 +372,10 @@ public class Carmin {
     Response authenticateHTTP(@XmlElement(required = true) @WebParam(name = "userName") String userName) {
         Response r;
         try {
-            AuthenticationBusiness ab = new AuthenticationBusiness(wsContext);
+            ApiContext apiContext = new ApiBusiness().getApiContext(wsContext, false);
+            AuthenticationBusiness ab = new AuthenticationBusiness(apiContext);
             ab.authenticateHTTP(userName);
-            r = new Response(0, ApiUtils.getMessage(ab), null);
+            r = new Response(0, ApiUtils.getMessage(apiContext), null);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
@@ -379,10 +388,11 @@ public class Carmin {
     Response logout() {
         Response r;
         try {
+            ApiContext apiContext = new ApiBusiness().getApiContext(wsContext, true);
             ApiUtils.methodInvocationLog("logout");
-            AuthenticationBusiness ab = new AuthenticationBusiness(wsContext);
+            AuthenticationBusiness ab = new AuthenticationBusiness(apiContext);
             ab.logout();
-            r = new Response(0, ApiUtils.getMessage(ab), null);
+            r = new Response(0, ApiUtils.getMessage(apiContext), null);
         } catch (ApiException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);

@@ -34,19 +34,20 @@ package fr.insalyon.creatis.vip.api.business;
 import fr.insalyon.creatis.vip.api.bean.GlobalProperties;
 import fr.insalyon.creatis.vip.api.bean.Module;
 import fr.insalyon.creatis.vip.core.server.business.Server;
-import javax.xml.ws.WebServiceContext;
 import org.apache.log4j.Logger;
 
 /**
  *
  * @author Tristan Glatard
  */
-public class GlobalPropertiesBusiness extends ApiBusiness {
+public class GlobalPropertiesBusiness {
 
     private final static Logger logger = Logger.getLogger(GlobalPropertiesBusiness.class);
-    
-    public GlobalPropertiesBusiness(WebServiceContext wsContext) throws ApiException {
-        super(wsContext,false);
+
+    private final ApiContext apiContext;
+
+    public GlobalPropertiesBusiness(ApiContext apiContext) {
+        this.apiContext = apiContext;
     }
 
     public GlobalProperties getGlobalProperties() throws ApiException {
