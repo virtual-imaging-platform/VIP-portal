@@ -6,14 +6,27 @@
       <source-comment>&lt;b&gt;&lt;font color="blue"&gt;new input&lt;/font&gt;&lt;/b&gt;: add description here...
       </source-comment>
     </source>
+
+
 #foreach( $input in $adaptater.getInputs() )
-#if( $input.getId() != "json_file")
-      <source name="$input.getId()" type="string" >
-      <source-comment>&lt;b&gt;&lt;font color="blue"&gt;new input&lt;/font&gt;&lt;/b&gt;: add description here...
+#if( $input.getId() == "pipeline_name" )
+    <constant name="pipeline_name" type="string" value="$tool.getName()" cardinality="scalar" />
+#end
+#if( $input.getId() == "team_name" )
+   <source name="team_name" type="string" default="$tool.getChallengerTeam()" >
+    <source-comment>&lt;b&gt;&lt;font color="blue"&gt;new input&lt;/font&gt;&lt;/b&gt;: add description here...
       </source-comment>
     </source>
 #end
+
+#if( $input.getId() == "challenger_email" )
+    <source name="challenger_email" type="string" default="$tool.getChallengerEmail()" >
+    <source-comment>&lt;b&gt;&lt;font color="blue"&gt;new input&lt;/font&gt;&lt;/b&gt;: add description here...
+      </source-comment>
+  </source>
 #end
+#end
+
     <source name="results-directory" type="string" optional="false" default="/vip/Home">
         <source-comment>$esc.xml("<b><font color=blue>results-directory</font></b> (<b><font color=green>Directory</font></b>):") Directory where the results will be stored.</source-comment>
     </source>
