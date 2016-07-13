@@ -178,19 +178,17 @@
       <in name="in" type="string" depth="0" />
       <out name="fullPaths" type="string" depth="1" />
       <out name="baseNames" type="string" depth="1" />
-      <out name="reference" type="string" depth="0" />
-      <out name="flair_raw" type="string" depth="0" />
-      <out name="flair_preprocessed" type="string" depth="0" />
-      <out name="t1_raw" type="string" depth="0" />
-      <out name="t1_preprocessed" type="string" depth="0" />
-      <out name="t2_raw" type="string" depth="0" />
-      <out name="t2_preprocessed" type="string" depth="0" />
-      <out name="gado_raw" type="string" depth="0" />
-      <out name="gado_preprocessed" type="string" depth="0" />
-      <out name="pd_raw" type="string" depth="0" />
-      <out name="pd_preprocessed" type="string" depth="0" />
-      <out name="mask" type="string" depth="0" />
       <out name="metadata" type="string" depth="0" />
+         #foreach( $input in $tool.getInputs() )
+#if ($input.getId() == "flair_raw" || $input.getId() == "flair_preprocessed"
+  || $input.getId() == "t1_raw" || $input.getId() == "t1_preprocessed"
+  || $input.getId() == "t2_raw" || $input.getId() == "t2_preprocessed"
+  || $input.getId() == "gado_raw" || $input.getId() == "gado_preprocessed"
+  || $input.getId() == "pd_raw" || $input.getId() == "pd_preprocessed"
+  || $input.getId() == "mask" || $input.getId() == "reference")
+      <out name="$input.getId()" type="string" depth="0" />
+      #end
+      #end
       <beanshell>import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.common.bean.GridData;
@@ -201,6 +199,7 @@ import java.util.List;
         fullPaths = new ArrayList();
         baseNames = new ArrayList();
        
+        mask = null;
         metadata = null;
         reference = null;
         flair_raw = null;
@@ -213,7 +212,6 @@ import java.util.List;
         gado_preprocessed = null;
         pd_raw = null;
         pd_preprocessed = null;
-        mask = null;
             try {
                 String proxyPath = "/var/www/.vip/proxies/x509up_server";
                 GRIDAClient vc = new GRIDAClient("kingkong.grid.creatis.insa-lyon.fr", 9006, proxyPath);
@@ -232,7 +230,7 @@ import java.util.List;
                           metadata=fullPath;
                           continue;
                         }
-                        if(name.equals("reference.nii.gz")){
+                        if(name.equals("Consensus.nii.gz")){
                           if(reference != null )
                         throw new Exception("[ERROR] Found file reference.nii.gz but reference image was already present "+"("+reference+")");
                         reference=fullPath;
@@ -310,31 +308,17 @@ import java.util.List;
                 } catch (GRIDAClientException ex) {
                   ex.printStackTrace();
                 }
-
-    if(flair_raw == null)
-        throw new Exception("[ERROR] Couldn't find flair_raw file in "+baseNames);
-    if(flair_preprocessed == null)
-        throw new Exception("[ERROR] Couldn't find flair_preprocessed file in "+baseNames);
-    if(t1_raw == null)
-        throw new Exception("[ERROR] Couldn't find t1_raw file in "+baseNames);
-    if(t1_preprocessed == null)
-        throw new Exception("[ERROR] Couldn't find t1_preprocessed file in "+baseNames);
-    if(t2_raw == null)
-        throw new Exception("[ERROR] Couldn't find t2_raw file in "+baseNames);
-    if(t2_preprocessed == null)
-        throw new Exception("[ERROR] Couldn't find t2_preprocessed file in "+baseNames);
-    if(gado_raw == null)
-        throw new Exception("[ERROR] Couldn't find gado_raw file in "+baseNames);
-    if(gado_preprocessed == null)
-        throw new Exception("[ERROR] Couldn't find gado_preprocessed file in "+baseNames);
-    if(pd_raw == null)
-        throw new Exception("[ERROR] Couldn't find pd_raw file in "+baseNames);
-    if(pd_preprocessed == null)
-        throw new Exception("[ERROR] Couldn't find pd_preprocessed file in "+baseNames);
-    if(mask == null)
-        throw new Exception("[ERROR] Couldn't find mask file in "+baseNames);  
-    if(reference == null)
-        throw new Exception("[ERROR] Couldn't find reference file in "+baseNames);
+ #foreach( $input in $tool.getInputs() )
+#if ($input.getId() == "flair_raw" || $input.getId() == "flair_preprocessed"
+  || $input.getId() == "t1_raw" || $input.getId() == "t1_preprocessed"
+  || $input.getId() == "t2_raw" || $input.getId() == "t2_preprocessed"
+  || $input.getId() == "gado_raw" || $input.getId() == "gado_preprocessed"
+  || $input.getId() == "pd_raw" || $input.getId() == "pd_preprocessed"
+  || $input.getId() == "mask" || $input.getId() == "reference")
+    if($input.getId() == null)
+        throw new Exception("[ERROR] Couldn't find $input.getId() file in "+baseNames);
+          #end
+          #end
     if(metadata == null)
         throw new Exception("[ERROR] Couldn't find metadata file in "+baseNames);
       </beanshell>
