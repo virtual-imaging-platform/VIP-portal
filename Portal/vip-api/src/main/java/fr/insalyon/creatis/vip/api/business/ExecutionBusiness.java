@@ -416,7 +416,7 @@ public class ExecutionBusiness {
                 return;
             }
             Simulation s = workflowBusiness.getSimulation(executionId);
-            if (s.getUserName().equals(user.getEmail())) {
+            if (s.getUserName().equals(user.getFullName())) {
                 return;
             }
             throw new ApiException("Permission denied");
