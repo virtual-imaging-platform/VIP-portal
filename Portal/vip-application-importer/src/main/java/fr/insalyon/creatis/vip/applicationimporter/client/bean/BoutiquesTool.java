@@ -42,7 +42,7 @@ import java.util.List;
 public class BoutiquesTool implements IsSerializable {
 
     private String applicationLFN;
-    
+
     // Fields parsed from the JSON object.
     private String name;
     private String toolVersion;
@@ -51,14 +51,16 @@ public class BoutiquesTool implements IsSerializable {
     private String dockerImage;
     private String dockerIndex;
     private String schemaVersion;
+    private String challengerEmail;
+    private String challengerTeam;
     private List<BoutiquesInput> inputs;
     private List<BoutiquesOutputFile> outputFiles;
-    
+
     public BoutiquesTool() {
         inputs = new ArrayList<BoutiquesInput>();
         outputFiles = new ArrayList<BoutiquesOutputFile>();
     }
-    
+
     public String getName() {
         return name;
     }
@@ -87,6 +89,14 @@ public class BoutiquesTool implements IsSerializable {
         return schemaVersion;
     }
 
+    public String getChallengerEmail() {
+        return challengerEmail;
+    }
+
+    public String getChallengerTeam() {
+        return challengerTeam;
+    }
+
     public List<BoutiquesInput> getInputs() {
         return inputs;
     }
@@ -94,25 +104,25 @@ public class BoutiquesTool implements IsSerializable {
     public List<BoutiquesOutputFile> getOutputFiles() {
         return outputFiles;
     }
-        
-    public void setApplicationLFN(String applicationLFN){
+
+    public void setApplicationLFN(String applicationLFN) {
         this.applicationLFN = applicationLFN;
     }
-    
-    public String getWrapperLFN(){
-        return this.applicationLFN+"/bin/"+getName()+".sh";
+
+    public String getWrapperLFN() {
+        return this.applicationLFN + "/bin/" + getName() + ".sh";
     }
-    
-    public String getWrapperName(){
-        return getName()+".sh";
+
+    public String getWrapperName() {
+        return getName() + ".sh";
     }
-    
-    public String getGASWLFN(){
-        return this.applicationLFN+"/gasw/"+getName()+".xml";
+
+    public String getGASWLFN() {
+        return this.applicationLFN + "/gasw/" + getName() + ".xml";
     }
-    
-    public String getGwendiaLFN(){
-        return this.applicationLFN+"/workflow/"+getName()+".gwendia";
+
+    public String getGwendiaLFN() {
+        return this.applicationLFN + "/workflow/" + getName() + ".gwendia";
     }
 
     public void setName(String name) {
@@ -143,10 +153,16 @@ public class BoutiquesTool implements IsSerializable {
         this.schemaVersion = schemaVersion;
     }
 
+    public void setChallengerEmail(String challengerEmail) {
+        this.challengerEmail = challengerEmail;
+    }
+
+    public void setChallengerTeam(String challengerTeam) {
+        this.challengerTeam = challengerTeam;
+    }
+
     public String getApplicationLFN() {
         return applicationLFN;
     }
-    
-    
-    
+
 }

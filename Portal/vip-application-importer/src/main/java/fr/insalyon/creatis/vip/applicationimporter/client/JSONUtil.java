@@ -54,7 +54,9 @@ public class JSONUtil {
         bt.setDockerImage(getPropertyAsString(jsonObject, "docker-image"));
         bt.setDockerIndex(getPropertyAsString(jsonObject, "docker-index"));
         bt.setSchemaVersion(getPropertyAsString(jsonObject, "schema-version"));
-
+        bt.setChallengerEmail(getPropertyAsString(jsonObject, "vip:miccai-challenger-email"));
+        bt.setChallengerTeam(getPropertyAsString(jsonObject, "vip:miccai-challenge-team-name"));
+        
         JSONArray inputJSONArray = getPropertyAsArray(jsonObject, "inputs");
         if (inputJSONArray != null) {
             for (int i = 0; i < inputJSONArray.size(); i++) {
