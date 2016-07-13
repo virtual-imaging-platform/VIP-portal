@@ -39,13 +39,13 @@ public class ApiUtils {
         }
     }
 
-    public static String getMessage(ApiBusiness eb) {
+    public static String getMessage(ApiContext apiContext) {
         String message;
-        if (eb.getWarnings().isEmpty()) {
+        if (apiContext.getWarnings().isEmpty()) {
             message = "OK";
         } else {
             message = "Warning: ";
-            for (String warning : eb.getWarnings()) {
+            for (String warning : apiContext.getWarnings()) {
                 message += warning + " ";
             }
         }

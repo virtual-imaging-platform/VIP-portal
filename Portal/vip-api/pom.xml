@@ -32,7 +32,8 @@ knowledge of the CeCILL-B license and that you accept its terms.
 
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
@@ -71,7 +72,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
                         <version>${cxf.version}</version>
                     </dependency>
                 </dependencies>
- 
+
                 <executions>
                     <execution>
                         <id>process-classes</id>
@@ -93,14 +94,14 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <cxf.version>2.2.3</cxf.version>
     </properties>
-    <dependencies> 
+    <dependencies>
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-application</artifactId>
             <version>${vip.application.version}</version>
             <scope>provided</scope>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-core</artifactId>
             <version>${vip.core.version}</version>
@@ -127,5 +128,22 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <artifactId>vip-core</artifactId>
             <version>${vip.core.version}</version>
         </dependency>-->
+
+        <!-- Test dependencies -->
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.10.19</version>
+        </dependency>
+
+        <!-- End test dependencies -->
+
     </dependencies>
 </project>

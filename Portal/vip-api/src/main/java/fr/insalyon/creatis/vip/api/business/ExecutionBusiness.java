@@ -46,6 +46,7 @@ import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
 import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
@@ -61,30 +62,52 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.ws.WebServiceContext;
 
 /**
  *
  * @author Tristan Glatard
  */
-public class ExecutionBusiness extends ApiBusiness {
+public class ExecutionBusiness {
 
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ExecutionBusiness.class);
 
-    public ExecutionBusiness(WebServiceContext wsContext) throws ApiException {
-        super(wsContext, true);
+    private final ApiContext apiContext;
+    private final SimulationBusiness simulationBusiness;
+    private final WorkflowBusiness workflowBusiness;
+    private final PipelineBusiness pipelineBusiness;
+    private final ConfigurationBusiness configurationBusiness;
+    private final ApplicationBusiness applicationBusiness;
+
+
+    public ExecutionBusiness(ApiContext apiContext) {
+        WorkflowBusiness workflowBusiness = new WorkflowBusiness();
+        ApplicationBusiness applicationBusiness = new ApplicationBusiness();
+        this.apiContext = apiContext;
+        this.simulationBusiness = new SimulationBusiness();
+        this.workflowBusiness = workflowBusiness;
+        this.configurationBusiness = new ConfigurationBusiness();
+        this.applicationBusiness = applicationBusiness;
+        this.pipelineBusiness = new PipelineBusiness(apiContext, workflowBusiness, applicationBusiness, new ClassBusiness());
     }
 
-    public ExecutionBusiness(ApiBusiness ab) {
-        super(ab);
+    public ExecutionBusiness(ApiContext apiContext,
+                             SimulationBusiness simulationBusiness,
+                             WorkflowBusiness workflowBusiness,
+                             ConfigurationBusiness configurationBusiness,
+                             ApplicationBusiness applicationBusiness,
+                             PipelineBusiness pipelineBusiness) {
+        this.apiContext = apiContext;
+        this.simulationBusiness = simulationBusiness;
+        this.workflowBusiness = workflowBusiness;
+        this.configurationBusiness = configurationBusiness;
+        this.applicationBusiness = applicationBusiness;
+        this.pipelineBusiness = pipelineBusiness;
     }
 
     public String getStdOut(String executionId) throws ApiException {
         try {
-            WorkflowBusiness wb = new WorkflowBusiness();
-            SimulationBusiness sb = new SimulationBusiness();
-            Simulation s = wb.getSimulation(executionId);
-            String stdout = sb.readFile(s.getID(), "", "workflow", ".out");
+            Simulation s = workflowBusiness.getSimulation(executionId);
+            String stdout = simulationBusiness.readFile(s.getID(), "", "workflow", ".out");
             return stdout;
         } catch (BusinessException ex) {
             throw new ApiException(ex);
@@ -93,10 +116,8 @@ public class ExecutionBusiness extends ApiBusiness {
 
     public String getStdErr(String executionId) throws ApiException {
         try {
-            WorkflowBusiness wb = new WorkflowBusiness();
-            SimulationBusiness sb = new SimulationBusiness();
-            Simulation s = wb.getSimulation(executionId);
-            String stderr = sb.readFile(s.getID(), "", "workflow", ".err");
+            Simulation s = workflowBusiness.getSimulation(executionId);
+            String stderr = simulationBusiness.readFile(s.getID(), "", "workflow", ".err");
             return stderr;
         } catch (BusinessException ex) {
             throw new ApiException(ex);
@@ -105,10 +126,8 @@ public class ExecutionBusiness extends ApiBusiness {
 
     public Execution getExecution(String executionId, boolean summarize) throws ApiException {
         try {
-            WorkflowBusiness wb = new WorkflowBusiness();
-
             // Get main execution object
-            Simulation s = wb.getSimulation(executionId);
+            Simulation s = workflowBusiness.getSimulation(executionId);
 
             // Return null if execution doesn't exist or is cleaned (cleaned status is not supported in Carmin)
             if (s == null || s.getStatus() == SimulationStatus.Cleaned) {
@@ -132,7 +151,7 @@ public class ExecutionBusiness extends ApiBusiness {
                 return e;
             
             // Inputs
-            List<InOutData> inputs = wb.getInputData(executionId, getUser().getFolder());
+            List<InOutData> inputs = workflowBusiness.getInputData(executionId, apiContext.getUser().getFolder());
             logger.info("Execution has " + inputs.size() + " inputs ");
             for (InOutData iod : inputs) {
                 ParameterTypedValue value = new ParameterTypedValue(ApiUtils.getCarminType(iod.getType()), iod.getPath());
@@ -142,7 +161,7 @@ public class ExecutionBusiness extends ApiBusiness {
             }
 
             // Outputs
-            List<InOutData> outputs = wb.getOutputData(executionId, getUser().getFolder());
+            List<InOutData> outputs = workflowBusiness.getOutputData(executionId, apiContext.getUser().getFolder());
             for (InOutData iod : outputs) {
                 ParameterTypedValue value = new ParameterTypedValue(ApiUtils.getCarminType(iod.getType()), iod.getPath());
                 StringKeyParameterValuePair skpv = new StringKeyParameterValuePair(iod.getProcessor(), value);
@@ -163,10 +182,9 @@ public class ExecutionBusiness extends ApiBusiness {
 
     public Execution[] listExecutions(int maxReturned) throws ApiException {
         try {
-            
-            WorkflowBusiness wb = new WorkflowBusiness();
-            List<Simulation> simulations = wb.getSimulations(
-                    getUser().getFullName(),
+
+            List<Simulation> simulations = workflowBusiness.getSimulations(
+                    apiContext.getUser().getFullName(),
                     null, // application
                     null, // status
                     null, // class
@@ -181,7 +199,7 @@ public class ExecutionBusiness extends ApiBusiness {
                     count++;
                     executions.add(getExecution(s.getID(),true));
                     if(count >= maxReturned){
-                        getWarnings().add("Only the "+maxReturned+" most recent pipelines were returned.");
+                        apiContext.getWarnings().add("Only the "+maxReturned+" most recent pipelines were returned.");
                         break;
                     }
                 }
@@ -228,14 +246,13 @@ public class ExecutionBusiness extends ApiBusiness {
             // So we will just launch the execution, and launch an error in case playExecution is not true.
             // Set warnings
             if (studyId != null) {
-                getWarnings().add("Study identifier was ignored.");
+                apiContext.getWarnings().add("Study identifier was ignored.");
             }
             if (timeoutInSeconds != null && timeoutInSeconds != 0) {
-                getWarnings().add("Timeout value (" + timeoutInSeconds.toString() + ") was ignored.");
+                apiContext.getWarnings().add("Timeout value (" + timeoutInSeconds.toString() + ") was ignored.");
             }
 
             // Build input parameter map
-            WorkflowBusiness wb = new WorkflowBusiness();
             Map<String, String> pm = new HashMap<>();
             for (StringKeyParameterValuePair skpvp : inputValues) {
                 logger.info("Adding value " + skpvp.getValue().getValue() + " to input " + skpvp.getName());
@@ -243,8 +260,7 @@ public class ExecutionBusiness extends ApiBusiness {
             }
 
             // Check that all pipeline inputs are present
-            PipelineBusiness pb = new PipelineBusiness(this);
-            Pipeline p = pb.getPipeline(pipelineId);
+            Pipeline p = pipelineBusiness.getPipeline(pipelineId);
             for (PipelineParameter pp : p.getParameters()) {
                 if (pp.isReturnedValue()) {
                     continue;
@@ -268,9 +284,8 @@ public class ExecutionBusiness extends ApiBusiness {
             }
 
             // Get user groups
-            ConfigurationBusiness cb = new ConfigurationBusiness();
             List<String> groupNames = new ArrayList<>();
-            for (Group g : cb.getUserGroups(getUser().getEmail()).keySet()) {
+            for (Group g : configurationBusiness.getUserGroups(apiContext.getUser().getEmail()).keySet()) {
                 groupNames.add(g.getName());
             }
 
@@ -279,14 +294,13 @@ public class ExecutionBusiness extends ApiBusiness {
             String applicationVersion = ApiUtils.getApplicationVersion(pipelineId);
 
             // Get application classes
-            ApplicationBusiness ab = new ApplicationBusiness();
-            List<String> classes = ab.getApplication(applicationName).getApplicationClasses();
+            List<String> classes = applicationBusiness.getApplication(applicationName).getApplicationClasses();
             if (classes.isEmpty()) {
                 throw new ApiException("Application " + applicationName + " cannot be launched because it doesn't belong to any VIP class.");
             }
 
             logger.info("Launching workflow with the following parameters: ");
-            logger.info(getUser());
+            logger.info(apiContext.getUser());
             logger.info(groupNames);
             logger.info(pm);
             logger.info(applicationName);
@@ -295,7 +309,7 @@ public class ExecutionBusiness extends ApiBusiness {
             logger.info(executionName);
 
             // Launch the workflow
-            String executionId = wb.launch(getUser(),
+            String executionId = workflowBusiness.launch(apiContext.getUser(),
                                            groupNames,
                                            pm,
                                            applicationName,
@@ -313,18 +327,16 @@ public class ExecutionBusiness extends ApiBusiness {
         try {
             // Execution cannot be "played" (i.e. started) because it was already started in initExecution method.
             // So we just return the execution status.
-            WorkflowBusiness wb = new WorkflowBusiness();
-            getWarnings().add("In VIP, playExecution only returns the status of the execution.");
-            return VIPtoCarminStatus(wb.getSimulation(executionId).getStatus());
+            apiContext.getWarnings().add("In VIP, playExecution only returns the status of the execution.");
+            return VIPtoCarminStatus(workflowBusiness.getSimulation(executionId).getStatus());
         } catch (BusinessException ex) {
             throw new ApiException(ex);
         }
     }
 
     public void killExecution(String executionId) throws ApiException {
-        WorkflowBusiness wb = new WorkflowBusiness();
         try {
-            wb.kill(executionId);
+            workflowBusiness.kill(executionId);
         } catch (BusinessException ex) {
             throw new ApiException(ex);
         }
@@ -332,15 +344,14 @@ public class ExecutionBusiness extends ApiBusiness {
 
     public void deleteExecution(String executionId, Boolean deleteFiles) throws ApiException {
         checkIfUserCanAccessExecution(executionId);
-        WorkflowBusiness wb = new WorkflowBusiness();
         try {
-            Simulation s = wb.getSimulation(executionId);
+            Simulation s = workflowBusiness.getSimulation(executionId);
             if (s.getStatus() != SimulationStatus.Completed && s.getStatus() != SimulationStatus.Killed) {
                 throw new ApiException("Cannot delete execution " + executionId + " because status is " + s.getStatus().toString());
             }
             // Note: this won't delete the intermediate files in case the execution was run locally, which violates the spec.
             // Purge should be called in that case but purge also violates the spec.
-            wb.clean(executionId, getUser().getEmail(), deleteFiles);
+            workflowBusiness.clean(executionId, apiContext.getUser().getEmail(), deleteFiles);
         } catch (BusinessException ex) {
             throw new ApiException(ex);
         }
@@ -360,13 +371,12 @@ public class ExecutionBusiness extends ApiBusiness {
             ArrayList<String> urls = new ArrayList<>();
 
             TransferPoolBusiness tpb = new TransferPoolBusiness();
-            WorkflowBusiness wb = new WorkflowBusiness();
-            List<InOutData> outputs = wb.getOutputData(executionId, getUser().getFolder());
+            List<InOutData> outputs = workflowBusiness.getOutputData(executionId, apiContext.getUser().getFolder());
             for (InOutData output : outputs) {
 
-                String operationId = tpb.downloadFile(getUser(), output.getPath());
+                String operationId = tpb.downloadFile(apiContext.getUser(), output.getPath());
 
-                String url = getRequest().getRequestURL() + "/../fr.insalyon.creatis.vip.portal.Main/filedownloadservice?operationid=" + operationId;
+                String url = apiContext.getRequest().getRequestURL() + "/../fr.insalyon.creatis.vip.portal.Main/filedownloadservice?operationid=" + operationId;
                 URL u = new URL(url); // just to check that it is a well-formed URL
                 urls.add(url);
             }
@@ -401,12 +411,11 @@ public class ExecutionBusiness extends ApiBusiness {
 
     public void checkIfUserCanAccessExecution(String executionId) throws ApiException {
         try {
-            User user = getUser();
+            User user = apiContext.getUser();
             if (user.isSystemAdministrator()) {
                 return;
             }
-            WorkflowBusiness wb = new WorkflowBusiness();
-            Simulation s = wb.getSimulation(executionId);
+            Simulation s = workflowBusiness.getSimulation(executionId);
             if (s.getUserName().equals(user.getFullName())) {
                 return;
             }
