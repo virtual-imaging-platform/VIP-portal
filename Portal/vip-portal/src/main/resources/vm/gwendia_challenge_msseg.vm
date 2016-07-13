@@ -3,7 +3,7 @@
   <description>$esc.xml($tool.getDescription())</description>
   <interface>
        <source name="Subject directory" type="string">
-      <source-comment>&lt;b&gt;&lt;font color="blue"&gt;new input&lt;/font&gt;&lt;/b&gt;: add description here...
+      <source-comment>&lt;b&gt;&lt;font color="blue"&gt;Subject directory&lt;/font&gt;&lt;/b&gt;: subject directories as available in /vip/MSEG-training (group)/data, containing unprocessed data, pre-processed data, or both.
       </source-comment>
     </source>
 
@@ -13,17 +13,11 @@
     <constant name="pipeline_name" type="string" value="$tool.getName()" cardinality="scalar" />
 #end
 #if( $input.getId() == "team_name" )
-   <source name="team_name" type="string" default="$tool.getChallengerTeam()" >
-    <source-comment>&lt;b&gt;&lt;font color="blue"&gt;new input&lt;/font&gt;&lt;/b&gt;: add description here...
-      </source-comment>
-    </source>
+   <constant name="team_name" type="string" value="$tool.getChallengerTeam()" cardinality="scalar" />
 #end
 
 #if( $input.getId() == "challenger_email" )
-    <source name="challenger_email" type="string" default="$tool.getChallengerEmail()" >
-    <source-comment>&lt;b&gt;&lt;font color="blue"&gt;new input&lt;/font&gt;&lt;/b&gt;: add description here...
-      </source-comment>
-  </source>
+    <constant name="challenger_email" type="string" value="$tool.getChallengerEmail()" cardinality="scalar" />
 #end
 #end
 
