@@ -388,8 +388,8 @@ public class Carmin {
     Response logout() {
         Response r;
         try {
-            ApiContext apiContext = new ApiBusiness().getApiContext(wsContext, true);
             ApiUtils.methodInvocationLog("logout");
+            ApiContext apiContext = new ApiBusiness().getApiContext(wsContext, true);
             AuthenticationBusiness ab = new AuthenticationBusiness(apiContext);
             ab.logout();
             r = new Response(0, ApiUtils.getMessage(apiContext), null);

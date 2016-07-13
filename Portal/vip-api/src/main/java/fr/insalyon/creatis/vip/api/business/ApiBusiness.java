@@ -72,15 +72,24 @@ public class ApiBusiness {
             WebServiceContext wsContext,
             boolean authenticate) throws ApiException {
 
+        MessageContext mc = wsContext.getMessageContext();
+        HttpServletRequest request = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
+        HttpServletResponse response = (HttpServletResponse) mc.get(MessageContext.SERVLET_RESPONSE);
+
+        return getApiContext(request, response, authenticate);
+    }
+
+    public ApiContext getApiContext(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            boolean authenticate) throws ApiException {
+
         try {
             // set logging properties and DB connection
             PropertyConfigurator.configure(ConfigurationBusiness.class.getClassLoader().getResource("vipLog4j.properties"));
             PlatformConnection.getInstance();
 
             //set request and response
-            MessageContext mc = wsContext.getMessageContext();
-            HttpServletRequest request = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
-            HttpServletResponse response = (HttpServletResponse) mc.get(MessageContext.SERVLET_RESPONSE);
             HttpSession session = request.getSession();
             if (session == null) {
                 throw new ApiException("No session in WebServiceContext");
