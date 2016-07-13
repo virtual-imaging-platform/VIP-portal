@@ -82,7 +82,7 @@ public class ExecutionBusinessTest {
         sut.checkIfUserCanAccessExecution(EXEC_ID);
     }
 
-    //@Test
+    @Test
     public void checkIfBasicUserCanAccessItsExecution() throws Exception {
         ApiContext apiContext = new ApiContext(null, null, null, prepareTestUser(0, false));
         Simulation simulation = prepareSimulation(EXEC_ID, 0); // the creator of the execution is the same user
