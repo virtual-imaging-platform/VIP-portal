@@ -73,7 +73,7 @@
   </interface>
   <processors>
     <processor name="$tool.getName()" >
-     <in name="results-directory" type="string" depth="0"/>
+     
 #foreach($input in $tool.getInputs())
 #if($input.getType()=="File" )
         <in name="$input.getId()" type="string" depth="0"/>
@@ -81,23 +81,13 @@
         <in name="$input.getId()" type="string" depth="0"/>
 #end
 #end
+        <in name="results-directory" type="string" depth="0"/>
 #foreach( $output in $tool.getOutputFiles() )
         <out name="$output.getId()" type="string" depth="0"/>
 #end
         <iterationstrategy>
-          <cross>
-#foreach($input in $tool.getInputs())
-#if ($input.getId() != "flair_raw" && $input.getId() != "flair_preprocessed"
-  && $input.getId() != "t1_raw" && $input.getId() != "t1_preprocessed"
-  && $input.getId() != "t2_raw" && $input.getId() != "t2_preprocessed"
-  && $input.getId() != "gado_raw" && $input.getId() != "gado_preprocessed"
-  && $input.getId() != "pd_raw" && $input.getId() != "pd_preprocessed"
-  && $input.getId() != "mask")
-                 <port name="$input.getId()"/>
-#end
-#end
-                 <port name="results-directory" />
            <dot>
+               <port name="results-directory" />
                #foreach($input in $tool.getInputs())
 #if ($input.getId() == "flair_raw" || $input.getId() == "flair_preprocessed"
   || $input.getId() == "t1_raw" || $input.getId() == "t1_preprocessed"
@@ -109,7 +99,6 @@
             #end
             #end
             </dot>
-          </cross>
         </iterationstrategy>
         <gasw descriptor="$tool.getGASWLFN()"/>
     </processor>
@@ -121,30 +110,33 @@
             <out name="$output.getId()" type="string" depth="0"/>
 #end
            <iterationstrategy>
-             <cross>
+             <dot>
                <port name="results-directory" />
-               
-                 <port name="segmented_image"/>
-                 <port name="reference_image"/>
-               
-             </cross>
+               <port name="segmented_image"/>
+               <port name="reference_image"/>
+             </dot>
         </iterationstrategy>
         <gasw descriptor="$metric.getGASWLFN()"/>
       </processor>
       <processor name="$adaptater.getName()" >
-          <in name="results-directory" type="string" depth="0" />
 #foreach($input in $adaptater.getInputs())
             <in name="$input.getId()" type="string" depth="0" />
 #end
+            <in name="results-directory" type="string" depth="0" />
 #foreach($output in $adaptater.getOutputFiles())
             <out name="$output.getId()" type="string" depth="0"/>
 #end
            <iterationstrategy>
           <cross>
 #foreach($input in $adaptater.getInputs())
+#if ($input.getId() != "json_file")
             <port name="$input.getId()"  />
 #end
-            <port name="results-directory" />
+#end
+            <dot>
+              <port name="json_file" />  
+              <port name="results-directory" />
+            </dot>
           </cross>
         </iterationstrategy>
         <gasw descriptor="$adaptater.getGASWLFN()"/>
@@ -164,6 +156,12 @@
         <in name="dir" type="string" depth="0" />
         <in name="image" type="string" depth="0" />
         <out name="result" type="string" depth="0" />
+        <iterationstrategy>
+          <cross>
+            <port name="image" />
+            <port name="dir" />
+          </cross>
+        </iterationstrategy>
         <beanshell>
                 String result = dir+"/"+(new File(image)).getName();
         </beanshell>
@@ -172,7 +170,7 @@
       <in name="in" type="string" depth="0" />
       <out name="fullPaths" type="string" depth="1" />
       <out name="baseNames" type="string" depth="1" />
-      <out name="metadata" type="string" depth="0" />
+      <out name="metadata" type="string" depth="1" />
          #foreach( $input in $tool.getInputs() )
 #if ($input.getId() == "flair_raw" || $input.getId() == "flair_preprocessed"
   || $input.getId() == "t1_raw" || $input.getId() == "t1_preprocessed"
@@ -180,10 +178,10 @@
   || $input.getId() == "gado_raw" || $input.getId() == "gado_preprocessed"
   || $input.getId() == "pd_raw" || $input.getId() == "pd_preprocessed"
   || $input.getId() == "mask")
-      <out name="$input.getId()" type="string" depth="0" />
+      <out name="$input.getId()" type="string" depth="1" />
       #end
       #end
-      <out name="reference" type="string" depth="0" />
+      <out name="reference" type="string" depth="1" />
       <beanshell>import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.common.bean.GridData;
@@ -194,19 +192,19 @@ import java.util.List;
         fullPaths = new ArrayList();
         baseNames = new ArrayList();
        
-        mask = null;
-        metadata = null;
-        reference = null;
-        flair_raw = null;
-        flair_preprocessed = null;
-        t1_raw = null;
-        t1_preprocessed = null;
-        t2_raw = null;
-        t2_preprocessed = null;
-        gado_raw = null;
-        gado_preprocessed = null;
-        pd_raw = null;
-        pd_preprocessed = null;
+        mask = new ArrayList();
+        metadata = new ArrayList();
+        reference = new ArrayList();
+        flair_raw = new ArrayList();
+        flair_preprocessed = new ArrayList();
+        t1_raw = new ArrayList();
+        t1_preprocessed = new ArrayList();
+        t2_raw = new ArrayList();
+        t2_preprocessed = new ArrayList();
+        gado_raw = new ArrayList();
+        gado_preprocessed = new ArrayList();
+        pd_raw = new ArrayList();
+        pd_preprocessed = new ArrayList();
             try {
                 String proxyPath = "/var/www/.vip/proxies/x509up_server";
                 GRIDAClient vc = new GRIDAClient("kingkong.grid.creatis.insa-lyon.fr", 9006, proxyPath);
@@ -220,81 +218,81 @@ import java.util.List;
                         fullPaths.add(fullPath);
                         baseNames.add(name);
                         if(name.equals("input.json")){
-                          if(metadata != null )
+                          if(!metadata.isEmpty() )
                             throw new  Exception("[ERROR] Found file input.json but metadata was already present "+"("+metadata+")");
-                          metadata=fullPath;
+                          metadata.add(fullPath);
                           continue;
                         }
                         if(name.equals("Consensus.nii.gz")){
-                          if(reference != null )
+                          if(!reference.isEmpty() )
                         throw new Exception("[ERROR] Found file reference.nii.gz but reference image was already present "+"("+reference+")");
-                        reference=fullPath;
+                        reference.add(fullPath);
                         continue;
                         }
                         if(name.equals("3DFLAIR.nii.gz")){
-                          if(flair_raw != null )
+                          if(!flair_raw.isEmpty() )
                             throw new Exception("[ERROR] Found file 3DFLAIR.nii.gz but image was already present "+"("+flair_raw+")");
-                          flair_raw=fullPath;
+                          flair_raw.add(fullPath);
                           continue;
                         }
                         if(name.equals("FLAIR_preprocessed.nii.gz")){
-                          if(flair_preprocessed != null )
+                          if(!flair_preprocessed.isEmpty() )
                             throw new Exception("[ERROR] Found file FLAIR_preprocessed.nii.gz but image was already present "+"("+flair_preprocessed+")");
-                          flair_preprocessed=fullPath;
+                          flair_preprocessed.add(fullPath);
                           continue;
                         }
                         if(name.equals("3DT1.nii.gz")){
-                          if(t1_raw != null )
+                          if(!t1_raw.isEmpty() )
                             throw new Exception("[ERROR] Found file 3DT1.nii.gz but image was already present "+"("+t1_raw+")");
-                          t1_raw=fullPath;
+                          t1_raw.add(fullPath);
                           continue;
                         }
                         if(name.equals("T1_preprocessed.nii.gz")){
-                          if(t1_preprocessed != null )
+                          if(!t1_preprocessed.isEmpty() )
                             throw new Exception("[ERROR] Found file T1_preprocessed.nii.gz but image was already present "+"("+t1_preprocessed+")");
-                          t1_preprocessed=fullPath;
+                          t1_preprocessed.add(fullPath);
                           continue;
                         }
                         if(name.equals("T2.nii.gz")){
-                          if(t2_raw != null )
+                          if(!t2_raw.isEmpty() )
                             throw new Exception("[ERROR] Found file T2.nii.gz but image was already present "+"("+t2_raw+")");
-                          t2_raw=fullPath;
+                          t2_raw.add(fullPath);
                           continue;
                         }
                         if(name.equals("T2_preprocessed.nii.gz")){
-                          if(t2_preprocessed != null )
+                          if(!t2_preprocessed.isEmpty() )
                             throw new Exception("[ERROR] Found file T2_preprocessed.nii.gz but image was already present "+"("+t2_preprocessed+")");
-                          t2_preprocessed=fullPath;
+                          t2_preprocessed.add(fullPath);
                           continue;
                         }
                         if(name.equals("3DT1GADO.nii.gz")){
-                          if(gado_raw != null )
+                          if(!gado_raw.isEmpty() )
                             throw new Exception("[ERROR] Found file 3DT1GADO.nii.gz but image was already present "+"("+gado_raw+")");
-                          gado_raw=fullPath;
+                          gado_raw.add(fullPath);
                           continue;
                         }
                         if(name.equals("GADO_preprocessed.nii.gz")){
-                          if(gado_preprocessed != null )
+                          if(!gado_preprocessed.isEmpty() )
                             throw new Exception("[ERROR] Found file GADO_preprocessed.nii.gz but image was already present "+"("+gado_preprocessed+")");
-                          gado_preprocessed=fullPath;
+                          gado_preprocessed.add(fullPath);
                           continue;
                         }
                          if(name.equals("DP.nii.gz")){
-                          if(pd_raw != null )
+                          if(!pd_raw.isEmpty() )
                             throw new Exception("[ERROR] Found file DP.nii.gz but image was already present "+"("+pd_raw+")");
-                          pd_raw=fullPath;
+                          pd_raw.add(fullPath);
                           continue;
                         }
                         if(name.equals("DP_preprocessed.nii.gz")){
-                          if(pd_preprocessed != null )
+                          if(!pd_preprocessed.isEmpty() )
                             throw new Exception("[ERROR] Found file DP_preprocessed.nii.gz but image was already present "+"("+pd_preprocessed+")");
-                          pd_preprocessed=fullPath;
+                          pd_preprocessed.add(fullPath);
                           continue;
                         }
                         if(name.equals("Mask_registered.nii.gz")){
-                          if(mask != null )
+                          if(!mask.isEmpty() )
                             throw new Exception("[ERROR] Found file Mask_registered.nii.gz but image was already present "+"("+mask+")");
-                          mask=fullPath;
+                          mask.add(fullPath);
                           continue;
                         }
                         System.out.println("[WARNING] unknown file found in "+in+": "+name);
@@ -310,11 +308,11 @@ import java.util.List;
   || $input.getId() == "gado_raw" || $input.getId() == "gado_preprocessed"
   || $input.getId() == "pd_raw" || $input.getId() == "pd_preprocessed"
   || $input.getId() == "mask" || $input.getId() == "reference")
-    if($input.getId() == null)
+    if(${input.getId()}.isEmpty())
         throw new Exception("[ERROR] Couldn't find $input.getId() file in "+baseNames);
           #end
           #end
-    if(metadata == null)
+    if(metadata.isEmpty())
         throw new Exception("[ERROR] Couldn't find metadata file in "+baseNames);
       </beanshell>
     </processor>
@@ -322,7 +320,6 @@ import java.util.List;
 </processors>
   <links>
     <link from="results-directory" to="appendDirAndImage:dir" />
-    <link from="listSubjectDirectory:image" to="appendDirAndImage:image" />
     <link from="appendDirAndImage:result" to="appendDate:dir" />
     <link from="appendDate:result" to="$tool.getName():results-directory" />
     <link from="appendDate:result" to="$adaptater.getName():results-directory" />
