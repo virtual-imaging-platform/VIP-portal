@@ -162,7 +162,8 @@ cat << DOCKERJOB > .dockerjob.sh
 ${BOUTIQUES_COMMAND_LINE}
 DOCKERJOB
 
-chmod 755 .dockerjob.sh 
+chmod 755 .dockerjob.sh
+docker pull $tool.getDockerImage()
 docker run --rm -v $PWD:/gasw-execution-dir -v $PWD/../cache:$PWD/../cache -w /gasw-execution-dir -u `id -u`:`id -g` $tool.getDockerImage()  ./.dockerjob.sh 
 #else
 ${BOUTIQUES_COMMAND_LINE}
