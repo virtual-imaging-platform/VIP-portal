@@ -179,10 +179,11 @@
   || $input.getId() == "t2_raw" || $input.getId() == "t2_preprocessed"
   || $input.getId() == "gado_raw" || $input.getId() == "gado_preprocessed"
   || $input.getId() == "pd_raw" || $input.getId() == "pd_preprocessed"
-  || $input.getId() == "mask" || $input.getId() == "reference")
+  || $input.getId() == "mask")
       <out name="$input.getId()" type="string" depth="0" />
       #end
       #end
+      <out name="reference" type="string" depth="0" />
       <beanshell>import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.common.bean.GridData;
