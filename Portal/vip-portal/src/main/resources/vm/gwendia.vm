@@ -18,7 +18,7 @@
     <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="$input.getDefaultValue()">
     #else
       #if($input.isOptional()==true)
-    <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="no">
+    <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="Empty_optional_input">
         #set($extraComment="Put '<b>no</b>' to ignore this optional input.")
       #else
     <source name="$input.getId()" type="$type" optional="$input.isOptional()">

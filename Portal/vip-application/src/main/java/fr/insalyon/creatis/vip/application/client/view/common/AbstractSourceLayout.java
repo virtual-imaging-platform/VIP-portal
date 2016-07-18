@@ -47,6 +47,12 @@ public abstract class AbstractSourceLayout extends VLayout {
     protected HLayout hLayout;
     protected boolean optional;
 
+    /**
+     * TODO
+     * This construtor will be deprecated during the realisation of the redmine feature 2803.
+     * It will be replaced by the constructor (see below) with a fourth argument : prettyName
+     * Currently InputLayout and GateLabSourceLayout classes use it.
+     */
     public AbstractSourceLayout(String name, String comment, boolean optional) {
         this.name = name;
         this.optional = optional;
@@ -70,6 +76,34 @@ public abstract class AbstractSourceLayout extends VLayout {
         
     public AbstractSourceLayout(String name, String comment) {
         this(name,comment,false);
+    }
+    
+     /**
+     * TODO
+     * This construtor will replace the constructor (see above) with 3 arguments, during the redmine feature 2803.
+     * Currently this constructor is called only by InputFlagLayout object. 
+     * It allows to display an input name which value is contained in prettyName variable and not in name variable.
+     */
+    public AbstractSourceLayout(String name, String comment, boolean optional, String prettyName) {
+        this.name = name;
+        this.optional = optional;
+        String labelText = "<b>" + prettyName;
+        if(!optional)
+            labelText += "<font color=\"red\">*</font>";
+        labelText += "</b>";
+        this.sourceLabel = WidgetUtil.getLabel(labelText, 15);
+        this.sourceLabel.setWidth(300);
+        if (comment != null) {
+            this.sourceLabel.setTooltip(comment);
+            this.sourceLabel.setHoverWidth(500);
+        }
+        this.setAutoWidth();
+        this.addMember(sourceLabel);
+        
+        this.hLayout = new HLayout(3);
+        //use setBorder()
+        this.hLayout.setAutoWidth();
+        this.addMember(hLayout);        
     }
 
     public String getName() {

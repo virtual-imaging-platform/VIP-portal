@@ -142,7 +142,7 @@ public class InputLayout extends AbstractSourceLayout {
                 // List
                 listLayout.setDisabled(selected);
                 listLayout.removeMembers(listLayout.getMembers());
-                listLayout.addMember(new ListHLayout(listLayout, true, "no"));
+                listLayout.addMember(new ListHLayout(listLayout, true, "Empty_optional_input"));
                 
                 // Range
                 // TODO reset item values when Redmine feature 2980 will be realize.
