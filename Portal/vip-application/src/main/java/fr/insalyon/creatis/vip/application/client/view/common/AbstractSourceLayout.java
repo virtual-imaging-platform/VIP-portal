@@ -101,6 +101,7 @@ public abstract class AbstractSourceLayout extends VLayout {
         this.addMember(sourceLabel);
         
         this.hLayout = new HLayout(3);
+
         //use setBorder()
         this.hLayout.setAutoWidth();
         this.addMember(hLayout);        

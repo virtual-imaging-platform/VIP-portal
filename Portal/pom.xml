@@ -37,23 +37,23 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip</artifactId>
     <packaging>pom</packaging>
-    <version>1.17.1</version>
+    <version>1.18</version>
     <name>VIP</name>
     
     <properties>
-        <vip.core.version>1.17.1</vip.core.version>
-        <vip.portal.version>1.17.1</vip.portal.version>
-        <vip.docs.version>1.15</vip.docs.version>
-        <vip.application.version>1.17.1</vip.application.version>
-        <vip.datamanager.version>1.16.1</vip.datamanager.version>
+        <vip.core.version>1.18</vip.core.version>
+        <vip.portal.version>1.18</vip.portal.version>
+        <vip.application-importer.version>1.18</vip.application-importer.version>
+        <vip.api.version>1.18</vip.api.version>
+        <vip.application.version>1.18</vip.application.version>
         <vip.datamanager-applet.version>1.16.2</vip.datamanager-applet.version>
-        <vip.gatelab.version>1.15</vip.gatelab.version>
         <vip.gatelab-applet.version>1.16.2</vip.gatelab-applet.version>
+        <vip.datamanager.version>1.16.1</vip.datamanager.version>
+        <vip.gatelab.version>1.15</vip.gatelab.version>
+        <vip.docs.version>1.15</vip.docs.version>
         <vip.social.version>1.15</vip.social.version>
-        <vip.cardiac.version>0.9.4</vip.cardiac.version>
         <vip.query.version>1.7</vip.query.version>
-        <vip.application-importer.version>1.16</vip.application-importer.version>
-        <vip.api.version>1.16</vip.api.version>
+        <vip.cardiac.version>0.9.4</vip.cardiac.version>
     </properties>
     
     <description>VIP</description>
@@ -70,18 +70,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <name>CREATIS</name>
         <url>http://www.creatis.insa-lyon.fr/</url>
     </organization>
-    
-    <developers>
-        <developer>
-            <id>silva</id>
-            <name>Rafael FERREIRA DA SILVA</name>
-            <email>rafael.silva@creatis.insa-lyon.fr</email>
-            <url>http://www.rafaelsilva.com/</url>
-            <organization>Centre National de la Recherche Scientifique</organization>
-            <organizationUrl>http://www.cnrs.fr/</organizationUrl>
-            <timezone>1</timezone>
-        </developer>
-    </developers>
     
     <modules>
         <module>vip-core</module>

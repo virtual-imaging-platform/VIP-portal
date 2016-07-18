@@ -35,7 +35,6 @@ import fr.insalyon.creatis.vip.api.bean.ParameterType;
 import fr.insalyon.creatis.vip.api.bean.ParameterTypedValue;
 import fr.insalyon.creatis.vip.api.bean.Pipeline;
 import fr.insalyon.creatis.vip.api.bean.PipelineParameter;
-import fr.insalyon.creatis.vip.api.bean.pairs.PairOfPipelineAndBooleanLists;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
@@ -47,23 +46,32 @@ import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.ws.WebServiceContext;
+
 import org.apache.log4j.Logger;
 
 /**
  *
  * @author Tristan Glatard
  */
-public class PipelineBusiness extends ApiBusiness {
+public class PipelineBusiness {
 
     private final static Logger logger = Logger.getLogger(PipelineBusiness.class);
 
-    public PipelineBusiness(WebServiceContext wsContext) throws ApiException {
-        super(wsContext, true);
+    private final ApiContext apiContext;
+
+    private final WorkflowBusiness workflowBusiness;
+    private final ApplicationBusiness applicationBusiness;
+    private final ClassBusiness classBusiness;
+
+    public PipelineBusiness(ApiContext apiContext) {
+        this(apiContext, new WorkflowBusiness(), new ApplicationBusiness(), new ClassBusiness());
     }
 
-    public PipelineBusiness(ApiBusiness ab) {
-        super(ab);
+    public PipelineBusiness(ApiContext apiContext, WorkflowBusiness workflowBusiness, ApplicationBusiness applicationBusiness, ClassBusiness classBusiness) {
+        this.apiContext = apiContext;
+        this.workflowBusiness = workflowBusiness;
+        this.applicationBusiness = applicationBusiness;
+        this.classBusiness = classBusiness;
     }
 
     public Pipeline getPipeline(String pipelineId) throws ApiException {
@@ -73,8 +81,7 @@ public class PipelineBusiness extends ApiBusiness {
             String applicationVersion = ApiUtils.getApplicationVersion(pipelineId);
             Pipeline p = getPipelineWithPermissions(applicationName, applicationVersion);
 
-            WorkflowBusiness wb = new WorkflowBusiness();
-            Descriptor d = wb.getApplicationDescriptor(getUser(), p.getName(), p.getVersion()); // Be careful, this copies the Gwendia file from LFC. 
+            Descriptor d = workflowBusiness.getApplicationDescriptor(apiContext.getUser(), p.getName(), p.getVersion()); // Be careful, this copies the Gwendia file from LFC.
             p.setDescription(d.getDescription());
 
             for (Source s : d.getSources()) {
@@ -98,21 +105,19 @@ public class PipelineBusiness extends ApiBusiness {
 
         try {
             if (studyIdentifier != null) {
-                getWarnings().add("Study identifier was ignored.");
+                apiContext.getWarnings().add("Study identifier was ignored.");
             }
-            ApplicationBusiness ab = new ApplicationBusiness();
             ArrayList<Pipeline> pipelines = new ArrayList<>();
 
-            ClassBusiness classBusiness = new ClassBusiness();
-            List<AppClass> classes = classBusiness.getUserClasses(getUser().getEmail(), false);
+            List<AppClass> classes = classBusiness.getUserClasses(apiContext.getUser().getEmail(), false);
             List<String> classNames = new ArrayList<>();
             for (AppClass c : classes) {
                 classNames.add(c.getName());
             }
 
-            List<Application> applications = ab.getApplications(classNames);
+            List<Application> applications = applicationBusiness.getApplications(classNames);
             for (Application a : applications) {
-                List<AppVersion> versions = ab.getVersions(a.getName());
+                List<AppVersion> versions = applicationBusiness.getVersions(a.getName());
                 for (AppVersion av : versions) {
                     pipelines.add(
                             new Pipeline(ApiUtils.getPipelineIdentifier(a.getName(), av.getVersion()), a.getName(), av.getVersion(), true)
@@ -129,13 +134,11 @@ public class PipelineBusiness extends ApiBusiness {
 
     public void checkIfUserCanAccessPipeline(String pipelineId) throws ApiException {
         try {
-            ClassBusiness cb = new ClassBusiness();
-            ApplicationBusiness ab = new ApplicationBusiness();
 
             String applicationName = ApiUtils.getApplicationName(pipelineId);
-            List<String> userClassNames = cb.getUserClassesName(getUser().getEmail(), false);
+            List<String> userClassNames = classBusiness.getUserClassesName(apiContext.getUser().getEmail(), false);
 
-            Application a = ab.getApplication(applicationName);
+            Application a = applicationBusiness.getApplication(applicationName);
             if (a == null) {
                 throw new ApiException("Cannot find application " + applicationName);
             }
@@ -144,7 +147,7 @@ public class PipelineBusiness extends ApiBusiness {
                     return;
                 }
             }
-            throw new ApiException("User " + getUser().getEmail() + " not allowed to access application " + a.getName());
+            throw new ApiException("User " + apiContext.getUser().getEmail() + " not allowed to access application " + a.getName());
         } catch (BusinessException ex) {
             throw new ApiException(ex);
         }
@@ -157,6 +160,7 @@ public class PipelineBusiness extends ApiBusiness {
                 return p;
             }
         }
-        throw new ApiException("Pipeline '" + applicationName + "' (version '" + applicationVersion + "') doesn't exist or user '" + getUser().getEmail() + "' cannot access it");
+        throw new ApiException("Pipeline '" + applicationName + "' (version '" + applicationVersion + "') doesn't exist or user '"
+                + apiContext.getUser().getEmail() + "' cannot access it");
     }
 }

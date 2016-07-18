@@ -35,30 +35,41 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.auth.AbstractAuthenticationService;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import javax.xml.ws.WebServiceContext;
 import org.apache.log4j.Logger;
 
 /**
  *
  * @author Tristan Glatard
  */
-public class AuthenticationBusiness extends ApiBusiness {
+public class AuthenticationBusiness {
 
     private final static Logger logger = Logger.getLogger(AuthenticationBusiness.class);
-    
-    public AuthenticationBusiness(WebServiceContext wsContext) throws ApiException {
-        super(wsContext,false);
+
+    private final ApiContext apiContext;
+
+    private final ConfigurationBusiness configurationBusiness;
+    private final ApiBusiness apiBusiness;
+
+    public AuthenticationBusiness(ApiContext apiContext) {
+        this.apiContext = apiContext;
+        this.configurationBusiness = new ConfigurationBusiness();
+        this.apiBusiness = new ApiBusiness(configurationBusiness);
+    }
+
+    public AuthenticationBusiness(ApiContext apiContext, ConfigurationBusiness configurationBusiness, ApiBusiness apiBusiness) {
+        this.apiContext = apiContext;
+        this.configurationBusiness = configurationBusiness;
+        this.apiBusiness = apiBusiness;
     }
     
     public void authenticateSession(String userName, String password) throws ApiException {
         
          try {
              //verify userName and password
-             ConfigurationBusiness configurationBusiness = new ConfigurationBusiness();
              configurationBusiness.configure();
              User user = configurationBusiness.signin(userName, password);
              
-             AbstractAuthenticationService.setVIPSession(getRequest(), getResponse(), user);             
+             AbstractAuthenticationService.setVIPSession(apiContext.getRequest(), apiContext.getResponse(), user);
              configurationBusiness.updateUserLastLogin(userName);
              
          } catch (BusinessException ex) {
@@ -72,10 +83,8 @@ public class AuthenticationBusiness extends ApiBusiness {
 
     public void logout() throws ApiException {
          try {
-             ConfigurationBusiness cb = new ConfigurationBusiness();
-             authenticateSession(); // not done in constructor for obvious reasons but needed here,
-                                    // otherwise getUser() is null and we don't know which user should be logged out.
-             cb.signout(getUser().getEmail());
+             // authentication has been done, so user is present in apiContext
+             configurationBusiness.signout(apiContext.getUser().getEmail());
          } catch (BusinessException ex) {
              throw new ApiException(ex);
          }
