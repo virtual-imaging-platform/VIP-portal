@@ -31,27 +31,10 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-
 /**
- * Created by abonnet on 7/13/16.
+ * Created by abonnet on 7/21/16.
  */
-@Configuration
-@ComponentScan("fr.insalyon.creatis.vip.api.rest")
-@PropertySource("classpath:carmin.properties")
-public class SpringWebConfig extends WebMvcConfigurationSupport {
-
-    @Override
-    public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
-        RequestMappingHandlerAdapter requestMappingHandlerAdapter = super.requestMappingHandlerAdapter();
-        requestMappingHandlerAdapter.setSynchronizeOnSession(true);
-        return requestMappingHandlerAdapter;
-    }
+public interface CarminAPITestConstants {
+    String TEST_PLATFORM_NAME = "TestPlatform";
+    String TEST_PLATFORM_DESCRIPTION = "Test Platform description";
 }

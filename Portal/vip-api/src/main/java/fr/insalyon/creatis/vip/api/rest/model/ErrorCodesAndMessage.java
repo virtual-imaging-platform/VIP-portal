@@ -29,29 +29,31 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.rest.model;
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import javax.validation.constraints.NotNull;
 
 /**
- * Created by abonnet on 7/13/16.
+ * Created by abonnet on 7/19/16.
  */
-@Configuration
-@ComponentScan("fr.insalyon.creatis.vip.api.rest")
-@PropertySource("classpath:carmin.properties")
-public class SpringWebConfig extends WebMvcConfigurationSupport {
+public class ErrorCodesAndMessage {
 
-    @Override
-    public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
-        RequestMappingHandlerAdapter requestMappingHandlerAdapter = super.requestMappingHandlerAdapter();
-        requestMappingHandlerAdapter.setSynchronizeOnSession(true);
-        return requestMappingHandlerAdapter;
+    @NotNull private Integer code;
+    @NotNull private String message;
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

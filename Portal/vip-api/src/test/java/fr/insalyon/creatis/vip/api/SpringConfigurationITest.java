@@ -31,27 +31,35 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.util.Assert;
+import org.springframework.web.context.WebApplicationContext;
+
+import static fr.insalyon.creatis.vip.api.CarminProperties.PLATFORM_DESCRIPTION;
+import static fr.insalyon.creatis.vip.api.CarminProperties.PLATFORM_NAME;
 
 /**
- * Created by abonnet on 7/13/16.
+ * Created by abonnet on 7/21/16.
  */
-@Configuration
-@ComponentScan("fr.insalyon.creatis.vip.api.rest")
-@PropertySource("classpath:carmin.properties")
-public class SpringWebConfig extends WebMvcConfigurationSupport {
+@RunWith(SpringRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(classes = SpringWebConfig.class)
+public class SpringConfigurationITest {
 
-    @Override
-    public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
-        RequestMappingHandlerAdapter requestMappingHandlerAdapter = super.requestMappingHandlerAdapter();
-        requestMappingHandlerAdapter.setSynchronizeOnSession(true);
-        return requestMappingHandlerAdapter;
+    @Autowired
+    private WebApplicationContext wac;
+    @Autowired
+    private Environment env;
+
+    @Test
+    public void propertiesShouldBePresent() {
+        Assert.notNull(env.getProperty(PLATFORM_NAME));
+        Assert.notNull(env.getProperty(PLATFORM_DESCRIPTION));
     }
 }

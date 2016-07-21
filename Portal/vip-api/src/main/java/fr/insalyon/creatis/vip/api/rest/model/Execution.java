@@ -29,29 +29,61 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.rest.model;
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import javax.validation.constraints.NotNull;
 
 /**
- * Created by abonnet on 7/13/16.
+ * Created by abonnet on 7/19/16.
  */
-@Configuration
-@ComponentScan("fr.insalyon.creatis.vip.api.rest")
-@PropertySource("classpath:carmin.properties")
-public class SpringWebConfig extends WebMvcConfigurationSupport {
+public class Execution {
 
-    @Override
-    public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
-        RequestMappingHandlerAdapter requestMappingHandlerAdapter = super.requestMappingHandlerAdapter();
-        requestMappingHandlerAdapter.setSynchronizeOnSession(true);
-        return requestMappingHandlerAdapter;
+    @NotNull
+    private String executionId;
+    private String name;
+    @NotNull
+    private String pipelineIdentifier;
+    private String pipelineName;
+    @NotNull
+    private ExecutionStatus status;
+
+    public String getExecutionId() {
+        return executionId;
+    }
+
+    public void setExecutionId(String executionId) {
+        this.executionId = executionId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPipelineIdentifier() {
+        return pipelineIdentifier;
+    }
+
+    public void setPipelineIdentifier(String pipelineIdentifier) {
+        this.pipelineIdentifier = pipelineIdentifier;
+    }
+
+    public String getPipelineName() {
+        return pipelineName;
+    }
+
+    public void setPipelineName(String pipelineName) {
+        this.pipelineName = pipelineName;
+    }
+
+    public ExecutionStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ExecutionStatus status) {
+        this.status = status;
     }
 }

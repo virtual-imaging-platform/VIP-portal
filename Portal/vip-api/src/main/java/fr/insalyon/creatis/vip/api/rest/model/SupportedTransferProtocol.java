@@ -29,29 +29,31 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.rest.model;
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * Created by abonnet on 7/13/16.
+ * Created by abonnet on 7/19/16.
  */
-@Configuration
-@ComponentScan("fr.insalyon.creatis.vip.api.rest")
-@PropertySource("classpath:carmin.properties")
-public class SpringWebConfig extends WebMvcConfigurationSupport {
+public enum SupportedTransferProtocol {
 
-    @Override
-    public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
-        RequestMappingHandlerAdapter requestMappingHandlerAdapter = super.requestMappingHandlerAdapter();
-        requestMappingHandlerAdapter.setSynchronizeOnSession(true);
-        return requestMappingHandlerAdapter;
+    HTTP,
+    HTTPS,
+    FTP,
+    SFTP,
+    FTPS,
+    SCP,
+    WEBDAV;
+
+    @JsonCreator
+    public static SupportedTransferProtocol forValue(String value) {
+        return SupportedTransferProtocol.valueOf(value.toUpperCase());
+    }
+
+    @JsonValue
+    public String toValue() {
+        return this.name().toLowerCase();
     }
 }

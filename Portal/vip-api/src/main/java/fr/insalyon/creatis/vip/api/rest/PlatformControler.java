@@ -31,12 +31,12 @@
  */
 package fr.insalyon.creatis.vip.api.rest;
 
-import fr.insalyon.creatis.vip.api.business.*;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.api.CarminProperties;
+import fr.insalyon.creatis.vip.api.rest.model.PlatformProperties;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,10 +46,13 @@ import javax.servlet.http.HttpServletResponse;
  * Created by abonnet on 7/13/16.
  */
 @RestController
-@RequestMapping("/")
-public class LoginControler {
+@RequestMapping("/platform")
+public class PlatformControler {
 
-    public static final Logger logger = Logger.getLogger(LoginControler.class);
+    public static final Logger logger = Logger.getLogger(PlatformControler.class);
+
+    @Autowired
+    private Environment env;
 
     // although the controler is a singleton, these are proxies that always point on the current request
     @Autowired
@@ -57,40 +60,12 @@ public class LoginControler {
     @Autowired
     HttpServletResponse httpServletResponse;
 
-    @RequestMapping("login")
-    public String login(@RequestParam String username, @RequestParam String password) {
-        try {
-            ApiUtils.methodInvocationLog("authenticateSession", username, "*****");
-            ApiUtils.throwIfNull(username, "User name");
-            ApiUtils.throwIfNull(password, "Password");
-            ApiContext apiContext = new ApiBusiness().getApiContext(httpServletRequest, httpServletResponse, false);
-            AuthenticationBusiness ab = new AuthenticationBusiness(apiContext);
-            ab.authenticateSession(username, password);
-            return "success";
-        } catch (ApiException ex) {
-            logger.error(ex);
-            return "failure";
-        }
-    }
-
-    @RequestMapping("logout")
-    public String logout() {
-        try {
-            ApiUtils.methodInvocationLog("logout");
-            ApiContext apiContext = new ApiBusiness().getApiContext(httpServletRequest, httpServletResponse, true);
-            AuthenticationBusiness ab = new AuthenticationBusiness(apiContext);
-            ab.logout();
-            return "success";
-        } catch (ApiException ex) {
-            logger.error(ex);
-            return "failure";
-        }
-    }
-
-    @RequestMapping("user")
-    public User getCurrentUser() throws ApiException {
-        ApiContext apiContext = new ApiBusiness().getApiContext(httpServletRequest, httpServletResponse, true);
-        return apiContext.getUser();
+    @RequestMapping
+    public PlatformProperties getPlatformProperties() {
+        PlatformProperties platformProperties = new PlatformProperties();
+        platformProperties.setPlatformName(env.getProperty(CarminProperties.PLATFORM_NAME));
+        platformProperties.setPlatformDescription(env.getProperty(CarminProperties.PLATFORM_DESCRIPTION));
+        return platformProperties;
     }
 
 }

@@ -95,6 +95,16 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <cxf.version>2.2.3</cxf.version>
     </properties>
     <dependencies>
+
+        <!-- spring testing requires servlet api 3.0 min.
+         Need to be first because of conflict with servlet api 2.5 present as transitive dependency-->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-application</artifactId>
@@ -113,10 +123,31 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <version>${vip.datamanager.version}</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- Spring mvc and the whole spring framework with the dependencies-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
             <version>4.3.1.RELEASE</version>
+        </dependency>
+
+        <!-- Json mapping library -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.8.0.rc2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.8.0.rc2</version>
+        </dependency>
+
+        <!-- Validation implementation -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>4.3.2.Final</version>
         </dependency>
 
         <!-- Test dependencies -->
@@ -124,15 +155,27 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.10</version>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>1.10.19</version>
+            <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>4.3.1.RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>2.2.0</version>
+            <scope>test</scope>
+        </dependency>
         <!-- End test dependencies -->
 
     </dependencies>
