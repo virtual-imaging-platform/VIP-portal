@@ -211,6 +211,14 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <servlet-name>RestAPI</servlet-name>
         <url-pattern>/rest/*</url-pattern>
     </servlet-mapping>
+    <filter>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <url-pattern>/rest/*</url-pattern>
+    </filter-mapping>
     <!-- END REST API -->
     <!-- SOAP API -->
     <listener>

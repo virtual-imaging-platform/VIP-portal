@@ -37,6 +37,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -58,39 +59,10 @@ public class LoginControler {
     HttpServletResponse httpServletResponse;
 
     @RequestMapping("login")
-    public String login(@RequestParam String username, @RequestParam String password) {
-        try {
-            ApiUtils.methodInvocationLog("authenticateSession", username, "*****");
-            ApiUtils.throwIfNull(username, "User name");
-            ApiUtils.throwIfNull(password, "Password");
-            ApiContext apiContext = new ApiBusiness().getApiContext(httpServletRequest, httpServletResponse, false);
-            AuthenticationBusiness ab = new AuthenticationBusiness(apiContext);
-            ab.authenticateSession(username, password);
-            return "success";
-        } catch (ApiException ex) {
-            logger.error(ex);
-            return "failure";
-        }
-    }
-
-    @RequestMapping("logout")
-    public String logout() {
-        try {
-            ApiUtils.methodInvocationLog("logout");
-            ApiContext apiContext = new ApiBusiness().getApiContext(httpServletRequest, httpServletResponse, true);
-            AuthenticationBusiness ab = new AuthenticationBusiness(apiContext);
-            ab.logout();
-            return "success";
-        } catch (ApiException ex) {
-            logger.error(ex);
-            return "failure";
-        }
-    }
-
-    @RequestMapping("user")
-    public User getCurrentUser() throws ApiException {
-        ApiContext apiContext = new ApiBusiness().getApiContext(httpServletRequest, httpServletResponse, true);
-        return apiContext.getUser();
+    @ResponseBody
+    public String login() {
+        logger.debug("user : " + httpServletRequest.getUserPrincipal().getName());
+        return "SUCCESS";
     }
 
 }
