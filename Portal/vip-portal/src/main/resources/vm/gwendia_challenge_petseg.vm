@@ -3,17 +3,24 @@
   <description>$esc.xml($tool.getDescription())</description>
   <interface>
        <source name="Subject directory" type="string">
-      <source-comment>&lt;b&gt;&lt;font color="blue"&gt;new input&lt;/font&gt;&lt;/b&gt;: add description here...
+      <source-comment>&lt;b&gt;&lt;font color="blue"&gt;Subject directory&lt;/font&gt;&lt;/b&gt;: subject directories as available in /vip/MSEG-training (group)/data, containing unprocessed data, pre-processed data, or both.
       </source-comment>
     </source>
+
+
 #foreach( $input in $adaptater.getInputs() )
-#if( $input.getId() != "json_file")
-      <source name="$input.getId()" type="string" >
-      <source-comment>&lt;b&gt;&lt;font color="blue"&gt;new input&lt;/font&gt;&lt;/b&gt;: add description here...
-      </source-comment>
-    </source>
+#if( $input.getId() == "pipeline_name" )
+    <constant name="pipeline_name" type="string" value="$tool.getName()" cardinality="scalar" />
+#end
+#if( $input.getId() == "team_name" )
+   <constant name="team_name" type="string" value="$tool.getChallengerTeam()" cardinality="scalar" />
+#end
+
+#if( $input.getId() == "challenger_email" )
+    <constant name="challenger_email" type="string" value="$tool.getChallengerEmail()" cardinality="scalar" />
 #end
 #end
+
     <source name="results-directory" type="string" optional="false" default="/vip/Home">
         <source-comment>$esc.xml("<b><font color=blue>results-directory</font></b> (<b><font color=green>Directory</font></b>):") Directory where the results will be stored.</source-comment>
     </source>
@@ -61,7 +68,7 @@
   </interface>
   <processors>
     <processor name="$tool.getName()" >
-     <in name="results-directory" type="string" depth="0"/>
+     
 #foreach($input in $tool.getInputs())
 #if($input.getType()=="File" )
         <in name="$input.getId()" type="string" depth="0"/>
@@ -69,21 +76,15 @@
         <in name="$input.getId()" type="string" depth="0"/>
 #end
 #end
+        <in name="results-directory" type="string" depth="0"/>
 #foreach( $output in $tool.getOutputFiles() )
         <out name="$output.getId()" type="string" depth="0"/>
 #end
         <iterationstrategy>
-          <cross>
-#foreach($input in $tool.getInputs())
-#if ($input.getId() != "pet_image")
-                 <port name="$input.getId()"/>
-#end
-#end
-                 <port name="results-directory" />
            <dot>
-            <port name="pet_image"/>
+               <port name="results-directory" />
+                <port name="pet_image"/>
             </dot>
-          </cross>
         </iterationstrategy>
         <gasw descriptor="$tool.getGASWLFN()"/>
     </processor>
@@ -95,30 +96,33 @@
             <out name="$output.getId()" type="string" depth="0"/>
 #end
            <iterationstrategy>
-             <cross>
+             <dot>
                <port name="results-directory" />
-               
-                 <port name="segmented_image"/>
-                 <port name="reference_image"/>
-               
-             </cross>
+               <port name="segmented_image"/>
+               <port name="reference_image"/>
+             </dot>
         </iterationstrategy>
         <gasw descriptor="$metric.getGASWLFN()"/>
       </processor>
       <processor name="$adaptater.getName()" >
-          <in name="results-directory" type="string" depth="0" />
 #foreach($input in $adaptater.getInputs())
             <in name="$input.getId()" type="string" depth="0" />
 #end
+            <in name="results-directory" type="string" depth="0" />
 #foreach($output in $adaptater.getOutputFiles())
             <out name="$output.getId()" type="string" depth="0"/>
 #end
            <iterationstrategy>
           <cross>
 #foreach($input in $adaptater.getInputs())
+#if ($input.getId() != "json_file")
             <port name="$input.getId()"  />
 #end
-            <port name="results-directory" />
+#end
+            <dot>
+              <port name="json_file" />  
+              <port name="results-directory" />
+            </dot>
           </cross>
         </iterationstrategy>
         <gasw descriptor="$adaptater.getGASWLFN()"/>
@@ -138,29 +142,38 @@
         <in name="dir" type="string" depth="0" />
         <in name="image" type="string" depth="0" />
         <out name="result" type="string" depth="0" />
+        <iterationstrategy>
+          <cross>
+            <port name="image" />
+            <port name="dir" />
+          </cross>
+        </iterationstrategy>
         <beanshell>
                 String result = dir+"/"+(new File(image)).getName();
         </beanshell>
       </processor>
     <processor name="listSubjectDirectory" >
       <in name="in" type="string" depth="0" />
-      <out name="reference" type="string" depth="0" />
-      <out name="pet_image" type="string" depth="0" />
-      <out name="metadata" type="string" depth="0" />
+      <out name="fullPaths" type="string" depth="1" />
+      <out name="baseNames" type="string" depth="1" />
+      <out name="metadata" type="string" depth="1" />
+       <out name="pet_image" type="string" depth="1" />
+      <out name="reference" type="string" depth="1" />
       <beanshell>import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.common.bean.GridData;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.lang.String;
 
         fullPaths = new ArrayList();
         baseNames = new ArrayList();
        
-        metadata = null;
-        reference = null;
-        pet_image = null;
-        
+        pet_image = new ArrayList();
+        metadata = new ArrayList();
+        reference = new ArrayList();
+          String pet_name = new String("_PET");
+          String ref_name = new String("_GT");
             try {
                 String proxyPath = "/var/www/.vip/proxies/x509up_server";
                 GRIDAClient vc = new GRIDAClient("kingkong.grid.creatis.insa-lyon.fr", 9006, proxyPath);
@@ -174,37 +187,34 @@ import java.util.List;
                         fullPaths.add(fullPath);
                         baseNames.add(name);
                         if(name.equals("input.json")){
-                          if(metadata != null )
+                          if(!metadata.isEmpty() )
                             throw new  Exception("[ERROR] Found file input.json but metadata was already present "+"("+metadata+")");
-                          metadata=fullPath;
+                          metadata.add(fullPath);
                           continue;
                         }
-                        if(name.contains("GT.nii")){
-                          if(reference != null )
-                        throw new Exception("[ERROR] Found file reference.nii.gz but reference image was already present "+"("+reference+")");
-           System.out.println("[WARNING] GT file found in "+fullPath;);
-                        reference=fullPath;
+                        if(name.indexOf(pet_name) >0){
+                          if(!pet_image.isEmpty() )
+                        throw new Exception("[ERROR] Found file pet_image.nii.gz but reference image was already present "+"("+pet_image+")");
+                        pet_image.add(fullPath);
                         continue;
                         }
-                        if(name.contains("PET.nii")){
-                          if(pet_image != null )
-                            throw new Exception("[ERROR] Found file PET Image but image was already present "+"("+pet_image+")");
-          System.out.println("[WARNING] PET file found in "+fullPath;);
-                          pet_image=fullPath;
+                        if(name.indexOf(ref_name) >0){
+                          if(!reference.isEmpty() )
+                            throw new Exception("[ERROR] Found file reference.nii.gz but image was already present "+"("+reference+")");
+                          reference.add(fullPath);
                           continue;
                         }
-                        System.out.println("[WARNING] unknown file found in "+in+": "+name);
+                        System.out.println("[WARNING] unknown file found in "+in+": "+name+"   "+pet_name+"   "+ref_name);
                       }
                   }
                 } catch (GRIDAClientException ex) {
                   ex.printStackTrace();
                 }
-
-    if(pet_image == null)
-        throw new Exception("[ERROR] Couldn't find pet_image file in "+baseNames);
-    if(reference == null)
+    if(reference.isEmpty())
         throw new Exception("[ERROR] Couldn't find reference file in "+baseNames);
-    if(metadata == null)
+     if(pet_image.isEmpty())
+        throw new Exception("[ERROR] Couldn't find pet_image file in "+baseNames);
+    if(metadata.isEmpty())
         throw new Exception("[ERROR] Couldn't find metadata file in "+baseNames);
       </beanshell>
     </processor>
@@ -212,14 +222,16 @@ import java.util.List;
 </processors>
   <links>
     <link from="results-directory" to="appendDirAndImage:dir" />
-    <link from="listSubjectDirectory:image" to="appendDirAndImage:image" />
     <link from="appendDirAndImage:result" to="appendDate:dir" />
     <link from="appendDate:result" to="$tool.getName():results-directory" />
     <link from="appendDate:result" to="$adaptater.getName():results-directory" />
     <link from="appendDate:result" to="$metric.getName():results-directory" />
-    <link from="listSubjectDirectory:pet_image" to="$tool.getName():pet_image" />
     <link from="listSubjectDirectory:reference" to="$metric.getName():reference_image" />
     <link from="listSubjectDirectory:metadata" to="$adaptater.getName():json_file" />
+  <link from="listSubjectDirectory:pet_image" to="$tool.getName():pet_image" />
+    
+    
+    
 #foreach( $input in $tool.getInputs() )
 #if ($input.getId() != "pet_image")
     <link from="$input.getId()" to="$tool.getName():$input.getId()" />
